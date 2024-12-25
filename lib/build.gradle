@@ -1,15 +1,7 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2024.3.2"
-    id "jacoco"
+    id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-3"
 }
-
-// these four lines are for development builds
-// https://github.com/wpilibsuite/allwpilib/blob/main/DevelopmentBuilds.md
-// wpi.maven.useLocal = false
-// wpi.maven.useDevelopment = true
-// wpi.versions.wpilibVersion = '2025.+'
-// wpi.versions.wpimathVersion = '2025.+'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -41,6 +33,8 @@ deploy {
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
+                    deleteOldFiles = false // Change to true to delete files on roboRIO that no
+                                           // longer exist in deploy directory of this project
                 }
             }
         }
@@ -58,10 +52,9 @@ def includeDesktopSupport = true
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
-
+    annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-    implementation 'org.json:json:20231013'
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
@@ -77,24 +70,13 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-
-    // for test visualizations
-    testImplementation "org.jfree:jfreechart:1.5.3"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
-    finalizedBy jacocoTestReport
-}
-jacocoTestReport {
-    dependsOn test
-    reports {
-       csv.required = true
-    }
 }
 
 // Simulation configuration (e.g. environment variables).
