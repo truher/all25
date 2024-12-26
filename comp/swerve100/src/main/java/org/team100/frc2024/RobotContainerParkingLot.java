@@ -6,7 +6,6 @@ import java.util.function.BooleanSupplier;
 
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
-import org.team100.lib.commands.drivetrain.CommandMaker;
 import org.team100.lib.commands.drivetrain.DriveToState101;
 import org.team100.lib.commands.drivetrain.DriveToWaypoint100;
 import org.team100.lib.commands.drivetrain.FullStateTrajectoryListCommand;
@@ -48,9 +47,6 @@ import org.team100.lib.timing.TimingConstraint;
 import org.team100.lib.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.TrajectoryMaker;
 import org.team100.lib.visualization.TrajectoryVisualization;
-
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.RobotController;
@@ -138,11 +134,6 @@ public class RobotContainerParkingLot implements Glassy {
 
         m_driveInALittleSquare = new DriveInALittleSquare(m_drive);
         whileTrue(driverControl::never, m_driveInALittleSquare);
-
-        ///////////////////////
-        // trying the new ChoreoLib
-        ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory("test");
-        whileTrue(driverControl::never, CommandMaker.choreo(choreoTrajectory, m_drive, viz));
 
         ///////////////////////
 
