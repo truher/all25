@@ -146,11 +146,13 @@ class GeometryUtilTest {
     void testParallel() {
         assertTrue(GeometryUtil.isParallel(new Rotation2d(), new Rotation2d()));
         assertTrue(GeometryUtil.isParallel(new Rotation2d(), new Rotation2d(Math.PI)));
+        assertTrue(GeometryUtil.isParallel(new Rotation2d(), new Rotation2d(2 * Math.PI)));
+        assertTrue(GeometryUtil.isParallel(new Rotation2d(Math.PI / 2), new Rotation2d(3 * Math.PI / 2)));
+        assertFalse(GeometryUtil.isParallel(new Rotation2d(), new Rotation2d(1)));
     }
 
     @Test
     void testZforwardToXforward1() {
-
         // camera coordinates are x-right, y-down, z-forward
         // zero rotation.
         Rotation3d zforward = new Rotation3d();
@@ -266,4 +268,5 @@ class GeometryUtilTest {
         assertEquals(0, xforward.getY(), kDelta);
         assertEquals(-1, xforward.getZ(), kDelta);
     }
+
 }

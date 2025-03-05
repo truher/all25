@@ -313,16 +313,25 @@ class HolonomicSplineTest {
         HolonomicSpline s0 = new HolonomicSpline(
                 new HolonomicPose2d(new Translation2d(0, -1), Rotation2d.kZero, Rotation2d.kZero),
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kCCW_90deg),
-                1.2);
+                1.0);
+        // the curvature should be constant across the boundary
+        HolonomicSpline s1 = new HolonomicSpline(
+                new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kCCW_90deg),
+                new HolonomicPose2d(new Translation2d(0, 1), Rotation2d.kZero, Rotation2d.k180deg),
+                1.0);
         // for (double t = 0; t < 1; t += 0.03) {
         // Util.printf("%5.3f %5.3f\n", s0.x(t), s0.y(t));
         // }
 
-        List<HolonomicSpline> splines = List.of(s0);
-        List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05);
-        for (Pose2dWithMotion p : motion) {
-            Util.printf("%5.3f %5.3f\n", p.getTranslation().getX(), p.getTranslation().getY());
-        }
+        List<HolonomicSpline> splines = new ArrayList<>();
+        splines.add(s0);
+        splines.add(s1);
+        SplineUtil.optimizeSpline(splines);
+        List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.01, 0.01, 0.01);
+        // for (Pose2dWithMotion p : motion) {
+        // Util.printf("%5.3f %5.3f\n", p.getTranslation().getX(),
+        // p.getTranslation().getY());
+        // }
         Path100 path = new Path100(motion);
         // for (int i = 0; i < path.length(); ++i) {
         // Util.printf("%5.3f %5.3f\n",
@@ -342,6 +351,6 @@ class HolonomicSplineTest {
         // a = v^2/r so v = sqrt(ar) = 2.858
         Trajectory100 trajectory = scheduleGenerator.timeParameterizeTrajectory(path,
                 0.05, 2.858, 2.858);
-        // Util.printf("trajectory %s\n", trajectory);
+        Util.printf("trajectory %s\n", trajectory);
     }
 }

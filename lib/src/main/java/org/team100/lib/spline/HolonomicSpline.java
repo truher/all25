@@ -105,6 +105,10 @@ public class HolonomicSpline {
         m_theta = Spline1d.newSpline1d(0.0, delta, dtheta0, dtheta1, ddtheta0, ddtheta1);
     }
 
+    HolonomicSpline deepCopy() {
+        return new HolonomicSpline(m_x, m_y, m_theta, m_r0);
+    }
+
     @Override
     public String toString() {
         return "HolonomicSpline [m_x=" + m_x + ", m_y=" + m_y + ", m_theta=" + m_theta + ", m_r0=" + m_r0 + "]";
@@ -331,8 +335,13 @@ public class HolonomicSpline {
      * but the argument to this function *is* the parameter, p. :-)
      */
     protected double getCurvature(double t) {
+        double dx2dy2 = dx(t) * dx(t) + dy(t) * dy(t);
+        if (dx2dy2 < 1e-12) {
+            // zero velocity, curvature is ... zero?
+            return 0;
+        }
         return (dx(t) * ddy(t) - ddx(t) * dy(t))
-                / ((dx(t) * dx(t) + dy(t) * dy(t)) * Math.sqrt((dx(t) * dx(t) + dy(t) * dy(t))));
+                / (dx2dy2 * Math.sqrt(dx2dy2));
     }
 
     /**
@@ -341,16 +350,22 @@ public class HolonomicSpline {
      * If you want change in curvature per meter, use getDCurvatureDs.
      */
     protected double getDCurvature(double t) {
-        double dx2dy2 = (dx(t) * dx(t) + dy(t) * dy(t));
+        double dx2dy2 = dx(t) * dx(t) + dy(t) * dy(t);
+        if (dx2dy2 < 1e-12) {
+            // zero velocity, curvature is ... zero?
+            return 0;
+        }
         double num = (dx(t) * dddy(t) - dddx(t) * dy(t)) * dx2dy2
                 - 3 * (dx(t) * ddy(t) - ddx(t) * dy(t)) * (dx(t) * ddx(t) + dy(t) * ddy(t));
         return num / (dx2dy2 * dx2dy2 * Math.sqrt(dx2dy2));
     }
 
     private double dCurvature2(double t) {
-        double dx2dy2 = (dx(t) * dx(t) + dy(t) * dy(t));
-        if (dx2dy2 == 0)
-            throw new IllegalArgumentException();
+        double dx2dy2 = dx(t) * dx(t) + dy(t) * dy(t);
+        if (dx2dy2 < 1e-12) {
+            // zero velocity, curvature is ... zero?
+            return 0;
+        }
         double num = (dx(t) * dddy(t) - dddx(t) * dy(t)) * dx2dy2
                 - 3 * (dx(t) * ddy(t) - ddx(t) * dy(t)) * (dx(t) * ddx(t) + dy(t) * ddy(t));
         return num * num / (dx2dy2 * dx2dy2 * dx2dy2 * dx2dy2 * dx2dy2);

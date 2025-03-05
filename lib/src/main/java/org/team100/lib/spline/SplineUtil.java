@@ -1,21 +1,19 @@
 package org.team100.lib.spline;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /** Static utility methods for splines. */
 public class SplineUtil {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final double kEpsilon = 1e-5;
     private static final double kStepSize = 1.0;
-    private static final double kMinDelta = 0.001;
+    private static final double kMinDelta = 0.00000001;
     private static final int kMaxIterations = 100;
 
     /**
@@ -177,10 +175,25 @@ public class SplineUtil {
         int count = 0;
         double prev = sumDCurvature2(splines);
         while (count < kMaxIterations) {
+            if (DEBUG)
+                Util.printf("optimize %d\n", count);
+            if (DEBUG) {
+                for (HolonomicSpline s : splines) {
+                    Util.printf("%s\n", s);
+                }
+            }
+            // List<HolonomicSpline> maybeBetter = runOptimizationIteration(splines);
             runOptimizationIteration(splines);
             double current = sumDCurvature2(splines);
-            if (prev - current < kMinDelta)
+            if (DEBUG)
+                Util.printf("prev %5.3f curr %5.3f\n", prev, current);
+            if (prev - current < kMinDelta) {
+                // no longer improving quickly
+                if (DEBUG)
+                    Util.printf("done\n");
                 return current;
+            }
+
             prev = current;
             count++;
         }
@@ -196,28 +209,34 @@ public class SplineUtil {
         for (HolonomicSpline s : splines) {
             sum += s.sumDCurvature2();
         }
-        if (Double.isNaN(sum))
-            throw new IllegalArgumentException();
         return sum;
     }
 
     /**
      * Runs a single optimization iteration, using Newton's method.
      */
-    static void runOptimizationIteration(List<HolonomicSpline> splines) {
+    static List<HolonomicSpline> runOptimizationIteration(List<HolonomicSpline> splines) {
         // can't optimize anything with less than 2 splines
         if (splines.size() <= 1) {
             // Util.warn("runOptimizationIteration: nothing to optimize");
-            return;
+            return splines;
         }
+
+        // // mutate a copy
+        // List<HolonomicSpline> splines = new ArrayList<>();
+        // for (HolonomicSpline s : splines) {
+        //     splines.add(s.deepCopy());
+        // }
 
         ControlPoint[] controlPoints = new ControlPoint[splines.size() - 1];
 
         double magnitude = getControlPoints(splines, controlPoints);
+        // if (magnitude < 1e-6) {
+        // if (DEBUG) Util.printf("no curvature anywhere, nothing to do\n");
+        // return;
+        // }
 
         magnitude = Math.sqrt(magnitude);
-        if (Double.isNaN(magnitude))
-            throw new IllegalArgumentException();
 
         // minimize along the direction of the gradient
         // first calculate 3 points along the direction of the gradient
@@ -229,20 +248,21 @@ public class SplineUtil {
         for (int i = 0; i < splines.size() - 1; ++i) {
             backwards(splines, controlPoints, magnitude, i);
         }
+        Translation2d p1 = new Translation2d(-kStepSize, sumDCurvature2(splines));
 
         // last point is offset from the middle location by +stepSize
-        Translation2d p1 = new Translation2d(-kStepSize, sumDCurvature2(splines));
         for (int i = 0; i < splines.size() - 1; ++i) {
             forwards(splines, controlPoints, i);
         }
-
         Translation2d p3 = new Translation2d(kStepSize, sumDCurvature2(splines));
+
         // approximate step size to minimize sumDCurvature2 along the gradient
         double stepSize = fitParabola(p1, p2, p3);
 
         for (int i = 0; i < splines.size() - 1; ++i) {
             finish(splines, controlPoints, stepSize, i);
         }
+        return splines;
     }
 
     static void finish(
@@ -250,21 +270,22 @@ public class SplineUtil {
             ControlPoint[] controlPoints,
             double stepSize,
             int i) {
-        Optional<Pose2d> startPose = splines.get(i).getStartPose();
-        Optional<Pose2d> startPose2 = splines.get(i + 1).getStartPose();
-        Optional<Pose2d> endPose = splines.get(i).getEndPose();
-        Optional<Pose2d> endPose2 = splines.get(i + 1).getEndPose();
-        if (startPose.isEmpty() || startPose2.isEmpty() || endPose.isEmpty() || endPose2.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        if (GeometryUtil.isColinear(startPose.get(), startPose2.get())
-                || GeometryUtil.isColinear(endPose.get(), endPose2.get())) {
-            return;
-        }
+        // Optional<Pose2d> startPose = splines.get(i).getStartPose();
+        // Optional<Pose2d> startPose2 = splines.get(i + 1).getStartPose();
+        // Optional<Pose2d> endPose = splines.get(i).getEndPose();
+        // Optional<Pose2d> endPose2 = splines.get(i + 1).getEndPose();
+        // if (startPose.isEmpty() || startPose2.isEmpty() || endPose.isEmpty() ||
+        // endPose2.isEmpty()) {
+        // throw new IllegalArgumentException();
+        // }
+        // if (GeometryUtil.isColinear(startPose.get(), startPose2.get())
+        // || GeometryUtil.isColinear(endPose.get(), endPose2.get())) {
+        // return;
+        // }
 
         // why would this happen?
-        if (controlPoints[i] == null)
-            return;
+        // if (controlPoints[i] == null)
+        // return;
 
         // move by the step size calculated by the parabola fit (+1 to offset for the
         // final transformation to find p3)
@@ -277,21 +298,22 @@ public class SplineUtil {
     }
 
     static void forwards(List<HolonomicSpline> splines, ControlPoint[] controlPoints, int i) {
-        Optional<Pose2d> startPose = splines.get(i).getStartPose();
-        Optional<Pose2d> startPose2 = splines.get(i + 1).getStartPose();
-        Optional<Pose2d> endPose = splines.get(i).getEndPose();
-        Optional<Pose2d> endPose2 = splines.get(i + 1).getEndPose();
-        if (startPose.isEmpty() || startPose2.isEmpty() || endPose.isEmpty() || endPose2.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        if (GeometryUtil.isColinear(startPose.get(), startPose2.get())
-                || GeometryUtil.isColinear(endPose.get(), endPose2.get())) {
-            return;
-        }
+        // Optional<Pose2d> startPose = splines.get(i).getStartPose();
+        // Optional<Pose2d> startPose2 = splines.get(i + 1).getStartPose();
+        // Optional<Pose2d> endPose = splines.get(i).getEndPose();
+        // Optional<Pose2d> endPose2 = splines.get(i + 1).getEndPose();
+        // if (startPose.isEmpty() || startPose2.isEmpty() || endPose.isEmpty() ||
+        // endPose2.isEmpty()) {
+        // throw new IllegalArgumentException();
+        // }
+        // if (GeometryUtil.isColinear(startPose.get(), startPose2.get())
+        // || GeometryUtil.isColinear(endPose.get(), endPose2.get())) {
+        // return;
+        // }
 
         // why would this happen?
-        if (controlPoints[i] == null)
-            return;
+        // if (controlPoints[i] == null)
+        // return;
 
         // move along the gradient by 2 times the step size amount (to return to
         // original location and move by 1 step)
@@ -306,21 +328,22 @@ public class SplineUtil {
             ControlPoint[] controlPoints,
             double magnitude,
             int i) {
-        Optional<Pose2d> startPose = splines.get(i).getStartPose();
-        Optional<Pose2d> startPose2 = splines.get(i + 1).getStartPose();
-        Optional<Pose2d> endPose = splines.get(i).getEndPose();
-        Optional<Pose2d> endPose2 = splines.get(i + 1).getEndPose();
-        if (startPose.isEmpty() || startPose2.isEmpty() || endPose.isEmpty() || endPose2.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        if (GeometryUtil.isColinear(startPose.get(), startPose2.get())
-                || GeometryUtil.isColinear(endPose.get(), endPose2.get())) {
-            return;
-        }
+        // Optional<Pose2d> startPose = splines.get(i).getStartPose();
+        // Optional<Pose2d> startPose2 = splines.get(i + 1).getStartPose();
+        // Optional<Pose2d> endPose = splines.get(i).getEndPose();
+        // Optional<Pose2d> endPose2 = splines.get(i + 1).getEndPose();
+        // if (startPose.isEmpty() || startPose2.isEmpty() || endPose.isEmpty() ||
+        // endPose2.isEmpty()) {
+        // throw new IllegalArgumentException();
+        // }
+        // if (GeometryUtil.isColinear(startPose.get(), startPose2.get())
+        // || GeometryUtil.isColinear(endPose.get(), endPose2.get())) {
+        // return;
+        // }
 
         // why would this happen?
-        if (controlPoints[i] == null)
-            return;
+        // if (controlPoints[i] == null)
+        // return;
 
         // normalize to step size
         controlPoints[i].ddx *= kStepSize / magnitude;
@@ -345,30 +368,39 @@ public class SplineUtil {
         double magnitude = 0;
         for (int i = 0; i < splines.size() - 1; ++i) {
             // don't try to optimize colinear points
-            Optional<Pose2d> startPose = splines.get(i).getStartPose();
-            Optional<Pose2d> startPose2 = splines.get(i + 1).getStartPose();
-            Optional<Pose2d> endPose = splines.get(i).getEndPose();
-            Optional<Pose2d> endPose2 = splines.get(i + 1).getEndPose();
-            if (startPose.isEmpty() || startPose2.isEmpty() || endPose.isEmpty() || endPose2.isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-            if (GeometryUtil.isColinear(startPose.get(), startPose2.get())
-                    || GeometryUtil.isColinear(endPose.get(), endPose2.get())) {
-                continue;
-            }
+            // Optional<Pose2d> startPose = splines.get(i).getStartPose();
+            // Optional<Pose2d> startPose2 = splines.get(i + 1).getStartPose();
+            // Optional<Pose2d> endPose = splines.get(i).getEndPose();
+            // Optional<Pose2d> endPose2 = splines.get(i + 1).getEndPose();
+            // if (startPose.isEmpty() || startPose2.isEmpty() || endPose.isEmpty() ||
+            // endPose2.isEmpty()) {
+            // throw new IllegalArgumentException();
+            // }
+            // if (GeometryUtil.isColinear(startPose.get(), startPose2.get())
+            // || GeometryUtil.isColinear(endPose.get(), endPose2.get())) {
+            // continue;
+            // }
             double original = sumDCurvature2(splines);
 
             // holds the gradient at a control point
             controlPoints[i] = new ControlPoint();
 
-            // calculate partial derivatives of sumDCurvature2
-            splines.set(i, splines.get(i).addToSecondDerivatives(0, kEpsilon, 0, 0));
-            splines.set(i + 1, splines.get(i + 1).addToSecondDerivatives(kEpsilon, 0, 0, 0));
-            controlPoints[i].ddx = (sumDCurvature2(splines) - original) / kEpsilon;
+            HolonomicSpline temp = splines.get(i);
+            HolonomicSpline temp1 = splines.get(i + 1);
 
-            splines.set(i, splines.get(i).addToSecondDerivatives(0, 0, 0, kEpsilon));
-            splines.set(i + 1, splines.get(i + 1).addToSecondDerivatives(0, 0, kEpsilon, 0));
-            controlPoints[i].ddy = (sumDCurvature2(splines) - original) / kEpsilon;
+            // calculate partial derivatives of sumDCurvature2
+            splines.set(i, temp.addToSecondDerivatives(0, kEpsilon, 0, 0));
+            splines.set(i + 1, temp1.addToSecondDerivatives(kEpsilon, 0, 0, 0));
+            double dx = sumDCurvature2(splines);
+            controlPoints[i].ddx = (dx - original) / kEpsilon;
+
+            splines.set(i, temp.addToSecondDerivatives(0, 0, 0, kEpsilon));
+            splines.set(i + 1, temp1.addToSecondDerivatives(0, 0, kEpsilon, 0));
+            double dy = sumDCurvature2(splines);
+            controlPoints[i].ddy = (dy - original) / kEpsilon;
+
+            splines.set(i, temp);
+            splines.set(i + 1, temp1);
 
             magnitude += controlPoints[i].ddx * controlPoints[i].ddx + controlPoints[i].ddy * controlPoints[i].ddy;
         }

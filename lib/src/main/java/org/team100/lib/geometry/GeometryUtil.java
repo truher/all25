@@ -103,17 +103,8 @@ public class GeometryUtil {
         return fromRadians(Math.toRadians(angle_degrees));
     }
 
-    public static double WrapRadians(double radians) {
-        final double k2Pi = 2.0 * Math.PI;
-        radians = radians % k2Pi;
-        radians = (radians + k2Pi) % k2Pi;
-        if (radians > Math.PI)
-            radians -= k2Pi;
-        return radians;
-    }
-
     /**
-     * Rotations must be identical, translation is allowed along the rotational
+     * Rotations must be parallel, translation is allowed along the rotational
      * direction but not any other direction.
      */
     public static boolean isColinear(Pose2d a, final Pose2d other) {
@@ -124,10 +115,9 @@ public class GeometryUtil {
                 && Math.abs(twist.dtheta - 0.0) <= 1e-12);
     }
 
-    // note parallel also means antiparallel.
+    /** Parallel also means antiparallel. */
     public static boolean isParallel(Rotation2d a, Rotation2d b) {
-        return Math.abs(a.getRadians() - b.getRadians()) <= 1e-12
-                || Math.abs(a.getRadians() - WrapRadians(b.getRadians() + Math.PI)) <= 1e-12;
+        return Math.abs(MathUtil.inputModulus(a.getRadians() - b.getRadians(), -Math.PI / 2, Math.PI / 2)) < 1e-12;
     }
 
     /**
