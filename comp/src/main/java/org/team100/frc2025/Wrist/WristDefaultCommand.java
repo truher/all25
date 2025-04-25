@@ -12,9 +12,6 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class WristDefaultCommand extends Command implements Glassy {
-    private final double kPositionTolerance = 0.02;
-    private final double kVelocityTolerance = 0.01;
-
     private final StringLogger m_log_activity;
     private final Elevator m_elevator;
     private final Wrist2 m_wrist;
@@ -22,8 +19,8 @@ public class WristDefaultCommand extends Command implements Glassy {
     private final AlgaeGrip m_grip;
     private final SwerveDriveSubsystem m_drive;
 
-    private double count = 0;
-    private boolean docked = false;
+    // private double count = 0;
+    // private boolean docked = false;
     private double m_holdPosition;
     private final DoubleLogger m_log_holdPosition;
 
@@ -46,8 +43,8 @@ public class WristDefaultCommand extends Command implements Glassy {
         // this sets the setpoint position to the current measurement,
         // and sets the setpoint velocity to zero.
         m_wrist.resetWristProfile();
-        count = 0;
-        docked = false;
+        // count = 0;
+        // docked = false;
         m_holdPosition = m_wrist.getAngle();
     }
 
@@ -63,7 +60,9 @@ public class WristDefaultCommand extends Command implements Glassy {
             return;
         }
 
-        m_holdPosition = m_wrist.getAngle();
+        
+
+
 
         // if (distanceToReef > 1.6) {
         if (!m_grip.hasAlgae()) {
@@ -84,35 +83,41 @@ public class WristDefaultCommand extends Command implements Glassy {
             } else if (m_elevator.getPosition() > 2 && m_elevator.getPosition() < 17.5) {
                 // System.out.println("IM WITHIN THE FIRST STAGE");
 
-                m_wrist.setAngleValue(0.5);
-
-                if (m_wrist.getAngle() < 0.5 - deadband) {
-                    m_wrist.setSafeCondition(false);
-                    // m_wrist.setAngleValue(0.5);
-                } else if (m_wrist.getAngle() > 0.5 - deadband && m_wrist.getAngle() < 1.78 + deadband) {
-                    m_wrist.setSafeCondition(true);
-                    // m_wrist.setAngleValue(0.5);
-                } else if (m_wrist.getAngle() > 1.78) {
-                    m_wrist.setSafeCondition(false);
-                    // m_wrist.setAngleValue(0.5);
+                    m_wrist.setAngleValue(0.5);
+                    
+                    if (m_wrist.getAngle() < 0.5 - deadband) {
+                        m_wrist.setSafeCondition(false);
+                        // m_wrist.setAngleValue(0.5);
+                    } else if (m_wrist.getAngle() > 0.5 - deadband && m_wrist.getAngle() < 1.78 + deadband) {
+                        m_wrist.setSafeCondition(true);
+                        // m_wrist.setAngleValue(0.5);
+                    } else if (m_wrist.getAngle() > 1.78) {
+                        m_wrist.setSafeCondition(false);
+                        // m_wrist.setAngleValue(0.5);
+                    }
+                } else {
+                    // System.out.println("IM GOING IN");
+                    if (m_elevator.getSafeCondition()) {
+                        m_wrist.setSafeCondition(true);
+                        m_wrist.setAngleValue(0.1);
+                    } else {
+                        m_wrist.setAngleValue(m_holdPosition);
+                        return;
+                    }
                 }
             } else {
-                // System.out.println("IM GOING IN");
-                if (m_elevator.getSafeCondition()) {
-                    m_wrist.setSafeCondition(true);
-                    m_wrist.setAngleValue(0.1);
-                }
-            }
-        } else {
-            m_log_activity.log(() -> "has algae");
-            m_wrist.setAngleValue(3.7);
+                m_log_activity.log(() -> "has algae");
+                m_wrist.setAngleValue(3.7);
 
             double error = Math.abs(m_wrist.getAngle() - 3.7);
 
-            if (error < 0.1) {
-                m_wrist.setSafeCondition(true);
+                if (error < 0.1) {
+                    m_wrist.setSafeCondition(true);
+                }
             }
-        }
+
+            m_holdPosition = m_wrist.getAngle();
+
         // } else {
         // m_log_activity.log(() -> "far away");
         // // m_wrist.stop();

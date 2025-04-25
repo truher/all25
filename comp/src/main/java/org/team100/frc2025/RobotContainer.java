@@ -40,7 +40,6 @@ import org.team100.lib.commands.drivetrain.ResetPose;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManually;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
-import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
 import org.team100.lib.commands.drivetrain.manual.ManualChassisSpeeds;
 import org.team100.lib.commands.drivetrain.manual.ManualFieldRelativeSpeeds;
 import org.team100.lib.commands.drivetrain.manual.ManualWithBargeAssist;
@@ -85,7 +84,6 @@ import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.sensors.Gyro;
 import org.team100.lib.sensors.GyroFactory;
-import org.team100.lib.timing.ConstantConstraint;
 import org.team100.lib.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.util.Takt;
@@ -106,7 +104,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * don't need right now, cut and paste it into {@link RobotContainerParkingLot}.
  */
 // for background on drive current limits:
-public class RobotContainer implements Glassy{
+public class RobotContainer implements Glassy {
     // https://v6.docs.ctr-electronics.com/en/stable/docs/hardware-reference/talonfx/improving-performance-with-current-limits.html
     // https://www.chiefdelphi.com/t/the-brushless-era-needs-sensible-default-current-limits/461056/51
     // https://docs.google.com/document/d/10uXdmu62AFxyolmwtDY8_9UNnci7eVcev4Y64ZS0Aqk
@@ -176,13 +174,9 @@ public class RobotContainer implements Glassy{
             m_funnel = new Funnel(logger, 23, 14);
             m_grip = new AlgaeGrip(logger, m_tunnel);
             m_climber = new Climber(logger, 15);
-            // TODO: calibrate the elevator and use it here.
-            // swerveKinodynamics = SwerveKinodynamicsFactory
-            // .get(() -> VCG.vcg(m_elevator.getPosition()));
-            m_swerveKinodynamics = SwerveKinodynamicsFactory.get(() -> 0.5);
+            m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         } else {
-            m_swerveKinodynamics = SwerveKinodynamicsFactory
-                    .get(() -> 1);
+            m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
             m_tunnel = new CoralTunnel(elevatorLog, 3, 25);
             m_grip = new AlgaeGrip(logger, m_tunnel);
             m_elevator = new Elevator(elevatorLog, 2, 19);
@@ -195,8 +189,6 @@ public class RobotContainer implements Glassy{
 
         m_test = new Coordinated(m_elevator, m_wrist);
 
-        final TrajectoryPlanner planner = new TrajectoryPlanner(
-                List.of(new ConstantConstraint(1, 0.5, m_swerveKinodynamics)));
         m_modules = SwerveModuleCollection.get(
                 driveLog,
                 kDriveCurrentLimit,
@@ -223,7 +215,6 @@ public class RobotContainer implements Glassy{
                 layout,
                 poseEstimator);
 
-        m_leds = new LEDIndicator(0, visionDataProvider::getPoseAgeSec);
 
         final SwerveLocal swerveLocal = new SwerveLocal(
                 driveLog,
@@ -240,6 +231,8 @@ public class RobotContainer implements Glassy{
                 swerveLocal,
                 visionDataProvider::update,
                 limiter);
+        
+        m_leds = new LEDIndicator(0, visionDataProvider::getPoseAgeSec); 
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -323,22 +316,23 @@ public class RobotContainer implements Glassy{
                         m_swerveKinodynamics,
                         driverControl::useReefLock,
                         thetaFeedback,
-                        m_drive));
+                        m_drive,
+                        buttons::red1));
 
         // DEFAULT COMMANDS
         // m_drive.setDefaultCommand(driveManually);
 
-        FieldRelativeDriver driver = new ManualWithProfiledHeading(
-                manLog,
-                m_swerveKinodynamics,
-                driverControl::desiredRotation,
-                thetaFeedback);
+        // FieldRelativeDriver driver = new ManualWithProfiledHeading(
+        // manLog,
+        // m_swerveKinodynamics,
+        // driverControl::desiredRotation,
+        // thetaFeedback);
 
         DriveManuallySimple driveDefault = new DriveManuallySimple(
                 driverControl::velocity,
                 m_drive,
                 new ManualWithProfiledReefLock(manLog, m_swerveKinodynamics, driverControl::useReefLock, thetaFeedback,
-                        m_drive),
+                        m_drive, buttons::red1),
                 new ManualWithBargeAssist(manLog, m_swerveKinodynamics, driverControl::desiredRotation, thetaFeedback,
                         m_drive),
                 driverControl::driveWithBargeAssist);
@@ -381,7 +375,7 @@ public class RobotContainer implements Glassy{
         whileTrue(driverControl::feedFunnel,
                 new RunFunnelHandoff(comLog, m_elevator, m_wrist, m_funnel, m_tunnel, m_grip));
         whileTrue(driverControl::climb,
-                new ParallelCommandGroup(new SetClimber(m_climber, 0.6), new DriveForwardSlowly(m_drive)));
+                new ParallelCommandGroup(new SetClimber(m_climber, 0.53), new DriveForwardSlowly(m_drive)));
 
         // whileTrue(driverControl::driveToTag,
         // new Coral2AutoLeftNewNew(logger, m_wrist, m_elevator, m_funnel, m_tunnel,
@@ -468,7 +462,7 @@ public class RobotContainer implements Glassy{
         whileTrue(buttons::ij, new GrabAlgaeL3Dumb(comLog, m_wrist, m_elevator, m_grip));
         whileTrue(buttons::kl, new GrabAlgaeL2Dumb(comLog, m_wrist, m_elevator, m_grip));
 
-        whileTrue(buttons::red1, new RunFunnelHandoff(comLog, m_elevator, m_wrist, m_funnel, m_tunnel, m_grip));
+        // whileTrue(buttons::red1, new RunFunnelHandoff(comLog, m_elevator, m_wrist, m_funnel, m_tunnel, m_grip));
         whileTrue(buttons::red2, new AlgaeOuttakeGroup(comLog, m_grip, m_wrist, m_elevator));
         whileTrue(buttons::red3, new ScoreBargeSmart(m_elevator, m_wrist, m_grip,
                 buttons::red4));
@@ -541,6 +535,8 @@ public class RobotContainer implements Glassy{
     public void onInit() {
         // m_drive.resetPose()
         m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(Math.PI)));
+
+        m_auton.initialize();
 
     }
 
