@@ -6,7 +6,10 @@ import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -14,7 +17,10 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.spline.PoseWithCurvature;
 
 /**
@@ -79,8 +85,12 @@ public class GeometryUtil {
         return new Pose2d(a.getTranslation().unaryMinus().rotateBy(rotation_inverted), rotation_inverted);
     }
 
-    public static Twist2d slog(final Pose2d transform) {
-        return Pose2d.kZero.log(transform);
+    public static Twist2d slog(final Pose2d p) {
+        return Pose2d.kZero.log(p);
+    }
+
+    public static Twist3d slog(final Pose3d p) {
+        return Pose3d.kZero.log(p);
     }
 
     public static Pose2d sexp(final Twist2d delta) {
@@ -139,6 +149,11 @@ public class GeometryUtil {
         if (a.dy == 0.0)
             return Math.abs(a.dx);
         return Math.hypot(a.dx, a.dy);
+    }
+
+    public static double norm(Twist3d t) {
+        Vector<N6> v = VecBuilder.fill(t.dx, t.dy, t.dz, t.rx, t.ry, t.rz);
+        return v.norm();
     }
 
     public static double norm(ChassisSpeeds a) {
@@ -283,6 +298,13 @@ public class GeometryUtil {
         Quaternion q = zforward.getQuaternion();
         Quaternion q2 = new Quaternion(q.getW(), q.getZ(), -q.getX(), -q.getY());
         return new Rotation3d(q2);
+    }
 
+    public static Vector<N3> toVec(Twist2d twist) {
+        return VecBuilder.fill(twist.dx, twist.dy, twist.dtheta);
+    }
+
+    public static Vector<N6> toVec(Twist3d twist) {
+        return VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz);
     }
 }
