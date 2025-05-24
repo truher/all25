@@ -7,9 +7,13 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N5;
 
 public class URDFUtilTest {
     @Test
@@ -226,7 +230,9 @@ public class URDFUtilTest {
         // far from the solution.
         URDFModel.Robot m = URDFAL5D.ROBOT;
         Pose3d end = new Pose3d(0.15, 0.0, 0.1, new Rotation3d(0, 0, 0));
-        Map<String, Double> qMap = URDFUtil.inverse(m, "center_point", end);
+        Vector<N5> q0 = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1);
+        Map<String, Double> qMap = URDFUtil.inverse(
+                m, Nat.N5(), q0, "center_point", end);
         assertEquals(5, qMap.size());
         assertEquals(0, qMap.get("base_pan"), 1e-3);
         assertEquals(-2.522, qMap.get("shoulder_tilt"), 1e-3);

@@ -68,8 +68,10 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             Vector<Y> y = m_f.apply(x);
             Vector<Y> error = goal.minus(y);
             // using dot instead of norm saves the sqrt.
-            if (error.dot(error) < m_toleranceSq)
+            if (error.dot(error) < m_toleranceSq) {
+                // System.out.printf("iterations %d\n", i);
                 return x;
+            }
             Matrix<Y, X> j = NumericalJacobian100.numericalJacobian2(m_xdim, m_ydim, m_f, x);
             // System.out.printf("J %s\n", j);
             Vector<X> dx = new Vector<>(j.solve(error));

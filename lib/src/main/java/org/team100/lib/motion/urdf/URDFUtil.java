@@ -26,15 +26,17 @@ public class URDFUtil {
     /**
      * All joint configurations.
      * TODO: add initial/current starting point.
+     * 
+     * qDim indicates the dimensionality of the configuration space.
+     * q0 is the initial (e.g. current) configuration.
      */
-    public static Map<String, Double> inverse(
+    public static <Q extends Num> Map<String, Double> inverse(
             URDFModel.Robot robot,
+            Nat<Q> qDim,
+            Vector<Q> q0,
             String jointName,
             Pose3d goal) {
-        // there are 6 joints but one is "fixed"
-        Nat<N5> configDim = Nat.N5();
-        Nat<N6> twistDim = Nat.N6();
-        Function<Vector<N5>, Vector<N6>> f = q -> {
+        Function<Vector<Q>, Vector<N6>> f = q -> {
             // print("q", q);
             // solve all of them
             Map<String, Double> qMap = qMap(robot, q);
@@ -46,15 +48,17 @@ public class URDFUtil {
             // print("pv", pv);
             return pv;
         };
-        NewtonsMethod<N5, N6> solver = new NewtonsMethod<>(configDim, twistDim, f, 1e-3, 20);
-        // TODO: replace this
-        Vector<N5> q0 = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1);
+        // this function always uses pose3d so the goal dim is always N6.
+        Nat<N6> twistDim = Nat.N6();
         Vector<N6> goalVec = GeometryUtil.toVec(GeometryUtil.slog(goal));
-        Vector<N5> q = solver.solve2(q0, goalVec);
+        NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
+            qDim, twistDim, f, 1e-3, 20);
+        Vector<Q> q = solver.solve2(q0, goalVec);
         return qMap(robot, q);
     }
 
-    static <Q extends Num> Map<String, Double> qMap(URDFModel.Robot robot, Vector<Q> q) {
+    /** Transform the config vector, q, into a named map. */
+    static Map<String, Double> qMap(URDFModel.Robot robot, Vector<?> q) {
         Map<String, Double> qMap = new HashMap<>();
         List<URDFModel.Joint> joints = robot.joints();
         for (int i = 0; i < joints.size(); ++i) {
@@ -72,10 +76,10 @@ public class URDFUtil {
     /** All joint poses. */
     public static Map<String, Pose3d> forward(
             URDFModel.Robot robot,
-            Map<String, Double> q) {
+            Map<String, Double> qMap) {
         Map<String, Pose3d> poses = new HashMap<>();
         for (URDFModel.Joint joint : robot.joints()) {
-            forward(robot, poses, joint.name(), q);
+            forward(robot, poses, joint.name(), qMap);
         }
         return poses;
     }
@@ -88,9 +92,9 @@ public class URDFUtil {
             URDFModel.Robot robot,
             Map<String, Pose3d> poses,
             String jointName,
-            Map<String, Double> q) {
+            Map<String, Double> qMap) {
         URDFModel.Joint joint = getJoint(robot, jointName);
-        Transform3d t = jointTransform(joint, q.get(jointName));
+        Transform3d t = jointTransform(joint, qMap.get(jointName));
         URDFModel.Joint parent = parentJoint(robot, jointName);
         if (parent == null) {
             // this is the root
@@ -104,7 +108,8 @@ public class URDFUtil {
             poses.put(jointName, newPose);
             return newPose;
         }
-        Pose3d newParentPose = forward(robot, poses, parent.name(), q);
+        // if the parent hasn't been computed yet, recurse to do it.
+        Pose3d newParentPose = forward(robot, poses, parent.name(), qMap);
         Pose3d newNewPose = newParentPose.transformBy(t);
         poses.put(jointName, newNewPose);
         return newNewPose;
