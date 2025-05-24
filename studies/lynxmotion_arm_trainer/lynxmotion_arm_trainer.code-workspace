@@ -49,6 +49,7 @@
         "editor.minimap.enabled": false,
         "editor.inlayHints.enabled": "off",
         "workbench.editor.revealIfOpen": true,
-        "editor.parameterHints.enabled": false
+        "editor.parameterHints.enabled": false,
+        "terminal.integrated.scrollback": 2000
 	}
 }

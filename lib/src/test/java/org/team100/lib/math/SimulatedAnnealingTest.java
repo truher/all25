@@ -20,6 +20,7 @@ import edu.wpi.first.math.optimization.SimulatedAnnealing;
  * See TernarySearchTest.java.
  */
 public class SimulatedAnnealingTest {
+    private static final boolean DEBUG = false;
 
     @Test
     void testUnimodal() {
@@ -46,7 +47,9 @@ public class SimulatedAnnealingTest {
         }
         long finishTime = System.currentTimeMillis();
 
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 }

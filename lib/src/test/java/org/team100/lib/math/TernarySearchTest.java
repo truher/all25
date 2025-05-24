@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.numbers.N3;
 
 public class TernarySearchTest {
+    private static final boolean DEBUG = false;
 
     /** This function has only one minimum, so we find it. */
     @Test
@@ -60,9 +61,11 @@ public class TernarySearchTest {
         }
         long finishTime = System.currentTimeMillis();
 
-        Util.println("Ternary search over quadratic");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Ternary search over quadratic");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
     /**
@@ -101,9 +104,11 @@ public class TernarySearchTest {
         }
         long finishTime = System.currentTimeMillis();
 
-        Util.println("Ternary search over tangent norm");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Ternary search over tangent norm");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
     /**
@@ -113,7 +118,7 @@ public class TernarySearchTest {
      * metric.
      * 
      * Below we implement the simplest one, which it calls $\Phi_4$, the dot product
-     * of quaternions.  It's about 3X faster than the natural metric.
+     * of quaternions. It's about 3X faster than the natural metric.
      */
     @Test
     void testFasterPose() {
@@ -156,9 +161,10 @@ public class TernarySearchTest {
         }
         long finishTime = System.currentTimeMillis();
 
-        Util.println("Ternary search over quaternion dot product");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Ternary search over quaternion dot product");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
-
 }

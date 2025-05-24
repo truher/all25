@@ -2,7 +2,6 @@ package org.team100.lib.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
@@ -21,6 +20,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 
 public class GradientDescentTest {
+    private static final boolean DEBUG = false;
+
     @Test
     void test1() {
         Function<Vector<N2>, Double> f = x -> Math.pow(x.normF(), 2);
@@ -43,9 +44,11 @@ public class GradientDescentTest {
             s.solve(x);
         }
         long finishTime = System.currentTimeMillis();
-        Util.println("Gradient descent over quadratic");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Gradient descent over quadratic");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
     /** 14 us per solve */
@@ -61,9 +64,11 @@ public class GradientDescentTest {
             s.solve(x);
         }
         long finishTime = System.currentTimeMillis();
-        Util.println("Gradient descent over quadratic");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Gradient descent over quadratic");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
     @Test
@@ -100,9 +105,11 @@ public class GradientDescentTest {
         }
         long finishTime = System.currentTimeMillis();
 
-        Util.println("Gradient descent over tangent norm");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Gradient descent over tangent norm");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
 }

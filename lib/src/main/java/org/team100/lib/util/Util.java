@@ -1,5 +1,9 @@
 package org.team100.lib.util;
 
+import edu.wpi.first.math.Num;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose3d;
+
 public class Util {
 
     public static boolean all(boolean[] x) {
@@ -17,6 +21,20 @@ public class Util {
 
     public static void printf(String s, Object... args) {
         System.out.printf(s, args);
+    }
+
+    static void print(Pose3d p) {
+        System.out.printf("x %6.3f y %6.3f z %6.3f r %6.3f p %6.3f y %6.3f\n",
+                p.getX(), p.getY(), p.getZ(),
+                p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
+    }
+
+    static <R extends Num> void print(String name, Vector<R> v) {
+        System.out.printf("%s ", name);
+        for (int i = 0; i < v.getNumRows(); ++i) {
+            System.out.printf("%6.3f ", v.get(i));
+        }
+        System.out.println();
     }
 
     /**

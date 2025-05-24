@@ -22,7 +22,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
  * find that easier to remember.
  * 
  * I changed the joint zeros so that the "arm zero" is the same as the
- * rotation3d zero axis, i.e. +x.
+ * rotation3d zero axis, i.e. +x, and I changed the limits to match.
  */
 public class URDFAL5D {
     public static final Robot ROBOT;
@@ -48,7 +48,7 @@ public class URDFAL5D {
                         new Joint(
                                 "base_pan",
                                 JointType.revolute,
-                                new Limit(1000, 0, 3.14, 0.5),
+                                new Limit(1000, -Math.PI/2, Math.PI, 0.5),
                                 base_link,
                                 base_pan_link,
                                 // rot z zero used to be -pi/2
@@ -57,7 +57,7 @@ public class URDFAL5D {
                         new Joint(
                                 "shoulder_tilt",
                                 JointType.revolute,
-                                new Limit(1000.0, 0.17, 2.97, 0.5),
+                                new Limit(1000.0, -Math.PI, 0, 0.5),
                                 base_pan_link,
                                 upper_arm_link,
                                 new Pose3d(),
@@ -66,7 +66,7 @@ public class URDFAL5D {
                         new Joint(
                                 "elbow_tilt",
                                 JointType.revolute,
-                                new Limit(1000.0, 0.52, 3.14, 0.5),
+                                new Limit(1000.0, 0.0, Math.PI, 0.5),
                                 upper_arm_link,
                                 lower_arm_link,
                                 // rot y zero used to be pi
@@ -76,7 +76,7 @@ public class URDFAL5D {
                         new Joint(
                                 "wrist_tilt",
                                 JointType.revolute,
-                                new Limit(1000.0, 0.0, 3.14, 0.5),
+                                new Limit(1000.0, -Math.PI/2, Math.PI/2, 0.5),
                                 lower_arm_link,
                                 link3,
                                 // rot y zero used to be pi/2
@@ -86,7 +86,7 @@ public class URDFAL5D {
                         new Joint(
                                 "wrist_rotate",
                                 JointType.revolute,
-                                new Limit(1000.0, 0.0, 3.14, 0.5),
+                                new Limit(1000.0, -Math.PI/2, Math.PI/2, 0.5),
                                 link3,
                                 gripper,
                                 // rot x zero used to be -pi/2

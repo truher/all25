@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class LynxArmKinematics {
+    private static final boolean DEBUG = false;
+
     /**
      * Each joint is relative to its parent link, in radians.
      * 
@@ -35,7 +37,8 @@ public class LynxArmKinematics {
 
         public Transform3d swingT() {
             if (swing.isEmpty()) {
-                System.out.println("empty swing");
+                if (DEBUG)
+                    System.out.println("empty swing");
                 return Transform3d.kZero;
             }
             return yaw(swing.getAsDouble());
@@ -55,7 +58,7 @@ public class LynxArmKinematics {
 
         public Transform3d twistT() {
             if (twist.isEmpty()) {
-                System.out.println("empty twist");
+                if (DEBUG) System.out.println("empty twist");
                 return Transform3d.kZero;
             }
             return roll(twist.getAsDouble());
@@ -150,7 +153,7 @@ public class LynxArmKinematics {
      * https://docs.google.com/document/d/1B6vGPtBtnDSOpfzwHBflI8-nn98W9QvmrX78bon8Ajw
      */
     public LynxArmConfig inverse(final Pose3d end) {
-        
+
         final OptionalDouble swing;
         final double boom;
         final double stick;
@@ -239,7 +242,7 @@ public class LynxArmKinematics {
                     // String.format("end rotation %s not equal to swing %s",
                     // endRotation2d, swingAngle));
                     // System.out.printf("end rotation %s not equal to swing %s for goal %s\n",
-                    //         endRotation2d, swingAngle, poseStr(end));
+                    // endRotation2d, swingAngle, poseStr(end));
                 }
             }
         }

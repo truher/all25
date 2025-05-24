@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N3;
 
 public class URDFCartesianTest {
+    private static final boolean DEBUG = false;
 
     @Test
     void testFwd() {
@@ -23,7 +24,7 @@ public class URDFCartesianTest {
                 "base_gantry", 0.0,
                 "gantry_head", 0.0,
                 "head_spindle", 0.0);
-        Map<String, Pose3d> poses = URDFUtil.forward(m, q);
+        Map<String, Pose3d> poses = m.forward(q);
         assertEquals(4, poses.size());
         verify(new Pose3d(0, 0, 0.0, new Rotation3d()), poses, "base_gantry");
         verify(new Pose3d(0, 0, 0.0, new Rotation3d()), poses, "gantry_head");
@@ -40,8 +41,8 @@ public class URDFCartesianTest {
         Pose3d end = new Pose3d(0.5, 0.5, 0.05, new Rotation3d());
         // initial position is just somewhere random
         Vector<N3> q0 = VecBuilder.fill(0.1, 0.1, 0.1);
-        Map<String, Double> qMap = URDFUtil.inverse(
-                m, Nat.N3(), q0, "center_point", end);
+        Map<String, Double> qMap = m.inverse(
+                Nat.N3(), q0, 1, "center_point", end);
         assertEquals(3, qMap.size());
         assertEquals(0.5, qMap.get("base_gantry"), 1e-3);
         assertEquals(0.5, qMap.get("gantry_head"), 1e-3);
@@ -55,8 +56,8 @@ public class URDFCartesianTest {
         Pose3d end = new Pose3d(1.5, 0.5, 0.05, new Rotation3d());
         // initial position is just somewhere random
         Vector<N3> q0 = VecBuilder.fill(0.1, 0.1, 0.1);
-        Map<String, Double> qMap = URDFUtil.inverse(
-                m, Nat.N3(), q0, "center_point", end);
+        Map<String, Double> qMap = m.inverse(
+                Nat.N3(), q0, 1, "center_point", end);
         assertEquals(3, qMap.size());
         assertEquals(0.5, qMap.get("base_gantry"), 1e-3);
         // this is the coordinate that should be limited.
@@ -73,13 +74,14 @@ public class URDFCartesianTest {
         int iterations = 10000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            URDFUtil.inverse(m, Nat.N3(), q0, "center_point", end);
+            m.inverse(Nat.N3(), q0, 1, "center_point", end);
         }
         long finishTime = System.currentTimeMillis();
-        Util.println("Cartesian inverse");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
-
+        if (DEBUG) {
+            Util.println("Cartesian inverse");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
     void verify(Pose3d expected, Map<String, Pose3d> poses, String name) {

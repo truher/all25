@@ -20,6 +20,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 
 public class NewtonsMethodTest {
+    private static final boolean DEBUG = false;
+
     /** Multivariate scalar function, f(x) = norm(x)^2 */
     @Test
     void test1() {
@@ -379,7 +381,9 @@ public class NewtonsMethodTest {
         Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, 1e-3, 10);
+        Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
+        Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
         Vector<N2> Xd = VecBuilder.fill(0, 1);
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         Vector<N2> x = s.solve(q0, Xd);
@@ -394,7 +398,9 @@ public class NewtonsMethodTest {
         Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, 1e-3, 10);
+        Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
+        Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
         Vector<N2> Xd = VecBuilder.fill(0, 1);
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         int iterations = 1000000;
@@ -403,9 +409,11 @@ public class NewtonsMethodTest {
             s.solve(q0, Xd);
         }
         long finishTime = System.currentTimeMillis();
-        Util.println("Newton's method for RR arm");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Newton's solve for RR arm");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
     @Test
@@ -414,7 +422,9 @@ public class NewtonsMethodTest {
         Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, 1e-3, 10);
+        Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
+        Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
         Vector<N2> Xd = VecBuilder.fill(0, 1);
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         Vector<N2> x = s.solve2(q0, Xd);
@@ -429,7 +439,9 @@ public class NewtonsMethodTest {
         Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, 1e-3, 10);
+        Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
+        Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
         Vector<N2> Xd = VecBuilder.fill(0, 1);
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         int iterations = 1000000;
@@ -438,8 +450,10 @@ public class NewtonsMethodTest {
             s.solve2(q0, Xd);
         }
         long finishTime = System.currentTimeMillis();
-        Util.println("Newton's method for RR arm");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Newton's solve2 for RR arm");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 }

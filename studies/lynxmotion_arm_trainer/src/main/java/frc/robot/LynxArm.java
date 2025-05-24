@@ -39,6 +39,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * TODO: compute gravity effect on each joint, adjust estimated position
  */
 public class LynxArm extends SubsystemBase implements AutoCloseable {
+    private static final boolean DEBUG = false;
+
     private static final Pose3d HOME = new Pose3d(0.1, 0, 0.2, new Rotation3d(0, Math.PI/4, 0));
     private final CalibratedServo m_swing;
     private final CalibratedServo m_boom;
@@ -113,9 +115,9 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         m_wrist.setAngle(q.wrist());
         q.twist().ifPresent(m_twist::setAngle);
         if (q.swing().isEmpty())
-            System.out.println("empty swing");
+            if (DEBUG) System.out.println("empty swing");
         if (q.twist().isEmpty())
-            System.out.println("empty twist");
+            if (DEBUG) System.out.println("empty twist");
     }
 
     public LynxArmConfig getInverse(Pose3d p) {

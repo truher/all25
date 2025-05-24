@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 
 public class LynxArmVisualizerTest {
+    private static final boolean DEBUG = false;
+
     @Test
     void testFoo() {
         try (LynxArm arm = new LynxArm()) {
@@ -28,9 +30,11 @@ public class LynxArmVisualizerTest {
                     new Pose3d(1, -1, -1, Rotation3d.kZero));
             MatOfPoint2f points = foo.project(cameraPose, tList);
             List<Point> pointList = points.toList();
-            System.out.printf("pointList.size() = %d\n", pointList.size());
+            if (DEBUG)
+                System.out.printf("pointList.size() = %d\n", pointList.size());
             for (Point p : pointList) {
-                System.out.printf("%5.3f, %5.3f\n", p.x, p.y);
+                if (DEBUG)
+                    System.out.printf("%5.3f, %5.3f\n", p.x, p.y);
             }
         }
     }

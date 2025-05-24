@@ -58,7 +58,7 @@ public class URDFCartesian {
                         new Joint(
                                 "head_spindle",
                                 JointType.prismatic,
-                                new Limit(1000, 0, 0.1, 1),
+                                new Limit(1000, 0, 0.2, 1),
                                 head_stock,
                                 spindle,
                                 new Pose3d(),
