@@ -122,7 +122,7 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
                 System.out.println("empty twist");
         if (DEBUG) {
             System.out.printf("set p %s q %s\n", Util.poseStr(end), q.str());
-            System.out.printf("result %s\n", Util.poseStr(p.p5()));
+            System.out.printf("result %s\n", Util.poseStr(p.p6()));
         }
     }
 

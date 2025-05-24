@@ -121,7 +121,8 @@ public class LynxArmVisualizer {
                 p.p2(),
                 p.p3(),
                 p.p4(),
-                p.p5());
+                p.p5(),
+                p.p6());
         paint(m_base, "actual_arm", m_cameraPose, pList, Color.kOrangeRed);
 
         // List<Translation3d> tList2 = List.of(

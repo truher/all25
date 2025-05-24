@@ -38,7 +38,7 @@ public class MoveCommand extends Command {
     public void initialize() {
         if (DEBUG)
             System.out.println("\n***INITIALIZE***");
-        m_start = m_arm.getPosition().p5();
+        m_start = m_arm.getPosition().p6();
         // this doesn't work for twist-only moves without the minimum
         m_distance = Math.max(0.01, m_start.getTranslation().getDistance(m_goal.getTranslation()));
         m_profile.init(new Control100(), new Model100(m_distance, 0));
@@ -57,7 +57,7 @@ public class MoveCommand extends Command {
         Control100 c = m_profile.sample(m_timer.get());
         double s = c.x() / m_distance;
         Pose3d setpoint = m_start.interpolate(m_goal, s);
-        Pose3d measurement = m_arm.getPosition().p5();
+        Pose3d measurement = m_arm.getPosition().p6();
         if (DEBUG) {
             System.out.printf("Goal %s Setpoint %s Measurement %s\n",
                     Util.poseStr(m_goal), Util.poseStr(setpoint), Util.poseStr(measurement));

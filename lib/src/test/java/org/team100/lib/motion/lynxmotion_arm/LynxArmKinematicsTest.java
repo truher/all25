@@ -46,8 +46,10 @@ public class LynxArmKinematicsTest {
             System.out.printf("p3 %s\n", Util.poseStr(p.p3()));
             System.out.printf("p4 %s\n", Util.poseStr(p.p4()));
             System.out.printf("p5 %s\n", Util.poseStr(p.p5()));
-        } // the difference in joint poses here produces a pure pitch
-          // which does not match my intuition (that the joint axis would be rotated)
+            System.out.printf("p6 %s\n", Util.poseStr(p.p6()));
+        }
+        // the difference in joint poses here produces a pure pitch
+        // which does not match my intuition (that the joint axis would be rotated)
         Rotation3d r = p.p3().getRotation().minus(p.p2().getRotation());
         if (DEBUG)
             System.out.printf("r %s\n", Util.rotStr(r));
@@ -118,21 +120,29 @@ public class LynxArmKinematicsTest {
         // stretched out along x but with the wrong end rotation
         AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose t = new LynxArmPose(
-                new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d(),
+                new Pose3d(),
+                new Pose3d(),
+                new Pose3d(),
+                new Pose3d(),
+                new Pose3d(),
                 new Pose3d(new Translation3d(2, 0, 1), new Rotation3d(0, 0, 1)));
         LynxArmConfig q = new LynxArmConfig(0, 0, 0, 0, 0);
-        assertThrows(IllegalArgumentException.class, () -> k.inverse(q, t.p5()));
+        assertThrows(IllegalArgumentException.class, () -> k.inverse(q, t.p6()));
     }
 
     @Test
     void testOutOfBounds() {
         AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose t = new LynxArmPose(
-                new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d(),
+                new Pose3d(),
+                new Pose3d(),
+                new Pose3d(),
+                new Pose3d(),
+                new Pose3d(),
                 new Pose3d(new Translation3d(5, 0, 1), new Rotation3d(0, 0, 0)));
         LynxArmConfig q = new LynxArmConfig(0, 0, 0, 0, 0);
 
-        assertThrows(IllegalArgumentException.class, () -> k.inverse(q, t.p5()));
+        assertThrows(IllegalArgumentException.class, () -> k.inverse(q, t.p6()));
     }
 
     @Test

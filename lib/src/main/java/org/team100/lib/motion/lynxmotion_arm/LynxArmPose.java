@@ -11,5 +11,6 @@ public record LynxArmPose(
         Pose3d p2,
         Pose3d p3,
         Pose3d p4,
-        Pose3d p5) {
+        Pose3d p5,
+        Pose3d p6) {
 }
