@@ -1,11 +1,13 @@
 package frc.robot;
 
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmConfig;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmPose;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
+import org.team100.lib.motion.lynxmotion_arm.AnalyticLynxArmKinematics;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmPose;
+import org.team100.lib.motion.lynxmotion_arm.TwoDofArmConfig;
+import org.team100.lib.motion.lynxmotion_arm.TwoDofArmPosition;
 import org.team100.lib.motion.lynxmotion_arm.TwoDofKinematics;
-import org.team100.lib.motion.lynxmotion_arm.TwoDofKinematics.TwoDofArmConfig;
-import org.team100.lib.motion.lynxmotion_arm.TwoDofKinematics.TwoDofArmPosition;
+import org.team100.lib.motion.lynxmotion_arm.AnalyticTwoDofKinematics;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -68,8 +70,8 @@ public class LynxArmTwoDof extends SubsystemBase implements AutoCloseable {
         m_wrist.setAngle(0);
         m_twist.setAngle(0);
 
-        m_kinematics = new TwoDofKinematics(0.146, 0.298);
-        m_fullKinematics = new LynxArmKinematics(0.07, 0.146, 0.187, 0.111);
+        m_kinematics = new AnalyticTwoDofKinematics(0.146, 0.298);
+        m_fullKinematics = new AnalyticLynxArmKinematics(0.07, 0.146, 0.187, 0.111);
 
         setPosition(HOME);
     }

@@ -3,6 +3,7 @@ package org.team100.lib.util;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 
 public class Util {
 
@@ -35,6 +36,17 @@ public class Util {
             System.out.printf("%6.3f ", v.get(i));
         }
         System.out.println();
+    }
+
+    public static String poseStr(Pose3d p) {
+        return String.format("%f %f %f %f %f %f",
+                p.getX(), p.getY(), p.getZ(),
+                p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
+    }
+
+    public static String rotStr(Rotation3d r) {
+        return String.format("%f %f %f",
+                r.getX(), r.getY(), r.getZ());
     }
 
     /**

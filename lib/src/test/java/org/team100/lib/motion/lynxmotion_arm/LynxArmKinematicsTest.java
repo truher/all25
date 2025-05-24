@@ -7,8 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.OptionalDouble;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmConfig;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmPose;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -27,37 +26,37 @@ public class LynxArmKinematicsTest {
         // figure out the twist axis
         Rotation3d r = new Rotation3d(Math.PI / 2, Math.PI / 2, Math.PI / 2);
         if (DEBUG)
-            System.out.printf("r %s\n", rotStr(r));
+            System.out.printf("r %s\n", Util.rotStr(r));
 
     }
 
     @Test
     void testDerived() {
         // derive the axis directions
-        LynxArmKinematics k = new LynxArmKinematics(0.07, 0.12, 0.15, 0.09);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(0.07, 0.12, 0.15, 0.09);
         Pose3d end = new Pose3d(0.15, -0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0));
         LynxArmConfig q = k.inverse(end);
         if (DEBUG)
             System.out.printf("q %s\n", q);
         LynxArmPose p = k.forward(q);
         if (DEBUG) {
-            System.out.printf("p1 %s\n", poseStr(p.p1()));
-            System.out.printf("p2 %s\n", poseStr(p.p2()));
-            System.out.printf("p3 %s\n", poseStr(p.p3()));
-            System.out.printf("p4 %s\n", poseStr(p.p4()));
-            System.out.printf("p5 %s\n", poseStr(p.p5()));
+            System.out.printf("p1 %s\n", Util.poseStr(p.p1()));
+            System.out.printf("p2 %s\n", Util.poseStr(p.p2()));
+            System.out.printf("p3 %s\n", Util.poseStr(p.p3()));
+            System.out.printf("p4 %s\n", Util.poseStr(p.p4()));
+            System.out.printf("p5 %s\n", Util.poseStr(p.p5()));
         } // the difference in joint poses here produces a pure pitch
           // which does not match my intuition (that the joint axis would be rotated)
         Rotation3d r = p.p3().getRotation().minus(p.p2().getRotation());
         if (DEBUG)
-            System.out.printf("r %s\n", rotStr(r));
+            System.out.printf("r %s\n", Util.rotStr(r));
         Translation3d t = new Translation3d(1, 0, 0);
         Vector<N3> v2 = t.rotateBy(p.p2().getRotation()).toVector();
         Vector<N3> v3 = t.rotateBy(p.p3().getRotation()).toVector();
         Vector<N3> axis = Vector.cross(v2, v3);
         Rotation3d axisR = new Rotation3d(axis);
         if (DEBUG)
-            System.out.printf("axisR %s\n", rotStr(axisR));
+            System.out.printf("axisR %s\n", Util.rotStr(axisR));
         Translation3d tR = new Translation3d(axis);
         if (DEBUG)
             System.out.printf("tR %s\n", tR);
@@ -72,7 +71,7 @@ public class LynxArmKinematicsTest {
 
     @Test
     void testWrist() {
-        LynxArmKinematics k = new LynxArmKinematics(0.07, 0.12, 0.15, 0.09);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(0.07, 0.12, 0.15, 0.09);
         Pose3d start = new Pose3d(0.15, -0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0));
         Pose3d end = new Pose3d(0.15, 0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0));
         for (double s = 0; s <= 1; s += 0.1) {
@@ -80,14 +79,14 @@ public class LynxArmKinematicsTest {
             // wrist should be pointing down the whole time
             LynxArmConfig q = k.inverse(lerp);
             if (DEBUG)
-                System.out.printf("q %s\n", poseStr(lerp));
+                System.out.printf("q %s\n", Util.poseStr(lerp));
         }
     }
 
     @Test
     void testWrist2() {
         // is the wrist logic right?
-        LynxArmKinematics k = new LynxArmKinematics(0.07, 0.12, 0.15, 0.09);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(0.07, 0.12, 0.15, 0.09);
 
         // this is from an error case
         Pose3d p = new Pose3d(
@@ -113,7 +112,7 @@ public class LynxArmKinematicsTest {
     // @Test
     void testBadRotation() {
         // stretched out along x but with the wrong end rotation
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose t = new LynxArmPose(
                 new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d(),
                 new Pose3d(new Translation3d(2, 0, 1), new Rotation3d(0, 0, 1)));
@@ -122,7 +121,7 @@ public class LynxArmKinematicsTest {
 
     @Test
     void testOutOfBounds() {
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose t = new LynxArmPose(
                 new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d(),
                 new Pose3d(new Translation3d(5, 0, 1), new Rotation3d(0, 0, 0)));
@@ -132,7 +131,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test1() {
         // stretched out along x
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d()),
                 new Pose3d(new Translation3d(1, 0, 1), new Rotation3d()),
@@ -146,7 +145,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test2() {
         // stretched out along x
-        LynxArmKinematics k = new LynxArmKinematics(0.5, 0.5, 0.5, 0.5);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(0.5, 0.5, 0.5, 0.5);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 0.5), new Rotation3d()),
                 new Pose3d(new Translation3d(0.5, 0, 0.5), new Rotation3d()),
@@ -160,7 +159,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test3() {
         // up at the shoulder, forward at the elbow
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d()),
                 new Pose3d(new Translation3d(0, 0, 2), new Rotation3d(0, -Math.PI / 2, 0)),
@@ -174,7 +173,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test4() {
         // boom and stick make an equilateral, wrist points ahead
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d()),
                 new Pose3d(new Translation3d(0.5, 0, 1 + Math.sqrt(3) / 2), new Rotation3d(0, -Math.PI / 3, 0)),
@@ -188,7 +187,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test5() {
         // boom and stick make an equilateral, wrist points ahead, with swing
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d(0, 0, Math.PI / 6)),
                 new Pose3d(
@@ -204,7 +203,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test6() {
         // wrist vertical
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmConfig q = new LynxArmConfig(0, -Math.PI / 3, 2 * Math.PI / 3, Math.PI / 6, 0);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d()),
@@ -218,7 +217,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test7() {
         // wrist vertical with roll (which is yaw but inverted since it's pointing down)
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmConfig q = new LynxArmConfig(0, -Math.PI / 3, 2 * Math.PI / 3, Math.PI / 6, Math.PI / 2);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d()),
@@ -232,7 +231,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test8() {
         // wrist vertical with roll and swing
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmConfig q = new LynxArmConfig(
                 Math.PI / 3, -Math.PI / 3, 2 * Math.PI / 3, Math.PI / 6, Math.PI / 2);
         LynxArmPose p = new LynxArmPose(
@@ -253,7 +252,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test9() {
         // grip is on the swing axis, make the swing match end yaw
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d(0, 0, -Math.PI / 4)),
                 new Pose3d(
@@ -271,7 +270,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test10() {
         // grip is on the swing axis, wrist pointing up => indeterminate
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d()),
                 new Pose3d(new Translation3d(-Math.sqrt(3) / 2, 0, 1.5), new Rotation3d(0, -5 * Math.PI / 6, 0)),
@@ -286,7 +285,7 @@ public class LynxArmKinematicsTest {
     @Test
     void test11() {
         // arch
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         LynxArmPose p = new LynxArmPose(
                 new Pose3d(new Translation3d(0, 0, 1), new Rotation3d()),
                 new Pose3d(new Translation3d(0.5, 0, 1 + Math.sqrt(3) / 2), new Rotation3d(0, -Math.PI / 3, 0)),
@@ -301,7 +300,7 @@ public class LynxArmKinematicsTest {
     void testPath() {
         // print the path from (1,1,0) to (1,-1,0). end effector on the table, wrist
         // vertical, no workspace twist
-        LynxArmKinematics k = new LynxArmKinematics(1, 1, 1, 1);
+        AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         Translation3d start = new Translation3d(1, 1, 0);
         Translation3d end = new Translation3d(1, -1, 0);
         // end-effector rotation is fixed
@@ -318,7 +317,7 @@ public class LynxArmKinematicsTest {
         }
     }
 
-    void verify(LynxArmKinematics k, LynxArmPose p, LynxArmConfig q) {
+    void verify(AnalyticLynxArmKinematics k, LynxArmPose p, LynxArmConfig q) {
         verifyFwd(p, k.forward(q));
         verifyInv(q, k.inverse(p.p5()));
     }
@@ -345,16 +344,5 @@ public class LynxArmKinematicsTest {
         } else {
             assertTrue(actual.twist().isEmpty());
         }
-    }
-
-    String poseStr(Pose3d p) {
-        return String.format("%f %f %f %f %f %f",
-                p.getX(), p.getY(), p.getZ(),
-                p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
-    }
-
-    String rotStr(Rotation3d r) {
-        return String.format("%f %f %f",
-                r.getX(), r.getY(), r.getZ());
     }
 }

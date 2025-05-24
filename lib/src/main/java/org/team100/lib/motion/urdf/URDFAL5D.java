@@ -2,11 +2,8 @@ package org.team100.lib.motion.urdf;
 
 import java.util.List;
 
-import org.team100.lib.motion.urdf.URDFModel.Joint;
-import org.team100.lib.motion.urdf.URDFModel.Link;
-import org.team100.lib.motion.urdf.URDFModel.Robot;
-import org.team100.lib.motion.urdf.URDFModel.Joint.JointType;
-import org.team100.lib.motion.urdf.URDFModel.Joint.Limit;
+import org.team100.lib.motion.urdf.URDFJoint.JointType;
+import org.team100.lib.motion.urdf.URDFJoint.Limit;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -24,17 +21,21 @@ import edu.wpi.first.math.geometry.Rotation3d;
  * I changed the joint zeros so that the "arm zero" is the same as the
  * rotation3d zero axis, i.e. +x, and I changed the limits to match.
  */
-public class URDFAL5D {
-    public static final Robot ROBOT;
-    static {
-        Link base_link = new Link("base_link");
-        Link base_pan_link = new Link("base_pan_link");
-        Link upper_arm_link = new Link("upper_arm_link");
-        Link lower_arm_link = new Link("lower_arm_link");
-        Link link3 = new Link("link3");
-        Link gripper = new Link("gripper");
-        Link tool_center_point = new Link("tool_center_point");
-        ROBOT = new Robot(
+public class URDFAL5D extends URDFRobot {
+
+    private URDFAL5D(String name, List<URDFLink> links, List<URDFJoint> joints) {
+        super(name, links, joints);
+    }
+
+    public static URDFAL5D make() {
+        URDFLink base_link = new URDFLink("base_link");
+        URDFLink base_pan_link = new URDFLink("base_pan_link");
+        URDFLink upper_arm_link = new URDFLink("upper_arm_link");
+        URDFLink lower_arm_link = new URDFLink("lower_arm_link");
+        URDFLink link3 = new URDFLink("link3");
+        URDFLink gripper = new URDFLink("gripper");
+        URDFLink tool_center_point = new URDFLink("tool_center_point");
+        return new URDFAL5D(
                 "AL5D",
                 List.of(
                         base_link,
@@ -45,16 +46,16 @@ public class URDFAL5D {
                         gripper,
                         tool_center_point),
                 List.of(
-                        new Joint(
+                        new URDFJoint(
                                 "base_pan",
                                 JointType.revolute,
-                                new Limit(1000, -Math.PI/2, Math.PI, 0.5),
+                                new Limit(1000, -Math.PI / 2, Math.PI, 0.5),
                                 base_link,
                                 base_pan_link,
                                 // rot z zero used to be -pi/2
                                 new Pose3d(0, 0, 0.06731, new Rotation3d(0, 0, 0)),
                                 VecBuilder.fill(0, 0, 1)),
-                        new Joint(
+                        new URDFJoint(
                                 "shoulder_tilt",
                                 JointType.revolute,
                                 new Limit(1000.0, -Math.PI, 0, 0.5),
@@ -63,7 +64,7 @@ public class URDFAL5D {
                                 new Pose3d(),
                                 // rotation was -y
                                 VecBuilder.fill(0, 1, 0)),
-                        new Joint(
+                        new URDFJoint(
                                 "elbow_tilt",
                                 JointType.revolute,
                                 new Limit(1000.0, 0.0, Math.PI, 0.5),
@@ -73,26 +74,26 @@ public class URDFAL5D {
                                 new Pose3d(0.14605, 0, 0, new Rotation3d(0, 0, 0)),
                                 // rot was -y
                                 VecBuilder.fill(0, 1, 0)),
-                        new Joint(
+                        new URDFJoint(
                                 "wrist_tilt",
                                 JointType.revolute,
-                                new Limit(1000.0, -Math.PI/2, Math.PI/2, 0.5),
+                                new Limit(1000.0, -Math.PI / 2, Math.PI / 2, 0.5),
                                 lower_arm_link,
                                 link3,
                                 // rot y zero used to be pi/2
                                 new Pose3d(0.187325, 0, 0, new Rotation3d(0, 0, 0)),
                                 // rot was -y
                                 VecBuilder.fill(0, 1, 0)),
-                        new Joint(
+                        new URDFJoint(
                                 "wrist_rotate",
                                 JointType.revolute,
-                                new Limit(1000.0, -Math.PI/2, Math.PI/2, 0.5),
+                                new Limit(1000.0, -Math.PI / 2, Math.PI / 2, 0.5),
                                 link3,
                                 gripper,
                                 // rot x zero used to be -pi/2
                                 new Pose3d(0.034, 0, 0, new Rotation3d(0, 0, 0)),
                                 VecBuilder.fill(1, 0, 0)),
-                        new Joint(
+                        new URDFJoint(
                                 "center_point",
                                 JointType.fixed,
                                 null,

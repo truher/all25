@@ -1,0 +1,206 @@
+package org.team100.lib.motion.urdf;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.math.NewtonsMethod;
+
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Num;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N6;
+
+/**
+ * This is a partial implementation of the URDF object model.
+ * 
+ * The idea is to use a more general mechanism representation than the usual
+ * POJO (e.g. LynxArm, which uses fields), which would allow more general
+ * kinematics than the hand-made stuff we've done previously (e.g. we could try
+ * Cyclic Coordinate Descent, or Gradient Descent, in a general way)
+ * 
+ * It would be possible to serialize this to URDF XML and vice versa, but our
+ * robots are small enough that (IMHO) putting the "loader" in code would be
+ * much easier than bringing in the XML overhead.
+ * 
+ * See http://wiki.ros.org/urdf, in particular, urdf.xsd. I transcribed directly
+ * from that file. (I tried to use JAXB to auto-generate this, but gave up
+ * trying to run it.)
+ * 
+ * This omits the collision and visual parts of the model, which are used for
+ * simulation and visualization, respectively. We could add those back in if we
+ * need them someday. I haven't found the URDF visualizers (e.g.
+ * https://mymodelrobot.appspot.com/5629499534213120) or simulators (e.g.
+ * Gazebo) to be that useful.
+ * 
+ * TODO: normalize the "axis" vector or complain if not normalized.
+ * 
+ * There exists SRDF, which specifies, among other things, group states, e.g.
+ * home positions. I think SRDF is dead, but representing states seems fine;
+ * the format is a map of joint names and values.
+ * 
+ * https://wiki.ros.org/srdf/review
+ */
+public class URDFRobot {
+    private final String m_name;
+    private final List<URDFLink> m_links;
+    private final List<URDFJoint> m_joints;
+
+    public URDFRobot(String name, List<URDFLink> links, List<URDFJoint> joints) {
+        m_name = name;
+        m_links = links;
+        m_joints = joints;
+    }
+
+    /**
+     * Solve forward kinematics for all joints.
+     * 
+     * Key is joint name.
+     */
+    public Map<String, Pose3d> forward(Map<String, Double> qMap) {
+        Map<String, Pose3d> poses = new HashMap<>();
+        for (URDFJoint joint : m_joints) {
+            forward(poses, joint.name(), qMap);
+        }
+        return poses;
+    }
+
+    /**
+     * Solve inverse kinematics for all joints using Newton's method.
+     * 
+     * qDim indicates the dimensionality of the configuration space.
+     * TODO: get rid of qDim.
+     * q0 is the initial (e.g. current) configuration.
+     */
+    public <Q extends Num> Map<String, Double> inverse(
+            Nat<Q> qDim,
+            Vector<Q> q0,
+            double dqLimit,
+            String jointName,
+            Pose3d goal) {
+        Function<Vector<Q>, Vector<N6>> f = q -> {
+            // print("q", q);
+            // solve all of them
+            Map<String, Double> qMap = qMap(q);
+            Map<String, Pose3d> p = forward(qMap);
+            // Pick out the joint we want.
+            Pose3d pose = p.get(jointName);
+            Vector<N6> pv = GeometryUtil.toVec(GeometryUtil.slog(pose));
+            // print(pose);
+            // print("pv", pv);
+            return pv;
+        };
+        // this function always uses pose3d so the goal dim is always N6.
+        Nat<N6> twistDim = Nat.N6();
+        Vector<N6> goalVec = GeometryUtil.toVec(GeometryUtil.slog(goal));
+        NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
+                qDim, twistDim, f,
+                minQ(qDim), maxQ(qDim),
+                1e-3, 20, dqLimit);
+        Vector<Q> q = solver.solve2(q0, goalVec);
+        return qMap(q);
+    }
+
+    ///////////////////////////////////////////////////
+
+    URDFJoint getJoint(String name) {
+        for (URDFJoint joint : m_joints) {
+            if (joint.name().equals(name))
+                return joint;
+        }
+        return null;
+    }
+
+    ///////////////////////////////////////////////////
+
+    /**
+     * Populate poses with the pose of the specified joint and those of its parent
+     * chain.
+     */
+    private Pose3d forward(
+            Map<String, Pose3d> poses,
+            String jointName,
+            Map<String, Double> qMap) {
+        URDFJoint joint = getJoint(jointName);
+        Transform3d t = joint.transform(qMap.get(jointName));
+        URDFJoint parent = parentJoint(jointName);
+        if (parent == null) {
+            // this is the root
+            Pose3d basePose = Pose3d.kZero.transformBy(t);
+            poses.put(jointName, basePose);
+            return basePose;
+        }
+        Pose3d parentPose = poses.get(parent.name());
+        if (parentPose != null) {
+            Pose3d newPose = parentPose.transformBy(t);
+            poses.put(jointName, newPose);
+            return newPose;
+        }
+        // if the parent hasn't been computed yet, recurse to do it.
+        Pose3d newParentPose = forward(poses, parent.name(), qMap);
+        Pose3d newNewPose = newParentPose.transformBy(t);
+        poses.put(jointName, newNewPose);
+        return newNewPose;
+    }
+
+    /** Parent joint of the specified joint. */
+    private URDFJoint parentJoint(String childName) {
+        URDFJoint childJoint = getJoint(childName);
+        URDFLink parentLink = childJoint.parent();
+        for (URDFJoint joint : m_joints) {
+            if (joint.child() == parentLink)
+                return joint;
+        }
+        return null;
+    }
+
+    /** Transform the config vector, q, into a named map. */
+    private Map<String, Double> qMap(Vector<?> q) {
+        Map<String, Double> qMap = new HashMap<>();
+        List<URDFJoint> joints = m_joints;
+        for (int i = 0; i < joints.size(); ++i) {
+            URDFJoint joint = joints.get(i);
+            if (joint.active()) {
+                qMap.put(joint.name(), q.get(i));
+            }
+        }
+        return qMap;
+    }
+
+    /**
+     * qDim needs to match the actual number of moveable joints.
+     * TODO: remove it.
+     */
+    private <Q extends Num> Vector<Q> minQ(Nat<Q> qDim) {
+        Vector<Q> v = new Vector<>(qDim);
+        List<URDFJoint> joints = m_joints;
+        for (int i = 0; i < joints.size(); ++i) {
+            URDFJoint joint = joints.get(i);
+            if (joint.active()) {
+                v.set(i, 0, joint.limit().lower());
+            }
+        }
+        return v;
+    }
+
+    /**
+     * qDim needs to match the actual number of moveable joints.
+     * TODO: remove it.
+     */
+    private <Q extends Num> Vector<Q> maxQ(Nat<Q> qDim) {
+        Vector<Q> v = new Vector<>(qDim);
+        List<URDFJoint> joints = m_joints;
+        for (int i = 0; i < joints.size(); ++i) {
+            URDFJoint joint = joints.get(i);
+            if (joint.active()) {
+                v.set(i, 0, joint.limit().upper());
+            }
+        }
+        return v;
+    }
+
+}

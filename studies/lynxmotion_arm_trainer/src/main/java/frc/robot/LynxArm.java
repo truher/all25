@@ -1,8 +1,9 @@
 package frc.robot;
 
+import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmConfig;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmPose;
+import org.team100.lib.motion.lynxmotion_arm.AnalyticLynxArmKinematics;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmPose;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -92,7 +93,7 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         // for dimensions, see
         // https://wiki.lynxmotion.com/info/wiki/lynxmotion/download/ses-v1/ses-v1-robots/ses-v1-arms/al5d/WebHome/PLTW-AL5D-Guide-11.pdf
 
-        m_kinematics = new LynxArmKinematics(0.07, 0.146, 0.187, 0.111);
+        m_kinematics = new AnalyticLynxArmKinematics(0.07, 0.146, 0.187, 0.111);
         // initial position keeps the IK path from being invalid
         setPosition(HOME);
     }

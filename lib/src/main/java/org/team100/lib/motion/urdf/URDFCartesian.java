@@ -2,11 +2,8 @@ package org.team100.lib.motion.urdf;
 
 import java.util.List;
 
-import org.team100.lib.motion.urdf.URDFModel.Joint;
-import org.team100.lib.motion.urdf.URDFModel.Joint.JointType;
-import org.team100.lib.motion.urdf.URDFModel.Joint.Limit;
-import org.team100.lib.motion.urdf.URDFModel.Link;
-import org.team100.lib.motion.urdf.URDFModel.Robot;
+import org.team100.lib.motion.urdf.URDFJoint.JointType;
+import org.team100.lib.motion.urdf.URDFJoint.Limit;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -22,15 +19,18 @@ import edu.wpi.first.math.geometry.Rotation3d;
  * 
  * This should be very easy to solve :-)
  */
-public class URDFCartesian {
-    public static final Robot ROBOT;
-    static {
-        Link base = new Link("base");
-        Link gantry = new Link("gantry");
-        Link head_stock = new Link("head_stock");
-        Link spindle = new Link("spindle");
-        Link tool_center_point = new Link("tool_center_point");
-        ROBOT = new Robot(
+public class URDFCartesian extends URDFRobot {
+    private URDFCartesian(String name, List<URDFLink> links, List<URDFJoint> joints) {
+        super(name, links, joints);
+    }
+
+    public static URDFCartesian make() {
+        URDFLink base = new URDFLink("base");
+        URDFLink gantry = new URDFLink("gantry");
+        URDFLink head_stock = new URDFLink("head_stock");
+        URDFLink spindle = new URDFLink("spindle");
+        URDFLink tool_center_point = new URDFLink("tool_center_point");
+        return new URDFCartesian(
                 "Cartesian",
                 List.of(
                         base,
@@ -39,7 +39,7 @@ public class URDFCartesian {
                         spindle,
                         tool_center_point),
                 List.of(
-                        new Joint(
+                        new URDFJoint(
                                 "base_gantry",
                                 JointType.prismatic,
                                 new Limit(1000, 0, 1, 1),
@@ -47,7 +47,7 @@ public class URDFCartesian {
                                 gantry,
                                 new Pose3d(),
                                 VecBuilder.fill(0, 1, 0)),
-                        new Joint(
+                        new URDFJoint(
                                 "gantry_head",
                                 JointType.prismatic,
                                 new Limit(1000, 0, 1, 1),
@@ -55,7 +55,7 @@ public class URDFCartesian {
                                 head_stock,
                                 new Pose3d(),
                                 VecBuilder.fill(1, 0, 0)),
-                        new Joint(
+                        new URDFJoint(
                                 "head_spindle",
                                 JointType.prismatic,
                                 new Limit(1000, 0, 0.2, 1),
@@ -63,7 +63,7 @@ public class URDFCartesian {
                                 spindle,
                                 new Pose3d(),
                                 VecBuilder.fill(0, 0, 1)),
-                        new Joint(
+                        new URDFJoint(
                                 "center_point",
                                 JointType.fixed,
                                 null,

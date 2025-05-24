@@ -2,7 +2,6 @@ package org.team100.lib.motion.urdf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ public class URDFAL5DTest {
 
     @Test
     void testZeroForward() {
-        URDFModel.Robot m = URDFAL5D.ROBOT;
+        URDFAL5D m = URDFAL5D.make();
         Map<String, Double> q = Map.of(
                 "base_pan", 0.0,
                 "shoulder_tilt", 0.0,
@@ -40,7 +39,7 @@ public class URDFAL5DTest {
 
     @Test
     void testBaseForward() {
-        URDFModel.Robot m = URDFAL5D.ROBOT;
+        URDFAL5D m = URDFAL5D.make();
         Map<String, Double> q = Map.of(
                 // positive = pan left, so extent is +x +y
                 "base_pan", Math.PI / 4,
@@ -62,7 +61,7 @@ public class URDFAL5DTest {
 
     @Test
     void testShoulderForward() {
-        URDFModel.Robot m = URDFAL5D.ROBOT;
+        URDFAL5D m = URDFAL5D.make();
         Map<String, Double> q = Map.of(
                 "base_pan", 0.0,
                 // negative = tilt up
@@ -82,7 +81,7 @@ public class URDFAL5DTest {
 
     @Test
     void testElbowForward() {
-        URDFModel.Robot m = URDFAL5D.ROBOT;
+        URDFAL5D m = URDFAL5D.make();
         Map<String, Double> q = Map.of(
                 "base_pan", 0.0,
                 // elbow tilts only down
@@ -103,7 +102,7 @@ public class URDFAL5DTest {
 
     @Test
     void testWristForward() {
-        URDFModel.Robot m = URDFAL5D.ROBOT;
+        URDFAL5D m = URDFAL5D.make();
         Map<String, Double> q = Map.of(
                 "base_pan", 0.0,
                 "shoulder_tilt", 0.0,
@@ -123,7 +122,7 @@ public class URDFAL5DTest {
 
     @Test
     void testWristRotateForward() {
-        URDFModel.Robot m = URDFAL5D.ROBOT;
+        URDFAL5D m = URDFAL5D.make();
         Map<String, Double> q = Map.of(
                 "base_pan", 0.0,
                 "shoulder_tilt", 0.0,
@@ -144,7 +143,7 @@ public class URDFAL5DTest {
     @Test
     void testCenterPointForward() {
         // this is what the inverse kinematics below should come up with
-        URDFModel.Robot m = URDFAL5D.ROBOT;
+        URDFAL5D m = URDFAL5D.make();
         Map<String, Double> q = Map.of(
                 "base_pan", 0.0,
                 "shoulder_tilt", -2.522,
@@ -152,27 +151,24 @@ public class URDFAL5DTest {
                 "wrist_tilt", -0.282,
                 "wrist_rotate", 0.0,
                 "center_point", 0.0);
-        Map<String, Pose3d> poses = new HashMap<>();
-        Pose3d pose = m.forward(poses, "center_point", q);
-        if (DEBUG)
-            TestUtil.print(pose);
-        TestUtil.verify(new Pose3d(0.15, 0, 0.1, new Rotation3d(0, 0, 0)), pose, "center_point");
+        Map<String, Pose3d> poses = m.forward(q);
+        TestUtil.verify(new Pose3d(0.15, 0, 0.1, new Rotation3d(0, 0, 0)), poses, "center_point");
     }
 
     @Test
     void testElbowTransform() {
-        URDFModel.Robot m = URDFAL5D.ROBOT;
-        URDFModel.Joint j = m.getJoint("elbow_tilt");
-        Transform3d t = j.jointTransform(Math.PI / 4);
+        URDFAL5D m = URDFAL5D.make();
+        URDFJoint j = m.getJoint("elbow_tilt");
+        Transform3d t = j.transform(Math.PI / 4);
         TestUtil.verify(new Transform3d(0.14605, 0, 0, new Rotation3d(0, Math.PI / 4, 0)), t);
     }
 
     @Test
     void testCenterTransform() {
-        URDFModel.Robot m = URDFAL5D.ROBOT;
-        URDFModel.Joint j = m.getJoint("center_point");
+        URDFAL5D m = URDFAL5D.make();
+        URDFJoint j = m.getJoint("center_point");
         // the parameter here is ignored.
-        Transform3d t = j.jointTransform(1.0);
+        Transform3d t = j.transform(1.0);
         TestUtil.verify(new Transform3d(0.055, 0, 0, new Rotation3d()), t);
     }
 
@@ -180,7 +176,7 @@ public class URDFAL5DTest {
     void testInverse() {
         // this problem requires the dx limit, otherwise it oscillates
         // far from the solution.
-        URDFModel.Robot m = URDFAL5D.ROBOT;
+        URDFAL5D m = URDFAL5D.make();
         Pose3d end = new Pose3d(0.15, 0.0, 0.1, new Rotation3d(0, 0, 0));
         Vector<N5> q0 = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1);
         Map<String, Double> qMap = m.inverse(
