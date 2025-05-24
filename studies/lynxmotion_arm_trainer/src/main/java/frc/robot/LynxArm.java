@@ -2,8 +2,8 @@ package frc.robot;
 
 import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
-import org.team100.lib.motion.lynxmotion_arm.AnalyticLynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmPose;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -40,9 +40,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * TODO: compute gravity effect on each joint, adjust estimated position
  */
 public class LynxArm extends SubsystemBase implements AutoCloseable {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
-    private static final Pose3d HOME = new Pose3d(0.1, 0, 0.2, new Rotation3d(0, Math.PI/4, 0));
+    private static final Pose3d HOME = new Pose3d(0.2, 0, 0.2, new Rotation3d(0, Math.PI / 4, 0));
     private final CalibratedServo m_swing;
     private final CalibratedServo m_boom;
     private final CalibratedServo m_stick;
@@ -52,7 +52,8 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
 
     private final LynxArmKinematics m_kinematics;
 
-    public LynxArm() {
+    public LynxArm(LynxArmKinematics kinematics) {
+        m_kinematics = kinematics;
         // all these implement the WPI normal coordinates:
         // x ahead, y left, z up.
 
@@ -90,10 +91,6 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
                 new Clamp(0, 0.02),
                 new AffineFunction(-0.02, 0.02));
 
-        // for dimensions, see
-        // https://wiki.lynxmotion.com/info/wiki/lynxmotion/download/ses-v1/ses-v1-robots/ses-v1-arms/al5d/WebHome/PLTW-AL5D-Guide-11.pdf
-
-        m_kinematics = new AnalyticLynxArmKinematics(0.07, 0.146, 0.187, 0.111);
         // initial position keeps the IK path from being invalid
         setPosition(HOME);
     }
@@ -110,32 +107,29 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
      */
     public void setPosition(Pose3d end) {
         LynxArmConfig q = getInverse(end);
+        LynxArmPose p = getPosition();
+
         q.swing().ifPresent(m_swing::setAngle);
         m_boom.setAngle(q.boom());
         m_stick.setAngle(q.stick());
         m_wrist.setAngle(q.wrist());
         q.twist().ifPresent(m_twist::setAngle);
         if (q.swing().isEmpty())
-            if (DEBUG) System.out.println("empty swing");
+            if (DEBUG)
+                System.out.println("empty swing");
         if (q.twist().isEmpty())
-            if (DEBUG) System.out.println("empty twist");
-    }
-
-    public LynxArmConfig getInverse(Pose3d p) {
-        return m_kinematics.inverse(p);
-    }
-
-    public LynxArmConfig getMeasuredConfig() {
-        return new LynxArmConfig(
-                m_swing.getAngle(),
-                m_boom.getAngle(),
-                m_stick.getAngle(),
-                m_wrist.getAngle(),
-                m_twist.getAngle());
+            if (DEBUG)
+                System.out.println("empty twist");
+        if (DEBUG) {
+            System.out.printf("set p %s q %s\n", Util.poseStr(end), q.str());
+            System.out.printf("result %s\n", Util.poseStr(p.p5()));
+        }
     }
 
     public LynxArmPose getPosition() {
         LynxArmConfig q = getMeasuredConfig();
+        if (DEBUG)
+            System.out.printf("get %s\n", q.str());
         return m_kinematics.forward(q);
     }
 
@@ -157,4 +151,19 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         m_grip.close();
     }
 
+    /////////////////////////////////////////////
+
+    LynxArmConfig getInverse(Pose3d p) {
+        LynxArmConfig q0 = getMeasuredConfig();
+        return m_kinematics.inverse(q0, p);
+    }
+
+    LynxArmConfig getMeasuredConfig() {
+        return new LynxArmConfig(
+                m_swing.getAngle(),
+                m_boom.getAngle(),
+                m_stick.getAngle(),
+                m_wrist.getAngle(),
+                m_twist.getAngle());
+    }
 }

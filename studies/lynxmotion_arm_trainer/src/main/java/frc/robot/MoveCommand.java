@@ -1,8 +1,10 @@
 package frc.robot;
 
+import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.profile.timed.JerkLimitedProfile100;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * end-effector poses.
  */
 public class MoveCommand extends Command {
+    private static final boolean DEBUG = false;
     private final LynxArm m_arm;
     private final Pose3d m_goal;
     private final JerkLimitedProfile100 m_profile;
@@ -33,43 +36,56 @@ public class MoveCommand extends Command {
 
     @Override
     public void initialize() {
+        if (DEBUG)
+            System.out.println("\n***INITIALIZE***");
         m_start = m_arm.getPosition().p5();
         // this doesn't work for twist-only moves without the minimum
         m_distance = Math.max(0.01, m_start.getTranslation().getDistance(m_goal.getTranslation()));
         m_profile.init(new Control100(), new Model100(m_distance, 0));
         m_timer.restart();
-        // System.out.printf("start %s\n", Util.poseStr(m_start));
-        // System.out.printf("end %s\n", Util.poseStr(m_goal));
         m_done = false;
+        if (DEBUG) {
+            System.out.printf("start %s\n", Util.poseStr(m_start));
+            System.out.printf("end %s\n", Util.poseStr(m_goal));
+        }
     }
 
     @Override
     public void execute() {
-        // System.out.println("***EXECUTE***");
+        if (DEBUG)
+            System.out.println("\n***EXECUTE***");
         Control100 c = m_profile.sample(m_timer.get());
         double s = c.x() / m_distance;
         Pose3d setpoint = m_start.interpolate(m_goal, s);
-        // System.out.printf("Setpoint %s\n", Util.poseStr(setpoint));
+        Pose3d measurement = m_arm.getPosition().p5();
+        if (DEBUG) {
+            System.out.printf("Goal %s Setpoint %s Measurement %s\n",
+                    Util.poseStr(m_goal), Util.poseStr(setpoint), Util.poseStr(measurement));
+        }
         double togo = setpoint.getTranslation().getDistance(m_goal.getTranslation());
         Rotation3d rotTogo = setpoint.getRotation().minus(m_goal.getRotation());
         double angleTogo = rotTogo.getAngle();
-        Pose3d measurement = m_arm.getPosition().p5();
         Rotation3d rotTogo2 = measurement.getRotation().minus(m_goal.getRotation());
         double angleTogo2 = rotTogo2.getAngle();
-        // System.out.printf("to go %f angle %f measured %f \n", togo, angleTogo, angleTogo2);
+        if (DEBUG)
+            System.out.printf("to go %f angle %f measured %f \n", togo, angleTogo,
+                    angleTogo2);
         if (togo < 0.001 && Math.abs(angleTogo2) < 0.001) {
-            // System.out.println("at goal");
+            if (DEBUG)
+                System.out.println("***** at goal *****");
             m_arm.setPosition(m_goal);
             m_done = true;
             return;
         }
         m_arm.setPosition(setpoint);
-        // System.out.printf("setpoint %s\n", Util.poseStr(setpoint));
-        // System.out.printf("goal %s\n", Util.poseStr(m_goal));
-        // LynxArmConfig measuredConfig = m_arm.getMeasuredConfig();
-        // System.out.printf("measured  config %s\n", measuredConfig);
-        // LynxArmConfig commandedConfig = m_arm.getInverse(setpoint);
-        // System.out.printf("commanded config %s\n", commandedConfig);
+        if (DEBUG) {
+            System.out.printf("setpoint %s\n", Util.poseStr(setpoint));
+            System.out.printf("goal %s\n", Util.poseStr(m_goal));
+            LynxArmConfig measuredConfig = m_arm.getMeasuredConfig();
+            System.out.printf("measured config %s\n", measuredConfig.str());
+            LynxArmConfig commandedConfig = m_arm.getInverse(setpoint);
+            System.out.printf("commanded config %s\n", commandedConfig.str());
+        }
     }
 
     public boolean done() {

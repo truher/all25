@@ -60,11 +60,14 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
     /**
      * Solve the inverse kinematics for the given end-effector pose.
      * 
+     * Ignores the initial config.
+     * TODO: use the initial config for singularities.
+     * 
      * Refer to the diagram
      * https://docs.google.com/document/d/1B6vGPtBtnDSOpfzwHBflI8-nn98W9QvmrX78bon8Ajw
      */
     @Override
-    public LynxArmConfig inverse(final Pose3d end) {
+    public LynxArmConfig inverse(LynxArmConfig c, final Pose3d end) {
 
         final OptionalDouble swing;
         final double boom;

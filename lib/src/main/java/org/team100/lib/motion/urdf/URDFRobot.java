@@ -97,10 +97,11 @@ public class URDFRobot {
         // this function always uses pose3d so the goal dim is always N6.
         Nat<N6> twistDim = Nat.N6();
         Vector<N6> goalVec = GeometryUtil.toVec(GeometryUtil.slog(goal));
+        // TODO: lower the iteration limit
         NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
                 qDim, twistDim, f,
                 minQ(qDim), maxQ(qDim),
-                1e-3, 20, dqLimit);
+                1e-3, 200, dqLimit);
         Vector<Q> q = solver.solve2(q0, goalVec);
         return qMap(q);
     }

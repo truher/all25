@@ -5,6 +5,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.team100.lib.motion.lynxmotion_arm.AnalyticLynxArmKinematics;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -14,7 +16,10 @@ public class LynxArmVisualizerTest {
 
     @Test
     void testFoo() {
-        try (LynxArm arm = new LynxArm()) {
+        // for dimensions, see
+        // https://wiki.lynxmotion.com/info/wiki/lynxmotion/download/ses-v1/ses-v1-robots/ses-v1-arms/al5d/WebHome/PLTW-AL5D-Guide-11.pdf
+        LynxArmKinematics kinematics = new AnalyticLynxArmKinematics(0.07, 0.146, 0.187, 0.111);
+        try (LynxArm arm = new LynxArm(kinematics)) {
             LynxArmVisualizer foo = new LynxArmVisualizer(arm::getPosition);
             // unrotated camera below the table
             Pose3d cameraPose = new Pose3d(0, 0, -4, new Rotation3d(0, 0, 0));

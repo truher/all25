@@ -70,4 +70,14 @@ public record LynxArmConfig(
     static Transform3d yaw(double x) {
         return new Transform3d(0, 0, 0, new Rotation3d(0, 0, x));
     }
+
+    public String str() {
+        return String.format(
+                "swing %6.3f boom %6.3f stick %6.3f wrist %6.3f twist %6.3f",
+                swing.getAsDouble(),
+                boom,
+                stick,
+                wrist,
+                twist.getAsDouble());
+    }
 }

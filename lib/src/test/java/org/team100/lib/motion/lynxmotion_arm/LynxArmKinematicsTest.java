@@ -34,8 +34,9 @@ public class LynxArmKinematicsTest {
     void testDerived() {
         // derive the axis directions
         AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(0.07, 0.12, 0.15, 0.09);
+        LynxArmConfig q0 = new LynxArmConfig(0, 0, 0, 0, 0);
         Pose3d end = new Pose3d(0.15, -0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0));
-        LynxArmConfig q = k.inverse(end);
+        LynxArmConfig q = k.inverse(q0, end);
         if (DEBUG)
             System.out.printf("q %s\n", q);
         LynxArmPose p = k.forward(q);
@@ -74,10 +75,11 @@ public class LynxArmKinematicsTest {
         AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(0.07, 0.12, 0.15, 0.09);
         Pose3d start = new Pose3d(0.15, -0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0));
         Pose3d end = new Pose3d(0.15, 0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0));
+        LynxArmConfig q = new LynxArmConfig(0, 0, 0, 0, 0);
         for (double s = 0; s <= 1; s += 0.1) {
             Pose3d lerp = start.interpolate(end, s);
             // wrist should be pointing down the whole time
-            LynxArmConfig q = k.inverse(lerp);
+            q = k.inverse(q, lerp);
             if (DEBUG)
                 System.out.printf("q %s\n", Util.poseStr(lerp));
         }
@@ -93,8 +95,10 @@ public class LynxArmKinematicsTest {
                 new Translation3d(0.191993, 0.013100, 0.092421),
                 new Rotation3d(0.051100, 0.220814, -0.048971));
 
+        LynxArmConfig q0 = new LynxArmConfig(0, 0, 0, 0, 0);
+
         // this does indeed produce an error
-        LynxArmConfig q = k.inverse(p);
+        LynxArmConfig q = k.inverse(q0, p);
 
         Translation2d translation = p.toPose2d().getTranslation();
         Rotation3d endRotation = p.getRotation();
@@ -116,7 +120,8 @@ public class LynxArmKinematicsTest {
         LynxArmPose t = new LynxArmPose(
                 new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d(),
                 new Pose3d(new Translation3d(2, 0, 1), new Rotation3d(0, 0, 1)));
-        assertThrows(IllegalArgumentException.class, () -> k.inverse(t.p5()));
+        LynxArmConfig q = new LynxArmConfig(0, 0, 0, 0, 0);
+        assertThrows(IllegalArgumentException.class, () -> k.inverse(q, t.p5()));
     }
 
     @Test
@@ -125,7 +130,9 @@ public class LynxArmKinematicsTest {
         LynxArmPose t = new LynxArmPose(
                 new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d(),
                 new Pose3d(new Translation3d(5, 0, 1), new Rotation3d(0, 0, 0)));
-        assertThrows(IllegalArgumentException.class, () -> k.inverse(t.p5()));
+        LynxArmConfig q = new LynxArmConfig(0, 0, 0, 0, 0);
+
+        assertThrows(IllegalArgumentException.class, () -> k.inverse(q, t.p5()));
     }
 
     @Test
@@ -303,6 +310,7 @@ public class LynxArmKinematicsTest {
         AnalyticLynxArmKinematics k = new AnalyticLynxArmKinematics(1, 1, 1, 1);
         Translation3d start = new Translation3d(1, 1, 0);
         Translation3d end = new Translation3d(1, -1, 0);
+        LynxArmConfig q = new LynxArmConfig(0, 0, 0, 0, 0);
         // end-effector rotation is fixed
         Rotation3d r = new Rotation3d(0, Math.PI / 2, 0);
         if (DEBUG)
@@ -310,7 +318,7 @@ public class LynxArmKinematicsTest {
         for (double s = 0; s <= 1.0; s += 0.05) {
             Translation3d t = start.interpolate(end, s);
             Pose3d p = new Pose3d(t, r);
-            LynxArmConfig q = k.inverse(p);
+            q = k.inverse(q, p);
             if (DEBUG)
                 System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
                         s, q.swing().getAsDouble(), q.boom(), q.stick(), q.wrist(), q.twist().getAsDouble());
@@ -319,7 +327,8 @@ public class LynxArmKinematicsTest {
 
     void verify(AnalyticLynxArmKinematics k, LynxArmPose p, LynxArmConfig q) {
         verifyFwd(p, k.forward(q));
-        verifyInv(q, k.inverse(p.p5()));
+        LynxArmConfig q0 = new LynxArmConfig(0, 0, 0, 0, 0);
+        verifyInv(q, k.inverse(q0, p.p5()));
     }
 
     void verifyFwd(LynxArmPose expected, LynxArmPose actual) {

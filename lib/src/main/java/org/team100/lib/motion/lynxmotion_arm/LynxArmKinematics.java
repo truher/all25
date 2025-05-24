@@ -14,9 +14,12 @@ public interface LynxArmKinematics {
     /**
      * Solve the inverse kinematics for the given end-effector pose.
      * 
+     * The initial config is useful for the solver: usually the new position is not
+     * too far from the old one.
+     * 
      * Refer to the diagram
      * https://docs.google.com/document/d/1B6vGPtBtnDSOpfzwHBflI8-nn98W9QvmrX78bon8Ajw
      */
-    LynxArmConfig inverse(Pose3d end);
+    LynxArmConfig inverse(LynxArmConfig initial, Pose3d end);
 
 }
