@@ -40,10 +40,15 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
      */
     @Override
     public LynxArmPose forward(LynxArmConfig joints) {
+        // first translate and then rotate
         Pose3d root = Pose3d.kZero;
-        // the end of the swing axis, at the boom joint
-        // TODO: this is a little bit weird, translating in z. Maybe use x and a
-        // rotation?
+        // the end of the swing axis
+        Pose3d base_pan = root.transformBy(z(m_swingHeight)).transformBy(joints.swingT());
+        // shoulder "link" has zero length
+        Pose3d shoulder_tilt = base_pan.transformBy(joints.swingT());
+        Pose3d elbow_tilt = shoulder_tilt.transformBy(x(m_boomLength)).transformBy(null)
+        // at the boom joint
+        // 
         Pose3d boomRoot = root.transformBy(joints.swingT()).transformBy(z(m_swingHeight));
         // the end of the boom, at the stick joint
         Pose3d stickRoot = boomRoot.transformBy(joints.boomT()).transformBy(x(m_boomLength));

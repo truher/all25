@@ -35,7 +35,8 @@ public class NumericLynxArmKinematics implements LynxArmKinematics {
                 poses.get("shoulder_tilt"),
                 poses.get("elbow_tilt"),
                 poses.get("wrist_tilt"),
-                poses.get("wrist_rotate"));
+                poses.get("wrist_rotate"),
+                poses.get("center_point"));
         return p;
     }
 
