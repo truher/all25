@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 public class LynxArmTest {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     @Test
     void testTwist() {
@@ -117,29 +117,87 @@ public class LynxArmTest {
         }
     }
 
+    void verify(LynxArmConfig q, double a, double b, double c, double d, double e) {
+        assertEquals(a, q.swing().getAsDouble(), 1e-3);
+        assertEquals(b, q.boom(), 1e-3);
+        assertEquals(c, q.stick(), 1e-3);
+        assertEquals(d, q.wrist(), 1e-3);
+        assertEquals(e, q.twist().getAsDouble(), 1e-3);
+    }
+
+    @Test
+    void testHome() {
+        // numeric kinematics
+        final Pose3d HOME = new Pose3d(0.2, 0, 0.2, new Rotation3d(0, Math.PI / 4, 0));
+        final LynxArmKinematics kinematics = new NumericLynxArmKinematics();
+        LynxArmConfig q = kinematics.inverse(new LynxArmConfig(0, 0, 0, 0, 0), HOME);
+        // zero swing, pitch up, elbow and wrist down, no twist.
+        verify(q, 0.00, -1.86, 1.56, 1.09, 0.00);
+    }
+
+    @Test
+    void testHome2() {
+        final LynxArmKinematics kinematics = new NumericLynxArmKinematics();
+        try (LynxArm m_arm = new LynxArm(kinematics)) {
+            LynxArmConfig q = m_arm.getMeasuredConfig();
+            verify(q, 0.00, -1.86, 1.56, 1.09, 0.00);
+        }
+    }
+
+    @Test
+    void testHome3() {
+        // analytic kinematics
+        final Pose3d HOME = new Pose3d(0.2, 0, 0.2, new Rotation3d(0, Math.PI / 4, 0));
+        final LynxArmKinematics kinematics = AnalyticLynxArmKinematics.real();
+        LynxArmConfig q = kinematics.inverse(new LynxArmConfig(0, 0, 0, 0, 0), HOME);
+        // zero swing, pitch up, elbow and wrist down, no twist.
+        verify(q, 0.00, -1.86, 1.56, 1.09, 0.00);
+    }
+
+    @Test
+    void testHome4() {
+        final LynxArmKinematics kinematics = AnalyticLynxArmKinematics.real();
+        try (LynxArm m_arm = new LynxArm(kinematics)) {
+            LynxArmConfig q = m_arm.getMeasuredConfig();
+            verify(q, 0.00, -1.86, 1.56, 1.09, 0.00);
+        }
+    }
+
     @Test
     void testRoundTrip2b() {
         // for dimensions, see
         // https://wiki.lynxmotion.com/info/wiki/lynxmotion/download/ses-v1/ses-v1-robots/ses-v1-arms/al5d/WebHome/PLTW-AL5D-Guide-11.pdf
-        LynxArmKinematics kinematics = new NumericLynxArmKinematics();
+        final LynxArmKinematics kinematics = new NumericLynxArmKinematics();
 
         try (LynxArm m_arm = new LynxArm(kinematics)) {
+            // first check the home position
+            LynxArmConfig q = m_arm.getMeasuredConfig();
+            if (DEBUG)
+                System.out.printf("** INITIAL %s\n", q.str());
             // there's something wrong with this setpoint.
             // Pose3d setpoint = new Pose3d(
             // new Translation3d(0.165326, 0.056973, 0.085628),
             // new Rotation3d(0.172187, 0.923138, -0.154456));
-            Pose3d setpoint = new Pose3d(
+            final Pose3d setpoint = new Pose3d(
                     new Translation3d(0.2, 0.0, 0.2),
                     new Rotation3d(0.0, 0.0, 0.0));
+
+            if (DEBUG) {
+                System.out.printf("** SETPOINT %s\n", Util.poseStr(setpoint));
+                LynxArmConfig inv = kinematics.inverse(new LynxArmConfig(0, 0, 0, 0, 0), setpoint);
+                System.out.printf("** INV %s\n", inv.str());
+            }
+
             m_arm.setPosition(setpoint);
-            if (DEBUG)
-                System.out.printf("setpoint %s\n", Util.poseStr(setpoint));
+
             LynxArmConfig measuredConfig = m_arm.getMeasuredConfig();
             if (DEBUG)
-                System.out.printf("measured  config %s\n", measuredConfig.str());
+                System.out.printf("** MEASURED %s\n", measuredConfig.str());
+
             LynxArmConfig commandedConfig = m_arm.getInverse(setpoint);
             if (DEBUG)
-                System.out.printf("commanded config %s\n", commandedConfig.str());
+                System.out.printf("** INV2 %s\n", commandedConfig.str());
+
             assertEquals(measuredConfig.swing().getAsDouble(), commandedConfig.swing().getAsDouble(), 0.001);
             assertEquals(measuredConfig.boom(), commandedConfig.boom(), 0.001);
             assertEquals(measuredConfig.stick(), commandedConfig.stick(), 0.001);

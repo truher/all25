@@ -2,11 +2,15 @@ package org.team100.lib.math;
 
 import java.util.function.Function;
 
+import org.team100.lib.util.Util;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.jni.EigenJNI;
+import edu.wpi.first.math.numbers.N1;
 
 /**
  * Newton's method finds a zero of a multivariate function; in this case, the
@@ -25,6 +29,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     private final Nat<X> m_xdim;
     private final Nat<Y> m_ydim;
     private final Function<Vector<X>, Vector<Y>> m_f;
+    private final Function<Vector<Y>, Vector<Y>> m_fErr;
     private final Vector<X> m_xMin;
     private final Vector<X> m_xMax;
     private final double m_toleranceSq;
@@ -38,6 +43,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             Nat<X> xdim,
             Nat<Y> ydim,
             Function<Vector<X>, Vector<Y>> f,
+            Function<Vector<Y>, Vector<Y>> fErr,
             Vector<X> xMin,
             Vector<X> xMax,
             double tolerance,
@@ -46,6 +52,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         m_xdim = xdim;
         m_ydim = ydim;
         m_f = f;
+        m_fErr = fErr;
         m_xMin = xMin;
         m_xMax = xMax;
         m_toleranceSq = tolerance * tolerance;
@@ -58,10 +65,10 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         Vector<X> x = new Vector<>(initial.getStorage().copy());
         for (int i = 0; i < m_iterations; ++i) {
             Vector<Y> y = m_f.apply(x);
-            dump(i, x, y);
             Vector<Y> error = goal.minus(y);
-            if (within(error))
+            if (within(error)) {
                 return x;
+            }
             Matrix<Y, X> j = NumericalJacobian100.numericalJacobian(m_xdim, m_ydim, m_f, x);
             Vector<X> dx = new Vector<>(j.solve(error));
             // Too-high dx results in oscillation.
@@ -73,32 +80,80 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         return x;
     }
 
-    /** Single-sided Jacobian, faster. */
-    public Vector<X> solve2(Vector<X> initial, Vector<Y> goal) {
-        Vector<X> x = new Vector<>(initial.getStorage().copy());
-        for (int iter = 0; iter < m_iterations; ++iter) {
-            Vector<Y> y = m_f.apply(x);
-            dump(iter, x, y);
-            Vector<Y> error = goal.minus(y);
-            if (within(error)) {
-                return x;
+    /**
+     * Single-sided Jacobian, faster.
+     * TODO: remove goalY
+     */
+    public Vector<X> solve2(Vector<X> initialX, Vector<Y> goalY) {
+        // Vector<Y> initialY = m_f.apply(initialX);
+        Vector<Y> initialErrorY = m_fErr.apply(initialY);
+
+        System.out.printf("INITIAL ERROR %s\n", Util.vecStr(initialErrorY));
+
+        long startTime = System.nanoTime();
+        int iter = 0;
+        try {
+            Vector<X> x = new Vector<>(initialX.getStorage().copy());
+            for (iter = 0; iter < m_iterations; ++iter) {
+
+                Vector<Y> y = m_f.apply(x);
+                // i think this "minus" is the problem
+                // Vector<Y> error = goalY.minus(y);
+                Vector<Y> error = m_fErr.apply(y);
+
+                if (within(error)) {
+                    return x;
+                }
+                Matrix<Y, X> j = NumericalJacobian100.numericalJacobian2(m_xdim, m_ydim, m_f, x);
+                // Matrix<Y, X> j = NumericalJacobian100.numericalJacobian(m_xdim, m_ydim, m_f,
+                // x);
+
+                // solve Ax=B or Jdx=error
+                Vector<X> dx = new Vector<>(j.solve(error));
+
+                // this solver also works but it's not better.
+                // Vector<X> dx = getDxWithQRDecomp(error, j);
+
+                System.out.printf("error: %s dx: %s\n",
+                        Util.vecStr(error), Util.vecStr(dx));
+                // Too-high dx results in oscillation.
+                clamp(dx);
+                update(x, dx);
+                // Keep the x estimate within bounds.
+                limit(x);
             }
-            Matrix<Y, X> j = NumericalJacobian100.numericalJacobian2(m_xdim, m_ydim, m_f, x);
-            Vector<X> dx = new Vector<>(j.solve(error));
-            // Too-high dx results in oscillation.
-            clamp(dx);
-            update(x, dx);
-            // Keep the x estimate within bounds.
-            limit(x);
+            System.out.println("FAILED TO CONVERGE");
+            return x;
+        } finally {
+            long finishTime = System.nanoTime();
+            Util.printf("solve2 iterations: %d ET (ms): %6.3f\n",
+                    iter, ((double) finishTime - startTime) / 1000000);
         }
-        return x;
+    }
+
+    /** A different solver */
+    Vector<X> getDxWithQRDecomp(Vector<Y> error, Matrix<Y, X> j) {
+        double[] A = j.getData();
+        int Arows = j.getNumRows();
+        int Acols = j.getNumCols();
+        double[] B = error.getData();
+        int Brows = error.getNumRows();
+        int Bcols = error.getNumCols();
+        // dst has same dimensions as B
+        double[] dst = new double[B.length];
+        // solve Ax=B
+        EigenJNI.solveFullPivHouseholderQr(A, Arows, Acols, B, Brows, Bcols, dst);
+        Vector<X> dx = new Vector<>(new Matrix<>(m_xdim, Nat.N1(), dst));
+        return dx;
     }
 
     /**
      * Using dot instead of norm saves the sqrt.
      */
     private boolean within(Vector<Y> error) {
-        return error.dot(error) < m_toleranceSq;
+        double sqErr = error.dot(error);
+        System.out.printf("sqErr %f\n", sqErr);
+        return sqErr < m_toleranceSq;
     }
 
     /**
@@ -132,19 +187,14 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      */
     private void clamp(Vector<X> dx) {
         for (int i = 0; i < dx.getNumRows(); ++i) {
-            dx.set(i, 0, MathUtil.clamp(dx.get(i), -m_dxLimit, m_dxLimit));
+            double dxI = dx.get(i);
+            if (Math.abs(dxI) > m_dxLimit) {
+                System.out.println("clamped!");
+            }
+            double clampedDxI = MathUtil.clamp(dxI, -m_dxLimit, m_dxLimit);
+            // System.out.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);
+            dx.set(i, 0, clampedDxI);
         }
-    }
-
-    private void dump(int iter, Vector<X> x, Vector<Y> y) {
-        if (!DEBUG)
-            return;
-        System.out.printf("%d: ", iter);
-        System.out.printf("X [");
-        print(x);
-        System.out.printf("] Y [");
-        print(y);
-        System.out.println("]");
     }
 
     static <R extends Num> void print(Vector<R> v) {

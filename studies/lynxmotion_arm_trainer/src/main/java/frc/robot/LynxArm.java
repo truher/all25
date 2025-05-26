@@ -40,9 +40,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * TODO: compute gravity effect on each joint, adjust estimated position
  */
 public class LynxArm extends SubsystemBase implements AutoCloseable {
-    private static final boolean DEBUG = true;
-
+    private static final boolean DEBUG = false;
     private static final Pose3d HOME = new Pose3d(0.2, 0, 0.2, new Rotation3d(0, Math.PI / 4, 0));
+
     private final CalibratedServo m_swing;
     private final CalibratedServo m_boom;
     private final CalibratedServo m_stick;
@@ -59,11 +59,8 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
 
         // yaw; joint zero is is in the middle of the servo range; unconstrained.
         m_swing = new CalibratedServo(0,
-                new Clamp(-Math.PI, Math.PI),
+                new Clamp(-Math.PI / 2, Math.PI / 2),
                 new AffineFunction(-3.216, 1.534));
-
-        // these are placeholders
-        // TODO: calibrate all the axes.
 
         // pitch; joint zero and servo zero are aligned; unconstrained.
         m_boom = new CalibratedServo(1,
@@ -77,12 +74,12 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
 
         // pitch; joint zero is in the middle of the servo range; unconstrained
         m_wrist = new CalibratedServo(3,
-                new Clamp(-Math.PI, Math.PI),
+                new Clamp(-Math.PI / 2, Math.PI / 2),
                 new AffineFunction(-Math.PI, Math.PI / 2));
 
         // roll; joint zero is in the middle of the servo range; unconstrained.
         m_twist = new CalibratedServo(4,
-                new Clamp(-Math.PI, Math.PI),
+                new Clamp(-Math.PI / 2, Math.PI / 2),
                 new AffineFunction(-Math.PI, Math.PI / 2));
 
         // the grip axis measures the width of the jaws.
@@ -91,8 +88,26 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
                 new Clamp(0, 0.02),
                 new AffineFunction(-0.02, 0.02));
 
-        // initial position keeps the IK path from being invalid
+        // initialize the servo values so that the solver doesn't freak out
+        // TODO: why was it freaking out?
+        m_swing.setAngle(0);
+        m_boom.setAngle(-2.0 * Math.PI / 3);
+        m_stick.setAngle(Math.PI / 2);
+        m_wrist.setAngle(Math.PI / 2);
+        m_twist.setAngle(0);
+        m_grip.setAngle(0);
+
+        // set the initial position to the actual desired value
+        if (DEBUG) {
+            System.out.println("-> initializing position to HOME");
+            System.out.printf("HOME: %s\n", Util.poseStr(HOME));
+        }
         setPosition(HOME);
+        if (DEBUG)
+            System.out.println("-> check position");
+        getPosition();
+        if (DEBUG)
+            System.out.println("-> initializing done");
     }
 
     /**
@@ -106,7 +121,11 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
      * TODO: use the previous value for indeterminate axes.
      */
     public void setPosition(Pose3d end) {
+        if (DEBUG)
+            System.out.println("setPosition()");
         LynxArmConfig q = getInverse(end);
+        if (DEBUG)
+            System.out.printf("set q: %s\n", q.str());
 
         q.swing().ifPresent(m_swing::setAngle);
         m_boom.setAngle(q.boom());
@@ -119,18 +138,16 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         if (q.twist().isEmpty())
             if (DEBUG)
                 System.out.println("empty twist");
-        LynxArmPose p = getPosition();
-        if (DEBUG) {
-            System.out.printf("set p %s q %s\n", Util.poseStr(end), q.str());
-            System.out.printf("result %s\n", Util.poseStr(p.p6()));
-        }
     }
 
     public LynxArmPose getPosition() {
-        LynxArmConfig q = getMeasuredConfig();
         if (DEBUG)
-            System.out.printf("get %s\n", q.str());
-        return m_kinematics.forward(q);
+            System.out.println("getPosition()");
+        LynxArmConfig q = getMeasuredConfig();
+        LynxArmPose p = m_kinematics.forward(q);
+        if (DEBUG)
+            System.out.printf("p6: %s\n", Util.poseStr(p.p6()));
+        return p;
     }
 
     public MoveCommand moveTo(Pose3d goal) {
@@ -154,16 +171,23 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
     /////////////////////////////////////////////
 
     LynxArmConfig getInverse(Pose3d p) {
+        if (DEBUG)
+            System.out.println("getInverse()");
         LynxArmConfig q0 = getMeasuredConfig();
         return m_kinematics.inverse(q0, p);
     }
 
     LynxArmConfig getMeasuredConfig() {
-        return new LynxArmConfig(
+        if (DEBUG)
+            System.out.println("getMeasuredConfig()");
+        LynxArmConfig q = new LynxArmConfig(
                 m_swing.getAngle(),
                 m_boom.getAngle(),
                 m_stick.getAngle(),
                 m_wrist.getAngle(),
                 m_twist.getAngle());
+        if (DEBUG)
+            System.out.printf("get q: %s\n", q.str());
+        return q;
     }
 }

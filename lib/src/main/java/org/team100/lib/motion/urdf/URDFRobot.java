@@ -3,6 +3,7 @@ package org.team100.lib.motion.urdf;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.team100.lib.geometry.GeometryUtil;
@@ -46,6 +47,7 @@ import edu.wpi.first.math.numbers.N6;
  * https://wiki.ros.org/srdf/review
  */
 public class URDFRobot {
+    private static final boolean DEBUG = false;
     private final String m_name;
     private final List<URDFLink> m_links;
     private final List<URDFJoint> m_joints;
@@ -75,6 +77,19 @@ public class URDFRobot {
      * qDim indicates the dimensionality of the configuration space.
      * TODO: get rid of qDim.
      * q0 is the initial (e.g. current) configuration.
+     * 
+     * the function, f, is the forward transform: it takes the joint
+     * configuration vector, Q, and produces a vector representing the pose, P.
+     * since the Pose is in SE(3) we have to choose a parameterization. see
+     * https://ingmec.ual.es/~jlblanco/papers/jlblanco2010geometry3D_techrep.pdf
+     * which has a section on SE(3) parameterizations for optimization.
+     * optimizers assume euclidean spaces. they suggest optimizing on the manifold,
+     * like GTSAM does.
+     * 
+     * ideally at each optimizer would reparameterize at each step.
+     * 
+     * if not, then the "error" is between two tangent vectors whose origin is far
+     * away.
      */
     public <Q extends Num> Map<String, Double> inverse(
             Nat<Q> qDim,
@@ -82,7 +97,8 @@ public class URDFRobot {
             double dqLimit,
             String jointName,
             Pose3d goal) {
-        Function<Vector<Q>, Vector<N6>> f = q -> {
+
+        Function<Vector<Q>, Vector<N6>> fwd = q -> {
             // print("q", q);
             // solve all of them
             Map<String, Double> qMap = qMap(q);
@@ -94,16 +110,29 @@ public class URDFRobot {
             // print("pv", pv);
             return pv;
         };
+
+
         // this function always uses pose3d so the goal dim is always N6.
         Nat<N6> twistDim = Nat.N6();
         Vector<N6> goalVec = GeometryUtil.toVec(GeometryUtil.slog(goal));
+
+        Function<Vector<N6>, Vector<N6>> errF = (YY) -> {
+            Pose3d YY
+            return goalVec.minus(YY);
+        };
+
         // TODO: lower the iteration limit
         NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
-                qDim, twistDim, f,
+                qDim, twistDim, fwd, errF,
                 minQ(qDim), maxQ(qDim),
                 1e-3, 200, dqLimit);
-        Vector<Q> q = solver.solve2(q0, goalVec);
-        return qMap(q);
+        Vector<Q> qVec = solver.solve2(q0, goalVec);
+        if (DEBUG) {
+            System.out.printf("goalVec: %s\n", goalVec);
+            System.out.printf("q0: %s\n", q0);
+            System.out.printf("qVec: %s\n", qVec);
+        }
+        return qMap(qVec);
     }
 
     ///////////////////////////////////////////////////

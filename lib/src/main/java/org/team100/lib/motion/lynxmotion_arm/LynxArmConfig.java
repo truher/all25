@@ -73,7 +73,7 @@ public record LynxArmConfig(
 
     public String str() {
         return String.format(
-                "swing %6.3f boom %6.3f stick %6.3f wrist %6.3f twist %6.3f",
+                "config: [%5.2f %5.2f %5.2f %5.2f %5.2f]",
                 swing.getAsDouble(),
                 boom,
                 stick,

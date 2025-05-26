@@ -49,7 +49,7 @@ public class URDFAL5D extends URDFRobot {
                         new URDFJoint(
                                 "base_pan",
                                 JointType.revolute,
-                                new Limit(1000, -Math.PI / 2, Math.PI, 0.5),
+                                new Limit(1000, -Math.PI / 2, Math.PI / 2, 0.5),
                                 base_link,
                                 base_pan_link,
                                 // rot z zero used to be -pi/2

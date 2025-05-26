@@ -378,14 +378,19 @@ public class NewtonsMethodTest {
     @Test
     void test6() {
         // case from test3 but using the solver class
+        Vector<N2> Xd = VecBuilder.fill(0, 1);
+        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
+
         Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
+        Function<Vector<N2>, Vector<N2>> fErr = y -> Xd.minus(y);
+
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> Xd = VecBuilder.fill(0, 1);
-        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
+
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, fErr, minQ, maxQ, 1e-3, 10, 1);
+
         Vector<N2> x = s.solve(q0, Xd);
         assertEquals(0.524, x.get(0), 1e-3);
         assertEquals(2.094, x.get(1), 1e-3);
@@ -394,15 +399,17 @@ public class NewtonsMethodTest {
     /** 3.7 us per solve */
     @Test
     void test7() {
+        Vector<N2> Xd = VecBuilder.fill(0, 1);
+        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // performance
         Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
+        Function<Vector<N2>, Vector<N2>> fErr = y -> Xd.minus(y);
+
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> Xd = VecBuilder.fill(0, 1);
-        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, fErr, minQ, maxQ, 1e-3, 10, 1);
         int iterations = 1000000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
@@ -418,15 +425,17 @@ public class NewtonsMethodTest {
 
     @Test
     void test62() {
+        Vector<N2> Xd = VecBuilder.fill(0, 1);
+        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // case from test3 but using the solver class
         Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
+        Function<Vector<N2>, Vector<N2>> fErr = y -> Xd.minus(y);
+
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> Xd = VecBuilder.fill(0, 1);
-        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, fErr, minQ, maxQ, 1e-3, 10, 1);
         Vector<N2> x = s.solve2(q0, Xd);
         assertEquals(0.524, x.get(0), 1e-3);
         assertEquals(2.094, x.get(1), 1e-3);
@@ -435,15 +444,16 @@ public class NewtonsMethodTest {
     /** 2.4 us per solve with "solve2" optimizations. */
     @Test
     void test72() {
+        Vector<N2> Xd = VecBuilder.fill(0, 1);
+        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // performance
         Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
+        Function<Vector<N2>, Vector<N2>> fErr = y -> Xd.minus(y);
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> Xd = VecBuilder.fill(0, 1);
-        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, fErr, minQ, maxQ, 1e-3, 10, 1);
         int iterations = 1000000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {

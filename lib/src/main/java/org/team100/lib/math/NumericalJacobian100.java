@@ -2,6 +2,8 @@ package org.team100.lib.math;
 
 import java.util.function.Function;
 
+import org.team100.lib.util.Util;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -13,7 +15,7 @@ import edu.wpi.first.math.Vector;
  * Estimates the Jacobian using symmetric differences around the reference x.
  */
 public class NumericalJacobian100 {
-    private static final double kEpsilon = 1e-5;
+    private static final double kEpsilon = 1e-6;
 
     /**
      * Estimates the Jacobian using symmetric differences around the reference x.
@@ -63,6 +65,7 @@ public class NumericalJacobian100 {
             // put the old value back
             x.set(i, 0, xi);
         }
+        // System.out.printf("J: %s\n", Util.matStr(result));
         return result;
     }
 }

@@ -50,8 +50,6 @@ public class NumericLynxArmKinematics implements LynxArmKinematics {
                 initial.twist().getAsDouble());
 
         // TODO: raise the step limit
-        // TODO: replace "wrist_rotate" with "center_point" -- this is a workaround
-        // for the shim.
         Map<String, Double> qMap = m_arm.inverse(Nat.N5(), q0, 0.1, "center_point", end);
         LynxArmConfig c = new LynxArmConfig(
                 qMap.get("base_pan"),
