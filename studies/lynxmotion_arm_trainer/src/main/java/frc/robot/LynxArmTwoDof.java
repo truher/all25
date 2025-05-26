@@ -71,7 +71,7 @@ public class LynxArmTwoDof extends SubsystemBase implements AutoCloseable {
         m_twist.setAngle(0);
 
         m_kinematics = new AnalyticTwoDofKinematics(0.146, 0.298);
-        m_fullKinematics = new AnalyticLynxArmKinematics(0.07, 0.146, 0.187, 0.111);
+        m_fullKinematics = AnalyticLynxArmKinematics.real();
 
         setPosition(HOME);
     }

@@ -107,7 +107,6 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
      */
     public void setPosition(Pose3d end) {
         LynxArmConfig q = getInverse(end);
-        LynxArmPose p = getPosition();
 
         q.swing().ifPresent(m_swing::setAngle);
         m_boom.setAngle(q.boom());
@@ -120,6 +119,7 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         if (q.twist().isEmpty())
             if (DEBUG)
                 System.out.println("empty twist");
+        LynxArmPose p = getPosition();
         if (DEBUG) {
             System.out.printf("set p %s q %s\n", Util.poseStr(end), q.str());
             System.out.printf("result %s\n", Util.poseStr(p.p6()));

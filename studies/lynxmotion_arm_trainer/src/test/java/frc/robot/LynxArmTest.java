@@ -21,7 +21,7 @@ public class LynxArmTest {
     void testTwist() {
         // for dimensions, see
         // https://wiki.lynxmotion.com/info/wiki/lynxmotion/download/ses-v1/ses-v1-robots/ses-v1-arms/al5d/WebHome/PLTW-AL5D-Guide-11.pdf
-        LynxArmKinematics kinematics = new AnalyticLynxArmKinematics(0.07, 0.146, 0.187, 0.111);
+        LynxArmKinematics kinematics = AnalyticLynxArmKinematics.real();
 
         try (LynxArm m_arm = new LynxArm(kinematics)) {
             Pose3d start = new Pose3d(0.15, -0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0));
@@ -42,6 +42,7 @@ public class LynxArmTest {
                     System.out.printf("s %f p3 %s\n", s, Util.poseStr(p.p3()));
                     System.out.printf("s %f p4 %s\n", s, Util.poseStr(p.p4()));
                     System.out.printf("s %f p5 %s\n", s, Util.poseStr(p.p5()));
+                    System.out.printf("s %f p6 %s\n", s, Util.poseStr(p.p6()));
                 }
             }
         }
@@ -51,7 +52,7 @@ public class LynxArmTest {
     void testRoundTrip() {
         // for dimensions, see
         // https://wiki.lynxmotion.com/info/wiki/lynxmotion/download/ses-v1/ses-v1-robots/ses-v1-arms/al5d/WebHome/PLTW-AL5D-Guide-11.pdf
-        LynxArmKinematics kinematics = new AnalyticLynxArmKinematics(0.07, 0.146, 0.187, 0.111);
+        LynxArmKinematics kinematics = AnalyticLynxArmKinematics.real();
 
         try (LynxArm m_arm = new LynxArm(kinematics)) {
             Pose3d setpoint = new Pose3d(
@@ -97,8 +98,7 @@ public class LynxArmTest {
     void testRoundTrip2() {
         // for dimensions, see
         // https://wiki.lynxmotion.com/info/wiki/lynxmotion/download/ses-v1/ses-v1-robots/ses-v1-arms/al5d/WebHome/PLTW-AL5D-Guide-11.pdf
-        LynxArmKinematics kinematics = new AnalyticLynxArmKinematics(0.07, 0.146,
-                0.187, 0.111);
+        LynxArmKinematics kinematics = AnalyticLynxArmKinematics.real();
 
         try (LynxArm m_arm = new LynxArm(kinematics)) {
             Pose3d setpoint = new Pose3d(

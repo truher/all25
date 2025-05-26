@@ -13,24 +13,35 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
     private final double m_swingHeight;
     private final double m_boomLength;
     private final double m_stickLength;
-    /**
-     * Includes the link before the twist servo and also the length of the grip,
-     * since they're collinear.
-     */
     private final double m_wristLength;
+    private final double m_gripLength;
     private final TwoDofKinematics twodof;
 
     /** All distances are in meters. */
-    public AnalyticLynxArmKinematics(
+    private AnalyticLynxArmKinematics(
             double swingHeight,
             double boomLength,
             double stickLength,
-            double wristLength) {
+            double wristLength,
+            double gripLength) {
         m_swingHeight = swingHeight;
         m_boomLength = boomLength;
         m_stickLength = stickLength;
         m_wristLength = wristLength;
+        m_gripLength = gripLength;
         twodof = new AnalyticTwoDofKinematics(boomLength, stickLength);
+    }
+
+    public static AnalyticLynxArmKinematics unit() {
+        return new AnalyticLynxArmKinematics(1, 1, 1, 1, 1);
+    }
+
+    public static AnalyticLynxArmKinematics half() {
+        return new AnalyticLynxArmKinematics(0.5, 0.5, 0.5, 0.5, 0.5);
+    }
+
+    public static AnalyticLynxArmKinematics real() {
+        return new AnalyticLynxArmKinematics(0.06731, 0.14605, 0.187325, 0.034, 0.055);
     }
 
     /**
@@ -40,26 +51,47 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
      */
     @Override
     public LynxArmPose forward(LynxArmConfig joints) {
+        // these names mirror the URDF AL5D names.
         // first translate and then rotate
         Pose3d root = Pose3d.kZero;
         // the end of the swing axis
         Pose3d base_pan = root.transformBy(z(m_swingHeight)).transformBy(joints.swingT());
-        // shoulder "link" has zero length
-        Pose3d shoulder_tilt = base_pan.transformBy(joints.swingT());
-        Pose3d elbow_tilt = shoulder_tilt.transformBy(x(m_boomLength)).transformBy(null)
-        // at the boom joint
-        // 
-        Pose3d boomRoot = root.transformBy(joints.swingT()).transformBy(z(m_swingHeight));
-        // the end of the boom, at the stick joint
-        Pose3d stickRoot = boomRoot.transformBy(joints.boomT()).transformBy(x(m_boomLength));
-        // the end of the stick, at the wrist joint
-        Pose3d wristRoot = stickRoot.transformBy(joints.stickT()).transformBy(x(m_stickLength));
-        // this is actually at the grip center but without the twist,
-        // since the twist axis and the grip axis are collinear.
-        Pose3d twistRoot = wristRoot.transformBy(joints.wristT()).transformBy(x(m_wristLength));
-        // this is Tool Center Point.
-        Pose3d grip = twistRoot.transformBy(joints.twistT());
-        return new LynxArmPose(boomRoot, stickRoot, wristRoot, twistRoot, grip);
+        // shoulder "link" has zero length, so this pose is still on the yaw axis
+        Pose3d shoulder_tilt = base_pan.transformBy(joints.boomT());
+        // the pose of the elbow, including the elbow rotation
+        Pose3d elbow_tilt = shoulder_tilt.transformBy(x(m_boomLength)).transformBy(joints.stickT());
+        // the pose of the wrist, including the wrist rotation
+        Pose3d wrist_tilt = elbow_tilt.transformBy(x(m_stickLength)).transformBy(joints.wristT());
+        // the pose at the twisting part, i.e. between the twisting servo and the grip
+        // servo
+        Pose3d wrist_rotate = wrist_tilt.transformBy(x(m_wristLength)).transformBy(joints.twistT());
+        // center point is just extension
+        Pose3d center_point = wrist_rotate.transformBy(x(m_gripLength));
+        return new LynxArmPose(
+                base_pan,
+                shoulder_tilt,
+                elbow_tilt,
+                wrist_tilt,
+                wrist_rotate,
+                center_point);
+
+        // // at the boom joint
+        // //
+        // Pose3d boomRoot =
+        // root.transformBy(joints.swingT()).transformBy(z(m_swingHeight));
+        // // the end of the boom, at the stick joint
+        // Pose3d stickRoot =
+        // boomRoot.transformBy(joints.boomT()).transformBy(x(m_boomLength));
+        // // the end of the stick, at the wrist joint
+        // Pose3d wristRoot =
+        // stickRoot.transformBy(joints.stickT()).transformBy(x(m_stickLength));
+        // // this is actually at the grip center but without the twist,
+        // // since the twist axis and the grip axis are collinear.
+        // Pose3d twistRoot =
+        // wristRoot.transformBy(joints.wristT()).transformBy(x(m_wristLength));
+        // // this is Tool Center Point.
+        // Pose3d grip = twistRoot.transformBy(joints.twistT());
+        // return new LynxArmPose(boomRoot, stickRoot, wristRoot, twistRoot, grip);
     }
 
     /**
@@ -83,7 +115,7 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
         Translation2d translation = end.toPose2d().getTranslation();
 
         // To find the wrist joint location, follow the wrist backwards.
-        Pose3d wristPose = end.transformBy(x(m_wristLength).inverse());
+        Pose3d wristPose = end.transformBy(x(m_wristLength + m_gripLength).inverse());
 
         // Solve the 2dof problem. The 2dof coordinates are different:
         // the x dimension is the radius in 3d xy.

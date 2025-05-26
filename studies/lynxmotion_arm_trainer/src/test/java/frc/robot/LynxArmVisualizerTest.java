@@ -18,7 +18,7 @@ public class LynxArmVisualizerTest {
     void testFoo() {
         // for dimensions, see
         // https://wiki.lynxmotion.com/info/wiki/lynxmotion/download/ses-v1/ses-v1-robots/ses-v1-arms/al5d/WebHome/PLTW-AL5D-Guide-11.pdf
-        LynxArmKinematics kinematics = new AnalyticLynxArmKinematics(0.07, 0.146, 0.187, 0.111);
+        LynxArmKinematics kinematics = AnalyticLynxArmKinematics.real();
         try (LynxArm arm = new LynxArm(kinematics)) {
             LynxArmVisualizer foo = new LynxArmVisualizer(arm::getPosition);
             // unrotated camera below the table
