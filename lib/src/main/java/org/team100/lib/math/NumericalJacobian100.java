@@ -2,8 +2,6 @@ package org.team100.lib.math;
 
 import java.util.function.Function;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -15,7 +13,7 @@ import edu.wpi.first.math.Vector;
  * Estimates the Jacobian using symmetric differences around the reference x.
  */
 public class NumericalJacobian100 {
-    private static final double kEpsilon = 1e-6;
+    private static final double DX = 1e-5;
 
     /**
      * Estimates the Jacobian using symmetric differences around the reference x.
@@ -29,9 +27,9 @@ public class NumericalJacobian100 {
         for (int i = 0; i < xdim.getNum(); i++) {
             Vector<X> dxPlus = new Vector<>(x.getStorage().copy());
             Vector<X> dxMinus = new Vector<>(x.getStorage().copy());
-            dxPlus.set(i, 0, dxPlus.get(i, 0) + kEpsilon);
-            dxMinus.set(i, 0, dxMinus.get(i, 0) - kEpsilon);
-            Vector<Y> dF = f.apply(dxPlus).minus(f.apply(dxMinus)).div(2 * kEpsilon);
+            dxPlus.set(i, 0, dxPlus.get(i, 0) + DX);
+            dxMinus.set(i, 0, dxMinus.get(i, 0) - DX);
+            Vector<Y> dF = f.apply(dxPlus).minus(f.apply(dxMinus)).div(2 * DX);
             result.setColumn(i, Matrix.changeBoundsUnchecked(dF));
         }
         return result;
@@ -49,23 +47,20 @@ public class NumericalJacobian100 {
             Nat<Y> ydim,
             Function<Vector<X>, Vector<Y>> f,
             Vector<X> x) {
-        Vector<Y> Y = f.apply(x);
+        final Vector<Y> Y = f.apply(x);
         Matrix<Y, X> result = new Matrix<>(ydim, xdim);
-        for (int i = 0; i < xdim.getNum(); i++) {
-            double xi = x.get(i);
-            x.set(i, 0, xi + kEpsilon);
-            Vector<Y> Y1 = f.apply(x);
-            // System.out.printf("Y1 - Y %s\n", Y1.minus(Y));
-            // mutate Y1 here to save lots of allocations
-            // dF = (f(x + epsilon) - f(x)) / epsilon
-            for (int j = 0; j < ydim.getNum(); ++j) {
-                Y1.set(j, 0, (Y1.get(j) - Y.get(j)) / kEpsilon);
+        for (int colI = 0; colI < xdim.getNum(); colI++) {
+            final double xi = x.get(colI);
+            x.set(colI, 0, xi + DX);
+            final Vector<Y> Y1 = f.apply(x);
+            for (int rowI = 0; rowI < ydim.getNum(); rowI++) {
+                double dy = Y1.get(rowI) - Y.get(rowI);
+                double dydx = dy / DX;
+                result.set(rowI, colI, dydx);
             }
-            result.setColumn(i, Y1);
             // put the old value back
-            x.set(i, 0, xi);
+            x.set(colI, 0, xi);
         }
-        // System.out.printf("J: %s\n", Util.matStr(result));
         return result;
     }
 }

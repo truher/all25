@@ -98,6 +98,9 @@ public class URDFRobot {
             String jointName,
             Pose3d goal) {
 
+        Vector<N6> goalVec = GeometryUtil.toVec(GeometryUtil.slog(goal));
+
+        // this is the ERROR in the forward kinematics
         Function<Vector<Q>, Vector<N6>> fwd = q -> {
             // print("q", q);
             // solve all of them
@@ -108,25 +111,18 @@ public class URDFRobot {
             Vector<N6> pv = GeometryUtil.toVec(GeometryUtil.slog(pose));
             // print(pose);
             // print("pv", pv);
-            return pv;
+            return goalVec.minus(pv);
         };
-
 
         // this function always uses pose3d so the goal dim is always N6.
         Nat<N6> twistDim = Nat.N6();
-        Vector<N6> goalVec = GeometryUtil.toVec(GeometryUtil.slog(goal));
-
-        Function<Vector<N6>, Vector<N6>> errF = (YY) -> {
-            Pose3d YY
-            return goalVec.minus(YY);
-        };
 
         // TODO: lower the iteration limit
         NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
-                qDim, twistDim, fwd, errF,
+                qDim, twistDim, fwd,
                 minQ(qDim), maxQ(qDim),
                 1e-3, 200, dqLimit);
-        Vector<Q> qVec = solver.solve2(q0, goalVec);
+        Vector<Q> qVec = solver.solve2(q0);
         if (DEBUG) {
             System.out.printf("goalVec: %s\n", goalVec);
             System.out.printf("q0: %s\n", q0);

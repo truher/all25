@@ -13,11 +13,10 @@ import edu.wpi.first.math.jni.EigenJNI;
 import edu.wpi.first.math.numbers.N1;
 
 /**
- * Newton's method finds a zero of a multivariate function; in this case, the
- * function is the error between the f and the desired value of f, so
- * driving it to zero yields the x values to get the desired f.
+ * Newton's method finds a zero of a multivariate function.
  * 
- * TODO: would it be better (i.e. faster) to make the error a scalar metric?
+ * For example, supply a function that describes the error in estimate and goal:
+ * driving it to zero yields the x values to get the desired f.
  * 
  * Uses the (estimated) Jacobian of the function to estimate the x intercept.
  * 
@@ -29,7 +28,6 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     private final Nat<X> m_xdim;
     private final Nat<Y> m_ydim;
     private final Function<Vector<X>, Vector<Y>> m_f;
-    private final Function<Vector<Y>, Vector<Y>> m_fErr;
     private final Vector<X> m_xMin;
     private final Vector<X> m_xMax;
     private final double m_toleranceSq;
@@ -43,7 +41,6 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             Nat<X> xdim,
             Nat<Y> ydim,
             Function<Vector<X>, Vector<Y>> f,
-            Function<Vector<Y>, Vector<Y>> fErr,
             Vector<X> xMin,
             Vector<X> xMax,
             double tolerance,
@@ -52,7 +49,6 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         m_xdim = xdim;
         m_ydim = ydim;
         m_f = f;
-        m_fErr = fErr;
         m_xMin = xMin;
         m_xMax = xMax;
         m_toleranceSq = tolerance * tolerance;
@@ -84,22 +80,18 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      * Single-sided Jacobian, faster.
      * TODO: remove goalY
      */
-    public Vector<X> solve2(Vector<X> initialX, Vector<Y> goalY) {
-        // Vector<Y> initialY = m_f.apply(initialX);
-        Vector<Y> initialErrorY = m_fErr.apply(initialY);
-
-        System.out.printf("INITIAL ERROR %s\n", Util.vecStr(initialErrorY));
-
+    public Vector<X> solve2(Vector<X> initialX) {
         long startTime = System.nanoTime();
         int iter = 0;
         try {
             Vector<X> x = new Vector<>(initialX.getStorage().copy());
             for (iter = 0; iter < m_iterations; ++iter) {
 
-                Vector<Y> y = m_f.apply(x);
+                Vector<Y> error = m_f.apply(x);
+                // Vector<Y> y = m_f.apply(x);
                 // i think this "minus" is the problem
                 // Vector<Y> error = goalY.minus(y);
-                Vector<Y> error = m_fErr.apply(y);
+                // Vector<Y> error = m_fErr.apply(y);
 
                 if (within(error)) {
                     return x;
@@ -114,20 +106,22 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 // this solver also works but it's not better.
                 // Vector<X> dx = getDxWithQRDecomp(error, j);
 
-                System.out.printf("error: %s dx: %s\n",
-                        Util.vecStr(error), Util.vecStr(dx));
+                if (DEBUG)
+                    System.out.printf("error: %s dx: %s\n", Util.vecStr(error), Util.vecStr(dx));
                 // Too-high dx results in oscillation.
                 clamp(dx);
                 update(x, dx);
                 // Keep the x estimate within bounds.
                 limit(x);
             }
-            System.out.println("FAILED TO CONVERGE");
+            if (DEBUG)
+                System.out.println("FAILED TO CONVERGE");
             return x;
         } finally {
             long finishTime = System.nanoTime();
-            Util.printf("solve2 iterations: %d ET (ms): %6.3f\n",
-                    iter, ((double) finishTime - startTime) / 1000000);
+            if (DEBUG)
+                Util.printf("solve2 iterations: %d ET (ms): %6.3f\n",
+                        iter, ((double) finishTime - startTime) / 1000000);
         }
     }
 
@@ -152,7 +146,8 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      */
     private boolean within(Vector<Y> error) {
         double sqErr = error.dot(error);
-        System.out.printf("sqErr %f\n", sqErr);
+        if (DEBUG)
+            System.out.printf("sqErr %f\n", sqErr);
         return sqErr < m_toleranceSq;
     }
 
@@ -173,6 +168,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     /**
      * Update: x = x + dx.
      * Mutates x to save allocations.
+     * The "x" space is Euclidean, so using a simple sum is ok.
      */
     private void update(Vector<X> x, Vector<X> dx) {
         for (int i = 0; i < x.getNumRows(); ++i) {
@@ -189,7 +185,8 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         for (int i = 0; i < dx.getNumRows(); ++i) {
             double dxI = dx.get(i);
             if (Math.abs(dxI) > m_dxLimit) {
-                System.out.println("clamped!");
+                if (DEBUG)
+                    System.out.println("clamped!");
             }
             double clampedDxI = MathUtil.clamp(dxI, -m_dxLimit, m_dxLimit);
             // System.out.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);
@@ -199,7 +196,8 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
 
     static <R extends Num> void print(Vector<R> v) {
         for (int i = 0; i < v.getNumRows(); ++i) {
-            System.out.printf("%6.3f ", v.get(i));
+            if (DEBUG)
+                System.out.printf("%6.3f ", v.get(i));
         }
     }
 }

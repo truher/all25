@@ -101,50 +101,72 @@ public class NewtonsMethodTest {
     @Test
     void test3() {
         // 2d RR arm example, f translation as a function of joint angles q
-        Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
-                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
-                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
 
         // desired position
         // q0 should be pi/6 or 0.524, q1 should be 2pi/3 or 2.094
         Vector<N2> Xd = VecBuilder.fill(0, 1);
 
+        Function<Vector<N2>, Vector<N2>> fwd = q -> VecBuilder.fill(
+                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
+                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
+        Function<Vector<N2>, Vector<N2>> err = q -> fwd.apply(q).minus(Xd);
+
         // initial joint angles
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // initial position
-        Vector<N2> X0 = f.apply(q0);
+        Vector<N2> X0 = fwd.apply(q0);
         assertEquals(1, X0.get(0), 1e-9);
         assertEquals(1, X0.get(1), 1e-9);
+        // initial error
+        Vector<N2> err0 = err.apply(q0);
+        assertEquals(1, err0.get(0), 1e-9);
+        assertEquals(0, err0.get(1), 1e-9);
+        
         // jacobian at q0
-        Matrix<N2, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N2(), f, q0);
+        Matrix<N2, N2> j0 = NumericalJacobian100.numericalJacobian(
+                Nat.N2(), Nat.N2(), err, q0);
+        // dx/dq0
         assertEquals(-1, j0.get(0, 0), 1e-9);
+        // dx/dq1
         assertEquals(-1, j0.get(0, 1), 1e-9);
+        // dp1/dq0
         assertEquals(1, j0.get(1, 0), 1e-9);
+        // dp1/dq1
         assertEquals(0, j0.get(1, 1), 1e-9);
-        Vector<N2> dq1 = new Vector<>(j0.solve(Xd.minus(X0)));
 
-        Vector<N2> q1 = q0.plus(dq1);
-        assertEquals(0, q1.get(0), 1e-9);
-        assertEquals(2.571, q1.get(1), 1e-3);
+        Vector<N2> dq1 = new Vector<>(j0.solve(err0));
+        // matches my hand-guess
+        assertEquals(0, dq1.get(0), 1e-9);
+        assertEquals(-1, dq1.get(1), 1e-3);
 
-        Matrix<N2, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N2(), f, q1);
-        Vector<N2> X1 = f.apply(q1);
-        Vector<N2> dq2 = new Vector<>(j1.solve(Xd.minus(X1)));
+        Vector<N2> q1 = q0.minus(dq1);
+        assertEquals(1, q1.get(0), 1e-9);
+        assertEquals(-0.429, q1.get(1), 1e-3);
+
+        Matrix<N2, N2> j1 = NumericalJacobian100.numericalJacobian(
+                Nat.N2(), Nat.N2(), err, q1);
+        // Vector<N2> X1 = fwd.apply(q1);
+        Vector<N2> err1 = err.apply(q1);
+        Vector<N2> dq2 = new Vector<>(j1.solve(err1));
         Vector<N2> q2 = q1.plus(dq2);
         assertEquals(0.707, q2.get(0), 1e-3);
         assertEquals(2.158, q2.get(1), 1e-3);
 
-        Matrix<N2, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N2(), f, q2);
-        Vector<N2> X2 = f.apply(q2);
-        Vector<N2> dq3 = new Vector<>(j2.solve(Xd.minus(X2)));
+        Matrix<N2, N2> j2 = NumericalJacobian100.numericalJacobian(
+                Nat.N2(), Nat.N2(), err, q2);
+        // Vector<N2> X2 = fwd.apply(q2);
+        Vector<N2> err2 = err.apply(q2);
+        Vector<N2> dq3 = new Vector<>(j2.solve(err2));
         Vector<N2> q3 = q2.plus(dq3);
         assertEquals(0.5, q3.get(0), 1e-3);
         assertEquals(2.121, q3.get(1), 1e-3);
 
         // by step 3 we have the answer
-        Matrix<N2, N2> j3 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N2(), f, q3);
-        Vector<N2> X3 = f.apply(q3);
-        Vector<N2> dq4 = new Vector<>(j3.solve(Xd.minus(X3)));
+        Matrix<N2, N2> j3 = NumericalJacobian100.numericalJacobian(
+                Nat.N2(), Nat.N2(), err, q3);
+        // Vector<N2> X3 = fwd.apply(q3);
+        Vector<N2> err3 = err.apply(q3);
+        Vector<N2> dq4 = new Vector<>(j3.solve(err3));
         Vector<N2> q4 = q3.plus(dq4);
         assertEquals(0.524, q4.get(0), 1e-3);
         assertEquals(2.094, q4.get(1), 1e-3);
@@ -380,17 +402,12 @@ public class NewtonsMethodTest {
         // case from test3 but using the solver class
         Vector<N2> Xd = VecBuilder.fill(0, 1);
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
-
-        Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
+        Function<Vector<N2>, Vector<N2>> f = q -> Xd.minus(VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
-                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
-        Function<Vector<N2>, Vector<N2>> fErr = y -> Xd.minus(y);
-
+                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1))));
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
-
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, fErr, minQ, maxQ, 1e-3, 10, 1);
-
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
         Vector<N2> x = s.solve(q0, Xd);
         assertEquals(0.524, x.get(0), 1e-3);
         assertEquals(2.094, x.get(1), 1e-3);
@@ -402,14 +419,13 @@ public class NewtonsMethodTest {
         Vector<N2> Xd = VecBuilder.fill(0, 1);
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // performance
-        Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
-                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
-                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
-        Function<Vector<N2>, Vector<N2>> fErr = y -> Xd.minus(y);
-
+        Function<Vector<N2>, Vector<N2>> f = q -> Xd.minus(
+                VecBuilder.fill(
+                        Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
+                        Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1))));
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, fErr, minQ, maxQ, 1e-3, 10, 1);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
         int iterations = 1000000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
@@ -428,15 +444,14 @@ public class NewtonsMethodTest {
         Vector<N2> Xd = VecBuilder.fill(0, 1);
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // case from test3 but using the solver class
-        Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
-                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
-                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
-        Function<Vector<N2>, Vector<N2>> fErr = y -> Xd.minus(y);
-
+        Function<Vector<N2>, Vector<N2>> f = q -> Xd.minus(
+                VecBuilder.fill(
+                        Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
+                        Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1))));
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, fErr, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> x = s.solve2(q0, Xd);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
+        Vector<N2> x = s.solve2(q0);
         assertEquals(0.524, x.get(0), 1e-3);
         assertEquals(2.094, x.get(1), 1e-3);
     }
@@ -447,17 +462,17 @@ public class NewtonsMethodTest {
         Vector<N2> Xd = VecBuilder.fill(0, 1);
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // performance
-        Function<Vector<N2>, Vector<N2>> f = q -> VecBuilder.fill(
-                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
-                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
-        Function<Vector<N2>, Vector<N2>> fErr = y -> Xd.minus(y);
+        Function<Vector<N2>, Vector<N2>> f = q -> Xd.minus(
+                VecBuilder.fill(
+                        Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
+                        Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1))));
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
-        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, fErr, minQ, maxQ, 1e-3, 10, 1);
+        NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), f, minQ, maxQ, 1e-3, 10, 1);
         int iterations = 1000000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            s.solve2(q0, Xd);
+            s.solve2(q0);
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {
