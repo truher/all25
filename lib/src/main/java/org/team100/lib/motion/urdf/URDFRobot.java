@@ -45,14 +45,18 @@ import edu.wpi.first.math.numbers.N6;
  * the format is a map of joint names and values.
  * 
  * https://wiki.ros.org/srdf/review
+ * 
+ * @param Q the number of joints
  */
-public class URDFRobot {
+public class URDFRobot<Q extends Num> {
     private static final boolean DEBUG = false;
     private final String m_name;
     private final List<URDFLink> m_links;
     private final List<URDFJoint> m_joints;
+    private final Nat<Q> m_qDim;
 
-    public URDFRobot(String name, List<URDFLink> links, List<URDFJoint> joints) {
+    public URDFRobot(Nat<Q> qDim, String name, List<URDFLink> links, List<URDFJoint> joints) {
+        m_qDim = qDim;
         m_name = name;
         m_links = links;
         m_joints = joints;
@@ -91,8 +95,7 @@ public class URDFRobot {
      * if not, then the "error" is between two tangent vectors whose origin is far
      * away.
      */
-    public <Q extends Num> Map<String, Double> inverse(
-            Nat<Q> qDim,
+    public  Map<String, Double> inverse(
             Vector<Q> q0,
             double dqLimit,
             String jointName,
@@ -132,8 +135,8 @@ public class URDFRobot {
         int restarts = 3;
 
         NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
-                qDim, twistDim, err,
-                minQ(qDim), maxQ(qDim),
+                m_qDim, twistDim, err,
+                minQ(m_qDim), maxQ(m_qDim),
                 tolerance, iterations, dqLimit);
         long startTime = System.nanoTime();
         Vector<Q> qVec = solver.solve2(q0, restarts);
@@ -142,8 +145,8 @@ public class URDFRobot {
             long finishTime = System.nanoTime();
             Util.printf("ET (ms): %6.3f\n",
                     ((double) finishTime - startTime) / 1000000);
-            System.out.printf("q0: %s\n", q0);
-            System.out.printf("qVec: %s\n", qVec);
+            // System.out.printf("q0: %s\n", q0);
+            // System.out.printf("qVec: %s\n", qVec);
         }
         return qMap(qVec);
     }

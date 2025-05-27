@@ -5,9 +5,11 @@ import java.util.List;
 import org.team100.lib.motion.urdf.URDFJoint.JointType;
 import org.team100.lib.motion.urdf.URDFJoint.Limit;
 
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.numbers.N3;
 
 /**
  * Cartesian prismatic, like the Shopsabre:
@@ -19,9 +21,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
  * 
  * This should be very easy to solve :-)
  */
-public class URDFCartesian extends URDFRobot {
+public class URDFCartesian extends URDFRobot<N3> {
     private URDFCartesian(String name, List<URDFLink> links, List<URDFJoint> joints) {
-        super(name, links, joints);
+        super(Nat.N3(), name, links, joints);
     }
 
     public static URDFCartesian make() {

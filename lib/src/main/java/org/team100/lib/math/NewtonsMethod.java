@@ -152,7 +152,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 limit(x);
             }
             if (restarts > 0) {
-                if (DEBUG)
+                // if (DEBUG)
                     System.out.println("convergence failed, trying random restart");
                 // this is *really* random, including out-of-bounds.
                 // SimpleMatrix r = SimpleMatrix.random(m_xdim.getNum(), 1)
@@ -168,7 +168,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 limit(x);
                 return solve2(x, restarts - 1);
             }
-            if (DEBUG)
+            // if (DEBUG)
                 System.out.printf("random restart failed, error %f\n", error.maxAbs());
             // throw new IllegalArgumentException(
             // String.format("failed to converge for inputs %s",

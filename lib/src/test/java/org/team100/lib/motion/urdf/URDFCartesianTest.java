@@ -43,7 +43,7 @@ public class URDFCartesianTest {
         // initial position is just somewhere random
         Vector<N3> q0 = VecBuilder.fill(0.1, 0.1, 0.1);
         Map<String, Double> qMap = m.inverse(
-                Nat.N3(), q0, 1, "center_point", end);
+                q0, 1, "center_point", end);
         assertEquals(3, qMap.size());
         assertEquals(0.5, qMap.get("base_gantry"), 1e-3);
         assertEquals(0.5, qMap.get("gantry_head"), 1e-3);
@@ -58,7 +58,7 @@ public class URDFCartesianTest {
         // initial position is just somewhere random
         Vector<N3> q0 = VecBuilder.fill(0.1, 0.1, 0.1);
         Map<String, Double> qMap = m.inverse(
-                Nat.N3(), q0, 1, "center_point", end);
+                q0, 1, "center_point", end);
         assertEquals(3, qMap.size());
         assertEquals(0.5, qMap.get("base_gantry"), 1e-3);
         // this is the coordinate that should be limited.
@@ -75,7 +75,7 @@ public class URDFCartesianTest {
         int iterations = 10000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            m.inverse(Nat.N3(), q0, 1, "center_point", end);
+            m.inverse(q0, 1, "center_point", end);
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {

@@ -29,7 +29,7 @@ import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.numbers.N6;
 
 public class NewtonsMethodTest {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /** Multivariate scalar function, f(x) = norm(x)^2 */
     @Test

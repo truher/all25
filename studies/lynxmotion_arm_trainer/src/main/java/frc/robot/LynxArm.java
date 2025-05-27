@@ -174,6 +174,8 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         if (DEBUG)
             System.out.println("getInverse()");
         LynxArmConfig q0 = getMeasuredConfig();
+        // p might be infeasible, so fix it.
+        p = LynxArmKinematics.fix(p);
         return m_kinematics.inverse(q0, p);
     }
 

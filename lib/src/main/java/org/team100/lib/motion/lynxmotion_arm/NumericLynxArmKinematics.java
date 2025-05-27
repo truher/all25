@@ -5,8 +5,6 @@ import java.util.Map;
 import org.team100.lib.motion.urdf.URDFAL5D;
 import org.team100.lib.motion.urdf.URDFRobot;
 
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N5;
@@ -14,7 +12,7 @@ import edu.wpi.first.math.numbers.N5;
 /** Uses URDFRobot for the Lynxmotion arm. */
 public class NumericLynxArmKinematics implements LynxArmKinematics {
 
-    private final URDFRobot m_arm;
+    private final URDFRobot<N5> m_arm;
 
     public NumericLynxArmKinematics() {
         m_arm = URDFAL5D.make();
@@ -45,7 +43,7 @@ public class NumericLynxArmKinematics implements LynxArmKinematics {
         Vector<N5> q0 = initial.toVec();
 
         // TODO: raise the step limit
-        Map<String, Double> qMap = m_arm.inverse(Nat.N5(), q0, 1, "center_point", end);
+        Map<String, Double> qMap = m_arm.inverse(q0, 1, "center_point", end);
         LynxArmConfig c = new LynxArmConfig(
                 qMap.get("base_pan"),
                 qMap.get("shoulder_tilt"),

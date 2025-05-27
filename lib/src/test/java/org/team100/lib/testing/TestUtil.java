@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
+import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
@@ -43,5 +45,13 @@ public class TestUtil {
         System.out.printf("x %6.3f y %6.3f z %6.3f r %6.3f p %6.3f y %6.3f\n",
                 p.getX(), p.getY(), p.getZ(),
                 p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
+    }
+
+    public static void verify(LynxArmConfig expected, LynxArmConfig actual) {
+        assertEquals(expected.swing().getAsDouble(), actual.swing().getAsDouble(), 1e-3, "swing");
+        assertEquals(expected.boom(), actual.boom(), 1e-3, "boom");
+        assertEquals(expected.stick(), actual.stick(), 1e-3, "stick");
+        assertEquals(expected.wrist(), actual.wrist(), 1e-3, "wrist");
+        assertEquals(expected.twist().getAsDouble(), actual.twist().getAsDouble(), 1e-3, "twist");
     }
 }

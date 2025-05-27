@@ -5,9 +5,11 @@ import java.util.List;
 import org.team100.lib.motion.urdf.URDFJoint.JointType;
 import org.team100.lib.motion.urdf.URDFJoint.Limit;
 
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.numbers.N5;
 
 /**
  * An example of using the URDF model to describe the Lynxmotion arm.
@@ -21,10 +23,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
  * I changed the joint zeros so that the "arm zero" is the same as the
  * rotation3d zero axis, i.e. +x, and I changed the limits to match.
  */
-public class URDFAL5D extends URDFRobot {
+public class URDFAL5D extends URDFRobot<N5> {
 
     private URDFAL5D(String name, List<URDFLink> links, List<URDFJoint> joints) {
-        super(name, links, joints);
+        super(Nat.N5(), name, links, joints);
     }
 
     public static URDFAL5D make() {
