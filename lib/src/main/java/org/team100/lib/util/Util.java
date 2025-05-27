@@ -5,6 +5,8 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist3d;
 
 public class Util {
 
@@ -40,13 +42,23 @@ public class Util {
     }
 
     public static String poseStr(Pose3d p) {
-        return String.format("Pose3d: [%.8g %.8g %.8g %.8g %.8g %.8g]",
+        return String.format("%.8e, %.8e, %.8e, %.8e, %.8e, %.8e",
                 p.getX(), p.getY(), p.getZ(),
                 p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
     }
 
+    public static String twistStr(Twist3d t) {
+        return String.format("Twist3d: [%.8e %.8e %.8e %.8e %.8e %.8e]",
+                t.dx, t.dy, t.dz, t.rx, t.ry, t.rz);
+    }
+
     public static String rotStr(Rotation3d r) {
-        return String.format("Rotation3d: [%6.3f %6.3f %6.3f]",
+        return String.format("%.8e, %.8e, %.8e",
+                r.getX(), r.getY(), r.getZ());
+    }
+
+    public static String transStr(Translation3d r) {
+        return String.format("%.8e, %.8e, %.8e",
                 r.getX(), r.getY(), r.getZ());
     }
 

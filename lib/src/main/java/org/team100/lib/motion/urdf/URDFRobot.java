@@ -97,8 +97,9 @@ public class URDFRobot {
             double dqLimit,
             String jointName,
             Pose3d goal) {
-        System.out.printf("\n\n*** inverse() q0 %s goal %s\n",
-                Util.vecStr(q0), Util.poseStr(goal));
+        if (DEBUG)
+            System.out.printf("\n\n*** inverse() q0 %s goal %s\n",
+                    Util.vecStr(q0), Util.poseStr(goal));
         Function<Vector<Q>, Pose3d> fwd = q -> {
             Pose3d pose = forward(qMap(q)).get(jointName);
             // System.out.printf("fwd() pose %s\n", Util.poseStr(pose));
@@ -112,8 +113,8 @@ public class URDFRobot {
 
         // if the error is too large, then movements become jerky -- the
         // distance between current and desired pose can be within the
-        // error. so keep this small.
-        double tolerance = 5e-3;
+        // error. so keep this small, a few mm.
+        double tolerance = 2e-3;
 
         // sometimes the solver seems to circle around the goal
         // TODO: fix that
@@ -121,15 +122,26 @@ public class URDFRobot {
         // initial and goal are far apart.
 
         // regardless, each iteration (on my fast machine) takes 50 us,
-        // so we can only afford to do, say, 20.
-        int iterations = 50;
+        // so we can only afford to do, say, 20, even when random-restarting, so make
+        // each iteration limit low.
+        int iterations = 8;
+
+        // random restart tries to escape local minima.
+        // don't try for too long, it's better to have the wrong answer sooner than the
+        // right answer after a long delay.
+        int restarts = 3;
 
         NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
                 qDim, twistDim, err,
                 minQ(qDim), maxQ(qDim),
                 tolerance, iterations, dqLimit);
-        Vector<Q> qVec = solver.solve2(q0);
+        long startTime = System.nanoTime();
+        Vector<Q> qVec = solver.solve2(q0, restarts);
+
         if (DEBUG) {
+            long finishTime = System.nanoTime();
+            Util.printf("ET (ms): %6.3f\n",
+                    ((double) finishTime - startTime) / 1000000);
             System.out.printf("q0: %s\n", q0);
             System.out.printf("qVec: %s\n", qVec);
         }

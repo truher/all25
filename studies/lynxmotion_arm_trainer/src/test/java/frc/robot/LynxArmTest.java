@@ -3,6 +3,7 @@ package frc.robot;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.motion.lynxmotion_arm.AnalyticLynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
@@ -32,7 +33,7 @@ public class LynxArmTest {
                 System.out.printf("end %s\n", Util.poseStr(end));
             }
             for (double s = 0; s <= 1; s += 0.2) {
-                Pose3d lerp = start.interpolate(end, s);
+                Pose3d lerp = GeometryUtil.interpolate(start, end, s);
                 m_arm.setPosition(lerp);
                 // wrist should be pointing down the whole time
                 LynxArmPose p = m_arm.getPosition();

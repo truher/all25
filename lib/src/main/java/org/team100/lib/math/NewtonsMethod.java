@@ -1,5 +1,6 @@
 package org.team100.lib.math;
 
+import java.util.Random;
 import java.util.function.Function;
 
 import org.team100.lib.util.Util;
@@ -17,13 +18,15 @@ import edu.wpi.first.math.jni.EigenJNI;
  * For example, supply a function that describes the error in estimate and goal:
  * driving it to zero yields the x values to get the desired f.
  * 
+ * 
+ * 
  * Uses the (estimated) Jacobian of the function to estimate the x intercept.
  * 
  * https://en.wikipedia.org/wiki/Newton%27s_method
  * https://hades.mech.northwestern.edu/images/7/7f/MR.pdf
  */
 public class NewtonsMethod<X extends Num, Y extends Num> {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private final Nat<X> m_xdim;
     private final Nat<Y> m_ydim;
     private final Function<Vector<X>, Vector<Y>> m_f;
@@ -37,6 +40,23 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      */
     private final double m_dxLimit;
 
+    private final Random random = new Random();
+
+    /**
+     * 
+     * @param xdim
+     * @param ydim
+     * @param f          The f function should take euclidean (i.e. independent)
+     *                   input and return an error estimate in the tangent manifold
+     *                   of whatever space it's actually acting in (e.g. SE(3))
+     * @param xMin
+     * @param xMax
+     * @param tolerance
+     * @param iterations when Newton gets stuck, it only takes a few iterations, so
+     *                   this doesn't need to be large. Specify a generous
+     *                   random-restart limit instead of a large iteration limit.
+     * @param dxLimit
+     */
     public NewtonsMethod(
             Nat<X> xdim,
             Nat<Y> ydim,
@@ -78,41 +98,82 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
 
     /**
      * Single-sided Jacobian, faster.
+     * 
+     * @param initialX start here
+     * @param restarts number of random restarts in case of non-convergence
      */
-    public Vector<X> solve2(Vector<X> initialX) {
+    public Vector<X> solve2(Vector<X> initialX, int restarts) {
+        // System.out.printf("initialX: %s\n", Util.vecStr(initialX));
         long startTime = System.nanoTime();
         int iter = 0;
+        Vector<Y> error = new Vector<>(m_ydim);
         try {
+            // x is the solution estimate
             Vector<X> x = new Vector<>(initialX.getStorage().copy());
             for (iter = 0; iter < m_iterations; ++iter) {
+                // if (DEBUG)
+                // System.out.printf("x: %s\n", Util.vecStr(x));
 
-                Vector<Y> error = m_f.apply(x);
+                error = m_f.apply(x);
+                // if (DEBUG)
+                // System.out.printf("error: %s\n", Util.vecStr(error));
+
                 if (within(error)) {
+                    // System.out.println("success");
                     return x;
                 }
                 Matrix<Y, X> j = NumericalJacobian100.numericalJacobian2(m_xdim, m_ydim, m_f, x);
 
+                // if (DEBUG)
+                // System.out.printf("J %s\n", Util.matStr(j));
+
+                // the pseudoinverse should always work too
+                // note this is quite slow
+                // Matrix<X, Y> jInv = new Matrix<>(j.getStorage().pseudoInverse());
+                // if (DEBUG)
+                // System.out.printf("Jinv %s\n", Util.matStr(jInv));
+
+                // Vector<X> dx = new Vector<>(jInv.times(error));
+
+                // this method is faster.
                 // solve A x = B i.e. J dx = error
                 Vector<X> dx = new Vector<>(j.solve(error));
 
                 // this solver also works but it's not better.
                 // Vector<X> dx = getDxWithQRDecomp(error, j);
 
-                if (DEBUG)
-                    System.out.printf("error: %s x: %s dx: %s\n",
-                            Util.vecStr(error), Util.vecStr(x), Util.vecStr(dx));
+                // if (DEBUG)
+                // System.out.printf("dx: %s\n", Util.vecStr(dx));
+
                 // Too-high dx results in oscillation.
                 clamp(dx);
                 update(x, dx);
                 // Keep the x estimate within bounds.
                 limit(x);
             }
+            if (restarts > 0) {
+                if (DEBUG)
+                    System.out.println("convergence failed, trying random restart");
+                // this is *really* random, including out-of-bounds.
+                // SimpleMatrix r = SimpleMatrix.random(m_xdim.getNum(), 1)
+                // .minus(0.5)
+                // .scale(1);
+                // Vector<X> rv = new Vector<>(r);
+                // System.out.printf("rv %s\n", Util.vecStr(rv));
+                // rv = rv.plus(x);
+                // limit(rv);
+                for (int i = 0; i < m_xdim.getNum(); i++) {
+                    x.set(i, 0, x.get(i) + 0.1 * (random.nextDouble() - 0.5));
+                }
+                limit(x);
+                return solve2(x, restarts - 1);
+            }
             if (DEBUG)
-                System.out.println("FAILED TO CONVERGE");
-            throw new IllegalArgumentException(
-                    String.format("failed to converge for inputs %s",
-                            Util.vecStr(initialX)));
-            // return x;
+                System.out.printf("random restart failed, error %f\n", error.maxAbs());
+            // throw new IllegalArgumentException(
+            // String.format("failed to converge for inputs %s",
+            // Util.vecStr(initialX)));
+            return x;
         } finally {
             long finishTime = System.nanoTime();
             if (DEBUG)

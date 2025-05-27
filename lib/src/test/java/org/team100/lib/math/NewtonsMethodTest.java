@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
@@ -28,7 +29,7 @@ import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.numbers.N6;
 
 public class NewtonsMethodTest {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     /** Multivariate scalar function, f(x) = norm(x)^2 */
     @Test
@@ -374,7 +375,7 @@ public class NewtonsMethodTest {
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
         NewtonsMethod<N2, N3> s = new NewtonsMethod<>(Nat.N2(), Nat.N3(), err, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> x = s.solve2(q0);
+        Vector<N2> x = s.solve2(q0, 5);
         assertEquals(0.524, x.get(0), 1e-3);
         assertEquals(2.094, x.get(1), 1e-3);
     }
@@ -555,7 +556,7 @@ public class NewtonsMethodTest {
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
         NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), err, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> x = s.solve2(q0);
+        Vector<N2> x = s.solve2(q0, 5);
         assertEquals(0.524, x.get(0), 1e-3);
         assertEquals(2.094, x.get(1), 1e-3);
     }
@@ -574,10 +575,11 @@ public class NewtonsMethodTest {
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
         NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), err, minQ, maxQ, 1e-3, 10, 1);
-        int iterations = 1000000;
+        // int iterations = 1000000;
+        int iterations = 50000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            s.solve2(q0);
+            s.solve2(q0, 5);
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {
@@ -589,30 +591,33 @@ public class NewtonsMethodTest {
 
     @Test
     void testConvergence() {
+        // this is a case from the simulator that doesn't converge.
         URDFAL5D m = URDFAL5D.make();
 
         Pose3d goal = new Pose3d(
                 new Translation3d(0.19991979, 0.0011040928, 0.19832649),
                 new Rotation3d(3.3019369e-18, 0.79406969, 7.6530612e-19));
-        Map<String, Double> qMap = Map.of(
-                "base_pan", 2.0994465067e-04,
-                "shoulder_tilt", -1.8609471376e+00,
-                "elbow_tilt", 1.5635203893e+00,
-                "wrist_tilt", 1.0872555301e+00,
-                "wrist_rotate", 1.4888289270e-04);
         Function<Vector<N5>, Pose3d> fwd = q -> {
             Pose3d pose = m.forward(m.qMap(q)).get("center_point");
-            // System.out.printf("fwd() q %s pose %s\n", Util.vecStr(q), Util.poseStr(pose));
+            // System.out.printf("fwd() q %s pose %s\n", Util.vecStr(q),
+            // Util.poseStr(pose));
             return pose;
         };
-        Function<Vector<N5>, Vector<N6>> err = q -> GeometryUtil.toVec(goal.log(fwd.apply(q)));
+        Function<Vector<N5>, Vector<N6>> err = q -> {
+            Pose3d estimate = fwd.apply(q);
+            // System.out.printf("estimate %s\n", Util.poseStr(estimate));
+            Twist3d twist = goal.log(estimate);
+            // System.out.printf("twist %s\n", Util.twistStr(twist));
+            return GeometryUtil.toVec(twist);
+        };
 
-        double tolerance = 5e-3;
-        int iterations = 50;
+        double tolerance = 1e-3;
+        int iterations = 5;
         double dqLimit = 2;
-zzzzzz
+        int restarts = 10;
+
         NewtonsMethod<N5, N6> solver = new NewtonsMethod<>(
-                Nat.N5(), Nat.N6(), err,zzzzzzz
+                Nat.N5(), Nat.N6(), err,
                 m.minQ(Nat.N5()), m.maxQ(Nat.N5()),
                 tolerance, iterations, dqLimit);
 
@@ -623,6 +628,13 @@ zzzzzz
                 1.0872555301e+00,
                 1.4888289270e-04);
         Vector<N5> q0 = c.toVec();
-        solver.solve2(q0);
+        long startTime = System.nanoTime();
+        solver.solve2(q0, restarts);
+        if (DEBUG) {
+            long finishTime = System.nanoTime();
+            Util.printf("ET (ms): %6.3f\n",
+                    ((double) finishTime - startTime) / 1000000);
+
+        }
     }
 }

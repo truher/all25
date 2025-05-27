@@ -1,5 +1,6 @@
 package frc.robot;
 
+import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.profile.timed.JerkLimitedProfile100;
 import org.team100.lib.state.Control100;
@@ -56,7 +57,7 @@ public class MoveCommand extends Command {
             System.out.println("\n***EXECUTE***");
         Control100 c = m_profile.sample(m_timer.get());
         double s = c.x() / m_distance;
-        Pose3d setpoint = m_start.interpolate(m_goal, s);
+        Pose3d setpoint = GeometryUtil.interpolate(m_start, m_goal, s);
         Pose3d measurement = m_arm.getPosition().p6();
         if (DEBUG) {
             System.out.printf("Goal %s Setpoint %s Measurement %s\n",
@@ -70,7 +71,8 @@ public class MoveCommand extends Command {
         if (DEBUG)
             System.out.printf("to go %f angle %f measured %f \n", togo, angleTogo,
                     angleTogo2);
-        if (togo < 0.001 && Math.abs(angleTogo2) < 0.001) {
+        // "done" state ignores the measurement to avoid solver convergence.
+        if (togo < 0.001 && Math.abs(angleTogo) < 0.001) {
             if (DEBUG)
                 System.out.println("***** at goal *****");
             m_arm.setPosition(m_goal);
