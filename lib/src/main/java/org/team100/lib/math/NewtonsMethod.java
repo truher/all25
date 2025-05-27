@@ -23,12 +23,13 @@ import edu.wpi.first.math.jni.EigenJNI;
  * https://hades.mech.northwestern.edu/images/7/7f/MR.pdf
  */
 public class NewtonsMethod<X extends Num, Y extends Num> {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private final Nat<X> m_xdim;
     private final Nat<Y> m_ydim;
     private final Function<Vector<X>, Vector<Y>> m_f;
     private final Vector<X> m_xMin;
     private final Vector<X> m_xMax;
+    private final double m_tolerance;
     private final double m_toleranceSq;
     private final int m_iterations;
     /**
@@ -50,6 +51,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         m_f = f;
         m_xMin = xMin;
         m_xMax = xMax;
+        m_tolerance = tolerance;
         m_toleranceSq = tolerance * tolerance;
         m_iterations = iterations;
         m_dxLimit = dxLimit;
@@ -97,8 +99,8 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 // Vector<X> dx = getDxWithQRDecomp(error, j);
 
                 if (DEBUG)
-                    System.out.printf("error: %s dx: %s\n",
-                            Util.vecStr(error), Util.vecStr(dx));
+                    System.out.printf("error: %s x: %s dx: %s\n",
+                            Util.vecStr(error), Util.vecStr(x), Util.vecStr(dx));
                 // Too-high dx results in oscillation.
                 clamp(dx);
                 update(x, dx);
@@ -109,7 +111,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 System.out.println("FAILED TO CONVERGE");
             throw new IllegalArgumentException(
                     String.format("failed to converge for inputs %s",
-                            initialX));
+                            Util.vecStr(initialX)));
             // return x;
         } finally {
             long finishTime = System.nanoTime();
@@ -139,10 +141,11 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      * Using dot instead of norm saves the sqrt.
      */
     private boolean within(Vector<Y> error) {
-        double sqErr = error.dot(error);
-        if (DEBUG)
-            System.out.printf("sqErr %f tolSq %f\n", sqErr, m_toleranceSq);
-        return sqErr < m_toleranceSq;
+        return error.maxAbs() < m_tolerance;
+        // double sqErr = error.dot(error);
+        // if (DEBUG)
+        // System.out.printf("sqErr %f tolSq %f\n", sqErr, m_toleranceSq);
+        // return sqErr < m_toleranceSq;
     }
 
     /**
@@ -185,13 +188,6 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             double clampedDxI = MathUtil.clamp(dxI, -m_dxLimit, m_dxLimit);
             // System.out.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);
             dx.set(i, 0, clampedDxI);
-        }
-    }
-
-    static <R extends Num> void print(Vector<R> v) {
-        for (int i = 0; i < v.getNumRows(); ++i) {
-            if (DEBUG)
-                System.out.printf("%6.3f ", v.get(i));
         }
     }
 }

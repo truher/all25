@@ -40,7 +40,7 @@ public class Util {
     }
 
     public static String poseStr(Pose3d p) {
-        return String.format("Pose3d: [%6.3f %6.3f %6.3f %6.3f %6.3f %6.3f]",
+        return String.format("Pose3d: [%.8g %.8g %.8g %.8g %.8g %.8g]",
                 p.getX(), p.getY(), p.getZ(),
                 p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
     }
@@ -54,7 +54,7 @@ public class Util {
         StringBuilder b = new StringBuilder();
         b.append("[");
         for (int i = 0; i < m.getNumRows(); ++i) {
-            b.append(String.format(" %.3e", m.get(i)));
+            b.append(String.format(" %.10e", m.get(i)));
         }
         b.append("]");
         return b.toString();

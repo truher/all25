@@ -3,19 +3,17 @@ package org.team100.lib.motion.urdf;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.math.NewtonsMethod;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 
 /**
@@ -98,11 +96,12 @@ public class URDFRobot {
             Vector<Q> q0,
             double dqLimit,
             String jointName,
-            Pose3d goal) {zzzzzz
-        System.out.printf("inverse q0 %s goal %s\n", q0, goal);
+            Pose3d goal) {
+        System.out.printf("\n\n*** inverse() q0 %s goal %s\n",
+                Util.vecStr(q0), Util.poseStr(goal));
         Function<Vector<Q>, Pose3d> fwd = q -> {
             Pose3d pose = forward(qMap(q)).get(jointName);
-            System.out.printf("%f, %f, %f\n", pose.getX(), pose.getY(), pose.getZ());
+            // System.out.printf("fwd() pose %s\n", Util.poseStr(pose));
             return pose;
         };
 
@@ -113,8 +112,8 @@ public class URDFRobot {
 
         // if the error is too large, then movements become jerky -- the
         // distance between current and desired pose can be within the
-        // error. so keep this small, 1 millimeter.
-        double tolerance = 1e-3;
+        // error. so keep this small.
+        double tolerance = 5e-3;
 
         // sometimes the solver seems to circle around the goal
         // TODO: fix that
@@ -123,7 +122,7 @@ public class URDFRobot {
 
         // regardless, each iteration (on my fast machine) takes 50 us,
         // so we can only afford to do, say, 20.
-        int iterations = 20;
+        int iterations = 50;
 
         NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
                 qDim, twistDim, err,
@@ -191,7 +190,7 @@ public class URDFRobot {
     }
 
     /** Transform the config vector, q, into a named map. */
-    private Map<String, Double> qMap(Vector<?> q) {
+    public Map<String, Double> qMap(Vector<?> q) {
         Map<String, Double> qMap = new HashMap<>();
         List<URDFJoint> joints = m_joints;
         for (int i = 0; i < joints.size(); ++i) {
@@ -207,7 +206,7 @@ public class URDFRobot {
      * qDim needs to match the actual number of moveable joints.
      * TODO: remove it.
      */
-    private <Q extends Num> Vector<Q> minQ(Nat<Q> qDim) {
+    public <Q extends Num> Vector<Q> minQ(Nat<Q> qDim) {
         Vector<Q> v = new Vector<>(qDim);
         List<URDFJoint> joints = m_joints;
         for (int i = 0; i < joints.size(); ++i) {
@@ -223,7 +222,7 @@ public class URDFRobot {
      * qDim needs to match the actual number of moveable joints.
      * TODO: remove it.
      */
-    private <Q extends Num> Vector<Q> maxQ(Nat<Q> qDim) {
+    public <Q extends Num> Vector<Q> maxQ(Nat<Q> qDim) {
         Vector<Q> v = new Vector<>(qDim);
         List<URDFJoint> joints = m_joints;
         for (int i = 0; i < joints.size(); ++i) {

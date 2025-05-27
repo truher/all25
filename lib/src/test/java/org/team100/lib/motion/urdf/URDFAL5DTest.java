@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.testing.TestUtil;
 
 import edu.wpi.first.math.Nat;
@@ -13,6 +14,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N5;
 
 public class URDFAL5DTest {
@@ -187,6 +189,21 @@ public class URDFAL5DTest {
                 "elbow_tilt", 2.804,
                 "wrist_tilt", -0.282,
                 "wrist_rotate", 0.000), qMap);
+    }
+
+    @Test
+    void testConvergence() {
+        URDFAL5D m = URDFAL5D.make();
+        LynxArmConfig c = new LynxArmConfig(
+                2.0994465067e-04,
+                -1.8609471376e+00,
+                1.5635203893e+00,
+                1.0872555301e+00,
+                1.4888289270e-04);
+        Pose3d goal = new Pose3d(
+                new Translation3d(0.19991979, 0.0011040928, 0.19832649),
+                new Rotation3d(3.3019369e-18, 0.79406969, 7.6530612e-19));
+        m.inverse(Nat.N5(), c.toVec(), 2, "center_point", goal);
     }
 
 }

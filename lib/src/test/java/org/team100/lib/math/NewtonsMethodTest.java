@@ -2,10 +2,13 @@ package org.team100.lib.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Map;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
+import org.team100.lib.motion.urdf.URDFAL5D;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Matrix;
@@ -13,11 +16,16 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N5;
+import edu.wpi.first.math.numbers.N6;
 
 public class NewtonsMethodTest {
     private static final boolean DEBUG = false;
@@ -577,5 +585,44 @@ public class NewtonsMethodTest {
             Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
+    }
+
+    @Test
+    void testConvergence() {
+        URDFAL5D m = URDFAL5D.make();
+
+        Pose3d goal = new Pose3d(
+                new Translation3d(0.19991979, 0.0011040928, 0.19832649),
+                new Rotation3d(3.3019369e-18, 0.79406969, 7.6530612e-19));
+        Map<String, Double> qMap = Map.of(
+                "base_pan", 2.0994465067e-04,
+                "shoulder_tilt", -1.8609471376e+00,
+                "elbow_tilt", 1.5635203893e+00,
+                "wrist_tilt", 1.0872555301e+00,
+                "wrist_rotate", 1.4888289270e-04);
+        Function<Vector<N5>, Pose3d> fwd = q -> {
+            Pose3d pose = m.forward(m.qMap(q)).get("center_point");
+            // System.out.printf("fwd() q %s pose %s\n", Util.vecStr(q), Util.poseStr(pose));
+            return pose;
+        };
+        Function<Vector<N5>, Vector<N6>> err = q -> GeometryUtil.toVec(goal.log(fwd.apply(q)));
+
+        double tolerance = 5e-3;
+        int iterations = 50;
+        double dqLimit = 2;
+zzzzzz
+        NewtonsMethod<N5, N6> solver = new NewtonsMethod<>(
+                Nat.N5(), Nat.N6(), err,zzzzzzz
+                m.minQ(Nat.N5()), m.maxQ(Nat.N5()),
+                tolerance, iterations, dqLimit);
+
+        LynxArmConfig c = new LynxArmConfig(
+                2.0994465067e-04,
+                -1.8609471376e+00,
+                1.5635203893e+00,
+                1.0872555301e+00,
+                1.4888289270e-04);
+        Vector<N5> q0 = c.toVec();
+        solver.solve2(q0);
     }
 }

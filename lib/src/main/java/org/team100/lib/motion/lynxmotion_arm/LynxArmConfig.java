@@ -2,8 +2,11 @@ package org.team100.lib.motion.lynxmotion_arm;
 
 import java.util.OptionalDouble;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N5;
 
 /**
  * Each joint is relative to its parent link, in radians.
@@ -79,5 +82,14 @@ public record LynxArmConfig(
                 stick,
                 wrist,
                 twist.getAsDouble());
+    }
+
+    public Vector<N5> toVec() {
+        return VecBuilder.fill(
+                swing().getAsDouble(),
+                boom(),
+                stick(),
+                wrist(),
+                twist().getAsDouble());
     }
 }

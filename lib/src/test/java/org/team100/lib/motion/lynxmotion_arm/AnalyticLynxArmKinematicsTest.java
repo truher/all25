@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 
-public class LynxArmKinematicsTest {
+public class AnalyticLynxArmKinematicsTest {
     private static final boolean DEBUG = false;
     private static final double kDelta = 0.001;
 
@@ -226,7 +226,7 @@ public class LynxArmKinematicsTest {
                         new Translation3d(Math.sqrt(3), 1, 1),
                         new Rotation3d(0, 0, Math.PI / 6)),
                 new Pose3d(
-                        new Translation3d(1.5*Math.sqrt(3), 1.5, 1),
+                        new Translation3d(1.5 * Math.sqrt(3), 1.5, 1),
                         new Rotation3d(0, 0, Math.PI / 6)));
         LynxArmConfig q = new LynxArmConfig(Math.PI / 6, -Math.PI / 3, 2 * Math.PI / 3, -Math.PI / 3, 0);
         verify(k, p, q);
@@ -365,8 +365,7 @@ public class LynxArmKinematicsTest {
             Pose3d p = new Pose3d(t, r);
             q = k.inverse(q, p);
             if (DEBUG)
-                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
-                        s, q.swing().getAsDouble(), q.boom(), q.stick(), q.wrist(), q.twist().getAsDouble());
+                System.out.printf("%6.3f, %s\n", s, q.str());
         }
     }
 
