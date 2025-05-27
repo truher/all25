@@ -10,7 +10,6 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.jni.EigenJNI;
-import edu.wpi.first.math.numbers.N1;
 
 /**
  * Newton's method finds a zero of a multivariate function.
@@ -57,11 +56,10 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     }
 
     /** Symmetric Jacobian, slower. */
-    public Vector<X> solve(Vector<X> initial, Vector<Y> goal) {
+    public Vector<X> solve(Vector<X> initial) {
         Vector<X> x = new Vector<>(initial.getStorage().copy());
         for (int i = 0; i < m_iterations; ++i) {
-            Vector<Y> y = m_f.apply(x);
-            Vector<Y> error = goal.minus(y);
+            Vector<Y> error = m_f.apply(x);
             if (within(error)) {
                 return x;
             }
@@ -78,7 +76,6 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
 
     /**
      * Single-sided Jacobian, faster.
-     * TODO: remove goalY
      */
     public Vector<X> solve2(Vector<X> initialX) {
         long startTime = System.nanoTime();
@@ -88,26 +85,20 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             for (iter = 0; iter < m_iterations; ++iter) {
 
                 Vector<Y> error = m_f.apply(x);
-                // Vector<Y> y = m_f.apply(x);
-                // i think this "minus" is the problem
-                // Vector<Y> error = goalY.minus(y);
-                // Vector<Y> error = m_fErr.apply(y);
-
                 if (within(error)) {
                     return x;
                 }
                 Matrix<Y, X> j = NumericalJacobian100.numericalJacobian2(m_xdim, m_ydim, m_f, x);
-                // Matrix<Y, X> j = NumericalJacobian100.numericalJacobian(m_xdim, m_ydim, m_f,
-                // x);
 
-                // solve Ax=B or Jdx=error
+                // solve A x = B i.e. J dx = error
                 Vector<X> dx = new Vector<>(j.solve(error));
 
                 // this solver also works but it's not better.
                 // Vector<X> dx = getDxWithQRDecomp(error, j);
 
                 if (DEBUG)
-                    System.out.printf("error: %s dx: %s\n", Util.vecStr(error), Util.vecStr(dx));
+                    System.out.printf("error: %s dx: %s\n",
+                            Util.vecStr(error), Util.vecStr(dx));
                 // Too-high dx results in oscillation.
                 clamp(dx);
                 update(x, dx);
@@ -147,7 +138,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     private boolean within(Vector<Y> error) {
         double sqErr = error.dot(error);
         if (DEBUG)
-            System.out.printf("sqErr %f\n", sqErr);
+            System.out.printf("sqErr %f tolSq %f\n", sqErr, m_toleranceSq);
         return sqErr < m_toleranceSq;
     }
 
@@ -172,7 +163,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      */
     private void update(Vector<X> x, Vector<X> dx) {
         for (int i = 0; i < x.getNumRows(); ++i) {
-            double newXi = x.get(i) + dx.get(i);
+            double newXi = x.get(i) - dx.get(i);
             x.set(i, 0, newXi);
         }
     }

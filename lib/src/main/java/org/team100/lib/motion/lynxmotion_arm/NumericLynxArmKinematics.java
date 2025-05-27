@@ -50,7 +50,7 @@ public class NumericLynxArmKinematics implements LynxArmKinematics {
                 initial.twist().getAsDouble());
 
         // TODO: raise the step limit
-        Map<String, Double> qMap = m_arm.inverse(Nat.N5(), q0, 0.1, "center_point", end);
+        Map<String, Double> qMap = m_arm.inverse(Nat.N5(), q0, 1, "center_point", end);
         LynxArmConfig c = new LynxArmConfig(
                 qMap.get("base_pan"),
                 qMap.get("shoulder_tilt"),

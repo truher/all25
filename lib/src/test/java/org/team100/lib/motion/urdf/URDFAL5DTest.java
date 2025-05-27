@@ -180,7 +180,7 @@ public class URDFAL5DTest {
         Pose3d end = new Pose3d(0.15, 0.0, 0.1, new Rotation3d(0, 0, 0));
         Vector<N5> q0 = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1);
         Map<String, Double> qMap = m.inverse(
-                Nat.N5(), q0, 1, "center_point", end);
+                Nat.N5(), q0, 2, "center_point", end);
         TestUtil.verify(Map.of(
                 "base_pan", 0.000,
                 "shoulder_tilt", -2.522,

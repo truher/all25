@@ -14,6 +14,8 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 
 /**
@@ -97,34 +99,37 @@ public class URDFRobot {
             double dqLimit,
             String jointName,
             Pose3d goal) {
-
-        Vector<N6> goalVec = GeometryUtil.toVec(GeometryUtil.slog(goal));
-
-        // this is the ERROR in the forward kinematics
-        Function<Vector<Q>, Vector<N6>> fwd = q -> {
-            // print("q", q);
-            // solve all of them
-            Map<String, Double> qMap = qMap(q);
-            Map<String, Pose3d> p = forward(qMap);
-            // Pick out the joint we want.
-            Pose3d pose = p.get(jointName);
-            Vector<N6> pv = GeometryUtil.toVec(GeometryUtil.slog(pose));
-            // print(pose);
-            // print("pv", pv);
-            return goalVec.minus(pv);
+        Function<Vector<Q>, Pose3d> fwd = q -> {
+            Pose3d pose = forward(qMap(q)).get(jointName);
+            System.out.printf("%f, %f, %f\n", pose.getX(), pose.getY(), pose.getZ());
+            return pose;
         };
+
+        Function<Vector<Q>, Vector<N6>> err = q -> GeometryUtil.toVec(goal.log(fwd.apply(q)));
 
         // this function always uses pose3d so the goal dim is always N6.
         Nat<N6> twistDim = Nat.N6();
 
-        // TODO: lower the iteration limit
+        // if the error is too large, then movements become jerky -- the
+        // distance between current and desired pose can be within the
+        // error. so keep this small, 1 millimeter.
+        double tolerance = 1e-3;
+
+        // sometimes the solver seems to circle around the goal
+        // TODO: fix that
+        // but it only happens in the middle of movements, when the
+        // initial and goal are far apart.
+
+        // regardless, each iteration (on my fast machine) takes 50 us,
+        // so we can only afford to do, say, 20.
+        int iterations = 20;
+
         NewtonsMethod<Q, N6> solver = new NewtonsMethod<>(
-                qDim, twistDim, fwd,
+                qDim, twistDim, err,
                 minQ(qDim), maxQ(qDim),
-                1e-3, 200, dqLimit);
+                tolerance, iterations, dqLimit);
         Vector<Q> qVec = solver.solve2(q0);
         if (DEBUG) {
-            System.out.printf("goalVec: %s\n", goalVec);
             System.out.printf("q0: %s\n", q0);
             System.out.printf("qVec: %s\n", qVec);
         }

@@ -13,7 +13,7 @@ import edu.wpi.first.math.Vector;
  * Estimates the Jacobian using symmetric differences around the reference x.
  */
 public class NumericalJacobian100 {
-    private static final double DX = 1e-5;
+    private static final double DX = 1e-8;
 
     /**
      * Estimates the Jacobian using symmetric differences around the reference x.
