@@ -401,55 +401,54 @@ public class NewtonsMethodTest {
     void test5() {
         // Same as above but with an inconsistent end angle: the solver compromises
         // since it's a least-squares thing
-        Function<Vector<N2>, Vector<N3>> f = q -> VecBuilder.fill(
-                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
-                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)),
-                q.get(0) + q.get(1));
 
         // desired position
         // q0 should be pi/6 or 0.524, q1 should be 2pi/3 or 2.094
         // the resulting end-angle is 5pi/6, so this is wrong.
-        Vector<N3> Xd = VecBuilder.fill(0, 1, 2);
+        Pose2d XXd = new Pose2d(0, 1, new Rotation2d(2));
+
+        Function<Vector<N2>, Pose2d> fwd = q -> new Pose2d(
+                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
+                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)),
+                new Rotation2d(q.get(0) + q.get(1)));
+
+        Function<Vector<N2>, Vector<N3>> err = q -> GeometryUtil.toVec(XXd.log(fwd.apply(q)));
 
         // initial joint angles
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
-        // initial position
-        Vector<N3> X0 = f.apply(q0);
-        assertEquals(1, X0.get(0), 1e-9);
-        assertEquals(1, X0.get(1), 1e-9);
+
         // jacobian at q0
-        Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), f, q0);
-        assertEquals(-1, j0.get(0, 0), 1e-9);
-        assertEquals(-1, j0.get(0, 1), 1e-9);
-        assertEquals(1, j0.get(1, 0), 1e-9);
-        assertEquals(0, j0.get(1, 1), 1e-9);
-        Vector<N2> dq1 = new Vector<>(j0.solve(Xd.minus(X0)));
+        Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
+        System.out.println(Util.matStr(j0));
+        assertEquals(0.715, j0.get(0, 0), 1e-3);
+        assertEquals(-0.270, j0.get(0, 1), 1e-3);
+        assertEquals(0.913, j0.get(1, 0), 1e-3);
+        assertEquals(1.127, j0.get(1, 1), 1e-3);
+        assertEquals(1, j0.get(2, 0), 1e-9);
+        assertEquals(1, j0.get(2, 1), 1e-9);
 
-        Vector<N2> q1 = q0.plus(dq1);
-        assertEquals(0, q1.get(0), 1e-9);
-        assertEquals(2.285, q1.get(1), 1e-3);
+        Vector<N3> err0 = err.apply(q0);
+        Vector<N2> dq1 = new Vector<>(j0.solve(err0));
 
-        Matrix<N3, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), f, q1);
-        Vector<N3> X1 = f.apply(q1);
-        Vector<N2> dq2 = new Vector<>(j1.solve(Xd.minus(X1)));
-        Vector<N2> q2 = q1.plus(dq2);
-        assertEquals(0.234, q2.get(0), 1e-3);
-        assertEquals(2.035, q2.get(1), 1e-3);
+        Vector<N2> q1 = q0.minus(dq1);
+        assertEquals(0.354, q1.get(0), 1e-3);
+        assertEquals(1.925, q1.get(1), 1e-3);
 
-        Matrix<N3, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), f, q2);
-        Vector<N3> X2 = f.apply(q2);
-        Vector<N2> dq3 = new Vector<>(j2.solve(Xd.minus(X2)));
-        Vector<N2> q3 = q2.plus(dq3);
-        assertEquals(0.317, q3.get(0), 1e-3);
-        assertEquals(1.962, q3.get(1), 1e-3);
+        Matrix<N3, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q1);
+        Vector<N3> err1 = err.apply(q1);
+        Vector<N2> dq2 = new Vector<>(j1.solve(err1));
+        Vector<N2> q2 = q1.minus(dq2);
+        assertEquals(0.356, q2.get(0), 1e-3);
+        assertEquals(1.927, q2.get(1), 1e-3);
 
-        // by step 3 we have the answer
-        Matrix<N3, N2> j3 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), f, q3);
-        Vector<N3> X3 = f.apply(q3);
-        Vector<N2> dq4 = new Vector<>(j3.solve(Xd.minus(X3)));
-        Vector<N2> q4 = q3.plus(dq4);
-        assertEquals(0.344, q4.get(0), 1e-3);
-        assertEquals(1.938, q4.get(1), 1e-3);
+        // so this is the compromise
+        Matrix<N3, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q2);
+        Vector<N3> err2 = err.apply(q2);
+        Vector<N2> dq3 = new Vector<>(j2.solve(err2));
+        Vector<N2> q3 = q2.minus(dq3);
+        assertEquals(0.356, q3.get(0), 1e-3);
+        assertEquals(1.927, q3.get(1), 1e-3);
+
     }
 
     @Test
