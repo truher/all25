@@ -98,7 +98,8 @@ public class URDFRobot {
             Vector<Q> q0,
             double dqLimit,
             String jointName,
-            Pose3d goal) {
+            Pose3d goal) {zzzzzz
+        System.out.printf("inverse q0 %s goal %s\n", q0, goal);
         Function<Vector<Q>, Pose3d> fwd = q -> {
             Pose3d pose = forward(qMap(q)).get(jointName);
             System.out.printf("%f, %f, %f\n", pose.getX(), pose.getY(), pose.getZ());

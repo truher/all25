@@ -107,7 +107,10 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             }
             if (DEBUG)
                 System.out.println("FAILED TO CONVERGE");
-            return x;
+            throw new IllegalArgumentException(
+                    String.format("failed to converge for inputs %s",
+                            initialX));
+            // return x;
         } finally {
             long finishTime = System.nanoTime();
             if (DEBUG)
