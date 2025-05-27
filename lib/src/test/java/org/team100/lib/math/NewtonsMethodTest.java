@@ -109,6 +109,7 @@ public class NewtonsMethodTest {
         Function<Vector<N2>, Vector<N2>> fwd = q -> VecBuilder.fill(
                 Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
                 Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
+        // this will be fwd in the goal frame
         Function<Vector<N2>, Vector<N2>> err = q -> fwd.apply(q).minus(Xd);
 
         // initial joint angles
@@ -117,59 +118,89 @@ public class NewtonsMethodTest {
         Vector<N2> X0 = fwd.apply(q0);
         assertEquals(1, X0.get(0), 1e-9);
         assertEquals(1, X0.get(1), 1e-9);
-        // initial error
-        Vector<N2> err0 = err.apply(q0);
-        assertEquals(1, err0.get(0), 1e-9);
-        assertEquals(0, err0.get(1), 1e-9);
-        
+
         // jacobian at q0
         Matrix<N2, N2> j0 = NumericalJacobian100.numericalJacobian(
                 Nat.N2(), Nat.N2(), err, q0);
+        System.out.println(Util.matStr(j0));
         // dx/dq0
         assertEquals(-1, j0.get(0, 0), 1e-9);
         // dx/dq1
         assertEquals(-1, j0.get(0, 1), 1e-9);
-        // dp1/dq0
+        // dy/dq0
         assertEquals(1, j0.get(1, 0), 1e-9);
-        // dp1/dq1
+        // dy/dq1
         assertEquals(0, j0.get(1, 1), 1e-9);
+
+        // initial error
+        Vector<N2> err0 = err.apply(q0);
+        // printxy(err0);
+        assertEquals(1, err0.get(0), 1e-9);
+        assertEquals(0, err0.get(1), 1e-9);
 
         Vector<N2> dq1 = new Vector<>(j0.solve(err0));
         // matches my hand-guess
+        // q0 (0,1.5), dq(0,-1), so q1 (0,2.5)
         assertEquals(0, dq1.get(0), 1e-9);
         assertEquals(-1, dq1.get(1), 1e-3);
 
         Vector<N2> q1 = q0.minus(dq1);
-        assertEquals(1, q1.get(0), 1e-9);
-        assertEquals(-0.429, q1.get(1), 1e-3);
+        assertEquals(0, q1.get(0), 1e-9);
+        assertEquals(2.571, q1.get(1), 1e-3);
 
         Matrix<N2, N2> j1 = NumericalJacobian100.numericalJacobian(
                 Nat.N2(), Nat.N2(), err, q1);
-        // Vector<N2> X1 = fwd.apply(q1);
+        // since q1 has overshot and q0 hasn't moved, x is still a little over and y is
+        // under
         Vector<N2> err1 = err.apply(q1);
+        // printxy(err1);
+        assertEquals(0.158, err1.get(0), 1e-3);
+        assertEquals(-0.460, err1.get(1), 1e-3);
+
         Vector<N2> dq2 = new Vector<>(j1.solve(err1));
-        Vector<N2> q2 = q1.plus(dq2);
+        assertEquals(-0.706, dq2.get(0), 1e-3);
+        assertEquals(0.413, dq2.get(1), 1e-3);
+
+        Vector<N2> q2 = q1.minus(dq2);
         assertEquals(0.707, q2.get(0), 1e-3);
         assertEquals(2.158, q2.get(1), 1e-3);
 
         Matrix<N2, N2> j2 = NumericalJacobian100.numericalJacobian(
                 Nat.N2(), Nat.N2(), err, q2);
-        // Vector<N2> X2 = fwd.apply(q2);
+
+        // now x and y have overshot
         Vector<N2> err2 = err.apply(q2);
+        // printxy(err2);
+        assertEquals(-0.201, err2.get(0), 1e-3);
+        assertEquals(-0.077, err2.get(1), 1e-3);
+
         Vector<N2> dq3 = new Vector<>(j2.solve(err2));
-        Vector<N2> q3 = q2.plus(dq3);
+        assertEquals(0.207, dq3.get(0), 1e-3);
+        assertEquals(0.037, dq3.get(1), 1e-3);
+
+        Vector<N2> q3 = q2.minus(dq3);
         assertEquals(0.5, q3.get(0), 1e-3);
         assertEquals(2.121, q3.get(1), 1e-3);
 
-        // by step 3 we have the answer
         Matrix<N2, N2> j3 = NumericalJacobian100.numericalJacobian(
                 Nat.N2(), Nat.N2(), err, q3);
         // Vector<N2> X3 = fwd.apply(q3);
         Vector<N2> err3 = err.apply(q3);
+        // printxy(err3);
+        assertEquals(0.011, err3.get(0), 1e-3);
+        assertEquals(-0.023, err3.get(1), 1e-3);
+
         Vector<N2> dq4 = new Vector<>(j3.solve(err3));
-        Vector<N2> q4 = q3.plus(dq4);
+        assertEquals(-0.024, dq4.get(0), 1e-3);
+        assertEquals(0.026, dq4.get(1), 1e-3);
+
+        Vector<N2> q4 = q3.minus(dq4);
         assertEquals(0.524, q4.get(0), 1e-3);
         assertEquals(2.094, q4.get(1), 1e-3);
+    }
+
+    void printxy(Vector<N2> err) {
+        System.out.println(Util.vecStr(err));
     }
 
     @Test
@@ -177,53 +208,69 @@ public class NewtonsMethodTest {
         // Same as above but including end angle. note that end angle
         // can't be specified independently of position. so what happens?
         // when we specify the right angle, it speeds up the solver a bit.
-        Function<Vector<N2>, Vector<N3>> f = q -> VecBuilder.fill(
-                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
-                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)),
-                q.get(0) + q.get(1));
 
         // desired position
         // q0 should be pi/6 or 0.524, q1 should be 2pi/3 or 2.094
         // the resulting end-angle is 5pi/6
         Vector<N3> Xd = VecBuilder.fill(0, 1, 2.618);
 
+        Function<Vector<N2>, Vector<N3>> fwd = q -> VecBuilder.fill(
+                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
+                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)),
+                q.get(0) + q.get(1));
+        Function<Vector<N2>, Vector<N3>> err = q -> fwd.apply(q).minus(Xd);
+
         // initial joint angles
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // initial position
-        Vector<N3> X0 = f.apply(q0);
+        Vector<N3> X0 = fwd.apply(q0);
         assertEquals(1, X0.get(0), 1e-9);
         assertEquals(1, X0.get(1), 1e-9);
-        // jacobian at q0
-        Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), f, q0);
-        assertEquals(-1, j0.get(0, 0), 1e-9);
-        assertEquals(-1, j0.get(0, 1), 1e-9);
-        assertEquals(1, j0.get(1, 0), 1e-9);
-        assertEquals(0, j0.get(1, 1), 1e-9);
-        Vector<N2> dq1 = new Vector<>(j0.solve(Xd.minus(X0)));
 
-        Vector<N2> q1 = q0.plus(dq1);
+        // jacobian at q0
+        Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
+        System.out.println(Util.matStr(j0));
+        // dx/dq0
+        assertEquals(-1, j0.get(0, 0), 1e-9);
+        // dx/dq1
+        assertEquals(-1, j0.get(0, 1), 1e-9);
+        // dy/dq0
+        assertEquals(1, j0.get(1, 0), 1e-9);
+        // dy/dq1
+        assertEquals(0, j0.get(1, 1), 1e-9);
+        // angles just add
+        // dt/dq0
+        assertEquals(1, j0.get(2, 0), 1e-9);
+        // dt/dq1
+        assertEquals(1, j0.get(2, 1), 1e-9);
+
+        Vector<N3> err0 = err.apply(q0);
+        Vector<N2> dq1 = new Vector<>(j0.solve(err0));
+
+        Vector<N2> q1 = q0.minus(dq1);
         assertEquals(0, q1.get(0), 1e-9);
         assertEquals(2.594, q1.get(1), 1e-3);
 
-        Matrix<N3, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), f, q1);
-        Vector<N3> X1 = f.apply(q1);
-        Vector<N2> dq2 = new Vector<>(j1.solve(Xd.minus(X1)));
-        Vector<N2> q2 = q1.plus(dq2);
+        Matrix<N3, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q1);
+        Vector<N3> err1 = err.apply(q1);
+
+        Vector<N2> dq2 = new Vector<>(j1.solve(err1));
+        Vector<N2> q2 = q1.minus(dq2);
         assertEquals(0.547, q2.get(0), 1e-3);
         assertEquals(2.126, q2.get(1), 1e-3);
 
-        Matrix<N3, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), f, q2);
-        Vector<N3> X2 = f.apply(q2);
-        Vector<N2> dq3 = new Vector<>(j2.solve(Xd.minus(X2)));
-        Vector<N2> q3 = q2.plus(dq3);
+        Matrix<N3, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q2);
+        Vector<N3> err2 = err.apply(q2);
+        Vector<N2> dq3 = new Vector<>(j2.solve(err2));
+        Vector<N2> q3 = q2.minus(dq3);
         assertEquals(0.522, q3.get(0), 1e-3);
         assertEquals(2.096, q3.get(1), 1e-3);
 
         // by step 3 we have the answer
-        Matrix<N3, N2> j3 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), f, q3);
-        Vector<N3> X3 = f.apply(q3);
-        Vector<N2> dq4 = new Vector<>(j3.solve(Xd.minus(X3)));
-        Vector<N2> q4 = q3.plus(dq4);
+        Matrix<N3, N2> j3 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q3);
+        Vector<N3> err3 = err.apply(q3);
+        Vector<N2> dq4 = new Vector<>(j3.solve(err3));
+        Vector<N2> q4 = q3.minus(dq4);
         assertEquals(0.524, q4.get(0), 1e-3);
         assertEquals(2.094, q4.get(1), 1e-3);
     }
@@ -232,52 +279,58 @@ public class NewtonsMethodTest {
     void test4Pose2() {
         // Same as above but using pose2d. This does what GTSAM does, which is to
         // optimize in the tangent space (pose->log->twist->vector) .
-        Function<Vector<N2>, Pose2d> f = q -> new Pose2d(
-                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
-                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)),
-                new Rotation2d(q.get(0) + q.get(1)));
-        Function<Vector<N2>, Vector<N3>> ff = (x) -> GeometryUtil.toVec(GeometryUtil.slog(f.apply(x)));
 
         // desired position
         // q0 should be pi/6 or 0.524, q1 should be 2pi/3 or 2.094
         // the resulting end-angle is 5pi/6
         Pose2d XXd = new Pose2d(0, 1, new Rotation2d(2.618));
-        Vector<N3> Xd = GeometryUtil.toVec(GeometryUtil.slog(XXd));
+
+        Function<Vector<N2>, Pose2d> fwd = q -> new Pose2d(
+                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
+                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)),
+                new Rotation2d(q.get(0) + q.get(1)));
+
+        Function<Vector<N2>, Vector<N3>> err = q -> GeometryUtil.toVec(XXd.log(fwd.apply(q)));
+
         // initial joint angles
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // initial position
-        Pose2d XX0 = f.apply(q0);
+        Pose2d XX0 = fwd.apply(q0);
         assertEquals(1, XX0.getX(), 1e-9);
         assertEquals(1, XX0.getY(), 1e-9);
-        Vector<N3> X0 = ff.apply(q0);
         // jacobian at q0
-        Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), ff, q0);
-        // note the jacobian is different since the "log" is in there.
-        assertEquals(0.215, j0.get(0, 0), 1e-3);
-        assertEquals(-0.571, j0.get(0, 1), 1e-3);
-        assertEquals(0.785, j0.get(1, 0), 1e-3);
-        assertEquals(0, j0.get(1, 1), 1e-3);
+        Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
+        System.out.println(Util.matStr(j0));
+
+        // note the jacobian is different since the "log" is in there and we are far
+        // from the goal.
+        assertEquals(1.024, j0.get(0, 0), 1e-3);
+        assertEquals(0.117, j0.get(0, 1), 1e-3);
+        assertEquals(0.726, j0.get(1, 0), 1e-3);
+        assertEquals(1.249, j0.get(1, 1), 1e-3);
         assertEquals(1, j0.get(2, 0), 1e-3);
         assertEquals(1, j0.get(2, 1), 1e-3);
-        Vector<N2> dq1 = new Vector<>(j0.solve(Xd.minus(X0)));
 
-        Vector<N2> q1 = q0.plus(dq1);
-        assertEquals(0.438, q1.get(0), 1e-3);
-        assertEquals(2.183, q1.get(1), 1e-3);
+        Vector<N3> err0 = err.apply(q0);
+        Vector<N2> dq1 = new Vector<>(j0.solve(err0));
 
-        // this is a bit better convergence than the case above
-        Matrix<N3, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), ff, q1);
-        Vector<N3> X1 = ff.apply(q1);
-        Vector<N2> dq2 = new Vector<>(j1.solve(Xd.minus(X1)));
-        Vector<N2> q2 = q1.plus(dq2);
+        Vector<N2> q1 = q0.minus(dq1);
+        assertEquals(0.487, q1.get(0), 1e-3);
+        assertEquals(2.058, q1.get(1), 1e-3);
+
+        // including the pose makes it converge faster
+        Matrix<N3, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q1);
+        Vector<N3> err1 = err.apply(q1);
+        Vector<N2> dq2 = new Vector<>(j1.solve(err1));
+        Vector<N2> q2 = q1.minus(dq2);
         assertEquals(0.524, q2.get(0), 1e-3);
         assertEquals(2.095, q2.get(1), 1e-3);
 
         // there in step 2
-        Matrix<N3, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), ff, q2);
-        Vector<N3> X2 = ff.apply(q2);
-        Vector<N2> dq3 = new Vector<>(j2.solve(Xd.minus(X2)));
-        Vector<N2> q3 = q2.plus(dq3);
+        Matrix<N3, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q2);
+        Vector<N3> err2 = err.apply(q2);
+        Vector<N2> dq3 = new Vector<>(j2.solve(err2));
+        Vector<N2> q3 = q2.minus(dq3);
         assertEquals(0.524, q3.get(0), 1e-3);
         assertEquals(2.094, q3.get(1), 1e-3);
     }
@@ -285,59 +338,61 @@ public class NewtonsMethodTest {
     @Test
     void test4Pose2Transform2() {
         // Same as above but using pose2d and transform2d for the forward f, so that
-        // it's more like an arbitrary kinematic chain.
+        // it's more like an arbitrary kinematic chain. Same convergence as above.
         // link lengths
         final double l0 = 1;
         final double l1 = 1;
-        Function<Double, Rotation2d> r = q -> new Rotation2d(q);
-        Function<Vector<N2>, Pose2d> f = q -> Pose2d.kZero
-                .transformBy(new Transform2d(0, 0, r.apply(q.get(0))))
-                .transformBy(new Transform2d(l0, 0, Rotation2d.kZero))
-                .transformBy(new Transform2d(0, 0, r.apply(q.get(1))))
-                .transformBy(new Transform2d(l1, 0, Rotation2d.kZero));
-
-        Function<Vector<N2>, Vector<N3>> ff = (x) -> GeometryUtil.toVec(GeometryUtil.slog(f.apply(x)));
 
         // desired position
         // q0 should be pi/6 or 0.524, q1 should be 2pi/3 or 2.094
         // the resulting end-angle is 5pi/6
         Pose2d XXd = new Pose2d(0, 1, new Rotation2d(2.618));
-        Vector<N3> Xd = GeometryUtil.toVec(GeometryUtil.slog(XXd));
+
+        Function<Vector<N2>, Pose2d> fwd = q -> Pose2d.kZero
+                .transformBy(new Transform2d(0, 0, new Rotation2d(q.get(0))))
+                .transformBy(new Transform2d(l0, 0, Rotation2d.kZero))
+                .transformBy(new Transform2d(0, 0, new Rotation2d(q.get(1))))
+                .transformBy(new Transform2d(l1, 0, Rotation2d.kZero));
+        Function<Vector<N2>, Vector<N3>> err = q -> GeometryUtil.toVec(XXd.log(fwd.apply(q)));
+
         // initial joint angles
         Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
         // initial position
-        Pose2d XX0 = f.apply(q0);
+        Pose2d XX0 = fwd.apply(q0);
         assertEquals(1, XX0.getX(), 1e-9);
         assertEquals(1, XX0.getY(), 1e-9);
-        Vector<N3> X0 = ff.apply(q0);
+
         // jacobian at q0
-        Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), ff, q0);
+        Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
+        System.out.println(Util.matStr(j0));
+
         // note the jacobian is different since the "log" is in there.
-        assertEquals(0.215, j0.get(0, 0), 1e-3);
-        assertEquals(-0.571, j0.get(0, 1), 1e-3);
-        assertEquals(0.785, j0.get(1, 0), 1e-3);
-        assertEquals(0, j0.get(1, 1), 1e-3);
+        assertEquals(1.024, j0.get(0, 0), 1e-3);
+        assertEquals(0.117, j0.get(0, 1), 1e-3);
+        assertEquals(0.726, j0.get(1, 0), 1e-3);
+        assertEquals(1.249, j0.get(1, 1), 1e-3);
         assertEquals(1, j0.get(2, 0), 1e-3);
         assertEquals(1, j0.get(2, 1), 1e-3);
-        Vector<N2> dq1 = new Vector<>(j0.solve(Xd.minus(X0)));
 
-        Vector<N2> q1 = q0.plus(dq1);
-        assertEquals(0.438, q1.get(0), 1e-3);
-        assertEquals(2.183, q1.get(1), 1e-3);
+        Vector<N3> err0 = err.apply(q0);
+        Vector<N2> dq1 = new Vector<>(j0.solve(err0));
+        Vector<N2> q1 = q0.minus(dq1);
+        assertEquals(0.487, q1.get(0), 1e-3);
+        assertEquals(2.058, q1.get(1), 1e-3);
 
         // this is a bit better convergence than the case above
-        Matrix<N3, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), ff, q1);
-        Vector<N3> X1 = ff.apply(q1);
-        Vector<N2> dq2 = new Vector<>(j1.solve(Xd.minus(X1)));
-        Vector<N2> q2 = q1.plus(dq2);
+        Matrix<N3, N2> j1 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q1);
+        Vector<N3> err1 = err.apply(q1);
+        Vector<N2> dq2 = new Vector<>(j1.solve(err1));
+        Vector<N2> q2 = q1.minus(dq2);
         assertEquals(0.524, q2.get(0), 1e-3);
         assertEquals(2.095, q2.get(1), 1e-3);
 
         // there in step 2
-        Matrix<N3, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), ff, q2);
-        Vector<N3> X2 = ff.apply(q2);
-        Vector<N2> dq3 = new Vector<>(j2.solve(Xd.minus(X2)));
-        Vector<N2> q3 = q2.plus(dq3);
+        Matrix<N3, N2> j2 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q2);
+        Vector<N3> err2 = err.apply(q2);
+        Vector<N2> dq3 = new Vector<>(j2.solve(err2));
+        Vector<N2> q3 = q2.minus(dq3);
         assertEquals(0.524, q3.get(0), 1e-3);
         assertEquals(2.094, q3.get(1), 1e-3);
     }
