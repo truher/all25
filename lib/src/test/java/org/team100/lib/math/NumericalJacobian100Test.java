@@ -13,7 +13,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 
-public class NumericalJacobianTest {
+public class NumericalJacobian100Test {
     /** Scalar function, f(x) = x. */
     @Test
     void test1() {
@@ -67,4 +67,40 @@ public class NumericalJacobianTest {
         assertEquals(1, jInv.get(1, 1), 1e-9);
     }
 
+    /** 2d RR arm */
+    @Test
+    void testRR() {
+        // desired position
+        // q0 should be pi/6 or 0.524, q1 should be 2pi/3 or 2.094
+        Vector<N2> Xd = VecBuilder.fill(0, 1);
+
+        Function<Vector<N2>, Vector<N2>> fwd = q -> VecBuilder.fill(
+                Math.cos(q.get(0)) + Math.cos(q.get(0) + q.get(1)),
+                Math.sin(q.get(0)) + Math.sin(q.get(0) + q.get(1)));
+        // estimate - goal so that the jacobian is the same.
+        Function<Vector<N2>, Vector<N2>> err = q -> fwd.apply(q).minus(Xd);
+
+        // initial joint angles
+        Vector<N2> q0 = VecBuilder.fill(0, Math.PI / 2);
+        // initial position
+        Vector<N2> X0 = fwd.apply(q0);
+        assertEquals(1, X0.get(0), 1e-9);
+        assertEquals(1, X0.get(1), 1e-9);
+        // jacobian at q0
+        Matrix<N2, N2> j0 = NumericalJacobian100.numericalJacobian2(
+                Nat.N2(), Nat.N2(), err, q0);
+        // radius of rotation for q0 to end, at pi/2, is sqrt(2)
+        // dx/dq for unit circle is -sqrt(2)/2
+        // dx/dq0
+        assertEquals(-1, j0.get(0, 0), 1e-5);
+        // q1 is opposite to x with unit radius
+        // dx/dq1
+        assertEquals(-1, j0.get(0, 1), 1e-5);
+        // same as first case but positive
+        // dy/dq0
+        assertEquals(1, j0.get(1, 0), 1e-5);
+        // q1 doesn't change y
+        // dy/dq1
+        assertEquals(0, j0.get(1, 1), 1e-5);
+    }
 }

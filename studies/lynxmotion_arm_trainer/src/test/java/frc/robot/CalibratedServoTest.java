@@ -15,8 +15,8 @@ public class CalibratedServoTest {
                 f)) {
             double xx = f.x(0.0);
             assertEquals(0.47699004975124376, xx, 1e-12);
-            s.setAngle(0.0);
-            assertEquals(0.0, s.getAngle(), 1e-12);
+            s.set(0.0);
+            assertEquals(0.0, s.get(), 1e-12);
         }
     }
 }

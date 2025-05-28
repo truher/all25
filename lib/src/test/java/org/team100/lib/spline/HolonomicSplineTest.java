@@ -323,8 +323,10 @@ class HolonomicSplineTest {
 
         List<HolonomicSpline> splines = List.of(s0);
         List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05);
-        for (Pose2dWithMotion p : motion) {
-            Util.printf("%5.3f %5.3f\n", p.getTranslation().getX(), p.getTranslation().getY());
+        if (DEBUG) {
+            for (Pose2dWithMotion p : motion) {
+                Util.printf("%5.3f %5.3f\n", p.getTranslation().getX(), p.getTranslation().getY());
+            }
         }
         Path100 path = new Path100(motion);
         if (DEBUG) {

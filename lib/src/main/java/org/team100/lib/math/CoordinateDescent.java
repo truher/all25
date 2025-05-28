@@ -1,7 +1,5 @@
 package org.team100.lib.math;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 

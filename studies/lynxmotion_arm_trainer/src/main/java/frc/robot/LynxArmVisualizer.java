@@ -14,7 +14,7 @@ import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
 import org.opencv.core.Point3;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmPose;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmPose;
 
 import edu.wpi.first.cscore.OpenCvLoader;
 import edu.wpi.first.math.MatBuilder;
@@ -121,7 +121,8 @@ public class LynxArmVisualizer {
                 p.p2(),
                 p.p3(),
                 p.p4(),
-                p.p5());
+                p.p5(),
+                p.p6());
         paint(m_base, "actual_arm", m_cameraPose, pList, Color.kOrangeRed);
 
         // List<Translation3d> tList2 = List.of(

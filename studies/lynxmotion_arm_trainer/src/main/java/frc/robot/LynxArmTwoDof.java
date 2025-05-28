@@ -1,11 +1,13 @@
 package frc.robot;
 
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmConfig;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics.LynxArmPose;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
+import org.team100.lib.motion.lynxmotion_arm.AnalyticLynxArmKinematics;
+import org.team100.lib.motion.lynxmotion_arm.LynxArmPose;
+import org.team100.lib.motion.lynxmotion_arm.TwoDofArmConfig;
+import org.team100.lib.motion.lynxmotion_arm.TwoDofArmPosition;
 import org.team100.lib.motion.lynxmotion_arm.TwoDofKinematics;
-import org.team100.lib.motion.lynxmotion_arm.TwoDofKinematics.TwoDofArmConfig;
-import org.team100.lib.motion.lynxmotion_arm.TwoDofKinematics.TwoDofArmPosition;
+import org.team100.lib.motion.lynxmotion_arm.AnalyticTwoDofKinematics;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,12 +66,12 @@ public class LynxArmTwoDof extends SubsystemBase implements AutoCloseable {
                 new AffineFunction(-0.02, 0.02));
 
         // these are constant
-        m_swing.setAngle(0);
-        m_wrist.setAngle(0);
-        m_twist.setAngle(0);
+        m_swing.set(0);
+        m_wrist.set(0);
+        m_twist.set(0);
 
-        m_kinematics = new TwoDofKinematics(0.146, 0.298);
-        m_fullKinematics = new LynxArmKinematics(0.07, 0.146, 0.187, 0.111);
+        m_kinematics = new AnalyticTwoDofKinematics(0.146, 0.298);
+        m_fullKinematics = AnalyticLynxArmKinematics.real();
 
         setPosition(HOME);
     }
@@ -79,8 +81,8 @@ public class LynxArmTwoDof extends SubsystemBase implements AutoCloseable {
         TwoDofArmConfig q = m_kinematics.inverse(end);
         // the joint coordinates use the 3d convention which is inverted
         // from the 2d one, so fix it here.
-        m_boom.setAngle(-1.0 * q.q1());
-        m_stick.setAngle(-1.0 * q.q2());
+        m_boom.set(-1.0 * q.q1());
+        m_stick.set(-1.0 * q.q2());
     }
 
     public TwoDofArmPosition getPosition() {
@@ -91,18 +93,18 @@ public class LynxArmTwoDof extends SubsystemBase implements AutoCloseable {
     public TwoDofArmConfig getMeasuredConfig() {
         // invert the actual angles to match the 2dof convention
         return new TwoDofArmConfig(
-                -1.0 * m_boom.getAngle(),
-                -1.0 * m_stick.getAngle());
+                -1.0 * m_boom.get(),
+                -1.0 * m_stick.get());
     }
 
     /** For visualization. */
     public LynxArmPose getPose() {
         LynxArmConfig q = new LynxArmConfig(
-                m_swing.getAngle(),
-                m_boom.getAngle(),
-                m_stick.getAngle(),
-                m_wrist.getAngle(),
-                m_twist.getAngle());
+                m_swing.get(),
+                m_boom.get(),
+                m_stick.get(),
+                m_wrist.get(),
+                m_twist.get());
         return m_fullKinematics.forward(q);
     }
 

@@ -1,5 +1,13 @@
 package org.team100.lib.util;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Num;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist3d;
+
 public class Util {
 
     public static boolean all(boolean[] x) {
@@ -17,6 +25,65 @@ public class Util {
 
     public static void printf(String s, Object... args) {
         System.out.printf(s, args);
+    }
+
+    static void print(Pose3d p) {
+        System.out.printf("x %6.3f y %6.3f z %6.3f r %6.3f p %6.3f y %6.3f\n",
+                p.getX(), p.getY(), p.getZ(),
+                p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
+    }
+
+    static <R extends Num> void print(String name, Vector<R> v) {
+        System.out.printf("%s ", name);
+        for (int i = 0; i < v.getNumRows(); ++i) {
+            System.out.printf("%6.3f ", v.get(i));
+        }
+        System.out.println();
+    }
+
+    public static String poseStr(Pose3d p) {
+        return String.format("%.8e, %.8e, %.8e, %.8e, %.8e, %.8e",
+                p.getX(), p.getY(), p.getZ(),
+                p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
+    }
+
+    public static String twistStr(Twist3d t) {
+        return String.format("Twist3d: [%.8e %.8e %.8e %.8e %.8e %.8e]",
+                t.dx, t.dy, t.dz, t.rx, t.ry, t.rz);
+    }
+
+    public static String rotStr(Rotation3d r) {
+        return String.format("%.8e, %.8e, %.8e",
+                r.getX(), r.getY(), r.getZ());
+    }
+
+    public static String transStr(Translation3d r) {
+        return String.format("%.8e, %.8e, %.8e",
+                r.getX(), r.getY(), r.getZ());
+    }
+
+    public static String vecStr(Vector<?> m) {
+        StringBuilder b = new StringBuilder();
+        b.append("[");
+        for (int i = 0; i < m.getNumRows(); ++i) {
+            b.append(String.format(" %.10e", m.get(i)));
+        }
+        b.append("]");
+        return b.toString();
+    }
+
+    public static String matStr(Matrix<?, ?> m) {
+        StringBuilder b = new StringBuilder();
+        b.append("[");
+        for (int i = 0; i < m.getNumRows(); ++i) {
+            for (int j = 0; j < m.getNumCols(); ++j) {
+                b.append(String.format(" %.3e", m.get(i, j)));
+            }
+            b.append(";\n");
+        }
+
+        b.append("]");
+        return b.toString();
     }
 
     /**

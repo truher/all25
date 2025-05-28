@@ -14,6 +14,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 
 public class CoordinateDescentTest {
+    private static final boolean DEBUG = false;
+
     @Test
     void test1() {
         Nat<N1> rows = Nat.N1();
@@ -53,9 +55,11 @@ public class CoordinateDescentTest {
             s.solve(bottom, x, top);
         }
         long finishTime = System.currentTimeMillis();
-        Util.println("Coordinate descent over quadratic");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Coordinate descent over quadratic");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
     /** 136 us per solve */
@@ -73,9 +77,11 @@ public class CoordinateDescentTest {
             s.solve(bottom, x, top);
         }
         long finishTime = System.currentTimeMillis();
-        Util.println("Coordinate descent over quadratic");
-        Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-        Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        if (DEBUG) {
+            Util.println("Coordinate descent over quadratic");
+            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+        }
     }
 
 }

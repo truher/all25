@@ -22,11 +22,16 @@ public class CalibratedServo implements AutoCloseable {
     /** Implements mechanical limits. */
     private final Clamp m_clamp;
 
-    // TODO: are all the servos linear like this?
     /**
-     * Transfer function from PWM to measured angle in radians. The calibration goes
-     * from PWM to angle, instead of the reverse, which is what we actually want,
-     * because servos don't have angle inputs or measurements.
+     * Transfer function from PWM to measurement. This could be an angle in radians,
+     * or a linear measurement in meters, or whatever: the caller needs to know what
+     * unit is being used here.
+     * 
+     * The calibration goes from PWM to measurement, instead of the reverse, which
+     * is what we actually want, because there's no actual measurement signal from a
+     * servo.
+     * 
+     * TODO: are all servos linear like this? Maybe allow nonlinear transfer.
      */
     private final AffineFunction m_transfer;
 
@@ -44,14 +49,17 @@ public class CalibratedServo implements AutoCloseable {
         m_transfer = transfer;
     }
 
-    /** Sets the angle in radians. */
-    public void setAngle(double rad) {
-        m_setpoint = rad;
-        m_servo.set(m_transfer.x(m_clamp.f(rad)));
+    /** Sets the measurement in whatever unit you're using. */
+    public void set(double x) {
+        m_setpoint = x;
+        m_servo.set(m_transfer.x(m_clamp.f(x)));
     }
 
-    /** Returns the current setpoint (not the actual measurement) in radians. */
-    public double getAngle() {
+    /**
+     * Returns the current setpoint (not the actual measurement) in whatever unit
+     * you're using.
+     */
+    public double get() {
         double measurement = m_transfer.y(m_servo.get());
         if (!MathUtil.isNear(m_setpoint, measurement, 0.01)) {
             // if we're somehow way out of sync, then get back in sync.
