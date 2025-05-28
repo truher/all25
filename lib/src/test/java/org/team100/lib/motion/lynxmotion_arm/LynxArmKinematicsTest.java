@@ -36,7 +36,10 @@ public class LynxArmKinematicsTest {
         // non-vertical axis that needs fixing: make yaw zero
         if (DEBUG)
             System.out.printf("fixed %s\n", Util.poseStr(fixed));
-        TestUtil.verify(new Pose3d(1, 0, 0, new Rotation3d(1, 1, 0)), fixed, "fix3");
+        // projection method
+        TestUtil.verify(new Pose3d(1, 0, 0, new Rotation3d(0.081, 1.237, 0)), fixed, "fix3");
+        // yaw substitution method
+        // TestUtil.verify(new Pose3d(1, 0, 0, new Rotation3d(1, 1, 0)), fixed, "fix3");
     }
 
     @Test
@@ -47,7 +50,11 @@ public class LynxArmKinematicsTest {
         // non-vertical axis that needs fixing: make yaw match the translation (45 deg)
         if (DEBUG)
             System.out.printf("fixed %s\n", Util.poseStr(fixed));
-        TestUtil.verify(new Pose3d(1, 1, 0, new Rotation3d(1, 1, Math.PI / 4)), fixed, "fix3");
+        // projection method
+        TestUtil.verify(new Pose3d(1, 1, 0, new Rotation3d(0.819, 1.01, Math.PI / 4)), fixed, "fix3");
+        // yaw substitution method
+        // TestUtil.verify(new Pose3d(1, 1, 0, new Rotation3d(1, 1, Math.PI / 4)),
+        // fixed, "fix3");
     }
 
     @Test
@@ -58,7 +65,11 @@ public class LynxArmKinematicsTest {
         // this just rotates the pure pitch in yaw.
         if (DEBUG)
             System.out.printf("fixed %s\n", Util.poseStr(fixed));
-        TestUtil.verify(new Pose3d(1, 1, 0, new Rotation3d(0, 1, Math.PI / 4)), fixed, "fix3");
+        // projection method
+        TestUtil.verify(new Pose3d(1, 1, 0, new Rotation3d(0.699, 1.145, Math.PI / 4)), fixed, "fix3");
+        // yaw substitution method
+        // TestUtil.verify(new Pose3d(1, 1, 0, new Rotation3d(0, 1, Math.PI / 4)),
+        // fixed, "fix3");
     }
 
     @Test
@@ -70,13 +81,24 @@ public class LynxArmKinematicsTest {
             // almost vertical pitch
             Pose3d p = new Pose3d(0, 0.15, 0, new Rotation3d(0, Math.PI / 2 - 0.01, 0));
             Pose3d fixed = LynxArmKinematics.fix(p);
-            // pitch is left alone but yaw is very wrong
             if (DEBUG)
                 System.out.printf("fixed %s\n", Util.poseStr(fixed));
-            TestUtil.verify(new Pose3d(0, 0.15, 0, new Rotation3d(0, Math.PI / 2 - 0.01, Math.PI / 2)), fixed, "fix6");
+            // projection
+            // it just goes all the way to vertical since it's quite close
+            TestUtil.verify(new Pose3d(0, 0.15, 0, new Rotation3d(0, Math.PI / 2, 0)), fixed,
+                    "fix6");
+            // yaw substitution
+            // pitch is left alone but yaw is very wrong
+            // TestUtil.verify(new Pose3d(0, 0.15, 0, new Rotation3d(0, Math.PI / 2 - 0.01,
+            // Math.PI / 2)), fixed, "fix6");
+
             LynxArmConfig q = k.inverse(initial, fixed);
+            // projection method
+            // note roll is more correct
+            TestUtil.verify(new LynxArmConfig(Math.PI / 2, -1.503, 2.229, 0.845, 1.571), q);
+            // yaw substitution method
             // note zero grip roll axis
-            TestUtil.verify(new LynxArmConfig(Math.PI / 2, -1.510, 2.235, 0.836, 0), q);
+            // TestUtil.verify(new LynxArmConfig(Math.PI / 2, -1.510, 2.235, 0.836, 0), q);
         }
         {
             // exactly vertical pitch
@@ -87,10 +109,14 @@ public class LynxArmKinematicsTest {
                 System.out.printf("fixed %s\n", Util.poseStr(fixed));
             TestUtil.verify(new Pose3d(0, 0.15, 0, new Rotation3d(0, Math.PI / 2, 0)), fixed, "fix3");
             LynxArmConfig q = k.inverse(initial, fixed);
+            // projection method
+            TestUtil.verify(new LynxArmConfig(Math.PI / 2, -1.503, 2.229, 0.845, 1.571), q);
+            // yaw substitution method
             // ***
             // note the large change in grip roll axis
             // ***
-            TestUtil.verify(new LynxArmConfig(Math.PI / 2, -1.503, 2.229, 0.845, 1.571), q);
+            // TestUtil.verify(new LynxArmConfig(Math.PI / 2, -1.503, 2.229, 0.845, 1.571),
+            // q);
         }
     }
 

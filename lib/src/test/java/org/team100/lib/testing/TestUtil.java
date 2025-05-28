@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Map;
 
 import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 public class TestUtil {
+    private static final boolean DEBUG = true;
 
     public static void verify(Map<String, Double> expected, Map<String, Double> actual) {
         assertEquals(expected.size(), actual.size());
@@ -24,6 +26,8 @@ public class TestUtil {
     }
 
     public static void verify(Pose3d expected, Pose3d actual, String name) {
+        if (DEBUG)
+            System.out.printf("expected %s actual %s\n", Util.poseStr(expected), Util.poseStr(actual));
         assertEquals(expected.getX(), actual.getX(), 1e-3, name + " x");
         assertEquals(expected.getY(), actual.getY(), 1e-3, name + " y");
         assertEquals(expected.getZ(), actual.getZ(), 1e-3, name + " z");
