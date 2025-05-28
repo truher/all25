@@ -6,7 +6,10 @@ import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -14,7 +17,10 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.spline.PoseWithCurvature;
 
 /**
@@ -79,8 +85,12 @@ public class GeometryUtil {
         return new Pose2d(a.getTranslation().unaryMinus().rotateBy(rotation_inverted), rotation_inverted);
     }
 
-    public static Twist2d slog(final Pose2d transform) {
-        return Pose2d.kZero.log(transform);
+    public static Twist2d slog(final Pose2d p) {
+        return Pose2d.kZero.log(p);
+    }
+
+    public static Twist3d slog(final Pose3d p) {
+        return Pose3d.kZero.log(p);
     }
 
     public static Pose2d sexp(final Twist2d delta) {
@@ -141,6 +151,11 @@ public class GeometryUtil {
         return Math.hypot(a.dx, a.dy);
     }
 
+    public static double norm(Twist3d t) {
+        Vector<N6> v = VecBuilder.fill(t.dx, t.dy, t.dz, t.rx, t.ry, t.rz);
+        return v.norm();
+    }
+
     public static double norm(ChassisSpeeds a) {
         // Common case of dy == 0
         if (a.vyMetersPerSecond == 0.0)
@@ -170,6 +185,45 @@ public class GeometryUtil {
         }
         double angle_diff = a.unaryMinus().rotateBy(b).getRadians();
         return a.rotateBy(Rotation2d.fromRadians(angle_diff * x));
+    }
+
+    /**
+     * Interpolate between a and b, treating each dimension separately. This will
+     * make straight lines, whereas the WPI Pose3d interpolator will make
+     * constant-twist curves.
+     */
+    public static Pose3d interpolate(Pose3d a, Pose3d b, double x) {
+        if (x <= 0.0) {
+            return a;
+        } else if (x >= 1.0) {
+            return b;
+        }
+        Translation3d aT = a.getTranslation();
+        Translation3d bT = b.getTranslation();
+        Rotation3d aR = a.getRotation();
+        Rotation3d bR = b.getRotation();
+        // each translation axis is interpolated separately
+        Translation3d lerpT = aT.interpolate(bT, x);
+        // Rotation3d lerpR = aR.interpolate(bR, x);
+        Rotation3d lerpR = interpolate(aR, bR, x);
+        return new Pose3d(lerpT, lerpR);
+    }
+
+    /**
+     * Interpolate between a and b, treating each dimension separately. This will
+     * make straight lines, whereas the WPI Rotation3d interpolator uses quaternion
+     * composition.
+     */
+    public static Rotation3d interpolate(Rotation3d a, Rotation3d b, double x) {
+        if (x <= 0.0) {
+            return a;
+        } else if (x >= 1.0) {
+            return b;
+        }
+        return new Rotation3d(
+                MathUtil.interpolate(a.getX(), b.getX(), x),
+                MathUtil.interpolate(a.getY(), b.getY(), x),
+                MathUtil.interpolate(a.getZ(), b.getZ(), x));
     }
 
     public static double distance(PoseWithCurvature a, PoseWithCurvature b) {
@@ -283,6 +337,13 @@ public class GeometryUtil {
         Quaternion q = zforward.getQuaternion();
         Quaternion q2 = new Quaternion(q.getW(), q.getZ(), -q.getX(), -q.getY());
         return new Rotation3d(q2);
+    }
 
+    public static Vector<N3> toVec(Twist2d twist) {
+        return VecBuilder.fill(twist.dx, twist.dy, twist.dtheta);
+    }
+
+    public static Vector<N6> toVec(Twist3d twist) {
+        return VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz);
     }
 }
