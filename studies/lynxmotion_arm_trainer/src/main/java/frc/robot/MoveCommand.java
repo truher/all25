@@ -27,10 +27,10 @@ public class MoveCommand extends Command {
     private double m_distance;
     private boolean m_done;
 
-    public MoveCommand(LynxArm arm, Pose3d goal) {
+    public MoveCommand(LynxArm arm, Pose3d goal, double velocity) {
         m_arm = arm;
         m_goal = goal;
-        m_profile = new JerkLimitedProfile100(0.1, 1, 10, true);
+        m_profile = new JerkLimitedProfile100(velocity, 1, 10, true);
         m_timer = new Timer();
         addRequirements(arm);
     }

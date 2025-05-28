@@ -7,6 +7,7 @@ import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -150,12 +151,19 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         return p;
     }
 
+    /** Move to goal forever -- use a termination condition to stop. */
     public MoveCommand moveTo(Pose3d goal) {
-        return new MoveCommand(this, goal);
+        return new MoveCommand(this, goal, 0.1);
+    }
+
+    /** Move to goal and terminate when done. */
+    public Command moveQuicklyUntilDone(Pose3d goal) {
+        MoveCommand m = new MoveCommand(this, goal, 0.5);
+        return m.until(m::done);
     }
 
     public MoveCommand moveHome() {
-        return new MoveCommand(this, HOME);
+        return new MoveCommand(this, HOME, 0.1);
     }
 
     @Override

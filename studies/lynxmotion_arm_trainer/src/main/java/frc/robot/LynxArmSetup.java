@@ -6,6 +6,7 @@ import org.team100.lib.motion.lynxmotion_arm.NumericLynxArmKinematics;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -34,20 +35,22 @@ public class LynxArmSetup implements Runnable {
         MoveCommand move3 = m_arm.moveTo(new Pose3d(0.15, -0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0)));
         new Trigger(m_controller::getXButton).whileTrue(move3);
 
-        MoveCommand move4 = m_arm.moveTo(new Pose3d(0.2, -0.12, 0.05, new Rotation3d(0, Math.PI / 2, 0)));
-        MoveCommand move5 = m_arm.moveTo(new Pose3d(0.2, -0.12, 0.0, new Rotation3d(0, Math.PI / 2, 0)));
-        MoveCommand move6 = m_arm.moveTo(new Pose3d(0.2, -0.12, 0.05, new Rotation3d(0, Math.PI / 2, 0)));
-        MoveCommand move7 = m_arm.moveTo(new Pose3d(0.2, 0.12, 0.05, new Rotation3d(0, Math.PI / 2, 0)));
-        MoveCommand move8 = m_arm.moveTo(new Pose3d(0.2, 0.12, 0.0, new Rotation3d(0, Math.PI / 2, 0)));
-        MoveCommand move9 = m_arm.moveTo(new Pose3d(0.2, 0.12, 0.05, new Rotation3d(0, Math.PI / 2, 0)));
+        // peck in a little square
         new Trigger(m_controller::getYButton).whileTrue(
                 Commands.sequence(
-                        move4.until(move4::done),
-                        move5.until(move5::done),
-                        move6.until(move6::done),
-                        move7.until(move7::done),
-                        move8.until(move8::done),
-                        move9.until(move9::done)));
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.12, -0.15, 0.05, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.12, -0.15, 0.0, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.12, -0.15, 0.05, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.12, 0.15, 0.05, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.12, 0.15, 0.0, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.12, 0.15, 0.05, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.26, 0.15, 0.05, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.26, 0.15, 0.0, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.26, 0.15, 0.05, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.26, -0.15, 0.05, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.26, -0.15, 0.0, new Rotation3d(0, Math.PI / 2, 0))),
+                        m_arm.moveQuicklyUntilDone(new Pose3d(0.26, -0.15, 0.05, new Rotation3d(0, Math.PI / 2, 0))
+                        )));
 
         m_arm.setDefaultCommand(m_arm.moveHome());
     }
