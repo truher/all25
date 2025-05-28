@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmPose;
@@ -91,12 +93,13 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
 
         // initialize the servo values so that the solver doesn't freak out
         // TODO: why was it freaking out?
-        m_swing.setAngle(0);
-        m_boom.setAngle(-2.0 * Math.PI / 3);
-        m_stick.setAngle(Math.PI / 2);
-        m_wrist.setAngle(Math.PI / 2);
-        m_twist.setAngle(0);
-        m_grip.setAngle(0);
+        m_swing.set(0);
+        m_boom.set(-2.0 * Math.PI / 3);
+        m_stick.set(Math.PI / 2);
+        m_wrist.set(Math.PI / 2);
+        m_twist.set(0);
+        // TODO: make sure this means "open"
+        m_grip.set(0.02);
 
         // set the initial position to the actual desired value
         if (DEBUG) {
@@ -119,6 +122,8 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
      * 
      * For indeterminate axes, we do nothing.
      * 
+     * Pose does not include grip state.
+     * 
      * TODO: use the previous value for indeterminate axes.
      */
     public void setPosition(Pose3d end) {
@@ -128,17 +133,25 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         if (DEBUG)
             System.out.printf("set q: %s\n", q.str());
 
-        q.swing().ifPresent(m_swing::setAngle);
-        m_boom.setAngle(q.boom());
-        m_stick.setAngle(q.stick());
-        m_wrist.setAngle(q.wrist());
-        q.twist().ifPresent(m_twist::setAngle);
+        q.swing().ifPresent(m_swing::set);
+        m_boom.set(q.boom());
+        m_stick.set(q.stick());
+        m_wrist.set(q.wrist());
+        q.twist().ifPresent(m_twist::set);
         if (q.swing().isEmpty())
             if (DEBUG)
                 System.out.println("empty swing");
         if (q.twist().isEmpty())
             if (DEBUG)
                 System.out.println("empty twist");
+    }
+
+    public void setGrip(double width) {
+        m_grip.set(width);
+    }
+
+    public double getGrip() {
+        return m_grip.get();
     }
 
     public LynxArmPose getPosition() {
@@ -166,6 +179,18 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         return new MoveCommand(this, HOME, 0.1);
     }
 
+    public MoveManually manual(DoubleSupplier xSpeed, DoubleSupplier ySpeed) {
+        return new MoveManually(this, xSpeed, ySpeed);
+    }
+
+    public ToggleGrip toggleGrip() {
+        return new ToggleGrip(this);
+    }
+
+    public ToggleHeight toggleHeight() {
+        return new ToggleHeight(this);
+    }
+
     @Override
     public void close() {
         m_swing.close();
@@ -191,11 +216,11 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         if (DEBUG)
             System.out.println("getMeasuredConfig()");
         LynxArmConfig q = new LynxArmConfig(
-                m_swing.getAngle(),
-                m_boom.getAngle(),
-                m_stick.getAngle(),
-                m_wrist.getAngle(),
-                m_twist.getAngle());
+                m_swing.get(),
+                m_boom.get(),
+                m_stick.get(),
+                m_wrist.get(),
+                m_twist.get());
         if (DEBUG)
             System.out.printf("get q: %s\n", q.str());
         return q;

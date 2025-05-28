@@ -24,6 +24,7 @@ public class MoveCommand extends Command {
     private final Timer m_timer;
 
     private Pose3d m_start;
+    private double m_grip;
     private double m_distance;
     private boolean m_done;
 
@@ -40,6 +41,8 @@ public class MoveCommand extends Command {
         if (DEBUG)
             System.out.println("\n***INITIALIZE***");
         m_start = m_arm.getPosition().p6();
+        m_grip = m_arm.getGrip();
+
         // this doesn't work for twist-only moves without the minimum
         m_distance = Math.max(0.01, m_start.getTranslation().getDistance(m_goal.getTranslation()));
         m_profile.init(new Control100(), new Model100(m_distance, 0));
@@ -55,6 +58,9 @@ public class MoveCommand extends Command {
     public void execute() {
         if (DEBUG)
             System.out.println("\n***EXECUTE***");
+        // the servo doesn't need to be commanded to maintain its position but it's a
+        // good habit since some motor types do need this.
+        m_arm.setGrip(m_grip);
         Control100 c = m_profile.sample(m_timer.get());
         double s = c.x() / m_distance;
         Pose3d setpoint = GeometryUtil.interpolate(m_start, m_goal, s);
