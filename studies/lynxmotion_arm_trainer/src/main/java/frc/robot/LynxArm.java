@@ -9,7 +9,10 @@ import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -44,6 +47,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public class LynxArm extends SubsystemBase implements AutoCloseable {
     private static final boolean DEBUG = false;
+    // prefer vertical grip. beyond this radius, extend it.
+    private static final double VERTICAL_LIMIT = 0.3;
+    private static final double MAX_RADIUS = 0.4;
     private static final Pose3d HOME = new Pose3d(0.2, 0, 0.2, new Rotation3d(0, Math.PI / 4, 0));
 
     private final CalibratedServo m_swing;
@@ -51,6 +57,8 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
     private final CalibratedServo m_stick;
     private final CalibratedServo m_wrist;
     private final CalibratedServo m_twist;
+    // it might be easier if the grip were actually a separate subsystem,
+    // since it never collides with anything...
     private final CalibratedServo m_grip;
 
     private final LynxArmKinematics m_kinematics;
@@ -146,6 +154,39 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
                 System.out.println("empty twist");
     }
 
+    /**
+     * Compute the pose that gets to this translation, using the current z value.
+     * There's no feasibility check here.
+     * 
+     * TODO: add feasibility checking.
+     */
+    public void setPosition(Translation2d t) {
+        Pose3d p = getPosition().p6();
+        final double pitch;
+        double r = t.getNorm();
+        if (r < VERTICAL_LIMIT) {
+            // for near targets, the grip is vertical.
+            pitch = Math.PI / 2;
+        } else {
+            // further away, the pitch depends on range.
+            double s = 1 - (r - VERTICAL_LIMIT) / (MAX_RADIUS - VERTICAL_LIMIT);
+            pitch = s * Math.PI / 2;
+        }
+
+        Pose3d newPose = new Pose3d(
+                new Translation3d(t.getX(), t.getY(), p.getZ()),
+                new Rotation3d(0.0, pitch, t.getAngle().getRadians()));
+        setPosition(newPose);
+    }
+
+    /** change z, leave everything else alone. */
+    public void setHeight(double z) {
+        Pose3d p = getPosition().p6();
+        setPosition(new Pose3d(
+                new Translation3d(p.getX(), p.getY(), z),
+                p.getRotation()));
+    }
+
     public void setGrip(double width) {
         m_grip.set(width);
     }
@@ -164,6 +205,24 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         return p;
     }
 
+    public Command up() {
+        return new MoveZ(this, 0.05);
+    }
+
+    public Command down() {
+        return new MoveZ(this, 0.0);
+    }
+
+    // TODO: to a separate subsystem
+    public Command closeGrip() {
+        return new MoveGrip(this, 0);
+    }
+
+    // TODO: to a separate subsystem
+    public Command openGrip() {
+        return new MoveGrip(this, 0.02);
+    }
+
     /** Move to goal forever -- use a termination condition to stop. */
     public MoveCommand moveTo(Pose3d goal) {
         return new MoveCommand(this, goal, 0.1);
@@ -172,6 +231,11 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
     /** Move to goal and terminate when done. */
     public Command moveQuicklyUntilDone(Pose3d goal) {
         MoveCommand m = new MoveCommand(this, goal, 0.5);
+        return m.until(m::done);
+    }
+
+    public Command moveXY(double x, double y) {
+        MoveXY m = new MoveXY(this, new Translation2d(x, y));
         return m.until(m::done);
     }
 

@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * * Yaw follows the XY position.
  */
 public class MoveManually extends Command {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     // prefer vertical grip.  beyond this radius, extend it.
     private static final double VERTICAL_LIMIT = 0.3;
@@ -81,12 +81,6 @@ public class MoveManually extends Command {
             m_y = m_y + m_ySpeed.getAsDouble() * STEP;
 
         }
-
-        // limits
-        // yaw = MathUtil.clamp(yaw, -Math.PI / 2, Math.PI / 2);
-        // r = MathUtil.clamp(r, MIN_RADIUS, MAX_RADIUS);
-        // m_x = r * Math.cos(yaw);
-        // m_y = r * Math.sin(yaw);
 
         if (DEBUG) {
             System.out.printf("x %f y %f\n", m_x, m_y);
