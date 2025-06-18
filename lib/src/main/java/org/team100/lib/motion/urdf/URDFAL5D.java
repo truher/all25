@@ -93,7 +93,8 @@ public class URDFAL5D extends URDFRobot<N5> {
                                 link3,
                                 gripper,
                                 // rot x zero used to be -pi/2
-                                new Pose3d(0.034, 0, 0, new Rotation3d(0, 0, 0)),
+                                // this is longer than the original i think because of the twist axis
+                                new Pose3d(0.061, 0, 0, new Rotation3d(0, 0, 0)),
                                 VecBuilder.fill(1, 0, 0)),
                         new URDFJoint(
                                 "center_point",
@@ -101,6 +102,7 @@ public class URDFAL5D extends URDFRobot<N5> {
                                 null,
                                 gripper,
                                 tool_center_point,
+                                // 55mm is the distance to the *end* of the end effector, not the target grip point
                                 new Pose3d(0.055, 0, 0, new Rotation3d()), null)));
     }
 }

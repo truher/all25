@@ -75,29 +75,29 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
 
         // pitch; joint zero and servo zero are aligned; unconstrained.
         m_boom = new CalibratedServo(1,
-                new Clamp(-Math.PI, Math.PI),
-                new AffineFunction(-Math.PI, 0));
+                new Clamp(-Math.PI, 0),
+                new AffineFunction(-3.437, 0.138));
 
         // pitch; joint zero is servo max; constrained in the positive direction.
         m_stick = new CalibratedServo(2,
                 new Clamp(0, Math.PI),
-                new AffineFunction(-Math.PI, Math.PI));
+                new AffineFunction(3.205, -0.125));
 
         // pitch; joint zero is in the middle of the servo range; unconstrained
         m_wrist = new CalibratedServo(3,
                 new Clamp(-Math.PI / 2, Math.PI / 2),
-                new AffineFunction(-Math.PI, Math.PI / 2));
+                new AffineFunction(-3.203, 1.568));
 
-        // roll; joint zero is in the middle of the servo range; unconstrained.
+        // roll: note the limited range.
         m_twist = new CalibratedServo(4,
-                new Clamp(-Math.PI / 2, Math.PI / 2),
-                new AffineFunction(-Math.PI, Math.PI / 2));
+                new Clamp(-1.257, 1.187),
+                new AffineFunction(-3.081, 1.54));
 
         // the grip axis measures the width of the jaws.
         // TODO: calibrate in meters
         m_grip = new CalibratedServo(5,
-                new Clamp(0, 0.02),
-                new AffineFunction(-0.02, 0.02));
+                new Clamp(0, 0.033),
+                new AffineFunction(-0.041, 0.036));
 
         // initialize the servo values so that the solver doesn't freak out
         // TODO: why was it freaking out?
@@ -243,8 +243,11 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         return new MoveCommand(this, HOME, 0.1);
     }
 
-    public MoveManually manual(DoubleSupplier xSpeed, DoubleSupplier ySpeed) {
-        return new MoveManually(this, xSpeed, ySpeed);
+    public MoveManually manual(
+            DoubleSupplier xSpeed,
+            DoubleSupplier ySpeed,
+            DoubleSupplier zSpeed) {
+        return new MoveManually(this, xSpeed, ySpeed, zSpeed);
     }
 
     public ToggleGrip toggleGrip() {

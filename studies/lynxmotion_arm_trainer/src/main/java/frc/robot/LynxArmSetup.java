@@ -1,5 +1,6 @@
 package frc.robot;
 
+import org.team100.lib.hid.ControlUtil;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.NumericLynxArmKinematics;
 
@@ -38,7 +39,8 @@ public class LynxArmSetup implements Runnable {
         // 0))));
 
         new Trigger(m_controller::getAButton).whileTrue(m_arm.toggleHeight());
-        new Trigger(m_controller::getBButton).whileTrue(m_arm.toggleGrip());
+        // open/close is left bumper
+        new Trigger(m_controller::getLeftBumperButton).whileTrue(m_arm.toggleGrip());
 
         // this is one way to do it.
         new Trigger(m_controller::getXButton).whileTrue(
@@ -59,7 +61,7 @@ public class LynxArmSetup implements Runnable {
         // another way to do it; note this doesn't control the roll axis the same way
         new Trigger(m_controller::getYButton).whileTrue(
                 Commands.sequence(
-                        m_arm.up(),
+                        m_arm.up(), m_arm.openGrip(),
                         m_arm.moveXY(0.12, -0.15),
                         m_arm.down(), m_arm.closeGrip(), m_arm.up(),
                         m_arm.moveXY(0.12, 0.15),
@@ -75,8 +77,9 @@ public class LynxArmSetup implements Runnable {
         // joystick
         // so that axes 4 (x) and 5 (y) are bound somewhere (e.g. WASD)
         m_arm.setDefaultCommand(m_arm.manual(
-                () -> -1.0 * m_controller.getRightY(),
-                () -> -1.0 * m_controller.getRightX()));
+                () -> -1.0 * ControlUtil.deadband(m_controller.getRightY(), 0.05, 1),
+                () -> -1.0 * ControlUtil.deadband(m_controller.getRightX(), 0.05, 1),
+                () -> -1.0 * ControlUtil.deadband(m_controller.getLeftY(), 0.05, 1)));
     }
 
     @Override

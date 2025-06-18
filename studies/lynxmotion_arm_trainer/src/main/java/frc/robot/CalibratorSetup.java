@@ -8,7 +8,7 @@ public class CalibratorSetup implements Runnable {
     private final AxisCalibrator m_calibrator;
 
     public CalibratorSetup(XboxController m_controller, DemoLED m_led) {
-        m_calibrator = new AxisCalibrator(2);
+        m_calibrator = new AxisCalibrator(5);
         new Trigger(m_controller::getXButton).onTrue(m_calibrator.step());
         m_led.setDefaultCommand(m_led.indicateCalibration(m_calibrator));
     }

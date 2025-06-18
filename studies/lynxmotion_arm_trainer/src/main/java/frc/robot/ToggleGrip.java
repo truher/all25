@@ -13,7 +13,9 @@ import edu.wpi.first.wpilibj2.command.Command;
  * this will run when you're stopped anyway (to pick or place).
  */
 public class ToggleGrip extends Command {
-    private static final double DURATION = 1.0;
+    private static final double CLOSED = 0.001;
+    private static final double OPEN = 0.0325;
+    private static final double DURATION = 0.5;
     private final LynxArm m_arm;
     private final Timer m_timer;
 
@@ -33,10 +35,10 @@ public class ToggleGrip extends Command {
         m_startGrip = m_arm.getGrip();
         if (m_startGrip < 0.01) {
             // it's closed, we want to open it.
-            m_goal = 0.02;
+            m_goal = OPEN;
         } else {
             // it's open, we want to close it.
-            m_goal = 0;
+            m_goal = CLOSED;
         }
         m_timer.restart();
     }
