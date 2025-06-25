@@ -43,10 +43,23 @@ public class TankDriveSubsystem extends SubsystemBase implements Glassy {
         double invertedRot = rotSpeed * -1.0;
         double leftSpeed = translationSpeed + invertedRot;
         double rightSpeed = translationSpeed - invertedRot;
-        setRawModules(leftSpeed * kMaxSpeedM_S, rightSpeed * kMaxSpeedM_S);
+        setModules(leftSpeed * kMaxSpeedM_S, rightSpeed * kMaxSpeedM_S);
     }
 
-    public void setRawModules(double... states) {
+    /**
+     * 
+     * @param translationSpeed -1 to 1 duty cycle
+     * @param rotSpeed         -1 to 1 duty cycle
+     * 
+     */
+    public void setRaw(double translationSpeed, double rotSpeed) {
+        double invertedRot = rotSpeed * -1.0;
+        double leftSpeed = translationSpeed + invertedRot;
+        double rightSpeed = translationSpeed - invertedRot;
+        setModules(leftSpeed, rightSpeed);
+    }
+
+    public void setModules(double... states) {
         m_modules.setDrive(states);
     }
 
