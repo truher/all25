@@ -65,18 +65,12 @@ public class RobotContainer {
             m_pivot = new PivotSubsystem(sysLog, PivotCollection.get(sysLog, 15));
             m_pivot.setDefaultCommand(new PivotDefault(driverControl::shooterPivot, m_pivot));
 
-<<<<<<< Updated upstream
-        whileTrue(driverControl::driveOneMeter, new Shoot(m_shooter, m_indexer));
-        // whileTrue(driverControl::fullCycle, new ShootOne(m_shooter, m_indexer));
-        whileTrue(driverControl::driveToObject, m_shooter.run(m_shooter::spinUp));
-=======
             whileTrue(driverControl::driveToTag, new  Shoot(m_shooter, m_indexer));
             // whileTrue(driverControl::fullCycle, new ShootOne(m_shooter, m_indexer));
             whileTrue(driverControl::driveToObject, m_shooter.run(m_shooter::spinUp));
         } else {
             m_pivot = null;
         }
->>>>>>> Stashed changes
 
         m_auton = null;
     }
