@@ -36,7 +36,8 @@ public class TankModuleCollection {
         m_frontLeftTalonSRX = null;
     }
 
-    private TankModuleCollection(TalonSRX rearLeftDrive, TalonSRX rearRightDrive, TalonSRX frontLeftDrive, TalonSRX frontRightDrive) {
+    private TankModuleCollection(TalonSRX rearLeftDrive, TalonSRX rearRightDrive, TalonSRX frontLeftDrive,
+            TalonSRX frontRightDrive) {
         m_leftDrive = null;
         m_rightDrive = null;
         m_rearLeftTalonSRX = rearLeftDrive;
@@ -63,17 +64,18 @@ public class TankModuleCollection {
                 LinearMechanism leftMechanism = Neo550Factory.getNEO550LinearMechanism(
                         kLeft, collectionLogger, currentLimit, 3, Math.pow(m_5to1, 2), MotorPhase.FORWARD,
                         m_wheelDiameter);
-                  OutboardLinearVelocityServo leftMotor = new OutboardLinearVelocityServo(collectionLogger,
+                OutboardLinearVelocityServo leftMotor = new OutboardLinearVelocityServo(collectionLogger,
                         leftMechanism);
                 return new TankModuleCollection(leftMotor, rightMotor);
             case ROOKIE_BOT:
-            TalonSRX rearRightTalonSRX = new TalonSRX(10);
-            TalonSRX rearLeftTalonSRX = new TalonSRX(5);
-            rearLeftTalonSRX.setInverted(true);
-            TalonSRX frontRightTalonSRX = new TalonSRX(3);
-            TalonSRX frontLeftTalonSRX = new TalonSRX(11);
-            frontLeftTalonSRX.setInverted(true);
-                return new TankModuleCollection(rearLeftTalonSRX, rearRightTalonSRX, frontLeftTalonSRX, frontRightTalonSRX);
+                TalonSRX rearRightTalonSRX = new TalonSRX(10);
+                TalonSRX rearLeftTalonSRX = new TalonSRX(5);
+                rearLeftTalonSRX.setInverted(true);
+                TalonSRX frontRightTalonSRX = new TalonSRX(3);
+                TalonSRX frontLeftTalonSRX = new TalonSRX(11);
+                frontLeftTalonSRX.setInverted(true);
+                return new TankModuleCollection(rearLeftTalonSRX, rearRightTalonSRX, frontLeftTalonSRX,
+                        frontRightTalonSRX);
             case BLANK:
                 Util.println("************** SIMULATED MODULES **************");
             default:
@@ -112,8 +114,10 @@ public class TankModuleCollection {
     public OptionalDouble[] getCurrent() {
         if (m_rearRightTalonSRX == null) {
             return new OptionalDouble[] {
-                    m_leftDrive.getVelocity(),
-                    m_rightDrive.getVelocity()
+                    OptionalDouble.empty(),
+                    OptionalDouble.empty(),
+                    OptionalDouble.empty(),
+                    OptionalDouble.empty()
             };
         } else {
             return new OptionalDouble[] {
