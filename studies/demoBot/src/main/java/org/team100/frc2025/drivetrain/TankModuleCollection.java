@@ -10,7 +10,8 @@ import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.Neo550Factory;
 import org.team100.lib.util.Util;
 
-import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class TankModuleCollection {
     private static final String kSwerveModules = "Tank Modules";
@@ -19,23 +20,29 @@ public class TankModuleCollection {
     private static final double m_5to1 = 5.2307692308;
     private static final double m_wheelDiameter = 0.098425;
 
-    private final VictorSP m_rightVictorSP;
-    private final VictorSP m_leftVictorSP;
+    private final TalonSRX m_rearRightTalonSRX;
+    private final TalonSRX m_rearLeftTalonSRX;
+    private final TalonSRX m_frontRightTalonSRX;
+    private final TalonSRX m_frontLeftTalonSRX;
     private final OutboardLinearVelocityServo m_rightDrive;
     private final OutboardLinearVelocityServo m_leftDrive;
 
     private TankModuleCollection(OutboardLinearVelocityServo leftDrive, OutboardLinearVelocityServo rightDrive) {
         m_leftDrive = leftDrive;
         m_rightDrive = rightDrive;
-        m_rightVictorSP = null;
-        m_leftVictorSP = null;
+        m_rearRightTalonSRX = null;
+        m_rearLeftTalonSRX = null;
+        m_frontRightTalonSRX = null;
+        m_frontLeftTalonSRX = null;
     }
 
-    private TankModuleCollection(VictorSP leftDrive, VictorSP rightDrive) {
+    private TankModuleCollection(TalonSRX rearLeftDrive, TalonSRX rearRightDrive, TalonSRX frontLeftDrive, TalonSRX frontRightDrive) {
         m_leftDrive = null;
         m_rightDrive = null;
-        m_leftVictorSP = leftDrive;
-        m_rightVictorSP = rightDrive;
+        m_rearLeftTalonSRX = rearLeftDrive;
+        m_rearRightTalonSRX = rearRightDrive;
+        m_frontLeftTalonSRX = frontLeftDrive;
+        m_frontRightTalonSRX = frontRightDrive;
     }
 
     /**
@@ -60,9 +67,13 @@ public class TankModuleCollection {
                         leftMechanism);
                 return new TankModuleCollection(leftMotor, rightMotor);
             case ROOKIE_BOT:
-                 VictorSP rightVictorSP = new VictorSP(8);
-                VictorSP leftVictorSP = new VictorSP(9);
-                return new TankModuleCollection(leftVictorSP, rightVictorSP);
+            TalonSRX rearRightTalonSRX = new TalonSRX(10);
+            TalonSRX rearLeftTalonSRX = new TalonSRX(5);
+            rearLeftTalonSRX.setInverted(true);
+            TalonSRX frontRightTalonSRX = new TalonSRX(3);
+            TalonSRX frontLeftTalonSRX = new TalonSRX(11);
+            frontLeftTalonSRX.setInverted(true);
+                return new TankModuleCollection(rearLeftTalonSRX, rearRightTalonSRX, frontLeftTalonSRX, frontRightTalonSRX);
             case BLANK:
                 Util.println("************** SIMULATED MODULES **************");
             default:
@@ -73,17 +84,19 @@ public class TankModuleCollection {
     }
 
     public void setDrive(double[] value) {
-        if (m_rightVictorSP == null) {
+        if (m_rearRightTalonSRX == null) {
             m_leftDrive.setVelocityM_S(value[0]);
             m_rightDrive.setVelocityM_S(value[1]);
         } else {
-            m_leftVictorSP.set(-1.0 * value[0]);
-            m_rightVictorSP.set(value[1]);
+            m_rearLeftTalonSRX.set(ControlMode.PercentOutput, value[0]);
+            m_rearRightTalonSRX.set(ControlMode.PercentOutput, value[1]);
+            m_frontLeftTalonSRX.set(ControlMode.PercentOutput, value[0]);
+            m_frontRightTalonSRX.set(ControlMode.PercentOutput, value[1]);
         }
     }
 
     public OptionalDouble[] getSpeeds() {
-        if (m_rightVictorSP == null) {
+        if (m_rearRightTalonSRX == null) {
             return new OptionalDouble[] {
                     m_leftDrive.getVelocity(),
                     m_rightDrive.getVelocity()
@@ -96,13 +109,31 @@ public class TankModuleCollection {
         }
     }
 
+    public OptionalDouble[] getCurrent() {
+        if (m_rearRightTalonSRX == null) {
+            return new OptionalDouble[] {
+                    m_leftDrive.getVelocity(),
+                    m_rightDrive.getVelocity()
+            };
+        } else {
+            return new OptionalDouble[] {
+                    OptionalDouble.of(m_rearLeftTalonSRX.getSupplyCurrent()),
+                    OptionalDouble.of(m_rearRightTalonSRX.getSupplyCurrent()),
+                    OptionalDouble.of(m_frontLeftTalonSRX.getSupplyCurrent()),
+                    OptionalDouble.of(m_frontRightTalonSRX.getSupplyCurrent())
+            };
+        }
+    }
+
     public void stop() {
-        if (m_rightVictorSP == null) {
+        if (m_rearRightTalonSRX == null) {
             m_leftDrive.stop();
             m_rightDrive.stop();
         } else {
-            m_leftVictorSP.set(0);
-            m_rightVictorSP.set(0);
+            m_rearLeftTalonSRX.set(ControlMode.PercentOutput, 0);
+            m_rearRightTalonSRX.set(ControlMode.PercentOutput, 0);
+            m_frontLeftTalonSRX.set(ControlMode.PercentOutput, 0);
+            m_frontRightTalonSRX.set(ControlMode.PercentOutput, 0);
         }
     }
 }
