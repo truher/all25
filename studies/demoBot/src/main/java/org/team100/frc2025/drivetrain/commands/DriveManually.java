@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.team100.frc2025.drivetrain.TankDriveSubsystem;
+import org.team100.lib.config.Identity;
 import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.util.NamedChooser;
@@ -53,13 +54,29 @@ public class DriveManually extends Command implements Glassy {
         SmartDashboard.putData(m_manualModeChooser);
         addRequirements(m_drive);
         addName("Manual", true);
-        m_drivers.put(
-            "Manual",
-                new TankDriver() {
-                    public void apply(DriverControl.Velocity t) {
-                        m_drive.set(t.x(), t.y());
-                    }
-        });
+        switch (Identity.instance) {
+            case BETA_BOT:
+            default:
+            m_drivers.put(
+                "Manual",
+                    new TankDriver() {
+                        public void apply(DriverControl.Velocity t) {
+                            m_drive.set(t.x(), t.y());
+                        }
+            });
+                break;
+                //TODO add id of other bots
+            case ROOKIE_BOT:
+            m_drivers.put(
+                "Manual",
+                    new TankDriver() {
+                        public void apply(DriverControl.Velocity t) {
+                            m_drive.setRaw(t.x(), t.y());
+                        }
+            });
+                break;
+        }
+        
     }
 
     @Override
