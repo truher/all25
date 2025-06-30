@@ -48,7 +48,7 @@ class Identity(Enum):
     SWERVE_RIGHT = "47403d5eafe002a9" #34
 
     # for testing
-    DEV = "10000000a7c673d9"  # rpi4 used for development
+    DEV = "82c4c3fe4f941e96"  # rpi4 used for development
     FLIPPED = "flipme"  # example for per-identity config
     JOELS_TEST = "9b297e919a0634e6"
     UNKNOWN = "unknown"
