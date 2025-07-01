@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.testing.TestUtil;
 
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -35,8 +34,8 @@ public class URDFAL5DTest {
         TestUtil.verify(new Pose3d(0, 0, 0.06731, new Rotation3d()), poses, "shoulder_tilt");
         TestUtil.verify(new Pose3d(0.14605, 0, 0.06731, new Rotation3d()), poses, "elbow_tilt");
         TestUtil.verify(new Pose3d(0.33337, 0, 0.06731, new Rotation3d()), poses, "wrist_tilt");
-        TestUtil.verify(new Pose3d(0.36737, 0, 0.06731, new Rotation3d()), poses, "wrist_rotate");
-        TestUtil.verify(new Pose3d(0.42237, 0, 0.06731, new Rotation3d()), poses, "center_point");
+        TestUtil.verify(new Pose3d(0.39437, 0, 0.06731, new Rotation3d()), poses, "wrist_rotate");
+        TestUtil.verify(new Pose3d(0.44937, 0, 0.06731, new Rotation3d()), poses, "center_point");
     }
 
     @Test
@@ -55,9 +54,9 @@ public class URDFAL5DTest {
         TestUtil.verify(new Pose3d(0, 0, 0.06731, new Rotation3d(0, 0, Math.PI / 4)), poses, "shoulder_tilt");
         TestUtil.verify(new Pose3d(0.10327, 0.10327, 0.06731, new Rotation3d(0, 0, Math.PI / 4)), poses, "elbow_tilt");
         TestUtil.verify(new Pose3d(0.23573, 0.23573, 0.06731, new Rotation3d(0, 0, Math.PI / 4)), poses, "wrist_tilt");
-        TestUtil.verify(new Pose3d(0.25977, 0.25977, 0.06731, new Rotation3d(0, 0, Math.PI / 4)), poses,
+        TestUtil.verify(new Pose3d(0.27886, 0.27886, 0.06731, new Rotation3d(0, 0, Math.PI / 4)), poses,
                 "wrist_rotate");
-        TestUtil.verify(new Pose3d(0.29866, 0.29866, 0.06731, new Rotation3d(0, 0, Math.PI / 4)), poses,
+        TestUtil.verify(new Pose3d(0.31776, 0.31776, 0.06731, new Rotation3d(0, 0, Math.PI / 4)), poses,
                 "center_point");
     }
 
@@ -77,8 +76,8 @@ public class URDFAL5DTest {
         TestUtil.verify(new Pose3d(0, 0, 0.06731, new Rotation3d(0, -Math.PI / 4, 0)), poses, "shoulder_tilt");
         TestUtil.verify(new Pose3d(0.10372, 0, 0.17058, new Rotation3d(0, -Math.PI / 4, 0)), poses, "elbow_tilt");
         TestUtil.verify(new Pose3d(0.23573, 0, 0.30304, new Rotation3d(0, -Math.PI / 4, 0)), poses, "wrist_tilt");
-        TestUtil.verify(new Pose3d(0.25977, 0, 0.32708, new Rotation3d(0, -Math.PI / 4, 0)), poses, "wrist_rotate");
-        TestUtil.verify(new Pose3d(0.29866, 0, 0.36597, new Rotation3d(0, -Math.PI / 4, 0)), poses, "center_point");
+        TestUtil.verify(new Pose3d(0.27886, 0, 0.34617, new Rotation3d(0, -Math.PI / 4, 0)), poses, "wrist_rotate");
+        TestUtil.verify(new Pose3d(0.31775, 0, 0.38506, new Rotation3d(0, -Math.PI / 4, 0)), poses, "center_point");
     }
 
     @Test
@@ -98,8 +97,8 @@ public class URDFAL5DTest {
         TestUtil.verify(new Pose3d(0, 0, 0.06731, new Rotation3d(0, -Math.PI / 4, 0)), poses, "shoulder_tilt");
         TestUtil.verify(new Pose3d(0.10372, 0, 0.17058, new Rotation3d()), poses, "elbow_tilt");
         TestUtil.verify(new Pose3d(0.29060, 0, 0.17058, new Rotation3d()), poses, "wrist_tilt");
-        TestUtil.verify(new Pose3d(0.32460, 0, 0.17058, new Rotation3d()), poses, "wrist_rotate");
-        TestUtil.verify(new Pose3d(0.37960, 0, 0.17058, new Rotation3d()), poses, "center_point");
+        TestUtil.verify(new Pose3d(0.35159, 0, 0.17058, new Rotation3d()), poses, "wrist_rotate");
+        TestUtil.verify(new Pose3d(0.40659, 0, 0.17058, new Rotation3d()), poses, "center_point");
     }
 
     @Test
@@ -118,8 +117,8 @@ public class URDFAL5DTest {
         TestUtil.verify(new Pose3d(0, 0, 0.06731, new Rotation3d(0, 0, 0)), poses, "shoulder_tilt");
         TestUtil.verify(new Pose3d(0.14605, 0, 0.06731, new Rotation3d()), poses, "elbow_tilt");
         TestUtil.verify(new Pose3d(0.33337, 0, 0.06731, new Rotation3d(0, -Math.PI / 4, 0)), poses, "wrist_tilt");
-        TestUtil.verify(new Pose3d(0.35741, 0, 0.09135, new Rotation3d(0, -Math.PI / 4, 0)), poses, "wrist_rotate");
-        TestUtil.verify(new Pose3d(0.39631, 0, 0.13024, new Rotation3d(0, -Math.PI / 4, 0)), poses, "center_point");
+        TestUtil.verify(new Pose3d(0.37650, 0, 0.11044, new Rotation3d(0, -Math.PI / 4, 0)), poses, "wrist_rotate");
+        TestUtil.verify(new Pose3d(0.41539, 0, 0.14933, new Rotation3d(0, -Math.PI / 4, 0)), poses, "center_point");
     }
 
     @Test
@@ -138,8 +137,8 @@ public class URDFAL5DTest {
         TestUtil.verify(new Pose3d(0, 0, 0.06731, new Rotation3d()), poses, "shoulder_tilt");
         TestUtil.verify(new Pose3d(0.14605, 0, 0.06731, new Rotation3d()), poses, "elbow_tilt");
         TestUtil.verify(new Pose3d(0.33337, 0, 0.06731, new Rotation3d()), poses, "wrist_tilt");
-        TestUtil.verify(new Pose3d(0.36737, 0, 0.06731, new Rotation3d(Math.PI / 4, 0, 0)), poses, "wrist_rotate");
-        TestUtil.verify(new Pose3d(0.42237, 0, 0.06731, new Rotation3d(Math.PI / 4, 0, 0)), poses, "center_point");
+        TestUtil.verify(new Pose3d(0.39437, 0, 0.06731, new Rotation3d(Math.PI / 4, 0, 0)), poses, "wrist_rotate");
+        TestUtil.verify(new Pose3d(0.44937, 0, 0.06731, new Rotation3d(Math.PI / 4, 0, 0)), poses, "center_point");
     }
 
     @Test
@@ -154,7 +153,7 @@ public class URDFAL5DTest {
                 "wrist_rotate", 0.0,
                 "center_point", 0.0);
         Map<String, Pose3d> poses = m.forward(q);
-        TestUtil.verify(new Pose3d(0.15, 0, 0.1, new Rotation3d(0, 0, 0)), poses, "center_point");
+        TestUtil.verify(new Pose3d(0.177024, 0, 0.1, new Rotation3d(0, 0, 0)), poses, "center_point");
     }
 
     @Test
@@ -179,15 +178,15 @@ public class URDFAL5DTest {
         // this problem requires the dx limit, otherwise it oscillates
         // far from the solution.
         URDFAL5D m = URDFAL5D.make();
-        Pose3d end = new Pose3d(0.15, 0.0, 0.1, new Rotation3d(0, 0, 0));
+        Pose3d end = new Pose3d(0.2, 0.0, 0.1, new Rotation3d(0, 0, 0));
         Vector<N5> q0 = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1);
         Map<String, Double> qMap = m.inverse(
                 q0, 2, "center_point", end);
         TestUtil.verify(Map.of(
                 "base_pan", 0.000,
-                "shoulder_tilt", -2.546,
-                "elbow_tilt", 2.811,
-                "wrist_tilt", -0.265,
+                "shoulder_tilt", -2.162,
+                "elbow_tilt", 2.654,
+                "wrist_tilt", -0.492,
                 "wrist_rotate", 0.000), qMap);
     }
 
