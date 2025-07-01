@@ -2,8 +2,6 @@ package org.team100.lib.math;
 
 import java.util.function.Function;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;

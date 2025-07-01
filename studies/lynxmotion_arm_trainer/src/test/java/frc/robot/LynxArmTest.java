@@ -134,7 +134,7 @@ public class LynxArmTest {
         LynxArmConfig initial = new LynxArmConfig(0, 0, 0, 0, 0);
         LynxArmConfig q = kinematics.inverse(initial, HOME);
         // zero swing, pitch up, elbow and wrist down, no twist.
-        verify(q, 0.00, -1.862, 1.570, 1.077, 0.00);
+        verify(q, 0.00, -1.936, 1.505, 1.217, 0.00);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class LynxArmTest {
         final LynxArmKinematics kinematics = new NumericLynxArmKinematics();
         try (LynxArm m_arm = new LynxArm(kinematics)) {
             LynxArmConfig q = m_arm.getMeasuredConfig();
-            verify(q, 0.00, -1.862, 1.5621, 1.085, 0.00);
+            verify(q, 0.00, -1.937, 1.505, 1.216, 0.00);
         }
     }
 

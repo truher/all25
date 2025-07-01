@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.RobotController;
 
 public enum Identity {
     TEST_BOARD_B0("030628b0"),
-    TEST_BOARD_8D("03063c8d"),
+    ROOKIE_BOT("03063c8d"),
     FRC_100_ea4("0306cea4"),
     TEST_BOARD_6B("030d286b"),
     DEMO_BOT("03126d76"),

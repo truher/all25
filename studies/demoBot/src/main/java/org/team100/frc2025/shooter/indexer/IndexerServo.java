@@ -14,7 +14,7 @@ public class IndexerServo extends SubsystemBase implements Indexer {
     private final DoubleLogger m_doubleLogger;
     private final int m_motorPhase;
 
-    public IndexerServo(LoggerFactory parent, MotorPhase motorPhase,int channel) {
+    public IndexerServo(LoggerFactory parent, MotorPhase motorPhase, int channel) {
         LoggerFactory logger = parent.child(this);
         if (MotorPhase.FORWARD.equals(motorPhase)) {
             m_motorPhase = 1;
