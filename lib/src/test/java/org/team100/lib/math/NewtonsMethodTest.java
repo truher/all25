@@ -2,7 +2,6 @@ package org.team100.lib.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Map;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
