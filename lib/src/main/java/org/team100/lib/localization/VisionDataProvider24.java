@@ -190,7 +190,6 @@ public class VisionDataProvider24 implements Glassy {
      * Memo.updateAll(), which runs in Robot.robotPeriodic().
      */
     public void update() {
-        System.out.println("bw");
         final Optional<Alliance> alliance = DriverStation.getAlliance();
         if (!alliance.isPresent()) {
             // this happens on startup
@@ -203,9 +202,7 @@ public class VisionDataProvider24 implements Glassy {
         m_allTags.clear();
         m_usedTags.clear();
         NetworkTableEvent[] events = m_poller.readQueue();
-        System.out.println("blipseeee[0]");
         for (NetworkTableEvent e : events) {
-            System.out.println("eve");
             ValueEventData ve = e.valueData;
             NetworkTableValue v = ve.value;
             String name = ve.getTopic().getName();
@@ -216,12 +213,9 @@ public class VisionDataProvider24 implements Glassy {
             }
             if (fields[2].equals("fps")) {
                 // FPS is not used by the robot
-                System.out.println("fps");
             } else if (fields[2].equals("latency")) {
                 // latency is not used by the robot
-                System.out.println("la");
             } else if (fields[3].equals("blips")) {
-                System.out.println("bi");
                 // decode the way StructArrayEntryImpl does
                 byte[] b = v.getRaw();
                 if (b.length == 0) {
@@ -253,7 +247,6 @@ public class VisionDataProvider24 implements Glassy {
                 m_log_lag.log(() -> Takt.get() - blipTimeSec);
                 estimateRobotPose(cameraId, blips, blipTimeSec, alliance.get());
             } else {
-                System.out.println("beene");
                 // this event is not for us
                 // Util.println("weird vision update key: " + name);
             }
