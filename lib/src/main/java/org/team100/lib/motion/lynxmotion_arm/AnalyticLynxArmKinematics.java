@@ -41,7 +41,7 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
     }
 
     public static AnalyticLynxArmKinematics real() {
-        return new AnalyticLynxArmKinematics(0.06731, 0.14605, 0.187325, 0.034, 0.055);
+        return new AnalyticLynxArmKinematics(0.06731, 0.14605, 0.187325, 0.061, 0.055);
     }
 
     /**

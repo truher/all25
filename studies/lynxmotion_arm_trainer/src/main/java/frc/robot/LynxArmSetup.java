@@ -1,6 +1,7 @@
 package frc.robot;
 
 import org.team100.lib.hid.ControlUtil;
+import org.team100.lib.motion.lynxmotion_arm.AnalyticLynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.NumericLynxArmKinematics;
 
@@ -25,7 +26,10 @@ public class LynxArmSetup implements Runnable {
         // 0.187, 0.111);
 
         // numeric kinematics produce weird artifacts in the visualizer
+        // Newton Rafston thing-a-ma-jig
         LynxArmKinematics kinematics = new NumericLynxArmKinematics();
+        // Geometry based positioning
+        //LynxArmKinematics kinematics = AnalyticLynxArmKinematics.real();
 
         m_arm = new LynxArm(kinematics);
         m_viz = new LynxArmVisualizer(m_arm::getPosition);
