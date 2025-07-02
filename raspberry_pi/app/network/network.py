@@ -31,7 +31,7 @@ class BlipSender:
     def __init__(self, pub: ntcore.StructArrayPublisher) -> None:
         self.pub = pub
 
-    def send(self, val: list[24], delay_us: int) -> None:
+    def send(self, val: list[Blip24], delay_us: int) -> None:
         self.pub.set(val, int(ntcore._now() - delay_us))
 
 class NoteSender:
