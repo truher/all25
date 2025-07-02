@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.I2C;
 /**
  * Adafruit 4517 contains this gyro, interfaced with I2C.
  * 
- * (It is also possible to use SPI with this device but this class supports only I2C.)
- * 
  * It uses NWU coordinates, clockwise-negative, like most of WPILIB.
  * 
  * Full datasheet is at https://www.st.com/resource/en/datasheet/lsm6dsox.pdf
@@ -123,26 +121,24 @@ public class LSM6DSOX_I2C {
     }
 
     /**
-     * I2C address. 8-bit addr is 0xd5, so 7-bit is shifted, 0x6A
+     * I2C address. This is 7 bits that appears as bits 7-1 in the transmitted
+     * address, with the 0th bit being read-or-write.
      */
-    private static final byte ADDR = (byte) 0xD5;
+    private static final byte ADDR = (byte) 0x6A;
     /**
      * Control register for scale and rate. See datasheet section 9.16.
      */
     private static final byte CTRL2_G = (byte) 0x11;
 
     /**
-     * Output register, little-endian, 16b.  See datasheet section 9.33.
+     * Output register, little-endian, 16b. See datasheet section 9.33.
      */
     private static final byte OUTZ_L_G = (byte) 0x26;
 
     /**
-     * Static offset.
-     * updated for "minibotNEO".
-     * TODO: different offset for each robot
-     * TODO: capture offset at startup, when motionless.
+     * Offset to yield zero when motionless
      */
-    private static final int kRawOffset = -16;
+    private static final int kRawOffset = 17;
 
     private final I2C m_i2c;
     private final FS_G m_scale;
@@ -175,7 +171,6 @@ public class LSM6DSOX_I2C {
             byte i2cAddress,
             ODR_G odr,
             FS_G fs) {
-        // m_i2c = new I2C(I2C.Port.kPort1, i2cAddress >>> 1);
         m_i2c = new I2C(I2C.Port.kPort1, i2cAddress);
         odr.set(m_i2c);
         m_scale = fs;
