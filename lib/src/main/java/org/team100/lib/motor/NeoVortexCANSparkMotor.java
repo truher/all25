@@ -15,12 +15,13 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 public class NeoVortexCANSparkMotor extends CANSparkMotor {
     public NeoVortexCANSparkMotor(
             LoggerFactory parent,
+            int busId,
             int canId,
             MotorPhase motorPhase,
             int currentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
-        super(parent, new SparkFlex(canId, MotorType.kBrushless),
+        super(parent, new SparkFlex(busId, canId, MotorType.kBrushless),
                 motorPhase, currentLimit, ff, pid);
     }
 

@@ -71,7 +71,7 @@ public class SimulatedTagDetector {
         m_robotPose = robotPose;
         m_publishers = new HashMap<>();
         m_inst = NetworkTableInstance.create();
-        m_inst.startClient4("SimulatedTagDetector");
+        m_inst.startClient("SimulatedTagDetector");
         m_inst.setServer("localhost");
         for (Camera camera : m_cameras) {
             // see tag_detector.py

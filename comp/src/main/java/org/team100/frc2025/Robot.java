@@ -68,7 +68,8 @@ public class Robot extends TimedRobot100 implements Debug {
 
         // By default, LiveWindow turns off the CommandScheduler in test mode,
         // but we don't want that.
-        enableLiveWindowInTest(false);
+        // TODO: does this exist in 2027?
+        // enableLiveWindowInTest(false);
 
         // log what the scheduler is doing
         SmartDashboard.putData(CommandScheduler.getInstance());

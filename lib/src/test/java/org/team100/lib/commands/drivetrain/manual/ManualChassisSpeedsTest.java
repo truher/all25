@@ -23,9 +23,9 @@ class ManualChassisSpeedsTest {
         ManualChassisSpeeds manual = new ManualChassisSpeeds(logger, limits);
         DriverControl.Velocity input = new DriverControl.Velocity(0, 0, 0);
         ChassisSpeeds speeds = manual.apply(new SwerveModel(), input);
-        assertEquals(0, speeds.vxMetersPerSecond, kDelta);
-        assertEquals(0, speeds.vyMetersPerSecond, kDelta);
-        assertEquals(0, speeds.omegaRadiansPerSecond, kDelta);
+        assertEquals(0, speeds.vx, kDelta);
+        assertEquals(0, speeds.vy, kDelta);
+        assertEquals(0, speeds.omega, kDelta);
     }
 
     @Test
@@ -37,8 +37,8 @@ class ManualChassisSpeedsTest {
         // clipping to the unit circle
         DriverControl.Velocity input = new DriverControl.Velocity(1, 2, 3);
         ChassisSpeeds speeds = manual.apply(new SwerveModel(), input);
-        assertEquals(0.447, speeds.vxMetersPerSecond, kDelta);
-        assertEquals(0.894, speeds.vyMetersPerSecond, kDelta);
-        assertEquals(2.828, speeds.omegaRadiansPerSecond, kDelta);
+        assertEquals(0.447, speeds.vx, kDelta);
+        assertEquals(0.894, speeds.vy, kDelta);
+        assertEquals(2.828, speeds.omega, kDelta);
     }
 }

@@ -216,14 +216,11 @@ public class SwerveKinodynamics implements Glassy {
      */
     SwerveModuleStates toSwerveModuleStates(ChassisSpeeds in, double dt) {
         // This is the extra correction angle ...
-        Rotation2d angle = new Rotation2d(VeeringCorrection.correctionRad(in.omegaRadiansPerSecond));
+        Rotation2d angle = new Rotation2d(VeeringCorrection.correctionRad(in.omega));
         // ... which is subtracted here; this isn't really a field-relative
         // transformation it's just a rotation.
-        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                in.vxMetersPerSecond,
-                in.vyMetersPerSecond,
-                in.omegaRadiansPerSecond,
-                angle);
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(
+                in.vx, in.vy, in.omega).toRobotRelative(angle);
         // discretization does not affect omega
         DiscreteSpeed descretized = discretize(chassisSpeeds, dt);
         SwerveModuleStates states = m_kinematics.toSwerveModuleStates(descretized);
@@ -236,9 +233,9 @@ public class SwerveKinodynamics implements Glassy {
      */
     public static DiscreteSpeed discretize(ChassisSpeeds chassisSpeeds, double dt) {
         Pose2d desiredDeltaPose = new Pose2d(
-                chassisSpeeds.vxMetersPerSecond * dt,
-                chassisSpeeds.vyMetersPerSecond * dt,
-                new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * dt));
+                chassisSpeeds.vx * dt,
+                chassisSpeeds.vy * dt,
+                new Rotation2d(chassisSpeeds.omega * dt));
 
         return new DiscreteSpeed(Pose2d.kZero.log(desiredDeltaPose), dt);
     }
@@ -258,9 +255,9 @@ public class SwerveKinodynamics implements Glassy {
             double dt) {
         ChassisSpeeds discreteSpeeds = m_kinematics.toChassisSpeeds(moduleStates);
         Twist2d twist = new Twist2d(
-                discreteSpeeds.vxMetersPerSecond * dt,
-                discreteSpeeds.vyMetersPerSecond * dt,
-                discreteSpeeds.omegaRadiansPerSecond * dt);
+                discreteSpeeds.vx * dt,
+                discreteSpeeds.vy * dt,
+                discreteSpeeds.omega * dt);
 
         Pose2d deltaPose = GeometryUtil.sexp(twist);
         ChassisSpeeds continuousSpeeds = new ChassisSpeeds(
@@ -268,28 +265,28 @@ public class SwerveKinodynamics implements Glassy {
                 deltaPose.getY(),
                 deltaPose.getRotation().getRadians()).div(dt);
 
-        double omega = discreteSpeeds.omegaRadiansPerSecond;
+        double omega = discreteSpeeds.omega;
         // This is the opposite direction
         Rotation2d angle = new Rotation2d(VeeringCorrection.correctionRad(omega));
-        return ChassisSpeeds.fromFieldRelativeSpeeds(
-                continuousSpeeds.vxMetersPerSecond,
-                continuousSpeeds.vyMetersPerSecond,
-                continuousSpeeds.omegaRadiansPerSecond,
-                angle.unaryMinus());
+        return new ChassisSpeeds(
+                continuousSpeeds.vx,
+                continuousSpeeds.vy,
+                continuousSpeeds.omega)
+                .toRobotRelative(angle.unaryMinus());
     }
 
     public SwerveDrivePoseEstimator100 newPoseEstimator(
             LoggerFactory parent,
             Gyro gyro,
             SwerveModulePositions modulePositions,
-            Pose2d initialPoseMeters,
+            Pose2d initialpose,
             double timestampSeconds) {
         return new SwerveDrivePoseEstimator100(
                 parent,
                 this,
                 gyro,
                 modulePositions,
-                initialPoseMeters,
+                initialpose,
                 timestampSeconds);
     }
 
@@ -300,11 +297,12 @@ public class SwerveKinodynamics implements Glassy {
     public static ChassisSpeeds toInstantaneousChassisSpeeds(
             FieldRelativeVelocity v,
             Rotation2d theta) {
-        return ChassisSpeeds.fromFieldRelativeSpeeds(
+        return new ChassisSpeeds(
                 v.x(),
                 v.y(),
-                v.theta(),
-                theta);
+                v.theta())
+                .toRobotRelative(theta);
+
     }
 
     /**
@@ -312,8 +310,8 @@ public class SwerveKinodynamics implements Glassy {
      * This simply rotates the velocity from the robot frame to the field frame.
      */
     public static FieldRelativeVelocity fromInstantaneousChassisSpeeds(ChassisSpeeds instantaneous, Rotation2d theta) {
-        ChassisSpeeds c = ChassisSpeeds.fromRobotRelativeSpeeds(instantaneous, theta);
-        return new FieldRelativeVelocity(c.vxMetersPerSecond, c.vyMetersPerSecond, c.omegaRadiansPerSecond);
+        ChassisSpeeds c = instantaneous.toFieldRelative(theta);
+        return new FieldRelativeVelocity(c.vx, c.vy, c.omega);
     }
 
     public SwerveDriveKinematics100 getKinematics() {

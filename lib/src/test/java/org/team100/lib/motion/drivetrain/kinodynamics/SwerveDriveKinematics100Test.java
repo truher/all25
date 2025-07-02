@@ -433,9 +433,9 @@ class SwerveDriveKinematics100Test {
                 new SwerveModuleStates(state, state, state, state));
 
         assertAll(
-                () -> assertEquals(5.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
-                () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-                () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
+                () -> assertEquals(5.0, chassisSpeeds.vx, kEpsilon),
+                () -> assertEquals(0.0, chassisSpeeds.vy, kEpsilon),
+                () -> assertEquals(0.0, chassisSpeeds.omega, kEpsilon));
     }
 
     @Test
@@ -474,9 +474,9 @@ class SwerveDriveKinematics100Test {
                 new SwerveModuleStates(state, state, state, state));
 
         assertAll(
-                () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
-                () -> assertEquals(5.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-                () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
+                () -> assertEquals(0.0, chassisSpeeds.vx, kEpsilon),
+                () -> assertEquals(5.0, chassisSpeeds.vy, kEpsilon),
+                () -> assertEquals(0.0, chassisSpeeds.omega, kEpsilon));
     }
 
     @Test
@@ -565,9 +565,9 @@ class SwerveDriveKinematics100Test {
                 new SwerveModuleStates(flState, frState, blState, brState));
 
         assertAll(
-                () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
-                () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-                () -> assertEquals(2 * Math.PI, chassisSpeeds.omegaRadiansPerSecond, 0.1));
+                () -> assertEquals(0.0, chassisSpeeds.vx, kEpsilon),
+                () -> assertEquals(0.0, chassisSpeeds.vy, kEpsilon),
+                () -> assertEquals(2 * Math.PI, chassisSpeeds.omega, 0.1));
     }
 
     @Test
@@ -614,9 +614,9 @@ class SwerveDriveKinematics100Test {
          */
 
         assertAll(
-                () -> assertEquals(75.398, chassisSpeeds.vxMetersPerSecond, 0.1),
-                () -> assertEquals(-75.398, chassisSpeeds.vyMetersPerSecond, 0.1),
-                () -> assertEquals(2 * Math.PI, chassisSpeeds.omegaRadiansPerSecond, 0.1));
+                () -> assertEquals(75.398, chassisSpeeds.vx, 0.1),
+                () -> assertEquals(-75.398, chassisSpeeds.vy, 0.1),
+                () -> assertEquals(2 * Math.PI, chassisSpeeds.omega, 0.1));
     }
 
     @Test
@@ -672,9 +672,9 @@ class SwerveDriveKinematics100Test {
          * calculated using Numpy's linalg.pinv function.
          */
 
-        assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, 0.1);
-        assertEquals(-33.0, chassisSpeeds.vyMetersPerSecond, 0.1);
-        assertEquals(1.5, chassisSpeeds.omegaRadiansPerSecond, 0.1);
+        assertEquals(0.0, chassisSpeeds.vx, 0.1);
+        assertEquals(-33.0, chassisSpeeds.vy, 0.1);
+        assertEquals(1.5, chassisSpeeds.omega, 0.1);
     }
 
     @Test

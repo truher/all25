@@ -15,12 +15,13 @@ import com.revrobotics.spark.SparkMax;
 public class Neo550CANSparkMotor extends CANSparkMotor {
     public Neo550CANSparkMotor(
             LoggerFactory parent,
+            int busId,
             int canId,
             MotorPhase motorPhase,
             int currentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
-        super(parent, new SparkMax(canId, MotorType.kBrushless),
+        super(parent, new SparkMax(busId, canId, MotorType.kBrushless),
                 motorPhase, currentLimit, ff, pid);
     }
 

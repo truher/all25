@@ -43,13 +43,13 @@ public class GeometryUtil {
         if (DEBUG)
             Util.printf("project() scale %.8f\n", scale);
         return new ChassisSpeeds(
-                b.vxMetersPerSecond * scale,
-                b.vyMetersPerSecond * scale,
-                a.omegaRadiansPerSecond);
+                b.vx * scale,
+                b.vy * scale,
+                a.omega);
     }
 
     public static double dot(ChassisSpeeds a, ChassisSpeeds b) {
-        return a.vxMetersPerSecond * b.vxMetersPerSecond + a.vyMetersPerSecond * b.vyMetersPerSecond;
+        return a.vx * b.vx + a.vy * b.vy;
     }
 
     public static double dot(Translation2d a, Translation2d b) {
@@ -61,11 +61,11 @@ public class GeometryUtil {
     }
 
     public static Twist2d discretize(ChassisSpeeds continuous, double dt) {
-        ChassisSpeeds speeds = ChassisSpeeds.discretize(continuous, dt);
+        ChassisSpeeds speeds = continuous.discretize(dt);
         return new Twist2d(
-                speeds.vxMetersPerSecond * dt,
-                speeds.vyMetersPerSecond * dt,
-                speeds.omegaRadiansPerSecond * dt);
+                speeds.vx * dt,
+                speeds.vy * dt,
+                speeds.omega * dt);
     }
 
     public static Twist2d scale(Twist2d twist, double scale) {
@@ -158,15 +158,15 @@ public class GeometryUtil {
 
     public static double norm(ChassisSpeeds a) {
         // Common case of dy == 0
-        if (a.vyMetersPerSecond == 0.0)
-            return Math.abs(a.vxMetersPerSecond);
-        return Math.hypot(a.vxMetersPerSecond, a.vyMetersPerSecond);
+        if (a.vy == 0.0)
+            return Math.abs(a.vx);
+        return Math.hypot(a.vx, a.vy);
     }
 
     public static boolean near(ChassisSpeeds a, ChassisSpeeds b) {
-        return MathUtil.isNear(a.vxMetersPerSecond, b.vxMetersPerSecond, 1e-6)
-                && MathUtil.isNear(a.vyMetersPerSecond, b.vyMetersPerSecond, 1e-6)
-                && MathUtil.isNear(a.omegaRadiansPerSecond, b.omegaRadiansPerSecond, 1e-6);
+        return MathUtil.isNear(a.vx, b.vx, 1e-6)
+                && MathUtil.isNear(a.vy, b.vy, 1e-6)
+                && MathUtil.isNear(a.omega, b.omega, 1e-6);
     }
 
     public static Rotation2d flip(Rotation2d a) {
@@ -228,7 +228,7 @@ public class GeometryUtil {
 
     public static double distance(PoseWithCurvature a, PoseWithCurvature b) {
         // this is not used
-        return norm(slog(transformBy(inverse(a.poseMeters), b.poseMeters)));
+        return norm(slog(transformBy(inverse(a.pose), b.pose)));
     }
 
     /**
@@ -248,8 +248,8 @@ public class GeometryUtil {
     }
 
     public static PoseWithCurvature interpolate2(PoseWithCurvature a, final PoseWithCurvature other, double x) {
-        Pose2d interpolatedPose = a.poseMeters.interpolate(other.poseMeters, x);
-        double interpolatedCurvature = MathUtil.interpolate(a.curvatureRadPerMeter, other.curvatureRadPerMeter, x);
+        Pose2d interpolatedPose = a.pose.interpolate(other.pose, x);
+        double interpolatedCurvature = MathUtil.interpolate(a.curvature, other.curvature, x);
         return new PoseWithCurvature(interpolatedPose, interpolatedCurvature);
     }
 
@@ -260,11 +260,11 @@ public class GeometryUtil {
     }
 
     public static boolean poseWithCurvatureEquals(PoseWithCurvature a, PoseWithCurvature b) {
-        boolean poseEqual = a.poseMeters.equals(b.poseMeters);
+        boolean poseEqual = a.pose.equals(b.pose);
         if (!poseEqual) {
             return false;
         }
-        return Math.abs(a.curvatureRadPerMeter - b.curvatureRadPerMeter) <= 1e-12;
+        return Math.abs(a.curvature - b.curvature) <= 1e-12;
     }
 
     /** direction of the translational part of the twist */
@@ -279,16 +279,16 @@ public class GeometryUtil {
     /** robot-relative course */
     public static Optional<Rotation2d> getCourse(ChassisSpeeds t) {
         if (norm(t) > 1e-12) {
-            return Optional.of(new Rotation2d(t.vxMetersPerSecond, t.vyMetersPerSecond));
+            return Optional.of(new Rotation2d(t.vx, t.vy));
         } else {
             return Optional.empty();
         }
     }
 
     public static boolean isZero(ChassisSpeeds x) {
-        return Math.abs(x.vxMetersPerSecond) < 1E-9
-                && Math.abs(x.vyMetersPerSecond) < 1E-9
-                && Math.abs(x.omegaRadiansPerSecond) < 1E-9;
+        return Math.abs(x.vx) < 1E-9
+                && Math.abs(x.vy) < 1E-9
+                && Math.abs(x.omega) < 1E-9;
     }
 
     /**

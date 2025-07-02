@@ -112,7 +112,7 @@ public class SimulatedDrivingTest implements Timeless {
                 deltaPose.getRotation().getRadians()).div(dt);
 
         // to pass, this requires the "veering correction" to be zero.
-        assertEquals(0, continuousSpeeds.vyMetersPerSecond, 1e-12);
+        assertEquals(0, continuousSpeeds.vy, 1e-12);
     }
 
     @Test

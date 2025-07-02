@@ -1,12 +1,13 @@
 package org.team100.lib.examples.motion;
 
 import static edu.wpi.first.wpilibj2.command.Commands.deadline;
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 
+
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -59,7 +60,7 @@ public class ContainerSnippet {
         new Trigger(control::feedFunnel).whileTrue(
                 rotary.goToTheSpot().until(rotary::isDone)
                         .andThen(deadline(
-                                waitSeconds(2),
+                                new WaitCommand(2),
                                 openloop.forward()))
                         .andThen(rotary.goHome().until(rotary::isDone)));
 

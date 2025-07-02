@@ -24,36 +24,36 @@ class GeometryUtilTest {
             ChassisSpeeds prev = new ChassisSpeeds(0.5, 0.5, 0);
             ChassisSpeeds target = new ChassisSpeeds(1, 0, 0);
             ChassisSpeeds result = GeometryUtil.project(prev, target);
-            assertEquals(0.5, result.vxMetersPerSecond, 1e-12);
-            assertEquals(0, result.vyMetersPerSecond, 1e-12);
-            assertEquals(0, result.omegaRadiansPerSecond, 1e-12);
+            assertEquals(0.5, result.vx, 1e-12);
+            assertEquals(0, result.vy, 1e-12);
+            assertEquals(0, result.omega, 1e-12);
             assertEquals(0, GeometryUtil.getCourse(result).get().getRadians(), 1e-12);
         }
         {
             ChassisSpeeds prev = new ChassisSpeeds(0.5, 0.5, 1);
             ChassisSpeeds target = new ChassisSpeeds(1, 0, 0);
             ChassisSpeeds result = GeometryUtil.project(prev, target);
-            assertEquals(0.5, result.vxMetersPerSecond, 1e-12);
-            assertEquals(0, result.vyMetersPerSecond, 1e-12);
-            assertEquals(1, result.omegaRadiansPerSecond, 1e-12);
+            assertEquals(0.5, result.vx, 1e-12);
+            assertEquals(0, result.vy, 1e-12);
+            assertEquals(1, result.omega, 1e-12);
             assertEquals(0, GeometryUtil.getCourse(result).get().getRadians(), 1e-12);
         }
         {
             ChassisSpeeds prev = new ChassisSpeeds(0.5, 0.5, 1);
             ChassisSpeeds target = new ChassisSpeeds(2, 0, 1);
             ChassisSpeeds result = GeometryUtil.project(prev, target);
-            assertEquals(0.5, result.vxMetersPerSecond, 1e-12);
-            assertEquals(0, result.vyMetersPerSecond, 1e-12);
-            assertEquals(1, result.omegaRadiansPerSecond, 1e-12);
+            assertEquals(0.5, result.vx, 1e-12);
+            assertEquals(0, result.vy, 1e-12);
+            assertEquals(1, result.omega, 1e-12);
             assertEquals(0, GeometryUtil.getCourse(result).get().getRadians(), 1e-12);
         }
         {
             ChassisSpeeds prev = new ChassisSpeeds(1, 0, 0);
             ChassisSpeeds target = new ChassisSpeeds(1, 0, 0);
             ChassisSpeeds result = GeometryUtil.project(prev, target);
-            assertEquals(1, result.vxMetersPerSecond, 1e-12);
-            assertEquals(0, result.vyMetersPerSecond, 1e-12);
-            assertEquals(0, result.omegaRadiansPerSecond, 1e-12);
+            assertEquals(1, result.vx, 1e-12);
+            assertEquals(0, result.vy, 1e-12);
+            assertEquals(0, result.omega, 1e-12);
             assertEquals(0, GeometryUtil.getCourse(result).get().getRadians(), 1e-12);
         }
         {
@@ -62,9 +62,9 @@ class GeometryUtilTest {
             ChassisSpeeds target = new ChassisSpeeds(1.99996732, -0.01143327, 3.50000000);
             assertEquals(-0.005716666136460627, GeometryUtil.getCourse(target).get().getRadians(), 1e-12);
             ChassisSpeeds result = GeometryUtil.project(prev, target);
-            assertEquals(1.99996732, result.vxMetersPerSecond, 1e-12);
-            assertEquals(-0.01143327, result.vyMetersPerSecond, 1e-12);
-            assertEquals(3.5, result.omegaRadiansPerSecond, 1e-12);
+            assertEquals(1.99996732, result.vx, 1e-12);
+            assertEquals(-0.01143327, result.vy, 1e-12);
+            assertEquals(3.5, result.omega, 1e-12);
             assertEquals(-0.005716666136460627, GeometryUtil.getCourse(result).get().getRadians(), 1e-12);
         }
     }

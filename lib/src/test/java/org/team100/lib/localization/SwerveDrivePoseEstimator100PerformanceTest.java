@@ -22,7 +22,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
     private static final double kDelta = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
-    private final Pose2d visionRobotPoseMeters = new Pose2d(1, 0, Rotation2d.kZero);
+    private final Pose2d visionRobotpose = new Pose2d(1, 0, Rotation2d.kZero);
 
     static SwerveModulePositions p(double x) {
         SwerveModulePosition100 m = new SwerveModulePosition100(x, Optional.of(Rotation2d.kZero));
@@ -78,7 +78,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         int iterations = 100000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            poseEstimator.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+            poseEstimator.put(0.00, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {
@@ -92,7 +92,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         iterations = 1000000;
         startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            poseEstimator.put(duration - 0.1, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+            poseEstimator.put(duration - 0.1, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         }
         finishTime = System.currentTimeMillis();
         if (DEBUG) {

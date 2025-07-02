@@ -26,6 +26,7 @@ public class Funnel extends SubsystemBase implements Glassy {
 
     public Funnel(
             LoggerFactory parent,
+            int busId,
             int starboardID,
             int portID) {
         LoggerFactory child = parent.child(this);
@@ -36,9 +37,9 @@ public class Funnel extends SubsystemBase implements Glassy {
             case COMP_BOT -> {
 
                 m_starboardMech = Neo550Factory.getNEO550LinearMechanism(
-                        getName(), child, funnelSupplyLimit, starboardID, 1, MotorPhase.REVERSE, 1);
+                        getName(), child, funnelSupplyLimit, busId, starboardID, 1, MotorPhase.REVERSE, 1);
                 m_portMech = Neo550Factory.getNEO550LinearMechanism(
-                        getName(), child, funnelSupplyLimit, portID, 1, MotorPhase.FORWARD, 1);
+                        getName(), child, funnelSupplyLimit, busId, portID, 1, MotorPhase.FORWARD, 1);
 
                 latchingServo1 = new Servo(3);
                 latchingServo2 = new Servo(9);

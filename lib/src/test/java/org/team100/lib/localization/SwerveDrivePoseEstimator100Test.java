@@ -48,7 +48,7 @@ class SwerveDrivePoseEstimator100Test {
     private final SwerveModulePosition100 p01 = new SwerveModulePosition100(0.1,
             Optional.of(Rotation2d.kZero));
     private final SwerveModulePositions position01 = new SwerveModulePositions(p01, p01, p01, p01);
-    private final Pose2d visionRobotPoseMeters = new Pose2d(1, 0, Rotation2d.kZero);
+    private final Pose2d visionRobotpose = new Pose2d(1, 0, Rotation2d.kZero);
 
     private static void verify(double x, SwerveModel state) {
         Pose2d estimate = state.pose();
@@ -245,7 +245,7 @@ class SwerveDrivePoseEstimator100Test {
         verifyVelocity(5.000, poseEstimator.get(0.02));
 
         // big vision update
-        poseEstimator.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.00, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         // position slides over there
         verify(0.167, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
@@ -278,7 +278,7 @@ class SwerveDrivePoseEstimator100Test {
         verifyVelocity(5.000, poseEstimator.get(0.02));
 
         // big vision update, but later
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.02, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         // initial position is unchanged
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
@@ -313,7 +313,7 @@ class SwerveDrivePoseEstimator100Test {
         verifyVelocity(5.000, poseEstimator.get(0.02));
 
         // big vision update, even later
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.04, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         // initial position is unchanged
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
@@ -354,13 +354,13 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.02));
 
         // now vision says we're one meter away, so pose goes towards that
-        poseEstimator.put(0.01, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.01, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.01));
 
         // if we had added this vision measurement here, it would have pulled the
         // estimate further
-        // poseEstimator.addVisionMeasurement(visionRobotPoseMeters, 0.015);
+        // poseEstimator.addVisionMeasurement(visionRobotpose, 0.015);
         // verify(0.305, poseEstimator.get());
 
         // wheels haven't moved, so the "odometry opinion" should be zero
@@ -385,7 +385,7 @@ class SwerveDrivePoseEstimator100Test {
 
         // here's the delayed update from above, which moves the estimate to 0.305 and
         // then the odometry is applied on top of that, yielding 0.405.
-        poseEstimator.put(0.015, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.015, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.015));
         // odometry thinks no motion at 0.02 so repeat the vision estimate here
@@ -402,7 +402,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.08));
 
         // a little earlier than the previous estimate does nothing
-        poseEstimator.put(0.014, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.014, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         // notices the vision input a bit earlier
         verify(0.305, poseEstimator.get(0.014));
@@ -416,7 +416,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.06));
 
         // a little later than the previous estimate works normally.
-        poseEstimator.put(0.016, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.016, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.014));
         verify(0.305, poseEstimator.get(0.015));
@@ -467,7 +467,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.08));
 
         // now vision says we're one meter away, so pose goes towards that
-        poseEstimator.put(0.01, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.01, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.167, poseEstimator.get(0.04));
@@ -476,7 +476,7 @@ class SwerveDrivePoseEstimator100Test {
 
         // if we had added this vision measurement here, it would have pulled the
         // estimate further
-        // poseEstimator.addVisionMeasurement(visionRobotPoseMeters, 0.015);
+        // poseEstimator.addVisionMeasurement(visionRobotpose, 0.015);
         // verify(0.305, poseEstimator.get());
 
         // wheels haven't moved, so the "odometry opinion" should be zero
@@ -503,7 +503,7 @@ class SwerveDrivePoseEstimator100Test {
 
         // here's the delayed update from above, which moves the estimate to 0.305 and
         // then the odometry is applied on top of that, yielding 0.405.
-        poseEstimator.put(0.015, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.015, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.02));
         verify(0.405, poseEstimator.get(0.04));
@@ -519,7 +519,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.08));
 
         // a little earlier than the previous estimate does nothing.
-        poseEstimator.put(0.014, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.014, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.02));
         verify(0.405, poseEstimator.get(0.04));
@@ -527,7 +527,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.08));
 
         // a little later than the previous estimate works normally.
-        poseEstimator.put(0.016, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.016, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.421, poseEstimator.get(0.02));
         verify(0.521, poseEstimator.get(0.04));
@@ -570,21 +570,21 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.02, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.167, poseEstimator.get(0.04));
         verify(0.167, poseEstimator.get(0.06));
         verify(0.167, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.04, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.305, poseEstimator.get(0.04));
         verify(0.305, poseEstimator.get(0.06));
         verify(0.305, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.06, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.305, poseEstimator.get(0.04));
@@ -619,21 +619,21 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.02, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.091, poseEstimator.get(0.04));
         verify(0.091, poseEstimator.get(0.06));
         verify(0.091, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.04, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.173, poseEstimator.get(0.04));
         verify(0.173, poseEstimator.get(0.06));
         verify(0.173, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.06, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.173, poseEstimator.get(0.04));
@@ -668,21 +668,21 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.02, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.091, poseEstimator.get(0.04));
         verify(0.091, poseEstimator.get(0.06));
         verify(0.091, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.04, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.173, poseEstimator.get(0.04));
         verify(0.173, poseEstimator.get(0.06));
         verify(0.173, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.06, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.173, poseEstimator.get(0.04));
@@ -718,21 +718,21 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.02, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.010, poseEstimator.get(0.02));
         verify(0.010, poseEstimator.get(0.04));
         verify(0.010, poseEstimator.get(0.06));
         verify(0.010, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.04, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.010, poseEstimator.get(0.02));
         verify(0.020, poseEstimator.get(0.04));
         verify(0.020, poseEstimator.get(0.06));
         verify(0.020, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        poseEstimator.put(0.06, visionRobotpose, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.010, poseEstimator.get(0.02));
         verify(0.020, poseEstimator.get(0.04));
@@ -782,10 +782,10 @@ class SwerveDrivePoseEstimator100Test {
                 visionMeasurementStdDevs,
                 trajectory,
                 state -> new ChassisSpeeds(
-                        state.velocityMetersPerSecond,
+                        state.velocity,
                         0,
-                        state.velocityMetersPerSecond * state.curvatureRadPerMeter),
-                state -> state.poseMeters,
+                        state.velocity * state.curvature),
+                state -> state.pose,
                 trajectory.getInitialPose(),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 0.02,
@@ -850,10 +850,10 @@ class SwerveDrivePoseEstimator100Test {
                         visionMeasurementStdDevs,
                         trajectory,
                         state -> new ChassisSpeeds(
-                                state.velocityMetersPerSecond,
+                                state.velocity,
                                 0, // vy = 0 -> drive like a tank
-                                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
-                        state -> state.poseMeters,
+                                state.velocity * state.curvature),
+                        state -> state.pose,
                         initial_pose,
                         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                         0.02,
@@ -901,7 +901,7 @@ class SwerveDrivePoseEstimator100Test {
 
         double maxError = Double.NEGATIVE_INFINITY;
         double errorSum = 0;
-        while (t <= trajectory.getTotalTimeSeconds()) {
+        while (t <= trajectory.getTotalTime()) {
             State groundTruthState = trajectory.sample(t);
 
             // We are due for a new vision measurement if it's been `visionUpdateRate`
@@ -949,7 +949,7 @@ class SwerveDrivePoseEstimator100Test {
 
             estimator.put(
                     t,
-                    groundTruthState.poseMeters
+                    groundTruthState.pose
                             .getRotation()
                             .plus(new Rotation2d(rand.nextGaussian() * 0.05))
                             .minus(trajectory.getInitialPose().getRotation()),
@@ -957,7 +957,7 @@ class SwerveDrivePoseEstimator100Test {
                     positions);
             SwerveModel xHat = estimator.get(t);
 
-            double error = groundTruthState.poseMeters.getTranslation().getDistance(xHat.pose().getTranslation());
+            double error = groundTruthState.pose.getTranslation().getDistance(xHat.pose().getTranslation());
             if (error > maxError) {
                 maxError = error;
             }
@@ -966,8 +966,8 @@ class SwerveDrivePoseEstimator100Test {
             if (DEBUG) {
                 Util.printf("t %5.3f refX %5.3f refY %5.3f xhatX %5.3f xhatY %5.3f\n",
                         t,
-                        groundTruthState.poseMeters.getX(),
-                        groundTruthState.poseMeters.getY(),
+                        groundTruthState.pose.getX(),
+                        groundTruthState.pose.getY(),
                         xHat.pose().getX(),
                         xHat.pose().getY());
             }
@@ -989,7 +989,7 @@ class SwerveDrivePoseEstimator100Test {
 
         if (checkError) {
             assertEquals(
-                    0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.07, "Incorrect mean error");
+                    0.0, errorSum / (trajectory.getTotalTime() / dt), 0.07, "Incorrect mean error");
             assertEquals(0.0, maxError, 0.2, "Incorrect max error");
         }
     }

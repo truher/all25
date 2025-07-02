@@ -26,7 +26,7 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
     private static final int kFrequencyThreshold = 500;
 
     private final int m_channel;
-    private final DigitalInput m_digitalInput;
+    // private final DigitalInput m_digitalInput;
     private final DutyCycle m_dutyCycle;
     private final DoubleSupplier m_duty;
     private final DoubleLogger m_log_duty;
@@ -46,8 +46,8 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
         super(parent, inputOffset, drive);
         LoggerFactory child = parent.child(this);
         m_channel = channel;
-        m_digitalInput = new DigitalInput(channel);
-        m_dutyCycle = new DutyCycle(m_digitalInput);
+        // m_digitalInput = new DigitalInput(channel);
+        m_dutyCycle = new DutyCycle(channel);
         m_duty = Memo.ofDouble(m_dutyCycle::getOutput);
         m_log_duty = child.doubleLogger(Level.COMP, "duty cycle");
         m_log_frequency = child.intLogger(Level.TRACE, "frequency");
@@ -62,7 +62,7 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
     @Override
     public void close() {
         m_dutyCycle.close();
-        m_digitalInput.close();
+        // m_digitalInput.close();
     }
 
     /**

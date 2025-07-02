@@ -178,9 +178,9 @@ class SwerveKinodynamicsTest {
 
             ChassisSpeeds i = limits.toChassisSpeedsWithDiscretization(ms, 0.02);
             // we get back what we put in
-            assertEquals(0.13, i.vxMetersPerSecond, kDelta);
-            assertEquals(-1.95, i.vyMetersPerSecond, kDelta);
-            assertEquals(-9.38, i.omegaRadiansPerSecond, kDelta);
+            assertEquals(0.13, i.vx, kDelta);
+            assertEquals(-1.95, i.vy, kDelta);
+            assertEquals(-9.38, i.omega, kDelta);
         }
 
     }
@@ -195,18 +195,18 @@ class SwerveKinodynamicsTest {
             ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 1);
             SwerveModuleStates states = l.toSwerveModuleStates(speeds, 0.02);
             ChassisSpeeds impliedSpeeds = l.toChassisSpeedsWithDiscretization(states, 0.02);
-            assertEquals(0, impliedSpeeds.vxMetersPerSecond, kDelta);
-            assertEquals(0, impliedSpeeds.vyMetersPerSecond, kDelta);
-            assertEquals(1, impliedSpeeds.omegaRadiansPerSecond, kDelta);
+            assertEquals(0, impliedSpeeds.vx, kDelta);
+            assertEquals(0, impliedSpeeds.vy, kDelta);
+            assertEquals(1, impliedSpeeds.omega, kDelta);
         }
         {
             // pure translation involves no discretization effect
             ChassisSpeeds speeds = new ChassisSpeeds(1, 0, 0);
             SwerveModuleStates states = l.toSwerveModuleStates(speeds, 0.02);
             ChassisSpeeds impliedSpeeds = l.toChassisSpeedsWithDiscretization(states, 0.02);
-            assertEquals(1, impliedSpeeds.vxMetersPerSecond, kDelta);
-            assertEquals(0, impliedSpeeds.vyMetersPerSecond, kDelta);
-            assertEquals(0, impliedSpeeds.omegaRadiansPerSecond, kDelta);
+            assertEquals(1, impliedSpeeds.vx, kDelta);
+            assertEquals(0, impliedSpeeds.vy, kDelta);
+            assertEquals(0, impliedSpeeds.omega, kDelta);
         }
     }
 
@@ -220,54 +220,54 @@ class SwerveKinodynamicsTest {
             ChassisSpeeds speeds = new ChassisSpeeds(1, 0, 1);
             SwerveModuleStates states = l.toSwerveModuleStates(speeds, 0.02);
             ChassisSpeeds impliedSpeeds = l.toChassisSpeedsWithDiscretization(states, 0.02);
-            assertEquals(1, impliedSpeeds.vxMetersPerSecond, kDelta);
-            assertEquals(0, impliedSpeeds.vyMetersPerSecond, kDelta);
-            assertEquals(1, impliedSpeeds.omegaRadiansPerSecond, kDelta);
+            assertEquals(1, impliedSpeeds.vx, kDelta);
+            assertEquals(0, impliedSpeeds.vy, kDelta);
+            assertEquals(1, impliedSpeeds.omega, kDelta);
 
             // invert the discretization to extract the original speeds
             ChassisSpeeds correctedImplied = l.toChassisSpeedsWithDiscretization(states, 0.02);
-            assertEquals(0.999, correctedImplied.vxMetersPerSecond, kDelta);
-            assertEquals(0, correctedImplied.vyMetersPerSecond, kDelta);
-            assertEquals(1, correctedImplied.omegaRadiansPerSecond, kDelta);
+            assertEquals(0.999, correctedImplied.vx, kDelta);
+            assertEquals(0, correctedImplied.vy, kDelta);
+            assertEquals(1, correctedImplied.omega, kDelta);
         }
         {
             // more spinning => bigger effect
             ChassisSpeeds speeds = new ChassisSpeeds(1, 0, 3);
             SwerveModuleStates states = l.toSwerveModuleStates(speeds, 0.02);
             ChassisSpeeds impliedSpeeds = l.toChassisSpeedsWithDiscretization(states, 0.02);
-            assertEquals(1, impliedSpeeds.vxMetersPerSecond, kDelta);
-            assertEquals(0, impliedSpeeds.vyMetersPerSecond, kDelta);
-            assertEquals(3, impliedSpeeds.omegaRadiansPerSecond, kDelta);
+            assertEquals(1, impliedSpeeds.vx, kDelta);
+            assertEquals(0, impliedSpeeds.vy, kDelta);
+            assertEquals(3, impliedSpeeds.omega, kDelta);
 
             // invert the discretization to extract the original speeds.
             ChassisSpeeds correctedImplied = l.toChassisSpeedsWithDiscretization(states, 0.02);
-            assertEquals(1, correctedImplied.vxMetersPerSecond, kDelta);
-            assertEquals(0, correctedImplied.vyMetersPerSecond, kDelta);
-            assertEquals(3, correctedImplied.omegaRadiansPerSecond, kDelta);
+            assertEquals(1, correctedImplied.vx, kDelta);
+            assertEquals(0, correctedImplied.vy, kDelta);
+            assertEquals(3, correctedImplied.omega, kDelta);
         }
         {
             // longer time interval => bigger effect
             ChassisSpeeds speeds = new ChassisSpeeds(1, 0, 3);
             SwerveModuleStates states = l.toSwerveModuleStates(speeds, 0.2);
             ChassisSpeeds impliedSpeeds = l.toChassisSpeedsWithDiscretization(states, 0.2);
-            assertEquals(1, impliedSpeeds.vxMetersPerSecond, kDelta);
-            assertEquals(0, impliedSpeeds.vyMetersPerSecond, kDelta);
-            assertEquals(3, impliedSpeeds.omegaRadiansPerSecond, kDelta);
+            assertEquals(1, impliedSpeeds.vx, kDelta);
+            assertEquals(0, impliedSpeeds.vy, kDelta);
+            assertEquals(3, impliedSpeeds.omega, kDelta);
 
             // invert the discretization to extract the original speeds.
             ChassisSpeeds correctedImplied = l.toChassisSpeedsWithDiscretization(states, 0.2);
-            assertEquals(1, correctedImplied.vxMetersPerSecond, kDelta);
-            assertEquals(0, correctedImplied.vyMetersPerSecond, kDelta);
-            assertEquals(3, correctedImplied.omegaRadiansPerSecond, kDelta);
+            assertEquals(1, correctedImplied.vx, kDelta);
+            assertEquals(0, correctedImplied.vy, kDelta);
+            assertEquals(3, correctedImplied.omega, kDelta);
         }
         {
             // longer time interval => bigger effect
             ChassisSpeeds speeds = new ChassisSpeeds(1, 0, 3);
             SwerveModuleStates states = l.toSwerveModuleStates(speeds, 0.2);
             ChassisSpeeds correctedImplied = l.toChassisSpeedsWithDiscretization(states, 0.2);
-            assertEquals(1, correctedImplied.vxMetersPerSecond, kDelta);
-            assertEquals(0, correctedImplied.vyMetersPerSecond, kDelta);
-            assertEquals(3, correctedImplied.omegaRadiansPerSecond, kDelta);
+            assertEquals(1, correctedImplied.vx, kDelta);
+            assertEquals(0, correctedImplied.vy, kDelta);
+            assertEquals(3, correctedImplied.omega, kDelta);
         }
     }
 

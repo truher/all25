@@ -41,8 +41,8 @@ class TestSE2Math {
         rot1 = Rotation2d.fromDegrees(270);
         assertEquals(0, rot1.getCos(), kTestEpsilon);
         assertEquals(-1, rot1.getSin(), kTestEpsilon);
-        assertEquals(270, rot1.getDegrees(), kTestEpsilon);
-        assertEquals(3 * Math.PI / 2, rot1.getRadians(), kTestEpsilon);
+        assertEquals(-90, rot1.getDegrees(), kTestEpsilon);
+        assertEquals(-1 * Math.PI / 2, rot1.getRadians(), kTestEpsilon);
 
         // Test inversion
         rot1 = Rotation2d.fromDegrees(270);
@@ -53,8 +53,8 @@ class TestSE2Math {
         // assertTrue(1 / kTestEpsilon < rot2.getTan());
         // this tests the angle-wrapping thing that wpi doesn't do
         //assertEquals(90, rot2.getDegrees(), kTestEpsilon);
-        assertEquals(-270, rot2.getDegrees(), kTestEpsilon);
-        assertEquals(-3*Math.PI / 2, rot2.getRadians(), kTestEpsilon);
+        assertEquals(90, rot2.getDegrees(), kTestEpsilon);
+        assertEquals(Math.PI / 2, rot2.getRadians(), kTestEpsilon);
 
         rot1 = Rotation2d.fromDegrees(1);
         rot2 = rot1.unaryMinus();

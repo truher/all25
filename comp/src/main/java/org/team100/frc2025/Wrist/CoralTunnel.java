@@ -42,6 +42,7 @@ public class CoralTunnel extends SubsystemBase implements Glassy {
                 // m_motor = new SparkMax(25, MotorType.kBrushless);
                 m_motor = new Neo550CANSparkMotor(
                         child,
+                        0,
                         25,
                         MotorPhase.REVERSE,
                         coralCurrentLimit,

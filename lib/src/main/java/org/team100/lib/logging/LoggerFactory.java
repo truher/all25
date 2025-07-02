@@ -480,7 +480,7 @@ public class LoggerFactory {
             if (!allow(m_level))
                 return;
             PoseWithCurvature val = vals.get();
-            m_pose2dLogger.log(() -> val.poseMeters);
+            m_pose2dLogger.log(() -> val.pose);
         }
     }
 
@@ -559,9 +559,9 @@ public class LoggerFactory {
             if (!allow(m_level))
                 return;
             ChassisSpeeds val = vals.get();
-            m_vxLogger.log(() -> val.vxMetersPerSecond);
-            m_vyLogger.log(() -> val.vyMetersPerSecond);
-            m_omegaLogger.log(() -> val.omegaRadiansPerSecond);
+            m_vxLogger.log(() -> val.vx);
+            m_vyLogger.log(() -> val.vy);
+            m_omegaLogger.log(() -> val.omega);
         }
     }
 
@@ -824,10 +824,10 @@ public class LoggerFactory {
             if (!allow(m_level))
                 return;
             State val = vals.get();
-            m_poseLogger.log(() -> val.poseMeters);
-            m_curvatureLogger.log(() -> val.curvatureRadPerMeter);
-            m_velocityLogger.log(() -> val.velocityMetersPerSecond);
-            m_accelLogger.log(() -> val.accelerationMetersPerSecondSq);
+            m_poseLogger.log(() -> val.pose);
+            m_curvatureLogger.log(() -> val.curvature);
+            m_velocityLogger.log(() -> val.velocity);
+            m_accelLogger.log(() -> val.acceleration);
         }
     }
 

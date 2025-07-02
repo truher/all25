@@ -35,7 +35,7 @@ public class AnalogTurningEncoder extends RoboRioRotaryPositionSensor {
         LoggerFactory child = parent.child(this);
         m_input = new AnalogInput(channel);
         m_voltage = Memo.ofDouble(m_input::getVoltage);
-        m_rail = Memo.ofDouble(RobotController::getVoltage5V);
+        m_rail = Memo.ofDouble(RobotController::getVoltage3V3);
         m_log_voltage = child.doubleLogger(Level.TRACE, "voltage");
         m_log_ratio = child.doubleLogger(Level.TRACE, "ratio");
         child.intLogger(Level.COMP, "channel").log(m_input::getChannel);

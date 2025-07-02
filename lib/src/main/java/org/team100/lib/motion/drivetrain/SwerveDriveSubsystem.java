@@ -116,9 +116,9 @@ public class SwerveDriveSubsystem extends SubsystemBase implements Glassy, Drive
                     "driveInFieldCoords() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n",
                     theta.getRadians(),
                     GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(),
-                    targetChassisSpeeds.vxMetersPerSecond,
-                    targetChassisSpeeds.vyMetersPerSecond,
-                    targetChassisSpeeds.omegaRadiansPerSecond);
+                    targetChassisSpeeds.vx,
+                    targetChassisSpeeds.vy,
+                    targetChassisSpeeds.omega);
 
         m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
     }
@@ -138,9 +138,9 @@ public class SwerveDriveSubsystem extends SubsystemBase implements Glassy, Drive
                     "driveInFieldCoordsVerbatim() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n",
                     theta.getRadians(),
                     GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(),
-                    targetChassisSpeeds.vxMetersPerSecond,
-                    targetChassisSpeeds.vyMetersPerSecond,
-                    targetChassisSpeeds.omegaRadiansPerSecond);
+                    targetChassisSpeeds.vx,
+                    targetChassisSpeeds.vy,
+                    targetChassisSpeeds.omega);
 
         m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
     }

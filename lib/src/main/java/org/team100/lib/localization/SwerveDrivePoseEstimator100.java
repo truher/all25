@@ -51,14 +51,14 @@ public class SwerveDrivePoseEstimator100 implements PoseEstimator100, Glassy {
      * @param gyroAngle         The current gyro angle.
      * @param modulePositions   The current distance and rotation
      *                          measurements of the swerve modules.
-     * @param initialPoseMeters The starting pose estimate.
+     * @param initialpose The starting pose estimate.
      */
     public SwerveDrivePoseEstimator100(
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics,
             Gyro gyro,
             SwerveModulePositions modulePositions,
-            Pose2d initialPoseMeters,
+            Pose2d initialpose,
             double timestampSeconds) {
         LoggerFactory child = parent.child(this);
         m_kinodynamics = kinodynamics;
@@ -68,11 +68,11 @@ public class SwerveDrivePoseEstimator100 implements PoseEstimator100, Glassy {
                 new InterpolationRecord(
                         m_kinodynamics.getKinematics(),
                         new SwerveModel(
-                                initialPoseMeters,
+                                initialpose,
                                 new FieldRelativeVelocity(0, 0, 0)),
                         modulePositions));
         Rotation2d gyroAngle = gyro.getYawNWU();
-        m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
+        m_gyroOffset = initialpose.getRotation().minus(gyroAngle);
         m_log_offset = child.rotation2dLogger(Level.TRACE, "GYRO OFFSET");
         m_log_pose_x = child.doubleLogger(Level.TRACE, "posex");
     }

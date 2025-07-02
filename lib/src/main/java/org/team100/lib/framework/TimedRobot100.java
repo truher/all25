@@ -11,8 +11,6 @@ import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
@@ -108,7 +106,6 @@ public class TimedRobot100 extends IterativeRobotBase implements Glassy {
         m_startTime = Takt.actual();
         addPeriodic(this::loopFunc, TimedRobot100.LOOP_PERIOD_S, "main loop");
         NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
-        HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
     }
 
     @Override

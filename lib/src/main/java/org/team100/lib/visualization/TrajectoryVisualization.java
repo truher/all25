@@ -46,7 +46,7 @@ public class TrajectoryVisualization {
         double[] arr = new double[m_trajectory.getStates().size() * 3];
         int ndx = 0;
         for (State p : m_trajectory.getStates()) {
-            Pose2d pose = p.poseMeters;
+            Pose2d pose = p.pose;
             arr[ndx + 0] = pose.getTranslation().getX();
             arr[ndx + 1] = pose.getTranslation().getY();
             arr[ndx + 2] = pose.getRotation().getDegrees();
