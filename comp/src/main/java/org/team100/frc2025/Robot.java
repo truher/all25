@@ -63,7 +63,9 @@ public class Robot extends TimedRobot100 implements Debug {
         Util.printf("WPILib Version: %s\n", WPILibVersion.Version); // 2023.2.1
         Util.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
         Util.printf("Identity: %s\n", Identity.instance.name());
-        RobotController.setBrownoutVoltage(5.5);
+        // doesn't work in 2027
+        // https://github.com/wpilibsuite/SystemCoreTesting/issues/91
+        // RobotController.setBrownoutVoltage(5.5);
         banner();
 
         // By default, LiveWindow turns off the CommandScheduler in test mode,

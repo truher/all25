@@ -130,7 +130,9 @@ public class RobotContainer implements Glassy {
     final Wrist2 m_wrist;
     final Climber m_climber;
     final Funnel m_funnel;
-    final LEDIndicator m_leds;
+    // not working for 2027
+    // https://github.com/wpilibsuite/SystemCoreTesting/issues/91
+    // final LEDIndicator m_leds;
 
     final CoralTunnel m_tunnel;
     final AlgaeGrip m_grip;
@@ -232,7 +234,7 @@ public class RobotContainer implements Glassy {
                 visionDataProvider::update,
                 limiter);
         
-        m_leds = new LEDIndicator(0, visionDataProvider::getPoseAgeSec); 
+        // m_leds = new LEDIndicator(0, visionDataProvider::getPoseAgeSec); 
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -575,7 +577,7 @@ public class RobotContainer implements Glassy {
     public void periodic() {
         // publish the simulated tag sightings.
         m_simulatedTagDetector.run();
-        m_leds.periodic();
+        // m_leds.periodic();
         m_combinedViz.run();
     }
 
@@ -588,7 +590,7 @@ public class RobotContainer implements Glassy {
     // this keeps the tests from conflicting via the use of simulated HAL ports.
     public void close() {
         m_modules.close();
-        m_leds.close();
+        // m_leds.close();
         m_elevator.close();
     }
 }
