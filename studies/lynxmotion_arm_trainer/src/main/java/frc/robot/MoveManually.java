@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.OptionalDouble;
 import java.util.function.DoubleSupplier;
 
 import org.team100.lib.framework.TimedRobot100;
@@ -24,7 +25,8 @@ public class MoveManually extends Command {
     private static final double VERTICAL_LIMIT = 0.3;
     // TODO: find the actual limits
     private static final double MIN_HEIGHT = .04004;
-    private static final double MIN_RADIUS = 0.2;
+    private static final double MIN_RADIUS_BIRDSEYE = 0.2;
+    private static final double MIN_RADIUS = .1;
     private static final double MAX_RADIUS = 0.42;
     // meters per second
     private static final double SPEED = 0.25;
@@ -41,6 +43,10 @@ public class MoveManually extends Command {
     private double m_y;
     private double m_z;
 
+    private boolean mode;
+    // when mode = true, pitch = 0
+    // when mode = false, pitch = 1
+
     public MoveManually(
             LynxArm arm,
             DoubleSupplier xSpeed,
@@ -51,6 +57,7 @@ public class MoveManually extends Command {
         m_ySpeed = ySpeed;
         m_zSpeed = zSpeed;
         addRequirements(arm);
+        mode = true;
     }
 
     @Override
@@ -61,6 +68,7 @@ public class MoveManually extends Command {
         m_y = start.getY();
         m_z = start.getZ();
     }
+
 
     @Override
     public void execute() {
@@ -77,13 +85,13 @@ public class MoveManually extends Command {
         double rNew = Math.hypot(xNew, yNew);
         double yawNew = Math.atan2(yNew, xNew);
 
-        if (DEBUG) {
-            System.out.println("\n***EXECUTE***");
-            System.out.printf("x %f y %f z %f yaw %f\n", m_x, m_y, m_z, yaw);
-            System.out.printf("r %f, rNew %f", r, rNew);
-        }
+        // if (DEBUG) {
+        //     System.out.println("\n***EXECUTE***");
+        //     System.out.printf("x %f y %f z %f yaw %f\n", m_x, m_y, m_z, yaw);
+        //     System.out.printf("r %f, rNew %f", r, rNew);
+        // }
         // Jittery Code:  
-        // if (r1 <= MIN_RADIUS + STEP) {
+        // if (r1 <= MIN_RADIUS_BIRDSEYE + STEP) {
         //     // move away from the origin
         //     m_x += STEP * Math.cos(yaw);
         //     m_y += STEP * Math.sin(yaw);
@@ -106,7 +114,7 @@ public class MoveManually extends Command {
 
         //Non-Jittery Code but not great:
         // if ((r1 <= MAX_RADIUS || (Math.abs(xNew) <= Math.abs(m_x) && Math.abs(yNew) <= Math.abs(m_y))) && 
-        // (r1 >= MIN_RADIUS || (Math.abs(xNew) >= Math.abs(m_x) && Math.abs(yNew) >= Math.abs(m_y)))){
+        // (r1 >= MIN_RADIUS_BIRDSEYE || (Math.abs(xNew) >= Math.abs(m_x) && Math.abs(yNew) >= Math.abs(m_y)))){
         //     m_x = xNew;
         //     m_y = yNew;
         // }
@@ -114,35 +122,49 @@ public class MoveManually extends Command {
         //     m_z = zNew;
         // }
 
-        //Non-Jittery Code but better:
-        if ((r1 <= MAX_RADIUS || r1New <= r1) && 
-        ((yaw > -1 * 1.57 || yawNew > yaw) && (yaw < 1.57 || yawNew < yaw)) &&
-        (r >= MIN_RADIUS || rNew >= r)){
-            m_x = xNew;
-            m_y = yNew;
-            if(m_z >= MIN_HEIGHT || zNew > m_z)
-                m_z = zNew;
-        }
-
-        // if (DEBUG) {
-        //     System.out.printf("x %f y %f\n", m_x, m_y);
+        //Non-Jittery Code+:
+        // if ((r1 <= MAX_RADIUS || r1New <= r1) && 
+        // ((yaw > -1 * 1.57 || yawNew > yaw) && (yaw < 1.57 || yawNew < yaw)) &&
+        // (r >= MIN_RADIUS_BIRDSEYE || rNew >= r)){
+        //     m_x = xNew;
+        //     m_y = yNew;
+        //     if(m_z >= MIN_HEIGHT || zNew > m_z)
+        //         m_z = zNew;
         // }
+
+        // Non-Jitter with Pitch Toggle
+        if ((r1 <= MAX_RADIUS || r1New <= r1) &&
+        ((yaw > -1 * 1.57 || yawNew > yaw) && (yaw < 1.57 || yawNew < yaw))){
+            if(r >= MIN_RADIUS_BIRDSEYE){
+                m_x = xNew;
+                m_y = yNew;
+            }
+            if(m_z >= MIN_HEIGHT || zNew > m_z)
+                    m_z = zNew;
+        } 
+
+        if (DEBUG) {
+            System.out.printf("r %f, rNew %f \n pitch %f \n", r, rNew, getPitch());
+        }
         
         double roll = 0.0;
-        final double pitch;
         // if (r < VERTICAL_LIMIT) {
         // for near targets, the grip is vertical.
         // pitch = Math.PI / 2 - 5 * m_z;
-        pitch = 0;
         // } else {
+
+        //pitch = 0;
         // // further away, the pitch depends on range.
         // double s = 1 - (r - VERTICAL_LIMIT) / (MAX_RADIUS - VERTICAL_LIMIT);
         // pitch = s * Math.PI / 2;
         // }
         //m_z = Math.max(m_z, 0);
+
+        
+        
         Pose3d newPose = new Pose3d(
                 new Translation3d(m_x, m_y, m_z),
-                new Rotation3d(roll, pitch, yaw));
+                new Rotation3d(roll, getPitch(), yaw));
 
         m_arm.setGrip(m_grip);
         m_arm.setPosition(newPose);
