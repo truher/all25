@@ -204,6 +204,7 @@ public abstract class SwerveModule100 implements Glassy {
         switch (Identity.instance) {
             case SWERVE_ONE:
             case SWERVE_TWO:
+            case SYSTEMCORE:
             case COMP_BOT:
                 // TODO: replace the magic number here with .. i think this is like wheel
                 // diameter? radius? what is this?
