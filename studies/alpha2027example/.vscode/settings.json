@@ -61,5 +61,9 @@
   "editor.minimap.enabled": false,
   "editor.inlayHints.enabled": "off",
 "editor.detectIndentation": false,
-"workbench.editor.revealIfOpen": true
+"workbench.editor.revealIfOpen": true,
+"files.associations": {
+    "cstdint": "cpp",
+    "compare": "cpp"
+}
 }
