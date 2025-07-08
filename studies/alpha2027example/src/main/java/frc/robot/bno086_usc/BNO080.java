@@ -1,21 +1,24 @@
 package frc.robot.bno086_usc;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Quaternion;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.I2C;
 
 /**
  * This is part of the USC RPL library, removing most of it.
  * 
- * I'm not confident about the low-level i2c part, but it's worth a try.
+ * It can talk with the device but it can't get any of the correct data out of
+ * it.
  */
 public class BNO080 {
     /// i2c address of IMU (7 bits)
-    private static final byte ADDR = (byte) 0x4a; // 0x4b; //??
+    private static final byte ADDR = (byte) 0x4b; // 0x4a; //??
     private static final int CHANNEL_EXECUTABLE = 1;
     private static final int CHANNEL_CONTROL = 2;
     private static final int CHANNEL_REPORTS = 3;
@@ -107,7 +110,7 @@ public class BNO080 {
     private final I2C m_i2c;
 
     public BNO080() {
-        m_i2c = new I2C(I2C.Port.kPort0, ADDR);
+        m_i2c = new I2C(I2C.Port.kPort1, ADDR);
     }
 
     /**
@@ -123,8 +126,8 @@ public class BNO080 {
      *
      * @return initialization success
      */
-
     public boolean begin() {
+        System.out.println("========== initialize BNO086");
 
         // At system startup, the hub must send its full advertisement message (see SHTP
         // 5.2 and 5.3) to the
@@ -133,9 +136,11 @@ public class BNO080 {
         // indicate that the reset is complete.
         receivePacket();
 
+        System.out.println("========== send executable reset");
         // now, after startup, the BNO will send an Unsolicited Initialize response
         // (SH-2 section 6.4.5.2), and an Executable Reset command
         if (!readPacket(CHANNEL_EXECUTABLE, EXECUTABLE_REPORTID_RESET)) {
+            System.out.println("wrong read packet");
             return false;
         }
 
@@ -157,7 +162,8 @@ public class BNO080 {
                     | rxPacketBuffer[12];
 
         } else {
-            return false;
+            System.out.println("incorrect product id");
+            // return false;
         }
 
         // reports we use
@@ -165,6 +171,16 @@ public class BNO080 {
         enableReport(Report.GYROSCOPE, 50);
 
         return true;
+    }
+
+    /** example */
+    public Optional<Double> getYaw() {
+        boolean status = readPacket(CHANNEL_EXECUTABLE, Report.GAME_ROTATION.value);
+        if (!status) {
+            System.out.println("no read packet");
+            return Optional.empty();
+        }
+        return Optional.of(new Rotation3d(gameRotationVector).getZ());
     }
 
     /**
@@ -245,7 +261,7 @@ public class BNO080 {
                     break;
 
                 case SENSOR_REPORTID_GYROSCOPE_CALIBRATED:
-
+                    System.out.println("received gyro");
                     gyroRotation = VecBuilder.fill(
                             qToFloat(data1, GYRO_Q_POINT),
                             qToFloat(data2, GYRO_Q_POINT),
@@ -255,6 +271,7 @@ public class BNO080 {
                     break;
 
                 case SENSOR_REPORTID_GAME_ROTATION_VECTOR: {
+                    System.out.println("received rotation");
                     short realPartQ = (short) (rxPacketBuffer[currReportOffset + 15] << 8
                             | rxPacketBuffer[currReportOffset + 14]);
 
@@ -288,19 +305,26 @@ public class BNO080 {
      * @return true if the packet has been received
      */
     public boolean readPacket(int channel, int reportID) {
+        System.out.printf("expected channel %X report id %X\n", channel, reportID);
 
         if (!receivePacket()) {
+            System.out.println("no packet received");
             return false;
         }
 
-        if (channel == rxPacketBuffer[2] && reportID == rxPacketBuffer[4]) {
+        byte packetChannel = rxPacketBuffer[2];
+        byte packetReportID = rxPacketBuffer[4];
+        System.out.printf("channel %X report id %X\n", packetChannel, packetReportID);
+        if (channel == packetChannel && reportID == packetReportID) {
             // found correct packet!
+            processPacket();
             return true;
         } else {
             // other data packet, send to proper channels
             processPacket();
         }
 
+        System.out.println("wrong report id");
         return false;
     }
 
@@ -355,6 +379,13 @@ public class BNO080 {
         sendPacket(CHANNEL_CONTROL, 17);
     }
 
+    public void dumpBuffer(byte[] b, int len) {
+        for (int i = 0; i < len; ++i) {
+            System.out.printf("%02X", b[i]);
+        }
+        System.out.println();
+    }
+
     /**
      * Reads a packet from the IMU (if any are waiting) and stores it in the class
      * variables.
@@ -365,8 +396,13 @@ public class BNO080 {
      * @return whether a packet was recieved.
      */
     public boolean receivePacket() {
+        clearRxBuffer();
         // first read the header.
+        // boolean aborted =
         m_i2c.readOnly(rxPacketBuffer, 4);
+        System.out.print("received packet: ");
+        dumpBuffer(rxPacketBuffer, 4);
+        // System.out.printf("receive packet aborted = %b\n", aborted);
 
         // // Get the first four bytes, aka the packet header
         // byte packetLSB = (byte) (m_i2c.read(true));
@@ -386,11 +422,15 @@ public class BNO080 {
 
         if (packetLSB == 0xFF && packetMSB == 0xFF) {
             // invalid according to BNO080 datasheet section 1.4.1
+            System.out.println("invalid packet");
             return false;
         }
+        System.out.printf("before rx packet length %s %s\n",
+                Integer.toBinaryString(packetMSB),
+                Integer.toBinaryString(packetLSB));
 
         // Calculate the number of data bytes in this packet
-        rxPacketLength = (packetMSB << 8) | packetLSB;
+        rxPacketLength = ((packetMSB << 8) & 0xFF00) | packetLSB;
 
         // Clear the MSbit.
         // This bit indicates if this package is a continuation of the last. TBH, I
@@ -401,8 +441,13 @@ public class BNO080 {
         // chip select.
         rxPacketLength &= ~(1 << 15);
 
+        System.out.printf("rx packet length %s %d\n",
+                Integer.toBinaryString(rxPacketLength),
+                rxPacketLength);
+
         if (rxPacketLength == 0) {
             // Packet is empty
+            System.out.println("packet empty");
             return false;
         }
         // Remove the header bytes from the data count since we already read them
@@ -413,7 +458,10 @@ public class BNO080 {
         for (int i = 0; i < rxPacketLength - 4; ++i) {
             byte[] inbound = new byte[1];
             m_i2c.readOnly(inbound, 1);
+            System.out.printf("%X", inbound[0]);
             rxPacketBuffer[i + 4] = inbound[0];
+            if (i % 8 == 0)
+                System.out.println();
         }
 
         return true;
@@ -456,6 +504,10 @@ public class BNO080 {
      */
     private void clearSendBuffer() {
         Arrays.fill(txPacketBuffer, (byte) 0);
+    }
+
+    private void clearRxBuffer() {
+        Arrays.fill(rxPacketBuffer, (byte) 0);
     }
 
 }
