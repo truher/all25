@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.HexFormat;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Quaternion;
@@ -12,7 +14,7 @@ import edu.wpi.first.wpilibj.I2C;
  * This is the minimal thing, to try to get it to work at all.
  */
 public class BNO086_I2C {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final byte ADDR = (byte) 0x4b;
     // this is a remnant from the small arduino buffers
     private static final int I2C_BUFFER_LENGTH = 32;
@@ -53,7 +55,10 @@ public class BNO086_I2C {
     private static final int MAX_PACKET_SIZE = 128;
 
     private static final byte rotationVector_Q1 = 14;
+    // Heading accuracy estimate in radians. The Q point is 12.
+    private static final byte rotationVectorAccuracy_Q1 = 12;
     private static final byte accelerometer_Q1 = 8;
+    private static final byte gyro_Q1 = 9;
 
     private final I2C m_i2c;
 
@@ -86,20 +91,27 @@ public class BNO086_I2C {
     private byte calibrationStatus;
 
     public BNO086_I2C() {
-        m_i2c = new I2C(I2C.Port.kPort0, ADDR);
+        m_i2c = new I2C(I2C.Port.kPort1, ADDR);
     }
 
     public boolean begin() {
+        System.out.println("begin softReset");
         // Begin by resetting the IMU
         softReset();
+
+        System.out.println("begin send product id request");
+
+        delay(1000);
 
         // Check communication with device
         shtpData[0] = SHTP_REPORT_PRODUCT_ID_REQUEST; // Request the product ID and reset info
         shtpData[1] = 0; // Reserved
         sendPacket(CHANNEL_CONTROL, 2);
 
+        System.out.println("begin wait for product id response");
         // Now we wait for response
         if (receivePacket()) {
+            System.out.printf("response[0] %02X\n", shtpData[0]);
             if (shtpData[0] == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
                 if (DEBUG) {
                     System.out.printf("Version Major: %02X\n", shtpData[2]);
@@ -111,18 +123,27 @@ public class BNO086_I2C {
                     System.out.printf("Version Patch: %02X%02X\n",
                             shtpData[13], shtpData[12]);
                 }
+                System.out.println("begin success");
                 return true;
+            } else {
+                System.out.printf("wrong response %02X\n", shtpData[0]);
+                // this doesn't seem to hurt anything
             }
         }
+        // System.out.println("begin FAIL");
         return false;
     }
 
     public void enableAccelerometer() {
-        setFeatureCommand(SENSOR_REPORTID_ACCELEROMETER, 50);
+        setFeatureCommand(SENSOR_REPORTID_ACCELEROMETER, 10);
     }
 
     public void enableRotationVector() {
-        setFeatureCommand(SENSOR_REPORTID_ROTATION_VECTOR, 50);
+        setFeatureCommand(SENSOR_REPORTID_ROTATION_VECTOR, 10);
+    }
+
+    public void enableUncalibratedGyro() {
+        setFeatureCommand(SENSOR_REPORTID_UNCALIBRATED_GYRO, 10);
     }
 
     public int getTimeStamp() {
@@ -150,6 +171,11 @@ public class BNO086_I2C {
         return new Quaternion(getQuatReal(), getQuatI(), getQuatJ(), getQuatK());
     }
 
+    /** Return the rotation vector accuracy */
+    public float getQuatRadianAccuracy() {
+        return qToFloat(rawQuatRadianAccuracy, rotationVectorAccuracy_Q1);
+    }
+
     public float getAccelX() {
         return qToFloat(rawAccelX, accelerometer_Q1);
     }
@@ -166,6 +192,13 @@ public class BNO086_I2C {
         return VecBuilder.fill(getAccelX(), getAccelY(), getAccelZ());
     }
 
+    public Vector<N3> getUncalibratedGyro() {
+        float x = qToFloat(rawUncalibGyroX, gyro_Q1);
+        float y = qToFloat(rawUncalibGyroY, gyro_Q1);
+        float z = qToFloat(rawUncalibGyroZ, gyro_Q1);
+        return VecBuilder.fill(x, y, z);
+    }
+
     /**
      * Given a register value and a Q point, convert to float
      * See https://en.wikipedia.org/wiki/Q_(number_format)
@@ -180,32 +213,38 @@ public class BNO086_I2C {
      * @return false if new readings are not available
      */
     public boolean dataAvailable() {
-        return (getReadings() != 0);
+        return getReadings() != 0;
     }
 
     public int getReadings() {
+        // System.out.println("getReadings start");
         if (receivePacket()) {
             // Check to see if this packet is a sensor reporting its data to us
             if (shtpHeader[2] == CHANNEL_REPORTS && shtpData[0] == SHTP_REPORT_BASE_TIMESTAMP) {
+                // System.out.println("getReadings REPORTS");
                 // This will update the rawAccelX, etc variables depending on which feature
                 // report is found
                 return parseInputReport();
             } else if (shtpHeader[2] == CHANNEL_CONTROL) {
+                // System.out.println("getReadings CONTROL");
                 // This will update responses to commands, calibrationStatus, etc.
                 return parseCommandReport();
             } else if (shtpHeader[2] == CHANNEL_GYRO) {
+                System.out.println("getReadings GYRO");
                 // This will update the rawAccelX, etc variables depending on which feature
                 // report is found
                 return parseInputReport();
             }
 
         }
+        // System.out.println("getReadings end");
         return 0;
     }
 
     /**
      * start a report. no "specific config" here since it's only used for
      * classifiers which we don't use.
+     * @param timeBetweenReports in milliseconds
      */
     public void setFeatureCommand(int reportID, int timeBetweenReports) {
         long microsBetweenReports = (long) timeBetweenReports * 1000L;
@@ -256,6 +295,7 @@ public class BNO086_I2C {
      * shtpData[12:13]: Accuracy estimate
      */
     public int parseInputReport() {
+        // System.out.println("parseInputReport start");
         int dataLength = uint16(shtpHeader[0], shtpHeader[1]);
         dataLength &= ~(1 << 15);
         // Remove the header bytes from the data count
@@ -265,6 +305,7 @@ public class BNO086_I2C {
         // The gyro-integrated input reports are sent via the special gyro channel and
         // omit the usual ID, sequence, and status fields
         if (shtpHeader[2] == CHANNEL_GYRO) {
+            System.out.println("parseInputReport GYRO");
             rawQuatI = uint16(shtpData[0], shtpData[1]);
             rawQuatJ = uint16(shtpData[2], shtpData[3]);
             rawQuatK = uint16(shtpData[4], shtpData[5]);
@@ -326,6 +367,7 @@ public class BNO086_I2C {
                 shtpData[5] == SENSOR_REPORTID_GAME_ROTATION_VECTOR ||
                 shtpData[5] == SENSOR_REPORTID_AR_VR_STABILIZED_ROTATION_VECTOR ||
                 shtpData[5] == SENSOR_REPORTID_AR_VR_STABILIZED_GAME_ROTATION_VECTOR) {
+            System.out.println("parseInputReport ROTATION");
             quatAccuracy = status;
             rawQuatI = data1;
             rawQuatJ = data2;
@@ -381,9 +423,9 @@ public class BNO086_I2C {
             return 0;
         }
 
+        // System.out.println("parseInputReport end");
         // TODO additional feature reports may be strung together. Parse them all.
         return shtpData[5];
-
     }
 
     /**
@@ -426,18 +468,28 @@ public class BNO086_I2C {
      * Read all advertisement packets from sensor.
      */
     public void softReset() {
+        System.out.println("softReset sendpacket");
         shtpData[0] = 0x01;
         sendPacket(CHANNEL_EXECUTABLE, 1);
 
-        delay(50);
+        delay(1000);
+        System.out.println("softReset receive 1");
+
         while (receivePacket()) {
+            System.out.println("softReset reading ...");
             // slurp the whole packet
         }
 
-        delay(50);
+        delay(1000);
+
+        System.out.println("softReset receive 2");
+
         while (receivePacket()) {
+            System.out.println("softReset reading ...");
             // slurp the whole packet
         }
+        System.out.println("softReset done");
+
     }
 
     /**
@@ -459,7 +511,12 @@ public class BNO086_I2C {
 
         System.arraycopy(shtpData, 0, payload, 4, dataLength);
 
+        System.out.printf("==== sendPacket PAYLOAD: %s\n", hex(payload, packetLength));
         boolean aborted = m_i2c.writeBulk(payload);
+        if (aborted) {
+            System.out.println("==== sendPacket FAILED");
+        }
+        System.out.println("==== sendPacket done");
         return !aborted;
     }
 
@@ -470,9 +527,18 @@ public class BNO086_I2C {
      * @return false if no data available
      */
     public boolean receivePacket() {
+        // System.out.println("receivePacket read header");
         // Ask for four bytes to find out how much data we need to read
         byte[] payload = new byte[4];
-        m_i2c.readOnly(payload, 4);
+        boolean aborted = m_i2c.readOnly(payload, 4);
+
+        if (aborted) {
+            // System.out.println("==== receivePacket header FAILED");
+            return false;
+        } else {
+            // System.out.printf("==== receivePacket header received: %s\n", hex(payload,
+            // 4));
+        }
 
         byte packetLSB = payload[0];
         byte packetMSB = payload[1];
@@ -488,15 +554,19 @@ public class BNO086_I2C {
         // Clear the MSbit. This bit indicates if this package is a continuation of the
         // last. Ignore it for now.
         dataLength &= ~(1 << 15);
+        // System.out.printf("receivePacket dataLength %d\n", dataLength);
 
         if (dataLength == 0) {
             // Packet is empty
+            // System.out.println("receivePacket empty");
             return false;
         }
         // Remove the header bytes from the data count
         dataLength -= 4;
 
         getData(dataLength);
+
+        // System.out.println("receivePacket done");
 
         return true;
     }
@@ -506,6 +576,7 @@ public class BNO086_I2C {
      * sensor.
      */
     public void getData(int bytesRemaining) {
+        // System.out.println("getData start");
         // Start at the beginning of shtpData array
         short dataSpot = 0;
         // Setup a series of chunked 32 byte reads
@@ -515,6 +586,7 @@ public class BNO086_I2C {
                 numberOfBytesToRead = (I2C_BUFFER_LENGTH - 4);
             }
             byte[] payload = new byte[numberOfBytesToRead + 4];
+            // System.out.printf("getData read bytes %d\n", numberOfBytesToRead);
             m_i2c.readOnly(payload, numberOfBytesToRead + 4);
             for (int i = 0; i < numberOfBytesToRead; ++i) {
                 byte incoming = payload[i + 4];
@@ -524,6 +596,7 @@ public class BNO086_I2C {
             }
             bytesRemaining -= numberOfBytesToRead;
         }
+        System.out.printf("getData received: %s\n", hex(shtpData, dataSpot));
     }
 
     public void delay(int millis) {
@@ -543,5 +616,9 @@ public class BNO086_I2C {
                 | (Byte.toUnsignedInt(b2) << 16)
                 | (Byte.toUnsignedInt(b3) << 8)
                 | Byte.toUnsignedInt(lsb);
+    }
+
+    public String hex(byte[] b, int len) {
+        return HexFormat.of().formatHex(b, 0, len);
     }
 }
