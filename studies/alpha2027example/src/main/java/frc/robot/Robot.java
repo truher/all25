@@ -10,6 +10,8 @@ public class Robot extends TimedRobot {
     // private final AS5048B_I2C m_encoder;
     // private final BNO080 m_imu;
     private final APDS9960 m_sensor;
+    // private final BNO086_I2C myIMU;
+
     // private final DoublePublisher yawPub;
     // private final DoublePublisher anglePub;
     // private final DoublePublisher imuPub;
@@ -20,6 +22,8 @@ public class Robot extends TimedRobot {
         // m_encoder = new AS5048B_I2C();
         // m_imu = new BNO080();
         m_sensor = new APDS9960();
+        // myIMU = new BNO086_I2C();
+
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         // NetworkTable gyroTable = inst.getTable("gyro");
         // yawPub = gyroTable.getDoubleTopic("yaw (rad)").publish();
@@ -35,6 +39,9 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         System.out.println("teleop init");
         // m_imu.begin();
+
+        // myIMU.enableRotationVector();
+        // myIMU.enableAccelerometer();
     }
 
     @Override
@@ -60,5 +67,12 @@ public class Robot extends TimedRobot {
     @Override
     public void testPeriodic() {
         // Optional<Double> gyroRotation = m_imu.getYaw();
+
+        // if (myIMU.dataAvailable() == true) {
+        // float quatI = myIMU.getQuatI();
+        // float x = myIMU.getAccelX();
+        // System.out.printf("%f\n", quatI);
+        // System.out.printf("%f\n", x);
+        // }
     }
 }
