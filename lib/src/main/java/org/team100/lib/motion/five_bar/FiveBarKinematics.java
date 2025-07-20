@@ -70,8 +70,8 @@ public class FiveBarKinematics {
         Point Ph = P2.plus((P4.minus(P2)).times((P2Ph / P2.distance(P4))));
         double P3Ph = sqrt(pow(scenario.a2, 2) - pow(P2Ph, 2));
 
-        double x3 = Ph.x + (P3Ph / P2.distance(P4)) * (y4 - y2);
-        double y3 = Ph.y - (P3Ph / P2.distance(P4)) * (x4 - x2);
+        double x3 = Ph.x() + (P3Ph / P2.distance(P4)) * (y4 - y2);
+        double y3 = Ph.y() - (P3Ph / P2.distance(P4)) * (x4 - x2);
 
         Point P3 = new Point(x3, y3);
 

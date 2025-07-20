@@ -35,9 +35,9 @@ class FiveBarKinematicsTest {
         assertEquals(1.539, y3, kDelta);
         ActuatorAngles p = FiveBarKinematics.inverse(s, x3, y3);
         // 360/5 = 72 degrees
-        assertEquals(1.256, p.thetaOne, kDelta);
+        assertEquals(1.256, p.q1(), kDelta);
         // the complement
-        assertEquals(1.885, p.thetaFive, kDelta);
+        assertEquals(1.885, p.q5(), kDelta);
     }
 
     /** the inverse of the case above */
@@ -47,8 +47,8 @@ class FiveBarKinematicsTest {
         double t1 = 1.256;
         double t5 = 1.885;
         JointPositions j = FiveBarKinematics.forward(s, t1, t5);
-        assertEquals(-0.5, j.P3.x, kDelta);
-        assertEquals(1.539, j.P3.y, kDelta);
+        assertEquals(-0.5, j.P3().x(), kDelta);
+        assertEquals(1.539, j.P3().y(), kDelta);
     }
 
     private Scenario littleHouse() {
@@ -73,9 +73,9 @@ class FiveBarKinematicsTest {
         // check the height
         ActuatorAngles p = FiveBarKinematics.inverse(s, x3, y3);
         // 90 degrees
-        assertEquals(1.571, p.thetaOne, kDelta);
+        assertEquals(1.571, p.q1(), kDelta);
         // also 90 degrees
-        assertEquals(1.571, p.thetaFive, kDelta);
+        assertEquals(1.571, p.q5(), kDelta);
     }
 
     /** Inverse of the case above */
@@ -85,7 +85,7 @@ class FiveBarKinematicsTest {
         double t1 = 1.571;
         double t5 = 1.571;
         JointPositions j = FiveBarKinematics.forward(s, t1, t5);
-        assertEquals(-0.5, j.P3.x, kDelta);
-        assertEquals(1.5, j.P3.y, kDelta);
+        assertEquals(-0.5, j.P3().x(), kDelta);
+        assertEquals(1.5, j.P3().y(), kDelta);
     }
 }

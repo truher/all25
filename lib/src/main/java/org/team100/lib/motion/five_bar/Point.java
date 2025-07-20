@@ -4,14 +4,7 @@ import static java.lang.Math.sqrt;
 import static java.lang.Math.pow;
 
 /** A cartesian (x,y) point. */
-public class Point {
-    double x;
-    double y;
-
-    public Point(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
+public record Point(double x, double y) {
 
     public double distance(Point other) {
         return sqrt(pow(x - other.x, 2) + pow(y - other.y, 2));
@@ -28,5 +21,4 @@ public class Point {
     public Point times(double scale) {
         return new Point(x * scale, y * scale);
     }
-
 }

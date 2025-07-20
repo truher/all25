@@ -53,6 +53,7 @@ public class Logging {
         return m_level;
     }
 
+    /** The logging singleton. */
     public static Logging instance() {
         return instance;
     }
