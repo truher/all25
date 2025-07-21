@@ -8,6 +8,9 @@ import org.team100.lib.encoder.IncrementalBareEncoder;
 import org.team100.lib.encoder.ProxyRotaryPositionSensor;
 import org.team100.lib.encoder.Talon6Encoder;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.motion.five_bar.FiveBarKinematics;
+import org.team100.lib.motion.five_bar.JointPositions;
+import org.team100.lib.motion.five_bar.Scenario;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Falcon6Motor;
@@ -24,10 +27,21 @@ public class FiveBarMech extends SubsystemBase {
     /** Low current limits */
     private static final double SUPPLY_LIMIT = 5;
     private static final double STATOR_LIMIT = 5;
+    private static final Scenario SCENARIO;
+    static {
+        // origin is P1
+        SCENARIO = new Scenario();
+        // TODO: real measurements
+        SCENARIO.a1 = 0.1;
+        SCENARIO.a2 = 0.1;
+        SCENARIO.a3 = 0.1;
+        SCENARIO.a4 = 0.1;
+        SCENARIO.a5 = 0.1;
+        SCENARIO.xcenter = 0.5;
+        SCENARIO.ycenter = 0.15;
+    }
 
     /** Left motor, "P1" in the diagram. */
-    private final BareMotor m_motorP1;
-    private final IncrementalBareEncoder m_encoderP1;
     /**
      * There's no absolute encoder in the apparatus, so we use a "proxy" instead;
      * this needs a "homing" mechanism of some kind.
@@ -36,8 +50,6 @@ public class FiveBarMech extends SubsystemBase {
     private final RotaryMechanism m_mechP1;
 
     /** Right motor, "P5" in the diagram. */
-    private final BareMotor m_motorP5;
-    private final IncrementalBareEncoder m_encoderP5;
     private final ProxyRotaryPositionSensor m_sensorP5;
     private final RotaryMechanism m_mechP5;
 
@@ -55,12 +67,12 @@ public class FiveBarMech extends SubsystemBase {
                 STATOR_LIMIT,
                 pid,
                 ff);
-        m_motorP1 = motorP1;
-        m_encoderP1 = new Talon6Encoder(loggerP1, motorP1);
-        m_sensorP1 = new ProxyRotaryPositionSensor(m_encoderP1, 1.0);
+        IncrementalBareEncoder encoderP1;
+        encoderP1 = new Talon6Encoder(loggerP1, motorP1);
+        m_sensorP1 = new ProxyRotaryPositionSensor(encoderP1, 1.0);
         m_mechP1 = new RotaryMechanism(
                 loggerP1,
-                m_motorP1,
+                motorP1,
                 m_sensorP1,
                 1.0,
                 0.0,
@@ -75,12 +87,12 @@ public class FiveBarMech extends SubsystemBase {
                 STATOR_LIMIT,
                 pid,
                 ff);
-        m_motorP5 = motorP5;
-        m_encoderP5 = new Talon6Encoder(loggerP5, motorP5);
-        m_sensorP5 = new ProxyRotaryPositionSensor(m_encoderP5, 1.0);
+        IncrementalBareEncoder encoderP5;
+        encoderP5 = new Talon6Encoder(loggerP5, motorP5);
+        m_sensorP5 = new ProxyRotaryPositionSensor(encoderP5, 1.0);
         m_mechP5 = new RotaryMechanism(
                 loggerP5,
-                m_motorP5,
+                motorP5,
                 m_sensorP5,
                 1.0,
                 0.0,
@@ -92,11 +104,17 @@ public class FiveBarMech extends SubsystemBase {
         m_mechP5.setPosition(p5, 0, 0, 0);
     }
 
+    public JointPositions getJointPositions() {
+        double q1 = m_mechP1.getPositionRad().orElse(0);
+        double q5 = m_mechP5.getPositionRad().orElse(0);
+        return FiveBarKinematics.forward(SCENARIO, q1, q5);
+    }
+
     //////////////////////
 
     private void setDutyCycle(double p1, double p5) {
-        m_motorP1.setDutyCycle(p1);
-        m_motorP5.setDutyCycle(p5);
+        m_mechP1.setDutyCycle(p1);
+        m_mechP5.setDutyCycle(p5);
     }
 
     private void resetEncoderPosition() {
@@ -113,7 +131,7 @@ public class FiveBarMech extends SubsystemBase {
     }
 
     public Command zero() {
-        return run(this::resetEncoderPosition);
+        return runOnce(this::resetEncoderPosition);
     }
 
     public Command position(DoubleSupplier p1, DoubleSupplier p5) {

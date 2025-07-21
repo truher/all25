@@ -1,6 +1,7 @@
 package org.team100.five_bar.setups;
 
 import org.team100.five_bar.subsystems.FiveBarCartesian;
+import org.team100.five_bar.visualization.FiveBarVisualization;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class SetupCartesian implements Runnable {
     private final FiveBarCartesian m_fiveBar;
+    private final FiveBarVisualization m_viz;
 
     public SetupCartesian() {
         final Logging logging = Logging.instance();
@@ -18,6 +20,7 @@ public class SetupCartesian implements Runnable {
         XboxController controller = new XboxController(0);
 
         m_fiveBar = new FiveBarCartesian(logger);
+        m_viz = new FiveBarVisualization(m_fiveBar::getJointPositions);
         m_fiveBar.setDefaultCommand(m_fiveBar.position(
                 () -> new Translation2d(
                         -1.0 * controller.getRightX(),
@@ -43,7 +46,7 @@ public class SetupCartesian implements Runnable {
 
     @Override
     public void run() {
-        //
+        m_viz.periodic();
     }
 
 }

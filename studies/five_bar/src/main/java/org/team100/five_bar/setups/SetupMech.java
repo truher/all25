@@ -1,6 +1,7 @@
 package org.team100.five_bar.setups;
 
 import org.team100.five_bar.subsystems.FiveBarMech;
+import org.team100.five_bar.visualization.FiveBarVisualization;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 
@@ -9,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class SetupMech implements Runnable {
     private final FiveBarMech m_fiveBar;
+    private final FiveBarVisualization m_viz;
 
     public SetupMech() {
         final Logging logging = Logging.instance();
@@ -16,6 +18,7 @@ public class SetupMech implements Runnable {
         XboxController controller = new XboxController(0);
 
         m_fiveBar = new FiveBarMech(logger);
+        m_viz = new FiveBarVisualization(m_fiveBar::getJointPositions);
         m_fiveBar.setDefaultCommand(m_fiveBar.position(
                 controller::getLeftX, controller::getRightX));
 
@@ -27,7 +30,7 @@ public class SetupMech implements Runnable {
 
     @Override
     public void run() {
-        //
+        m_viz.periodic();
     }
 
 }
