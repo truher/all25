@@ -135,6 +135,12 @@ public class FiveBarServo extends SubsystemBase {
         return FiveBarKinematics.forward(SCENARIO, q1, q5);
     }
 
+    @Override
+    public void periodic() {
+        m_servoP1.periodic();
+        m_servoP5.periodic();
+    }
+
     //////////////////////
 
     private void setDutyCycle(double p1, double p5) {

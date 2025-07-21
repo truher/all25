@@ -25,6 +25,9 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
  * The root link ("a5") is not rendered.
  */
 public class FiveBarVisualization {
+    private static final boolean DEBUG = false;
+    /** links are like 0.1 m long, pic is like 100 wide. */
+    private static final double SCALE = 300;
     private static final Color8Bit ORANGE = new Color8Bit(Color.kOrangeRed);
     private final Supplier<JointPositions> m_q;
     private final Mechanism2d m_view;
@@ -52,14 +55,22 @@ public class FiveBarVisualization {
     public void periodic() {
         JointPositions q = m_q.get();
         List<Point> p = links(q);
-        m_a1.setLength(p.get(0).norm());
-        m_a2.setLength(p.get(1).norm());
-        m_a3.setLength(p.get(2).norm());
-        m_a4.setLength(p.get(3).norm());
-        m_a1.setLength(p.get(0).angle().orElse(0));
-        m_a2.setLength(p.get(1).angle().orElse(0));
-        m_a3.setLength(p.get(2).angle().orElse(0));
-        m_a4.setLength(p.get(3).angle().orElse(0));
+        if (DEBUG) {
+            System.out.printf("FiveBarVisualization q %s %s %s %s %s\n",
+                    q.P1(), q.P2(), q.P3(), q.P4(), q.P5());
+            System.out.printf("FiveBarVisualization links %s %s %s %s\n",
+                    p.get(0), p.get(1), p.get(2), p.get(3));
+            System.out.printf("FiveBarVisualization norms %f %f %f %f\n",
+                    p.get(0).norm(), p.get(1).norm(), p.get(2).norm(), p.get(3).norm());
+        }
+        m_a1.setLength(SCALE * p.get(0).norm());
+        m_a2.setLength(SCALE * p.get(1).norm());
+        m_a3.setLength(SCALE * p.get(2).norm());
+        m_a4.setLength(SCALE * p.get(3).norm());
+        m_a1.setAngle(Math.toDegrees(p.get(0).angle().orElseThrow()));
+        m_a2.setAngle(Math.toDegrees(p.get(1).angle().orElseThrow()));
+        m_a3.setAngle(Math.toDegrees(p.get(2).angle().orElseThrow()));
+        m_a4.setAngle(Math.toDegrees(p.get(3).angle().orElseThrow()));
     }
 
     static List<Point> links(JointPositions q) {
@@ -69,9 +80,9 @@ public class FiveBarVisualization {
         Point a4 = q.P5().minus(q.P4());
         return List.of(
                 a1,
-                a2.rotateBy(-1.0 * a1.angle().orElse(0)),
-                a3.rotateBy(-1.0 * a2.angle().orElse(0)),
-                a4.rotateBy(-1.0 * a3.angle().orElse(0)));
+                a2.rotateBy(-1.0 * a1.angle().orElseThrow()),
+                a3.rotateBy(-1.0 * a2.angle().orElseThrow()),
+                a4.rotateBy(-1.0 * a3.angle().orElseThrow()));
     }
 
 }

@@ -16,7 +16,7 @@ public record Point(double x, double y) {
         return Math.hypot(x, y);
     }
 
-    /** Empty at the origin */
+    /** Radians.  Empty at the origin */
     public OptionalDouble angle() {
         if (norm() < 1e-6)
             return OptionalDouble.empty();
@@ -39,5 +39,10 @@ public record Point(double x, double y) {
         double c = Math.cos(a);
         double s = Math.sin(a);
         return new Point(x * c - y * s, x * s + y * c);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("(%6.3f %6.3f)", x, y);
     }
 }

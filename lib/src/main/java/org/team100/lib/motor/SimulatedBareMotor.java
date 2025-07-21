@@ -10,6 +10,10 @@ import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 
+/**
+ * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
+ * Robot.robotPeriodic().
+ */
 public class SimulatedBareMotor implements BareMotor {
     private static final boolean DEBUG = false;
 
@@ -30,7 +34,11 @@ public class SimulatedBareMotor implements BareMotor {
         m_log_duty = child.doubleLogger(Level.DEBUG, "duty_cycle");
         m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");
         m_velocityCache = Memo.ofDouble(() -> m_velocity);
-        m_positionCache = Memo.ofDouble(() -> m_position);
+        m_positionCache = Memo.ofDouble(() -> {
+            if (DEBUG)
+                Util.printf("resetting position cache to %f\n", m_position);
+            return m_position;
+        });
     }
 
     @Override
@@ -65,10 +73,13 @@ public class SimulatedBareMotor implements BareMotor {
     /** ignores velocity and torque */
     @Override
     public void setPosition(double position, double velocity, double accel, double torque) {
+        if (DEBUG)
+            Util.printf("SimulatedBareMotor.setPosition %f\n", position);
         double now = Takt.get();
         double dt = now - m_time;
         if (dt < 1e-6) {
-            // calling twice in the same cycle => nothing happens
+            if (DEBUG)
+                Util.println("calling twice in the same cycle => nothing happens");
             return;
         }
         double dx = position - m_position;

@@ -132,6 +132,12 @@ public class FiveBarCartesian extends SubsystemBase {
         return m.until(m::done);
     }
 
+    @Override
+    public void periodic() {
+        m_mechP1.periodic();
+        m_mechP5.periodic();
+    }
+
     //////////////////////
 
     private void setDutyCycle(double p1, double p5) {
