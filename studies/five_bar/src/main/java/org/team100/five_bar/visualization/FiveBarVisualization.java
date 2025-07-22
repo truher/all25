@@ -23,6 +23,11 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
  * to extract the link-sequence angles and lengths from them.
  * 
  * The root link ("a5") is not rendered.
+ * 
+ * The orientation of this visualization matches the fivebar training apparatus,
+ * wherein the "y" axis is pointing towards the user, so "down" in the viz, and
+ * the "x" axis is therefore pointing to the left. The working area is entirely
+ * "below" the origin (i.e. positive y).
  */
 public class FiveBarVisualization {
     private static final boolean DEBUG = false;
@@ -31,7 +36,7 @@ public class FiveBarVisualization {
     private static final Color8Bit ORANGE = new Color8Bit(Color.kOrangeRed);
     private final Supplier<JointPositions> m_q;
     private final Mechanism2d m_view;
-    private final MechanismRoot2d m_root;
+    private final MechanismRoot2d m_p1;
     private final MechanismLigament2d m_a1;
     private final MechanismLigament2d m_a2;
     private final MechanismLigament2d m_a3;
@@ -40,9 +45,13 @@ public class FiveBarVisualization {
     public FiveBarVisualization(Supplier<JointPositions> q) {
         m_q = q;
         m_view = new Mechanism2d(100, 100);
-        m_root = m_view.getRoot("root", 50, 50);
+        Point p1 = m_q.get().P1();
+        Point p5 = m_q.get().P5();
+        // the midpoint of a5
+        Point a5Mid = p1.plus(p5.minus(p1).times(0.5));
+        m_p1 = m_view.getRoot("root", 50 + SCALE * a5Mid.x(), 75 + SCALE * a5Mid.y());
         m_a1 = new MechanismLigament2d("a1", 0, 0, 0, ORANGE);
-        m_root.append(m_a1);
+        m_p1.append(m_a1);
         m_a2 = new MechanismLigament2d("a2", 0, 0, 0, ORANGE);
         m_a1.append(m_a2);
         m_a3 = new MechanismLigament2d("a3", 0, 0, 0, ORANGE);
@@ -67,7 +76,8 @@ public class FiveBarVisualization {
         m_a2.setLength(SCALE * p.get(1).norm());
         m_a3.setLength(SCALE * p.get(2).norm());
         m_a4.setLength(SCALE * p.get(3).norm());
-        m_a1.setAngle(Math.toDegrees(p.get(0).angle().orElseThrow()));
+        // angle references +x which is to the left
+        m_a1.setAngle(Math.toDegrees(p.get(0).angle().orElseThrow()) + 180);
         m_a2.setAngle(Math.toDegrees(p.get(1).angle().orElseThrow()));
         m_a3.setAngle(Math.toDegrees(p.get(2).angle().orElseThrow()));
         m_a4.setAngle(Math.toDegrees(p.get(3).angle().orElseThrow()));

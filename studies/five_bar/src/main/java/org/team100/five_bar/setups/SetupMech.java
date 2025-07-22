@@ -2,6 +2,7 @@ package org.team100.five_bar.setups;
 
 import org.team100.five_bar.subsystems.FiveBarMech;
 import org.team100.five_bar.visualization.FiveBarVisualization;
+import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 
@@ -15,6 +16,7 @@ public class SetupMech implements Runnable {
 
     public SetupMech() {
         final Logging logging = Logging.instance();
+        logging.setLevel(Level.TRACE);
         final LoggerFactory logger = logging.rootLogger;
         XboxController controller = new XboxController(0);
 
