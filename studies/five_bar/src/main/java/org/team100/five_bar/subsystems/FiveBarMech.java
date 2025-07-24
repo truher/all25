@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
+import org.team100.lib.encoder.HomingRotaryPositionSensor;
 import org.team100.lib.encoder.ProxyRotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.Talon6Encoder;
@@ -13,6 +14,7 @@ import org.team100.lib.motion.five_bar.FiveBarKinematics;
 import org.team100.lib.motion.five_bar.JointPositions;
 import org.team100.lib.motion.five_bar.Scenario;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
+import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
@@ -52,13 +54,16 @@ public class FiveBarMech extends SubsystemBase {
     private final RotaryMechanism m_mechP1;
     /** Right motor, "P5" in the diagram. */
     private final RotaryMechanism m_mechP5;
+    
+    private final BareMotor m_motorP1;
+    private final BareMotor m_motorP5;
+
 
     /**
-     * There's no absolute encoder in the apparatus, so we use a "proxy" instead;
-     * this needs a "homing" mechanism of some kind.
+     * There's no absolute encoder in the apparatus, so we use a homing sensor.
      */
-    private final ProxyRotaryPositionSensor m_sensorP1;
-    private final ProxyRotaryPositionSensor m_sensorP5;
+    private final HomingRotaryPositionSensor m_sensorP1;
+    private final HomingRotaryPositionSensor m_sensorP5;
 
     public FiveBarMech(LoggerFactory logger) {
         LoggerFactory loggerP1 = logger.child("p1");
@@ -67,11 +72,15 @@ public class FiveBarMech extends SubsystemBase {
             case COMP_BOT -> {
                 Falcon6Motor motorP1 = makeMotor(loggerP1, 1);
                 Falcon6Motor motorP5 = makeMotor(loggerP5, 2);
+                m_motorP1 = motorP1;
+                m_motorP5 = motorP5;
 
-                m_sensorP1 = new ProxyRotaryPositionSensor(
-                        new Talon6Encoder(loggerP1, motorP1), 1.0);
-                m_sensorP5 = new ProxyRotaryPositionSensor(
-                        new Talon6Encoder(loggerP5, motorP5), 1.0);
+                m_sensorP1 = new HomingRotaryPositionSensor(
+                        new ProxyRotaryPositionSensor(
+                                new Talon6Encoder(loggerP1, motorP1), 1.0));
+                m_sensorP5 = new HomingRotaryPositionSensor(
+                        new ProxyRotaryPositionSensor(
+                                new Talon6Encoder(loggerP5, motorP5), 1.0));
 
                 m_mechP1 = new RotaryMechanism(
                         loggerP1,
@@ -91,11 +100,15 @@ public class FiveBarMech extends SubsystemBase {
             default -> {
                 SimulatedBareMotor motorP1 = new SimulatedBareMotor(loggerP1, 600);
                 SimulatedBareMotor motorP5 = new SimulatedBareMotor(loggerP5, 600);
+                m_motorP1 = motorP1;
+                m_motorP5 = motorP5;
 
-                m_sensorP1 = new ProxyRotaryPositionSensor(
-                        new SimulatedBareEncoder(logger, motorP1), 1.0);
-                m_sensorP5 = new ProxyRotaryPositionSensor(
-                        new SimulatedBareEncoder(logger, motorP5), 1.0);
+                m_sensorP1 = new HomingRotaryPositionSensor(
+                        new ProxyRotaryPositionSensor(
+                                new SimulatedBareEncoder(logger, motorP1), 1.0));
+                m_sensorP5 = new HomingRotaryPositionSensor(
+                        new ProxyRotaryPositionSensor(
+                                new SimulatedBareEncoder(logger, motorP5), 1.0));
 
                 m_mechP1 = new RotaryMechanism(
                         loggerP1,
@@ -162,22 +175,26 @@ public class FiveBarMech extends SubsystemBase {
         m_mechP5.setDutyCycleUnlimited(p5);
     }
 
-    /** For zeroing. */
-    private void resetEncoderPosition() {
-        m_sensorP1.setEncoderPosition(0);
-        m_sensorP5.setEncoderPosition(0);
+    /** The "home" position is p1 at pi/2 and p5 at pi. */
+    private void setHomePosition() {
+        m_motorP1.setEncoderPositionRad(2*Math.PI/3);
+        m_motorP5.setEncoderPositionRad(Math.PI);
+        // m_sensorP1.setPosition(Math.PI/2);
+        // m_sensorP5.setPosition(Math.PI);
     }
 
     ///////////////////////
     //
     // Commands
 
+    /** Move in the direction of home. */
     public Command home() {
         return run(() -> setDutyCycle(0.01, 0.01));
     }
 
+    /** Set the position sensor to the home position. */
     public Command zero() {
-        return runOnce(this::resetEncoderPosition);
+        return runOnce(this::setHomePosition);
     }
 
     /** Update position by adding. */
