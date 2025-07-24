@@ -32,6 +32,10 @@ public class FiveBarMech extends SubsystemBase {
     /** Low current limits */
     private static final double SUPPLY_LIMIT = 5;
     private static final double STATOR_LIMIT = 5;
+    private static final double Q1_MIN = 0;
+    private static final double Q1_MAX = 2 * Math.PI / 3 - 0.1;
+    private static final double Q5_MIN = Math.PI / 3 + 0.1;
+    private static final double Q5_MAX = Math.PI;
     /** Units of positional PID are volts per revolution. */
     private static final PIDConstants PID = PIDConstants.makePositionPID(10.0);
     /** We never use feedforward since all our goals are motionless. */
@@ -54,10 +58,9 @@ public class FiveBarMech extends SubsystemBase {
     private final RotaryMechanism m_mechP1;
     /** Right motor, "P5" in the diagram. */
     private final RotaryMechanism m_mechP5;
-    
+
     private final BareMotor m_motorP1;
     private final BareMotor m_motorP5;
-
 
     /**
      * There's no absolute encoder in the apparatus, so we use a homing sensor.
@@ -130,14 +133,17 @@ public class FiveBarMech extends SubsystemBase {
 
     /** Update position by adding. */
     public void add(double p1, double p5) {
-        m_mechP1.setPosition(m_mechP1.getPositionRad().orElseThrow() + p1, 0, 0, 0);
-        m_mechP5.setPosition(m_mechP5.getPositionRad().orElseThrow() + p5, 0, 0, 0);
+        double q1 = m_mechP1.getPositionRad().orElseThrow() + p1;
+        double q5 = m_mechP5.getPositionRad().orElseThrow() + p5;
+        setPosition(q1, q5);
     }
 
     /** Set position goal, motionless. */
     public void setPosition(double p1, double p5) {
         if (DEBUG)
             Util.printf("FiveBarMech.setPosition %f %f\n", p1, p5);
+        if (!feasible(p1, p5))
+            return;
         m_mechP1.setPosition(p1, 0, 0, 0);
         m_mechP5.setPosition(p5, 0, 0, 0);
     }
@@ -156,6 +162,33 @@ public class FiveBarMech extends SubsystemBase {
         m_mechP5.periodic();
     }
 
+    /**
+     * True if the specified angles result in a feasible configuration. For example,
+     * if the arms are far apart, the middle links won't reach. If the arms are
+     * pointing towards each other, that's also not allowed. Each arm also has
+     * physical limits enforced here.
+     */
+    static boolean feasible(double q1, double q5) {
+        JointPositions q = FiveBarKinematics.forward(SCENARIO, q1, q5);
+        if (!q.P3().valid()) {
+            // too wide
+            return false;
+        }
+        if (q.P2().x() < q.P4().x()) {
+            // inverted
+            return false;
+        }
+        if (q1 < Q1_MIN)
+            return false;
+        if (q1 > Q1_MAX)
+            return false;
+        if (q5 < Q5_MIN)
+            return false;
+        if (q5 > Q5_MAX)
+            return false;
+        return true;
+    }
+
     //////////////////////
 
     private Falcon6Motor makeMotor(LoggerFactory logger, int canId) {
@@ -169,16 +202,20 @@ public class FiveBarMech extends SubsystemBase {
                 FF);
     }
 
-    /** For homing. */
+    /** For homing; ignores feasibility and limits. */
     private void setDutyCycle(double p1, double p5) {
         m_mechP1.setDutyCycleUnlimited(p1);
         m_mechP5.setDutyCycleUnlimited(p5);
     }
 
-    /** The "home" position is p1 at pi/2 and p5 at pi. */
+    /**
+     * The "home" position is the max value; the idea is that you've run the duty
+     * cycle (gently) to the end of travel before pushing the "home" button.
+     */
     private void setHomePosition() {
-        m_motorP1.setEncoderPositionRad(2*Math.PI/3);
-        m_motorP5.setEncoderPositionRad(Math.PI);
+        m_motorP1.setEncoderPositionRad(Q1_MAX);
+        m_motorP5.setEncoderPositionRad(Q5_MIN);
+        // TODO: use the sensor?
         // m_sensorP1.setPosition(Math.PI/2);
         // m_sensorP5.setPosition(Math.PI);
     }
@@ -187,9 +224,9 @@ public class FiveBarMech extends SubsystemBase {
     //
     // Commands
 
-    /** Move in the direction of home. */
+    /** Move in the direction of home: q1 to max, q5 to min */
     public Command home() {
-        return run(() -> setDutyCycle(0.01, 0.01));
+        return run(() -> setDutyCycle(0.01, -0.01));
     }
 
     /** Set the position sensor to the home position. */
