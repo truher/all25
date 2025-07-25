@@ -16,6 +16,8 @@ import com.ctre.phoenix6.StatusCode;
  * (e.g. resetting a pose, and then wanting to do some more calculation with the
  * just-reset version).
  * 
+ * You also need to include Takt.update() in Robot.robotPeriodic().
+ * 
  * Note that there's little need for multiple layers of caching, if the only
  * thing in the middle of the sandwich is simple arithmetic. So if a "motor"
  * implements caching of its sensors, then the "sensor" that uses the "motor"

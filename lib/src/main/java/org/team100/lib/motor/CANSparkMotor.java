@@ -17,6 +17,10 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+/**
+ * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
+ * Robot.robotPeriodic().
+ */
 public abstract class CANSparkMotor implements BareMotor {
     protected final Feedforward100 m_ff;
     protected final SparkBase m_motor;
@@ -211,7 +215,7 @@ public abstract class CANSparkMotor implements BareMotor {
      * @return torque in Nm
      */
     // public double getMotorTorque() {
-    //     return m_current.getAsDouble() * kTNm_amp();
+    // return m_current.getAsDouble() * kTNm_amp();
     // }
 
     /**

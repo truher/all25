@@ -18,6 +18,9 @@ import edu.wpi.first.wpilibj.RobotController;
  * noise. It's only used in the legacy "arm" code (because there's no reason to
  * change it), and in the swerve factory, (in order to preserve the
  * selectable-encoder code paths).
+ * 
+ * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
+ * Robot.robotPeriodic().
  */
 public class AnalogTurningEncoder extends RoboRioRotaryPositionSensor {
     private final AnalogInput m_input;

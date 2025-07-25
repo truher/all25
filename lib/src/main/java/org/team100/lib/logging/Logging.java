@@ -5,7 +5,12 @@ import org.team100.lib.logging.primitive.PrimitiveLogger;
 
 import com.ctre.phoenix6.SignalLogger;
 
-/** Logging singleton */
+/**
+ * Logging singleton.
+ * 
+ * If you use this logger you'll want to set the log level, either directly
+ * (setLevel) or via the LevelPoller.
+ */
 public class Logging {
     private static final Logging instance = new Logging();
 
@@ -53,6 +58,7 @@ public class Logging {
         return m_level;
     }
 
+    /** The logging singleton. */
     public static Logging instance() {
         return instance;
     }

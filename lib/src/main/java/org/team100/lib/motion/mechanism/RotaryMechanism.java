@@ -8,6 +8,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
+import org.team100.lib.util.Util;
 
 /**
  * Uses a motor and gears to produce rotational output, e.g. an arm joint.
@@ -19,6 +20,7 @@ import org.team100.lib.motor.BareMotor;
  * seems simpler that way.
  */
 public class RotaryMechanism implements Glassy {
+    private static final boolean DEBUG = false;
     private final BareMotor m_motor;
     private final RotaryPositionSensor m_sensor;
     private final double m_gearRatio;
@@ -123,10 +125,14 @@ public class RotaryMechanism implements Glassy {
             double outputAccelRad_S2,
             double outputTorqueNm) {
         if (outputPositionRad < m_minPositionRad) {
+            if (DEBUG)
+                Util.println("min");
             m_motor.stop();
             return;
         }
         if (outputPositionRad > m_maxPositionRad) {
+            if (DEBUG)
+                Util.println("max");
             m_motor.stop();
             return;
         }

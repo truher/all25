@@ -21,6 +21,9 @@ import edu.wpi.first.wpilibj.DutyCycle;
  * totally immune: we saw issues in 2025 where high-frequency noise in the 5v
  * supply would produce noisy sensor output, and completely confuse the FPGA
  * counter.
+ * 
+ * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
+ * Robot.robotPeriodic().
  */
 public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositionSensor {
     private static final int kFrequencyThreshold = 500;
