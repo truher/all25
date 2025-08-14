@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveModel;
@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * 
  * If the supplier starts delivering empties, retain the old goal.
  */
-public class DriveToPoseWithProfile extends Command implements Glassy {
+public class DriveToPoseWithProfile extends Command  {
     private final FieldLogger.Log m_field_log;
     private final Supplier<SwerveModel> m_goals;
     private final SwerveDriveSubsystem m_drive;

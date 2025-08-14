@@ -32,7 +32,7 @@ public class DriverControlProxy implements DriverControl {
      * for it.
      */
     public DriverControlProxy(LoggerFactory parent, Async async) {
-        m_logger = parent.child(this);
+        m_logger = parent.type(this);
         m_hidLogger = m_logger.stringLogger(Level.TRACE, "HID");
         refresh();
         async.addPeriodic(this::refresh, kFreq, "DriverControlProxy");

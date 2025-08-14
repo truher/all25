@@ -1,7 +1,5 @@
 package org.team100.lib.localization;
 
-import org.team100.lib.dashboard.Glassy;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -9,7 +7,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 /**
  * Static methods used to interpret camera input.
  */
-public class PoseEstimationHelper implements Glassy {
+public class PoseEstimationHelper  {
     /**
      * Invert the camera-to-tag, to get tag-to-camera.
      * Compose field-to-tag with tag-to-camera, to get field-to-camera.

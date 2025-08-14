@@ -1,6 +1,5 @@
 package org.team100.lib.motion.drivetrain.kinodynamics;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
@@ -29,7 +28,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * In particular, the maximum spin rate is likely to seem quite high. Do not
  * lower it here.
  */
-public class SwerveKinodynamics implements Glassy {
+public class SwerveKinodynamics  {
     // geometry
     private final double m_fronttrack;
     private final double m_backtrack;

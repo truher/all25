@@ -33,7 +33,7 @@ public class ReduxGyro implements Gyro {
     private final Rotation2dLogger m_log_roll;
 
     public ReduxGyro(LoggerFactory parent, int canID) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_gyro = new Canandgyro(canID);
         m_gyro.clearStickyFaults();
 

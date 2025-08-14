@@ -45,7 +45,7 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
             ProfileReference1d ref,
             Feedback100 feedback,
             double kV) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_mechanism = mechanism;
         m_ref = ref;
         m_feedback = feedback;

@@ -72,7 +72,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
             SwerveKinodynamics swerveKinodynamics,
             Supplier<Rotation2d> desiredRotation,
             double[] k) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_desiredRotation = desiredRotation;
         m_K = k;

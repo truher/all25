@@ -99,7 +99,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_dutyCycleOut.UpdateFreqHz = 0;
         m_positionVoltage.UpdateFreqHz = 0;
 
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_motor = new TalonFX(canId);
         m_ff = ff;
         m_supplyLimit = supplyLimit;

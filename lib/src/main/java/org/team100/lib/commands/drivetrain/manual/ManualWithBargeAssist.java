@@ -72,7 +72,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
             Supplier<Rotation2d> desiredRotation,
             Feedback100 thetaController,
             SwerveDriveSubsystem drive) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_desiredRotation = desiredRotation;
         m_thetaFeedback = thetaController;

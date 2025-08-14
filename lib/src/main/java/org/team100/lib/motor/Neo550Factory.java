@@ -22,7 +22,7 @@ public class Neo550Factory {
             double gearRatio,
             MotorPhase motorPhase,
             double wheelDiameterM) {
-        LoggerFactory moduleLogger = parent.child(name);
+        LoggerFactory moduleLogger = parent.name(name);
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 moduleLogger,
                 canID,
@@ -42,7 +42,7 @@ public class Neo550Factory {
             int canID,
             double gearRatio,
             MotorPhase motorPhase) {
-        LoggerFactory moduleLogger = parent.child(name);
+        LoggerFactory moduleLogger = parent.name(name);
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 moduleLogger,
                 canID,
@@ -68,7 +68,7 @@ public class Neo550Factory {
             double gearRatio,
             MotorPhase motorPhase,
             double wheelDiameterM) {
-        LoggerFactory moduleLogger = parent.child(name);
+        LoggerFactory moduleLogger = parent.name(name);
         return new OutboardLinearVelocityServo(moduleLogger, getNEO550LinearMechanism(name,
                 moduleLogger,
                 currentLimit,

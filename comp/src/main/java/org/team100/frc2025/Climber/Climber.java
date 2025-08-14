@@ -29,7 +29,7 @@ public class Climber extends SubsystemBase {
     private final AngularPositionServo m_servo;
 
     public Climber(LoggerFactory parent, int canID) {
-        LoggerFactory log = parent.child("Climber");
+        LoggerFactory log = parent.name("Climber");
 
         Profile100 profile100 = new TrapezoidProfile100(0.5, 0.5, 0.05);
         ProfileReference1d ref = new IncrementalProfileReference1d(profile100, 0.05, 0.05);

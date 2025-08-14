@@ -2,7 +2,6 @@ package org.team100.lib.motion.servo;
 
 import java.util.function.DoubleUnaryOperator;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -11,7 +10,7 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
  * Represents torque required to counteract gravity. This was used in 2025 for
  * the wrist joint.
  */
-public class Gravity implements DoubleUnaryOperator, Glassy {
+public class Gravity implements DoubleUnaryOperator {
     /** Max gravity torque, newton-meters */
     private final double m_gravityNm;
     /** Offset from horizontal */
@@ -22,7 +21,7 @@ public class Gravity implements DoubleUnaryOperator, Glassy {
     public Gravity(LoggerFactory parent, double gravityNm, double offsetRad) {
         m_gravityNm = gravityNm;
         m_offsetRad = offsetRad;
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_gravityTorque = child.doubleLogger(Level.TRACE, "gravity torque (Nm)");
         m_log_correctedPosition = child.doubleLogger(Level.TRACE, "corrected position (rad)");
     }

@@ -3,7 +3,6 @@ package org.team100.frc2025.Elevator;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.lib.commands.drivetrain.FieldConstants;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -11,7 +10,7 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ElevatorDefaultCommand extends Command implements Glassy {
+public class ElevatorDefaultCommand extends Command  {
     private final DoubleLogger m_log_distanceToReef;
     private final Elevator m_elevator;
     private final Wrist2 m_wrist;
@@ -22,7 +21,7 @@ public class ElevatorDefaultCommand extends Command implements Glassy {
 
     public ElevatorDefaultCommand(LoggerFactory logger, Elevator elevator, Wrist2 wrist, AlgaeGrip grip,
             SwerveDriveSubsystem drive) {
-        LoggerFactory child = logger.child(this);
+        LoggerFactory child = logger.type(this);
         m_log_distanceToReef = child.doubleLogger(Level.TRACE, "distance to reef (m)");
         // m_log_holdPosition = child.doubleLogger(Level.TRACE, "hold position (m)");
 

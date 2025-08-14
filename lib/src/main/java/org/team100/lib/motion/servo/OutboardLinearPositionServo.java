@@ -40,7 +40,7 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
             LoggerFactory parent,
             LinearMechanism mechanism,
             ProfileReference1d ref) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_mechanism = mechanism;
         m_ref = ref;
         m_log_goal = child.doubleLogger(Level.COMP, "goal (m)");

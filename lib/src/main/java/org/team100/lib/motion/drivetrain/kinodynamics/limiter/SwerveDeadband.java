@@ -1,6 +1,5 @@
 package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -18,7 +17,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
  * 
  * For now, this is the simplest thing I could think of.
  */
-public class SwerveDeadband implements Glassy {
+public class SwerveDeadband  {
     /** 1 cm/s */
     private final double m_translationLimit = 0.01;
     /** 0.01 rad/s */
@@ -26,7 +25,7 @@ public class SwerveDeadband implements Glassy {
     private final DoubleLogger m_log_scale;
 
     public SwerveDeadband(LoggerFactory parent) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_scale = child.doubleLogger(Level.TRACE, "scale");
     }
 

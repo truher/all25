@@ -24,7 +24,7 @@ public class ParallelCommandGroup100 extends Command {
     private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
     public ParallelCommandGroup100(LoggerFactory logger, String name, Command... commands) {
-        m_logger = logger.child(name);
+        m_logger = logger.name(name);
         m_name = name;
         addCommands(commands);
     }

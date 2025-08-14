@@ -29,9 +29,9 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics) {
         LinearVelocityServo driveServo = simulatedDriveServo(
-                parent.child("Drive"));
+                parent.name("Drive"));
         AngularPositionServo turningServo = simulatedTurningServo(
-                parent.child("Turning"),
+                parent.name("Turning"),
                 kinodynamics);
         return new SimulatedSwerveModule100(driveServo, turningServo);
     }
@@ -43,9 +43,9 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics) {
         LinearVelocityServo driveServo = simulatedDriveServo(
-                parent.child("Drive"));
+                parent.name("Drive"));
         AngularPositionServo turningServo = simulatedOutboardTurningServo(
-                parent.child("Turning"),
+                parent.name("Turning"),
                 kinodynamics);
         return new SimulatedSwerveModule100(driveServo, turningServo);
     }

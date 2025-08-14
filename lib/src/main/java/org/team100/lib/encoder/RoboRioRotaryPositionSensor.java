@@ -34,7 +34,7 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
             LoggerFactory parent,
             double inputOffset,
             EncoderDrive drive) {
-        LoggerFactory log = parent.child(this);
+        LoggerFactory log = parent.type(this);
         m_positionOffset = Util.inRange(inputOffset, 0.0, 1.0);
         m_drive = drive;
         m_log_position = log.optionalDoubleLogger(Level.COMP, "position (rad)");

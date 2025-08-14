@@ -68,7 +68,7 @@ public class HolonomicProfile {
             double aScale,
             double omegaScale,
             double alphaScale) {
-        logger.child("HolonomicProfile").stringLogger(Level.TRACE, "profile").log(() -> kProfile.name());
+        logger.name("HolonomicProfile").stringLogger(Level.TRACE, "profile").log(() -> kProfile.name());
         switch (kProfile) {
             case EXP -> {
                 return currentLimitedExponential(

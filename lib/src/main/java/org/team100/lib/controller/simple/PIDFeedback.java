@@ -1,6 +1,5 @@
 package org.team100.lib.controller.simple;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -15,7 +14,7 @@ import edu.wpi.first.math.controller.PIDController;
  * This also logs the error that we have habitually logged elsewhere, because I
  * don't want the idea of "error" to be in the interface.
  */
-public class PIDFeedback implements Feedback100, Glassy {
+public class PIDFeedback implements Feedback100 {
     private final PIDController m_controller;
     private final DoubleLogger m_log_error;
     private final DoubleLogger m_log_errorD;
@@ -34,7 +33,7 @@ public class PIDFeedback implements Feedback100, Glassy {
 
         if (rotation)
             m_controller.enableContinuousInput(-Math.PI, Math.PI);
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_error = child.doubleLogger(Level.TRACE, "error");
         m_log_errorD = child.doubleLogger(Level.TRACE, "errorD");
 

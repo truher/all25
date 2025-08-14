@@ -3,7 +3,6 @@ package org.team100.lib.examples.motion;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Falcon6Motor;
@@ -24,13 +23,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * control.
  * 
  * This class extends SubsystemBase, to be compatible with the scheduler, and it
- * implements Glassy, so that the logger will use the class name.
+ * , so that the logger will use the class name.
  */
-public class OpenLoopSubsystem extends SubsystemBase implements Glassy {
+public class OpenLoopSubsystem extends SubsystemBase  {
     private final BareMotor m_motor;
 
     public OpenLoopSubsystem(LoggerFactory parent) {
-        LoggerFactory log = parent.child(this);
+        LoggerFactory log = parent.type(this);
         /*
          * Here we use the Team 100 "Identity" mechanism to allow different
          * configurations for different hardware. The most important distinction here is

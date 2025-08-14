@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import org.team100.lib.config.Identity;
-import org.team100.lib.dashboard.Glassy;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * -- override: using a Sendable Chooser in a dashboard, e.g. glass.
  * -- test override: to force a config for unit tests.
  */
-public class Experiments implements Glassy {
+public class Experiments  {
     public static final Experiments instance = new Experiments(Identity.instance);
 
     /** These experiments are enabled on every robot type. */

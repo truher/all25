@@ -5,7 +5,6 @@ import java.util.function.BooleanSupplier;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
@@ -14,7 +13,7 @@ import org.team100.lib.motor.Neo550CANSparkMotor;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CoralTunnel extends SubsystemBase implements Glassy {
+public class CoralTunnel extends SubsystemBase  {
     // private final LinearMechanism m_coralMech;
     // private LaserCan laserCAN;
 
@@ -28,7 +27,7 @@ public class CoralTunnel extends SubsystemBase implements Glassy {
 
     public CoralTunnel(LoggerFactory parent, int algaeID, int coralID) {
 
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         int coralCurrentLimit = 20;
 
         m_logRightLimitSwitch = child.booleanLogger(Level.COMP, "right");

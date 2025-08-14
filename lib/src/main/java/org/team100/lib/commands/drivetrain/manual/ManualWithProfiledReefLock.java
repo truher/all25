@@ -77,7 +77,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
             Feedback100 thetaController,
             SwerveDriveSubsystem drive,
             Supplier<Boolean> lockToFunnel) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_lockToReef = lockToReef;
         m_drive = drive;

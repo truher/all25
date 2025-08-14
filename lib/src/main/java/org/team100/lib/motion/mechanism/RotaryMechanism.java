@@ -2,7 +2,6 @@ package org.team100.lib.motion.mechanism;
 
 import java.util.OptionalDouble;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.encoder.RotaryPositionSensor;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -19,7 +18,7 @@ import org.team100.lib.util.Util;
  * The position limits used to be enforced by a proxy, but now they're here: it
  * seems simpler that way.
  */
-public class RotaryMechanism implements Glassy {
+public class RotaryMechanism  {
     private static final boolean DEBUG = false;
     private final BareMotor m_motor;
     private final RotaryPositionSensor m_sensor;
@@ -41,7 +40,7 @@ public class RotaryMechanism implements Glassy {
             double gearRatio,
             double minPositionRad,
             double maxPositionRad) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_motor = motor;
         m_sensor = sensor;
         m_gearRatio = gearRatio;

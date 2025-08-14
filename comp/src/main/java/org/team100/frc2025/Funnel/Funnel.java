@@ -1,7 +1,6 @@
 package org.team100.frc2025.Funnel;
 
 import org.team100.lib.config.Identity;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -14,7 +13,7 @@ import org.team100.lib.motor.SimulatedBareMotor;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Funnel extends SubsystemBase implements Glassy {
+public class Funnel extends SubsystemBase  {
 
     LinearMechanism m_starboardMech;
     LinearMechanism m_portMech;
@@ -28,7 +27,7 @@ public class Funnel extends SubsystemBase implements Glassy {
             LoggerFactory parent,
             int starboardID,
             int portID) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
 
         int funnelSupplyLimit = 20;
 

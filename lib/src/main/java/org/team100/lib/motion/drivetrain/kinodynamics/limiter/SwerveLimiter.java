@@ -2,7 +2,6 @@ package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
 import java.util.function.DoubleSupplier;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.logging.Level;
@@ -19,7 +18,7 @@ import org.team100.lib.util.Util;
  * Keeps the current setpoint, to avoid round-tripping through the pose
  * estimator. Remember to update the setpoint!
  */
-public class SwerveLimiter implements Glassy {
+public class SwerveLimiter  {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_norm;
@@ -35,7 +34,7 @@ public class SwerveLimiter implements Glassy {
     private FieldRelativeVelocity m_current;
 
     public SwerveLimiter(LoggerFactory parent, SwerveKinodynamics dynamics, DoubleSupplier voltage) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_norm = child.doubleLogger(Level.TRACE, "norm");
         m_log_normIn = child.doubleLogger(Level.TRACE, "norm in");
         m_log_next = child.fieldRelativeVelocityLogger(Level.TRACE, "next");

@@ -1,13 +1,11 @@
 package org.team100.lib.motor;
 
-import org.team100.lib.dashboard.Glassy;
-
 /**
  * A bare motor is like a Motor100 but the methods pertain only to its output
  * shaft, not the motion of the attached mechanism. Accordingly, the units are
  * always rotational, and there should be no gear ratios in any implementation.
  */
-public interface BareMotor extends Glassy {
+public interface BareMotor  {
 
     /**
      * Some motors allow torque limiting through current limiting.

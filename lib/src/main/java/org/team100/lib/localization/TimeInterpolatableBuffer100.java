@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.interpolation.Interpolatable;
@@ -17,7 +16,7 @@ import edu.wpi.first.math.interpolation.Interpolatable;
  * 
  * The buffer is never empty, so get() always returns *something*.
  */
-public final class TimeInterpolatableBuffer100<T extends Interpolatable<T>> implements Glassy {
+public final class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
     private static final boolean DEBUG = false;
 
     private final double m_historyS;

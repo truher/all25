@@ -31,7 +31,7 @@ public class Picker {
             SwerveKinodynamics kinodynamics,
             TrajectoryVisualization viz) {
 
-        m_logger = parent.child("Picker");
+        m_logger = parent.name("Picker");
         m_drive = swerve;
         constraints = new TimingConstraintFactory(kinodynamics);
         m_viz = viz;

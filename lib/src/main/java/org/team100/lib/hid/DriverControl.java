@@ -1,7 +1,5 @@
 package org.team100.lib.hid;
 
-import org.team100.lib.dashboard.Glassy;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -15,7 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * represent the control's effect on the robot. So, for example, velocity inputs
  * are scaled to control units, ([-1,1]), not robot units (m/s).
  */
-public interface DriverControl extends Glassy {
+public interface DriverControl  {
     /**
      * This represents driver's velocity command, usually mapped to three axes in
      * the control, so the ranges are [-1,1]

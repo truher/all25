@@ -28,7 +28,7 @@ public class SequentialCommandGroup100 extends Command {
      * have so many publishers to the same log key.
      */
     public SequentialCommandGroup100(LoggerFactory logger, String name, Command... commands) {
-        m_logger = logger.child(name);
+        m_logger = logger.name(name);
         m_name = name;
         addCommands(commands);
     }

@@ -2,7 +2,6 @@ package org.team100.lib.examples.semiauto;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.MockAngularPositionServo;
 
@@ -15,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 /**
  * Illustrates a self-aiming shooter angle mechanism.
  */
-public class PositionAwareSubsytem extends SubsystemBase implements Glassy {
+public class PositionAwareSubsytem extends SubsystemBase  {
     private final Translation2d m_aimingPoint;
     private final Supplier<Pose2d> m_pose;
     private final AngularPositionServo m_servo;

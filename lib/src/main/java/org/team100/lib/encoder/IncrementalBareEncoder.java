@@ -2,10 +2,8 @@ package org.team100.lib.encoder;
 
 import java.util.OptionalDouble;
 
-import org.team100.lib.dashboard.Glassy;
-
 /** Represents motor-shaft encoder, probably some kind of built-in. */
-public interface IncrementalBareEncoder extends Glassy {
+public interface IncrementalBareEncoder  {
 
     /**
      * Value should be updated in Robot.robotPeriodic().

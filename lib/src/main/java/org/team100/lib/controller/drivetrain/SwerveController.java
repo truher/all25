@@ -1,13 +1,12 @@
 package org.team100.lib.controller.drivetrain;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 
 /**
  * Feedback and feedforward control.
  */
-public interface SwerveController extends Glassy {
+public interface SwerveController  {
 
     /**
      * Feedback should compare the current-instant measurement to the

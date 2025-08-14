@@ -47,7 +47,7 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
             double inputOffset,
             EncoderDrive drive) {
         super(parent, inputOffset, drive);
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_channel = channel;
         m_digitalInput = new DigitalInput(channel);
         m_dutyCycle = new DutyCycle(m_digitalInput);

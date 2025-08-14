@@ -1,7 +1,6 @@
 package org.team100.lib.motion.servo;
 
 import java.util.OptionalDouble;
-import org.team100.lib.dashboard.Glassy;
 
 /**
  * Represents a servo whose output is measured in linear units -- this is
@@ -14,7 +13,7 @@ import org.team100.lib.dashboard.Glassy;
  * 
  * There should be no profile here.
  */
-public interface LinearVelocityServo extends Glassy {
+public interface LinearVelocityServo  {
     void reset();
 
     /**

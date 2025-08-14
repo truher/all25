@@ -13,7 +13,7 @@ public class Talon6Encoder implements IncrementalBareEncoder {
     private final OptionalDoubleLogger m_log_velocity;
 
     public Talon6Encoder(LoggerFactory parent, Talon6Motor motor) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_motor = motor;
         m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (rad)");
         m_log_velocity = child.optionalDoubleLogger(Level.TRACE, "velocity (rad_s)");

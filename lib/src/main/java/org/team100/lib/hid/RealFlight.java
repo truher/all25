@@ -50,7 +50,7 @@ public class RealFlight implements DriverControl {
 
     public RealFlight(LoggerFactory parent) {
         hid = new GenericHID(0);
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_speed = child.enumLogger(Level.TRACE, "control_speed");
     }
 

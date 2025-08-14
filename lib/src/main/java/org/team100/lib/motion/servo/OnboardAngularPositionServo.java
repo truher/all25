@@ -53,7 +53,7 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
             RotaryMechanism mech,
             ProfileReference1d ref,
             Feedback100 feedback) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_mechanism = mech;
         m_ref = ref;
         m_feedback = feedback;

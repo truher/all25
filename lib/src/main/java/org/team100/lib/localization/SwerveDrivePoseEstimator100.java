@@ -3,7 +3,6 @@ package org.team100.lib.localization;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -22,7 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
-public class SwerveDrivePoseEstimator100 implements PoseEstimator100, Glassy {
+public class SwerveDrivePoseEstimator100 implements PoseEstimator100 {
     private static final boolean DEBUG = false;
     /**
      * The buffer only needs to be long enough to catch stale-but-still-helpful
@@ -60,7 +59,7 @@ public class SwerveDrivePoseEstimator100 implements PoseEstimator100, Glassy {
             SwerveModulePositions modulePositions,
             Pose2d initialPoseMeters,
             double timestampSeconds) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_kinodynamics = kinodynamics;
         m_poseBuffer = new TimeInterpolatableBuffer100<>(
                 kBufferDuration,

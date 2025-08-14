@@ -82,13 +82,13 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             MotorPhase motorPhase) {
 
         LinearVelocityServo driveServo = driveKrakenServo(
-                parent.child("Drive"),
+                parent.name("Drive"),
                 supplyLimitAmps,
                 statorLimitAmps,
                 driveMotorCanId,
                 ratio);
         AngularPositionServo turningServo = turningServo(
-                parent.child("Turning"),
+                parent.name("Turning"),
                 encoderClass,
                 turningMotorCanId,
                 turningEncoderChannel,
@@ -117,13 +117,13 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             EncoderDrive drive,
             MotorPhase motorPhase) {
         LinearVelocityServo driveServo = driveFalconServo(
-                parent.child("Drive"),
+                parent.name("Drive"),
                 supplyLimitAmps,
                 statorLimitAmps,
                 driveMotorCanId,
                 ratio);
         AngularPositionServo turningServo = turningServo(
-                parent.child("Turning"),
+                parent.name("Turning"),
                 encoderClass,
                 turningMotorCanId,
                 turningEncoderChannel,

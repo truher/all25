@@ -1,7 +1,5 @@
 package org.team100.lib.hid;
 
-import org.team100.lib.dashboard.Glassy;
-
 /**
  * Represents the HID used by the "operator" role, which typically controls
  * everything other than the drivetrain.
@@ -9,7 +7,7 @@ import org.team100.lib.dashboard.Glassy;
  * When you change this interface, you'll need to also change the "proxy," don't
  * forget. :-)
  */
-public interface OperatorControl extends Glassy {
+public interface OperatorControl  {
 
     default String getHIDName() {
         return "No HID Found!!";

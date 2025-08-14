@@ -54,7 +54,7 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
             LoggerFactory parent,
             RotaryPositionSensor absolute,
             ProxyRotaryPositionSensor incremental) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_absolute = absolute;
         m_incremental = incremental;
         m_log_absolute = child.optionalDoubleLogger(Level.DEBUG, "absolute (rad))");
