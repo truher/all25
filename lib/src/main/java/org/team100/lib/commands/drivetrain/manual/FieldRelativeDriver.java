@@ -1,11 +1,10 @@
 package org.team100.lib.commands.drivetrain.manual;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 
-public interface FieldRelativeDriver extends Glassy {
+public interface FieldRelativeDriver  {
     /**
      * @param state from the drivetrain
      * @param input control units [-1,1]

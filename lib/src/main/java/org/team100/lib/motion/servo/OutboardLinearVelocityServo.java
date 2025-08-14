@@ -24,7 +24,7 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     // private double m_setpoint;
 
     public OutboardLinearVelocityServo(LoggerFactory parent, LinearMechanism mechanism) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_mechanism = mechanism;
         m_log_setpoint_v = child.doubleLogger(Level.TRACE, "setpoint v (m_s)");
         m_log_setpoint_a = child.doubleLogger(Level.TRACE, "setpoint a (m_s2)");

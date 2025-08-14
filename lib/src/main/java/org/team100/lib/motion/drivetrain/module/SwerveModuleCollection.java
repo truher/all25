@@ -49,11 +49,11 @@ public class SwerveModuleCollection {
             double currentLimit,
             double statorLimit,
             SwerveKinodynamics kinodynamics) {
-        LoggerFactory collectionLogger = parent.child(kSwerveModules);
-        LoggerFactory frontLeftLogger = collectionLogger.child(kFrontLeft);
-        LoggerFactory frontRightLogger = collectionLogger.child(kFrontRight);
-        LoggerFactory rearLeftLogger = collectionLogger.child(kRearLeft);
-        LoggerFactory rearRightLogger = collectionLogger.child(kRearRight);
+        LoggerFactory collectionLogger = parent.name(kSwerveModules);
+        LoggerFactory frontLeftLogger = collectionLogger.name(kFrontLeft);
+        LoggerFactory frontRightLogger = collectionLogger.name(kFrontRight);
+        LoggerFactory rearLeftLogger = collectionLogger.name(kRearLeft);
+        LoggerFactory rearRightLogger = collectionLogger.name(kRearRight);
 
         switch (Identity.instance) {
             case COMP_BOT:

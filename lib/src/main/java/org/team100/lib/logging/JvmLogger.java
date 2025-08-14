@@ -6,14 +6,13 @@ import java.lang.management.MemoryPoolMXBean;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.LoggerFactory.LongLogger;
 
 /**
  * Logs stuff about the JVM. Inspired by Advantage Kit's
  * LoggedRobot.GcStatsCollector().
  */
-public class JvmLogger implements Glassy {
+public class JvmLogger  {
     private final LoggerFactory child;
     private final LongLogger m_log_heap;
     private final LongLogger m_log_nonheap;
@@ -22,7 +21,7 @@ public class JvmLogger implements Glassy {
     private final Map<String, LongLogger> m_log_memory = new HashMap<>();
 
     public JvmLogger(LoggerFactory parent) {
-        child = parent.child(this);
+        child = parent.type(this);
         m_log_heap = child.longLogger(Level.DEBUG, "MemoryUsage/heap");
         m_log_nonheap = child.longLogger(Level.TRACE, "MemoryUsage/non-heap");
     }

@@ -53,7 +53,7 @@ public class DriverXboxControl implements DriverControl {
 
     public DriverXboxControl(LoggerFactory parent) {
         m_controller = new XboxController(0);
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_right_y = child.doubleLogger(Level.TRACE, "Xbox/right y");
         m_log_right_x = child.doubleLogger(Level.TRACE, "Xbox/right x");
         m_log_left_x = child.doubleLogger(Level.TRACE, "Xbox/left x");

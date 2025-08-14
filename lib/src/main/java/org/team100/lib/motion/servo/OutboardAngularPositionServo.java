@@ -48,7 +48,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
             LoggerFactory parent,
             RotaryMechanism mech,
             ProfileReference1d ref) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_mechanism = mech;
         m_ref = ref;
         m_log_goal = child.doubleLogger(Level.TRACE, "goal (rad)");

@@ -54,7 +54,7 @@ public class FullStateSwerveController implements SwerveController {
             double thetaTolerance,
             double xDotTolerance,
             double omegaTolerance) {
-        LoggerFactory log = parent.child(this);
+        LoggerFactory log = parent.type(this);
         m_log_measurement = log.swerveModelLogger(Level.DEBUG, "measurement");
         m_log_currentReference = log.swerveModelLogger(Level.DEBUG, "currentReference");
         m_log_nextReference = log.swerveModelLogger(Level.DEBUG, "nextReference");

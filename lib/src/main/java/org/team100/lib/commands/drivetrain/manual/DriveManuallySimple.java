@@ -2,7 +2,6 @@ package org.team100.lib.commands.drivetrain.manual;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveModel;
@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Use the mode supplier to choose which mode to use, e.g. using a Sendable
  * Chooser.
  */
-public class DriveManuallySimple extends Command implements Glassy {
+public class DriveManuallySimple extends Command  {
 
     /**
      * Velocity control in control units, [-1,1] on all axes. This needs to be

@@ -29,7 +29,7 @@ public class SimulatedBareMotor implements BareMotor {
     private double m_time = Takt.get();
 
     public SimulatedBareMotor(LoggerFactory parent, double freeSpeedRad_S) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_freeSpeedRad_S = freeSpeedRad_S;
         m_log_duty = child.doubleLogger(Level.DEBUG, "duty_cycle");
         m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");

@@ -18,7 +18,7 @@ public class SimulatedBareEncoder implements IncrementalBareEncoder {
     public SimulatedBareEncoder(
             LoggerFactory parent,
             SimulatedBareMotor motor) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_motor = motor;
         m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (rad)");
         m_log_velocity = child.optionalDoubleLogger(Level.TRACE, "velocity (rad_s)");

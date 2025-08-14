@@ -1,6 +1,5 @@
 package org.team100.lib.controller.drivetrain;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
@@ -13,7 +12,7 @@ import org.team100.lib.util.Util;
  * The lifespan of this object is intended to be a single "playback" of a
  * trajectory, so create it in Command.initialize().
  */
-public class ReferenceController implements Glassy {
+public class ReferenceController  {
     private static final boolean DEBUG = false;
     private final DriveSubsystemInterface m_drive;
     private final SwerveController m_controller;

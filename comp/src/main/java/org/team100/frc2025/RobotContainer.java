@@ -55,7 +55,6 @@ import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.hid.DriverControl;
@@ -104,7 +103,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * don't need right now, cut and paste it into {@link RobotContainerParkingLot}.
  */
 // for background on drive current limits:
-public class RobotContainer implements Glassy {
+public class RobotContainer  {
     // https://v6.docs.ctr-electronics.com/en/stable/docs/hardware-reference/talonfx/improving-performance-with-current-limits.html
     // https://www.chiefdelphi.com/t/the-brushless-era-needs-sensible-default-current-limits/461056/51
     // https://docs.google.com/document/d/10uXdmu62AFxyolmwtDY8_9UNnci7eVcev4Y64ZS0Aqk
@@ -152,11 +151,11 @@ public class RobotContainer implements Glassy {
         final FieldLogger.Log fieldLog = new FieldLogger.Log(fieldLogger);
 
         final LoggerFactory logger = logging.rootLogger;
-        final LoggerFactory driveLog = logger.child("Drive");
-        final LoggerFactory comLog = logger.child("Commands");
-        final LoggerFactory elevatorLog = logger.child("Elevator");
-        final LoggerFactory coralSequence = logger.child("Coral Sequence");
-        final LoggerFactory autoSequence = logger.child("Auto Sequence");
+        final LoggerFactory driveLog = logger.name("Drive");
+        final LoggerFactory comLog = logger.name("Commands");
+        final LoggerFactory elevatorLog = logger.name("Elevator");
+        final LoggerFactory coralSequence = logger.name("Coral Sequence");
+        final LoggerFactory autoSequence = logger.name("Auto Sequence");
 
         final TrajectoryVisualization viz = new TrajectoryVisualization(fieldLogger);
         final DriverControl driverControl = new DriverControlProxy(logger, async);
@@ -263,7 +262,7 @@ public class RobotContainer implements Glassy {
                 driverControl::velocity,
                 visionDataProvider::setHeedRadiusM,
                 m_drive);
-        final LoggerFactory manLog = comLog.child(driveManually);
+        final LoggerFactory manLog = comLog.type(driveManually);
 
         final Feedback100 thetaFeedback = new PIDFeedback(
                 manLog, 3.2, 0, 0, true, 0.05, 1);

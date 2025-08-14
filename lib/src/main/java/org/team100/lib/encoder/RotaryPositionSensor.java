@@ -1,7 +1,6 @@
 package org.team100.lib.encoder;
 
 import java.util.OptionalDouble;
-import org.team100.lib.dashboard.Glassy;
 
 /**
  * Absolute rotational measurement, as used in, for example, swerve steering,
@@ -12,7 +11,7 @@ import org.team100.lib.dashboard.Glassy;
  * In 2025 these position sensors always sense the absolute position of a
  * mechanism, not through any sort of gearing.
  */
-public interface RotaryPositionSensor extends Glassy {
+public interface RotaryPositionSensor  {
 
     /**
      * @return Counterclockwise-positive rad in [-pi,pi], empty if disconnected.

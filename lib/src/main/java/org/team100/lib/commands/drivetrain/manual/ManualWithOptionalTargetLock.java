@@ -63,7 +63,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
             Supplier<Optional<Translation2d>> target,
             Feedback100 controller) {
         m_field_log = fieldLogger;
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_apparent_motion = child.doubleLogger(Level.TRACE, "apparent motion");
 
         m_swerveKinodynamics = swerveKinodynamics;

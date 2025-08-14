@@ -22,7 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public abstract class Navigator extends Command implements Planner2025 {
+public abstract class Navigator extends Command {
 
     public final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;

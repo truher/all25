@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.reference.TrajectoryReference;
@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * 
  * The trajectory is supplied; the supplier is free to ignore the current state.
  */
-public class DriveToPoseWithTrajectory extends Command implements Glassy {
+public class DriveToPoseWithTrajectory extends Command  {
     private final Supplier<Pose2d> m_goal;
     private final SwerveDriveSubsystem m_drive;
     private final BiFunction<SwerveModel, Pose2d, Trajectory100> m_trajectories;

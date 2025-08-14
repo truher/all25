@@ -1,7 +1,6 @@
 package org.team100.frc2025.Wrist;
 
 import org.team100.lib.config.Identity;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.LoggerFactory;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -10,7 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class AlgaeGrip extends SubsystemBase implements Glassy {
+public class AlgaeGrip extends SubsystemBase  {
     // private static final int currLim = 10;
     // private static final double wheelDiameterM = 0.072;
 

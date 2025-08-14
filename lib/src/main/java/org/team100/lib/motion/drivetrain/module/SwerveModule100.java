@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 
 import org.team100.lib.config.Identity;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePosition100;
@@ -25,7 +24,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * It used to be that the turning servo would contain the profile, but now it's
  * here.
  */
-public abstract class SwerveModule100 implements Glassy {
+public abstract class SwerveModule100  {
     private final LinearVelocityServo m_driveServo;
     private final AngularPositionServo m_turningServo;
     /**

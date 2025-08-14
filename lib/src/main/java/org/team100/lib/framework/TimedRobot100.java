@@ -2,7 +2,6 @@ package org.team100.lib.framework;
 
 import java.util.PriorityQueue;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  * Copy of {@link edu.wpi.first.wpilibj.TimedRobot} in an effort to improve
  * instrumentation.
  */
-public class TimedRobot100 extends IterativeRobotBase implements Glassy {
+public class TimedRobot100 extends IterativeRobotBase  {
 
     static class Callback implements Comparable<Callback> {
         public Runnable func;
@@ -103,7 +102,7 @@ public class TimedRobot100 extends IterativeRobotBase implements Glassy {
 
     protected TimedRobot100() {
         super(LOOP_PERIOD_S);
-        m_robotLogger = Logging.instance().rootLogger.child(this);
+        m_robotLogger = Logging.instance().rootLogger.type(this);
         m_log_slack = m_robotLogger.doubleLogger(Level.COMP, "slack time (s)");
         m_startTime = Takt.actual();
         addPeriodic(this::loopFunc, TimedRobot100.LOOP_PERIOD_S, "main loop");

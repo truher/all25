@@ -2,7 +2,6 @@ package org.team100.frc2025.Wrist;
 
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.lib.commands.drivetrain.FieldConstants;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -11,7 +10,7 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class WristDefaultCommand extends Command implements Glassy {
+public class WristDefaultCommand extends Command  {
     private final StringLogger m_log_activity;
     private final Elevator m_elevator;
     private final Wrist2 m_wrist;
@@ -26,7 +25,7 @@ public class WristDefaultCommand extends Command implements Glassy {
 
     public WristDefaultCommand(LoggerFactory logger, Wrist2 wrist, Elevator elevator, AlgaeGrip grip,
             SwerveDriveSubsystem drive) {
-        LoggerFactory child = logger.child(this);
+        LoggerFactory child = logger.type(this);
         m_log_activity = child.stringLogger(Level.TRACE, "activity");
         m_log_holdPosition = child.doubleLogger(Level.TRACE, "hold position (m)");
 

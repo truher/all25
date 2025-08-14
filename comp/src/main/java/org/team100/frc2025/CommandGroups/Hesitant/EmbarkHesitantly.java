@@ -7,7 +7,6 @@ import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
@@ -23,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * 
  * If the supplier starts delivering empties, retain the old goal.
  */
-public class EmbarkHesitantly extends Command implements Glassy {
+public class EmbarkHesitantly extends Command  {
     
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;

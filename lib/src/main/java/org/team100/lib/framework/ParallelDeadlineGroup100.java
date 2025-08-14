@@ -26,7 +26,7 @@ public class ParallelDeadlineGroup100 extends Command {
     private Command m_deadline;
 
     public ParallelDeadlineGroup100(LoggerFactory logger, String name, Command deadline, Command... otherCommands) {
-        m_logger = logger.child(name);
+        m_logger = logger.name(name);
         m_name = name;
         setDeadline(deadline);
         addCommands(otherCommands);

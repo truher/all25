@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.team100.lib.config.Camera;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
@@ -44,7 +43,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * This "24" version uses the "struct" method instead of the "msgpack" method,
  * which matches the TagFinder24 code on the camera.
  */
-public class VisionDataProvider24 implements Glassy {
+public class VisionDataProvider24  {
     private static final boolean DEBUG = false;
     /**
      * Five cameras, 50hz each => 250 hz of updates. Rio runs at 50 hz, so there
@@ -149,7 +148,7 @@ public class VisionDataProvider24 implements Glassy {
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
             PoseEstimator100 poseEstimator) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_layout = layout;
         m_poseEstimator = poseEstimator;
 

@@ -2,7 +2,6 @@ package org.team100.lib.motion.drivetrain;
 
 import java.util.Optional;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ChassisSpeedsLogger;
@@ -22,7 +21,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * The swerve drive in local, or robot, reference frame. This class knows
  * nothing about the outside world, it just accepts chassis speeds.
  */
-public class SwerveLocal implements Glassy, SwerveLocalObserver {
+public class SwerveLocal implements SwerveLocalObserver {
     private static final boolean DEBUG = false;
     private static final SwerveModuleStates states0 = new SwerveModuleStates(
             new SwerveModuleState100(0, Optional.of(Rotation2d.kZero)),
@@ -53,7 +52,7 @@ public class SwerveLocal implements Glassy, SwerveLocalObserver {
             LoggerFactory parent,
             SwerveKinodynamics swerveKinodynamics,
             SwerveModuleCollection modules) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_chassis_speed = child.chassisSpeedsLogger(Level.TRACE, "chassis speed");
         m_swerveModuleFrontLeftPosition = child.swerveModulePosition100Logger(Level.TRACE, "Fromt Left");
         m_swerveModuleFrontRightPosition = child.swerveModulePosition100Logger(Level.TRACE, "Front Right");

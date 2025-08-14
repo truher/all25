@@ -42,7 +42,7 @@ public class FullStateFeedback implements Feedback100 {
             DoubleUnaryOperator modulus,
             double xtol,
             double vtol) {
-        LoggerFactory child = parent.child("FullStateController");
+        LoggerFactory child = parent.name("FullStateController");
         m_log_reference = child.model100Logger(Level.DEBUG, "reference");
         m_log_measurement = child.model100Logger(Level.DEBUG, "measurement");
         m_log_error = child.model100Logger(Level.DEBUG, "error");

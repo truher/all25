@@ -1,6 +1,5 @@
 package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -15,7 +14,7 @@ import org.team100.lib.util.Util;
 /**
  * Limits acceleration to avoid tipping over.
  */
-public class FieldRelativeCapsizeLimiter implements Glassy {
+public class FieldRelativeCapsizeLimiter  {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_scale;
@@ -28,7 +27,7 @@ public class FieldRelativeCapsizeLimiter implements Glassy {
     public FieldRelativeCapsizeLimiter(
             LoggerFactory parent,
             SwerveKinodynamics m_limits) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_scale = child.doubleLogger(Level.TRACE, "scale");
         m_log_accel = child.fieldRelativeAccelerationLogger(Level.TRACE, "accel");
         m_log_prev = child.fieldRelativeVelocityLogger(Level.TRACE, "prev");

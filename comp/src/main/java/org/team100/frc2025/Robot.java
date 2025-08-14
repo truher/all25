@@ -39,7 +39,7 @@ public class Robot extends TimedRobot100 implements Debug {
     private RobotContainer m_robotContainer;
 
     public Robot() {
-        LoggerFactory dsLog = m_robotLogger.child("DriverStation");
+        LoggerFactory dsLog = m_robotLogger.name("DriverStation");
         m_log_ds_MatchTime = dsLog.doubleLogger(Level.TRACE, "MatchTime");
         m_log_ds_AutonomousEnabled = dsLog.booleanLogger(Level.TRACE, "AutonomousEnabled");
         m_log_ds_TeleopEnabled = dsLog.booleanLogger(Level.TRACE, "TeleopEnabled");

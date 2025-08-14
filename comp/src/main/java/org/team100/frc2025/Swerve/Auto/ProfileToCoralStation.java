@@ -8,7 +8,6 @@ import org.team100.lib.commands.drivetrain.FieldConstants;
 import org.team100.lib.commands.drivetrain.FieldConstants.FieldSector;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -31,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 
  //3.6 2.83
-public class ProfileToCoralStation extends Command implements Glassy {
+public class ProfileToCoralStation extends Command  {
     /** While driving to scoring tag, pay attention only to very close tags. */
     private static final double kHeedRadiusM = 3;
 
@@ -57,7 +56,7 @@ public class ProfileToCoralStation extends Command implements Glassy {
             SwerveController controller,
             HolonomicProfile profile,
             Supplier<DriverControl.Velocity> velocityInput) {
-        LoggerFactory child = logger.child(this);
+        LoggerFactory child = logger.type(this);
         m_log_sector = child.stringLogger(Level.TRACE, "sector");
         m_log_goal = child.pose2dLogger(Level.TRACE, "goal");
         m_drive = drive;

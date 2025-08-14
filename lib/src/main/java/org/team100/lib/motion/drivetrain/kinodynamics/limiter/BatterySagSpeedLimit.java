@@ -2,7 +2,6 @@ package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
 import java.util.function.DoubleSupplier;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -19,7 +18,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
  * Note the motors actually get a bit less voltage than the battery, due to
  * wiring resistance, but it's ok to neglect that effect.
  */
-public class BatterySagSpeedLimit implements Glassy {
+public class BatterySagSpeedLimit  {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_scale;
@@ -31,7 +30,7 @@ public class BatterySagSpeedLimit implements Glassy {
             LoggerFactory parent,
             SwerveKinodynamics dynamics,
             DoubleSupplier voltage) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_scale = child.doubleLogger(Level.TRACE, "scale");
         m_dynamics = dynamics;
         // there's a supplier here so that the tests don't need to use the

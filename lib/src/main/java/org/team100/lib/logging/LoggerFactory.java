@@ -8,7 +8,6 @@ import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.primitive.PrimitiveLogger;
@@ -70,18 +69,20 @@ public class LoggerFactory {
      * 
      * Each child level is separated by slashes, to make a tree in glass.
      */
-    public LoggerFactory child(String stem) {
+    public LoggerFactory name(String stem) {
         return new LoggerFactory(m_level, m_root + "/" + stem, m_pLogger);
     }
 
     /**
-     * Use this to create a child logger that describes the type of the subordinate
-     * thing, using the stable glass name (i.e. interface names, not implementation
-     * names, where possible).
+     * Use this to create a child logger that describes concrete type. This used to
+     * be customizable, so multiple concrete types could log into the same key
+     * space, but we never used that ability, so I took it out.
      */
-    public LoggerFactory child(Glassy obj) {
-        return child(obj.getGlassName());
+    public LoggerFactory type(Object obj) {
+        return name(obj.getClass().getSimpleName());
     }
+
+    //////////////////////////////////////////////////////
 
     private boolean allow(Level level) {
         Level allowed = m_level.get();

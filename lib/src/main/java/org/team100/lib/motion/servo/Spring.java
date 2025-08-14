@@ -2,7 +2,6 @@ package org.team100.lib.motion.servo;
 
 import java.util.function.DoubleUnaryOperator;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -15,13 +14,13 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
  * but not exactly.
  * https://docs.google.com/spreadsheets/d/1xRXfkmg8WwagG4IE5CBNJi9Cfs16iEP-pp94ZeJAe6o/edit?gid=0#gid=0
  */
-public class Spring implements DoubleUnaryOperator, Glassy {
+public class Spring implements DoubleUnaryOperator {
     // elevator height, elevator cg
     private final InterpolatingDoubleTreeMap table = new InterpolatingDoubleTreeMap();
     private final DoubleLogger m_log_springTorque;
 
     public Spring(LoggerFactory parent) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_springTorque = child.doubleLogger(Level.TRACE, "spring torque (Nm)");
         table.put(-0.113302, -10.0);
         table.put(0.34, -6.2);

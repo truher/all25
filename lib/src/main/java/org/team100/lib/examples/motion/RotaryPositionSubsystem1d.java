@@ -5,7 +5,6 @@ import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.FullStateFeedback;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.encoder.AS5048RotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
 import org.team100.lib.encoder.RotaryPositionSensor;
@@ -38,9 +37,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * * the angle of a shooter
  * 
  * This class extends SubsystemBase, to be compatible with the scheduler, and it
- * implements Glassy, so that the logger will use the class name.
+ * , so that the logger will use the class name.
  */
-public class RotaryPositionSubsystem1d extends SubsystemBase implements Glassy {
+public class RotaryPositionSubsystem1d extends SubsystemBase  {
     /**
      * It's useful for a subsystem to know about positional settings, so that all
      * the knowledge about the subsystem itself is contained here.
@@ -63,7 +62,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase implements Glassy {
     private final AngularPositionServo m_servo;
 
     public RotaryPositionSubsystem1d(LoggerFactory parent) {
-        LoggerFactory log = parent.child(this);
+        LoggerFactory log = parent.type(this);
 
         double positionGain = 4.0;
         double velocityGain = 0.11;

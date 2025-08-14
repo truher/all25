@@ -2,7 +2,6 @@ package org.team100.lib.commands.drivetrain;
 
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 /**
  * Rotate in place to the specified angle.
  */
-public class Rotate extends Command implements Glassy {
+public class Rotate extends Command  {
     /** For testing */
     private static final boolean DEBUG = false;
     private static final double kThetaToleranceRad = 0.02;

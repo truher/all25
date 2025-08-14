@@ -1,7 +1,6 @@
 package org.team100.lib.motion.drivetrain;
 
 import org.team100.lib.config.DriverSkill;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
@@ -31,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * There are four mutually exclusive drive methods.
  * We depend on CommandScheduler to enforce the mutex.
  */
-public class SwerveDriveSubsystem extends SubsystemBase implements Glassy, DriveSubsystemInterface {
+public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsystemInterface {
     // this produces a LOT of output, you should only enable it while you're looking
     // at it.
     private static final boolean DEBUG = false;
@@ -61,7 +60,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements Glassy, Drive
             SwerveLocal swerveLocal,
             Runnable cameraUpdater,
             SwerveLimiter limiter) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_gyro = gyro;
         m_poseEstimator = poseEstimator;
         m_swerveLocal = swerveLocal;
@@ -232,7 +231,8 @@ public class SwerveDriveSubsystem extends SubsystemBase implements Glassy, Drive
     @Override
     public void periodic() {
         // m_poseEstimator.periodic();
-        // 4/2/25 Joel removed this state resetter because it happens earlier in Robot.java
+        // 4/2/25 Joel removed this state resetter because it happens earlier in
+        // Robot.java
         // and i think we don't need to do it twice.
         // m_stateSupplier.reset();
         m_log_state.log(this::getState);

@@ -19,7 +19,7 @@ public class CANSparkEncoder implements IncrementalBareEncoder {
     private final OptionalDoubleLogger m_log_velocity;
 
     public CANSparkEncoder(LoggerFactory parent, CANSparkMotor motor) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_motor = motor;
         m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (rad)");
         m_log_velocity = child.optionalDoubleLogger(Level.TRACE, "velocity (rad_s)");

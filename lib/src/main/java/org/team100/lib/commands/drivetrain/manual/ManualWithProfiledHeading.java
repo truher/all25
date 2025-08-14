@@ -70,7 +70,7 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
             SwerveKinodynamics swerveKinodynamics,
             Supplier<Rotation2d> desiredRotation,
             Feedback100 thetaController) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_desiredRotation = desiredRotation;
         m_thetaFeedback = thetaController;

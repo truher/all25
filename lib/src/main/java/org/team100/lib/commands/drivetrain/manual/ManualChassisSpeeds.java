@@ -22,7 +22,7 @@ public class ManualChassisSpeeds implements ChassisSpeedDriver {
     private final ChassisSpeedsLogger m_log_chassis_speeds;
 
     public ManualChassisSpeeds(LoggerFactory parent, SwerveKinodynamics swerveKinodynamics) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_chassis_speeds = child.chassisSpeedsLogger(Level.TRACE, "chassis speeds");
         m_swerveKinodynamics = swerveKinodynamics;
     }

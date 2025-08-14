@@ -2,7 +2,6 @@ package org.team100.lib.motion.servo;
 
 import java.util.OptionalDouble;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.reference.Setpoints1d;
 
 /**
@@ -12,7 +11,7 @@ import org.team100.lib.reference.Setpoints1d;
  * this just takes setpoints, and, for onboard versions, computes feedback
  * control.
  */
-public interface AngularPositionServo extends Glassy {
+public interface AngularPositionServo  {
     /**
      * Zeros controller errors, sets setpoint to current position.
      *

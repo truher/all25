@@ -7,7 +7,6 @@ import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.FullStateFeedback;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.encoder.AS5048RotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
 import org.team100.lib.encoder.RotaryPositionSensor;
@@ -38,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * TODO: caller should specify the acceleration of the carriage, since that
  * affects "gravity".
  */
-public class Wrist2 extends SubsystemBase implements Glassy {
+public class Wrist2 extends SubsystemBase  {
     /**
      * Publish the elevator mechanism visualization to glass. This might be a little
      * bit slow, turn it off for comp.
@@ -66,7 +65,7 @@ public class Wrist2 extends SubsystemBase implements Glassy {
 
     /** carriage acceleration is reported by the elevator */
     public Wrist2(LoggerFactory parent, int wristID, DoubleSupplier carriageAccel) {
-        LoggerFactory logger = parent.child(this);
+        LoggerFactory logger = parent.type(this);
 
         PIDConstants wristPID = PIDConstants.makeVelocityPID(0.3); // 0.3
 

@@ -60,7 +60,7 @@ public abstract class CANSparkMotor implements BareMotor {
             Feedforward100 ff,
             PIDConstants pid) {
         m_motor = motor;
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_ff = ff;
         // make config synchronous so we can see the errors
         Rev100.crash(() -> m_motor.setCANTimeout(500));

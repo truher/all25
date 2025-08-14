@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.reference.TrajectoryReference;
 import org.team100.lib.trajectory.Trajectory100;
@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * 
  * The list can be relative to the current pose.
  */
-public class DriveWithTrajectoryList extends Command implements Glassy {
+public class DriveWithTrajectoryList extends Command  {
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final Function<Pose2d, List<Trajectory100>> m_trajectories;

@@ -1,6 +1,5 @@
 package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.logging.Level;
@@ -12,7 +11,7 @@ import org.team100.lib.util.Util;
 /**
  * Return feasible velocity, using a simple worst-case model (diagonal course).
  */
-public class FieldRelativeVelocityLimiter implements Glassy {
+public class FieldRelativeVelocityLimiter  {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_scale;
@@ -21,7 +20,7 @@ public class FieldRelativeVelocityLimiter implements Glassy {
     public FieldRelativeVelocityLimiter(
             LoggerFactory parent,
             BatterySagSpeedLimit limit) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_scale = child.doubleLogger(Level.TRACE, "scale");
         m_limits = limit;
     }

@@ -4,7 +4,6 @@ import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.Talon6Encoder;
 import org.team100.lib.logging.LoggerFactory;
@@ -21,7 +20,7 @@ import org.team100.lib.reference.Setpoints1d;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Elevator extends SubsystemBase implements Glassy {
+public class Elevator extends SubsystemBase {
     /**
      * Publish the elevator mechanism visualization to glass. This might be a little
      * bit slow, turn it off for comp.
@@ -46,11 +45,11 @@ public class Elevator extends SubsystemBase implements Glassy {
     private ScoringPosition m_targetPosition = ScoringPosition.NONE;
 
     public Elevator(LoggerFactory parent, int starboardID, int portID) {
-        LoggerFactory child = parent.child(this);
-        LoggerFactory starboardLogger = child.child("Starboard");
-        LoggerFactory portLogger = child.child("Port");
-        LoggerFactory starboardMotorLogger = child.child("Starboard Motor");
-        LoggerFactory portMotorLogger = child.child("Port Motor");
+        LoggerFactory child = parent.type(this);
+        LoggerFactory starboardLogger = child.name("Starboard");
+        LoggerFactory portLogger = child.name("Port");
+        LoggerFactory starboardMotorLogger = child.name("Starboard Motor");
+        LoggerFactory portMotorLogger = child.name("Port Motor");
 
         Profile100 profile = new TrapezoidProfile100(maxVel, maxAccel, kPositionTolerance);
         ProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);

@@ -10,7 +10,6 @@ import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
 import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
@@ -33,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 
  //3.6 2.83
-public class Embark extends Command implements Glassy {
+public class Embark extends Command  {
     /** While driving to scoring tag, pay attention only to very close tags. */
     private static final double kHeedRadiusM = 3;
 
@@ -118,7 +117,7 @@ public class Embark extends Command implements Glassy {
             double radius,
             ReefPoint point,
             boolean perpetual) {
-        LoggerFactory child = logger.child(this);
+        LoggerFactory child = logger.type(this);
         m_log_sector = child.stringLogger(Level.TRACE, "sector");
         m_log_goal = child.pose2dLogger(Level.TRACE, "goal");
         m_drive = drive;

@@ -2,7 +2,6 @@ package org.team100.lib.commands.drivetrain;
 
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
 import org.team100.lib.reference.TrajectoryReference;
 import org.team100.lib.trajectory.Trajectory100;
@@ -16,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * The starting point is fixed, obviously, so this command can
  * only be used from that point. It's kinda just for testing.
  */
-public class DriveWithTrajectory extends Command implements Glassy {
+public class DriveWithTrajectory extends Command  {
     private final DriveSubsystemInterface m_drive;
     private final SwerveController m_controller;
     private final Trajectory100 m_trajectory;

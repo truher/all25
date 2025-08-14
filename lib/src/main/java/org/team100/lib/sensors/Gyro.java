@@ -1,13 +1,11 @@
 package org.team100.lib.sensors;
 
-import org.team100.lib.dashboard.Glassy;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * Three-axis gyro, NWU.
  */
-public interface Gyro extends Glassy {
+public interface Gyro  {
     /**
      * Yaw in radians, NWU, counterclockwise positive.
      * Implementations should extrapolate using the yaw rate,

@@ -1,6 +1,5 @@
 package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -18,7 +17,7 @@ import org.team100.lib.util.Util;
  * the individual components, so if you exceed the rotational limit, both
  * rotation *and* translational speed will be reduced.
  */
-public class FieldRelativeAccelerationLimiter implements Glassy {
+public class FieldRelativeAccelerationLimiter  {
     private static final boolean DEBUG = false;
     
     private final DoubleLogger m_log_scale;
@@ -38,7 +37,7 @@ public class FieldRelativeAccelerationLimiter implements Glassy {
             SwerveKinodynamics limits,
             double cartesianScale,
             double alphaScale) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_scale = child.doubleLogger(Level.TRACE, "scale");
         m_log_accel = child.fieldRelativeAccelerationLogger(Level.TRACE, "accel");
         m_limits = limits;

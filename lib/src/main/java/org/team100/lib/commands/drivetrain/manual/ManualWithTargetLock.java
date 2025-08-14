@@ -59,7 +59,7 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
             Supplier<Translation2d> target,
             Feedback100 thetaController) {
         m_field_log = fieldLogger;
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_target = target;
         m_thetaController = thetaController;
