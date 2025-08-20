@@ -20,7 +20,7 @@ public class IndexerSubsystem extends SubsystemBase implements Indexer {
 
     
     public IndexerSubsystem(LoggerFactory parent, LinearMechanism linearMechanism, double maxAccel, double objectLengthM, double indexVelocityM_S) {
-        m_logger = parent.child(this);
+        m_logger = parent.type(this);
         m_objectLength = objectLengthM;
         kIndexerVelocityM_S = indexVelocityM_S;
         m_linearMechanism = linearMechanism;
@@ -49,11 +49,6 @@ public class IndexerSubsystem extends SubsystemBase implements Indexer {
 
     public OptionalDouble getVelocity() {
         return m_indexer.getVelocity();
-    }
-
-    @Override
-    public String getGlassName() {
-        return "Indexer";
     }
 
     @Override

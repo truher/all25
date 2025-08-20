@@ -3,7 +3,6 @@ package org.team100.frc2025.shooter.drumShooter;
 import java.util.OptionalDouble;
 
 import org.ejml.simple.UnsupportedOperation;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * Empirically it seems to take a second or so to spin
  * up, so set the acceleration a bit higher than that to start.
  */
-public class DrumShooter extends SubsystemBase implements Glassy {
+public class DrumShooter extends SubsystemBase {
 
     private final DoubleLogger m_leftlogger;
     private final DoubleLogger m_rightlogger;
@@ -40,7 +39,7 @@ public class DrumShooter extends SubsystemBase implements Glassy {
     public DrumShooter(
             LoggerFactory parent,
             ShooterCollection shooterCollection) {
-        LoggerFactory logger = parent.child(this);
+        LoggerFactory logger = parent.type(this);
         m_atVelocitylogger = logger.booleanLogger(Level.TRACE, "At velocity");
         m_leftlogger = logger.doubleLogger(Level.TRACE, "Left Shooter Desired");
         m_rightlogger = logger.doubleLogger(Level.TRACE, "Right Shooter Desired");
@@ -120,10 +119,5 @@ public class DrumShooter extends SubsystemBase implements Glassy {
     public void periodic() {
         atVelocity = atVeloctity();
         m_atVelocitylogger.log(() -> atVelocity);
-    }
-
-    @Override
-    public String getGlassName() {
-        return "DrumShooter";
     }
 }
