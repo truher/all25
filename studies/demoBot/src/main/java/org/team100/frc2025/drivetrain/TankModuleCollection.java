@@ -52,7 +52,7 @@ public class TankModuleCollection {
     public static TankModuleCollection get(
             LoggerFactory parent,
             int currentLimit) {
-        LoggerFactory collectionLogger = parent.child(kSwerveModules);
+        LoggerFactory collectionLogger = parent.name(kSwerveModules);
         switch (Identity.instance) {
             case DEMO_BOT:
                 Util.println("************** Custom Tank Module Modules, using in built encoders? **************");
@@ -80,8 +80,8 @@ public class TankModuleCollection {
                 Util.println("************** SIMULATED MODULES **************");
             default:
                 return new TankModuleCollection(
-                        Neo550Factory.simulatedDriveServo(collectionLogger.child(kLeft)),
-                        Neo550Factory.simulatedDriveServo(collectionLogger.child(kRight)));
+                        Neo550Factory.simulatedDriveServo(collectionLogger.name(kLeft)),
+                        Neo550Factory.simulatedDriveServo(collectionLogger.name(kRight)));
         }
     }
 

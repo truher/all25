@@ -23,7 +23,7 @@ public class ShooterCollection {
     public static ShooterCollection get(
         LoggerFactory parent,
         int currentLimit) {
-            LoggerFactory collectionLogger = parent.child(kShooter);
+            LoggerFactory collectionLogger = parent.name(kShooter);
             double shooterWheelDiameterM = .33;
             switch (Identity.instance) {
                 case DEMO_BOT:
@@ -34,8 +34,8 @@ public class ShooterCollection {
                 case BLANK:
                 default:
                     return new ShooterCollection(
-                        Neo550Factory.simulatedDriveServo(collectionLogger.child(kLeft)),
-                        Neo550Factory.simulatedDriveServo(collectionLogger.child(kRight)));
+                        Neo550Factory.simulatedDriveServo(collectionLogger.name(kLeft)),
+                        Neo550Factory.simulatedDriveServo(collectionLogger.name(kRight)));
                     }
     }
 

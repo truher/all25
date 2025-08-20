@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 
 import org.team100.frc2025.drivetrain.TankDriveSubsystem;
 import org.team100.lib.config.Identity;
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.util.NamedChooser;
 
@@ -27,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Use the mode supplier to choose which mode to use, e.g. using a Sendable
  * Chooser.
  */
-public class DriveManually extends Command implements Glassy {
+public class DriveManually extends Command {
  
     private static final SendableChooser<String> m_manualModeChooser = new NamedChooser<>("Manual Drive Mode") {
     };
