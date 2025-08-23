@@ -1,13 +1,12 @@
 package org.team100.frc2025.drivetrain;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class TankDriveSubsystem extends SubsystemBase implements Glassy {
+public class TankDriveSubsystem extends SubsystemBase {
     private final OptionalDoubleLogger m_leftlogger;
     private final OptionalDoubleLogger m_rightlogger;
     private final OptionalDoubleLogger m_rearLeftCurrentlogger;
@@ -20,7 +19,7 @@ public class TankDriveSubsystem extends SubsystemBase implements Glassy {
     public TankDriveSubsystem(
             LoggerFactory parent,
             TankModuleCollection modules) {
-        LoggerFactory logger = parent.child(this);
+        LoggerFactory logger = parent.type(this);
         m_leftlogger = logger.optionalDoubleLogger(Level.TRACE, "Left Drive Velocity M_S");
         m_rightlogger = logger.optionalDoubleLogger(Level.TRACE, "Right Drive Velocity M_S");
         m_rearLeftCurrentlogger = logger.optionalDoubleLogger(Level.TRACE, "Rear Left Drive Current (A)");
@@ -28,11 +27,6 @@ public class TankDriveSubsystem extends SubsystemBase implements Glassy {
         m_frontLeftCurrentlogger = logger.optionalDoubleLogger(Level.TRACE, "Front Left Drive Current (A)");
         m_frontRightCurrentlogger = logger.optionalDoubleLogger(Level.TRACE, "Front Right Drive Current (A)");
         m_modules = modules;
-    }
-
-    @Override
-    public String getGlassName() {
-        return "Tank Drive Subsystem";
     }
 
     @Override
