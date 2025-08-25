@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
-import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -18,8 +17,8 @@ import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.profile.TrapezoidProfile100;
-import org.team100.lib.profile.Profile100;
+import org.team100.lib.profile.incremental.Profile100;
+import org.team100.lib.profile.incremental.TrapezoidProfile100;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 
@@ -31,7 +30,7 @@ class ManualWithMinTimeHeadingTest {
     private static final double kDelta = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
-    private Rotation2d desiredRotation = GeometryUtil.kRotationZero;
+    private Rotation2d desiredRotation = Rotation2d.kZero;
 
     @Test
     void testModeSwitching() {
@@ -109,7 +108,7 @@ class ManualWithMinTimeHeadingTest {
         assertEquals(0, m_manualWithHeading.m_thetaSetpoint.v(), kDelta);
 
         // face towards +y
-        desiredRotation = GeometryUtil.kRotation90;
+        desiredRotation = Rotation2d.kCCW_90deg;
         // no user input
         DriverControl.Velocity twist1_1 = new DriverControl.Velocity(0, 0, 0);
 
@@ -173,7 +172,7 @@ class ManualWithMinTimeHeadingTest {
         m_manualWithHeading.reset(new SwerveModel());
 
         // want to face towards +y
-        desiredRotation = GeometryUtil.kRotation90;
+        desiredRotation = Rotation2d.kCCW_90deg;
         // no dtheta
 
         // no stick input
@@ -233,7 +232,7 @@ class ManualWithMinTimeHeadingTest {
         DriverControl.Velocity twist1_1 = new DriverControl.Velocity(0, 0, 1);
 
         SwerveModel currentState = new SwerveModel(
-                GeometryUtil.kPoseZero,
+                Pose2d.kZero,
                 new FieldRelativeVelocity(0, 0, 0));
         // no POV
         desiredRotation = null;
@@ -246,7 +245,7 @@ class ManualWithMinTimeHeadingTest {
 
         // already going full speed:
         currentState = new SwerveModel(
-                GeometryUtil.kPoseZero,
+                Pose2d.kZero,
                 new FieldRelativeVelocity(0, 0, 2.828));
 
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -257,7 +256,7 @@ class ManualWithMinTimeHeadingTest {
         // let go of the stick
         twist1_1 = new DriverControl.Velocity(0, 0, 0);
         currentState = new SwerveModel(
-                GeometryUtil.kPoseZero,
+                Pose2d.kZero,
                 new FieldRelativeVelocity(0, 0, 2.828));
 
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -285,7 +284,7 @@ class ManualWithMinTimeHeadingTest {
         DriverControl.Velocity twist1_1 = new DriverControl.Velocity(0, 0, 1);
 
         SwerveModel currentState = new SwerveModel(
-                GeometryUtil.kPoseZero,
+                Pose2d.kZero,
                 new FieldRelativeVelocity(0, 0, 0));
         // no POV
         desiredRotation = null;
@@ -298,7 +297,7 @@ class ManualWithMinTimeHeadingTest {
 
         // already going full speed:
         currentState = new SwerveModel(
-                GeometryUtil.kPoseZero,
+                Pose2d.kZero,
                 new FieldRelativeVelocity(0, 0, 2.828));
 
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -309,7 +308,7 @@ class ManualWithMinTimeHeadingTest {
         // let go of the stick
         twist1_1 = new DriverControl.Velocity(0, 0, 0);
         currentState = new SwerveModel(
-                GeometryUtil.kPoseZero,
+                Pose2d.kZero,
                 new FieldRelativeVelocity(0, 0, 2.828));
 
         v = m_manualWithHeading.apply(currentState, twist1_1);

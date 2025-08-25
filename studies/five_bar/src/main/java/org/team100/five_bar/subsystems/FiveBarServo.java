@@ -72,7 +72,7 @@ public class FiveBarServo extends SubsystemBase {
         Profile100 profile = new TrapezoidProfile100(
                 maxVel, maxAccel, kPositionTolerance);
 
-        LoggerFactory loggerP1 = logger.child("p1");
+        LoggerFactory loggerP1 = logger.name("p1");
         Falcon6Motor motorP1 = new Falcon6Motor(
                 loggerP1,
                 1,
@@ -98,7 +98,7 @@ public class FiveBarServo extends SubsystemBase {
                 mechP1,
                 refP1);
 
-        LoggerFactory loggerP5 = logger.child("p5");
+        LoggerFactory loggerP5 = logger.name("p5");
         Falcon6Motor motorP5 = new Falcon6Motor(
                 loggerP5,
                 2,

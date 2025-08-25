@@ -59,7 +59,7 @@ public class FiveBarCartesian extends SubsystemBase {
         PIDConstants pid = new PIDConstants();
         Feedforward100 ff = Feedforward100.zero();
 
-        LoggerFactory loggerP1 = logger.child("p1");
+        LoggerFactory loggerP1 = logger.name("p1");
         Falcon6Motor motorP1 = new Falcon6Motor(
                 loggerP1,
                 1,
@@ -78,7 +78,7 @@ public class FiveBarCartesian extends SubsystemBase {
                 0.0,
                 1.0);
 
-        LoggerFactory loggerP5 = logger.child("p5");
+        LoggerFactory loggerP5 = logger.name("p5");
         Falcon6Motor motorP5 = new Falcon6Motor(
                 loggerP5,
                 2,

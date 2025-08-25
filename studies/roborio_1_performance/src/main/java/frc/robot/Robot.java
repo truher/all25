@@ -53,8 +53,8 @@ public class Robot extends TimedRobot {
         LoggerFactory logger = logging.rootLogger;
         LoggerFactory fieldLogger = logging.fieldLogger;
 
-        LoggerFactory log = logger.child("Commands");
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.get(() -> 0.5);
+        LoggerFactory log = logger.name("Commands");
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.get();
         m_modules = SwerveModuleCollection.get(
                 log,
                 60,
@@ -83,7 +83,7 @@ public class Robot extends TimedRobot {
                     m_layout,
                     poseEstimator);
 
-            SwerveLimiter limiter = new SwerveLimiter(swerveKinodynamics, RobotController::getBatteryVoltage);
+            SwerveLimiter limiter = new SwerveLimiter(log, swerveKinodynamics, RobotController::getBatteryVoltage);
 
             m_drive = new SwerveDriveSubsystem(
                     fieldLogger,
@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
                     gyro,
                     poseEstimator,
                     swerveLocal,
-                    visionDataProvider,
+                    visionDataProvider::update,
                     limiter);
 
             holonomicController = SwerveControllerFactory.byIdentity(log);
