@@ -2,7 +2,6 @@ package org.team100.lib.controller.simple;
 
 import java.util.function.DoubleUnaryOperator;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -91,7 +90,7 @@ import edu.wpi.first.math.MathUtil;
  * It might be slower around the switching points, since it can call itself once
  * or twice, once per segment.
  */
-public class MinTimeController implements Glassy {
+public class MinTimeController {
 
     // how close to a boundary (e.g. switching curve, max v) to behave as if we were
     // "on" the boundary
@@ -157,7 +156,7 @@ public class MinTimeController implements Glassy {
         m_tolerance = tolerance;
         m_finish = finish;
         m_k = k;
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_log_mode = child.stringLogger(Level.TRACE, "mode");
     }
 

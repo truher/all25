@@ -6,7 +6,7 @@ plugins {
 sourceSets {
     main {
         java {
-            srcDir "../lib/src/main/java"
+            srcDir "../../lib/src/main/java"
         }
     }
 }

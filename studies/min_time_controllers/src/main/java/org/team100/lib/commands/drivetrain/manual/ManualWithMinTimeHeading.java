@@ -82,7 +82,7 @@ public class ManualWithMinTimeHeading implements FieldRelativeDriver {
             LoggerFactory parent,
             SwerveKinodynamics swerveKinodynamics,
             Supplier<Rotation2d> desiredRotation) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_desiredRotation = desiredRotation;
         m_latch = new HeadingLatch();

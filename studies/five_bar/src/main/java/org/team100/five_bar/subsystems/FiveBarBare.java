@@ -32,8 +32,8 @@ public class FiveBarBare extends SubsystemBase {
     private final BareMotor m_motorP5;
 
     public FiveBarBare(LoggerFactory logger) {
-        LoggerFactory loggerP1 = logger.child("p1");
-        LoggerFactory loggerP5 = logger.child("p5");
+        LoggerFactory loggerP1 = logger.name("p1");
+        LoggerFactory loggerP5 = logger.name("p5");
         
         switch (Identity.instance) {
             case COMP_BOT -> {

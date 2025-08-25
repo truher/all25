@@ -7,6 +7,8 @@ import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
 
+
+
 public class SepticSplineProfileTest {
     private static final boolean DEBUG = false;
     private static final double kDelta = 0.001;

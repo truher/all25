@@ -28,7 +28,7 @@ public class MinTimeDriveController implements HolonomicFieldRelativeController 
     private final Log m_log;
 
     public MinTimeDriveController(LoggerFactory parent, Log log) {
-        LoggerFactory child = parent.child(this);
+        LoggerFactory child = parent.type(this);
         m_xController = new MinTimeController(
                 child,
                 x -> x,
