@@ -1,6 +1,5 @@
 package org.team100.frc2025.shooter.pivot;
 
-import org.team100.lib.dashboard.Glassy;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -8,14 +7,14 @@ import org.team100.lib.motor.Neo550CANSparkMotor;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class PivotSubsystem extends SubsystemBase implements Glassy {
+public class PivotSubsystem extends SubsystemBase  {
     
     private final Neo550CANSparkMotor m_pivot;
     private final DoubleLogger m_logger;
     public PivotSubsystem(
             LoggerFactory parent,
             PivotCollection pivotCollection) {
-        LoggerFactory logger = parent.child(this);
+        LoggerFactory logger = parent.type(this);
         m_logger = logger.doubleLogger(Level.TRACE, "Pivot Position (rad)");
         m_pivot = pivotCollection.getPivot();
     }
@@ -51,10 +50,5 @@ public class PivotSubsystem extends SubsystemBase implements Glassy {
     @Override
     public void periodic() {
         m_logger.log(() -> getAngleRad());
-    }
-
-    @Override
-    public String getGlassName() {
-        return "Pivot";
     }
 }

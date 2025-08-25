@@ -15,7 +15,7 @@ public class IndexerServo extends SubsystemBase implements Indexer {
     private final int m_motorPhase;
 
     public IndexerServo(LoggerFactory parent, MotorPhase motorPhase, int channel) {
-        LoggerFactory logger = parent.child(this);
+        LoggerFactory logger = parent.type(this);
         if (MotorPhase.FORWARD.equals(motorPhase)) {
             m_motorPhase = 1;
         } else {
@@ -36,9 +36,4 @@ public class IndexerServo extends SubsystemBase implements Indexer {
     public void stop() {
         m_servo.setSpeed(0);
     } 
-
-    @Override
-    public String getGlassName() {
-        return "Indexer";
-    }
 }
