@@ -61,7 +61,7 @@ public class LynxArmSetup implements Runnable {
                         m_arm.up(), m_arm.openGrip(),
                         m_arm.moveXY(0.12, -0.15),
                         m_arm.down(), m_arm.closeGrip(), m_arm.up(),
-                        m_arm.moveXY(0.12, 0.15),
+                        m_arm.moveXY(0.1, -0.1),
                         m_arm.down(), m_arm.openGrip(), m_arm.up(),
                         m_arm.moveXY(0.26, 0.15),
                         m_arm.down(), m_arm.closeGrip(), m_arm.up(),
@@ -74,9 +74,9 @@ public class LynxArmSetup implements Runnable {
         // joystick
         // so that axes 4 (x) and 5 (y) are bound somewhere (e.g. WASD)
         m_arm.setDefaultCommand(m_arm.manual(
-                () -> -1.0 * ControlUtil.deadband(m_controller.getRightY(), 0.05, 1),
-                () -> -1.0 * ControlUtil.deadband(m_controller.getRightX(), 0.05, 1),
-                () -> -1.0 * ControlUtil.deadband(m_controller.getLeftY(), 0.05, 1)));
+                () -> -0.5 * ControlUtil.deadband(m_controller.getRightY(), 0.05, 1),
+                () -> -0.5 * ControlUtil.deadband(m_controller.getRightX(), 0.05, 1),
+                () -> -0.5 * ControlUtil.deadband(m_controller.getLeftY(), 0.05, 1)));
     }
 
     @Override

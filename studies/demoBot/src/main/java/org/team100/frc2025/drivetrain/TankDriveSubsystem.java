@@ -46,7 +46,7 @@ public class TankDriveSubsystem extends SubsystemBase {
      * 
      */
     public void set(double translationSpeed, double rotSpeed) {
-        double invertedRot = rotSpeed * -1.0;
+        double invertedRot = rotSpeed * -0.30;
         double leftSpeed = translationSpeed + invertedRot;
         double rightSpeed = translationSpeed - invertedRot;
         setModules(leftSpeed * kMaxSpeedM_S, rightSpeed * kMaxSpeedM_S);
@@ -59,7 +59,7 @@ public class TankDriveSubsystem extends SubsystemBase {
      * 
      */
     public void setRaw(double translationSpeed, double rotSpeed) {
-        double invertedRot = rotSpeed * -1.0;
+        double invertedRot = rotSpeed * -0.30;
         double leftSpeed = translationSpeed + invertedRot;
         double rightSpeed = translationSpeed - invertedRot;
         setModules(leftSpeed, rightSpeed);
