@@ -2,12 +2,15 @@
 
 # pylint: disable=E0611,R0902,R0903,R0913,R0914,W0212
 
+import os
 from typing import cast
 
+import ntcore
 import numpy as np
-from cv2 import undistortImagePoints, undistort
+from cv2 import imwrite, undistort, undistortImagePoints
 from numpy.typing import NDArray
-from robotpy_apriltag import AprilTagDetection, AprilTagDetector, AprilTagPoseEstimator
+from robotpy_apriltag import (AprilTagDetection, AprilTagDetector,
+                              AprilTagPoseEstimator)
 from typing_extensions import override
 
 from app.camera.camera_protocol import Camera, Request, Size
@@ -20,6 +23,8 @@ Mat = NDArray[np.uint8]
 
 
 class TagDetector(Interpreter):
+    IMAGE_DIR = "images"
+
     def __init__(
         self,
         identity: Identity,
@@ -27,12 +32,15 @@ class TagDetector(Interpreter):
         camera_num: int,
         display: Display,
         network: Network,
+        debug: bool = False,
     ) -> None:
+        """debug is very slow, writes apriltag detector debug images into the same filenames over and over, and also writes timestamped images for later analysis"""
         self.identity = identity
         self.cam = cam
         self.camera_num = camera_num
         self.display = display
         self.network = network
+        self.debug = debug
 
         self.mtx: Mat = cam.get_intrinsic()
         self.dist: Mat = cam.get_dist()
@@ -45,8 +53,26 @@ class TagDetector(Interpreter):
 
         self.at_detector = AprilTagDetector()
         config = self.at_detector.Config()
+        # some of the detection steps can be done in parallel; this
+        # should be the same as the number of cores on the machine,
+        # which for the Raspberry Pi 5 is four.
         config.numThreads = 4
+        # sharpening kernel is [0,-1,0;-1,4,-1;0,-1,0], see apriltag.c
+        # this makes adjacent pixels more different.
+        config.decodeSharpening = 0.0
+        # do not decimate: improves far-away (small) detections
+        config.quadDecimate = 1.0
+        # stddev of the blur kernel in pixels: seems to help with small tags
+        config.quadSigma = 0.0
+        if self.debug:
+            config.debug = True
         self.at_detector.setConfig(config)
+        qtp = self.at_detector.QuadThresholdParameters()
+        # The apriltag default is 5.  WPI overrides this
+        # with 300, which prevents far-away detections.
+        # So set it back to 5.
+        qtp.minClusterPixels = 5
+        self.at_detector.setQuadThresholdParameters(qtp)
         self.at_detector.addFamily("tag36h11")
 
         if identity == Identity.DIST_TEST:
@@ -68,6 +94,12 @@ class TagDetector(Interpreter):
         # TODO: move the identity part of this path to the Network object
         path = "vision/" + identity.value + "/" + str(camera_num)
         self._blips = network.get_blip_sender(path + "/blips")
+        # to keep track of images to write
+        self.img_ts_sec = 0
+        if self.debug:
+            # make a place to put example images
+            if not os.path.exists(TagDetector.IMAGE_DIR):
+                os.mkdir(TagDetector.IMAGE_DIR)
 
     @override
     def analyze(self, req: Request) -> None:
@@ -81,22 +113,25 @@ class TagDetector(Interpreter):
             # this  makes a view, very fast (150 ns)
             img: Mat = img.reshape((self.height, self.width))  # type:ignore
 
+            if self.debug:
+                # Write some of the files for later analysis (e.g. calibration)
+                # To retrieve these files, use, e.g.:
+                # scp pi@10.1.0.11:images/* .
+                # These will accumulate forever so remember to clean it out:
+                # ssh pi@10.1.0.11 "rm images/img*"
+                now_us = ntcore._now()  # pylint:disable=W0212
+                now_s = now_us // 1000000  # once per second
+                if now_s > self.img_ts_sec:
+                    self.img_ts_sec = now_s
+                    filename = TagDetector.IMAGE_DIR + "/img" + str(now_s) + ".png"
+                    imwrite(filename, img)
+
             #######
             #
             # uncomment this line to undistort the whole image, for debugging
             # img = undistort(img, self.mtx, self.dist)
             #
             #######
-
-            # TODO: crop regions that never have targets
-            # this also makes a view, very fast (150 ns)
-            # img = img[int(self.height / 4) : int(3 * self.height / 4), : self.width]
-            # for now use the full frame
-            # TODO: probably remove this
-            # if self.identity == Identity.SHOOTER:
-            #     img = img[62:554, : self.width]
-            # else:
-            #     img = img[: self.height, : self.width]
 
             result: list[AprilTagDetection] = self.at_detector.detect(img.data)
 
@@ -120,7 +155,7 @@ class TagDetector(Interpreter):
                 # undistortPoints wants [[x0,y0],[x1,y1],...]
                 pairs = np.reshape(corners, [4, 2])
                 pairs = undistortImagePoints(pairs, self.mtx, self.dist)
-                
+
                 # the estimator wants [x0, y0, x1, y1, ...]
                 # pairs has an extra dimension, so redo it:
                 corners = (

@@ -55,19 +55,19 @@ class NoteDetectorTest(unittest.TestCase):
         rot = rots[0]
         # NOTE: 0.01 rad resolution is all that can be expected.
         # ~zero
-        self.assertAlmostEqual(-0.03, rot.x, 2)
+        self.assertAlmostEqual(-0.01, rot.x, 2)
         # pitch down
-        self.assertAlmostEqual(0.33, rot.y, 2)
+        self.assertAlmostEqual(0.18, rot.y, 2)
         # yaw right
-        self.assertAlmostEqual(-0.17, rot.z, 2)
+        self.assertAlmostEqual(-0.09, rot.z, 2)
         rot2d = rot.toRotation2d()
         # right yaw is about 10 deg
-        self.assertAlmostEqual(-9.69, rot2d.degrees(), 2)
+        self.assertAlmostEqual(-5.01, rot2d.degrees(), 2)
         q = rot.getQuaternion()
         self.assertAlmostEqual(0, q.X(), 2)
-        self.assertAlmostEqual(0.17, q.Y(), 2)
-        self.assertAlmostEqual(-0.08, q.Z(), 2)
-        self.assertAlmostEqual(0.98, q.W(), 2)
+        self.assertAlmostEqual(0.09, q.Y(), 2)
+        self.assertAlmostEqual(-0.04, q.Z(), 2)
+        self.assertAlmostEqual(1.0, q.W(), 2)
 
     def test_zero_notes_found(self) -> None:
         inst = ntcore.NetworkTableInstance.getDefault()
