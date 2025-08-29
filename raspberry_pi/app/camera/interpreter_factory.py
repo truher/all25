@@ -51,7 +51,6 @@ class InterpreterFactory:
                 | Identity.LEFTAMP
                 | Identity.SHOOTER
                 | Identity.GLOBAL_GAME_PIECE 
-                | Identity.DEV
                 | Identity.SWERVE_RIGHT
                 | Identity.SWERVE_LEFT
                 | Identity.FUNNEL
@@ -64,6 +63,13 @@ class InterpreterFactory:
                     "tag" + str(camera_num),
                 )
                 return TagDetector(identity, cam, camera_num, display, network)
+            case (Identity.DEV):
+                display = RealDisplay(
+                    int(scale * size.width),
+                    int(scale * size.height),
+                    "tag" + str(camera_num),
+                )
+                return TagDetector(identity, cam, camera_num, display, network, True)
             case (
                 # Identity.DEV
                 Identity.CORAL_RIGHT

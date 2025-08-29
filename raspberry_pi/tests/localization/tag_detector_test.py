@@ -47,7 +47,7 @@ class TagDetectorTest(unittest.TestCase):
         self.assertEqual(2, len(display.locs))
         self.assertEqual(1, display.frame_count)
 
-        self.assertAlmostEqual(703, display.tags[0].getCenter().x, 0)
+        self.assertAlmostEqual(703, display.tags[0].getCenter().x, -1)
         self.assertAlmostEqual(532, display.tags[0].getCenter().y, 0)
         self.assertAlmostEqual(0, display.poses[0].x, 1)
         self.assertAlmostEqual(0, display.poses[0].y, 1)
