@@ -12,7 +12,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 
 /**
  * Lynxmotion AL5D trainer board.
@@ -61,6 +64,9 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
     private final CalibratedServo m_grip;
 
     private final LynxArmKinematics m_kinematics;
+
+    private boolean distanceMode;
+    private final double MODE_BARRIER = 2;
 
     public LynxArm(LynxArmKinematics kinematics) {
         m_kinematics = kinematics;
@@ -121,6 +127,8 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
             System.out.println("-> initializing done");
     }
 
+
+
     /**
      * Sets the end-effector pose.
      * 
@@ -133,6 +141,7 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
      * 
      * TODO: use the previous value for indeterminate axes.
      */
+
     public void setPosition(Pose3d end) {
         if (DEBUG)
             System.out.println("setPosition()");
@@ -202,6 +211,27 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         if (DEBUG)
             System.out.printf("p6: %s\n", Util.poseStr(p.p6()));
         return p;
+    }
+
+    public void changeMode() {
+        Pose3d currentPose = this.getPosition().p6();
+        
+        double x = currentPose.getX();
+        double y = currentPose.getY();
+        double r = Math.hypot(x, y);
+
+        if (r < MODE_BARRIER)
+            distanceMode = true;
+        else
+            distanceMode = false;
+    }
+
+    public boolean getDistanceMode(){
+        return distanceMode;
+    }
+
+    public Command changeModeCmd() {
+        return runOnce(this::changeMode);
     }
 
     public Command up() {

@@ -93,13 +93,21 @@ class FakeCamera(Camera):
 
     @override
     def get_intrinsic(self) -> Mat:
+        # convenient for experiments related to the GS camera
         return np.array(
             [
-                [480, 0, self.w / 2],
-                [0, 480, self.h / 2],
+                [935, 0, self.w / 2],
+                [0, 935, self.h / 2],
                 [0, 0, 1],
             ]
         )
+        # return np.array(
+        #     [
+        #         [480, 0, self.w / 2],
+        #         [0, 480, self.h / 2],
+        #         [0, 0, 1],
+        #     ]
+        # )
 
     @override
     def get_dist(self) -> Mat:

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import org.team100.lib.hid.ControlUtil;
+import org.team100.lib.motion.lynxmotion_arm.AnalyticLynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.NumericLynxArmKinematics;
 
@@ -22,7 +23,10 @@ public class LynxArmSetup implements Runnable {
         // 0.187, 0.111);
 
         // numeric kinematics produce weird artifacts in the visualizer
-        LynxArmKinematics kinematics = new NumericLynxArmKinematics();
+        // Newton Rafston thing-a-ma-jig
+        //LynxArmKinematics kinematics = new NumericLynxArmKinematics();
+        // Geometry based positioning
+        LynxArmKinematics kinematics = AnalyticLynxArmKinematics.real();
 
         m_arm = new LynxArm(kinematics);
         m_viz = new LynxArmVisualizer(m_arm::getPosition);
@@ -69,6 +73,16 @@ public class LynxArmSetup implements Runnable {
                         m_arm.down(), m_arm.openGrip(), m_arm.up(),
                         m_arm.moveXY(0.12, -0.15)));
 
+
+
+        new Trigger(m_arm::getDistanceMode).onChange(     
+                       Commands.sequence(
+                        m_arm.up(),
+                        m_arm.changeModeCmd(),
+                        m_arm.down()
+                ));
+
+        
         // m_arm.setDefaultCommand(m_arm.moveHome());
         // for this to work in simulation you need to configure the sim gui keyboard
         // joystick
