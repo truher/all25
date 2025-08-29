@@ -40,6 +40,9 @@
 			"edu.wpi.first.math.proto.*",
 			"edu.wpi.first.math.**.proto.*",
 			"edu.wpi.first.math.**.struct.*"
-		]
+		],
+		"editor.minimap.enabled": false,
+		"editor.inlayHints.enabled": "off",
+		"workbench.colorTheme": "Default Light Modern"
 	}
 }

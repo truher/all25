@@ -51,7 +51,7 @@ public class RobotContainer {
 
         final DriverControl driverControl = new DriverControlProxy(logger, async);
 
-        final LoggerFactory sysLog = logger.child("Subsystems");
+        final LoggerFactory sysLog = logger.name("Subsystems");
         
         m_drive = new TankDriveSubsystem(fieldLogger, TankModuleCollection.get(fieldLogger, 20));
         m_drive.setDefaultCommand(new DriveManually(driverControl::velocity, m_drive));

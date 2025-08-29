@@ -22,7 +22,7 @@ public class PivotCollection {
             LoggerFactory parent,
             int currentLimit
             ) {
-        LoggerFactory collectionLogger = parent.child(kPivot);
+        LoggerFactory collectionLogger = parent.name(kPivot);
         switch (Identity.instance) {
             case DEMO_BOT:
             //TODO get canID, gearRatio, p values, and gravityNm
