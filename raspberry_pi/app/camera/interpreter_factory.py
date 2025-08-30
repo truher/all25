@@ -69,7 +69,7 @@ class InterpreterFactory:
                     int(scale * size.height),
                     "tag" + str(camera_num),
                 )
-                return TagDetector(identity, cam, camera_num, display, network, True)
+                return TagDetector(identity, cam, camera_num, display, network, False)
             case (
                 # Identity.DEV
                 Identity.CORAL_RIGHT
