@@ -8,6 +8,7 @@ from app.dashboard.fake_display import FakeDisplay
 from app.dashboard.real_display import RealDisplay
 from app.localization.combined_detector import CombinedDetector
 from app.localization.note_detector import NoteDetector
+from app.localization.null_detector import NullDetector
 from app.localization.tag_detector import TagDetector
 from app.network.network import Network
 
@@ -69,6 +70,7 @@ class InterpreterFactory:
                     int(scale * size.height),
                     "tag" + str(camera_num),
                 )
+                # return NullDetector(cam, display)
                 return TagDetector(identity, cam, camera_num, display, network, False)
             case (
                 # Identity.DEV
