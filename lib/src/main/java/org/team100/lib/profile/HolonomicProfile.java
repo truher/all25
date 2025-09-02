@@ -31,11 +31,11 @@ public class HolonomicProfile {
         EXP
     }
 
-    private static final Profile kProfile = Profile.P100;
+    private static final Profile PROFILE = Profile.P100;
     /** For testing */
     private static final boolean DEBUG = false;
     private static final double ETA_TOLERANCE = 0.02;
-    private static final double kDt = TimedRobot100.LOOP_PERIOD_S;
+    private static final double DT = TimedRobot100.LOOP_PERIOD_S;
 
     private final Profile100 px;
     private final Profile100 py;
@@ -68,8 +68,8 @@ public class HolonomicProfile {
             double aScale,
             double omegaScale,
             double alphaScale) {
-        logger.name("HolonomicProfile").stringLogger(Level.TRACE, "profile").log(() -> kProfile.name());
-        switch (kProfile) {
+        logger.name("HolonomicProfile").stringLogger(Level.TRACE, "profile").log(() -> PROFILE.name());
+        switch (PROFILE) {
             case EXP -> {
                 return currentLimitedExponential(
                         kinodynamics.getMaxDriveVelocityM_S() * vScale,
@@ -141,15 +141,20 @@ public class HolonomicProfile {
                 new CurrentLimitedExponentialProfile(maxXYVel, limitedAlpha, stallAlpha));
     }
 
-    /** Reset the scale factors. */
+    /**
+     * Reset the scale factors.
+     * 
+     * @param i initial
+     * @param g goal
+     */
     public void solve(SwerveModel i, SwerveModel g) {
         // first find the max ETA
         if (DEBUG) {
             Util.printf("ix %s gx %s\n", i.x(), g.x());
         }
-        ResultWithETA rx = px.calculateWithETA(kDt, i.x().control(), g.x());
-        ResultWithETA ry = py.calculateWithETA(kDt, i.y().control(), g.y());
-        ResultWithETA rtheta = ptheta.calculateWithETA(kDt, i.theta().control(), g.theta());
+        ResultWithETA rx = px.calculateWithETA(DT, i.x().control(), g.x());
+        ResultWithETA ry = py.calculateWithETA(DT, i.y().control(), g.y());
+        ResultWithETA rtheta = ptheta.calculateWithETA(DT, i.theta().control(), g.theta());
         if (DEBUG) {
             Util.printf("rx %.3f ry %.3f rtheta %.3f\n", rx.etaS(), ry.etaS(), rtheta.etaS());
         }
@@ -157,9 +162,9 @@ public class HolonomicProfile {
         slowETA = Math.max(slowETA, ry.etaS());
         slowETA = Math.max(slowETA, rtheta.etaS());
 
-        double sx = px.solve(kDt, i.x().control(), g.x(), slowETA, ETA_TOLERANCE);
-        double sy = py.solve(kDt, i.y().control(), g.y(), slowETA, ETA_TOLERANCE);
-        double stheta = ptheta.solve(kDt, i.theta().control(), g.theta(), slowETA, ETA_TOLERANCE);
+        double sx = px.solve(DT, i.x().control(), g.x(), slowETA, ETA_TOLERANCE);
+        double sy = py.solve(DT, i.y().control(), g.y(), slowETA, ETA_TOLERANCE);
+        double stheta = ptheta.solve(DT, i.theta().control(), g.theta(), slowETA, ETA_TOLERANCE);
 
         if (DEBUG) {
             Util.printf("sx %.3f sy %.3f stheta %.3f\n", sx, sy, stheta);
@@ -170,23 +175,29 @@ public class HolonomicProfile {
         pptheta = ptheta.scale(stheta);
     }
 
-    /** Compute the control for the end of the next time step */
+    /**
+     * Compute the control for the end of the next time step.
+     * 
+     * @param i initial
+     * @param g goal
+     * @return control
+     */
     public SwerveControl calculate(SwerveModel i, SwerveModel g) {
         if (i == null || g == null) {
             // this can happen on startup when the initial state hasn't yet been defined,
-            // but the memo refresher is trying to update the references.
+            // but the cache refresher is trying to update the references.
             return SwerveControl.zero();
         }
         if (DEBUG) {
             Util.printf("initial %s goal %s\n", i, g);
         }
-        Control100 stateX = ppx.calculate(kDt, i.x().control(), g.x());
-        Control100 stateY = ppy.calculate(kDt, i.y().control(), g.y());
+        Control100 stateX = ppx.calculate(DT, i.x().control(), g.x());
+        Control100 stateY = ppy.calculate(DT, i.y().control(), g.y());
         // theta is periodic; choose a setpoint angle near the goal.
         Model100 theta = new Model100(
                 MathUtil.angleModulus(i.theta().x() - g.theta().x()) + g.theta().x(),
                 i.theta().v());
-        Control100 stateTheta = pptheta.calculate(kDt, theta.control(), g.theta());
+        Control100 stateTheta = pptheta.calculate(DT, theta.control(), g.theta());
         return new SwerveControl(stateX, stateY, stateTheta);
     }
 }

@@ -16,14 +16,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 class SwerveControlTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testTransform() {
         Pose2d p = new Pose2d(new Translation2d(1, 1), new Rotation2d(1));
         FieldRelativeVelocity t = new FieldRelativeVelocity(1, 1, 1);
         SwerveControl s = new SwerveControl(p, t);
-        assertEquals(1, s.x().x(), kDelta);
+        assertEquals(1, s.x().x(), DELTA);
     }
 
     @Test
@@ -34,12 +34,12 @@ class SwerveControlTest {
                                 new Pose2d(0, 0, new Rotation2d()),
                                 new MotionDirection(0, 0, 0), 0, 0),
                         0, 0, 0));
-        assertEquals(0, s.x().x(), kDelta);
-        assertEquals(0, s.x().v(), kDelta);
-        assertEquals(0, s.x().a(), kDelta);
-        assertEquals(0, s.y().x(), kDelta);
-        assertEquals(0, s.y().v(), kDelta);
-        assertEquals(0, s.y().a(), kDelta);
+        assertEquals(0, s.x().x(), DELTA);
+        assertEquals(0, s.x().v(), DELTA);
+        assertEquals(0, s.x().a(), DELTA);
+        assertEquals(0, s.y().x(), DELTA);
+        assertEquals(0, s.y().v(), DELTA);
+        assertEquals(0, s.y().a(), DELTA);
     }
 
     @Test
@@ -50,12 +50,12 @@ class SwerveControlTest {
                                 new Pose2d(0, 0, new Rotation2d()),
                                 new MotionDirection(0, 0, 0), 0, 0),
                         0, 0, 1));
-        assertEquals(0, s.x().x(), kDelta);
-        assertEquals(0, s.x().v(), kDelta);
-        assertEquals(1, s.x().a(), kDelta);
-        assertEquals(0, s.y().x(), kDelta);
-        assertEquals(0, s.y().v(), kDelta);
-        assertEquals(0, s.y().a(), kDelta);
+        assertEquals(0, s.x().x(), DELTA);
+        assertEquals(0, s.x().v(), DELTA);
+        assertEquals(1, s.x().a(), DELTA);
+        assertEquals(0, s.y().x(), DELTA);
+        assertEquals(0, s.y().v(), DELTA);
+        assertEquals(0, s.y().a(), DELTA);
     }
 
     @Test
@@ -66,12 +66,12 @@ class SwerveControlTest {
                                 new Pose2d(0, 0, new Rotation2d()),
                                 new MotionDirection(1, 0, 0), 0, 0),
                         0, 1, 0));
-        assertEquals(0, s.x().x(), kDelta);
-        assertEquals(1, s.x().v(), kDelta);
-        assertEquals(0, s.x().a(), kDelta);
-        assertEquals(0, s.y().x(), kDelta);
-        assertEquals(0, s.y().v(), kDelta);
-        assertEquals(0, s.y().a(), kDelta);
+        assertEquals(0, s.x().x(), DELTA);
+        assertEquals(1, s.x().v(), DELTA);
+        assertEquals(0, s.x().a(), DELTA);
+        assertEquals(0, s.y().x(), DELTA);
+        assertEquals(0, s.y().v(), DELTA);
+        assertEquals(0, s.y().a(), DELTA);
     }
 
     /** +x motion, positive curvature => +y accel. */
@@ -83,12 +83,12 @@ class SwerveControlTest {
                                 new Pose2d(0, 0, new Rotation2d()),
                                 new MotionDirection(1, 0, 0), 1, 0),
                         0, 1, 0));
-        assertEquals(0, s.x().x(), kDelta);
-        assertEquals(1, s.x().v(), kDelta);
-        assertEquals(0, s.x().a(), kDelta);
-        assertEquals(0, s.y().x(), kDelta);
-        assertEquals(0, s.y().v(), kDelta);
-        assertEquals(1, s.y().a(), kDelta);
+        assertEquals(0, s.x().x(), DELTA);
+        assertEquals(1, s.x().v(), DELTA);
+        assertEquals(0, s.x().a(), DELTA);
+        assertEquals(0, s.y().x(), DELTA);
+        assertEquals(0, s.y().v(), DELTA);
+        assertEquals(1, s.y().a(), DELTA);
     }
 
     @Test
@@ -97,9 +97,9 @@ class SwerveControlTest {
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kPi),
                 new FieldRelativeVelocity(1, 0, 0));
         ChassisSpeeds speeds = state.chassisSpeeds();
-        assertEquals(-1, speeds.vxMetersPerSecond, kDelta);
-        assertEquals(0, speeds.vyMetersPerSecond, kDelta);
-        assertEquals(0, speeds.omegaRadiansPerSecond, kDelta);
+        assertEquals(-1, speeds.vxMetersPerSecond, DELTA);
+        assertEquals(0, speeds.vyMetersPerSecond, DELTA);
+        assertEquals(0, speeds.omegaRadiansPerSecond, DELTA);
     }
 
     @Test
@@ -108,8 +108,8 @@ class SwerveControlTest {
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kCCW_Pi_2),
                 new FieldRelativeVelocity(1, 0, 1));
         ChassisSpeeds speeds = state.chassisSpeeds();
-        assertEquals(0, speeds.vxMetersPerSecond, kDelta);
-        assertEquals(-1, speeds.vyMetersPerSecond, kDelta);
-        assertEquals(1, speeds.omegaRadiansPerSecond, kDelta);
+        assertEquals(0, speeds.vxMetersPerSecond, DELTA);
+        assertEquals(-1, speeds.vyMetersPerSecond, DELTA);
+        assertEquals(1, speeds.omegaRadiansPerSecond, DELTA);
     }
 }

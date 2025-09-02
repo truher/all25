@@ -11,14 +11,14 @@ import edu.wpi.first.math.numbers.N1;
 
 /** This is just so I understand what it does */
 class AngleStatisticsTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testWithoutWrapping() {
         Matrix<N1, N1> a = VecBuilder.fill(3.0 * Math.PI / 4);
         Matrix<N1, N1> b = VecBuilder.fill(Math.PI / 4);
         Matrix<N1, N1> c = AngleStatistics.angleResidual(a, b, 0);
-        assertEquals(Math.PI / 2, c.get(0, 0), kDelta);
+        assertEquals(Math.PI / 2, c.get(0, 0), DELTA);
     }
 
     @Test
@@ -26,7 +26,7 @@ class AngleStatisticsTest {
         Matrix<N1, N1> a = VecBuilder.fill(3 * Math.PI / 4);
         Matrix<N1, N1> b = VecBuilder.fill(-3 * Math.PI / 4);
         Matrix<N1, N1> c = AngleStatistics.angleResidual(a, b, 0);
-        assertEquals(-1.0 * Math.PI / 2, c.get(0, 0), kDelta);
+        assertEquals(-1.0 * Math.PI / 2, c.get(0, 0), DELTA);
     }
 
 }

@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Debug;
+import org.team100.lib.util.Util;
 
-public class CurrentLimitedExponentialProfileTest implements Debug {
+public class CurrentLimitedExponentialProfileTest {
+    private static final boolean DEBUG = false;
+
     /**
      * Just to see what it looks like.
      */
@@ -28,7 +30,8 @@ public class CurrentLimitedExponentialProfileTest implements Debug {
         for (int i = 0; i < 150; ++i) {
             tt += 0.02;
             sample = profile.calculate(0.02, sample, end);
-            debug("%5.3f %5.3f %5.3f\n", tt, sample.x(), sample.v());
+            if (DEBUG)
+                Util.printf("%5.3f %5.3f %5.3f\n", tt, sample.x(), sample.v());
         }
     }
 
@@ -61,10 +64,4 @@ public class CurrentLimitedExponentialProfileTest implements Debug {
                         new Control100(0, -1.1, -1)));
 
     }
-
-    @Override
-    public boolean debug() {
-        return false;
-    }
-
 }

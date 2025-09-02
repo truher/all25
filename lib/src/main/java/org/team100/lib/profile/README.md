@@ -1,5 +1,7 @@
 # profile
 
+The `lib.profile` package supports "profiled" motion.
+
 Team 100 profiles are stateless incremental reference generators:
 you construct a profile with constraints (e.g. on velocity)
 and then give the profile a setpoint: it produces the next setpoint.

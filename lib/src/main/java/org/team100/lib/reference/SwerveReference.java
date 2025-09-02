@@ -11,10 +11,16 @@ public interface SwerveReference {
      */
     void initialize(SwerveModel measurement);
 
-    /** Reference for the current time. */
+    /**
+     * Reference for the current time. This can be null (e.g. between instantiation
+     * and initialization).
+     */
     SwerveModel current();
 
-    /** Reference for 0.02 sec in the future. */
+    /**
+     * Reference for 0.02 sec in the future. This can be null (e.g. between
+     * instantiation and initialization).
+     */
     SwerveModel next();
 
     boolean done();

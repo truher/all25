@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
+import org.team100.lib.gyro.MockGyro;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -11,7 +12,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
-import org.team100.lib.sensors.MockGyro;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,7 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class SwerveDrivePoseEstimator100PerformanceTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     private final Pose2d visionRobotPoseMeters = new Pose2d(1, 0, Rotation2d.kZero);
@@ -66,13 +66,13 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
 
         // fill the buffer with odometry
         double t = 0.0;
-        double duration = SwerveDrivePoseEstimator100.kBufferDuration;
+        double duration = SwerveDrivePoseEstimator100.BUFFER_DURATION;
         while (t < duration) {
             poseEstimator.put(t, Rotation2d.kZero, 0, p(t));
             t += 0.02;
         }
         assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), kDelta);
+        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
 
         // add a very old vision estimate, which triggers replay of the entire buffer.
         int iterations = 100000;
@@ -86,7 +86,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
         assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), kDelta);
+        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
 
         // add a recent vision estimate, which triggers replay of a few samples.
         iterations = 1000000;
@@ -100,6 +100,6 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
         assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), kDelta);
+        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
     }
 }

@@ -9,7 +9,7 @@ import org.team100.lib.util.Util;
 
 class TrapezoidProfileWPITest {
     private static final boolean actuallyPrint = false;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     private void dump(double tt, Control100 sample) {
         if (actuallyPrint)
@@ -31,8 +31,8 @@ class TrapezoidProfileWPITest {
         sample = profileX.calculate(0.02, sample, end);
         tt += 0.02;
         dump(tt, sample);
-        assertEquals(0, sample.x(), kDelta);
-        assertEquals(0.04, sample.v(), kDelta);
+        assertEquals(0, sample.x(), DELTA);
+        assertEquals(0.04, sample.v(), DELTA);
 
         // step to the middle of the profile
         for (double t = 0; t < 0.68; t += 0.02) {

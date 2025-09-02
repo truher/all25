@@ -20,4 +20,19 @@ public record SwerveModuleDeltas(
                 rearRight
         };
     }
+
+    /**
+     * The inverse kinematics wants this to represent a geodesic, which
+     * means that the steering doesn't change between start and end.
+     */
+    public static SwerveModuleDeltas modulePositionDelta(
+            SwerveModulePositions start,
+            SwerveModulePositions end) {
+        return new SwerveModuleDeltas(
+                SwerveModuleDelta.delta(start.frontLeft(), end.frontLeft()),
+                SwerveModuleDelta.delta(start.frontRight(), end.frontRight()),
+                SwerveModuleDelta.delta(start.rearLeft(), end.rearLeft()),
+                SwerveModuleDelta.delta(start.rearRight(), end.rearRight()));
+    }
+
 }

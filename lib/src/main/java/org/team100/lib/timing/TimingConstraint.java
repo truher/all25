@@ -37,7 +37,7 @@ public interface TimingConstraint {
     MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocityM_S);
 
     class MinMaxAcceleration {
-        public static final MinMaxAcceleration kNoLimits = new MinMaxAcceleration();
+        public static final MinMaxAcceleration NO_LIMITS = new MinMaxAcceleration();
 
         private final double m_minAccel;
         private final double m_maxAccel;

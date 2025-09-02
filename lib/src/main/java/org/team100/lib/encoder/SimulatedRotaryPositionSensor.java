@@ -2,11 +2,11 @@ package org.team100.lib.encoder;
 
 import java.util.OptionalDouble;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
-import org.team100.lib.util.Takt;
 
 import edu.wpi.first.math.MathUtil;
 

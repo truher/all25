@@ -5,8 +5,8 @@ import java.util.Objects;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveDriveKinematics100;
+import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleDeltas;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
-import org.team100.lib.util.DriveUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -67,7 +67,7 @@ class InterpolationRecord implements Interpolatable<InterpolationRecord> {
         // Create a twist to represent the change based on the interpolated sensor
         // inputs.
         Twist2d twist = m_kinematics.toTwist2d(
-                DriveUtil.modulePositionDelta(m_wheelPositions, wheelLerp));
+                SwerveModuleDeltas.modulePositionDelta(m_wheelPositions, wheelLerp));
         Pose2d pose = m_state.pose().exp(twist);
 
         // these lerps are wrong but maybe close enough

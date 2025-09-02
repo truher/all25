@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.team100.lib.motion.drivetrain.kinodynamics.struct.SwerveModulePosition100Struct;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,6 +22,7 @@ public class SwerveModulePosition100
         implements Comparable<SwerveModulePosition100>,
         Interpolatable<SwerveModulePosition100>,
         StructSerializable {
+    private static final boolean DEBUG = false;
     /** Distance measured by the wheel of the module. */
     public double distanceMeters;
 
@@ -108,6 +110,31 @@ public class SwerveModulePosition100
         // both start and end are known, so interpolate.
         Rotation2d angleLerp = this.angle.get().interpolate(endValue.angle.get(), t);
         return new SwerveModulePosition100(distLerp, Optional.of(angleLerp));
-
     }
+
+    /**
+     * Given the start position, roll in the delta direction by the delta distance.
+     * Note: this ignores the start direction, and so can produce strange results if
+     * the difference between start and end angles is large.
+     */
+    public SwerveModulePosition100 plus(SwerveModuleDelta delta) {
+        double posM = distanceMeters + delta.distanceMeters;
+        if (delta.angle.isPresent()) {
+            if (DEBUG) {
+                if (angle.isPresent()) {
+                    Rotation2d angleDiff = delta.angle.get().minus(angle.get());
+                    if (angleDiff.getRadians() > 0.2)
+                        Util.printf("very fast steering start: %f end: %f\n",
+                                angle.get().getRadians(),
+                                delta.angle.get().getRadians());
+                }
+            }
+            return new SwerveModulePosition100(posM, delta.angle);
+        }
+        // if there's no delta angle, we're not going anywhere.
+        if (DEBUG)
+            Util.println("no delta angle");
+        return this;
+    }
+
 }

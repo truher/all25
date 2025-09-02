@@ -17,7 +17,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.incremental.TrapezoidProfile100;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.DriveUtil;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -181,12 +180,12 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
 
     public FieldRelativeVelocity clipAndScale(DriverControl.Velocity twist1_1) {
         // clip the input to the unit circle
-        final DriverControl.Velocity clipped = DriveUtil.clampTwist(twist1_1, 1.0);
+        final DriverControl.Velocity clipped = twist1_1.clip(1.0);
 
  
 
         // scale to max in both translation and rotation
-        return DriveUtil.scale(
+        return FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
@@ -202,11 +201,11 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
         // fraction left for rotation
         final double oRatio = 1 - xyRatio;
         // add a little bit of default speed
-        final double kRotationSpeed = Math.max(0.1, oRatio);
+        final double rotationSpeed = Math.max(0.1, oRatio);
 
-        final double maxSpeedRad_S = m_swerveKinodynamics.getMaxAngleSpeedRad_S() * kRotationSpeed * PROFILE_SPEED;
+        final double maxSpeedRad_S = m_swerveKinodynamics.getMaxAngleSpeedRad_S() * rotationSpeed * PROFILE_SPEED;
 
-        final double maxAccelRad_S2 = m_swerveKinodynamics.getMaxAngleAccelRad_S2() * kRotationSpeed * PROFILE_ACCEL;
+        final double maxAccelRad_S2 = m_swerveKinodynamics.getMaxAngleAccelRad_S2() * rotationSpeed * PROFILE_ACCEL;
 
         m_log_max_speed.log(() -> maxSpeedRad_S);
         m_log_max_accel.log(() -> maxAccelRad_S2);

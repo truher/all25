@@ -27,4 +27,15 @@ public record SwerveModulePositions(
                 other.rearLeft.copy(),
                 other.rearRight.copy());
     }
+
+    public static SwerveModulePositions modulePositionFromDelta(
+            SwerveModulePositions initial,
+            SwerveModuleDeltas delta) {
+        return new SwerveModulePositions(
+                initial.frontLeft().plus(delta.frontLeft()),
+                initial.frontRight().plus(delta.frontRight()),
+                initial.rearLeft().plus(delta.rearLeft()),
+                initial.rearRight().plus(delta.rearRight()));
+    }
+
 }

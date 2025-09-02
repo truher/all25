@@ -26,7 +26,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 
 public class PathFactoryTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
 
     @Test
     void testForced() throws TimingException {
@@ -64,13 +64,13 @@ public class PathFactoryTest {
 
         assertEquals(13, path.length());
         Pose2dWithMotion p = path.getPoint(0);
-        assertEquals(0, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
         p = path.getPoint(1);
-        assertEquals(0.3, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0.3, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
     }
 
     @Test
@@ -109,13 +109,13 @@ public class PathFactoryTest {
 
         assertEquals(9, path.length());
         Pose2dWithMotion p = path.getPoint(0);
-        assertEquals(0, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
         p = path.getPoint(1);
-        assertEquals(1, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(1, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
     }
 
     /**
@@ -139,13 +139,13 @@ public class PathFactoryTest {
                 waypoints, 0.01, 0.01, 0.1);
         assertEquals(2, path.length());
         Pose2dWithMotion p = path.getPoint(0);
-        assertEquals(0, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
         p = path.getPoint(1);
-        assertEquals(1, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(1, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
     }
 
     @Test
@@ -196,12 +196,6 @@ public class PathFactoryTest {
 
     @Test
     void testDx() {
-        // HolonomicSpline s0 = new HolonomicSpline(
-        // new HolonomicPose2d(new Translation2d(0, 0), Rotation2d.kZero,
-        // Rotation2d.kZero),
-        // new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero,
-        // Rotation2d.kZero),
-        // 1.0);
         HolonomicSpline s0 = new HolonomicSpline(
                 new HolonomicPose2d(new Translation2d(0, -1), Rotation2d.kZero, Rotation2d.kZero),
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kCCW_90deg),
@@ -227,14 +221,14 @@ public class PathFactoryTest {
         long startTimeNs = System.nanoTime();
         Path100 t = new Path100(new ArrayList<>());
         final int iterations = 100;
-        final double kSplineSampleToleranceM = 0.05;
-        final double kSplineSampleToleranceRad = 0.2;
+        final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;
+        final double SPLINE_SAMPLE_TOLERANCE_RAD = 0.2;
         for (int i = 0; i < iterations; ++i) {
             t = PathFactory.pathFromWaypoints(
                     waypoints,
-                    kSplineSampleToleranceM,
-                    kSplineSampleToleranceM,
-                    kSplineSampleToleranceRad);
+                    SPLINE_SAMPLE_TOLERANCE_M,
+                    SPLINE_SAMPLE_TOLERANCE_M,
+                    SPLINE_SAMPLE_TOLERANCE_RAD);
         }
         long endTimeNs = System.nanoTime();
         double totalDurationMs = (endTimeNs - startTimeNs) / 1000000.0;
@@ -244,8 +238,8 @@ public class PathFactoryTest {
         }
         assertEquals(5, t.length());
         Pose2dWithMotion p = t.getPoint(1);
-        assertEquals(0.417, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0.417, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
     }
 
 }

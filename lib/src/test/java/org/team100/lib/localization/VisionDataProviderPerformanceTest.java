@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.util.Takt;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -23,7 +23,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 class VisionDataProviderPerformanceTest {
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     // uncomment this to run it. it consumes all the CPU.
@@ -58,12 +58,12 @@ class VisionDataProviderPerformanceTest {
 
         // verify tag 7 location
         Pose3d tagPose = layout.getTagPose(Alliance.Red, 7).get();
-        assertEquals(16.5791, tagPose.getX(), kDelta);
-        assertEquals(2.663, tagPose.getY(), kDelta);
-        assertEquals(1.451, tagPose.getZ(), kDelta);
-        assertEquals(0, tagPose.getRotation().getX(), kDelta);
-        assertEquals(0, tagPose.getRotation().getY(), kDelta);
-        assertEquals(0, tagPose.getRotation().getZ(), kDelta);
+        assertEquals(16.5791, tagPose.getX(), DELTA);
+        assertEquals(2.663, tagPose.getY(), DELTA);
+        assertEquals(1.451, tagPose.getZ(), DELTA);
+        assertEquals(0, tagPose.getRotation().getX(), DELTA);
+        assertEquals(0, tagPose.getRotation().getY(), DELTA);
+        assertEquals(0, tagPose.getRotation().getZ(), DELTA);
 
         // default camera offset is no offset.
         final String cameraSerialNumber = "foo";

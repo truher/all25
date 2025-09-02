@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 class SwerveLocalTest extends Fixtured implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testSimple() {
@@ -26,6 +26,6 @@ class SwerveLocalTest extends Fixtured implements Timeless {
                 new SwerveModuleState100(0, Optional.of(new Rotation2d())),
                 new SwerveModuleState100(0, Optional.of(new Rotation2d())),
                 new SwerveModuleState100(0, Optional.of(new Rotation2d()))));
-        assertEquals(0, local.positions().frontLeft().distanceMeters, kDelta);
+        assertEquals(0, local.positions().frontLeft().distanceMeters, DELTA);
     }
 }

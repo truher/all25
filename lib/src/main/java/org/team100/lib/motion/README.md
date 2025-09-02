@@ -1,5 +1,7 @@
 # motion
 
+The `lib.motion` package supports actuation.
+
 A Team 100 simple motion control consists of several components:
 
 - a _motor_:  may support closed-loop positional or velocity control, or not.

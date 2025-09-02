@@ -36,10 +36,18 @@ public class ScoreCoralSmart extends SequentialCommandGroup100 {
         addCommands(
                 new SelectCommand<>(
                         Map.of(
-                            ScoringPosition.L4, new ScoreL4Smart(m_logger, wrist, elevator, tunnel, targetSector, destination, scoringPositionSupplier, controller, profile, m_drive, heedRadiusM, point),
-                            ScoringPosition.L3, new ScoreL3Smart(m_logger, wrist, elevator, tunnel, targetSector, destination, scoringPositionSupplier, controller, profile, m_drive, heedRadiusM, point),
-                            ScoringPosition.L2, new ScoreL2Smart(m_logger, wrist, elevator, tunnel, targetSector, destination, scoringPositionSupplier, controller, profile, m_drive, heedRadiusM, point)
-                        ),
+                                ScoringPosition.L4,
+                                new ScoreL4Smart(m_logger, wrist, elevator, tunnel,
+                                        targetSector, destination, scoringPositionSupplier, controller, profile,
+                                        m_drive, heedRadiusM, point),
+                                ScoringPosition.L3,
+                                new ScoreL3Smart(m_logger, wrist, elevator, tunnel,
+                                        targetSector, destination, scoringPositionSupplier, controller, profile,
+                                        m_drive, heedRadiusM, point),
+                                ScoringPosition.L2,
+                                new ScoreL2Smart(m_logger, wrist, elevator, tunnel,
+                                        targetSector, destination, scoringPositionSupplier, controller, profile,
+                                        m_drive, heedRadiusM, point)),
                         scoringPositionSupplier));
     }
 }

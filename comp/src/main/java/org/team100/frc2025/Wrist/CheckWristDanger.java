@@ -5,11 +5,13 @@ import org.team100.lib.experiments.Experiments;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
+/** Move the wrist out of the way of the elevator. */
 public class CheckWristDanger extends Command {
-    Wrist2 m_wrist;
-    double m_angle;
-    boolean finished = false;
-    double count = 0;
+    private static final double SAFE = 0.1;
+
+    private final Wrist2 m_wrist;
+    private boolean finished = false;
+    private double count = 0;
 
     public CheckWristDanger(Wrist2 wrist) {
         m_wrist = wrist;
@@ -20,32 +22,24 @@ public class CheckWristDanger extends Command {
     public void initialize() {
         finished = false;
         count = 0;
-        // resetting forces the setpoint velocity to zero, which is not always what we
-        // want
-        // m_wrist.resetWristProfile();
     }
 
     @Override
     public void execute() {
-        double m_angle = 0.1;
-
-        if (m_wrist.getAngle() < m_angle) {
-            m_wrist.setAngleValue(m_angle);
-
-            if (Math.abs(m_wrist.getAngle() - m_angle) < 0.05) {
+        if (m_wrist.getAngle() < SAFE) {
+            m_wrist.setAngleValue(SAFE);
+            if (Math.abs(m_wrist.getAngle() - SAFE) < 0.05) {
                 count++;
             } else {
                 count = 0;
             }
-
         } else {
             finished = true;
         }
-
         if (count >= 20) {
+            // if we've been trying for awhile (about 0.5 sec), give up.
             finished = true;
         }
-
     }
 
     @Override

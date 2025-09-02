@@ -15,7 +15,7 @@ import edu.wpi.first.math.MathUtil;
  * the RoboRIO.
  */
 public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSensor {
-    private static final double kTwoPi = 2.0 * Math.PI;
+    private static final double TWO_PI = 2.0 * Math.PI;
 
     private final double m_positionOffset;
     private final EncoderDrive m_drive;
@@ -89,9 +89,9 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
 
         switch (m_drive) {
             case DIRECT:
-                return OptionalDouble.of(MathUtil.angleModulus(turnsMinusOffset * kTwoPi));
+                return OptionalDouble.of(MathUtil.angleModulus(turnsMinusOffset * TWO_PI));
             case INVERSE:
-                return OptionalDouble.of(MathUtil.angleModulus(-1.0 * turnsMinusOffset * kTwoPi));
+                return OptionalDouble.of(MathUtil.angleModulus(-1.0 * turnsMinusOffset * TWO_PI));
             default:
                 throw new IllegalArgumentException();
         }

@@ -26,7 +26,7 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 import edu.wpi.first.wpilibj.DataLogManager;
 
 class DriveWithTrajectoryListTest extends Fixtured implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);
 
@@ -48,7 +48,7 @@ class DriveWithTrajectoryListTest extends Fixtured implements Timeless {
                 x -> List.of(planner.line(x)),
                 viz);
         c.initialize();
-        assertEquals(0, fixture.drive.getPose().getX(), kDelta);
+        assertEquals(0, fixture.drive.getPose().getX(), DELTA);
         c.execute();
         assertFalse(c.isFinished());
         // the trajectory takes a little over 3s

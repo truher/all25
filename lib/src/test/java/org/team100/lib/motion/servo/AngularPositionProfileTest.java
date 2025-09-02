@@ -22,7 +22,7 @@ import org.team100.lib.util.Util;
 
 class AngularPositionProfileTest implements Timeless {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     private final MockBareMotor motor;
@@ -106,7 +106,7 @@ class AngularPositionProfileTest implements Timeless {
         if (DEBUG)
             Util.printf("verify(%5.3f, %5.3f, %5.3f);\n", motor.velocity,
                     servo.m_setpoint.x(), servo.m_setpoint.v());
-        assertEquals(setpointPosition, servo.m_setpoint.x(), kDelta, "position");
-        assertEquals(setpointVelocity, servo.m_setpoint.v(), kDelta, "velocity");
+        assertEquals(setpointPosition, servo.m_setpoint.x(), DELTA, "position");
+        assertEquals(setpointVelocity, servo.m_setpoint.v(), DELTA, "velocity");
     }
 }

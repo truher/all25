@@ -18,7 +18,7 @@ import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.testing.Timeless;
 
 class AnglePositionServoProfileTest implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     private final MockBareMotor motor;
@@ -85,8 +85,8 @@ class AnglePositionServoProfileTest implements Timeless {
             sensor.angle += 0.5 * (motor.velocity + previousMotorSpeed) * 0.02;
             previousMotorSpeed = motor.velocity;
         }
-        assertEquals(motorVelocity, motor.velocity, kDelta, "velocity");
-        assertEquals(setpointPosition, servo.m_setpoint.x(), kDelta, "setpoint position");
-        assertEquals(setpointVelocity, servo.m_setpoint.v(), kDelta, "setpoint velocity");
+        assertEquals(motorVelocity, motor.velocity, DELTA, "velocity");
+        assertEquals(setpointPosition, servo.m_setpoint.x(), DELTA, "setpoint position");
+        assertEquals(setpointVelocity, servo.m_setpoint.v(), DELTA, "setpoint velocity");
     }
 }

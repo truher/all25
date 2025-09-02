@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 class TargetUtilTest {
 
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testBearing() {
@@ -21,27 +21,27 @@ class TargetUtilTest {
                 TargetUtil.bearing(
                         new Translation2d(),
                         new Translation2d(1, 0)).getRadians(),
-                kDelta);
+                DELTA);
         assertEquals(Math.PI / 2,
                 TargetUtil.bearing(
                         new Translation2d(),
                         new Translation2d(0, 1)).getRadians(),
-                kDelta);
+                DELTA);
         assertEquals(Math.PI / 4,
                 TargetUtil.bearing(
                         new Translation2d(),
                         new Translation2d(1, 1)).getRadians(),
-                kDelta);
+                DELTA);
         assertEquals(3 * Math.PI / 4,
                 TargetUtil.bearing(
                         new Translation2d(),
                         new Translation2d(-1, 1)).getRadians(),
-                kDelta);
+                DELTA);
         assertEquals(-Math.PI / 4,
                 TargetUtil.bearing(
                         new Translation2d(),
                         new Translation2d(1, -1)).getRadians(),
-                kDelta);
+                DELTA);
     }
 
     @Test
@@ -51,7 +51,7 @@ class TargetUtilTest {
         // target is 1m to the left
         Translation2d target = new Translation2d(0, 1);
         // so it appears to move clockwise
-        assertEquals(1, TargetUtil.targetMotion(state, target), kDelta);
+        assertEquals(1, TargetUtil.targetMotion(state, target), DELTA);
     }
 
     @Test
@@ -61,7 +61,7 @@ class TargetUtilTest {
         // target is 1m to the left
         Translation2d target = new Translation2d(0, 1);
         // so it appears to move clockwise
-        assertEquals(2, TargetUtil.targetMotion(state, target), kDelta);
+        assertEquals(2, TargetUtil.targetMotion(state, target), DELTA);
     }
 
     @Test
@@ -71,7 +71,7 @@ class TargetUtilTest {
         // target is 1m to the left
         Translation2d target = new Translation2d(1, 2);
         // so it appears to move clockwise
-        assertEquals(1, TargetUtil.targetMotion(state, target), kDelta);
+        assertEquals(1, TargetUtil.targetMotion(state, target), DELTA);
     }
 
     @Test
@@ -81,7 +81,7 @@ class TargetUtilTest {
         // target is 1m to the right
         Translation2d target = new Translation2d(0, -1);
         // so it appears to move counterclockwise
-        assertEquals(-1, TargetUtil.targetMotion(state, target), kDelta);
+        assertEquals(-1, TargetUtil.targetMotion(state, target), DELTA);
     }
 
     @Test
@@ -91,7 +91,7 @@ class TargetUtilTest {
         // target is dead ahead
         Translation2d target = new Translation2d(2, 0);
         // no apparent motion
-        assertEquals(0, TargetUtil.targetMotion(state, target), kDelta);
+        assertEquals(0, TargetUtil.targetMotion(state, target), DELTA);
     }
 
     @Test
@@ -101,7 +101,7 @@ class TargetUtilTest {
         // target is at 45
         Translation2d target = new Translation2d(1, 1);
         // apparent motion is slower
-        assertEquals(0.5, TargetUtil.targetMotion(state, target), kDelta);
+        assertEquals(0.5, TargetUtil.targetMotion(state, target), DELTA);
     }
 
     @Test
@@ -111,7 +111,7 @@ class TargetUtilTest {
         // target is dead ahead
         Translation2d target = new Translation2d(1, 0);
         // target moves the other way
-        assertEquals(-1, TargetUtil.targetMotion(state, target), kDelta);
+        assertEquals(-1, TargetUtil.targetMotion(state, target), DELTA);
     }
 
     @Test
@@ -123,6 +123,6 @@ class TargetUtilTest {
         // target is dead ahead
         Translation2d target = new Translation2d(0, 0);
         // target appears to move counterclockwise
-        assertEquals(1, TargetUtil.targetMotion(state, target), kDelta);
+        assertEquals(1, TargetUtil.targetMotion(state, target), DELTA);
     }
 }

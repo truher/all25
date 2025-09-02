@@ -1,13 +1,13 @@
 package org.team100.lib.motor;
 
+import org.team100.lib.coherence.Cache;
+import org.team100.lib.coherence.DoubleCache;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.util.Memo;
-import org.team100.lib.util.Memo.DoubleCache;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import com.ctre.phoenix6.StatusSignal;
@@ -130,20 +130,20 @@ public abstract class Talon6Motor implements BareMotor {
         // final StatusSignal<Current> motorTorqueCurrent = m_motor.getTorqueCurrent();
 
         // The memoizer refreshes all the signals at once.
-        Memo.registerSignal(motorPosition);
-        Memo.registerSignal(motorVelocity);
+        Cache.registerSignal(motorPosition);
+        Cache.registerSignal(motorVelocity);
         // Memo.registerSignal(motorAcceleration);
-        Memo.registerSignal(motorDutyCycle);
-        Memo.registerSignal(motorClosedLoopError);
-        Memo.registerSignal(motorSupplyCurrent);
-        Memo.registerSignal(motorSupplyVoltage);
-        Memo.registerSignal(motorStatorCurrent);
+        Cache.registerSignal(motorDutyCycle);
+        Cache.registerSignal(motorClosedLoopError);
+        Cache.registerSignal(motorSupplyCurrent);
+        Cache.registerSignal(motorSupplyVoltage);
+        Cache.registerSignal(motorStatorCurrent);
         // Memo.registerSignal(motorDeviceTemp);
         // Memo.registerSignal(motorTorqueCurrent);
 
         // None of these need to refresh.
         // this latency compensation uses takt time rather than the real clock.
-        m_position = Memo
+        m_position = Cache
                 .ofDouble(() -> {
                     double latency = Utils.fpgaToCurrentTime(Takt.get()) - motorPosition.getTimestamp().getTime();
                     if (latency > 0.1) {
@@ -152,13 +152,13 @@ public abstract class Talon6Motor implements BareMotor {
                     }
                     return motorPosition.getValueAsDouble() + (motorVelocity.getValueAsDouble() * latency);
                 });
-        m_velocity = Memo.ofDouble(() -> motorVelocity.getValueAsDouble());
-        m_dutyCycle = Memo.ofDouble(() -> motorDutyCycle.getValueAsDouble());
+        m_velocity = Cache.ofDouble(() -> motorVelocity.getValueAsDouble());
+        m_dutyCycle = Cache.ofDouble(() -> motorDutyCycle.getValueAsDouble());
         // m_acceleration = Memo.ofDouble(() -> motorAcceleration.getValueAsDouble());
-        m_error = Memo.ofDouble(() -> motorClosedLoopError.getValueAsDouble());
-        m_supply = Memo.ofDouble(() -> motorSupplyCurrent.getValueAsDouble());
-        m_supplyVoltage = Memo.ofDouble(() -> motorSupplyVoltage.getValueAsDouble());
-        m_stator = Memo.ofDouble(() -> motorStatorCurrent.getValueAsDouble());
+        m_error = Cache.ofDouble(() -> motorClosedLoopError.getValueAsDouble());
+        m_supply = Cache.ofDouble(() -> motorSupplyCurrent.getValueAsDouble());
+        m_supplyVoltage = Cache.ofDouble(() -> motorSupplyVoltage.getValueAsDouble());
+        m_stator = Cache.ofDouble(() -> motorStatorCurrent.getValueAsDouble());
         // m_temp = Memo.ofDouble(() -> motorDeviceTemp.getValueAsDouble());
         // m_torque = Memo.ofDouble(() -> motorTorqueCurrent.getValueAsDouble());
 
@@ -222,8 +222,8 @@ public abstract class Talon6Motor implements BareMotor {
         final double accelFFVolts = m_ff.accelFFVolts(currentMotorRev_S, motorRev_S2);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 
-        final double kFFVolts = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
-        // final double kFFVolts = torqueFFVolts;
+        final double FFVolts = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
+        // final double FFVolts = torqueFFVolts;
 
         // VelocityVoltage has an acceleration field for kA feedforward but we use
         // arbitrary feedforward for that.
@@ -231,7 +231,7 @@ public abstract class Talon6Motor implements BareMotor {
                 m_velocityVoltage
                         .withSlot(1)
                         .withVelocity(motorRev_S)
-                        .withFeedForward(kFFVolts)));
+                        .withFeedForward(FFVolts)));
 
         // without feedforward
         // Phoenix100.warn(() -> m_motor.setControl(
@@ -244,7 +244,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_log_velocity_FF.log(() -> velocityFFVolts);
         m_log_accel_FF.log(() -> accelFFVolts);
         m_log_torque_FF.log(() -> torqueFFVolts);
-        m_totalFeedForward.log(() -> kFFVolts);
+        m_totalFeedForward.log(() -> FFVolts);
 
         log();
     }
@@ -271,8 +271,8 @@ public abstract class Talon6Motor implements BareMotor {
         final double accelFFVolts = m_ff.accelFFVolts(currentMotorRev_S, motorRev_S2);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 
-        final double kFFVolts = frictionFFVolts + velocityFFVolts + torqueFFVolts + accelFFVolts;
-        // final double kFFVolts = torqueFFVolts;
+        final double FFVolts = frictionFFVolts + velocityFFVolts + torqueFFVolts + accelFFVolts;
+        // final double FFVolts = torqueFFVolts;
 
         // PositionVoltage has a velocity field for kV feedforward but we use arbitrary
         // feedforward for that.
@@ -280,7 +280,7 @@ public abstract class Talon6Motor implements BareMotor {
                 m_positionVoltage
                         .withSlot(0)
                         .withPosition(motorRev)
-                        .withFeedForward(kFFVolts)));
+                        .withFeedForward(FFVolts)));
 
         m_log_desired_position.log(() -> motorRev);
         m_log_desired_speed.log(() -> motorRev_S);
@@ -289,7 +289,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_log_velocity_FF.log(() -> velocityFFVolts);
         m_log_torque_FF.log(() -> torqueFFVolts);
         m_log_accel_FF.log(() -> accelFFVolts);
-        m_totalFeedForward.log(() -> kFFVolts);
+        m_totalFeedForward.log(() -> FFVolts);
 
         log();
     }

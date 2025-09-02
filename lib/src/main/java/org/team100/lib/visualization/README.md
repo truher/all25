@@ -1,5 +1,5 @@
 # visualization
 
-Glass has a few special widgets; the code here populates them.
+The `lib.visualization` package populates glass widgets.
 
 There are more of these in a studies/visualization if you're curious.

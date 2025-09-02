@@ -2,6 +2,8 @@ package org.team100.lib.motion.drivetrain;
 
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
+import org.team100.lib.gyro.Gyro;
+import org.team100.lib.gyro.SimulatedGyro;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -10,8 +12,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
-import org.team100.lib.sensors.Gyro;
-import org.team100.lib.sensors.SimulatedGyro;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Pose2d;

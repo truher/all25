@@ -37,6 +37,6 @@ public class SwerveDeadband  {
             return target;
         }
         m_log_scale.log(() -> 0.0);
-        return FieldRelativeVelocity.kZero;
+        return FieldRelativeVelocity.ZERO;
     }
 }

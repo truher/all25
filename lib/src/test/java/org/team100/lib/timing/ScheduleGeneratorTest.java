@@ -29,16 +29,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public class ScheduleGeneratorTest {
     private static final boolean DEBUG = false;
-    public static final double kTestEpsilon = 1e-12;
-    private static final double kDelta = 0.01;
+    public static final double EPSILON = 1e-12;
+    private static final double DELTA = 0.01;
 
-    public static final List<Pose2dWithMotion> kWaypoints = Arrays.asList(
+    public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
             new Pose2dWithMotion(new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.kZero)),
             new Pose2dWithMotion(new Pose2d(new Translation2d(24.0, 0.0), Rotation2d.kZero)),
             new Pose2dWithMotion(new Pose2d(new Translation2d(36.0, 12.0), Rotation2d.kZero)),
             new Pose2dWithMotion(new Pose2d(new Translation2d(60.0, 12.0), Rotation2d.kZero)));
 
-    public static final List<Rotation2d> kHeadings = List.of(
+    public static final List<Rotation2d> HEADINGS = List.of(
             GeometryUtil.fromDegrees(0),
             GeometryUtil.fromDegrees(0),
             GeometryUtil.fromDegrees(0),
@@ -70,27 +70,27 @@ public class ScheduleGeneratorTest {
             double max_vel,
             double max_acc) {
         assertFalse(traj.isEmpty());
-        assertEquals(start_vel, traj.sample(0).velocityM_S(), kTestEpsilon);
-        assertEquals(end_vel, traj.getLastPoint().velocityM_S(), kTestEpsilon);
+        assertEquals(start_vel, traj.sample(0).velocityM_S(), EPSILON);
+        assertEquals(end_vel, traj.getLastPoint().velocityM_S(), EPSILON);
 
         // Go state by state, verifying all constraints are satisfied and integration is
         // correct.
         TimedPose prev_state = null;
         for (TimedPose state : traj.getPoints()) {
             for (final TimingConstraint constraint : constraints) {
-                assertTrue(state.velocityM_S() - kTestEpsilon <= constraint.getMaxVelocity(state.state()).getValue());
+                assertTrue(state.velocityM_S() - EPSILON <= constraint.getMaxVelocity(state.state()).getValue());
                 final MinMaxAcceleration accel_limits = constraint.getMinMaxAcceleration(state.state(),
                         state.velocityM_S());
-                assertTrue(state.acceleration() - kTestEpsilon <= accel_limits.getMaxAccel(),
+                assertTrue(state.acceleration() - EPSILON <= accel_limits.getMaxAccel(),
                         String.format("%f %f", state.acceleration(), accel_limits.getMaxAccel()));
-                assertTrue(state.acceleration() + kTestEpsilon >= accel_limits.getMinAccel(),
+                assertTrue(state.acceleration() + EPSILON >= accel_limits.getMinAccel(),
                         String.format("%f %f", state.acceleration(), accel_limits.getMinAccel()));
             }
             if (prev_state != null) {
                 assertEquals(state.velocityM_S(),
                         prev_state.velocityM_S()
                                 + (state.getTimeS() - prev_state.getTimeS()) * prev_state.acceleration(),
-                        kTestEpsilon);
+                        EPSILON);
             }
             prev_state = state;
         }
@@ -137,7 +137,7 @@ public class ScheduleGeneratorTest {
      */
     @Test
     void testNoConstraints() {
-        Path100 path = new Path100(kWaypoints);
+        Path100 path = new Path100(WAYPOINTS);
 
         // Triangle profile.
         Trajectory100 timed_traj = buildAndCheckTrajectory(path,
@@ -166,7 +166,7 @@ public class ScheduleGeneratorTest {
      */
     @Test
     void testCentripetalConstraint() {
-        Path100 path = new Path100(kWaypoints);
+        Path100 path = new Path100(WAYPOINTS);
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
 
         // Triangle profile.
@@ -189,7 +189,7 @@ public class ScheduleGeneratorTest {
 
     @Test
     void testConditionalVelocityConstraint() {
-        Path100 path = new Path100(kWaypoints);
+        Path100 path = new Path100(WAYPOINTS);
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
@@ -216,7 +216,7 @@ public class ScheduleGeneratorTest {
 
     @Test
     void testConditionalAccelerationConstraint() {
-        Path100 path = new Path100(kWaypoints);
+        Path100 path = new Path100(WAYPOINTS);
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
@@ -276,21 +276,21 @@ public class ScheduleGeneratorTest {
                 new HolonomicPose2d(new Translation2d(1, 1), new Rotation2d(), new Rotation2d(Math.PI / 2)));
         long startTimeNs = System.nanoTime();
         final int iterations = 100;
-        final double kSplineSampleToleranceM = 0.05;
-        final double kSplineSampleToleranceRad = 0.2;
-        final double kTrajectoryStepM = 0.1;
+        final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;
+        final double SPLINE_SAMPLE_TOLERANCE_RAD = 0.2;
+        final double TRAJECTORY_STEP_M = 0.1;
 
         Path100 path = PathFactory.pathFromWaypoints(
                 waypoints,
-                kSplineSampleToleranceM,
-                kSplineSampleToleranceM,
-                kSplineSampleToleranceRad);
+                SPLINE_SAMPLE_TOLERANCE_M,
+                SPLINE_SAMPLE_TOLERANCE_M,
+                SPLINE_SAMPLE_TOLERANCE_RAD);
         Trajectory100 t = new Trajectory100();
         ScheduleGenerator m_scheduleGenerator = new ScheduleGenerator(new ArrayList<>());
         for (int i = 0; i < iterations; ++i) {
             t = m_scheduleGenerator.timeParameterizeTrajectory(
                     path,
-                    kTrajectoryStepM,
+                    TRAJECTORY_STEP_M,
                     0,
                     0);
         }
@@ -302,8 +302,8 @@ public class ScheduleGeneratorTest {
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.575, p.state().getPose().getX(), kDelta);
-        assertEquals(0, p.state().getHeadingRate(), kDelta);
+        assertEquals(0.575, p.state().getPose().getX(), DELTA);
+        assertEquals(0, p.state().getHeadingRate(), DELTA);
 
     }
 

@@ -13,12 +13,12 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 
 public class TrajectoryVisualization {
-    private static final String kTrajectory = "trajectory";
+    private static final String TRAJECTORY = "trajectory";
 
     private final DoubleArrayLogger m_log_trajectory;
 
     public TrajectoryVisualization(LoggerFactory fieldLogger) {
-        m_log_trajectory = fieldLogger.doubleArrayLogger(Level.TRACE, kTrajectory);
+        m_log_trajectory = fieldLogger.doubleArrayLogger(Level.TRACE, TRAJECTORY);
     }
 
     public void setViz(Trajectory100 m_trajectory) {

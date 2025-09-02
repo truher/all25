@@ -17,8 +17,9 @@ import org.team100.lib.state.Model100;
  * motor controller hardware.
  */
 public class OutboardLinearPositionServo implements LinearPositionServo {
-    private static final double kPositionTolerance = 0.01;
-    private static final double kVelocityTolerance = 0.01;
+    private static final double POSITION_TOLERANCE = 0.01;
+    private static final double VELOCITY_TOLERANCE = 0.01;
+    
     private final LinearMechanism m_mechanism;
     private final ProfileReference1d m_ref;
 
@@ -73,7 +74,7 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
         m_log_goal.log(() -> goalM);
         Model100 goal = new Model100(goalM, 0);
 
-        if (!goal.near(m_goal, kPositionTolerance, kVelocityTolerance)) {
+        if (!goal.near(m_goal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
             m_goal = goal;
             m_ref.setGoal(goal);
             if (m_nextSetpoint == null) {

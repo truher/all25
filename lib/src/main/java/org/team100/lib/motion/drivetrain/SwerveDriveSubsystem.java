@@ -1,9 +1,13 @@
 package org.team100.lib.motion.drivetrain;
 
+import org.team100.lib.coherence.Cache;
+import org.team100.lib.coherence.CotemporalCache;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.DriverSkill;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.gyro.Gyro;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -16,9 +20,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
-import org.team100.lib.sensors.Gyro;
-import org.team100.lib.util.Memo;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -41,7 +42,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     private final SwerveLimiter m_limiter;
 
     // CACHES
-    private final Memo.CotemporalCache<SwerveModel> m_stateSupplier;
+    private final CotemporalCache<SwerveModel> m_stateSupplier;
 
     // LOGGERS
     private final SwerveModelLogger m_log_state;
@@ -66,7 +67,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         m_swerveLocal = swerveLocal;
         m_cameraUpdater = cameraUpdater;
         m_limiter = limiter;
-        m_stateSupplier = Memo.of(this::update);
+        m_stateSupplier = Cache.of(this::update);
         stop();
         m_log_state = child.swerveModelLogger(Level.COMP, "state");
         m_log_turning = child.doubleLogger(Level.TRACE, "Tur Deg");
@@ -262,7 +263,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
 
     /////////////////////////////////////////////////////////////////
 
-    /** used by the supplier */
+    /**
+     * Compute the current state. This is a fairly heavyweight thing to do, so it
+     * should be cached (thus refreshed once per cycle).
+     */
     private SwerveModel update() {
         double now = Takt.get();
         m_poseEstimator.put(

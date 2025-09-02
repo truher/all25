@@ -9,7 +9,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
-import org.team100.lib.util.Memo;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -78,7 +77,8 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
      * Setting the encoder position is very slow, so just do it once.
      */
     void sync() {
-        Memo.resetAll();
+        // sep 1 2025, joel removed this, i don't think we need it.
+        // Cache.resetAll();
         // Assume the mechanism is stationary at startup, average a few measurements to
         // remove a little bit of noise.
         double sin = 0;

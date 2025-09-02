@@ -30,27 +30,11 @@ public abstract class Navigator extends Command {
 
     // used by trajectory()
     protected final TrajectoryPlanner m_planner;
-    private boolean m_perpetual = false;
 
     private boolean ranOnce = false;
 
     // created in initialize()
     protected ReferenceController m_referenceController;
-
-    public Navigator(
-            LoggerFactory parent,
-            SwerveDriveSubsystem drive,
-            SwerveController controller,
-            TrajectoryVisualization viz,
-            SwerveKinodynamics kinodynamics,
-            boolean perpetual) {
-        m_drive = drive;
-        m_controller = controller;
-        m_viz = viz;
-        m_planner = new TrajectoryPlanner(new TimingConstraintFactory(kinodynamics).auto());
-        m_perpetual = perpetual;
-        addRequirements(m_drive);
-    } 
 
     public Navigator(
             LoggerFactory parent,
@@ -92,45 +76,24 @@ public abstract class Navigator extends Command {
         m_drive.stop();
         m_viz.clear();
 
-        // if(!interrupted){
-            ranOnce = false;
-        // }
+        ranOnce = false;
 
         System.out.println("I FINISHED");
     }
 
-    @Override
-    public final boolean isFinished() {
 
-        if(m_perpetual){
-            return false;
-        }
-
-        if(m_referenceController == null){
-            return false;
-        } 
-
-        if(ranOnce == false){
-            System.out.println(" I AM ALSE FALse fASLE");
-            return false;
-        }
-        
-        return m_referenceController.isFinished();
-        // return false;
-    }
 
     public final boolean isDone() {
-        if(m_referenceController == null){
+        if (m_referenceController == null) {
             return false;
-        } 
+        }
 
-        if(ranOnce == false){
+        if (ranOnce == false) {
             System.out.println(" I AM ALSE FALse fASLE");
             return false;
         }
-        
+
         return m_referenceController.isFinished();
-        // return false;
     }
 
     public static List<HolonomicPose2d> addRobotPose(Pose2d currPose, List<HolonomicPose2d> waypoints) {

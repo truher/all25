@@ -10,8 +10,6 @@ import edu.wpi.first.math.Vector;
 
 /**
  * Find the minimum of a multivariate scalar function.
- * 
- * 
  */
 public class GradientDescent<R extends Num> {
     private final Nat<R> m_rows;

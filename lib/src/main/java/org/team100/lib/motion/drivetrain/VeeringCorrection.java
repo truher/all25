@@ -36,8 +36,8 @@ public class VeeringCorrection {
      * 
      * The setpoint generator seems to cause a lot of it.
      */
-    // private static final double kVeeringCorrection = 0.025;
-    private static final double kVeeringCorrection = byIdentity();
+    // private static final double VEERING_CORRECTION = 0.025;
+    private static final double VEERING_CORRECTION = byIdentity();
 
     /**
      * Extrapolates the rotation based on the current angular velocity.
@@ -47,7 +47,7 @@ public class VeeringCorrection {
      * @return correction amount
      */
     public static double correctionRad(double gyroRateRad_S) {
-        return gyroRateRad_S * kVeeringCorrection;
+        return gyroRateRad_S * VEERING_CORRECTION;
     }
 
     private static double byIdentity() {

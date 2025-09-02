@@ -11,28 +11,28 @@ import org.team100.lib.state.Model100;
 import edu.wpi.first.math.MathUtil;
 
 class FullStateControllerTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testZero() {
         FullStateFeedback c = new FullStateFeedback(logger, 4, 0.25, x -> x, 0.01, 0.01);
         double u = c.calculate(new Model100(0, 0), new Model100(0, 0));
-        assertEquals(0, u, kDelta);
+        assertEquals(0, u, DELTA);
     }
 
     @Test
     void testK1() {
         FullStateFeedback c = new FullStateFeedback(logger, 4, 0.25, x -> x, 0.01, 0.01);
         double u = c.calculate(new Model100(0, 0), new Model100(1, 0));
-        assertEquals(4, u, kDelta);
+        assertEquals(4, u, DELTA);
     }
 
     @Test
     void testK1b() {
         FullStateFeedback c = new FullStateFeedback(logger, 4, 0.25, x -> x, 0.01, 0.01);
         double u = c.calculate(new Model100(1, 0), new Model100(0, 0));
-        assertEquals(-4, u, kDelta);
+        assertEquals(-4, u, DELTA);
     }
 
     @Test
@@ -41,7 +41,7 @@ class FullStateControllerTest {
         // at -3, near pi, goal is 3, across pi
         double u = c.calculate(new Model100(-3, 0), new Model100(3, 0));
         // the correct course is reverse
-        assertEquals(-1.133, u, kDelta);
+        assertEquals(-1.133, u, DELTA);
     }
 
     @Test
@@ -50,7 +50,7 @@ class FullStateControllerTest {
         double u = c.calculate(new Model100(0, 0), new Model100(0, 1));
         // feedforward = reference velocity, but there's no feedforward
         // feedback = velocity error * k2
-        assertEquals(0.25, u, kDelta);
+        assertEquals(0.25, u, DELTA);
     }
 
     @Test
@@ -58,6 +58,6 @@ class FullStateControllerTest {
         FullStateFeedback c = new FullStateFeedback(logger, 4, 0.25, x -> x, 0.01, 0.01);
         double u = c.calculate(new Model100(0, 1), new Model100(0, 0));
         // slow down
-        assertEquals(-0.25, u, kDelta);
+        assertEquals(-0.25, u, DELTA);
     }
 }

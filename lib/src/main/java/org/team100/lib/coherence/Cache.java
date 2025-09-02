@@ -1,0 +1,101 @@
+package org.team100.lib.coherence;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.team100.lib.util.Util;
+
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
+
+/**
+ * List of caches to be managed coherently.
+ * 
+ * The reset() method should be called in Robot.robotPeriodic(), right
+ * after Takt.update() in Robot.robotPeriodic().
+ * 
+ * Note that there's little need for multiple layers of caching, if the only
+ * thing in the middle of the sandwich is simple arithmetic. So if a "motor"
+ * implements caching of its sensors, then the "sensor" that uses the "motor"
+ * doesn't need to apply its own cache layer. Accordingly, most of the
+ * observations we actually cache seem to be from motors.  On the other hand,
+ * it doesn't hurt anything to cache at multiple levels -- the updater makes
+ * everything consistent.
+ */
+public class Cache {
+    static final List<CotemporalCache<?>> caches = new ArrayList<>();
+    private static final List<DoubleCache> doubles = new ArrayList<>();
+    private static final List<BaseStatusSignal> signals = new ArrayList<>();
+
+    /**
+     * Adds the delegate to the set that is reset and updated synchronously by
+     * Robot.robotPeriodic(), so the time represented by the value is as close to
+     * the hardware interrupt time as possible, all values of cached quantities are
+     * consistent and constant through the whole cycle.
+     */
+    public static <T> CotemporalCache<T> of(Supplier<T> delegate) {
+        CotemporalCache<T> cache = new CotemporalCache<>(delegate);
+        caches.add(cache);
+        return cache;
+    }
+
+    public static DoubleCache ofDouble(DoubleSupplier delegate) {
+        DoubleCache cache = new DoubleCache(delegate);
+        doubles.add(cache);
+        return cache;
+    }
+
+    /**
+     * There's a "resetter" that calls CTRE's refreshAll; add the supplied signal to
+     * the list in the refresh.
+     */
+    public static void registerSignal(BaseStatusSignal signal) {
+        signals.add(signal);
+    }
+
+    /**
+     * Reset all caches and update them with fresh values. All the resets are done
+     * before any of the updates to ensure that the updates don't include any stale
+     * data.
+     * 
+     * Should be run in Robot.robotPeriodic().
+     */
+    public static void refresh() {
+        reset();
+        update();
+    }
+
+    /**
+     * Forgets all the stored values.
+     */
+    private static void reset() {
+        for (CotemporalCache<?> r : caches) {
+            r.reset();
+        }
+        for (DoubleCache r : doubles) {
+            r.reset();
+        }
+    }
+
+    /** Fetches fresh values for every stale cache. Should be called after reset. */
+    private static void update() {
+        if (!signals.isEmpty()) {
+            StatusCode result = BaseStatusSignal.refreshAll(signals.toArray(new BaseStatusSignal[0]));
+            if (result != StatusCode.OK) {
+                Util.warnf("RefreshAll failed: %s: %s\n", result.toString(), result.getDescription());
+            }
+        }
+        for (CotemporalCache<?> r : caches) {
+            r.get();
+        }
+        for (DoubleCache r : doubles) {
+            r.getAsDouble();
+        }
+    }
+
+    private Cache() {
+        //
+    }
+}

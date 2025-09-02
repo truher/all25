@@ -51,7 +51,7 @@ public class YawRateConstraint implements TimingConstraint {
         Optional<Rotation2d> course = state.getCourse();
         if (course.isEmpty()) {
             // This is turn in place, which doesn't really work anyway.
-            return MinMaxAcceleration.kNoLimits;
+            return MinMaxAcceleration.NO_LIMITS;
         }
         // Heading rate in rad/m
         final double heading_rate = state.getHeadingRate();

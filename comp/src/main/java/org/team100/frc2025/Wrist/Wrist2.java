@@ -29,6 +29,7 @@ import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.reference.TimedProfileReference1d;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -37,7 +38,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * TODO: caller should specify the acceleration of the carriage, since that
  * affects "gravity".
  */
-public class Wrist2 extends SubsystemBase  {
+public class Wrist2 extends SubsystemBase {
     /**
      * Publish the elevator mechanism visualization to glass. This might be a little
      * bit slow, turn it off for comp.
@@ -45,8 +46,8 @@ public class Wrist2 extends SubsystemBase  {
     private static final boolean VISUALIZE = true;
     private static final int GEAR_RATIO = 25;
 
-    private static final double kWristMinimumPosition = -0.5;
-    private static final double kWristMaximumPosition = 4;
+    private static final double WRIST_MIN_POSITION = -0.5;
+    private static final double WRIST_MAX_POSITION = 4;
 
     double maxVel = 40;
     double maxAccel = 40;
@@ -72,7 +73,7 @@ public class Wrist2 extends SubsystemBase  {
         Feedforward100 wristFF = Feedforward100.makeKraken6Wrist();
 
         Feedback100 wristFeedback = new FullStateFeedback(
-            logger, 4.5, 0.12, x -> x, 0.05, 0.05);
+                logger, 4.5, 0.12, x -> x, 0.05, 0.05);
 
         JerkLimitedProfile100 profile = new JerkLimitedProfile100(maxVel, maxAccel, maxJerk, false);
 
@@ -100,8 +101,8 @@ public class Wrist2 extends SubsystemBase  {
                         wristMotor,
                         sensor,
                         GEAR_RATIO,
-                        kWristMinimumPosition,
-                        kWristMaximumPosition);
+                        WRIST_MIN_POSITION,
+                        WRIST_MAX_POSITION);
 
                 wristServo = new OnboardAngularPositionServo(
                         logger, m_wristMech, ref, wristFeedback);
@@ -122,7 +123,7 @@ public class Wrist2 extends SubsystemBase  {
                         logger, encoder, GEAR_RATIO);
                 RotaryMechanism wristMech = new RotaryMechanism(
                         logger, motor, sensor,
-                        GEAR_RATIO, kWristMinimumPosition, kWristMaximumPosition);
+                        GEAR_RATIO, WRIST_MIN_POSITION, WRIST_MAX_POSITION);
 
                 wristServo = new OnboardAngularPositionServo(
                         logger, wristMech, ref, wristFeedback);
@@ -170,10 +171,6 @@ public class Wrist2 extends SubsystemBase  {
         m_wristMech.setDutyCycle(value);
     }
 
-    // public void setStatic() {
-    // wristServo.setStaticTorque(2.1);
-    // }
-
     public double getAngle() {
         // note this default might be dangerous
         return wristServo.getPosition().orElse(0);
@@ -184,6 +181,7 @@ public class Wrist2 extends SubsystemBase  {
         wristServo.setPositionProfiled(0.2, torque);
     }
 
+    /** set angle via profile */
     public void setAngleValue(double goal) {
         double torque = m_gravityAndSpringTorque.torque(wristServo.getPosition());
         wristServo.setPositionProfiled(goal, torque);
@@ -209,6 +207,21 @@ public class Wrist2 extends SubsystemBase  {
 
     public void stop() {
         wristServo.stop();
+    }
+
+    // COMMANDS
+
+    /** Set the duty cycle perpetually. */
+    public Command setDuty(double v) {
+        return run(
+                () -> setWristDutyCycle(v));
+    }
+
+    /** Use a profile to set the position perpetually. */
+    public Command setPosition(double v) {
+        return runEnd(
+                () -> setAngleValue(v),
+                () -> setWristDutyCycle(0));
     }
 
 }

@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj.GenericHID;
  * Command buttons are not implemented.
  */
 public class VKBJoystick implements DriverControl {
-    private static final double kDeadband = 0.02;
-    private static final double kExpo = 0.5;
+    private static final double DEADBAND = 0.02;
+    private static final double EXPO = 0.5;
 
     private final GenericHID m_hid;
 
@@ -70,9 +70,9 @@ public class VKBJoystick implements DriverControl {
      */
     @Override
     public DriverControl.Velocity velocity() {
-        double dx = expo(deadband(-1.0 * clamp(axis(1), 1), kDeadband, 1), kExpo);
-        double dy = expo(deadband(-1.0 * clamp(axis(0), 1), kDeadband, 1), kExpo);
-        double dtheta = expo(deadband(clamp(axis(5), 1), kDeadband, 1), kExpo);
+        double dx = expo(deadband(-1.0 * clamp(axis(1), 1), DEADBAND, 1), EXPO);
+        double dy = expo(deadband(-1.0 * clamp(axis(0), 1), DEADBAND, 1), EXPO);
+        double dtheta = expo(deadband(clamp(axis(5), 1), DEADBAND, 1), EXPO);
         return new DriverControl.Velocity(dx, dy, dtheta);
     }
 

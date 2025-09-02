@@ -27,9 +27,10 @@ import org.team100.lib.testing.Timeless;
 import org.team100.lib.util.Util;
 
 public class OutboardAngularPositionServoTest implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
+    private static final boolean ACTUALLY_PRINT = false;
+
     private static final LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
-    private static final boolean kActuallyPrint = false;
 
     @Test
     void testProfiled() {
@@ -61,15 +62,15 @@ public class OutboardAngularPositionServoTest implements Timeless {
         servo.setPositionProfiled(1, 0);
         stepTime();
 
-        assertEquals(0.002, motor.position, kDelta);
+        assertEquals(0.002, motor.position, DELTA);
         for (int i = 0; i < 100; ++i) {
             // run it for awhile
             servo.setPositionProfiled(1, 0);
             stepTime();
-            if (kActuallyPrint)
+            if (ACTUALLY_PRINT)
                 Util.printf("i: %d position: %5.3f\n", i, motor.position);
         }
-        assertEquals(1, motor.position, kDelta);
+        assertEquals(1, motor.position, DELTA);
     }
 
     @Test
@@ -87,23 +88,23 @@ public class OutboardAngularPositionServoTest implements Timeless {
         servo.periodic();
         stepTime();
 
-        assertEquals(0, motor.getVelocityRad_S(), kDelta);
-        assertEquals(0, encoder.getPositionRad().getAsDouble(), kDelta);
-        assertEquals(0, encoder.getVelocityRad_S().getAsDouble(), kDelta);
-        assertEquals(0, sensor.getPositionRad().getAsDouble(), kDelta);
-        assertEquals(0, mech.getVelocityRad_S().getAsDouble(), kDelta);
+        assertEquals(0, motor.getVelocityRad_S(), DELTA);
+        assertEquals(0, encoder.getPositionRad().getAsDouble(), DELTA);
+        assertEquals(0, encoder.getVelocityRad_S().getAsDouble(), DELTA);
+        assertEquals(0, sensor.getPositionRad().getAsDouble(), DELTA);
+        assertEquals(0, mech.getVelocityRad_S().getAsDouble(), DELTA);
 
         servo.periodic();
         servo.setPositionDirect(new Setpoints1d(new Control100(0, 0), new Control100(1, 0)), 0);
         stepTime();
 
         // move 0 to 1 in 0.02 => v = 50
-        assertEquals(50, motor.getVelocityRad_S(), kDelta);
-        assertEquals(1, encoder.getPositionRad().getAsDouble(), kDelta);
-        assertEquals(50, encoder.getVelocityRad_S().getAsDouble(), kDelta);
-        assertEquals(50, mech.getVelocityRad_S().getAsDouble(), kDelta);
+        assertEquals(50, motor.getVelocityRad_S(), DELTA);
+        assertEquals(1, encoder.getPositionRad().getAsDouble(), DELTA);
+        assertEquals(50, encoder.getVelocityRad_S().getAsDouble(), DELTA);
+        assertEquals(50, mech.getVelocityRad_S().getAsDouble(), DELTA);
         // the sensor does trapezoid integration so it's halfway there after one cycle
-        assertEquals(0.5, sensor.getPositionRad().getAsDouble(), kDelta);
+        assertEquals(0.5, sensor.getPositionRad().getAsDouble(), DELTA);
 
         servo.periodic();
         servo.setPositionDirect(new Setpoints1d(new Control100(0, 0), new Control100(1, 0)), 0);
@@ -113,11 +114,11 @@ public class OutboardAngularPositionServoTest implements Timeless {
         servo.setPositionDirect(new Setpoints1d(new Control100(0, 0), new Control100(1, 0)), 0);
         stepTime();
 
-        assertEquals(0, motor.getVelocityRad_S(), kDelta);
-        assertEquals(1, encoder.getPositionRad().getAsDouble(), kDelta);
-        assertEquals(0, encoder.getVelocityRad_S().getAsDouble(), kDelta);
-        assertEquals(0, mech.getVelocityRad_S().getAsDouble(), kDelta);
+        assertEquals(0, motor.getVelocityRad_S(), DELTA);
+        assertEquals(1, encoder.getPositionRad().getAsDouble(), DELTA);
+        assertEquals(0, encoder.getVelocityRad_S().getAsDouble(), DELTA);
+        assertEquals(0, mech.getVelocityRad_S().getAsDouble(), DELTA);
         // all the way there now
-        assertEquals(1, sensor.getPositionRad().getAsDouble(), kDelta);
+        assertEquals(1, sensor.getPositionRad().getAsDouble(), DELTA);
     }
 }

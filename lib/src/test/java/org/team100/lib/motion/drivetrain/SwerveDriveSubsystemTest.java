@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 class SwerveDriveSubsystemTest extends Fixtured implements Timeless {
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
 
     @Test
     void testWithSetpointGenerator() {
@@ -103,11 +103,11 @@ class SwerveDriveSubsystemTest extends Fixtured implements Timeless {
     }
 
     private void verify(SwerveDriveSubsystem drive, double x, double v, double a) {
-        assertEquals(x, drive.getPose().getX(), kDelta);
-        assertEquals(v, drive.getVelocity().x(), kDelta);
-        // assertEquals(a, drive.getState().acceleration().x(), kDelta);
-        assertEquals(x, drive.getState().x().x(), kDelta);
-        assertEquals(v, drive.getState().x().v(), kDelta);
-        // assertEquals(a, drive.getState().x().a(), kDelta);
+        assertEquals(x, drive.getPose().getX(), DELTA);
+        assertEquals(v, drive.getVelocity().x(), DELTA);
+        // assertEquals(a, drive.getState().acceleration().x(), DELTA);
+        assertEquals(x, drive.getState().x().x(), DELTA);
+        assertEquals(v, drive.getState().x().v(), DELTA);
+        // assertEquals(a, drive.getState().x().a(), DELTA);
     }
 }

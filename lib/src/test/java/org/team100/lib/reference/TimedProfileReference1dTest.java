@@ -8,7 +8,7 @@ import org.team100.lib.state.Model100;
 import org.team100.lib.testing.Timeless;
 
 public class TimedProfileReference1dTest implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testSimple() {
@@ -21,32 +21,32 @@ public class TimedProfileReference1dTest implements Timeless {
 
         // initial current setpoint is the measurement.
         Setpoints1d s = ref.get();
-        assertEquals(0, s.current().x(), kDelta);
-        assertEquals(0, s.current().v(), kDelta);
-        assertEquals(0, s.current().a(), kDelta);
-        assertEquals(0.00003, s.next().x(), kDelta);
-        assertEquals(0.005, s.next().v(), kDelta);
-        assertEquals(0.500, s.next().a(), kDelta);
+        assertEquals(0, s.current().x(), DELTA);
+        assertEquals(0, s.current().v(), DELTA);
+        assertEquals(0, s.current().a(), DELTA);
+        assertEquals(0.00003, s.next().x(), DELTA);
+        assertEquals(0.005, s.next().v(), DELTA);
+        assertEquals(0.500, s.next().a(), DELTA);
 
         // if time does not pass, nothing changes.
         s = ref.get();
-        assertEquals(0, s.current().x(), kDelta);
-        assertEquals(0, s.current().v(), kDelta);
-        assertEquals(0, s.current().a(), kDelta);
-        assertEquals(0.00003, s.next().x(), kDelta);
-        assertEquals(0.005, s.next().v(), kDelta);
-        assertEquals(0.500, s.next().a(), kDelta);
+        assertEquals(0, s.current().x(), DELTA);
+        assertEquals(0, s.current().v(), DELTA);
+        assertEquals(0, s.current().a(), DELTA);
+        assertEquals(0.00003, s.next().x(), DELTA);
+        assertEquals(0.005, s.next().v(), DELTA);
+        assertEquals(0.500, s.next().a(), DELTA);
 
         stepTime();
 
         // now the setpoint has advanced
         s = ref.get();
-        assertEquals(0, s.current().x(), kDelta);
-        assertEquals(0.005, s.current().v(), kDelta);
-        assertEquals(0.500, s.current().a(), kDelta);
-        assertEquals(0.00026, s.next().x(), kDelta);
-        assertEquals(0.020, s.next().v(), kDelta);
-        assertEquals(1.000, s.next().a(), kDelta);
+        assertEquals(0, s.current().x(), DELTA);
+        assertEquals(0.005, s.current().v(), DELTA);
+        assertEquals(0.500, s.current().a(), DELTA);
+        assertEquals(0.00026, s.next().x(), DELTA);
+        assertEquals(0.020, s.next().v(), DELTA);
+        assertEquals(1.000, s.next().a(), DELTA);
 
     }
 

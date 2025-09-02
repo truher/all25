@@ -1,9 +1,9 @@
 package org.team100.lib.reference;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.profile.timed.TimedProfile;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Takt;
 
 /**
  * Extracts current and next references from a timed profile.

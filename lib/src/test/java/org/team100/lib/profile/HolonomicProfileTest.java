@@ -1,10 +1,10 @@
 package org.team100.lib.profile;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.motion.drivetrain.SwerveControl;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;

@@ -26,12 +26,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class TrajectoryVelocityProfileTest {
     private static final boolean DEBUG = false;
     // A five-meter straight line.
-    public static final List<Pose2dWithMotion> kWaypoints = Arrays.asList(
+    public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
             new Pose2dWithMotion(new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.kZero)),
             new Pose2dWithMotion(new Pose2d(new Translation2d(5.0, 0.0), Rotation2d.kZero)));
 
     // No rotation.
-    public static final List<Rotation2d> kHeadings = List.of(
+    public static final List<Rotation2d> HEADINGS = List.of(
             GeometryUtil.fromDegrees(0),
             GeometryUtil.fromDegrees(0));
 
@@ -47,7 +47,7 @@ public class TrajectoryVelocityProfileTest {
     /** This uses the default max accel which is ridiculously high. */
     @Test
     void testNoConstraint() {
-        Path100 path = new Path100(kWaypoints);
+        Path100 path = new Path100(WAYPOINTS);
         List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
         ScheduleGenerator u = new ScheduleGenerator(constraints);
         Trajectory100 traj = u.timeParameterizeTrajectory(
@@ -58,7 +58,7 @@ public class TrajectoryVelocityProfileTest {
     /** This produces a trapezoid. */
     @Test
     void testConstantConstraint() {
-        Path100 path = new Path100(kWaypoints);
+        Path100 path = new Path100(WAYPOINTS);
         // somewhat realistic numbers
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
         List<TimingConstraint> constraints = List.of(new ConstantConstraint(1, 1, limits));
@@ -71,7 +71,7 @@ public class TrajectoryVelocityProfileTest {
     /** This produces the desired current-limited exponential shape. */
     @Test
     void testSwerveConstraint() {
-        Path100 path = new Path100(kWaypoints);
+        Path100 path = new Path100(WAYPOINTS);
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
         List<TimingConstraint> constraints = List.of(new SwerveDriveDynamicsConstraint(limits, 1, 1));
         ScheduleGenerator u = new ScheduleGenerator(constraints);
@@ -83,7 +83,7 @@ public class TrajectoryVelocityProfileTest {
     /** */
     @Test
     void testAuto() {
-        Path100 path = new Path100(kWaypoints);
+        Path100 path = new Path100(WAYPOINTS);
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
         TimingConstraintFactory timing = new TimingConstraintFactory(limits);
         List<TimingConstraint> constraints = timing.testAuto();

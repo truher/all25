@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 class TestCameraAngles {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testCameraAngles1() {
@@ -19,8 +19,8 @@ class TestCameraAngles {
         Rotation3d sight = new Rotation3d();
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // 30-60-90 triangle, so sqrt(3) in x
-        assertEquals(1.732, t.getX(), kDelta);
-        assertEquals(0, t.getY(), kDelta);
+        assertEquals(1.732, t.getX(), DELTA);
+        assertEquals(0, t.getY(), DELTA);
     }
 
     @Test
@@ -31,9 +31,9 @@ class TestCameraAngles {
         Rotation3d sight = new Rotation3d(0, Math.toRadians(25), Math.toRadians(-10));
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // steeper than 45 down
-        assertEquals(0.691, t.getX(), kDelta);
+        assertEquals(0.691, t.getX(), DELTA);
         // a bit to the right
-        assertEquals(-0.194, t.getY(), kDelta);
+        assertEquals(-0.194, t.getY(), DELTA);
     }
 
     @Test
@@ -44,8 +44,8 @@ class TestCameraAngles {
         Rotation3d sight = new Rotation3d();
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // 45 down means distance = height
-        assertEquals(1, t.getX(), kDelta);
-        assertEquals(0, t.getY(), kDelta);
+        assertEquals(1, t.getX(), DELTA);
+        assertEquals(0, t.getY(), DELTA);
     }
 
     @Test
@@ -57,12 +57,12 @@ class TestCameraAngles {
         Transform3d t = TargetLocalizer.sightInRobotCoords(camera, sight);
         // offset, sqrt(3) + 1
         // offset should be the same.
-        assertEquals(1, t.getX(), kDelta);
-        assertEquals(1, t.getY(), kDelta);
-        assertEquals(1, t.getZ(), kDelta);
-        assertEquals(0, t.getRotation().getX(), kDelta);
-        assertEquals(0.523, t.getRotation().getY(), kDelta);
-        assertEquals(0, t.getRotation().getZ(), kDelta);
+        assertEquals(1, t.getX(), DELTA);
+        assertEquals(1, t.getY(), DELTA);
+        assertEquals(1, t.getZ(), DELTA);
+        assertEquals(0, t.getRotation().getX(), DELTA);
+        assertEquals(0.523, t.getRotation().getY(), DELTA);
+        assertEquals(0, t.getRotation().getZ(), DELTA);
     }
 
     @Test
@@ -73,8 +73,8 @@ class TestCameraAngles {
         Rotation3d sight = new Rotation3d();
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // offset, sqrt(3) + 1
-        assertEquals(2.732, t.getX(), kDelta);
-        assertEquals(1, t.getY(), kDelta);
+        assertEquals(2.732, t.getX(), DELTA);
+        assertEquals(1, t.getY(), DELTA);
     }
 
     @Test
@@ -85,8 +85,8 @@ class TestCameraAngles {
         Rotation3d sight = new Rotation3d();
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // facing back
-        assertEquals(-1, t.getX(), kDelta);
-        assertEquals(0, t.getY(), kDelta);
+        assertEquals(-1, t.getX(), DELTA);
+        assertEquals(0, t.getY(), DELTA);
     }
 
     @Test
@@ -96,8 +96,8 @@ class TestCameraAngles {
         Rotation3d sight = new Rotation3d();
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // facing left
-        assertEquals(0, t.getX(), kDelta);
-        assertEquals(1, t.getY(), kDelta);
+        assertEquals(0, t.getX(), DELTA);
+        assertEquals(1, t.getY(), DELTA);
     }
 
         @Test
@@ -108,9 +108,9 @@ class TestCameraAngles {
         Rotation3d sight = new Rotation3d(0, 0, Math.toRadians(45));
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // camera still pointing at x=1
-        assertEquals(1, t.getX(), kDelta);
+        assertEquals(1, t.getX(), DELTA);
         // left sight is to the right due to inversion
-        assertEquals(-1.414, t.getY(), kDelta);
+        assertEquals(-1.414, t.getY(), DELTA);
     }
 
     @Test
@@ -121,9 +121,9 @@ class TestCameraAngles {
         Rotation3d sight = new Rotation3d(0, 0, Math.toRadians(45));
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // camera still pointing at x=1
-        assertEquals(1, t.getX(), kDelta);
+        assertEquals(1, t.getX(), DELTA);
         // distance to the floor is sqrt(2), so y sight at 45 is the same
-        assertEquals(1.414, t.getY(), kDelta);
+        assertEquals(1.414, t.getY(), DELTA);
     }
 
     @Test
@@ -135,8 +135,8 @@ class TestCameraAngles {
         Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
         // this was wrong before; roll to the right and look "down" -- you're looking to
         // the left.
-        // assertEquals(-1, t.getY(), kDelta);
-        assertEquals(1, t.getX(), kDelta);
-        assertEquals(1.414, t.getY(), kDelta);
+        // assertEquals(-1, t.getY(), DELTA);
+        assertEquals(1, t.getX(), DELTA);
+        assertEquals(1.414, t.getY(), DELTA);
     }
 }

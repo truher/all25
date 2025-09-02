@@ -13,10 +13,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 /** Static utility methods for splines. */
 public class SplineUtil {
     private static final boolean DEBUG = false;
-    private static final double kEpsilon = 1e-5;
-    private static final double kStepSize = 1.0;
-    private static final double kMinDelta = 0.001;
-    private static final int kMaxIterations = 100;
+    private static final double EPSILON = 1e-5;
+    private static final double STEP_SIZE = 1.0;
+    private static final double MIN_DELTA = 0.001;
+    private static final int MAX_ITERATIONS = 100;
 
     /**
      * Makes optimization code a little more readable
@@ -181,10 +181,10 @@ public class SplineUtil {
         }
         int count = 0;
         double prev = sumDCurvature2(splines);
-        while (count < kMaxIterations) {
+        while (count < MAX_ITERATIONS) {
             runOptimizationIteration(splines);
             double current = sumDCurvature2(splines);
-            if (prev - current < kMinDelta)
+            if (prev - current < MIN_DELTA)
                 return current;
             prev = current;
             count++;
@@ -235,12 +235,12 @@ public class SplineUtil {
         }
 
         // last point is offset from the middle location by +stepSize
-        Translation2d p1 = new Translation2d(-kStepSize, sumDCurvature2(splines));
+        Translation2d p1 = new Translation2d(-STEP_SIZE, sumDCurvature2(splines));
         for (int i = 0; i < splines.size() - 1; ++i) {
             forwards(splines, controlPoints, i);
         }
 
-        Translation2d p3 = new Translation2d(kStepSize, sumDCurvature2(splines));
+        Translation2d p3 = new Translation2d(STEP_SIZE, sumDCurvature2(splines));
         // approximate step size to minimize sumDCurvature2 along the gradient
         double stepSize = fitParabola(p1, p2, p3);
 
@@ -272,8 +272,8 @@ public class SplineUtil {
 
         // move by the step size calculated by the parabola fit (+1 to offset for the
         // final transformation to find p3)
-        controlPoints[i].ddx *= 1 + stepSize / kStepSize;
-        controlPoints[i].ddy *= 1 + stepSize / kStepSize;
+        controlPoints[i].ddx *= 1 + stepSize / STEP_SIZE;
+        controlPoints[i].ddy *= 1 + stepSize / STEP_SIZE;
 
         splines.set(i, splines.get(i).addToSecondDerivatives(0, controlPoints[i].ddx, 0, controlPoints[i].ddy));
         splines.set(i + 1,
@@ -327,8 +327,8 @@ public class SplineUtil {
             return;
 
         // normalize to step size
-        controlPoints[i].ddx *= kStepSize / magnitude;
-        controlPoints[i].ddy *= kStepSize / magnitude;
+        controlPoints[i].ddx *= STEP_SIZE / magnitude;
+        controlPoints[i].ddy *= STEP_SIZE / magnitude;
 
         // move opposite the gradient by step size amount
         splines.set(i, splines.get(i).addToSecondDerivatives(0, -controlPoints[i].ddx, 0, -controlPoints[i].ddy));
@@ -366,13 +366,13 @@ public class SplineUtil {
             controlPoints[i] = new ControlPoint();
 
             // calculate partial derivatives of sumDCurvature2
-            splines.set(i, splines.get(i).addToSecondDerivatives(0, kEpsilon, 0, 0));
-            splines.set(i + 1, splines.get(i + 1).addToSecondDerivatives(kEpsilon, 0, 0, 0));
-            controlPoints[i].ddx = (sumDCurvature2(splines) - original) / kEpsilon;
+            splines.set(i, splines.get(i).addToSecondDerivatives(0, EPSILON, 0, 0));
+            splines.set(i + 1, splines.get(i + 1).addToSecondDerivatives(EPSILON, 0, 0, 0));
+            controlPoints[i].ddx = (sumDCurvature2(splines) - original) / EPSILON;
 
-            splines.set(i, splines.get(i).addToSecondDerivatives(0, 0, 0, kEpsilon));
-            splines.set(i + 1, splines.get(i + 1).addToSecondDerivatives(0, 0, kEpsilon, 0));
-            controlPoints[i].ddy = (sumDCurvature2(splines) - original) / kEpsilon;
+            splines.set(i, splines.get(i).addToSecondDerivatives(0, 0, 0, EPSILON));
+            splines.set(i + 1, splines.get(i + 1).addToSecondDerivatives(0, 0, EPSILON, 0));
+            controlPoints[i].ddy = (sumDCurvature2(splines) - original) / EPSILON;
 
             magnitude += controlPoints[i].ddx * controlPoints[i].ddx + controlPoints[i].ddy * controlPoints[i].ddy;
         }

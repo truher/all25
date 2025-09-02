@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
@@ -16,7 +17,6 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -62,10 +62,10 @@ public class VisionDataProvider24  {
      * Set this to some large number (e.g. 100) to disable gyro-derived rotation and
      * always use the camera.
      */
-    private static final double kTagRotationBeliefThresholdMeters = 0;
+    private static final double TAG_ROTATION_BELIEF_THRESHOLD_M = 0;
     /** Discard results further than this from the previous one. */
-    private static final double kVisionChangeToleranceMeters = 0.1;
-    // private static final double kVisionChangeToleranceMeters = 1;
+    private static final double VISION_CHANGE_TOLERANCE_M = 0.1;
+    // private static final double VISION_CHANGE_TOLERANCE_M = 1;
 
     /** this is the default value which, in hindsight, seems ridiculously high. */
     private static final double[] defaultStateStdDevs = new double[] {
@@ -331,7 +331,7 @@ public class VisionDataProvider24  {
                         tagInRobot.getRotation().getZ());
             }
 
-            if (tagInCamera.getTranslation().getNorm() > kTagRotationBeliefThresholdMeters) {
+            if (tagInCamera.getTranslation().getNorm() > TAG_ROTATION_BELIEF_THRESHOLD_M) {
                 // If the tag is further than the threshold, replace the tag rotation with
                 // a rotation derived from the gyro.
                 m_log_using_gyro.log(() -> true);
@@ -385,7 +385,7 @@ public class VisionDataProvider24  {
             }
 
             final double distanceM = distance(m_prevPose, pose);
-            if (distanceM > kVisionChangeToleranceMeters) {
+            if (distanceM > VISION_CHANGE_TOLERANCE_M) {
                 // The new estimate is too far from the previous one: it's probably garbage.
                 m_prevPose = pose;
                 continue;
@@ -420,10 +420,10 @@ public class VisionDataProvider24  {
              * 
              * TODO: gather some actual data.
              */
-            final double k = 0.03;
+            final double K = 0.03;
             return new double[] {
-                    (k * distanceM) + 0.01,
-                    (k * distanceM) + 0.01,
+                    (K * distanceM) + 0.01,
+                    (K * distanceM) + 0.01,
                     Double.MAX_VALUE };
         }
         /*
@@ -431,10 +431,10 @@ public class VisionDataProvider24  {
          * This is a guess based on figure 5 in the Apriltag2 paper:
          * https://april.eecs.umich.edu/media/media/pdfs/wang2016iros.pdf
          */
-        final double k = 0.03;
+        final double K = 0.03;
         return new double[] {
-                k * distanceM,
-                k * distanceM,
+                K * distanceM,
+                K * distanceM,
                 Double.MAX_VALUE };
     }
 

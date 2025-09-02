@@ -13,7 +13,7 @@ import edu.wpi.first.math.numbers.N3;
  * Remind myself how 3d rotations work.
  */
 class CameraTest {
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
 
     @Test
     void testNoRotation() {
@@ -21,9 +21,9 @@ class CameraTest {
         double pitch = 0.0; // around Y (left)
         double yaw = 0.0; // around Z (up)
         Rotation3d r = new Rotation3d(roll, pitch, yaw);
-        assertEquals(0, r.getX(), kDelta);
-        assertEquals(0, r.getY(), kDelta);
-        assertEquals(0, r.getZ(), kDelta);
+        assertEquals(0, r.getX(), DELTA);
+        assertEquals(0, r.getY(), DELTA);
+        assertEquals(0, r.getZ(), DELTA);
     }
 
     @Test
@@ -32,9 +32,9 @@ class CameraTest {
         double pitch = 0.0;
         double yaw = 0.0;
         Rotation3d r = new Rotation3d(roll, pitch, yaw);
-        assertEquals(1.0, r.getX(), kDelta);
-        assertEquals(0, r.getY(), kDelta);
-        assertEquals(0, r.getZ(), kDelta);
+        assertEquals(1.0, r.getX(), DELTA);
+        assertEquals(0, r.getY(), DELTA);
+        assertEquals(0, r.getZ(), DELTA);
     }
 
     @Test
@@ -43,9 +43,9 @@ class CameraTest {
         double pitch = 1.0; // down
         double yaw = 0.0;
         Rotation3d r = new Rotation3d(roll, pitch, yaw);
-        assertEquals(0, r.getX(), kDelta);
-        assertEquals(1.0, r.getY(), kDelta);
-        assertEquals(0, r.getZ(), kDelta);
+        assertEquals(0, r.getX(), DELTA);
+        assertEquals(1.0, r.getY(), DELTA);
+        assertEquals(0, r.getZ(), DELTA);
     }
 
     @Test
@@ -54,18 +54,18 @@ class CameraTest {
         double pitch = 0.0;
         double yaw = 1.0; // left
         Rotation3d r = new Rotation3d(roll, pitch, yaw);
-        assertEquals(0, r.getX(), kDelta);
-        assertEquals(0, r.getY(), kDelta);
-        assertEquals(1.0, r.getZ(), kDelta);
+        assertEquals(0, r.getX(), DELTA);
+        assertEquals(0, r.getY(), DELTA);
+        assertEquals(1.0, r.getZ(), DELTA);
     }
 
     @Test
     void testIMatrix() {
         Matrix<N3, N3> matrix = Matrix.eye(Nat.N3());
         Rotation3d r = new Rotation3d(matrix);
-        assertEquals(0, r.getX(), kDelta);
-        assertEquals(0, r.getY(), kDelta);
-        assertEquals(0, r.getZ(), kDelta);
+        assertEquals(0, r.getX(), DELTA);
+        assertEquals(0, r.getY(), DELTA);
+        assertEquals(0, r.getZ(), DELTA);
     }
 
     @Test
@@ -92,9 +92,9 @@ class CameraTest {
         matrix.set(2, 2, rot);
 
         Rotation3d r = new Rotation3d(matrix);
-        assertEquals(Math.PI / 4, r.getX(), kDelta);
-        assertEquals(0, r.getY(), kDelta);
-        assertEquals(0, r.getZ(), kDelta);
+        assertEquals(Math.PI / 4, r.getX(), DELTA);
+        assertEquals(0, r.getY(), DELTA);
+        assertEquals(0, r.getZ(), DELTA);
     }
 
     @Test
@@ -121,9 +121,9 @@ class CameraTest {
         matrix.set(2, 2, rot);
 
         Rotation3d r = new Rotation3d(matrix);
-        assertEquals(0, r.getX(), kDelta);
-        assertEquals(Math.PI / 4, r.getY(), kDelta);
-        assertEquals(0, r.getZ(), kDelta);
+        assertEquals(0, r.getX(), DELTA);
+        assertEquals(Math.PI / 4, r.getY(), DELTA);
+        assertEquals(0, r.getZ(), DELTA);
     }
 
     @Test
@@ -150,8 +150,8 @@ class CameraTest {
         matrix.set(2, 2, 1.0);
 
         Rotation3d r = new Rotation3d(matrix);
-        assertEquals(0, r.getX(), kDelta);
-        assertEquals(0, r.getY(), kDelta);
-        assertEquals(Math.PI / 4, r.getZ(), kDelta);
+        assertEquals(0, r.getX(), DELTA);
+        assertEquals(0, r.getY(), DELTA);
+        assertEquals(Math.PI / 4, r.getZ(), DELTA);
     }
 }

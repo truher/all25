@@ -12,6 +12,8 @@ import org.team100.lib.motion.drivetrain.kinodynamics.struct.SwerveModulePositio
 import edu.wpi.first.math.geometry.Rotation2d;
 
 class SwerveModulePosition100Test {
+    private static final double DELTA = 0.001;
+
     @Test
     void testStruct() {
         SwerveModulePosition100Struct s = SwerveModulePosition100.struct;
@@ -41,5 +43,28 @@ class SwerveModulePosition100Test {
         SwerveModulePosition100 p2 = s.unpack(bb);
         assertEquals(1.0, p2.distanceMeters, 0.001);
         assertTrue(p2.angle.isEmpty());
+    }
+
+    @Test
+    void testPlus() {
+        {
+            SwerveModulePosition100 start = new SwerveModulePosition100(
+                    0, Optional.of(Rotation2d.kZero));
+            SwerveModuleDelta delta = new SwerveModuleDelta(
+                    0, Optional.of(Rotation2d.kZero));
+            SwerveModulePosition100 result = start.plus(delta);
+            assertEquals(0, result.distanceMeters, DELTA);
+            assertEquals(0, result.angle.get().getDegrees(), DELTA);
+        }
+        {
+            SwerveModulePosition100 start = new SwerveModulePosition100(
+                    1, Optional.of(Rotation2d.fromDegrees(2)));
+            SwerveModuleDelta delta = new SwerveModuleDelta(
+                    3, Optional.of(Rotation2d.fromDegrees(4)));
+            SwerveModulePosition100 result = start.plus(delta);
+            assertEquals(4, result.distanceMeters, DELTA);
+            assertEquals(4, result.angle.get().getDegrees(), DELTA);
+        }
+
     }
 }

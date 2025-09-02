@@ -6,8 +6,8 @@ import org.team100.lib.util.Util;
 
 /**
  * Golden ratio search finds the minimum by testing points. If the function has
- * more
- * than one local minimum, there's no guarantee it will find the global minimum.
+ * more than one local minimum, there's no guarantee it will find the global
+ * minimum.
  * 
  * It's intended to find the minimum error in each step of coordinate descent,
  * so the function has a scalar input (i.e. configuration of one joint) and a

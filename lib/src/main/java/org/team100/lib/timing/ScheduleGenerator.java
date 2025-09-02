@@ -13,7 +13,7 @@ import org.team100.lib.util.Util;
  * schedule.
  */
 public class ScheduleGenerator {
-    private static final double kEpsilon = 1e-6;
+    private static final double EPSILON = 1e-6;
     /** this is the default, in order to make the constraints set the actual */
     private static final double HIGH_ACCEL = 1000;
 
@@ -116,18 +116,18 @@ public class ScheduleGenerator {
             s1.clampAccel(m_constraints);
 
             // motionless
-            if (Math.abs(ds) < kEpsilon) {
+            if (Math.abs(ds) < EPSILON) {
                 return;
             }
 
             double accel = accel(s0.getVel(), s1.getVel(), ds);
-            if (accel > s1.getMax_acceleration() + kEpsilon) {
+            if (accel > s1.getMax_acceleration() + EPSILON) {
                 // implied accel is too high because v1 is too high, perhaps because
                 // a0 was too high, try again with the (lower) constrained value
                 s0.setMax_acceleration(s1.getMax_acceleration());
                 continue;
             }
-            if (accel > s0.getMin_acceleration() + kEpsilon) {
+            if (accel > s0.getMin_acceleration() + EPSILON) {
                 // set the previous state accel to whatever the constrained velocity implies
                 s0.setMax_acceleration(accel);
             }
@@ -184,13 +184,13 @@ public class ScheduleGenerator {
             s0.clampAccel(m_constraints);
 
             // motionless
-            if (Math.abs(ds) < kEpsilon) {
+            if (Math.abs(ds) < EPSILON) {
                 return;
             }
 
             // implied accel using the constrained v0
             double accel = accel(s1.getVel(), s0.getVel(), ds);
-            if (accel < s0.getMin_acceleration() - kEpsilon) {
+            if (accel < s0.getMin_acceleration() - EPSILON) {
                 // accel is too low which implies that s1 accel is too low, try again
                 s1.setMin_acceleration(s0.getMin_acceleration());
                 continue;
@@ -237,10 +237,10 @@ public class ScheduleGenerator {
             double v1,
             double ds,
             double accel) throws TimingException {
-        if (Math.abs(accel) > kEpsilon) {
+        if (Math.abs(accel) > EPSILON) {
             return (v1 - v0) / accel;
         }
-        if (Math.abs(v0) > kEpsilon) {
+        if (Math.abs(v0) > EPSILON) {
             return ds / v0;
         }
         throw new TimingException();

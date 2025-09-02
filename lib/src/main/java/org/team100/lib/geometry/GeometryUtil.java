@@ -114,11 +114,11 @@ public class GeometryUtil {
     }
 
     public static double WrapRadians(double radians) {
-        final double k2Pi = 2.0 * Math.PI;
-        radians = radians % k2Pi;
-        radians = (radians + k2Pi) % k2Pi;
+        final double twoPi = 2.0 * Math.PI;
+        radians = radians % twoPi;
+        radians = (radians + twoPi) % twoPi;
         if (radians > Math.PI)
-            radians -= k2Pi;
+            radians -= twoPi;
         return radians;
     }
 

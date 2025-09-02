@@ -56,10 +56,12 @@ public interface AngularPositionServo  {
      */
     OptionalDouble getPosition();
 
+    /** Mechanism is following the desired setpoint. */
     boolean atSetpoint();
 
     boolean profileDone();
 
+    /** Profile is done, and we're on the setpoint. */
     boolean atGoal();
 
     void stop();
