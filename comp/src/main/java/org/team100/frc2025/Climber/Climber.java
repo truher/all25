@@ -1,5 +1,8 @@
 package org.team100.frc2025.Climber;
 
+import java.util.OptionalDouble;
+import java.util.function.DoubleSupplier;
+
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
@@ -20,8 +23,9 @@ import org.team100.lib.profile.incremental.Profile100;
 import org.team100.lib.profile.incremental.TrapezoidProfile100;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
-import org.team100.lib.reference.Setpoints1d;
+import org.team100.lib.util.Util;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -72,32 +76,47 @@ public class Climber extends SubsystemBase {
 
     }
 
-    public void setDutyCycle(double dutyCycle) {
-        if (m_servo == null)
-            return;
-        m_servo.setDutyCycle(dutyCycle);
+    @Override
+    public void periodic() {
+        m_servo.periodic();
     }
 
-    public void setAngle(double value) {
-        m_servo.setPositionProfiled(value, 0);
+    public boolean atGoal() {
+        return m_servo.atGoal();
     }
 
-    public void setAngleSetpoint(Setpoints1d setpoint) {
-        m_servo.setPositionDirect(setpoint, 0);
+    // COMMANDS
+
+    public Command stop() {
+        return run(
+                () -> setDutyCycle(0));
     }
 
-    public double getAngle() {
-        return m_servo.getPosition().getAsDouble();
+    public Command manual(DoubleSupplier s) {
+        return runEnd(
+                () -> setDutyCycle(s.getAsDouble()),
+                () -> setDutyCycle(0));
     }
 
-    public void reset() {
+    /** Use a profile to set position perpetually. */
+    public Command setPosition(double v) {
+        return startRun(
+                () -> reset(),
+                () -> setAngle(v));
+    }
+
+    ////////////////////////////////
+
+    private void reset() {
         m_servo.reset();
     }
 
-    @Override
-    public void periodic() {
-        if (m_servo == null)
-            return;
-        m_servo.periodic();
+    private void setDutyCycle(double dutyCycle) {
+        m_servo.setDutyCycle(dutyCycle);
+    }
+
+    /** Use a profile to set the position. */
+    private void setAngle(double value) {
+        m_servo.setPositionProfiled(value, 0);
     }
 }

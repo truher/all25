@@ -7,22 +7,22 @@ package org.team100.lib.hid;
  * When you change this interface, you'll need to also change the "proxy," don't
  * forget. :-)
  */
-public interface OperatorControl  {
+public interface OperatorControl {
 
     default String getHIDName() {
         return "No HID Found!!";
     }
 
-    default double ramp() {
+    default boolean activateManualClimb() {
+        return false;
+    }
+
+    default double manualClimbSpeed() {
         return 0.0;
     }
 
     /** placeholder for elevator development */
     default boolean elevate() {
-        return false;
-    }
-
-    default boolean downavate() {
         return false;
     }
 

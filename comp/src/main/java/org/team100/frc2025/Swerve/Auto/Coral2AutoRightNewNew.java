@@ -6,12 +6,11 @@ import org.team100.frc2025.CommandGroups.DeadlineForEmbarkAndPrePlace;
 import org.team100.frc2025.CommandGroups.PostDropAndReadyFunnel;
 import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
 import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
-import org.team100.frc2025.CommandGroups.WaitForBooleanTrue;
 import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Funnel.RunFunnel;
-import org.team100.frc2025.Swerve.SemiAuto.Profile_Nav.Embark;
+import org.team100.frc2025.Swerve.SemiAuto.Embark;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.RunCoralTunnel;
@@ -32,7 +31,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class Coral2AutoRightNewNew extends SequentialCommandGroup100 {
 
@@ -50,37 +49,40 @@ public class Coral2AutoRightNewNew extends SequentialCommandGroup100 {
             TrajectoryVisualization viz) {
         super(logger, "Coral2Auto");
 
-        Embark embarkToI = new Embark(m_logger, m_drive, heedRadiusM, controller, profile, FieldSector.EF,
+        Embark embarkToI = new Embark(m_logger, m_drive, heedRadiusM,
+                controller, profile, FieldSector.EF,
                 ReefDestination.RIGHT,
-                () -> ScoringPosition.L4, ReefPoint.F, true);
+                () -> ScoringPosition.L4, ReefPoint.F);
 
-        Embark embarkToK = new Embark(m_logger, m_drive, heedRadiusM, controller, profile, FieldSector.CD,
+        Embark embarkToK = new Embark(m_logger, m_drive, heedRadiusM,
+                controller, profile, FieldSector.CD,
                 ReefDestination.RIGHT,
-                () -> ScoringPosition.L4, ReefPoint.D, true);
+                () -> ScoringPosition.L4, ReefPoint.D);
 
-        Embark embarkToL = new Embark(m_logger, m_drive, heedRadiusM, controller, profile, FieldSector.CD,
+        Embark embarkToL = new Embark(m_logger, m_drive, heedRadiusM,
+                controller, profile, FieldSector.CD,
                 ReefDestination.LEFT,
-                () -> ScoringPosition.L4, ReefPoint.C, true);
+                () -> ScoringPosition.L4, ReefPoint.C);
 
-        GoToCoralStation goToStation1stTime = new GoToCoralStation(logger, m_drive, controller, viz, kinodynamics,
-                                        CoralStation.Right, 0.5, true);
+        GoToCoralStation goToStation1stTime = new GoToCoralStation(
+                logger, m_drive, controller, viz, kinodynamics,
+                CoralStation.Right, 0.5);
 
-        GoToCoralStation goToStation2ndTime = new GoToCoralStation(logger, m_drive, controller, viz, kinodynamics,
-                                        CoralStation.Right, 0.5, true);
+        GoToCoralStation goToStation2ndTime = new GoToCoralStation(
+                logger, m_drive, controller, viz, kinodynamics,
+                CoralStation.Right, 0.5);
 
-        PrePlaceCoralL4 prePlaceCoralL4I = new PrePlaceCoralL4(wrist, elevator, tunnel, 47, true);
+        PrePlaceCoralL4 prePlaceCoralL4I = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
 
-        PrePlaceCoralL4 prePlaceCoralL4K = new PrePlaceCoralL4(wrist, elevator, tunnel, 47, true);
+        PrePlaceCoralL4 prePlaceCoralL4K = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
 
-        PrePlaceCoralL4 prePlaceCoralL4L = new PrePlaceCoralL4(wrist, elevator, tunnel, 47, true);
+        PrePlaceCoralL4 prePlaceCoralL4L = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
 
-       
+        PostDropAndReadyFunnel postDropAndReadyFunnelFromI = new PostDropAndReadyFunnel(wrist, elevator, 10,
+                (goToStation1stTime::isDone));
 
-        PostDropAndReadyFunnel postDropAndReadyFunnelFromI = new PostDropAndReadyFunnel(wrist, elevator, 10, (goToStation1stTime::isDone));
-
-        PostDropAndReadyFunnel postDropAndReadyFunnelFromK = new PostDropAndReadyFunnel(wrist, elevator, 10, goToStation2ndTime::isDone);
-
-
+        PostDropAndReadyFunnel postDropAndReadyFunnelFromK = new PostDropAndReadyFunnel(wrist, elevator, 10,
+                goToStation2ndTime::isDone);
 
         addCommands(
 
@@ -92,10 +94,9 @@ public class Coral2AutoRightNewNew extends SequentialCommandGroup100 {
                         embarkToI,
                         new SequentialCommandGroup100(logger, "handoff then place",
                                 new ParallelRaceGroup100(m_logger, "handoff",
-                                    new WaitCommand(0.5),
-                                    new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)
-                                ),
-                                new SetWrist(wrist, 0.4, false),
+                                        Commands.waitSeconds(0.5),
+                                        new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)),
+                                new SetWrist(wrist, 0.4),
                                 prePlaceCoralL4I)),
 
                 // Place preload and reload
@@ -107,31 +108,29 @@ public class Coral2AutoRightNewNew extends SequentialCommandGroup100 {
                         new SequentialCommandGroup100(
                                 logger,
                                 "wait then drive away to pick up",
-                                new WaitForBooleanTrue(postDropAndReadyFunnelFromI::indicateReadyToLeave),
+                                Commands.waitUntil(postDropAndReadyFunnelFromI::indicateReadyToLeave),
                                 new ParallelDeadlineGroup100(
                                         logger,
                                         "Pick up",
                                         goToStation1stTime,
                                         new RunFunnel(funnel),
-                                        new RunCoralTunnel(tunnel, 1))
-                        )
+                                        new RunCoralTunnel(tunnel, 1)))
 
                 ),
 
-                //Go to peg K and pre place
- 
+                // Go to peg K and pre place
+
                 new ParallelDeadlineGroup100(
-                    m_logger,
-                    "embark1",
-                    new DeadlineForEmbarkAndPrePlace(embarkToK::isDone, prePlaceCoralL4K::isDone),
-                    embarkToK,
-                    new SequentialCommandGroup100(logger, "handoff then place",
-                            new ParallelRaceGroup100(m_logger, "handoff",
-                                new WaitCommand(0.5),
-                                new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)
-                            ),
-                            new SetWrist(wrist, 0.4, false),
-                            prePlaceCoralL4K)),
+                        m_logger,
+                        "embark1",
+                        new DeadlineForEmbarkAndPrePlace(embarkToK::isDone, prePlaceCoralL4K::isDone),
+                        embarkToK,
+                        new SequentialCommandGroup100(logger, "handoff then place",
+                                new ParallelRaceGroup100(m_logger, "handoff",
+                                        Commands.waitSeconds(0.5),
+                                        new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)),
+                                new SetWrist(wrist, 0.4),
+                                prePlaceCoralL4K)),
 
                 // Place coral and reload
 
@@ -142,7 +141,7 @@ public class Coral2AutoRightNewNew extends SequentialCommandGroup100 {
                         new SequentialCommandGroup100(
                                 logger,
                                 "wait then drive away to pick up",
-                                new WaitForBooleanTrue(postDropAndReadyFunnelFromK::indicateReadyToLeave),
+                                Commands.waitUntil(postDropAndReadyFunnelFromK::indicateReadyToLeave),
                                 new ParallelDeadlineGroup100(
                                         logger,
                                         "Pick up",
@@ -152,8 +151,8 @@ public class Coral2AutoRightNewNew extends SequentialCommandGroup100 {
 
                 ),
 
-                //Go to peg L and pre place
- 
+                // Go to peg L and pre place
+
                 new ParallelDeadlineGroup100(
                         m_logger,
                         "embark1",
@@ -161,24 +160,10 @@ public class Coral2AutoRightNewNew extends SequentialCommandGroup100 {
                         embarkToL,
                         new SequentialCommandGroup100(logger, "handoff then place",
                                 new ParallelRaceGroup100(m_logger, "handoff",
-                                        new WaitCommand(0.5),
-                                new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)
-                                ),
-                                new SetWrist(wrist, 0.4, false),
+                                        Commands.waitSeconds(0.5),
+                                        new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)),
+                                new SetWrist(wrist, 0.4),
                                 prePlaceCoralL4L)),
-
-
-                new PostDropCoralL4(wrist, elevator, 10)
-
-        
-
-        );
-
-
-
-        
-
-        
-
+                new PostDropCoralL4(wrist, elevator, 10));
     }
 }

@@ -9,12 +9,13 @@ import org.team100.frc2025.Wrist.Wrist2;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class ScoreBargeSmart extends Command {
-    Elevator m_elevator;
-    Wrist2 m_wrist;
-    Supplier<Boolean> m_readyToShoot;
-    AlgaeGrip m_grip;
+    private final Elevator m_elevator;
+    private final Wrist2 m_wrist;
+    private final Supplier<Boolean> m_readyToShoot;
+    private final AlgaeGrip m_grip;
 
-    public ScoreBargeSmart(Elevator elevator, Wrist2 wrist, AlgaeGrip grip, Supplier<Boolean> readyToShoot) {
+    public ScoreBargeSmart(
+            Elevator elevator, Wrist2 wrist, AlgaeGrip grip, Supplier<Boolean> readyToShoot) {
         m_elevator = elevator;
         m_wrist = wrist;
         m_readyToShoot = readyToShoot;
@@ -35,12 +36,12 @@ public class ScoreBargeSmart extends Command {
 
             m_grip.setDutyCycle(0.5);
 
-        if(m_grip.hasAlgae()){
-            m_grip.applyLowConfigs();
-        }
-    } else {
-      m_elevator.setPosition(54.0);
-      m_wrist.setAngleValue(2.2);
+            if (m_grip.hasAlgae()) {
+                m_grip.applyLowConfigs();
+            }
+        } else {
+            m_elevator.setPosition(54.0);
+            m_wrist.setAngleValue(2.2);
 
             if (Math.abs(m_elevator.getPosition() - 54) < 0.5) {
                 m_grip.applyHighConfigs();

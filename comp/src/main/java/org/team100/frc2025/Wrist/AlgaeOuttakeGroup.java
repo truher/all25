@@ -14,7 +14,7 @@ public class AlgaeOuttakeGroup extends ParallelCommandGroup100 {
         super(logger, "AlgaeOuttakeGroup");
         addCommands(
                 new OuttakeAlgaeGrip(grip),
-                new SetWrist(wrist, 3.7, true),
+                new SetWristPerpetually(wrist, 3.7),
                 new SetElevatorPerpetually(elevator, 12));
     }
 }

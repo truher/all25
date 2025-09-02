@@ -29,6 +29,7 @@ import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.reference.TimedProfileReference1d;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -37,7 +38,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * TODO: caller should specify the acceleration of the carriage, since that
  * affects "gravity".
  */
-public class Wrist2 extends SubsystemBase  {
+public class Wrist2 extends SubsystemBase {
     /**
      * Publish the elevator mechanism visualization to glass. This might be a little
      * bit slow, turn it off for comp.
@@ -72,7 +73,7 @@ public class Wrist2 extends SubsystemBase  {
         Feedforward100 wristFF = Feedforward100.makeKraken6Wrist();
 
         Feedback100 wristFeedback = new FullStateFeedback(
-            logger, 4.5, 0.12, x -> x, 0.05, 0.05);
+                logger, 4.5, 0.12, x -> x, 0.05, 0.05);
 
         JerkLimitedProfile100 profile = new JerkLimitedProfile100(maxVel, maxAccel, maxJerk, false);
 
@@ -170,10 +171,6 @@ public class Wrist2 extends SubsystemBase  {
         m_wristMech.setDutyCycle(value);
     }
 
-    // public void setStatic() {
-    // wristServo.setStaticTorque(2.1);
-    // }
-
     public double getAngle() {
         // note this default might be dangerous
         return wristServo.getPosition().orElse(0);
@@ -209,6 +206,11 @@ public class Wrist2 extends SubsystemBase  {
 
     public void stop() {
         wristServo.stop();
+    }
+
+    /** Set the duty cycle perpetually. */
+    public Command setDuty(double v) {
+        return run(() -> setWristDutyCycle(v));
     }
 
 }

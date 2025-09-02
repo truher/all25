@@ -69,8 +69,8 @@ public class OperatorControlProxy implements OperatorControl {
     }
 
     @Override
-    public double ramp() {
-        return m_operatorControl.ramp();
+    public double manualClimbSpeed() {
+        return m_operatorControl.manualClimbSpeed();
     }
 
     @Override
@@ -79,8 +79,8 @@ public class OperatorControlProxy implements OperatorControl {
     }
 
     @Override
-    public boolean downavate() {
-        return m_operatorControl.downavate();
+    public boolean activateManualClimb() {
+        return m_operatorControl.activateManualClimb();
     }
 
     @Override

@@ -8,18 +8,16 @@ import org.team100.lib.experiments.Experiments;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class PrePlaceCoralL2 extends Command {
-    Wrist2 m_wrist;
-    Elevator m_elevator;
-    double m_elevatorGoal;
-    double count = 0;
-    boolean finished = false;
-    boolean m_perpetual = false;
+    private final Wrist2 m_wrist;
+    private final Elevator m_elevator;
+    private final double m_elevatorGoal;
+    private double count = 0;
+    private boolean finished = false;
 
-    public PrePlaceCoralL2(Wrist2 wrist, Elevator elevator, double elevatorValue, boolean perpetual) {
+    public PrePlaceCoralL2(Wrist2 wrist, Elevator elevator, double elevatorValue) {
         m_wrist = wrist;
         m_elevator = elevator;
         m_elevatorGoal = elevatorValue;
-        m_perpetual = perpetual;
         addRequirements(m_wrist, m_elevator);
     }
 
@@ -27,10 +25,6 @@ public class PrePlaceCoralL2 extends Command {
     public void initialize() {
         count = 0;
         finished = false;
-        // resetting forces the setpoint velocity to zero, which is not always what we
-        // want
-        // m_wrist.resetWristProfile();
-        // m_elevator.resetElevatorProfile();
     }
 
     @Override
@@ -55,28 +49,10 @@ public class PrePlaceCoralL2 extends Command {
         }
     }
 
-    @Override
-    public void end(boolean interrupted) {
-    }
-
     public boolean isDone() {
-            if (Experiments.instance.enabled(Experiment.UseProfileDone)){
-                return finished && m_wrist.profileDone() && m_elevator.profileDone();
-            }
-            return finished;
-        
-    }
-
-    @Override
-    public boolean isFinished() {
-        if(!m_perpetual){
-            if (Experiments.instance.enabled(Experiment.UseProfileDone)){
-                return finished && m_wrist.profileDone() && m_elevator.profileDone();
-            }
-            return finished;
-        } else {
-            return false;
+        if (Experiments.instance.enabled(Experiment.UseProfileDone)) {
+            return finished && m_wrist.profileDone() && m_elevator.profileDone();
         }
-        
+        return finished;
     }
 }

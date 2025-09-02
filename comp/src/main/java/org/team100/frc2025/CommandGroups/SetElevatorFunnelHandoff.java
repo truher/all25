@@ -5,10 +5,10 @@ import org.team100.frc2025.Elevator.Elevator;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class SetElevatorFunnelHandoff extends Command {
-    Elevator m_elevator;
-    double m_value;
-    boolean finished = false;
-    double count = 0;
+    private final Elevator m_elevator;
+    private final double m_value;
+    private boolean finished = false;
+    private double count = 0;
 
     public SetElevatorFunnelHandoff(Elevator elevator, double value) {
         m_elevator = elevator;
@@ -21,9 +21,6 @@ public class SetElevatorFunnelHandoff extends Command {
     public void initialize() {
         count = 0;
         finished = false;
-        // resetting forces the setpoint velocity to zero, which is not always what we
-        // want
-        // m_elevator.resetElevatorProfile();
     }
 
     @Override

@@ -27,19 +27,6 @@ public class GoToCoralStationPastGlass extends Navigator {
             TrajectoryVisualization viz,
             SwerveKinodynamics kinodynamics,
             CoralStation station,
-            double scale,
-            boolean perpetual) {
-        super(parent, drive, hcontroller, viz, kinodynamics, perpetual);
-        m_station = station;
-    }
-
-    public GoToCoralStationPastGlass(
-            LoggerFactory parent,
-            SwerveDriveSubsystem drive,
-            SwerveController hcontroller,
-            TrajectoryVisualization viz,
-            SwerveKinodynamics kinodynamics,
-            CoralStation station,
             double scale) {
         super(parent, drive, hcontroller, viz, kinodynamics);
         m_station = station;

@@ -10,21 +10,22 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ElevatorDefaultCommand extends Command  {
+public class ElevatorDefaultCommand extends Command {
     private final DoubleLogger m_log_distanceToReef;
     private final Elevator m_elevator;
     private final Wrist2 m_wrist;
     private final AlgaeGrip m_grip;
     private final SwerveDriveSubsystem m_drive;
     private double m_holdPosition;
-    // private final DoubleLogger m_log_holdPosition;
 
-    public ElevatorDefaultCommand(LoggerFactory logger, Elevator elevator, Wrist2 wrist, AlgaeGrip grip,
+    public ElevatorDefaultCommand(
+            LoggerFactory logger,
+            Elevator elevator,
+            Wrist2 wrist,
+            AlgaeGrip grip,
             SwerveDriveSubsystem drive) {
         LoggerFactory child = logger.type(this);
         m_log_distanceToReef = child.doubleLogger(Level.TRACE, "distance to reef (m)");
-        // m_log_holdPosition = child.doubleLogger(Level.TRACE, "hold position (m)");
-
         m_elevator = elevator;
         m_wrist = wrist;
         m_grip = grip;
