@@ -22,10 +22,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class Generate60 extends Navigator {
-
-    // private final double kTangentScale = 1;
-    // private final double kEntranceCurveFactor = 0.25;
-
     private final FieldSector m_end;
     private final ReefDestination m_reefDestination;
 
@@ -72,8 +68,6 @@ public class Generate60 extends Navigator {
                 * (vectorToAnchorPoint.getX() / vectorToAnchorPoint.getNorm()))
                 + ((pointToAnchor.getY() / pointToAnchor.getNorm())
                         * (vectorToAnchorPoint.getY() / vectorToAnchorPoint.getNorm()));
-
-        // System.out.println(dotProduct);
 
         double distanceToReef = FieldConstants.getDistanceToReefCenter(currTranslation);
 

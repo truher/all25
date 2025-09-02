@@ -14,10 +14,10 @@ import edu.wpi.first.math.geometry.Translation2d;
  * else.
  */
 public record FieldRelativeVelocity(double x, double y, double theta) {
-    public static final FieldRelativeVelocity kZero = new FieldRelativeVelocity(0, 0, 0);
+    public static final FieldRelativeVelocity ZERO = new FieldRelativeVelocity(0, 0, 0);
 
     public static FieldRelativeVelocity zero() {
-        return kZero;
+        return ZERO;
     }
 
     public static FieldRelativeVelocity velocity(Pose2d start, Pose2d end, double dt) {

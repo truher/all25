@@ -24,8 +24,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public class Generate180 extends Navigator {
 
-    private final double kTangentScale = 3;
-    private final double kEntranceCurveFactor = 0.25;
+    private final double TANGENT_SCALE = 3;
+    private final double ENTRANCE_CURVE_FACTOR = 0.25;
 
     private final FieldSector m_end;
     private final ReefDestination m_reefDestination;
@@ -66,14 +66,14 @@ public class Generate180 extends Navigator {
 
         Translation2d landingZone = FieldConstants.getOrbitLandingZone(end, approach);
 
-        LandingDestinationGroup rotationGroup = FieldConstants.getRotationGroup(approach, end, kEntranceCurveFactor);
+        LandingDestinationGroup rotationGroup = FieldConstants.getRotationGroup(approach, end, ENTRANCE_CURVE_FACTOR);
 
         Rotation2d initialSpline = calculateInitialSpline(
                 anchorWaypoint,
                 currTranslation,
                 currTranslation.minus(FieldConstants.getReefCenter()), // vector from robot to reef center
                 approach,
-                kTangentScale);
+                TANGENT_SCALE);
 
         double distance = 0.5; // Distance to move
         double newX = currTranslation.getX() + (distance * initialSpline.getCos());

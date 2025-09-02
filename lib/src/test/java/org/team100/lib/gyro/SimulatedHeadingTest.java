@@ -1,4 +1,4 @@
-package org.team100.lib.sensors;
+package org.team100.lib.gyro;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

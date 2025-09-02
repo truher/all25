@@ -222,8 +222,8 @@ public abstract class Talon6Motor implements BareMotor {
         final double accelFFVolts = m_ff.accelFFVolts(currentMotorRev_S, motorRev_S2);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 
-        final double kFFVolts = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
-        // final double kFFVolts = torqueFFVolts;
+        final double FFVolts = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
+        // final double FFVolts = torqueFFVolts;
 
         // VelocityVoltage has an acceleration field for kA feedforward but we use
         // arbitrary feedforward for that.
@@ -231,7 +231,7 @@ public abstract class Talon6Motor implements BareMotor {
                 m_velocityVoltage
                         .withSlot(1)
                         .withVelocity(motorRev_S)
-                        .withFeedForward(kFFVolts)));
+                        .withFeedForward(FFVolts)));
 
         // without feedforward
         // Phoenix100.warn(() -> m_motor.setControl(
@@ -244,7 +244,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_log_velocity_FF.log(() -> velocityFFVolts);
         m_log_accel_FF.log(() -> accelFFVolts);
         m_log_torque_FF.log(() -> torqueFFVolts);
-        m_totalFeedForward.log(() -> kFFVolts);
+        m_totalFeedForward.log(() -> FFVolts);
 
         log();
     }
@@ -271,8 +271,8 @@ public abstract class Talon6Motor implements BareMotor {
         final double accelFFVolts = m_ff.accelFFVolts(currentMotorRev_S, motorRev_S2);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 
-        final double kFFVolts = frictionFFVolts + velocityFFVolts + torqueFFVolts + accelFFVolts;
-        // final double kFFVolts = torqueFFVolts;
+        final double FFVolts = frictionFFVolts + velocityFFVolts + torqueFFVolts + accelFFVolts;
+        // final double FFVolts = torqueFFVolts;
 
         // PositionVoltage has a velocity field for kV feedforward but we use arbitrary
         // feedforward for that.
@@ -280,7 +280,7 @@ public abstract class Talon6Motor implements BareMotor {
                 m_positionVoltage
                         .withSlot(0)
                         .withPosition(motorRev)
-                        .withFeedForward(kFFVolts)));
+                        .withFeedForward(FFVolts)));
 
         m_log_desired_position.log(() -> motorRev);
         m_log_desired_speed.log(() -> motorRev_S);
@@ -289,7 +289,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_log_velocity_FF.log(() -> velocityFFVolts);
         m_log_torque_FF.log(() -> torqueFFVolts);
         m_log_accel_FF.log(() -> accelFFVolts);
-        m_totalFeedForward.log(() -> kFFVolts);
+        m_totalFeedForward.log(() -> FFVolts);
 
         log();
     }

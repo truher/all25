@@ -36,7 +36,7 @@ public class VelocityLimitRegionConstraint implements TimingConstraint {
     @Override
     public TimingConstraint.MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state,
             double velocity) {
-        return MinMaxAcceleration.kNoLimits;
+        return MinMaxAcceleration.NO_LIMITS;
     }
 
 }

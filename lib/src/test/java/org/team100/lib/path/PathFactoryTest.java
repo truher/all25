@@ -196,12 +196,6 @@ public class PathFactoryTest {
 
     @Test
     void testDx() {
-        // HolonomicSpline s0 = new HolonomicSpline(
-        // new HolonomicPose2d(new Translation2d(0, 0), Rotation2d.kZero,
-        // Rotation2d.kZero),
-        // new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero,
-        // Rotation2d.kZero),
-        // 1.0);
         HolonomicSpline s0 = new HolonomicSpline(
                 new HolonomicPose2d(new Translation2d(0, -1), Rotation2d.kZero, Rotation2d.kZero),
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kCCW_90deg),
@@ -227,14 +221,14 @@ public class PathFactoryTest {
         long startTimeNs = System.nanoTime();
         Path100 t = new Path100(new ArrayList<>());
         final int iterations = 100;
-        final double kSplineSampleToleranceM = 0.05;
-        final double kSplineSampleToleranceRad = 0.2;
+        final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;
+        final double SPLINE_SAMPLE_TOLERANCE_RAD = 0.2;
         for (int i = 0; i < iterations; ++i) {
             t = PathFactory.pathFromWaypoints(
                     waypoints,
-                    kSplineSampleToleranceM,
-                    kSplineSampleToleranceM,
-                    kSplineSampleToleranceRad);
+                    SPLINE_SAMPLE_TOLERANCE_M,
+                    SPLINE_SAMPLE_TOLERANCE_M,
+                    SPLINE_SAMPLE_TOLERANCE_RAD);
         }
         long endTimeNs = System.nanoTime();
         double totalDurationMs = (endTimeNs - startTimeNs) / 1000000.0;

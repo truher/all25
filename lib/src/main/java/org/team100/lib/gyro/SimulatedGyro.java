@@ -1,4 +1,4 @@
-package org.team100.lib.sensors;
+package org.team100.lib.gyro;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;

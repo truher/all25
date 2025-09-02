@@ -7,6 +7,7 @@ import org.team100.lib.config.DriverSkill;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.gyro.Gyro;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -19,7 +20,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
-import org.team100.lib.sensors.Gyro;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;

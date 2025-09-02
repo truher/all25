@@ -18,8 +18,6 @@ import edu.wpi.first.math.jni.EigenJNI;
  * For example, supply a function that describes the error in estimate and goal:
  * driving it to zero yields the x values to get the desired f.
  * 
- * 
- * 
  * Uses the (estimated) Jacobian of the function to estimate the x intercept.
  * 
  * https://en.wikipedia.org/wiki/Newton%27s_method

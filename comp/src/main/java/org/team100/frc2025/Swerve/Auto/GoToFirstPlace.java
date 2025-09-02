@@ -20,10 +20,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class GoToFirstPlace extends Navigator {
-
-    // private final double kTangentScale = 1;
-    // private final double kEntranceCurveFactor = 0.25;
-
     private final FieldSector m_end;
     private final ReefDestination m_reefDestination;
 
@@ -73,7 +69,5 @@ public class GoToFirstPlace extends Navigator {
                 newMidSpline));
 
         return m_planner.restToRest(waypoints);
-
     }
-
 }

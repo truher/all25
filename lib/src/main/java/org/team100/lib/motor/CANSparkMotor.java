@@ -140,11 +140,11 @@ public abstract class CANSparkMotor implements BareMotor {
         final double accelFFVolts = m_ff.accelFFVolts(currentMotorRev_S, motorRev_S2);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 
-        final double kFF = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
+        final double FF = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
 
         final double motorRev_M = motorRev_S * 60;
         Rev100.warn(() -> m_pidController.setReference(
-                motorRev_M, ControlType.kVelocity, ClosedLoopSlot.kSlot1, kFF, ArbFFUnits.kVoltage));
+                motorRev_M, ControlType.kVelocity, ClosedLoopSlot.kSlot1, FF, ArbFFUnits.kVoltage));
 
         m_log_desired_speed.log(() -> motorRev_S);
         m_log_desired_accel.log(() -> motorRev_S2);
@@ -175,10 +175,10 @@ public abstract class CANSparkMotor implements BareMotor {
         final double velocityFFVolts = m_ff.velocityFFVolts(motorRev_S);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 
-        final double kFF = frictionFFVolts + velocityFFVolts + torqueFFVolts;
+        final double FF = frictionFFVolts + velocityFFVolts + torqueFFVolts;
 
         Rev100.warn(() -> m_pidController.setReference(
-                motorRev, ControlType.kPosition, ClosedLoopSlot.kSlot0, kFF, ArbFFUnits.kVoltage));
+                motorRev, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF, ArbFFUnits.kVoltage));
 
         m_log_desired_position.log(() -> motorRev);
         m_log_desired_speed.log(() -> motorRev_S);

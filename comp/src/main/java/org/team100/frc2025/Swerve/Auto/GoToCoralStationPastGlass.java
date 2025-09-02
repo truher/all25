@@ -18,8 +18,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class GoToCoralStationPastGlass extends Navigator {
-
-    private double kScale;
     private final CoralStation m_station;
 
     public GoToCoralStationPastGlass(
@@ -33,10 +31,7 @@ public class GoToCoralStationPastGlass extends Navigator {
             boolean perpetual) {
         super(parent, drive, hcontroller, viz, kinodynamics, perpetual);
         m_station = station;
-        kScale = scale;
-
     }
-
 
     public GoToCoralStationPastGlass(
             LoggerFactory parent,
@@ -48,38 +43,26 @@ public class GoToCoralStationPastGlass extends Navigator {
             double scale) {
         super(parent, drive, hcontroller, viz, kinodynamics);
         m_station = station;
-        kScale = scale;
-
     }
 
     @Override
     public Trajectory100 trajectory(Pose2d currentPose) {
 
-        // System.out.println("RUNNING TRAJECTOR");
-
         Translation2d currTranslation = currentPose.getTranslation();
         Translation2d goalTranslation;
         Rotation2d goalRotation;
 
-        double scaleAdjust = kScale;
-
         if (m_station == CoralStation.Left) {
-            goalTranslation = new Translation2d(1.12 - (0.07 * 0.5), 7.14 + (0.07 * 0.86)); //1.2 7.0
+            goalTranslation = new Translation2d(1.12 - (0.07 * 0.5), 7.14 + (0.07 * 0.86)); // 1.2 7.0
             goalRotation = Rotation2d.fromDegrees(-54);
-            scaleAdjust *= 1;
-
         } else {
-            goalTranslation = new Translation2d(1.12 - (0.07 * 0.5), 0.98 - (0.07 * 0.86)); 
+            goalTranslation = new Translation2d(1.12 - (0.07 * 0.5), 0.98 - (0.07 * 0.86));
             goalRotation = Rotation2d.fromDegrees(54);
-            scaleAdjust *= -1;
         }
 
         Rotation2d courseToGoal = goalTranslation.minus(currTranslation).getAngle();
 
-        // Rotation2d newInitialSpline = FieldConstants.calculateDeltaSpline(courseToGoal,
-        //         courseToGoal.rotateBy(Rotation2d.fromDegrees(-90)), null, scaleAdjust);
-
-        Rotation2d newInitialSpline = courseToGoal; 
+        Rotation2d newInitialSpline = courseToGoal;
 
         List<HolonomicPose2d> waypoints = new ArrayList<>();
         waypoints.add(new HolonomicPose2d(currTranslation, currentPose.getRotation(), newInitialSpline));

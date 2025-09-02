@@ -3,6 +3,7 @@ package org.team100.lib.localization;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.team100.lib.gyro.Gyro;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -13,7 +14,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleDeltas;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
-import org.team100.lib.sensors.Gyro;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,7 +30,7 @@ public class SwerveDrivePoseEstimator100 implements PoseEstimator100 {
      * code with about 75-100 ms latency. There will never be a vision update
      * older than about 200 ms.
      */
-    static final double kBufferDuration = 0.2;
+    static final double BUFFER_DURATION = 0.2;
 
     private final SwerveKinodynamics m_kinodynamics;
     private final TimeInterpolatableBuffer100<InterpolationRecord> m_poseBuffer;
@@ -61,7 +61,7 @@ public class SwerveDrivePoseEstimator100 implements PoseEstimator100 {
         LoggerFactory child = parent.type(this);
         m_kinodynamics = kinodynamics;
         m_poseBuffer = new TimeInterpolatableBuffer100<>(
-                kBufferDuration,
+                BUFFER_DURATION,
                 timestampSeconds,
                 new InterpolationRecord(
                         m_kinodynamics.getKinematics(),
@@ -169,11 +169,11 @@ public class SwerveDrivePoseEstimator100 implements PoseEstimator100 {
             double[] visionSigma,
             Twist2d twist) {
         // discount the vision update by this factor.
-        final double[] k = getK(stateSigma, visionSigma);
+        final double[] K = getK(stateSigma, visionSigma);
         Twist2d scaledTwist = new Twist2d(
-                k[0] * twist.dx,
-                k[1] * twist.dy,
-                k[2] * twist.dtheta);
+                K[0] * twist.dx,
+                K[1] * twist.dy,
+                K[2] * twist.dtheta);
         return scaledTwist;
     }
 

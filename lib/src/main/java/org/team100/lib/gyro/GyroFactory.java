@@ -1,4 +1,4 @@
-package org.team100.lib.sensors;
+package org.team100.lib.gyro;
 
 import org.team100.lib.config.Identity;
 import org.team100.lib.logging.LoggerFactory;

@@ -1,3 +1,4 @@
 # jerk limited
 
-this is from roadrunner, ported in 2023.
+The package, `lib.profile.roadrunner` inclues classes derived from Roadrunner,
+as of in 2023.

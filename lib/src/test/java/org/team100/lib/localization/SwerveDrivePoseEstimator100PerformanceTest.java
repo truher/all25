@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
+import org.team100.lib.gyro.MockGyro;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -11,7 +12,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
-import org.team100.lib.sensors.MockGyro;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -66,7 +66,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
 
         // fill the buffer with odometry
         double t = 0.0;
-        double duration = SwerveDrivePoseEstimator100.kBufferDuration;
+        double duration = SwerveDrivePoseEstimator100.BUFFER_DURATION;
         while (t < duration) {
             poseEstimator.put(t, Rotation2d.kZero, 0, p(t));
             t += 0.02;

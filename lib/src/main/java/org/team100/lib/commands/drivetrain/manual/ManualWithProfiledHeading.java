@@ -201,11 +201,11 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
         // fraction left for rotation
         final double oRatio = 1 - xyRatio;
         // add a little bit of default speed
-        final double kRotationSpeed = Math.max(0.1, oRatio);
+        final double rotationSpeed = Math.max(0.1, oRatio);
 
-        final double maxSpeedRad_S = m_swerveKinodynamics.getMaxAngleSpeedRad_S() * kRotationSpeed * PROFILE_SPEED;
+        final double maxSpeedRad_S = m_swerveKinodynamics.getMaxAngleSpeedRad_S() * rotationSpeed * PROFILE_SPEED;
 
-        final double maxAccelRad_S2 = m_swerveKinodynamics.getMaxAngleAccelRad_S2() * kRotationSpeed * PROFILE_ACCEL;
+        final double maxAccelRad_S2 = m_swerveKinodynamics.getMaxAngleAccelRad_S2() * rotationSpeed * PROFILE_ACCEL;
 
         m_log_max_speed.log(() -> maxSpeedRad_S);
         m_log_max_accel.log(() -> maxAccelRad_S2);

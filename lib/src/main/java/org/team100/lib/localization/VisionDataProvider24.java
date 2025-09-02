@@ -420,10 +420,10 @@ public class VisionDataProvider24  {
              * 
              * TODO: gather some actual data.
              */
-            final double k = 0.03;
+            final double K = 0.03;
             return new double[] {
-                    (k * distanceM) + 0.01,
-                    (k * distanceM) + 0.01,
+                    (K * distanceM) + 0.01,
+                    (K * distanceM) + 0.01,
                     Double.MAX_VALUE };
         }
         /*
@@ -431,10 +431,10 @@ public class VisionDataProvider24  {
          * This is a guess based on figure 5 in the Apriltag2 paper:
          * https://april.eecs.umich.edu/media/media/pdfs/wang2016iros.pdf
          */
-        final double k = 0.03;
+        final double K = 0.03;
         return new double[] {
-                k * distanceM,
-                k * distanceM,
+                K * distanceM,
+                K * distanceM,
                 Double.MAX_VALUE };
     }
 
