@@ -208,9 +208,19 @@ public class Wrist2 extends SubsystemBase {
         wristServo.stop();
     }
 
+    // COMMANDS
+
     /** Set the duty cycle perpetually. */
     public Command setDuty(double v) {
-        return run(() -> setWristDutyCycle(v));
+        return run(
+                () -> setWristDutyCycle(v));
+    }
+
+    /** Use a profile to set the position perpetually. */
+    public Command setPosition(double v) {
+        return runEnd(
+                () -> setAngleValue(v),
+                () -> setWristDutyCycle(0));
     }
 
 }

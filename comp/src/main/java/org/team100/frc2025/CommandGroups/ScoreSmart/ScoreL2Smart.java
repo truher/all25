@@ -10,7 +10,6 @@ import org.team100.frc2025.Elevator.SetElevator;
 import org.team100.frc2025.Swerve.SemiAuto.Embark;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.SetWrist;
-import org.team100.frc2025.Wrist.SetWristPerpetually;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.lib.commands.drivetrain.FieldConstants.FieldSector;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
@@ -60,6 +59,6 @@ public class ScoreL2Smart extends SequentialCommandGroup100 {
                                 prePlaceCoralL2)),
                 new ParallelDeadlineGroup100(logger, "down",
                         new SetElevator(logger, elevator, 1.5),
-                        new SetWristPerpetually(wrist, 0.70)));
+                        wrist.setPosition(0.70)));
     }
 }

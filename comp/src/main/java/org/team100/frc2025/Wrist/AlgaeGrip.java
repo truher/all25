@@ -167,6 +167,7 @@ public class AlgaeGrip extends SubsystemBase  {
 
     }
 
+    /** Set moderate current limits. */
     public void applyLowConfigs() {
         if (m_motor == null)
             return;
@@ -182,6 +183,7 @@ public class AlgaeGrip extends SubsystemBase  {
         talonFXConfigurator.apply(currentConfigs);
     }
 
+    /** Set high current limits. */
     public void applyHighConfigs() {
         if (m_motor == null)
             return;

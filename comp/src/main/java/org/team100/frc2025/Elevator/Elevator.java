@@ -18,6 +18,7 @@ import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
@@ -144,6 +145,7 @@ public class Elevator extends SubsystemBase {
         portServo.reset();
     }
 
+    /** Use a profile to set the position. */
     public void setPosition(double x) {
         starboardServo.setPositionProfiled(x, 1.3); // 54 max
         portServo.setPositionProfiled(x, 1.3); // 54 max
@@ -217,5 +219,14 @@ public class Elevator extends SubsystemBase {
         starboardServo.periodic();
         portServo.periodic();
         m_viz.run();
+    }
+
+    // COMMANDS
+
+    /** Use a profile to set the position perpetually. */
+    public Command set(double v) {
+        return runEnd(
+                () -> setPosition(v),
+                () -> stop());
     }
 }
