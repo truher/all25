@@ -5,10 +5,10 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
 import org.team100.lib.config.Identity;
 import org.team100.lib.localization.PoseEstimator100;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -33,7 +33,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  */
 public class ObjectPosition24ArrayListener {
     /** Ignore sights older than this. */
-    private static final double kMaxSightAgeS = 0.1;
+    private static final double MAX_SIGHT_AGE = 0.1;
+    
     private StructBuffer<Rotation3d> m_buf = StructBuffer.create(Rotation3d.struct);
     private List<Translation2d> objects = new ArrayList<>();
     private final PoseEstimator100 m_poseSupplier;
@@ -118,7 +119,7 @@ public class ObjectPosition24ArrayListener {
                         simCamera.getOffset(),
                         rot.toArray(new Rotation3d[0]));
             default:
-                if (latestTime > Takt.get() - kMaxSightAgeS) {
+                if (latestTime > Takt.get() - MAX_SIGHT_AGE) {
                     return objects;
                 }
                 return new ArrayList<>();

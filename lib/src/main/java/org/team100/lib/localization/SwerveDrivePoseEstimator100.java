@@ -14,7 +14,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleDeltas;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
 import org.team100.lib.sensors.Gyro;
-import org.team100.lib.util.DriveUtil;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -228,7 +227,7 @@ public class SwerveDrivePoseEstimator100 implements PoseEstimator100 {
         if (DEBUG)
             Util.printf("previous x %.6f y %.6f\n", previousState.pose().getX(), previousState.pose().getY());
 
-        SwerveModuleDeltas modulePositionDelta = DriveUtil.modulePositionDelta(
+        SwerveModuleDeltas modulePositionDelta = SwerveModuleDeltas.modulePositionDelta(
                 value.m_wheelPositions,
                 wheelPositions);
         if (DEBUG)

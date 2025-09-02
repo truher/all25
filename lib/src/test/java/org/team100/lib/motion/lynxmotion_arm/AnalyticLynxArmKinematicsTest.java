@@ -20,7 +20,7 @@ import edu.wpi.first.math.numbers.N3;
 
 public class AnalyticLynxArmKinematicsTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testTwist() {
@@ -388,15 +388,15 @@ public class AnalyticLynxArmKinematicsTest {
 
     void verifyInv(LynxArmConfig expected, LynxArmConfig actual) {
         if (expected.swing().isPresent()) {
-            assertEquals(expected.swing().getAsDouble(), actual.swing().getAsDouble(), kDelta, "inv swing");
+            assertEquals(expected.swing().getAsDouble(), actual.swing().getAsDouble(), DELTA, "inv swing");
         } else {
             assertTrue(actual.swing().isEmpty(), "inv swing");
         }
-        assertEquals(expected.boom(), actual.boom(), kDelta, "inv boom");
-        assertEquals(expected.stick(), actual.stick(), kDelta, "inv stick");
-        assertEquals(expected.wrist(), actual.wrist(), kDelta, "inv wrist");
+        assertEquals(expected.boom(), actual.boom(), DELTA, "inv boom");
+        assertEquals(expected.stick(), actual.stick(), DELTA, "inv stick");
+        assertEquals(expected.wrist(), actual.wrist(), DELTA, "inv wrist");
         if (expected.twist().isPresent()) {
-            assertEquals(expected.twist().getAsDouble(), actual.twist().getAsDouble(), kDelta, "inv twist");
+            assertEquals(expected.twist().getAsDouble(), actual.twist().getAsDouble(), DELTA, "inv twist");
         } else {
             assertTrue(actual.twist().isEmpty());
         }

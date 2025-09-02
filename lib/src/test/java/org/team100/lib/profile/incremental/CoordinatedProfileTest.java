@@ -26,7 +26,7 @@ class CoordinatedProfileTest {
     private static final boolean PRINT = false;
 
     private static final double PROFILE_TOLERANCE = 0.01;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final double DT = 0.02;
 
     /**
@@ -70,7 +70,7 @@ class CoordinatedProfileTest {
         if (PRINT)
             Util.println("max v " + max_v);
         // this is a triangle profile
-        assertEquals(2.0, total_time, kDelta);
+        assertEquals(2.0, total_time, DELTA);
 
         // the second goal is farther away.
         Control100 s2 = i2.control();
@@ -92,7 +92,7 @@ class CoordinatedProfileTest {
         if (PRINT)
             Util.println("max v " + max_v);
         // this is a trapezoid profile
-        assertEquals(3.0, total_time, kDelta);
+        assertEquals(3.0, total_time, DELTA);
     }
 
     /**
@@ -133,7 +133,7 @@ class CoordinatedProfileTest {
         if (PRINT)
             Util.println("max v " + max_v);
         // this is a triangle profile
-        assertEquals(2.0, total_time, kDelta);
+        assertEquals(2.0, total_time, DELTA);
 
         // the second goal is farther away.
         Control100 s2 = i2.control();
@@ -155,7 +155,7 @@ class CoordinatedProfileTest {
         if (PRINT)
             Util.println("max v " + max_v);
         // this is a trapezoid profile
-        assertEquals(3.0, total_time, kDelta);
+        assertEquals(3.0, total_time, DELTA);
     }
 
     /** Verify that the profile produces the correct ETA for these cases. */
@@ -177,12 +177,12 @@ class CoordinatedProfileTest {
         Model100 s1 = i1;
         ResultWithETA r = p1.calculateWithETA(DT, s1.control(), g1);
         double total_time = r.etaS();
-        assertEquals(2.0, total_time, kDelta);
+        assertEquals(2.0, total_time, DELTA);
 
         Model100 s2 = i2;
         r = p2.calculateWithETA(DT, s2.control(), g2);
         total_time = r.etaS();
-        assertEquals(3.0, total_time, kDelta);
+        assertEquals(3.0, total_time, DELTA);
     }
 
     /** Same as above for WPI */
@@ -203,12 +203,12 @@ class CoordinatedProfileTest {
         Model100 s1 = i1;
         ResultWithETA r = p1.calculateWithETA(DT, s1.control(), g1);
         double total_time = r.etaS();
-        assertEquals(2.0, total_time, kDelta);
+        assertEquals(2.0, total_time, DELTA);
 
         Model100 s2 = i2;
         r = p2.calculateWithETA(DT, s2.control(), g2);
         total_time = r.etaS();
-        assertEquals(3.0, total_time, kDelta);
+        assertEquals(3.0, total_time, DELTA);
     }
 
     @Test
@@ -231,31 +231,31 @@ class CoordinatedProfileTest {
         // the "default profiles" produce different ETA's
         ResultWithETA rx = px.calculateWithETA(DT, ix, gx);
         double tx = rx.etaS();
-        assertEquals(2.414, tx, kDelta);
+        assertEquals(2.414, tx, DELTA);
 
         ResultWithETA ry = py.calculateWithETA(DT, iy, gy);
         double ty = ry.etaS();
-        assertEquals(1.414, ty, kDelta);
+        assertEquals(1.414, ty, DELTA);
 
         // the slower ETA is the controlling one
 
         double slowETA = Math.max(tx, ty);
-        assertEquals(2.414, slowETA, kDelta);
+        assertEquals(2.414, slowETA, DELTA);
 
         // find the scale parameters for x and y.
 
         // in the X case, the given ETA is the default ETA
         double sx = Profile100.solveForSlowerETA(
-                DT, ix, gx, slowETA, kDelta,
+                DT, ix, gx, slowETA, DELTA,
                 (s) -> new TrapezoidProfile100(maxVel, s * maxAccel, PROFILE_TOLERANCE));
         // in the Y case, it's slower
         double sy = Profile100.solveForSlowerETA(
-                DT, iy, gy, slowETA, kDelta,
+                DT, iy, gy, slowETA, DELTA,
                 (s) -> new TrapezoidProfile100(maxVel, s * maxAccel, PROFILE_TOLERANCE));
 
         // this should be 1.0
-        assertEquals(1.0, sx, kDelta);
-        assertEquals(0.336, sy, kDelta);
+        assertEquals(1.0, sx, DELTA);
+        assertEquals(0.336, sy, DELTA);
 
         // use the scale parameter to make adjusted profiles
         px = px.scale(sx);

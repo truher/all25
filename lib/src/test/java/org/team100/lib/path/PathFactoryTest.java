@@ -26,7 +26,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 
 public class PathFactoryTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
 
     @Test
     void testForced() throws TimingException {
@@ -64,13 +64,13 @@ public class PathFactoryTest {
 
         assertEquals(13, path.length());
         Pose2dWithMotion p = path.getPoint(0);
-        assertEquals(0, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
         p = path.getPoint(1);
-        assertEquals(0.3, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0.3, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
     }
 
     @Test
@@ -109,13 +109,13 @@ public class PathFactoryTest {
 
         assertEquals(9, path.length());
         Pose2dWithMotion p = path.getPoint(0);
-        assertEquals(0, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
         p = path.getPoint(1);
-        assertEquals(1, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(1, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
     }
 
     /**
@@ -139,13 +139,13 @@ public class PathFactoryTest {
                 waypoints, 0.01, 0.01, 0.1);
         assertEquals(2, path.length());
         Pose2dWithMotion p = path.getPoint(0);
-        assertEquals(0, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
         p = path.getPoint(1);
-        assertEquals(1, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getPose().getRotation().getRadians(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(1, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
     }
 
     @Test
@@ -244,8 +244,8 @@ public class PathFactoryTest {
         }
         assertEquals(5, t.length());
         Pose2dWithMotion p = t.getPoint(1);
-        assertEquals(0.417, p.getPose().getX(), kDelta);
-        assertEquals(0, p.getHeadingRate(), kDelta);
+        assertEquals(0.417, p.getPose().getX(), DELTA);
+        assertEquals(0, p.getHeadingRate(), DELTA);
     }
 
 }

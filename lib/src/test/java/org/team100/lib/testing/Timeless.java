@@ -2,9 +2,9 @@ package org.team100.lib.testing;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.team100.lib.coherence.Cache;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.util.Memo;
-import org.team100.lib.util.Takt;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
@@ -42,8 +42,7 @@ public interface Timeless {
     default void stepTime() {
         SimHooks.stepTiming(TimedRobot100.LOOP_PERIOD_S);
         Takt.update();
-        Memo.resetAll();
-        Memo.updateAll();
+        Cache.refresh();
     }
 
 }

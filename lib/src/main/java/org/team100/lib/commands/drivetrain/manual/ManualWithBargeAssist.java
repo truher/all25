@@ -18,7 +18,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.incremental.TrapezoidProfile100;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.DriveUtil;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -183,7 +182,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
 
     public FieldRelativeVelocity clipAndScale(DriverControl.Velocity twist1_1) {
         // clip the input to the unit circle
-        final DriverControl.Velocity clipped = DriveUtil.clampTwist(twist1_1, 1.0);
+        final DriverControl.Velocity clipped = twist1_1.clip(1.0);
         
         double scale = 1;
 
@@ -216,7 +215,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
         }
 
         // scale to max in both translation and rotation
-        return DriveUtil.scale(
+        return FieldRelativeDriver.scale(
                 scaled,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());

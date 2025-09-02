@@ -19,11 +19,11 @@ import org.team100.lib.util.Util;
  */
 public class SwerveModuleCollection {
     private static final boolean DEBUG = false;
-    private static final String kSwerveModules = "Swerve Modules";
-    private static final String kFrontLeft = "Front Left";
-    private static final String kFrontRight = "Front Right";
-    private static final String kRearLeft = "Rear Left";
-    private static final String kRearRight = "Rear Right";
+    private static final String SWERVE_MODULES = "Swerve Modules";
+    private static final String FRONT_LEFT = "Front Left";
+    private static final String FRONT_RIGHT = "Front Right";
+    private static final String REAR_LEFT = "Rear Left";
+    private static final String REAR_RIGHT = "Rear Right";
 
     private final SwerveModule100 m_frontLeft;
     private final SwerveModule100 m_frontRight;
@@ -49,11 +49,11 @@ public class SwerveModuleCollection {
             double currentLimit,
             double statorLimit,
             SwerveKinodynamics kinodynamics) {
-        LoggerFactory collectionLogger = parent.name(kSwerveModules);
-        LoggerFactory frontLeftLogger = collectionLogger.name(kFrontLeft);
-        LoggerFactory frontRightLogger = collectionLogger.name(kFrontRight);
-        LoggerFactory rearLeftLogger = collectionLogger.name(kRearLeft);
-        LoggerFactory rearRightLogger = collectionLogger.name(kRearRight);
+        LoggerFactory collectionLogger = parent.name(SWERVE_MODULES);
+        LoggerFactory frontLeftLogger = collectionLogger.name(FRONT_LEFT);
+        LoggerFactory frontRightLogger = collectionLogger.name(FRONT_RIGHT);
+        LoggerFactory rearLeftLogger = collectionLogger.name(REAR_LEFT);
+        LoggerFactory rearRightLogger = collectionLogger.name(REAR_RIGHT);
 
         switch (Identity.instance) {
             case COMP_BOT:

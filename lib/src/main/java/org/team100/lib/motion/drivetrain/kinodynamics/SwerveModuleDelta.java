@@ -33,7 +33,9 @@ public class SwerveModuleDelta {
 
     /**
      * Angle of the straight line path. It can be empty, in cases where the angle is
-     * indeterminate (e.g. calculating the angle required for zero speed).
+     * indeterminate (e.g. calculating the angle required for zero speed). This is
+     * not
+     * the *difference* in angle from start to end; it is the angle at the end.
      */
     public Optional<Rotation2d> angle = Optional.empty();
 
@@ -62,6 +64,21 @@ public class SwerveModuleDelta {
             this.distanceMeters = Math.hypot(dx, dy);
             this.angle = Optional.of(new Rotation2d(dx, dy));
         }
+    }
+
+    /**
+     * Delta for one module, straight line path using the end angle.
+     */
+    public static SwerveModuleDelta delta(
+            SwerveModulePosition100 start,
+            SwerveModulePosition100 end) {
+        double deltaM = end.distanceMeters - start.distanceMeters;
+        if (end.angle.isPresent()) {
+            return new SwerveModuleDelta(deltaM, end.angle);
+        }
+        // the angle might be empty, if the encoder has failed
+        // (which can seem to happen if the robot is *severely* overrunning).
+        return new SwerveModuleDelta(0, Optional.empty());
     }
 
     @Override

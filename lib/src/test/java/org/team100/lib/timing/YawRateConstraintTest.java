@@ -10,25 +10,25 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 
 class YawRateConstraintTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     // for testing, use the aboslute maximum. This shouldn't be used in a real
     // robot.
-    private static final double kYawRateScale = 1.0;
+    private static final double YAW_RATE_SCALE = 1.0;
 
     @Test
     void testSpin() {
         // one radian/m in place i.e. no constraint
         YawRateConstraint c = new YawRateConstraint(SwerveKinodynamicsFactory.forTest(),
-                kYawRateScale);
+                YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(), new MotionDirection(0, 0, 1), 0, 0);
         // the limiter is in the scheduler which only thinks about the along-the-path
         // dimension.
         assertEquals(Double.NEGATIVE_INFINITY,
-                c.getMinMaxAcceleration(p, 0).getMinAccel(), kDelta);
+                c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
         assertEquals(Double.POSITIVE_INFINITY,
-                c.getMinMaxAcceleration(p, 0).getMaxAccel(), kDelta);
-        assertEquals(Double.MAX_VALUE, c.getMaxVelocity(p).getValue(), kDelta);
+                c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
+        assertEquals(Double.MAX_VALUE, c.getMaxVelocity(p).getValue(), DELTA);
     }
 
     @Test
@@ -36,24 +36,24 @@ class YawRateConstraintTest {
         // towards +x, 1 rad/m, 1 m/s wheel -> 1 rad/s limit => 2.8 m/s (which violates
         // the linear constraint but it's ok)
         YawRateConstraint c = new YawRateConstraint(SwerveKinodynamicsFactory.forTest(),
-                kYawRateScale);
+                YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(),
                 new MotionDirection(1, 0, 1), // spatial, so rad/m
                 0, 0);
-        assertEquals(2.828, c.getMaxVelocity(p).getValue(), kDelta);
+        assertEquals(2.828, c.getMaxVelocity(p).getValue(), DELTA);
     }
 
     @Test
     void testVelocity2() {
         // towards +x, 1 rad/m, 2 rad/s limit => 2 m/s
         YawRateConstraint c = new YawRateConstraint(SwerveKinodynamicsFactory.forTest2(),
-                kYawRateScale);
+                YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(),
                 new MotionDirection(1, 0, 1), // spatial, so rad/m
                 0, 0);
-        assertEquals(5.656, c.getMaxVelocity(p).getValue(), kDelta);
+        assertEquals(5.656, c.getMaxVelocity(p).getValue(), DELTA);
     }
 
     @Test
@@ -61,7 +61,7 @@ class YawRateConstraintTest {
         // we should impose an accel limit, now that the trajectory builder doesn't
         // force omega to zero at the start.
         YawRateConstraint c = new YawRateConstraint(SwerveKinodynamicsFactory.forTest(),
-                kYawRateScale);
+                YAW_RATE_SCALE);
         // driving and spinning
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(),
@@ -69,9 +69,9 @@ class YawRateConstraintTest {
                 0, 0);
         // there is an accel limit.
         assertEquals(-8.485,
-                c.getMinMaxAcceleration(p, 0).getMinAccel(), kDelta);
+                c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
         assertEquals(8.485,
-                c.getMinMaxAcceleration(p, 0).getMaxAccel(), kDelta);
+                c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
     }
 
     @Test
@@ -86,8 +86,8 @@ class YawRateConstraintTest {
                 0, 0);
         // this number is still quite high even with a low scale.
         assertEquals(-16.971,
-                c.getMinMaxAcceleration(p, 0).getMinAccel(), kDelta);
+                c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
         assertEquals(16.971,
-                c.getMinMaxAcceleration(p, 0).getMaxAccel(), kDelta);
+                c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
     }
 }

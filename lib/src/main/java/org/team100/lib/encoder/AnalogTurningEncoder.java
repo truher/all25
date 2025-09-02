@@ -3,10 +3,10 @@ package org.team100.lib.encoder;
 import java.util.OptionalDouble;
 import java.util.function.DoubleSupplier;
 
+import org.team100.lib.coherence.Cache;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.util.Memo;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
@@ -37,8 +37,8 @@ public class AnalogTurningEncoder extends RoboRioRotaryPositionSensor {
         super(parent, inputOffset, drive);
         LoggerFactory child = parent.type(this);
         m_input = new AnalogInput(channel);
-        m_voltage = Memo.ofDouble(m_input::getVoltage);
-        m_rail = Memo.ofDouble(RobotController::getVoltage5V);
+        m_voltage = Cache.ofDouble(m_input::getVoltage);
+        m_rail = Cache.ofDouble(RobotController::getVoltage5V);
         m_log_voltage = child.doubleLogger(Level.TRACE, "voltage");
         m_log_ratio = child.doubleLogger(Level.TRACE, "ratio");
         child.intLogger(Level.COMP, "channel").log(m_input::getChannel);

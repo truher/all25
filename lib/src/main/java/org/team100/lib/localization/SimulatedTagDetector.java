@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleFunction;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Vector;
@@ -40,14 +40,14 @@ public class SimulatedTagDetector {
     //
     // see
     // https://docs.google.com/spreadsheets/d/1x2_58wyVb5e9HJW8WgakgYcOXgPaJe0yTIHew206M-M
-    private static final double kHFOV = 0.8;
-    private static final double kVFOV = 0.6;
-    private static final int kTagCount = 22;
+    private static final double HFOV = 0.8;
+    private static final double VFOV = 0.6;
+    private static final int TAG_COUNT = 22;
     // past about 80 degrees, you can't see the tag.
-    private static final double kObliqueLimitRad = 1.4;
+    private static final double OBLIQUE_LIMIT_RAD = 1.4;
     // camera frame is from 85 ms ago
     // TODO: make this jitter a little
-    private static final double kDelayS = 0.085;
+    private static final double DELAY = 0.085;
 
     private final List<Camera> m_cameras;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
@@ -89,7 +89,7 @@ public class SimulatedTagDetector {
         Optional<Alliance> opt = DriverStation.getAlliance();
         if (opt.isEmpty())
             return;
-        double timestampS = Takt.get() - kDelayS;
+        double timestampS = Takt.get() - DELAY;
         Pose3d robotPose3d = new Pose3d(m_robotPose.apply(timestampS));
         if (DEBUG) {
             Util.printf("robot pose X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f \n",
@@ -106,7 +106,7 @@ public class SimulatedTagDetector {
             Pose3d cameraPose3d = robotPose3d.plus(cameraOffset);
             Alliance alliance = opt.get();
 
-            for (int tagId = 1; tagId <= kTagCount; ++tagId) {
+            for (int tagId = 1; tagId <= TAG_COUNT; ++tagId) {
                 if (DEBUG) {
                     Util.printf("alliance %s camera %12s ", alliance.name(), camera.name());
                 }
@@ -162,7 +162,7 @@ public class SimulatedTagDetector {
             // https://docs.wpilib.org/en/stable/docs/software/networktables/publish-and-subscribe.html
 
             // guess about a reasonable delay
-            long delayUs = (long) kDelayS * 1000000;
+            long delayUs = (long) DELAY * 1000000;
             long timestampUs = NetworkTablesJNI.now();
             m_publishers.get(camera).set(blips.toArray(new Blip24[0]), timestampUs - delayUs);
             if (PUBLISH_DEBUG) {
@@ -210,7 +210,7 @@ public class SimulatedTagDetector {
         Rotation3d apparentAngle = new Rotation3d(tagTranslationVector, rotatedNormalVector);
         double angle = apparentAngle.getAngle();
 
-        if (Math.abs(angle) > kObliqueLimitRad) {
+        if (Math.abs(angle) > OBLIQUE_LIMIT_RAD) {
             if (DEBUG)
                 Util.printf(" facing away (%6.2f)", angle);
             return false;
@@ -233,7 +233,7 @@ public class SimulatedTagDetector {
         Translation3d tagTranslationInCamera = tagInCamera.getTranslation();
         double xpp = -1.0 * tagTranslationInCamera.getY() / tagTranslationInCamera.getX();
         double ypp = -1.0 * tagTranslationInCamera.getZ() / tagTranslationInCamera.getX();
-        if (Math.abs(xpp) < kHFOV && Math.abs(ypp) < kVFOV) {
+        if (Math.abs(xpp) < HFOV && Math.abs(ypp) < VFOV) {
             if (DEBUG)
                 Util.printf("  FOV IN xpp %6.2f ypp %6.2f ", xpp, ypp);
             return true;

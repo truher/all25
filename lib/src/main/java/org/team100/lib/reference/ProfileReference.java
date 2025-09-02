@@ -1,11 +1,28 @@
 package org.team100.lib.reference;
 
+import org.team100.lib.coherence.Cache;
+import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.util.Memo;
 
-/** Produces references based on profiles. */
+/**
+ * Produces references based on profiles.
+ * 
+ * This uses the central Cache to manage reference updates, because it's
+ * important that the reference updates be aligned with the clock, i.e. one
+ * profile update step per Takt step, but the SwerveReference interface doesn't
+ * know anything about time. Still, it's a sort of strange thing to do,
+ * since it's not a "Cache" per se.
+ * 
+ * One of the implications of this choice is that the cache updates will
+ * continue forever unless we explicitly stop them, so if you use this class,
+ * you need to remember to do that.
+ * 
+ * TODO: maybe implement this without the central Cache?
+ */
 public class ProfileReference implements SwerveReference {
+    private static final double TOLERANCE = 0.01;
+
     /**
      * Putting these in the same class allows us to refresh them both atomically.
      */
@@ -13,7 +30,7 @@ public class ProfileReference implements SwerveReference {
     }
 
     private final HolonomicProfile m_profile;
-    private final Memo.CotemporalCache<References> m_references;
+    private final CotemporalCache<References> m_references;
 
     private SwerveModel m_goal;
     private boolean m_done;
@@ -27,12 +44,7 @@ public class ProfileReference implements SwerveReference {
     public ProfileReference(HolonomicProfile profile) {
         m_profile = profile;
         // this will keep polling until we stop it.
-        m_references = Memo.of(() -> refresh(m_next));
-    }
-
-    private References refresh(SwerveModel newCurrent) {
-        m_next = makeNext(newCurrent);
-        return new References(newCurrent, m_next);
+        m_references = Cache.of(() -> refresh(m_next));
     }
 
     public void setGoal(SwerveModel goal) {
@@ -43,7 +55,7 @@ public class ProfileReference implements SwerveReference {
     @Override
     public void initialize(SwerveModel measurement) {
         m_profile.solve(measurement, m_goal);
-        m_references.update(refresh(measurement));
+        m_references.set(refresh(measurement));
         m_done = false;
     }
 
@@ -70,6 +82,13 @@ public class ProfileReference implements SwerveReference {
         m_references.end();
     }
 
+    ////////////////////////////////////
+
+    private References refresh(SwerveModel newCurrent) {
+        m_next = makeNext(newCurrent);
+        return new References(newCurrent, m_next);
+    }
+
     private SwerveModel makeNext(SwerveModel current) {
         if (current == null) {
             // happens at startup
@@ -79,7 +98,7 @@ public class ProfileReference implements SwerveReference {
             return current;
         }
         SwerveModel next = m_profile.calculate(current, m_goal).model();
-        if (current.near(m_goal, 0.01))
+        if (current.near(m_goal, TOLERANCE))
             m_done = true;
         return next;
     }

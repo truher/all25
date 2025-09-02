@@ -19,7 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class SwerveDrivePoseEstimator100PerformanceTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     private final Pose2d visionRobotPoseMeters = new Pose2d(1, 0, Rotation2d.kZero);
@@ -72,7 +72,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
             t += 0.02;
         }
         assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), kDelta);
+        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
 
         // add a very old vision estimate, which triggers replay of the entire buffer.
         int iterations = 100000;
@@ -86,7 +86,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
         assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), kDelta);
+        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
 
         // add a recent vision estimate, which triggers replay of a few samples.
         iterations = 1000000;
@@ -100,6 +100,6 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
         assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), kDelta);
+        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
     }
 }

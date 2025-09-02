@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 public class ElevatorVisualization implements Runnable {
-    private static final double kScale = 2.0;
+    private static final double SCALE = 2.0;
 
     private final Elevator m_elevator;
     private final Mechanism2d m_mechanism;
@@ -59,12 +59,12 @@ public class ElevatorVisualization implements Runnable {
     public void run() {
         if (Logging.instance().getLevel().admit(Level.TRACE)) {
             double position = m_elevator.getPosition();
-            double stage1Position = Math.max(5, kScale * (position - 23.5));
+            double stage1Position = Math.max(5, SCALE * (position - 23.5));
             stage1root.setPosition(45, stage1Position);
-            double stage2Position = Math.max(5, kScale * (position - 10));
+            double stage2Position = Math.max(5, SCALE * (position - 10));
             stage2root.setPosition(40, stage2Position);
             // carriage is always at the measured position
-            carriageRoot.setPosition(35, kScale * (position) + 5);
+            carriageRoot.setPosition(35, SCALE * (position) + 5);
         }
     }
 }

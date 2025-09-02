@@ -3,6 +3,7 @@ package org.team100.lib.motion.drivetrain.module;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Identity;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
@@ -12,7 +13,6 @@ import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;

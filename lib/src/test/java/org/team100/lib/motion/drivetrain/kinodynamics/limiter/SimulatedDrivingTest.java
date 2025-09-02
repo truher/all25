@@ -3,6 +3,7 @@ package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
@@ -24,8 +25,6 @@ import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.sensors.Gyro;
 import org.team100.lib.sensors.SimulatedGyro;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.util.DriveUtil;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -97,7 +96,7 @@ public class SimulatedDrivingTest implements Timeless {
                         states.rearRight().speedMetersPerSecond() * dt,
                         states.rearRight().angle()));
 
-        SwerveModuleDeltas modulePositionDelta = DriveUtil.modulePositionDelta(
+        SwerveModuleDeltas modulePositionDelta = SwerveModuleDeltas.modulePositionDelta(
                 startPositions,
                 endPositions);
         if (DEBUG)

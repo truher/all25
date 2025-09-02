@@ -18,7 +18,6 @@ import org.team100.lib.profile.incremental.Profile100;
 import org.team100.lib.profile.incremental.TrapezoidProfile100;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.DriveUtil;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -44,7 +43,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
      * Relative rotational speed. Use a moderate value to trade rotation for
      * translation
      */
-    private static final double kRotationSpeed = 0.5;
+    private static final double ROTATION_SPEED = 0.5;
 
     private final SwerveKinodynamics m_swerveKinodynamics;
     private final Supplier<Optional<Translation2d>> m_target;
@@ -70,8 +69,8 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
         m_target = target;
         m_controller = controller;
         m_profile = new TrapezoidProfile100(
-                swerveKinodynamics.getMaxAngleSpeedRad_S() * kRotationSpeed,
-                swerveKinodynamics.getMaxAngleAccelRad_S2() * kRotationSpeed,
+                swerveKinodynamics.getMaxAngleSpeedRad_S() * ROTATION_SPEED,
+                swerveKinodynamics.getMaxAngleAccelRad_S2() * ROTATION_SPEED,
                 0.01);
     }
 
@@ -104,9 +103,9 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
         //
 
         // clip the input to the unit circle
-        DriverControl.Velocity clipped = DriveUtil.clampTwist(input, 1.0);
+        DriverControl.Velocity clipped = input.clip(1.0);
         Optional<Translation2d> target = m_target.get();
-        FieldRelativeVelocity scaledInput = DriveUtil.scale(
+        FieldRelativeVelocity scaledInput = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());

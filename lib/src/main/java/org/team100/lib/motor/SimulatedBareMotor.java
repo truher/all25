@@ -1,11 +1,11 @@
 package org.team100.lib.motor;
 
+import org.team100.lib.coherence.Cache;
+import org.team100.lib.coherence.DoubleCache;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.util.Memo;
-import org.team100.lib.util.Memo.DoubleCache;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
@@ -33,8 +33,8 @@ public class SimulatedBareMotor implements BareMotor {
         m_freeSpeedRad_S = freeSpeedRad_S;
         m_log_duty = child.doubleLogger(Level.DEBUG, "duty_cycle");
         m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");
-        m_velocityCache = Memo.ofDouble(() -> m_velocity);
-        m_positionCache = Memo.ofDouble(() -> {
+        m_velocityCache = Cache.ofDouble(() -> m_velocity);
+        m_positionCache = Cache.ofDouble(() -> {
             if (DEBUG)
                 Util.printf("resetting position cache to %f\n", m_position);
             return m_position;

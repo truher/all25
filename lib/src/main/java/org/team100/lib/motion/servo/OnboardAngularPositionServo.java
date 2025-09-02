@@ -25,8 +25,8 @@ import edu.wpi.first.math.MathUtil;
  */
 public class OnboardAngularPositionServo implements AngularPositionServo {
     private static final boolean DEBUG = false;
-    private static final double kPositionTolerance = 0.02;
-    private static final double kVelocityTolerance = 0.02;
+    private static final double POSITION_TOLERANCE = 0.02;
+    private static final double VELOCITY_TOLERANCE = 0.02;
 
     private final RotaryMechanism m_mechanism;
     private final ProfileReference1d m_ref;
@@ -120,7 +120,7 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
         m_log_goal.log(() -> goalRad);
 
         Model100 goal = new Model100(goalRad, 0);
-        if (!goal.near(m_goal, kPositionTolerance, kVelocityTolerance)) {
+        if (!goal.near(m_goal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
             m_goal = goal;
             m_ref.setGoal(goal);
             if (m_setpoint == null) {

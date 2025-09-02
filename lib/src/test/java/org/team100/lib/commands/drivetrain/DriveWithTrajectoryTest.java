@@ -30,7 +30,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
@@ -43,7 +43,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
-        assertEquals(0, t.sample(0).velocityM_S(), kDelta);
+        assertEquals(0, t.sample(0).velocityM_S(), DELTA);
         SwerveController controller = SwerveControllerFactory.test(logger);
 
         MockDrive d = new MockDrive();
@@ -56,38 +56,38 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         stepTime();
         c.initialize();
         c.execute();
-        // assertEquals(0.098, d.m_atRestSetpoint.x(), kDelta);
-        // assertEquals(0, d.m_atRestSetpoint.y(), kDelta);
-        // assertEquals(0, d.m_atRestSetpoint.theta(), kDelta);
+        // assertEquals(0.098, d.m_atRestSetpoint.x(), DELTA);
+        // assertEquals(0, d.m_atRestSetpoint.y(), DELTA);
+        // assertEquals(0, d.m_atRestSetpoint.theta(), DELTA);
 
         // we don't advance because we're still steering.
         // this next-setpoint is from "preview"
         // and our current setpoint is equal to the measurement.
         stepTime();
         c.execute();
-        // assertEquals(0.098, d.m_atRestSetpoint.x(), kDelta);
-        // assertEquals(0, d.m_atRestSetpoint.y(), kDelta);
-        // assertEquals(0, d.m_atRestSetpoint.theta(), kDelta);
+        // assertEquals(0.098, d.m_atRestSetpoint.x(), DELTA);
+        // assertEquals(0, d.m_atRestSetpoint.y(), DELTA);
+        // assertEquals(0, d.m_atRestSetpoint.theta(), DELTA);
 
         stepTime();
         c.execute();
-        assertEquals(0.102, d.m_setpoint.x(), kDelta);
-        assertEquals(0, d.m_setpoint.y(), kDelta);
-        assertEquals(0, d.m_setpoint.theta(), kDelta);
+        assertEquals(0.102, d.m_setpoint.x(), DELTA);
+        assertEquals(0, d.m_setpoint.y(), DELTA);
+        assertEquals(0, d.m_setpoint.theta(), DELTA);
 
         // more normal driving
         stepTime();
         c.execute();
-        assertEquals(0.139, d.m_setpoint.x(), kDelta);
-        assertEquals(0, d.m_setpoint.y(), kDelta);
-        assertEquals(0, d.m_setpoint.theta(), kDelta);
+        assertEquals(0.139, d.m_setpoint.x(), DELTA);
+        assertEquals(0, d.m_setpoint.y(), DELTA);
+        assertEquals(0, d.m_setpoint.theta(), DELTA);
 
         // etc
         stepTime();
         c.execute();
-        assertEquals(0.179, d.m_setpoint.x(), kDelta);
-        assertEquals(0, d.m_setpoint.y(), kDelta);
-        assertEquals(0, d.m_setpoint.theta(), kDelta);
+        assertEquals(0.179, d.m_setpoint.x(), DELTA);
+        assertEquals(0, d.m_setpoint.y(), DELTA);
+        assertEquals(0, d.m_setpoint.theta(), DELTA);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
-        assertEquals(0, t.sample(0).velocityM_S(), kDelta);
+        assertEquals(0, t.sample(0).velocityM_S(), DELTA);
         SwerveController controller = SwerveControllerFactory.test(logger);
 
         MockDrive d = new MockDrive();
@@ -128,14 +128,14 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
-        assertEquals(0, trajectory.sample(0).velocityM_S(), kDelta);
+        assertEquals(0, trajectory.sample(0).velocityM_S(), DELTA);
         SwerveController controller = SwerveControllerFactory.test(logger);
 
         SwerveDriveSubsystem drive = fixture.drive;
 
         // initially at rest
-        assertEquals(0, fixture.collection.states().frontLeft().speedMetersPerSecond(), kDelta);
-        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), kDelta);
+        assertEquals(0, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
 
         DriveWithTrajectory command = new DriveWithTrajectory(drive, controller, trajectory, viz);
         stepTime();
@@ -143,21 +143,21 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
 
         command.execute();
         // but that output is not available until after takt.
-        assertEquals(0, fixture.collection.states().frontLeft().speedMetersPerSecond(), kDelta);
-        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), kDelta);
+        assertEquals(0, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
 
         // drive normally more
         stepTime();
         command.execute();
         // this is the output from the previous takt
-        assertEquals(0.02, fixture.collection.states().frontLeft().speedMetersPerSecond(), kDelta);
-        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), kDelta);
+        assertEquals(0.02, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
 
         // etc
         stepTime();
         command.execute();
-        assertEquals(0.04, fixture.collection.states().frontLeft().speedMetersPerSecond(), kDelta);
-        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), kDelta);
+        assertEquals(0.04, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
     }
 
 }

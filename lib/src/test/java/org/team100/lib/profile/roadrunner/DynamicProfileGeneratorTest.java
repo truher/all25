@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class DynamicProfileGeneratorTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testGenerateMotionProfile() {
@@ -24,24 +24,24 @@ public class DynamicProfileGeneratorTest {
                 resolution);
 
         assertEquals(7, p.getSegments().size());
-        assertEquals(0, p.get(0).x(), kDelta);
-        assertEquals(0.5, p.get(1).x(), kDelta);
-        assertEquals(1.5, p.get(2).x(), kDelta);
-        assertEquals(2.5, p.get(3).x(), kDelta);
-        assertEquals(3.5, p.get(4).x(), kDelta);
-        assertEquals(4.5, p.get(5).x(), kDelta);
-        assertEquals(5.0, p.get(6).x(), kDelta);
+        assertEquals(0, p.get(0).x(), DELTA);
+        assertEquals(0.5, p.get(1).x(), DELTA);
+        assertEquals(1.5, p.get(2).x(), DELTA);
+        assertEquals(2.5, p.get(3).x(), DELTA);
+        assertEquals(3.5, p.get(4).x(), DELTA);
+        assertEquals(4.5, p.get(5).x(), DELTA);
+        assertEquals(5.0, p.get(6).x(), DELTA);
 
-        assertEquals(6.0, p.duration(), kDelta);
+        assertEquals(6.0, p.duration(), DELTA);
 
         MotionState s0 = p.get(0);
-        assertEquals(0, s0.v(), kDelta);
+        assertEquals(0, s0.v(), DELTA);
 
         MotionProfile p1 = p.append(p);
-        assertEquals(12, p1.duration(), kDelta);
+        assertEquals(12, p1.duration(), DELTA);
 
         MotionState s1 = p.get(1);
-        assertEquals(1, s1.v(), kDelta);
+        assertEquals(1, s1.v(), DELTA);
     }
 
     @Test
@@ -50,28 +50,28 @@ public class DynamicProfileGeneratorTest {
             // this is a bit nonsensical, this state would never move.
             MotionState s0 = new MotionState(0, 0, 0, 0);
             MotionState s1 = DynamicProfileGenerator.evolve(s0, 1);
-            assertEquals(1, s1.x(), kDelta);
-            assertEquals(0, s1.v(), kDelta);
-            assertEquals(0, s1.a(), kDelta);
-            assertEquals(0, s1.j(), kDelta);
+            assertEquals(1, s1.x(), DELTA);
+            assertEquals(0, s1.v(), DELTA);
+            assertEquals(0, s1.a(), DELTA);
+            assertEquals(0, s1.j(), DELTA);
         }
         {
             // nonzero v, zero a, end v is the same
             MotionState s0 = new MotionState(0, 1, 0, 0);
             MotionState s1 = DynamicProfileGenerator.evolve(s0, 1);
-            assertEquals(1, s1.x(), kDelta);
-            assertEquals(1, s1.v(), kDelta);
-            assertEquals(0, s1.a(), kDelta);
-            assertEquals(0, s1.j(), kDelta);
+            assertEquals(1, s1.x(), DELTA);
+            assertEquals(1, s1.v(), DELTA);
+            assertEquals(0, s1.a(), DELTA);
+            assertEquals(0, s1.j(), DELTA);
         }
         {
             // nonzero a, end v is more
             MotionState s0 = new MotionState(0, 0, 1, 0);
             MotionState s1 = DynamicProfileGenerator.evolve(s0, 1);
-            assertEquals(1, s1.x(), kDelta);
-            assertEquals(1.414, s1.v(), kDelta);
-            assertEquals(1, s1.a(), kDelta);
-            assertEquals(0, s1.j(), kDelta);
+            assertEquals(1, s1.x(), DELTA);
+            assertEquals(1.414, s1.v(), DELTA);
+            assertEquals(1, s1.a(), DELTA);
+            assertEquals(0, s1.j(), DELTA);
         }
         {
             // v is low, a is negative
@@ -114,15 +114,15 @@ public class DynamicProfileGeneratorTest {
         MotionState s0 = new MotionState(0, 0, 1, 0);
         MotionState s1 = new MotionState(0, 0.5, 0.5, 0);
         double c = DynamicProfileGenerator.intersection(s0, s1);
-        assertEquals(0.25, c, kDelta);
+        assertEquals(0.25, c, DELTA);
     }
 
     void verify(MotionSpan p, double x, double v, double a, double j, double dx) {
-        assertEquals(x, p.start().x(), kDelta);
-        assertEquals(v, p.start().v(), kDelta);
-        assertEquals(a, p.start().a(), kDelta);
-        assertEquals(j, p.start().j(), kDelta);
-        assertEquals(dx, p.dx(), kDelta);
+        assertEquals(x, p.start().x(), DELTA);
+        assertEquals(v, p.start().v(), DELTA);
+        assertEquals(a, p.start().a(), DELTA);
+        assertEquals(j, p.start().j(), DELTA);
+        assertEquals(dx, p.dx(), DELTA);
 
     }
 

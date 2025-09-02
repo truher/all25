@@ -12,7 +12,7 @@ import edu.wpi.first.math.Vector;
  * with the Jacobian concept, matrices, etc.
  */
 public class NumericalGradient {
-    private static final double kEpsilon = 1e-5;
+    private static final double EPSILON = 1e-5;
 
     /**
      * Computes the numerical gradient with respect to x for f(x), by looking in the
@@ -27,11 +27,11 @@ public class NumericalGradient {
         for (int i = 0; i < cols.getNum(); i++) {
             Vector<R> dxPlus = new Vector<>(x.getStorage().copy());
             Vector<R> dxMinus = new Vector<>(x.getStorage().copy());
-            dxPlus.set(i, 0, dxPlus.get(i, 0) + kEpsilon);
-            dxMinus.set(i, 0, dxMinus.get(i, 0) - kEpsilon);
+            dxPlus.set(i, 0, dxPlus.get(i, 0) + EPSILON);
+            dxMinus.set(i, 0, dxMinus.get(i, 0) - EPSILON);
             Double fPlus = f.apply(dxPlus);
             Double fMinus = f.apply(dxMinus);
-            double dF = (fPlus - fMinus) / (2 * kEpsilon);
+            double dF = (fPlus - fMinus) / (2 * EPSILON);
             result.set(i, 0, dF);
         }
         return result;

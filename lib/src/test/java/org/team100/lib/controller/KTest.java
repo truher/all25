@@ -16,7 +16,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.Discretization;
 
 class KTest {
-    static final double kDelta = 0.001;
+    static final double DELTA = 0.001;
     static final double kDt = 0.02;
 
     /**
@@ -67,8 +67,8 @@ class KTest {
         Matrix<N2, N2> Q = StateSpaceUtil.makeCostMatrix(stateTolerance);
         Matrix<N1, N1> R = StateSpaceUtil.makeCostMatrix(controlTolerance);
         Matrix<N1, N2> K = calculateK(A, B, Q, R, kDt);
-        assertEquals(572.773, K.get(0, 0), kDelta);
-        assertEquals(44.336, K.get(0, 1), kDelta);
+        assertEquals(572.773, K.get(0, 0), DELTA);
+        assertEquals(44.336, K.get(0, 1), DELTA);
     }
 
 }

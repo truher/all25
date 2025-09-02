@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class DriveManually extends Command  {
     /** While driving manually, pay attention to tags even if they are somewhat far away. */
-    private static final double kHeedRadiusM = 6.0;
+    private static final double HEED_RADIUS_M = 6.0;
 
     private static final boolean DEBUG = false;
 
@@ -64,7 +64,7 @@ public class DriveManually extends Command  {
 
     @Override
     public void initialize() {
-        m_heedRadiusM.accept(kHeedRadiusM);
+        m_heedRadiusM.accept(HEED_RADIUS_M);
         m_drive.resetLimiter();
         SwerveModel p = m_drive.getState();
         for (Driver d : m_drivers.values()) {

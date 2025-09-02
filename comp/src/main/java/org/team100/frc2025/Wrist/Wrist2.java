@@ -45,8 +45,8 @@ public class Wrist2 extends SubsystemBase  {
     private static final boolean VISUALIZE = true;
     private static final int GEAR_RATIO = 25;
 
-    private static final double kWristMinimumPosition = -0.5;
-    private static final double kWristMaximumPosition = 4;
+    private static final double WRIST_MIN_POSITION = -0.5;
+    private static final double WRIST_MAX_POSITION = 4;
 
     double maxVel = 40;
     double maxAccel = 40;
@@ -100,8 +100,8 @@ public class Wrist2 extends SubsystemBase  {
                         wristMotor,
                         sensor,
                         GEAR_RATIO,
-                        kWristMinimumPosition,
-                        kWristMaximumPosition);
+                        WRIST_MIN_POSITION,
+                        WRIST_MAX_POSITION);
 
                 wristServo = new OnboardAngularPositionServo(
                         logger, m_wristMech, ref, wristFeedback);
@@ -122,7 +122,7 @@ public class Wrist2 extends SubsystemBase  {
                         logger, encoder, GEAR_RATIO);
                 RotaryMechanism wristMech = new RotaryMechanism(
                         logger, motor, sensor,
-                        GEAR_RATIO, kWristMinimumPosition, kWristMaximumPosition);
+                        GEAR_RATIO, WRIST_MIN_POSITION, WRIST_MAX_POSITION);
 
                 wristServo = new OnboardAngularPositionServo(
                         logger, wristMech, ref, wristFeedback);

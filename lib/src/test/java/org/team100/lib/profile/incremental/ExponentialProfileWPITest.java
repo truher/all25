@@ -3,10 +3,10 @@ package org.team100.lib.profile.incremental;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Debug;
+import org.team100.lib.util.Util;
 
-public class ExponentialProfileWPITest implements Debug {
-
+public class ExponentialProfileWPITest {
+    private static final boolean DEBUG = false;
     /**
      * Just to see what it looks like.
      */
@@ -21,13 +21,8 @@ public class ExponentialProfileWPITest implements Debug {
         for (int i = 0; i < 150; ++i) {
             tt += 0.02;
             sample = profile.calculate(0.02, sample, end);
-            debug("%5.3f %5.3f %5.3f\n", tt, sample.x(), sample.v());
+            if (DEBUG)
+                Util.printf("%5.3f %5.3f %5.3f\n", tt, sample.x(), sample.v());
         }
     }
-
-    @Override
-    public boolean debug() {
-        return false;
-    }
-
 }

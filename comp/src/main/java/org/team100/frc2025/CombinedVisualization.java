@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 public class CombinedVisualization implements Runnable {
-    private static final double kScale = 2.0;
+    private static final double SCALE = 2.0;
 
     private final Elevator m_elevator;
     private final Wrist2 m_wrist;
@@ -64,12 +64,12 @@ public class CombinedVisualization implements Runnable {
     public void run() {
         if (Logging.instance().getLevel().admit(Level.TRACE)) {
             double elevatorposition = m_elevator.getPosition();
-            double stage1Position = Math.max(5, kScale * (elevatorposition - 23.5));
+            double stage1Position = Math.max(5, SCALE * (elevatorposition - 23.5));
             stage1root.setPosition(65, stage1Position);
-            double stage2Position = Math.max(5, kScale * (elevatorposition - 10));
+            double stage2Position = Math.max(5, SCALE * (elevatorposition - 10));
             stage2root.setPosition(60, stage2Position);
             // carriage is always at the measured position
-            carriageRoot.setPosition(55, kScale * (elevatorposition) + 5);
+            carriageRoot.setPosition(55, SCALE * (elevatorposition) + 5);
             double wristPosition = m_wrist.getAngle();
             m_wristLigament.setAngle(Math.toDegrees(wristPosition));
         }

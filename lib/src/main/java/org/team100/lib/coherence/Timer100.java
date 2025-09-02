@@ -1,8 +1,7 @@
-package org.team100.lib.util;
+package org.team100.lib.coherence;
 
 /**
- * This exists because the WPI Timer class does not provide access to the
- * "running" field, which is just beyond.
+ * A timer that uses Takt time.
  */
 public class Timer100 {
     private double m_startTime;

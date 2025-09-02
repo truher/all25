@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
  * distance.
  */
 public class DriveBackwards extends Command {
-    private static final ChassisSpeeds kSpeed = new ChassisSpeeds(-0.1, 0, 0);
+    private static final ChassisSpeeds SPEED = new ChassisSpeeds(-0.1, 0, 0);
+    
     private final SwerveDriveSubsystem m_drive;
     private final double m_length;
 
@@ -30,7 +31,7 @@ public class DriveBackwards extends Command {
 
     @Override
     public void execute() {
-        m_drive.setChassisSpeeds(kSpeed);
+        m_drive.setChassisSpeeds(SPEED);
     }
 
     @Override

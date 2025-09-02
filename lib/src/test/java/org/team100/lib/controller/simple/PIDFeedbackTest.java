@@ -9,7 +9,7 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.state.Model100;
 
 public class PIDFeedbackTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
@@ -18,14 +18,14 @@ public class PIDFeedbackTest {
 
         // zero error, zero feedback
         double u = c.calculate(new Model100(), new Model100());
-        assertEquals(0, u, kDelta);
+        assertEquals(0, u, DELTA);
 
         // position error -> u
         u = c.calculate(new Model100(0, 0), new Model100(1, 0));
-        assertEquals(1, u, kDelta);
+        assertEquals(1, u, DELTA);
 
         // this controller ignores velocity
         u = c.calculate(new Model100(0, 0), new Model100(0, 1));
-        assertEquals(0, u, kDelta);
+        assertEquals(0, u, DELTA);
     }
 }

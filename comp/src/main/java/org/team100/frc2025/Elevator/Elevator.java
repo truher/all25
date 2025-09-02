@@ -26,14 +26,15 @@ public class Elevator extends SubsystemBase {
      * bit slow, turn it off for comp.
      */
     private static final boolean VISUALIZE = true;
-    private static final double kElevatorMaximumPosition = 56.0;
-    private static final double kElevatorMinimumPosition = 0.0;
-    private static final double kElevatorReduction = 2;
-    private static final double kElevatorWheelDiamater = 1;
+    private static final double ELEVATOR_MAXIMUM_POSITION = 56.0;
+    private static final double ELEVATOR_MINIMUM_POSITION = 0.0;
+    private static final double ELEVATOR_REDUCTION = 2;
+    /** This is wrong, it's "Sanjan units". */
+    private static final double ELEVATOR_WHEEL_DIAMETER = 1;
     private static final double maxVel = 190;
     private static final double maxAccel = 210;
-    private static final double kPositionTolerance = 0.01;
-    // private static final double kVelocityTolerance = 0.01;
+    private static final double POSITION_TOLERANCE = 0.01;
+    // private static final double VELOCITY_TOLERANCE = 0.01;
 
     private final OutboardLinearPositionServo starboardServo;
     private final OutboardLinearPositionServo portServo;
@@ -51,7 +52,7 @@ public class Elevator extends SubsystemBase {
         LoggerFactory starboardMotorLogger = child.name("Starboard Motor");
         LoggerFactory portMotorLogger = child.name("Port Motor");
 
-        Profile100 profile = new TrapezoidProfile100(maxVel, maxAccel, kPositionTolerance);
+        Profile100 profile = new TrapezoidProfile100(maxVel, maxAccel, POSITION_TOLERANCE);
         ProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
 
         switch (Identity.instance) {
@@ -72,18 +73,18 @@ public class Elevator extends SubsystemBase {
                 LinearMechanism starboardMech = new LinearMechanism(
                         starboardMotor,
                         stbdEncoder,
-                        kElevatorReduction,
-                        kElevatorWheelDiamater,
-                        kElevatorMinimumPosition,
-                        kElevatorMaximumPosition);
+                        ELEVATOR_REDUCTION,
+                        ELEVATOR_WHEEL_DIAMETER,
+                        ELEVATOR_MINIMUM_POSITION,
+                        ELEVATOR_MAXIMUM_POSITION);
 
                 LinearMechanism portMech = new LinearMechanism(
                         portMotor,
                         portEncoder,
-                        kElevatorReduction,
-                        kElevatorWheelDiamater,
-                        kElevatorMinimumPosition,
-                        kElevatorMaximumPosition);
+                        ELEVATOR_REDUCTION,
+                        ELEVATOR_WHEEL_DIAMETER,
+                        ELEVATOR_MINIMUM_POSITION,
+                        ELEVATOR_MAXIMUM_POSITION);
 
                 starboardServo = new OutboardLinearPositionServo(
                         starboardLogger,
@@ -105,17 +106,17 @@ public class Elevator extends SubsystemBase {
                 LinearMechanism starboardMech = new LinearMechanism(
                         starboardMotor,
                         stbdEncoder,
-                        kElevatorReduction,
-                        kElevatorWheelDiamater,
-                        kElevatorMinimumPosition,
-                        kElevatorMaximumPosition);
+                        ELEVATOR_REDUCTION,
+                        ELEVATOR_WHEEL_DIAMETER,
+                        ELEVATOR_MINIMUM_POSITION,
+                        ELEVATOR_MAXIMUM_POSITION);
                 LinearMechanism portMech = new LinearMechanism(
                         portMotor,
                         portEncoder,
-                        kElevatorReduction,
-                        kElevatorWheelDiamater,
-                        kElevatorMinimumPosition,
-                        kElevatorMaximumPosition);
+                        ELEVATOR_REDUCTION,
+                        ELEVATOR_WHEEL_DIAMETER,
+                        ELEVATOR_MINIMUM_POSITION,
+                        ELEVATOR_MAXIMUM_POSITION);
 
                 starboardServo = new OutboardLinearPositionServo(
                         starboardLogger,

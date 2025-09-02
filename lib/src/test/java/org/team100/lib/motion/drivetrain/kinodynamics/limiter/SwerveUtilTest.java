@@ -13,7 +13,7 @@ import org.team100.lib.util.Util;
 
 class SwerveUtilTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testIsAccel() {
@@ -38,24 +38,24 @@ class SwerveUtilTest {
     @Test
     void testAccelLimit1() {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
-        assertEquals(10, limits.getMaxDriveAccelerationM_S2(), kDelta);
+        assertEquals(10, limits.getMaxDriveAccelerationM_S2(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
                 new FieldRelativeVelocity(0, 0, 0),
                 new FieldRelativeVelocity(1, 0, 0));
         // low speed, current limited.
-        assertEquals(10, accelLimit, kDelta);
+        assertEquals(10, accelLimit, DELTA);
     }
 
     @Test
     void testAccelLimit2() {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
-        assertEquals(10, limits.getMaxDriveAccelerationM_S2(), kDelta);
-        assertEquals(5, limits.getMaxDriveVelocityM_S(), kDelta);
+        assertEquals(10, limits.getMaxDriveAccelerationM_S2(), DELTA);
+        assertEquals(5, limits.getMaxDriveVelocityM_S(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
                 new FieldRelativeVelocity(4.9, 0, 0),
                 new FieldRelativeVelocity(5, 0, 0));
         // near top speed, EMF-limited
-        assertEquals(0.2, accelLimit, kDelta);
+        assertEquals(0.2, accelLimit, DELTA);
     }
 
     @Test
@@ -63,11 +63,11 @@ class SwerveUtilTest {
         // this is to figure out why the Oscillate test isn't returning
         // exactly the right result
         SwerveKinodynamics limits = new Fixture().swerveKinodynamics;
-        assertEquals(1, limits.getMaxDriveAccelerationM_S2(), kDelta);
+        assertEquals(1, limits.getMaxDriveAccelerationM_S2(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
                 new FieldRelativeVelocity(0.92, 0, 0),
                 new FieldRelativeVelocity(0.94, 0, 0));
-        assertEquals(0.8, accelLimit, kDelta);
+        assertEquals(0.8, accelLimit, DELTA);
     }
 
     @Test
@@ -76,15 +76,15 @@ class SwerveUtilTest {
         // exactly the right result
         SwerveKinodynamics limits = new Fixture().swerveKinodynamics;
         // the test asks for 1 m/s/s
-        assertEquals(1, limits.getMaxDriveAccelerationM_S2(), kDelta);
+        assertEquals(1, limits.getMaxDriveAccelerationM_S2(), DELTA);
         // the problem is that the maximum possible velocity is right at the
         // maximum commanded velocity, so the motor can't execute the constant
         // accel command.
-        assertEquals(1, limits.getMaxDriveVelocityM_S(), kDelta);
-        assertEquals(10, limits.getStallAccelerationM_S2(), kDelta);
+        assertEquals(1, limits.getMaxDriveVelocityM_S(), DELTA);
+        assertEquals(10, limits.getStallAccelerationM_S2(), DELTA);
         // this returns 0.8 which is wrong
         double accelLimit = SwerveUtil.minAccel(limits, 1, 1, 0.92);
-        assertEquals(0.8, accelLimit, kDelta);
+        assertEquals(0.8, accelLimit, DELTA);
     }
 
     @Test

@@ -14,7 +14,7 @@ import edu.wpi.first.math.system.NumericalIntegration;
  * Nope, RK4 works forwards and backwards.
  */
 class NumericalIntegrationTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     Matrix<N1, N1> constantF(Matrix<N1, N1> x, Matrix<N1, N1> u) {
         return VecBuilder.fill(1);
@@ -25,7 +25,7 @@ class NumericalIntegrationTest {
         Matrix<N1, N1> prevXhat = VecBuilder.fill(0);
         Matrix<N1, N1> u = VecBuilder.fill(0);
         Matrix<N1, N1> xhat = NumericalIntegration.rk4(this::constantF, prevXhat, u, 1);
-        assertEquals(1, xhat.get(0, 0), kDelta);
+        assertEquals(1, xhat.get(0, 0), DELTA);
     }
 
     @Test
@@ -34,7 +34,7 @@ class NumericalIntegrationTest {
         Matrix<N1, N1> u = VecBuilder.fill(0);
         Matrix<N1, N1> xhat = NumericalIntegration.rk4(this::constantF, prevXhat, u, -1);
         // negative time means negative motion, works fine
-        assertEquals(-1, xhat.get(0, 0), kDelta);
+        assertEquals(-1, xhat.get(0, 0), DELTA);
     }
 
     @Test
@@ -44,6 +44,6 @@ class NumericalIntegrationTest {
         Matrix<N1, N1> xhat = NumericalIntegration.rk4(this::constantF, prevXhat, u, 1);
         // should be back where we started
         Matrix<N1, N1> newXhat = NumericalIntegration.rk4(this::constantF, xhat, u, -1);
-        assertEquals(0, newXhat.get(0, 0), kDelta);
+        assertEquals(0, newXhat.get(0, 0), DELTA);
     }
 }

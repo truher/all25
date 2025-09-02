@@ -30,7 +30,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class ScheduleGeneratorTest {
     private static final boolean DEBUG = false;
     public static final double kTestEpsilon = 1e-12;
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
 
     public static final List<Pose2dWithMotion> kWaypoints = Arrays.asList(
             new Pose2dWithMotion(new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.kZero)),
@@ -302,8 +302,8 @@ public class ScheduleGeneratorTest {
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.575, p.state().getPose().getX(), kDelta);
-        assertEquals(0, p.state().getHeadingRate(), kDelta);
+        assertEquals(0.575, p.state().getPose().getX(), DELTA);
+        assertEquals(0, p.state().getHeadingRate(), DELTA);
 
     }
 

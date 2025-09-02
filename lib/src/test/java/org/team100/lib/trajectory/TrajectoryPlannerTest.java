@@ -27,7 +27,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 class TrajectoryPlannerTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
 
     /**
      * Stationary trajectories do not work.
@@ -53,8 +53,8 @@ class TrajectoryPlannerTest {
         Trajectory100 t = planner.restToRest(waypoints);
         assertEquals(12, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.6, p.state().getPose().getX(), kDelta);
-        assertEquals(0, p.state().getHeadingRate(), kDelta);
+        assertEquals(0.6, p.state().getPose().getX(), DELTA);
+        assertEquals(0, p.state().getHeadingRate(), DELTA);
     }
 
     @Test
@@ -77,8 +77,8 @@ class TrajectoryPlannerTest {
         Trajectory100 t = planner.generateTrajectory(
                 waypoints, start_vel, end_vel);
         TimedPose p = t.getPoint(6);
-        assertEquals(0.272, p.state().getPose().getX(), kDelta);
-        assertEquals(0, p.state().getHeadingRate(), kDelta);
+        assertEquals(0.272, p.state().getPose().getX(), DELTA);
+        assertEquals(0, p.state().getHeadingRate(), DELTA);
 
     }
 
@@ -110,8 +110,8 @@ class TrajectoryPlannerTest {
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.575, p.state().getPose().getX(), kDelta);
-        assertEquals(0, p.state().getHeadingRate(), kDelta);
+        assertEquals(0.575, p.state().getPose().getX(), DELTA);
+        assertEquals(0, p.state().getHeadingRate(), DELTA);
     }
 
     /**
@@ -136,13 +136,13 @@ class TrajectoryPlannerTest {
         SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(0, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 trajectory = planner.restToRest(start.pose(), end);
-        assertEquals(1.565, trajectory.duration(), kDelta);
+        assertEquals(1.565, trajectory.duration(), DELTA);
 
         /** progress along trajectory */
         double m_timeS = 0;
 
         // initial velocity is zero.
-        assertEquals(0, trajectory.sample(m_timeS).velocityM_S(), kDelta);
+        assertEquals(0, trajectory.sample(m_timeS).velocityM_S(), DELTA);
 
         double maxDriveVelocityM_S = swerveKinodynamics.getMaxDriveVelocityM_S();
         double maxDriveAccelerationM_S2 = swerveKinodynamics.getMaxDriveAccelerationM_S2();
@@ -164,7 +164,7 @@ class TrajectoryPlannerTest {
         SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
-        assertEquals(1.176, traj.duration(), kDelta);
+        assertEquals(1.176, traj.duration(), DELTA);
     }
 
     @Test
@@ -175,7 +175,7 @@ class TrajectoryPlannerTest {
         SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(-1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
-        assertEquals(1.176, traj.duration(), kDelta);
+        assertEquals(1.176, traj.duration(), DELTA);
     }
 
     @Test
@@ -186,7 +186,7 @@ class TrajectoryPlannerTest {
         SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
-        assertEquals(2.525, traj.duration(), kDelta);
+        assertEquals(2.525, traj.duration(), DELTA);
     }
 
 }

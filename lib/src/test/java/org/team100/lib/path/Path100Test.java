@@ -21,19 +21,19 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 class Path100Test {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
-    private static final List<Rotation2d> kHeadings = Arrays.asList(
+    private static final List<Rotation2d> HEADINGS = Arrays.asList(
             GeometryUtil.fromDegrees(0),
             GeometryUtil.fromDegrees(30),
             GeometryUtil.fromDegrees(60),
             GeometryUtil.fromDegrees(90));
 
-    private static final List<Pose2dWithMotion> kWaypoints = Arrays.asList(
-            new Pose2dWithMotion(new Pose2d(new Translation2d(0.0, 0.0), kHeadings.get(0))),
-            new Pose2dWithMotion(new Pose2d(new Translation2d(24.0, 0.0), kHeadings.get(1))),
-            new Pose2dWithMotion(new Pose2d(new Translation2d(36.0, 12.0), kHeadings.get(2))),
-            new Pose2dWithMotion(new Pose2d(new Translation2d(60.0, 12.0), kHeadings.get(3))));
+    private static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
+            new Pose2dWithMotion(new Pose2d(new Translation2d(0.0, 0.0), HEADINGS.get(0))),
+            new Pose2dWithMotion(new Pose2d(new Translation2d(24.0, 0.0), HEADINGS.get(1))),
+            new Pose2dWithMotion(new Pose2d(new Translation2d(36.0, 12.0), HEADINGS.get(2))),
+            new Pose2dWithMotion(new Pose2d(new Translation2d(60.0, 12.0), HEADINGS.get(3))));
 
     @Test
     void testEmpty() {
@@ -100,24 +100,24 @@ class Path100Test {
 
     @Test
     void testConstruction() {
-        Path100 traj = new Path100(kWaypoints);
+        Path100 traj = new Path100(WAYPOINTS);
         assertFalse(traj.isEmpty());
         assertEquals(4, traj.length());
     }
 
     @Test
     void testStateAccessors() {
-        Path100 traj = new Path100(kWaypoints);
+        Path100 traj = new Path100(WAYPOINTS);
 
-        assertEquals(kWaypoints.get(0), traj.getPoint(0));
-        assertEquals(kWaypoints.get(1), traj.getPoint(1));
-        assertEquals(kWaypoints.get(2), traj.getPoint(2));
-        assertEquals(kWaypoints.get(3), traj.getPoint(3));
+        assertEquals(WAYPOINTS.get(0), traj.getPoint(0));
+        assertEquals(WAYPOINTS.get(1), traj.getPoint(1));
+        assertEquals(WAYPOINTS.get(2), traj.getPoint(2));
+        assertEquals(WAYPOINTS.get(3), traj.getPoint(3));
 
-        assertEquals(kHeadings.get(0), traj.getPoint(0).getHeading());
-        assertEquals(kHeadings.get(1), traj.getPoint(1).getHeading());
-        assertEquals(kHeadings.get(2), traj.getPoint(2).getHeading());
-        assertEquals(kHeadings.get(3), traj.getPoint(3).getHeading());
+        assertEquals(HEADINGS.get(0), traj.getPoint(0).getHeading());
+        assertEquals(HEADINGS.get(1), traj.getPoint(1).getHeading());
+        assertEquals(HEADINGS.get(2), traj.getPoint(2).getHeading());
+        assertEquals(HEADINGS.get(3), traj.getPoint(3).getHeading());
     }
 
     /**
@@ -146,15 +146,15 @@ class Path100Test {
         // Create the reference trajectory (straight line motion between waypoints).
         Path100 path = new Path100(waypoints);
 
-        assertEquals(0.0, path.getMinDistance(), kDelta);
+        assertEquals(0.0, path.getMinDistance(), DELTA);
         // the total path length is a bit more than the straight-line path because each
         // path is a constant-twist arc.
-        assertEquals(89.435, path.getMaxDistance(), kDelta);
+        assertEquals(89.435, path.getMaxDistance(), DELTA);
 
         // initial sample is exactly at the start
         Pose2dWithMotion sample0 = path.sample(0.0);
-        assertEquals(0, sample0.getPose().getX(), kDelta);
-        assertEquals(0, sample0.getPose().getY(), kDelta);
+        assertEquals(0, sample0.getPose().getX(), DELTA);
+        assertEquals(0, sample0.getPose().getY(), DELTA);
 
         // course is +x
         assertEquals(0, sample0.getCourse().get().getDegrees());
@@ -166,46 +166,46 @@ class Path100Test {
         // halfway between 0 and 1, the path sags a little, and it's a little longer,
         // so this is not (12,0).
         Pose2dWithMotion sample12 = path.sample(12.0);
-        assertEquals(11.862, sample12.getPose().getX(), kDelta);
-        assertEquals(-1.58, sample12.getPose().getY(), kDelta);
+        assertEquals(11.862, sample12.getPose().getX(), DELTA);
+        assertEquals(-1.58, sample12.getPose().getY(), DELTA);
 
         // course should be +x
-        assertEquals(0, sample12.getCourse().get().getDegrees(), kDelta);
+        assertEquals(0, sample12.getCourse().get().getDegrees(), DELTA);
 
         // heading should be about 15 degrees, but since the path is a bit
         // longer than the straight line, we're not quite to the middle of it yet
-        assertEquals(14.829, sample12.getHeading().getDegrees(), kDelta);
+        assertEquals(14.829, sample12.getHeading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample5 = path.sample(48);
-        assertEquals(36, sample5.getPose().getX(), kDelta);
-        assertEquals(11.585, sample5.getPose().getY(), kDelta);
-        assertEquals(46.978, sample5.getCourse().get().getDegrees(), kDelta);
-        assertEquals(60, sample5.getHeading().getDegrees(), kDelta);
+        assertEquals(36, sample5.getPose().getX(), DELTA);
+        assertEquals(11.585, sample5.getPose().getY(), DELTA);
+        assertEquals(46.978, sample5.getCourse().get().getDegrees(), DELTA);
+        assertEquals(60, sample5.getHeading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample6 = path.sample(60);
-        assertEquals(36, sample6.getPose().getX(), kDelta);
-        assertEquals(23.585, sample6.getPose().getY(), kDelta);
-        assertEquals(1.006, sample6.getCourse().get().getDegrees(), kDelta);
-        assertEquals(60, sample6.getHeading().getDegrees(), kDelta);
+        assertEquals(36, sample6.getPose().getX(), DELTA);
+        assertEquals(23.585, sample6.getPose().getY(), DELTA);
+        assertEquals(1.006, sample6.getCourse().get().getDegrees(), DELTA);
+        assertEquals(60, sample6.getHeading().getDegrees(), DELTA);
 
         // halfway between the last two points, the path sags a little,
         // and it's a little longer, so this is not (48,0)
         Pose2dWithMotion sample72 = path.sample(72.0);
-        assertEquals(45.097, sample72.getPose().getX(), kDelta);
-        assertEquals(17.379, sample72.getPose().getY(), kDelta);
+        assertEquals(45.097, sample72.getPose().getX(), DELTA);
+        assertEquals(17.379, sample72.getPose().getY(), DELTA);
 
         // course should be +x
-        assertEquals(0, sample72.getCourse().get().getDegrees(), kDelta);
+        assertEquals(0, sample72.getCourse().get().getDegrees(), DELTA);
 
         // heading should be about 135 degrees, but because of the longer
         // paths, we're not quite to the center of the arc yet
-        assertEquals(107.905, sample72.getHeading().getDegrees(), kDelta);
+        assertEquals(107.905, sample72.getHeading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample8 = path.sample(84);
-        assertEquals(56.440, sample8.getPose().getX(), kDelta);
-        assertEquals(19.939, sample8.getPose().getY(), kDelta);
-        assertEquals(0, sample8.getCourse().get().getDegrees(), kDelta);
-        assertEquals(157.525, sample8.getHeading().getDegrees(), kDelta);
+        assertEquals(56.440, sample8.getPose().getX(), DELTA);
+        assertEquals(19.939, sample8.getPose().getY(), DELTA);
+        assertEquals(0, sample8.getCourse().get().getDegrees(), DELTA);
+        assertEquals(157.525, sample8.getHeading().getDegrees(), DELTA);
 
     }
 }

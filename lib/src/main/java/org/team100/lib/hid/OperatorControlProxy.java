@@ -13,8 +13,8 @@ public class OperatorControlProxy implements OperatorControl {
     private static class NoOperatorControl implements OperatorControl {
     }
 
-    private static final int kPort = 1;
-    private static final double kFreq = 1;
+    private static final int PORT = 1;
+    private static final double FREQ = 1;
 
     private String m_name;
     private OperatorControl m_operatorControl;
@@ -25,12 +25,12 @@ public class OperatorControlProxy implements OperatorControl {
      */
     public OperatorControlProxy(Async async) {
         refresh();
-        async.addPeriodic(this::refresh, kFreq, "OperatorControlProxy");
+        async.addPeriodic(this::refresh, FREQ, "OperatorControlProxy");
     }
 
     public void refresh() {
         // name is blank if not connected
-        String name = DriverStation.getJoystickName(kPort);
+        String name = DriverStation.getJoystickName(PORT);
         name = name.trim();
         if (name.equals(m_name))
             return;

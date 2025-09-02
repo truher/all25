@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 
 public class SimulatedTagDetectorTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @BeforeEach
     void init() {
@@ -58,12 +58,12 @@ public class SimulatedTagDetectorTest {
         // tag in front
         Pose3d tagPose = new Pose3d(1, 0, 0, new Rotation3d());
         Transform3d tagInCamera = SimulatedTagDetector.tagInCamera(cameraPose3d, tagPose);
-        assertEquals(1, tagInCamera.getTranslation().getX(), kDelta);
-        assertEquals(0, tagInCamera.getTranslation().getY(), kDelta);
-        assertEquals(0, tagInCamera.getTranslation().getZ(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getX(), kDelta); // roll
-        assertEquals(0, tagInCamera.getRotation().getY(), kDelta); // pitch
-        assertEquals(0, tagInCamera.getRotation().getZ(), kDelta); // yaw
+        assertEquals(1, tagInCamera.getTranslation().getX(), DELTA);
+        assertEquals(0, tagInCamera.getTranslation().getY(), DELTA);
+        assertEquals(0, tagInCamera.getTranslation().getZ(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getX(), DELTA); // roll
+        assertEquals(0, tagInCamera.getRotation().getY(), DELTA); // pitch
+        assertEquals(0, tagInCamera.getRotation().getZ(), DELTA); // yaw
     }
 
     @Test
@@ -73,12 +73,12 @@ public class SimulatedTagDetectorTest {
         // tag in front
         Pose3d tagPose = new Pose3d(1, 0, 0, new Rotation3d());
         Transform3d tagInCamera = SimulatedTagDetector.tagInCamera(cameraPose3d, tagPose);
-        assertEquals(1, tagInCamera.getTranslation().getX(), kDelta);
-        assertEquals(-1, tagInCamera.getTranslation().getY(), kDelta);
-        assertEquals(0, tagInCamera.getTranslation().getZ(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getX(), kDelta); // roll
-        assertEquals(0, tagInCamera.getRotation().getY(), kDelta); // pitch
-        assertEquals(0, tagInCamera.getRotation().getZ(), kDelta); // yaw
+        assertEquals(1, tagInCamera.getTranslation().getX(), DELTA);
+        assertEquals(-1, tagInCamera.getTranslation().getY(), DELTA);
+        assertEquals(0, tagInCamera.getTranslation().getZ(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getX(), DELTA); // roll
+        assertEquals(0, tagInCamera.getRotation().getY(), DELTA); // pitch
+        assertEquals(0, tagInCamera.getRotation().getZ(), DELTA); // yaw
     }
 
     @Test
@@ -88,12 +88,12 @@ public class SimulatedTagDetectorTest {
         // tag in front
         Pose3d tagPose = new Pose3d(1, 0, 0, new Rotation3d());
         Transform3d tagInCamera = SimulatedTagDetector.tagInCamera(cameraPose3d, tagPose);
-        assertEquals(0.707, tagInCamera.getTranslation().getX(), kDelta);
-        assertEquals(-0.707, tagInCamera.getTranslation().getY(), kDelta);
-        assertEquals(0, tagInCamera.getTranslation().getZ(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getX(), kDelta); // roll
-        assertEquals(0, tagInCamera.getRotation().getY(), kDelta); // pitch
-        assertEquals(-Math.PI / 4, tagInCamera.getRotation().getZ(), kDelta); // yaw
+        assertEquals(0.707, tagInCamera.getTranslation().getX(), DELTA);
+        assertEquals(-0.707, tagInCamera.getTranslation().getY(), DELTA);
+        assertEquals(0, tagInCamera.getTranslation().getZ(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getX(), DELTA); // roll
+        assertEquals(0, tagInCamera.getRotation().getY(), DELTA); // pitch
+        assertEquals(-Math.PI / 4, tagInCamera.getRotation().getZ(), DELTA); // yaw
     }
 
     @Test
@@ -104,13 +104,13 @@ public class SimulatedTagDetectorTest {
         Pose3d tagPose = new Pose3d(1, 0, 1, new Rotation3d(1, 2, 3));
         Transform3d tagInCamera = SimulatedTagDetector.tagInCamera(cameraPose3d, tagPose);
         // position is not affectted by tag rotation
-        assertEquals(0.707, tagInCamera.getTranslation().getX(), kDelta);
-        assertEquals(-0.707, tagInCamera.getTranslation().getY(), kDelta);
-        assertEquals(1, tagInCamera.getTranslation().getZ(), kDelta);
+        assertEquals(0.707, tagInCamera.getTranslation().getX(), DELTA);
+        assertEquals(-0.707, tagInCamera.getTranslation().getY(), DELTA);
+        assertEquals(1, tagInCamera.getTranslation().getZ(), DELTA);
         // tag rotation is transformed
-        assertEquals(-2.142, tagInCamera.getRotation().getX(), kDelta); // roll
-        assertEquals(1.142, tagInCamera.getRotation().getY(), kDelta); // pitch
-        assertEquals(-0.927, tagInCamera.getRotation().getZ(), kDelta); // yaw
+        assertEquals(-2.142, tagInCamera.getRotation().getX(), DELTA); // roll
+        assertEquals(1.142, tagInCamera.getRotation().getY(), DELTA); // pitch
+        assertEquals(-0.927, tagInCamera.getRotation().getZ(), DELTA); // yaw
     }
 
     @Test
@@ -140,7 +140,7 @@ public class SimulatedTagDetectorTest {
         // this is the total rotation, we don't care what the axis of rotation is,
         // if the tag rotates around *any* axis more than pi/2, it's not visible.
         double angle = tag10RotationInCamera.getAngle();
-        assertEquals(2.92, angle, kDelta);
+        assertEquals(2.92, angle, DELTA);
 
         // facing away is invisible
         assertFalse(SimulatedTagDetector.visible(
@@ -155,14 +155,14 @@ public class SimulatedTagDetectorTest {
         // from above
         // Rotation3d(Quaternion(-0.862, -0.192, 0.286, 0.369))
         double angle = tag6.getAngle();
-        assertEquals(1.063, angle, kDelta);
+        assertEquals(1.063, angle, DELTA);
 
         // this seems reasonable
         Rotation3d thiscase = new Rotation3d(new Quaternion(0.861, 0.191, -0.286, -0.371));
-        assertEquals(1.062, thiscase.getAngle(), kDelta);
+        assertEquals(1.062, thiscase.getAngle(), DELTA);
         // this seems very wrong
         Rotation3d othercase = new Rotation3d(new Quaternion(-0.862, -0.192, 0.286, 0.369));
-        assertEquals(5.224, othercase.getAngle(), kDelta);
+        assertEquals(5.224, othercase.getAngle(), DELTA);
     }
 
     @Test
@@ -176,16 +176,16 @@ public class SimulatedTagDetectorTest {
         Transform3d cameraOffset = camera.getOffset();
         Pose3d cameraPose3d = robotPose3d.plus(cameraOffset);
         // camera is in the front
-        assertEquals(2.855, cameraPose3d.getTranslation().getX(), kDelta);
+        assertEquals(2.855, cameraPose3d.getTranslation().getX(), DELTA);
         // a little to the left
-        assertEquals(4.31, cameraPose3d.getTranslation().getY(), kDelta);
-        assertEquals(0.811, cameraPose3d.getTranslation().getZ(), kDelta);
+        assertEquals(4.31, cameraPose3d.getTranslation().getY(), DELTA);
+        assertEquals(0.811, cameraPose3d.getTranslation().getZ(), DELTA);
         // rolled a little due to the mounting
-        assertEquals(-0.158, cameraPose3d.getRotation().getX(), kDelta);
+        assertEquals(-0.158, cameraPose3d.getRotation().getX(), DELTA);
         // pitched down about 40 degrees
-        assertEquals(0.691, cameraPose3d.getRotation().getY(), kDelta);
+        assertEquals(0.691, cameraPose3d.getRotation().getY(), DELTA);
         // panned right about 17 degrees
-        assertEquals(-0.295, cameraPose3d.getRotation().getZ(), kDelta);
+        assertEquals(-0.295, cameraPose3d.getRotation().getZ(), DELTA);
 
         Pose3d tagPose = layout.getTagPose(Alliance.Red, 6).get();
         Transform3d tagInCamera = new Transform3d(cameraPose3d, tagPose);
@@ -194,19 +194,19 @@ public class SimulatedTagDetectorTest {
         Rotation3d tagRotationInCamera = tagInCamera.getRotation();
 
         // tag is ahead
-        assertEquals(1.121, tagTranslationInCamera.getX(), kDelta);
+        assertEquals(1.121, tagTranslationInCamera.getX(), DELTA);
         // to the left
-        assertEquals(0.718, tagTranslationInCamera.getY(), kDelta);
+        assertEquals(0.718, tagTranslationInCamera.getY(), DELTA);
         // a little above bore
-        assertEquals(0.392, tagTranslationInCamera.getZ(), kDelta);
+        assertEquals(0.392, tagTranslationInCamera.getZ(), DELTA);
         // tag seems rolled
-        assertEquals(0.621, tagRotationInCamera.getX(), kDelta);
+        assertEquals(0.621, tagRotationInCamera.getX(), DELTA);
         // tag seems pitched down
-        assertEquals(-0.36, tagRotationInCamera.getY(), kDelta);
+        assertEquals(-0.36, tagRotationInCamera.getY(), DELTA);
         // tag seems yawed right
-        assertEquals(-0.926, tagRotationInCamera.getZ(), kDelta);
+        assertEquals(-0.926, tagRotationInCamera.getZ(), DELTA);
         // why is this so large?
-        assertEquals(5.222, tagRotationInCamera.getAngle(), kDelta);
+        assertEquals(5.222, tagRotationInCamera.getAngle(), DELTA);
 
         Translation3d normal = new Translation3d(1, 0, 0);
         // this points "into the page" of the tag
@@ -215,7 +215,7 @@ public class SimulatedTagDetectorTest {
         Vector<N3> tagTranslationVector = tagTranslationInCamera.toVector();
         Rotation3d apparentAngle = new Rotation3d(tagTranslationVector, rotatedNormalVector);
         double angle = apparentAngle.getAngle();
-        assertEquals(1.403, angle, kDelta);
+        assertEquals(1.403, angle, DELTA);
 
     }
 }

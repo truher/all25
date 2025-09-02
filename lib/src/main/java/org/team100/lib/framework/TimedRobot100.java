@@ -2,11 +2,11 @@ package org.team100.lib.framework;
 
 import java.util.PriorityQueue;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.hal.DriverStationJNI;

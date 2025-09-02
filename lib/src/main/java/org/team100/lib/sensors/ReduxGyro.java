@@ -1,10 +1,10 @@
 package org.team100.lib.sensors;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.Rotation2dLogger;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;

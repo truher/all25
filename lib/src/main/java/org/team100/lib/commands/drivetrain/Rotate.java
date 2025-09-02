@@ -20,9 +20,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class Rotate extends Command  {
     /** For testing */
     private static final boolean DEBUG = false;
-    private static final double kThetaToleranceRad = 0.02;
+    private static final double THETA_TOLERANCE_RAD = 0.02;
     // don't try to rotate at max speed
-    private static final double kSpeed = 0.5;
+    private static final double SPEED = 0.5;
 
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
@@ -46,9 +46,9 @@ public class Rotate extends Command  {
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxDriveAccelerationM_S2(),
                 0.01,
-                m_swerveKinodynamics.getMaxAngleSpeedRad_S() * kSpeed,
-                m_swerveKinodynamics.getMaxAngleAccelRad_S2() * kSpeed,
-                kThetaToleranceRad);
+                m_swerveKinodynamics.getMaxAngleSpeedRad_S() * SPEED,
+                m_swerveKinodynamics.getMaxAngleAccelRad_S2() * SPEED,
+                THETA_TOLERANCE_RAD);
         addRequirements(drive);
     }
 

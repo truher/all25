@@ -18,8 +18,8 @@ public class DriverControlProxy implements DriverControl {
     private static class NoDriverControl implements DriverControl {
     }
 
-    private static final int kPort = 0;
-    private static final double kFreq = 1;
+    private static final int PORT = 0;
+    private static final double FREQ = 1;
 
     private String m_name;
     private DriverControl m_driverControl;
@@ -35,12 +35,12 @@ public class DriverControlProxy implements DriverControl {
         m_logger = parent.type(this);
         m_hidLogger = m_logger.stringLogger(Level.TRACE, "HID");
         refresh();
-        async.addPeriodic(this::refresh, kFreq, "DriverControlProxy");
+        async.addPeriodic(this::refresh, FREQ, "DriverControlProxy");
     }
 
     public void refresh() {
         // name is blank if not connected
-        String name = DriverStation.getJoystickName(kPort);
+        String name = DriverStation.getJoystickName(PORT);
         name = name.trim();
         if (name.equals(m_name)) {
             return;

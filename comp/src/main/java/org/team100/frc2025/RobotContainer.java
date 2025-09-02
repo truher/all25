@@ -33,6 +33,7 @@ import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.frc2025.Wrist.WristDefaultCommand;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.commands.drivetrain.FieldConstants.FieldSector;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
@@ -85,7 +86,6 @@ import org.team100.lib.sensors.Gyro;
 import org.team100.lib.sensors.GyroFactory;
 import org.team100.lib.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.TrajectoryPlanner;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -111,8 +111,8 @@ public class RobotContainer  {
     // 2/26/25: Joel updated the supply limit to 90A, see 1678 code above. This is
     // essentially unlimited, so you'll need to run some other kind of limiter (e.g.
     // acceleration) to keep from browning out.
-    private static final double kDriveCurrentLimit = 90;
-    private static final double kDriveStatorLimit = 110;
+    private static final double DRIVE_SUPPLY_LIMIT = 90;
+    private static final double DRIVE_STATOR_LIMIT = 110;
 
     private final SwerveModuleCollection m_modules;
     private final Command m_auton;
@@ -190,8 +190,8 @@ public class RobotContainer  {
 
         m_modules = SwerveModuleCollection.get(
                 driveLog,
-                kDriveCurrentLimit,
-                kDriveStatorLimit,
+                DRIVE_SUPPLY_LIMIT,
+                DRIVE_STATOR_LIMIT,
                 m_swerveKinodynamics);
 
         final Gyro gyro = GyroFactory.get(

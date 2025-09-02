@@ -39,7 +39,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DataLogManager;
 
 class SwerveDrivePoseEstimator100Test {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final boolean DEBUG = false;
 
@@ -52,14 +52,14 @@ class SwerveDrivePoseEstimator100Test {
 
     private static void verify(double x, SwerveModel state) {
         Pose2d estimate = state.pose();
-        assertEquals(x, estimate.getX(), kDelta);
-        assertEquals(0, estimate.getY(), kDelta);
-        assertEquals(0, estimate.getRotation().getRadians(), kDelta);
+        assertEquals(x, estimate.getX(), DELTA);
+        assertEquals(0, estimate.getY(), DELTA);
+        assertEquals(0, estimate.getRotation().getRadians(), DELTA);
     }
 
     private static void verifyVelocity(double xV, SwerveModel state) {
         FieldRelativeVelocity v = state.velocity();
-        assertEquals(xV, v.x(), kDelta);
+        assertEquals(xV, v.x(), DELTA);
     }
 
     @BeforeEach
@@ -72,9 +72,9 @@ class SwerveDrivePoseEstimator100Test {
         double targetRangeM = 1.0;
         double[] visionStdDev = VisionDataProvider24.visionMeasurementStdDevs(targetRangeM);
         assertEquals(3, visionStdDev.length);
-        assertEquals(0.04, visionStdDev[0], kDelta);
-        assertEquals(0.04, visionStdDev[1], kDelta);
-        assertEquals(Double.MAX_VALUE, visionStdDev[2], kDelta);
+        assertEquals(0.04, visionStdDev[0], DELTA);
+        assertEquals(0.04, visionStdDev[1], DELTA);
+        assertEquals(Double.MAX_VALUE, visionStdDev[2], DELTA);
     }
 
     @Test
@@ -83,9 +83,9 @@ class SwerveDrivePoseEstimator100Test {
         // 1 mm, very low
         double[] stateStdDev = VisionDataProvider24.tightStateStdDevs;
         assertEquals(3, stateStdDev.length);
-        assertEquals(0.001, stateStdDev[0], kDelta);
-        assertEquals(0.001, stateStdDev[1], kDelta);
-        assertEquals(0.1, stateStdDev[2], kDelta);
+        assertEquals(0.001, stateStdDev[0], DELTA);
+        assertEquals(0.001, stateStdDev[1], DELTA);
+        assertEquals(0.1, stateStdDev[2], DELTA);
     }
 
     @Test
@@ -95,18 +95,18 @@ class SwerveDrivePoseEstimator100Test {
         double[] visionStdDev = VisionDataProvider24.visionMeasurementStdDevs(targetRangeM);
         double[] k = SwerveDrivePoseEstimator100.getK(stateStdDev, visionStdDev);
         assertEquals(3, k.length);
-        assertEquals(0.024, k[0], kDelta);
-        assertEquals(0.024, k[1], kDelta);
-        assertEquals(0, k[2], kDelta);
+        assertEquals(0.024, k[0], DELTA);
+        assertEquals(0.024, k[1], DELTA);
+        assertEquals(0, k[2], DELTA);
     }
 
     @Test
     void testMix() {
-        assertEquals(0.091, SwerveDrivePoseEstimator100.mix(1, 100), kDelta);
-        assertEquals(0.24, SwerveDrivePoseEstimator100.mix(1, 10), kDelta);
-        assertEquals(0.5, SwerveDrivePoseEstimator100.mix(1, 1), kDelta);
-        assertEquals(0.76, SwerveDrivePoseEstimator100.mix(10, 1), kDelta);
-        assertEquals(0.909, SwerveDrivePoseEstimator100.mix(100, 1), kDelta);
+        assertEquals(0.091, SwerveDrivePoseEstimator100.mix(1, 100), DELTA);
+        assertEquals(0.24, SwerveDrivePoseEstimator100.mix(1, 10), DELTA);
+        assertEquals(0.5, SwerveDrivePoseEstimator100.mix(1, 1), DELTA);
+        assertEquals(0.76, SwerveDrivePoseEstimator100.mix(10, 1), DELTA);
+        assertEquals(0.909, SwerveDrivePoseEstimator100.mix(100, 1), DELTA);
     }
 
     @Test
@@ -171,18 +171,18 @@ class SwerveDrivePoseEstimator100Test {
         }
         // after 1 sec the error is about 6 cm which is too slow.
         Transform2d error = measurement.minus(nudged);
-        assertEquals(0.061, error.getX(), kDelta);
-        assertEquals(0, error.getY(), kDelta);
-        assertEquals(0, error.getRotation().getRadians(), kDelta);
+        assertEquals(0.061, error.getX(), DELTA);
+        assertEquals(0, error.getY(), DELTA);
+        assertEquals(0, error.getRotation().getRadians(), DELTA);
         //
         for (int i = 0; i < frameRate; ++i) {
             nudged = SwerveDrivePoseEstimator100.nudge(nudged, measurement, stateStdDev, visionStdDev);
         }
         // after 2 sec the error is about 4 cm.
         error = measurement.minus(nudged);
-        assertEquals(0.037, error.getX(), kDelta);
-        assertEquals(0, error.getY(), kDelta);
-        assertEquals(0, error.getRotation().getRadians(), kDelta);
+        assertEquals(0.037, error.getX(), DELTA);
+        assertEquals(0, error.getY(), DELTA);
+        assertEquals(0, error.getRotation().getRadians(), DELTA);
     }
 
     /**
@@ -207,18 +207,18 @@ class SwerveDrivePoseEstimator100Test {
         }
         // after 1 sec the error is about 2 cm which is the target.
         Transform2d error = measurement.minus(nudged);
-        assertEquals(0.019, error.getX(), kDelta);
-        assertEquals(0, error.getY(), kDelta);
-        assertEquals(0, error.getRotation().getRadians(), kDelta);
+        assertEquals(0.019, error.getX(), DELTA);
+        assertEquals(0, error.getY(), DELTA);
+        assertEquals(0, error.getRotation().getRadians(), DELTA);
         //
         for (int i = 0; i < frameRate; ++i) {
             nudged = SwerveDrivePoseEstimator100.nudge(nudged, measurement, stateStdDev, visionStdDev);
         }
         // after 2 sec the error is about 4 mm which seems plenty tight
         error = measurement.minus(nudged);
-        assertEquals(0.004, error.getX(), kDelta);
-        assertEquals(0, error.getY(), kDelta);
-        assertEquals(0, error.getRotation().getRadians(), kDelta);
+        assertEquals(0.004, error.getX(), DELTA);
+        assertEquals(0, error.getY(), DELTA);
+        assertEquals(0, error.getRotation().getRadians(), DELTA);
 
     }
 
@@ -1094,10 +1094,10 @@ class SwerveDrivePoseEstimator100Test {
 
         Pose2d visionPose = estimator.get(time).pose();
 
-        assertEquals(odometryPose.getX(), visionPose.getX(), kDelta);
-        assertEquals(odometryPose.getY(), visionPose.getY(), kDelta);
+        assertEquals(odometryPose.getX(), visionPose.getX(), DELTA);
+        assertEquals(odometryPose.getY(), visionPose.getY(), DELTA);
         assertEquals(
                 odometryPose.getRotation().getRadians(),
-                visionPose.getRotation().getRadians(), kDelta);
+                visionPose.getRotation().getRadians(), DELTA);
     }
 }

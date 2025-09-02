@@ -14,7 +14,7 @@ import org.team100.lib.util.Util;
 
 public class JerkLimitedProfileGeneratorTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     /**
      * see
@@ -87,16 +87,16 @@ public class JerkLimitedProfileGeneratorTest {
                 maxJerk,
                 overshoot);
 
-        assertEquals(12, p.duration(), kDelta);
+        assertEquals(12, p.duration(), DELTA);
 
         MotionState s0 = p.get(0);
-        assertEquals(0, s0.v(), kDelta);
+        assertEquals(0, s0.v(), DELTA);
 
         MotionProfile p1 = p.append(p);
-        assertEquals(24, p1.duration(), kDelta);
+        assertEquals(24, p1.duration(), DELTA);
 
         MotionState s1 = p.get(1);
-        assertEquals(0.5, s1.v(), kDelta);
+        assertEquals(0.5, s1.v(), DELTA);
     }
 
     @Test

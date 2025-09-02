@@ -40,10 +40,10 @@ import edu.wpi.first.wpilibj.XboxController;
  * Do not use stick buttons, they are prone to stray clicks
  */
 public class DriverXboxControl implements DriverControl {
-    private static final double kDeadband = 0.1;
-    private static final double kExpo = 0.65;
-    private static final double kMedium = 0.5;
-    private static final double kSlow = 0.15;
+    private static final double DEADBAND = 0.1;
+    private static final double EXPO = 0.65;
+    private static final double MEDIUM = 0.5;
+    private static final double SLOW = 0.15;
 
     private final XboxController m_controller;
     private final DoubleLogger m_log_right_y;
@@ -88,8 +88,8 @@ public class DriverXboxControl implements DriverControl {
         double x = -1.0 * clamp(rightY, 1);
         double y = -1.0 * clamp(rightX, 1);
         double r = Math.hypot(x, y);
-        if (r > kDeadband) {
-            double expoR = expo(r, kExpo);
+        if (r > DEADBAND) {
+            double expoR = expo(r, EXPO);
             double ratio = expoR / r;
             dx = ratio * x;
             dy = ratio * y;
@@ -98,16 +98,16 @@ public class DriverXboxControl implements DriverControl {
             dy = 0;
         }
 
-        double dtheta = expo(deadband(-1.0 * clamp(leftX, 1), kDeadband, 1), kExpo);
+        double dtheta = expo(deadband(-1.0 * clamp(leftX, 1), DEADBAND, 1), EXPO);
 
         Speed speed = speed();
         m_log_speed.log(() -> speed);
 
         switch (speed) {
             case SLOW:
-                return new Velocity(kSlow * dx, kSlow * dy, kSlow * dtheta);
+                return new Velocity(SLOW * dx, SLOW * dy, SLOW * dtheta);
             case MEDIUM:
-                return new Velocity(kMedium * dx, kMedium * dy, kMedium * dtheta);
+                return new Velocity(MEDIUM * dx, MEDIUM * dy, MEDIUM * dtheta);
             default:
                 return new Velocity(dx, dy, dtheta);
         }
@@ -127,8 +127,8 @@ public class DriverXboxControl implements DriverControl {
         double x = -1.0 * clamp(rightY, 1);
         double y = -1.0 * clamp(rightX, 1);
         double r = Math.hypot(x, y);
-        if (r > kDeadband) {
-            double expoR = expo(r, kExpo);
+        if (r > DEADBAND) {
+            double expoR = expo(r, EXPO);
             double ratio = expoR / r;
             dx = ratio * x;
             dy = ratio * y;
@@ -137,12 +137,12 @@ public class DriverXboxControl implements DriverControl {
             dy = 0;
         }
 
-        double dtheta = expo(deadband(-1.0 * clamp(leftX, 1), kDeadband, 1), kExpo);
+        double dtheta = expo(deadband(-1.0 * clamp(leftX, 1), DEADBAND, 1), EXPO);
 
         Speed speed = speed();
         m_log_speed.log(() -> speed);
 
-        return new Velocity(kSlow * dx, kSlow * dy, kSlow * dtheta);
+        return new Velocity(SLOW * dx, SLOW * dy, SLOW * dtheta);
         
     }
 

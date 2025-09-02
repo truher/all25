@@ -16,7 +16,7 @@ import org.team100.lib.testing.Timeless;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 class SimulatedHeadingTest implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
@@ -24,8 +24,8 @@ class SimulatedHeadingTest implements Timeless {
         SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest();
         SwerveModuleCollection c = SwerveModuleCollection.get(logger, 10, 20, l);
         SimulatedGyro h = new SimulatedGyro(l, c);
-        assertEquals(0, h.getYawNWU().getRadians(), kDelta);
-        assertEquals(0, h.getYawRateNWU(), kDelta);
+        assertEquals(0, h.getYawNWU().getRadians(), DELTA);
+        assertEquals(0, h.getYawRateNWU(), DELTA);
     }
 
     @Test
@@ -33,10 +33,10 @@ class SimulatedHeadingTest implements Timeless {
         SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest();
         SwerveModuleCollection c = SwerveModuleCollection.get(logger, 10, 20, l);
         SwerveModulePositions p = c.positions();
-        assertEquals(0, p.frontLeft().distanceMeters, kDelta);
-        assertEquals(0, p.frontRight().distanceMeters, kDelta);
-        assertEquals(0, p.rearLeft().distanceMeters, kDelta);
-        assertEquals(0, p.rearRight().distanceMeters, kDelta);
+        assertEquals(0, p.frontLeft().distanceMeters, DELTA);
+        assertEquals(0, p.frontRight().distanceMeters, DELTA);
+        assertEquals(0, p.rearLeft().distanceMeters, DELTA);
+        assertEquals(0, p.rearRight().distanceMeters, DELTA);
         SimulatedGyro h = new SimulatedGyro(l, c);
         ChassisSpeeds speeds = new ChassisSpeeds(1, 0, 0);
         // includes discretization
@@ -48,8 +48,8 @@ class SimulatedHeadingTest implements Timeless {
             c.setDesiredStates(states);
             stepTime();
         }
-        assertEquals(0, h.getYawNWU().getRadians(), kDelta);
-        assertEquals(0, h.getYawRateNWU(), kDelta);
+        assertEquals(0, h.getYawNWU().getRadians(), DELTA);
+        assertEquals(0, h.getYawRateNWU(), DELTA);
         p = c.positions();
         assertEquals(0.42, p.frontLeft().distanceMeters, 0.03);
         assertEquals(0.42, p.frontRight().distanceMeters, 0.03);
@@ -79,7 +79,7 @@ class SimulatedHeadingTest implements Timeless {
         // should be something less than 0.4, but it's a little too high?
         assertEquals(0.42, h.getYawNWU().getRadians(), 0.03);
         // the rate is what we asked for.
-        assertEquals(1, h.getYawRateNWU(), kDelta);
+        assertEquals(1, h.getYawRateNWU(), DELTA);
     }
 
     @Test
@@ -90,14 +90,14 @@ class SimulatedHeadingTest implements Timeless {
         // includes discretization
         SwerveModuleStates states = l.toSwerveModuleStates(speeds);
         // these are discretized so not symmetrical
-        assertEquals(0.787, states.frontLeft().speedMetersPerSecond(), kDelta);
-        assertEquals(1.273, states.frontRight().speedMetersPerSecond(), kDelta);
-        assertEquals(0.794, states.rearLeft().speedMetersPerSecond(), kDelta);
-        assertEquals(1.277, states.rearRight().speedMetersPerSecond(), kDelta);
-        assertEquals(0.310, states.frontLeft().angle().get().getRadians(), kDelta);
-        assertEquals(0.190, states.frontRight().angle().get().getRadians(), kDelta);
-        assertEquals(-0.334, states.rearLeft().angle().get().getRadians(), kDelta);
-        assertEquals(-0.205, states.rearRight().angle().get().getRadians(), kDelta);
+        assertEquals(0.787, states.frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(1.273, states.frontRight().speedMetersPerSecond(), DELTA);
+        assertEquals(0.794, states.rearLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(1.277, states.rearRight().speedMetersPerSecond(), DELTA);
+        assertEquals(0.310, states.frontLeft().angle().get().getRadians(), DELTA);
+        assertEquals(0.190, states.frontRight().angle().get().getRadians(), DELTA);
+        assertEquals(-0.334, states.rearLeft().angle().get().getRadians(), DELTA);
+        assertEquals(-0.205, states.rearRight().angle().get().getRadians(), DELTA);
 
         SwerveModuleCollection c = SwerveModuleCollection.get(logger, 10, 20, l);
         SimulatedGyro h = new SimulatedGyro(l, c);
@@ -113,18 +113,18 @@ class SimulatedHeadingTest implements Timeless {
         SwerveModuleStates states2 = c.states();
 
         // we get back what we put in
-        assertEquals(0.787, states2.frontLeft().speedMetersPerSecond(), kDelta);
-        assertEquals(1.273, states2.frontRight().speedMetersPerSecond(), kDelta);
-        assertEquals(0.794, states2.rearLeft().speedMetersPerSecond(), kDelta);
-        assertEquals(1.277, states2.rearRight().speedMetersPerSecond(), kDelta);
-        assertEquals(0.310, states2.frontLeft().angle().get().getRadians(), kDelta);
+        assertEquals(0.787, states2.frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(1.273, states2.frontRight().speedMetersPerSecond(), DELTA);
+        assertEquals(0.794, states2.rearLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(1.277, states2.rearRight().speedMetersPerSecond(), DELTA);
+        assertEquals(0.310, states2.frontLeft().angle().get().getRadians(), DELTA);
         assertEquals(0.190, states2.frontRight().angle().get().getRadians(), 0.01);
-        assertEquals(-0.334, states2.rearLeft().angle().get().getRadians(), kDelta);
+        assertEquals(-0.334, states2.rearLeft().angle().get().getRadians(), DELTA);
         assertEquals(-0.205, states2.rearRight().angle().get().getRadians(), 0.01);
 
         // we wanted to turn 1 rad/s for 0.4s so this is close.
         assertEquals(0.38, h.getYawNWU().getRadians(), 0.03);
         // we wanted to move 1 rad/s, so that's what we got.
-        assertEquals(1, h.getYawRateNWU(), kDelta);
+        assertEquals(1, h.getYawRateNWU(), DELTA);
     }
 }

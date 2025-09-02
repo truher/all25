@@ -8,7 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
 
 class TimeInterpolatableBuffer100Test {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     static class Item implements Interpolatable<Item> {
         public final double value;
@@ -27,18 +27,18 @@ class TimeInterpolatableBuffer100Test {
     @Test
     void testSimple() {
         TimeInterpolatableBuffer100<Item> b = new TimeInterpolatableBuffer100<>(10, 0, new Item(0));
-        assertEquals(0, b.get(0).value, kDelta);
+        assertEquals(0, b.get(0).value, DELTA);
         b.put(1, new Item(10));
-        assertEquals(5, b.get(0.5).value, kDelta);
-        assertEquals(7.5, b.get(0.75).value, kDelta);
+        assertEquals(5, b.get(0.5).value, DELTA);
+        assertEquals(7.5, b.get(0.75).value, DELTA);
     }
 
     /** For off-the-end requests, it returns the last item. */
     @Test
     void testOffTheEnd() {
         TimeInterpolatableBuffer100<Item> b = new TimeInterpolatableBuffer100<>(10, 0, new Item(0));
-        assertEquals(0, b.get(1).value, kDelta);
+        assertEquals(0, b.get(1).value, DELTA);
         b.put(1, new Item(10));
-        assertEquals(10, b.get(1.5).value, kDelta);
+        assertEquals(10, b.get(1.5).value, DELTA);
     }
 }

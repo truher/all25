@@ -13,23 +13,23 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class MotionProfileTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testBasic() {
         List<MotionSegment> segments = new ArrayList<MotionSegment>();
         segments.add(new MotionSegment(new MotionState(0, 1, 0, 0), 1));
         MotionProfile p = new MotionProfile(segments);
-        assertEquals(1, p.duration(), kDelta);
+        assertEquals(1, p.duration(), DELTA);
 
         MotionState s0 = p.get(0);
-        assertEquals(1, s0.v(), kDelta);
+        assertEquals(1, s0.v(), DELTA);
 
         MotionProfile p1 = p.append(p);
-        assertEquals(2, p1.duration(), kDelta);
+        assertEquals(2, p1.duration(), DELTA);
 
         MotionState s1 = p.get(1);
-        assertEquals(1, s1.v(), kDelta);
+        assertEquals(1, s1.v(), DELTA);
 
     }
 
@@ -39,7 +39,7 @@ public class MotionProfileTest {
         segments.add(new MotionSegment(new MotionState(0, 1, 0, 0), 1));
         MotionProfile p = new MotionProfile(segments);
         MotionProfile b = p.reversed();
-        assertEquals(1, b.duration(), kDelta);
+        assertEquals(1, b.duration(), DELTA);
 
     }
 }

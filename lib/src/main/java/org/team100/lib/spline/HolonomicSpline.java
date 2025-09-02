@@ -31,7 +31,7 @@ public class HolonomicSpline {
     private static final boolean DEBUG = false;
     // curvature measurement performance scales with sample count so make it kinda
     // low. most splines go between 0.5 and 5 meters so this is steps of 2 to 20 cm.
-    private static final int kSamples = 25;
+    private static final int SAMPLES = 25;
 
     private final Spline1d m_x;
     private final Spline1d m_y;
@@ -376,7 +376,7 @@ public class HolonomicSpline {
 
     /** integrate curvature over the length of the spline. */
     double maxCurvature() {
-        double dt = 1.0 / kSamples;
+        double dt = 1.0 / SAMPLES;
         double maxC = 0;
         for (double t = 0; t < 1.0; t += dt) {
             maxC = Math.max(maxC, getCurvature(t));
@@ -386,7 +386,7 @@ public class HolonomicSpline {
 
     /** integrate curvature over the length of the spline. */
     double sumCurvature() {
-        double dt = 1.0 / kSamples;
+        double dt = 1.0 / SAMPLES;
         double sum = 0;
         for (double t = 0; t < 1.0; t += dt) {
             sum += (dt * getCurvature(t));
@@ -398,7 +398,7 @@ public class HolonomicSpline {
      * @return integral of dCurvature^2 over the length of the spline
      */
     double sumDCurvature2() {
-        double dt = 1.0 / kSamples;
+        double dt = 1.0 / SAMPLES;
         double sum = 0;
         for (double t = 0; t < 1.0; t += dt) {
             sum += (dt * dCurvature2(t));

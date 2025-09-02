@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.util.Takt;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * TODO: clean up these cases for 2025.
  */
 class VisionDataProviderTest implements Timeless {
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
@@ -60,12 +60,12 @@ class VisionDataProviderTest implements Timeless {
 
         // verify tag location
         Pose3d tagPose = layout.getTagPose(Alliance.Red, 7).get();
-        assertEquals(3.658, tagPose.getX(), kDelta);
-        assertEquals(4.026, tagPose.getY(), kDelta);
-        assertEquals(0.308, tagPose.getZ(), kDelta);
-        assertEquals(0, tagPose.getRotation().getX(), kDelta);
-        assertEquals(0, tagPose.getRotation().getY(), kDelta);
-        assertEquals(0, tagPose.getRotation().getZ(), kDelta);
+        assertEquals(3.658, tagPose.getX(), DELTA);
+        assertEquals(4.026, tagPose.getY(), DELTA);
+        assertEquals(0.308, tagPose.getZ(), DELTA);
+        assertEquals(0, tagPose.getRotation().getX(), DELTA);
+        assertEquals(0, tagPose.getRotation().getY(), DELTA);
+        assertEquals(0, tagPose.getRotation().getZ(), DELTA);
 
         final String key = "foo";
         final Blip24[] blips = new Blip24[] {
@@ -79,9 +79,9 @@ class VisionDataProviderTest implements Timeless {
         assertEquals(1, timeEstimate.size());
 
         Pose2d result = poseEstimate.get(0);
-        assertEquals(2.657, result.getX(), kDelta); // target is one meter in front
-        assertEquals(4.026, result.getY(), kDelta); // same y as target
-        assertEquals(0, result.getRotation().getRadians(), kDelta); // facing along x
+        assertEquals(2.657, result.getX(), DELTA); // target is one meter in front
+        assertEquals(4.026, result.getY(), DELTA); // same y as target
+        assertEquals(0, result.getRotation().getRadians(), DELTA); // facing along x
     }
 
     @Test
@@ -114,12 +114,12 @@ class VisionDataProviderTest implements Timeless {
 
         // verify tag 7 location
         Pose3d tagPose = layout.getTagPose(Alliance.Red, 7).get();
-        assertEquals(3.658, tagPose.getX(), kDelta);
-        assertEquals(4.026, tagPose.getY(), kDelta);
-        assertEquals(0.308, tagPose.getZ(), kDelta);
-        assertEquals(0, tagPose.getRotation().getX(), kDelta);
-        assertEquals(0, tagPose.getRotation().getY(), kDelta);
-        assertEquals(0, tagPose.getRotation().getZ(), kDelta);
+        assertEquals(3.658, tagPose.getX(), DELTA);
+        assertEquals(4.026, tagPose.getY(), DELTA);
+        assertEquals(0.308, tagPose.getZ(), DELTA);
+        assertEquals(0, tagPose.getRotation().getX(), DELTA);
+        assertEquals(0, tagPose.getRotation().getY(), DELTA);
+        assertEquals(0, tagPose.getRotation().getZ(), DELTA);
 
         // default camera offset is no offset.
         final String cameraSerialNumber = "foo";
@@ -135,17 +135,17 @@ class VisionDataProviderTest implements Timeless {
 
         Pose2d result = poseEstimate.get(0);
         // robot is is one meter away from the target in x
-        assertEquals(2.658, result.getX(), kDelta);
+        assertEquals(2.658, result.getX(), DELTA);
         // robot is one meter to the left (i.e. in y)
-        assertEquals(5.026, result.getY(), kDelta);
+        assertEquals(5.026, result.getY(), DELTA);
         // facing diagonal, this is just what we provided.
-        assertEquals(-Math.PI / 4, result.getRotation().getRadians(), kDelta);
+        assertEquals(-Math.PI / 4, result.getRotation().getRadians(), DELTA);
 
         // the delay is just what we told it to use.
         double now = Takt.get();
         Double t = timeEstimate.get(0);
         double delay = now - t;
-        assertEquals(0.075, delay, kDelta);
+        assertEquals(0.075, delay, DELTA);
     }
 
     @Test
@@ -154,7 +154,7 @@ class VisionDataProviderTest implements Timeless {
         Rotation2d a = Rotation2d.fromDegrees(10);
         Rotation2d b = Rotation2d.fromDegrees(340);
         Rotation2d c = a.interpolate(b, 0.5);
-        assertEquals(-5, c.getDegrees(), kDelta);
+        assertEquals(-5, c.getDegrees(), DELTA);
     }
 
     @Test
@@ -209,15 +209,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(9.272, p.getX(), kDelta);
-                assertEquals(1.914, p.getY(), kDelta);
+                assertEquals(9.272, p.getX(), DELTA);
+                assertEquals(1.914, p.getY(), DELTA);
             }
 
             @Override
@@ -237,9 +237,9 @@ class VisionDataProviderTest implements Timeless {
         final String cameraSerialNumber = "test";
         // verify zero offset
         final Transform3d cameraInRobotCoordinates = Camera.get(cameraSerialNumber).getOffset();
-        assertEquals(0, cameraInRobotCoordinates.getX(), kDelta);
-        assertEquals(0, cameraInRobotCoordinates.getY(), kDelta);
-        assertEquals(0, cameraInRobotCoordinates.getZ(), kDelta);
+        assertEquals(0, cameraInRobotCoordinates.getX(), DELTA);
+        assertEquals(0, cameraInRobotCoordinates.getY(), DELTA);
+        assertEquals(0, cameraInRobotCoordinates.getZ(), DELTA);
 
         final Blip24[] tags = new Blip24[] { tag4 };
 
@@ -257,15 +257,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(10.272, p.getX(), kDelta);
-                assertEquals(1.914, p.getY(), kDelta);
+                assertEquals(10.272, p.getX(), DELTA);
+                assertEquals(1.914, p.getY(), DELTA);
             }
 
             @Override
@@ -300,15 +300,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(0.96, p.getX(), kDelta);
-                assertEquals(2.66, p.getY(), kDelta);
+                assertEquals(0.96, p.getX(), DELTA);
+                assertEquals(2.66, p.getY(), DELTA);
             }
 
             @Override
@@ -346,15 +346,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(9.272, p.getX(), kDelta);
-                assertEquals(1.914, p.getY(), kDelta);
+                assertEquals(9.272, p.getX(), DELTA);
+                assertEquals(1.914, p.getY(), DELTA);
             }
 
             @Override
@@ -389,15 +389,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(9.272, p.getX(), kDelta);
-                assertEquals(2.914, p.getY(), kDelta);
+                assertEquals(9.272, p.getX(), DELTA);
+                assertEquals(2.914, p.getY(), DELTA);
             }
 
             @Override
@@ -432,15 +432,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(9.272, p.getX(), kDelta);
-                assertEquals(2.914, p.getY(), kDelta);
+                assertEquals(9.272, p.getX(), DELTA);
+                assertEquals(2.914, p.getY(), DELTA);
             }
 
             @Override
@@ -475,15 +475,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(9.272, p.getX(), kDelta);
-                assertEquals(0.914, p.getY(), kDelta);
+                assertEquals(9.272, p.getX(), DELTA);
+                assertEquals(0.914, p.getY(), DELTA);
             }
 
             @Override
@@ -518,15 +518,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(9.272, p.getX(), kDelta);
-                assertEquals(0.914, p.getY(), kDelta);
+                assertEquals(9.272, p.getX(), DELTA);
+                assertEquals(0.914, p.getY(), DELTA);
             }
 
             @Override
@@ -561,15 +561,15 @@ class VisionDataProviderTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         Pose3d tag4pose = layout.getTagPose(Alliance.Red, 4).get();
-        assertEquals(8.272, tag4pose.getX(), kDelta);
-        assertEquals(1.914, tag4pose.getY(), kDelta);
-        assertEquals(1.868, tag4pose.getZ(), kDelta);
+        assertEquals(8.272, tag4pose.getX(), DELTA);
+        assertEquals(1.914, tag4pose.getY(), DELTA);
+        assertEquals(1.868, tag4pose.getZ(), DELTA);
 
         PoseEstimator100 poseEstimator = new PoseEstimator100() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
-                assertEquals(9.272, p.getX(), kDelta);
-                assertEquals(0.914, p.getY(), kDelta);
+                assertEquals(9.272, p.getX(), DELTA);
+                assertEquals(0.914, p.getY(), DELTA);
             }
 
             @Override

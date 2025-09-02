@@ -20,9 +20,9 @@ import org.team100.lib.util.Util;
 
 public class OnboardAngularPositionServoTest implements Timeless {
     // note ridiculously precise delta
-    private static final double kDelta = 1e-9;
+    private static final double DELTA = 1e-9;
+    private static final boolean ACTUALLY_PRINT = false;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
-    private static final boolean kActuallyPrint = false;
 
     @Test
     void testOnboard() {
@@ -42,17 +42,17 @@ public class OnboardAngularPositionServoTest implements Timeless {
         for (int i = 0; i < 50; ++i) {
             servo.setPositionProfiled(1, 0);
             stepTime();
-            if (kActuallyPrint)
+            if (ACTUALLY_PRINT)
                 Util.printf("i: %d position: %5.3f %5.3f\n", i, turningMotor.position, turningMotor.velocity);
             // lets say we're on the profile.
             positionSensor.angle = servo.m_setpoint.x();
             positionSensor.rate = servo.m_setpoint.v();
         }
         assertEquals(0, turningMotor.output, 0.001);
-        assertEquals(0.5, servo.m_setpoint.x(), kDelta);
-        assertEquals(1.0, servo.m_setpoint.v(), kDelta);
-        assertEquals(0.5, positionSensor.getPositionRad().getAsDouble(), kDelta);
-        assertEquals(1.000, turningMotor.velocity, kDelta);
+        assertEquals(0.5, servo.m_setpoint.x(), DELTA);
+        assertEquals(1.0, servo.m_setpoint.v(), DELTA);
+        assertEquals(0.5, positionSensor.getPositionRad().getAsDouble(), DELTA);
+        assertEquals(1.000, turningMotor.velocity, DELTA);
     }
 
 }

@@ -14,7 +14,7 @@ public class Math100 {
     private static final boolean DEBUG = false;
     private static final double EPSILON = 1e-6;
     // we just don't need very precise answers.
-    private static final double kRootTolerance = 0.0001;
+    private static final double ROOT_TOLERANCE = 0.0001;
 
     /**
      * Returns the real solutions to the quadratic ax^2 + bx + c.
@@ -174,7 +174,7 @@ public class Math100 {
         if (iterations_left < 0) {
             return 1.0;
         }
-        if (Math.abs(f_0 - f_1) <= kRootTolerance) {
+        if (Math.abs(f_0 - f_1) <= ROOT_TOLERANCE) {
             return 1.0;
         }
         double s_guess = Math.max(0.0, Math.min(1.0, -f_0 / (f_1 - f_0)));
@@ -182,7 +182,7 @@ public class Math100 {
         double y_guess = (y_1 - y_0) * s_guess + y_0;
         double f_guess = func.applyAsDouble(x_guess, y_guess);
 
-        if (Math.abs(f_guess) < kRootTolerance) {
+        if (Math.abs(f_guess) < ROOT_TOLERANCE) {
             // this is new as of dec 2023, why wasn't this here before?
             return s_guess;
         }

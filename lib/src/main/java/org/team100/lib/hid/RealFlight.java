@@ -40,10 +40,10 @@ import edu.wpi.first.wpilibj.GenericHID;
  * Right switch is slow speed.
  */
 public class RealFlight implements DriverControl {
-    private static final double kDeadband = 0.02;
-    private static final double kExpo = 0.5;
-    private static final double kMedium = 0.5;
-    private static final double kSlow = 0.15;
+    private static final double DEADBAND = 0.02;
+    private static final double EXPO = 0.5;
+    private static final double MEDIUM = 0.5;
+    private static final double SLOW = 0.15;
 
     private final GenericHID hid;
     private final EnumLogger m_log_speed;
@@ -65,18 +65,18 @@ public class RealFlight implements DriverControl {
      */
     @Override
     public Velocity velocity() {
-        final double dx = expo(deadband(-1.0 * clamp(scaled(1), 1), kDeadband, 1), kExpo);
-        final double dy = expo(deadband(-1.0 * clamp(scaled(0), 1), kDeadband, 1), kExpo);
-        final double dtheta = expo(deadband(-1.0 * clamp(scaled(4), 1), kDeadband, 1), kExpo);
+        final double dx = expo(deadband(-1.0 * clamp(scaled(1), 1), DEADBAND, 1), EXPO);
+        final double dy = expo(deadband(-1.0 * clamp(scaled(0), 1), DEADBAND, 1), EXPO);
+        final double dtheta = expo(deadband(-1.0 * clamp(scaled(4), 1), DEADBAND, 1), EXPO);
 
         final Speed speed = speed();
         m_log_speed.log(() -> speed);
 
         switch (speed) {
             case SLOW:
-                return new Velocity(kSlow * dx, kSlow * dy, kSlow * dtheta);
+                return new Velocity(SLOW * dx, SLOW * dy, SLOW * dtheta);
             case MEDIUM:
-                return new Velocity(kMedium * dx, kMedium * dy, kMedium * dtheta);
+                return new Velocity(MEDIUM * dx, MEDIUM * dy, MEDIUM * dtheta);
             default:
                 return new Velocity(dx, dy, dtheta);
         }

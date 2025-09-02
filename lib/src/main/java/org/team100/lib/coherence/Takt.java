@@ -1,4 +1,4 @@
-package org.team100.lib.util;
+package org.team100.lib.coherence;
 
 /**
  * Takt just caches the FPGA timer, so that all the readers get the same value.

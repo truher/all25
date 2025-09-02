@@ -11,7 +11,7 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motor.MockBareMotor;
 
 public class RotaryMechanismTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /** Show that the limits have effect. */
@@ -27,29 +27,29 @@ public class RotaryMechanismTest {
         // within bounds => ok
         sensor.angle = 1.5;
         mech.setDutyCycle(1.0);
-        assertEquals(1.0, motor.output, kDelta);
+        assertEquals(1.0, motor.output, DELTA);
         // out of bounds => stop.
         sensor.angle = 2.5;
         mech.setDutyCycle(1.0);
-        assertEquals(0.0, motor.output, kDelta);
+        assertEquals(0.0, motor.output, DELTA);
 
         // velocity limit observes the encoder
         // within bounds => ok
         sensor.angle = 1.5;
         mech.setVelocity(1.0, 0, 0);
-        assertEquals(1.0, motor.velocity, kDelta);
+        assertEquals(1.0, motor.velocity, DELTA);
         // out of bounds => stop
         sensor.angle = 2.5;
         mech.setVelocity(1.0, 0, 0);
-        assertEquals(0.0, motor.velocity, kDelta);
+        assertEquals(0.0, motor.velocity, DELTA);
 
         // positional limits filter the input
         // within bounds => ok
         mech.setPosition(1.5, 1.0, 0, 0);
-        assertEquals(1.0, motor.velocity, kDelta);
+        assertEquals(1.0, motor.velocity, DELTA);
         // out of bounds => stop
         mech.setPosition(2.5, 1.0, 0, 0);
-        assertEquals(0.0, motor.velocity, kDelta);
+        assertEquals(0.0, motor.velocity, DELTA);
     }
 
     /** Same cases as above, but unlimited */
@@ -66,29 +66,29 @@ public class RotaryMechanismTest {
         // within bounds => ok
         sensor.angle = 1.5;
         mech.setDutyCycle(1.0);
-        assertEquals(1.0, motor.output, kDelta);
+        assertEquals(1.0, motor.output, DELTA);
         // out of bounds => stop.
         sensor.angle = 2.5;
         mech.setDutyCycle(1.0);
-        assertEquals(1.0, motor.output, kDelta);
+        assertEquals(1.0, motor.output, DELTA);
 
         // velocity limit observes the encoder
         // within bounds => ok
         sensor.angle = 1.5;
         mech.setVelocity(1.0, 0, 0);
-        assertEquals(1.0, motor.velocity, kDelta);
+        assertEquals(1.0, motor.velocity, DELTA);
         // out of bounds => stop
         sensor.angle = 2.5;
         mech.setVelocity(1.0, 0, 0);
-        assertEquals(1.0, motor.velocity, kDelta);
+        assertEquals(1.0, motor.velocity, DELTA);
 
         // positional limits filter the input
         // within bounds => ok
         mech.setPosition(1.5, 1.0, 0, 0);
-        assertEquals(1.0, motor.velocity, kDelta);
+        assertEquals(1.0, motor.velocity, DELTA);
         // out of bounds => stop
         mech.setPosition(2.5, 1.0, 0, 0);
-        assertEquals(1.0, motor.velocity, kDelta);
+        assertEquals(1.0, motor.velocity, DELTA);
     }
 
 }

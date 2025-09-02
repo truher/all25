@@ -2,8 +2,8 @@ package org.team100.lib.profile.incremental;
 
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Debug;
 import org.team100.lib.util.Math100;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
@@ -36,7 +36,9 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
  * https://docs.google.com/spreadsheets/d/1JdKViVSTEMZ0dRS8broub4P-f0eA6STRHHzoV0U4N5M/edit?gid=2097479642#gid=2097479642
  * for output of this model
  */
-public class CompleteProfile implements IncrementalProfile, Debug {
+public class CompleteProfile implements IncrementalProfile {
+    private static final boolean DEBUG = false;
+
     private static final double DT = 0.01;
     // Extends maxV far away.
     private static final double FAR_AWAY = 1000;
@@ -171,36 +173,46 @@ public class CompleteProfile implements IncrementalProfile, Debug {
         // clarity.
 
         if (togo < 0) {
-            debug("goal is to the right");
+            if (DEBUG)
+                Util.println("goal is to the right");
             if (setpoint.v() < 0) {
-                debug("We're moving the wrong way (left), so brake.");
+                if (DEBUG)
+                    Util.println("We're moving the wrong way (left), so brake.");
                 return control(dt, setpoint, goal, togo, 1.0, m_maxD);
             }
             if (setpoint.v() + m_tolerance < lerp.v()) {
-                debug("Setpoint is below the goal path, so push right.");
+                if (DEBUG)
+                    Util.println("Setpoint is below the goal path, so push right.");
                 return control(dt, setpoint, goal, togo, 1.0, maxA);
             }
             if (setpoint.v() - m_tolerance < lerp.v()) {
-                debug("Setpoint is within tolerance of the goal path.");
+                if (DEBUG)
+                    Util.println("Setpoint is within tolerance of the goal path.");
                 return goalPath(dt, setpoint, goal, togo, lerp.a());
             }
-            debug("Setpoint is above the goal path, so brake.");
+            if (DEBUG)
+                Util.println("Setpoint is above the goal path, so brake.");
             return control(dt, setpoint, goal, togo, -1.0, m_maxD);
         } else {
-            debug("goal is to the left");
+            if (DEBUG)
+                Util.println("goal is to the left");
             if (setpoint.v() > 0) {
-                debug("We're moving the wrong way (right), so brake.");
+                if (DEBUG)
+                    Util.println("We're moving the wrong way (right), so brake.");
                 return control(dt, setpoint, goal, togo, -1.0, m_maxD);
             }
             if (setpoint.v() - m_tolerance > lerp.v()) {
-                debug("Setpoint is above the goal path, so push left.");
+                if (DEBUG)
+                    Util.println("Setpoint is above the goal path, so push left.");
                 return control(dt, setpoint, goal, togo, -1.0, maxA);
             }
             if (setpoint.v() + m_tolerance > lerp.v()) {
-                debug("Setpoint is within tolerance of the goal path.");
+                if (DEBUG)
+                    Util.println("Setpoint is within tolerance of the goal path.");
                 return goalPath(dt, setpoint, goal, togo, lerp.a());
             }
-            debug("Setpoint is below the goal path, so brake.");
+            if (DEBUG)
+                Util.println("Setpoint is below the goal path, so brake.");
 
             return control(dt, setpoint, goal, togo, 1.0, m_maxD);
         }
@@ -250,8 +262,9 @@ public class CompleteProfile implements IncrementalProfile, Debug {
         double currentLimitedAcceleration = m_maxA;
         double jerkLimitedAcceleration = Math.abs(setpoint.a()) + m_takeoffJ * dt;
 
-        debug("fraction %5.2f backEmfLimited %5.2f currentLimited %5.2f jerklimited %5.2f\n",
-                speedFraction, backEmfLimitedAcceleration, currentLimitedAcceleration, jerkLimitedAcceleration);
+        if (DEBUG)
+            Util.printf("fraction %5.2f backEmfLimited %5.2f currentLimited %5.2f jerklimited %5.2f\n",
+                    speedFraction, backEmfLimitedAcceleration, currentLimitedAcceleration, jerkLimitedAcceleration);
 
         return Math.min(Math.min(backEmfLimitedAcceleration, currentLimitedAcceleration), jerkLimitedAcceleration);
     }
@@ -261,8 +274,10 @@ public class CompleteProfile implements IncrementalProfile, Debug {
      */
     private void put(double t, Control100 c) {
         // t is just for debug
-        debug("%12.4f %12.4f %12.4f %12.4f\n", t, c.x(), c.v(), c.a());
-        debug("%12.4f %12.4f %12.4f %12.4f\n", t, -c.x(), -c.v(), -c.a());
+        if (DEBUG)
+            Util.printf("%12.4f %12.4f %12.4f %12.4f\n", t, c.x(), c.v(), c.a());
+        if (DEBUG)
+            Util.printf("%12.4f %12.4f %12.4f %12.4f\n", t, -c.x(), -c.v(), -c.a());
         m_byDistance.put(c.x(), c);
         m_byDistance.put(-c.x(), c.mult(-1.0));
     }
@@ -277,10 +292,5 @@ public class CompleteProfile implements IncrementalProfile, Debug {
             return -m_maxD;
         }
         return Math.max(-m_maxD, control.a() - m_landingJ * DT);
-    }
-
-    @Override
-    public boolean debug() {
-        return false;
     }
 }

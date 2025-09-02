@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class SwerveModule100Test {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testCrossTrackError1() {
@@ -16,7 +16,7 @@ public class SwerveModule100Test {
         Rotation2d desiredAngle = new Rotation2d(0);
         double speed = SwerveModule100.reduceCrossTrackError(
                 measurement, desiredSpeed, desiredAngle);
-        assertEquals(1, speed, kDelta);
+        assertEquals(1, speed, DELTA);
     }
 
     @Test
@@ -27,9 +27,9 @@ public class SwerveModule100Test {
         double speed = SwerveModule100.reduceCrossTrackError(
                 measurement, desiredSpeed, desiredAngle);
         // this is the value for cosine
-        // assertEquals(0.5, speed, kDelta);
+        // assertEquals(0.5, speed, DELTA);
         // this is the value for gaussian
-        assertEquals(0.012, speed, kDelta);
+        assertEquals(0.012, speed, DELTA);
     }
 
     @Test
@@ -40,8 +40,8 @@ public class SwerveModule100Test {
         double speed = SwerveModule100.reduceCrossTrackError(
                 measurement, desiredSpeed, desiredAngle);
         // this is the value for cosine
-        // assertEquals(0.866, speed, kDelta);
+        // assertEquals(0.866, speed, DELTA);
         // this is the value for gaussian
-        assertEquals(0.334, speed, kDelta);
+        assertEquals(0.334, speed, DELTA);
     }
 }

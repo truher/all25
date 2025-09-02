@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  //3.6 2.83
 public class Embark extends Command  {
     /** While driving to scoring tag, pay attention only to very close tags. */
-    private static final double kHeedRadiusM = 3;
+    private static final double HEED_RADIUS_M = 3;
 
     private final SwerveDriveSubsystem m_drive;
     private final DoubleConsumer m_heedRadiusM;
@@ -135,7 +135,7 @@ public class Embark extends Command  {
 
     @Override
     public void initialize() {
-        m_heedRadiusM.accept(kHeedRadiusM);
+        m_heedRadiusM.accept(HEED_RADIUS_M);
         Pose2d currentPose = m_drive.getPose();
         FieldSector currentSector = FieldConstants.getSector(currentPose);
         m_log_sector.log(() -> currentSector.name());
