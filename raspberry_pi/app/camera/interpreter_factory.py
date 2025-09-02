@@ -8,6 +8,7 @@ from app.dashboard.fake_display import FakeDisplay
 from app.dashboard.real_display import RealDisplay
 from app.localization.combined_detector import CombinedDetector
 from app.localization.note_detector import NoteDetector
+from app.localization.null_detector import NullDetector
 from app.localization.tag_detector import TagDetector
 from app.network.network import Network
 
@@ -19,6 +20,8 @@ class InterpreterFactory:
     ) -> Interpreter:
         size = cam.get_size()
         if identity == Identity.DIST_TEST:
+            scale = 1.0
+        elif identity == Identity.DEV:
             scale = 1.0
         elif identity != Identity.UNKNOWN:
             scale = 0.25
@@ -49,7 +52,6 @@ class InterpreterFactory:
                 | Identity.LEFTAMP
                 | Identity.SHOOTER
                 | Identity.GLOBAL_GAME_PIECE 
-                
                 | Identity.SWERVE_RIGHT
                 | Identity.SWERVE_LEFT
                 | Identity.FUNNEL
@@ -62,7 +64,18 @@ class InterpreterFactory:
                     "tag" + str(camera_num),
                 )
                 return TagDetector(identity, cam, camera_num, display, network)
-            case (Identity.DEV| Identity.CORAL_RIGHT| Identity.CORAL_LEFT):
+            case (Identity.DEV):
+                display = RealDisplay(
+                    int(scale * size.width),
+                    int(scale * size.height),
+                    "tag" + str(camera_num),
+                )
+                # return NullDetector(cam, display)
+                return TagDetector(identity, cam, camera_num, display, network, False)
+            case (
+                # Identity.DEV
+                Identity.CORAL_RIGHT
+                  | Identity.CORAL_LEFT):
                 display = RealDisplay(
                     int(scale * size.width),
                     int(scale * size.height),
