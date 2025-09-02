@@ -14,6 +14,7 @@ public class PrePlaceCoralL2 extends Command {
     private double count = 0;
     private boolean finished = false;
 
+    /** raise grip to scoring position perpetually */
     public PrePlaceCoralL2(Wrist2 wrist, Elevator elevator, double elevatorValue) {
         m_wrist = wrist;
         m_elevator = elevator;

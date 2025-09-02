@@ -18,6 +18,8 @@ Use names that describe the meaning of what you're doing.  If you change the mea
 
 When you have a lot of members and constructor arguments, put the lists in the same order.
 
+Put variable initialization as close to use as possible.  The worst thing is to initialize all the variables at the top of a method, and then sprinkle the usage throughout the body.  Don't do that.
+
 ## Infrastructure
 
 A common pattern is to print stuff to the console, if some sort of "debug" mode is engaged.  There are currently two patterns for that, a static boolean, or an interface that includes the printing methods -- the latter is preferred.

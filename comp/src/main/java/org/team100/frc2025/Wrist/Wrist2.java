@@ -181,6 +181,7 @@ public class Wrist2 extends SubsystemBase {
         wristServo.setPositionProfiled(0.2, torque);
     }
 
+    /** set angle via profile */
     public void setAngleValue(double goal) {
         double torque = m_gravityAndSpringTorque.torque(wristServo.getPosition());
         wristServo.setPositionProfiled(goal, torque);

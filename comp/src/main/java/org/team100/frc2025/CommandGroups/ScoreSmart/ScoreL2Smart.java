@@ -3,7 +3,6 @@ package org.team100.frc2025.CommandGroups.ScoreSmart;
 import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
-import org.team100.frc2025.CommandGroups.DeadlineForEmbarkAndPrePlace;
 import org.team100.frc2025.CommandGroups.PrePlaceCoralL2;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Elevator.SetElevator;
@@ -16,6 +15,7 @@ import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
 import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.framework.ParallelCommandGroup100;
 import org.team100.lib.framework.ParallelDeadlineGroup100;
 import org.team100.lib.framework.SequentialCommandGroup100;
 import org.team100.lib.logging.LoggerFactory;
@@ -33,14 +33,14 @@ public class ScoreL2Smart extends SequentialCommandGroup100 {
             Supplier<ScoringPosition> height,
             SwerveController controller,
             HolonomicProfile profile,
-            SwerveDriveSubsystem m_drive,
+            SwerveDriveSubsystem drive,
             DoubleConsumer heedRadiusM,
             ReefPoint reefPoint) {
         super(logger, "ScoreL2Smart");
 
         Embark embarkCommand = new Embark(
-                logger,
-                m_drive,
+                m_logger,
+                drive,
                 heedRadiusM,
                 controller, profile,
                 targetSector,
@@ -50,15 +50,14 @@ public class ScoreL2Smart extends SequentialCommandGroup100 {
         PrePlaceCoralL2 prePlaceCoralL2 = new PrePlaceCoralL2(wrist, elevator, 10.5);
 
         addCommands(
-                new ParallelDeadlineGroup100(logger, "drive",
-                        new DeadlineForEmbarkAndPrePlace(
-                                embarkCommand::isDone, prePlaceCoralL2::isDone),
+                new ParallelCommandGroup100(m_logger, "drive",
                         embarkCommand,
-                        new SequentialCommandGroup100(logger, "out",
+                        new SequentialCommandGroup100(m_logger, "out",
                                 new SetWrist(wrist, 0.4),
-                                prePlaceCoralL2)),
-                new ParallelDeadlineGroup100(logger, "down",
-                        new SetElevator(logger, elevator, 1.5),
+                                prePlaceCoralL2))
+                        .until(() -> (embarkCommand.isDone() && prePlaceCoralL2.isDone())),
+                new ParallelDeadlineGroup100(m_logger, "down",
+                        new SetElevator(m_logger, elevator, 1.5),
                         wrist.setPosition(0.70)));
     }
 }

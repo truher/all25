@@ -8,6 +8,7 @@ import org.team100.lib.experiments.Experiments;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
+/** Raise the grip into scoring position, perpetually. */
 public class PrePlaceCoralL4 extends Command {
     private final Wrist2 m_wrist;
     private final Elevator m_elevator;
@@ -17,6 +18,7 @@ public class PrePlaceCoralL4 extends Command {
     private double countWrist = 0;
     private boolean finished = false;
 
+    /** Raise the grip into scoring position, perpetually. */
     public PrePlaceCoralL4(
             Wrist2 wrist,
             Elevator elevator,

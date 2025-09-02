@@ -7,13 +7,13 @@ import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CheckFunnelDanger;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.RunCoralTunnel;
-import org.team100.frc2025.Wrist.SetWristDutyCycle;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.lib.framework.ParallelCommandGroup100;
 import org.team100.lib.framework.SequentialCommandGroup100;
 import org.team100.lib.logging.LoggerFactory;
 
 public class RunFunnelHandoff extends SequentialCommandGroup100 {
+    /** sequence of handoff motions that doesn't finish. */
     public RunFunnelHandoff(
             LoggerFactory logger,
             Elevator elevator,
@@ -28,6 +28,6 @@ public class RunFunnelHandoff extends SequentialCommandGroup100 {
                 new ParallelCommandGroup100(m_logger, "handoff",
                         new RunFunnel(funnel),
                         new RunCoralTunnel(tunnel, 1),
-                        new SetWristDutyCycle(wrist, -0.15)));
+                        wrist.setDuty(-0.15)));
     }
 }

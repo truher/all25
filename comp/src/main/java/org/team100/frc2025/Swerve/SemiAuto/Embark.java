@@ -25,7 +25,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
- * Drive to the supplied pose using a profile.
+ * Drive *perpetually* to the supplied pose using a profile.
  * 
  * If the supplier starts delivering empties, retain the old goal.
  */

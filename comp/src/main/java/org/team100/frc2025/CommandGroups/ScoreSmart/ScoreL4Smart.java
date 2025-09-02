@@ -3,7 +3,6 @@ package org.team100.frc2025.CommandGroups.ScoreSmart;
 import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
-import org.team100.frc2025.CommandGroups.DeadlineForEmbarkAndPrePlace;
 import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Swerve.SemiAuto.Embark;
@@ -15,7 +14,7 @@ import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
 import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.framework.ParallelDeadlineGroup100;
+import org.team100.lib.framework.ParallelCommandGroup100;
 import org.team100.lib.framework.SequentialCommandGroup100;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
@@ -44,12 +43,12 @@ public class ScoreL4Smart extends SequentialCommandGroup100 {
                 wrist, elevator, tunnel, 47);
 
         addCommands(
-                new ParallelDeadlineGroup100(m_logger, "drive",
-                        new DeadlineForEmbarkAndPrePlace(embarkCommand::isDone, prePlaceCoralL4::isDone),
+                new ParallelCommandGroup100(m_logger, "drive",
                         embarkCommand,
                         new SequentialCommandGroup100(m_logger, "out",
                                 new SetWrist(wrist, 0.4),
-                                prePlaceCoralL4)),
+                                prePlaceCoralL4))
+                        .until(() -> (embarkCommand.isDone() && prePlaceCoralL4.isDone())),
                 new PostDropCoralL4(wrist, elevator, 10));
     }
 }

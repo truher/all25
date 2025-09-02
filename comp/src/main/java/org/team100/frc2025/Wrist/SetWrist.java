@@ -10,6 +10,7 @@ public class SetWrist extends Command {
     private final double m_angle;
     private double count = 0;
 
+    /** set wrist via profile until done */
     public SetWrist(Wrist2 wrist, double angle) {
         m_wrist = wrist;
         m_angle = angle;

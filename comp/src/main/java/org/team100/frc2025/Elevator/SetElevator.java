@@ -17,6 +17,7 @@ public class SetElevator extends Command {
 
     private int count = 0;
 
+    /** set position via profile until done. */
     public SetElevator(
             LoggerFactory logger,
             Elevator elevator,

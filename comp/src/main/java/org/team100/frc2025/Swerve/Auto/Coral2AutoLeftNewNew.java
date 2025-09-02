@@ -2,7 +2,6 @@ package org.team100.frc2025.Swerve.Auto;
 
 import java.util.function.DoubleConsumer;
 
-import org.team100.frc2025.CommandGroups.DeadlineForEmbarkAndPrePlace;
 import org.team100.frc2025.CommandGroups.PostDropAndReadyFunnel;
 import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
 import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
@@ -39,146 +38,102 @@ public class Coral2AutoLeftNewNew extends SequentialCommandGroup100 {
 
     public Coral2AutoLeftNewNew(
             LoggerFactory logger,
-            Wrist2 wrist, Elevator elevator,
+            Wrist2 wrist,
+            Elevator elevator,
             Funnel funnel,
             CoralTunnel tunnel,
             AlgaeGrip grip,
             SwerveController controller,
             HolonomicProfile profile,
-            SwerveDriveSubsystem m_drive,
+            SwerveDriveSubsystem drive,
             DoubleConsumer heedRadiusM,
             SwerveKinodynamics kinodynamics,
             TrajectoryVisualization viz) {
         super(logger, "Coral2Auto");
 
-        Embark embarkToI = new Embark(m_logger, m_drive, heedRadiusM,
-                controller, profile, FieldSector.IJ,
-                ReefDestination.LEFT,
-                () -> ScoringPosition.L4, ReefPoint.I);
+        // Go to peg I and pre place preload
 
-        Embark embarkToK = new Embark(m_logger, m_drive, heedRadiusM,
-                controller, profile, FieldSector.KL,
-                ReefDestination.LEFT,
-                () -> ScoringPosition.L4, ReefPoint.K);
-
-        Embark embarkToL = new Embark(m_logger, m_drive, heedRadiusM,
-                controller, profile, FieldSector.KL,
-                ReefDestination.RIGHT,
-                () -> ScoringPosition.L4, ReefPoint.L);
-
-        GoToCoralStation goToStation1stTime = new GoToCoralStation(
-                logger, m_drive, controller, viz, kinodynamics,
-                CoralStation.Left, 0.5);
-
-        GoToCoralStationPastGlass goToStation2ndTime = new GoToCoralStationPastGlass(
-                logger, m_drive, controller, viz,
-                kinodynamics,
-                CoralStation.Left, 0.5);
-
+        Embark embarkToI = new Embark(
+                m_logger, drive, heedRadiusM, controller, profile, FieldSector.IJ,
+                ReefDestination.LEFT, () -> ScoringPosition.L4, ReefPoint.I);
         PrePlaceCoralL4 prePlaceCoralL4I = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
+        addCommands(
+                new ParallelCommandGroup100(m_logger, "embark1",
+                        embarkToI,
+                        new SequentialCommandGroup100(m_logger, "handoff then place",
+                                new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip).withTimeout(0.5),
+                                new ParallelCommandGroup100(m_logger, "wrist out",
+                                        new SetWrist(wrist, 0.4),
+                                        new SetElevator(m_logger, elevator, 1)),
+                                prePlaceCoralL4I))
+                        .until(() -> (embarkToI.isDone() && prePlaceCoralL4I.isDone())));
 
-        PrePlaceCoralL4 prePlaceCoralL4K = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
-
-        PrePlaceCoralL4 prePlaceCoralL4L = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
-
+        // Place preload and reload
+        GoToCoralStation goToStation1stTime = new GoToCoralStation(
+                m_logger, drive, controller, viz, kinodynamics, CoralStation.Left, 0.5);
         PostDropAndReadyFunnel postDropAndReadyFunnelFromI = new PostDropAndReadyFunnel(
                 wrist, elevator, 10,
                 (goToStation1stTime::isDone));
-
-        PostDropAndReadyFunnel postDropAndReadyFunnelFromK = new PostDropAndReadyFunnel(
-                wrist, elevator, 10,
-                (goToStation2ndTime::isDone));
-
         addCommands(
-                // Go to peg I and pre place preload
-
-                new ParallelDeadlineGroup100(
-                        m_logger,
-                        "embark1",
-                        new DeadlineForEmbarkAndPrePlace(embarkToI::isDone, prePlaceCoralL4I::isDone),
-                        embarkToI,
-                        new SequentialCommandGroup100(logger, "handoff then place",
-                                new ParallelRaceGroup100(m_logger, "handoff",
-                                        Commands.waitSeconds(0.5),
-                                        new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)),
-                                new ParallelCommandGroup100(logger, getName(),
-                                        new SetWrist(wrist, 0.4),
-                                        new SetElevator(logger, elevator, 1)),
-
-                                prePlaceCoralL4I)),
-
-                // Place preload and reload
-
-                new ParallelDeadlineGroup100(
-                        logger,
-                        "drive away",
+                new ParallelDeadlineGroup100(m_logger, "drive away",
                         postDropAndReadyFunnelFromI,
                         new SequentialCommandGroup100(
-                                logger,
+                                m_logger,
                                 "wait then drive away to pick up",
                                 Commands.waitUntil(postDropAndReadyFunnelFromI::indicateReadyToLeave),
-                                new ParallelDeadlineGroup100(
-                                        logger,
-                                        "Pick up",
+                                new ParallelDeadlineGroup100(m_logger, "Pick up",
                                         goToStation1stTime,
                                         new RunFunnel(funnel),
                                         new RunCoralTunnel(tunnel, 1)))
 
                 ),
-
-                new ParallelDeadlineGroup100(
-                        logger,
-                        "reload 1",
+                new ParallelDeadlineGroup100(m_logger, "reload 1",
                         Commands.waitSeconds(0.5),
-                        new RunFunnelHandoff(logger, elevator, wrist, funnel, tunnel, grip)),
+                        new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)));
 
-                // Go to peg K and pre place
-
-                new ParallelDeadlineGroup100(
-                        m_logger,
-                        "embark1",
-                        new DeadlineForEmbarkAndPrePlace(embarkToK::isDone, prePlaceCoralL4K::isDone),
+        // Go to peg K and pre place
+        Embark embarkToK = new Embark(
+                m_logger, drive, heedRadiusM, controller, profile, FieldSector.KL,
+                ReefDestination.LEFT, () -> ScoringPosition.L4, ReefPoint.K);
+        PrePlaceCoralL4 prePlaceCoralL4K = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
+        addCommands(
+                new ParallelCommandGroup100(m_logger, "embark2",
                         embarkToK,
-                        new SequentialCommandGroup100(logger, "handoff then place",
-                                new ParallelRaceGroup100(m_logger, "handoff",
-                                        Commands.waitSeconds(0.5),
-                                        new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip)),
+                        new SequentialCommandGroup100(m_logger, "handoff then place",
+                                new RunFunnelHandoff(m_logger, elevator, wrist, funnel, tunnel, grip).withTimeout(0.5),
                                 new SetWrist(wrist, 0.4),
-                                prePlaceCoralL4K)),
+                                prePlaceCoralL4K))
+                        .until(() -> (embarkToK.isDone() && prePlaceCoralL4K.isDone())));
 
-                // Place coral and reload
-
-                new ParallelRaceGroup100(
-                        logger,
-                        getName(),
-                        new ParallelDeadlineGroup100(
-                                logger,
-                                "drive away",
+        // Place coral and reload
+        GoToCoralStationPastGlass goToStation2ndTime = new GoToCoralStationPastGlass(
+                m_logger, drive, controller, viz, kinodynamics, CoralStation.Left, 0.5);
+        PostDropAndReadyFunnel postDropAndReadyFunnelFromK = new PostDropAndReadyFunnel(
+                wrist, elevator, 10, goToStation2ndTime::isDone);
+        addCommands(
+                new ParallelRaceGroup100(m_logger, "place and reload",
+                        new ParallelDeadlineGroup100(m_logger, "drive away",
                                 postDropAndReadyFunnelFromK,
-                                new SequentialCommandGroup100(
-                                        logger,
-                                        "wait then drive away to pick up",
+                                new SequentialCommandGroup100(m_logger, "wait then drive away to pick up",
                                         Commands.waitUntil(postDropAndReadyFunnelFromK::indicateReadyToLeave),
-                                        new ParallelDeadlineGroup100(
-                                                logger,
-                                                "Pick up",
+                                        new ParallelDeadlineGroup100(m_logger, "Pick up",
                                                 goToStation2ndTime,
                                                 new RunFunnel(funnel),
                                                 new RunCoralTunnel(tunnel, 1)))),
-                        Commands.waitSeconds(2.6)
+                        Commands.waitSeconds(2.6)));
 
-                ),
-
-                // Go to peg L and pre place
-
-                new ParallelDeadlineGroup100(
-                        m_logger,
-                        "embark1",
-                        new DeadlineForEmbarkAndPrePlace(embarkToL::isDone, prePlaceCoralL4L::isDone),
+        // Go to peg L and pre place
+        Embark embarkToL = new Embark(
+                m_logger, drive, heedRadiusM, controller, profile,
+                FieldSector.KL, ReefDestination.RIGHT, () -> ScoringPosition.L4, ReefPoint.L);
+        PrePlaceCoralL4 prePlaceCoralL4L = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
+        addCommands(
+                new ParallelCommandGroup100(m_logger, "embark1",
                         embarkToL,
-                        new SequentialCommandGroup100(logger, "handoff then place",
+                        new SequentialCommandGroup100(m_logger, "handoff then place",
                                 new SetWrist(wrist, 0.4),
-                                prePlaceCoralL4L)),
+                                prePlaceCoralL4L))
+                        .until(() -> (embarkToL.isDone() && prePlaceCoralL4L.isDone())),
                 new PostDropCoralL4(wrist, elevator, 10));
     }
 }
