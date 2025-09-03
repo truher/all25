@@ -23,6 +23,7 @@ public class GoToCoralStation extends Navigator {
     private double kScale;
     private final CoralStation m_station;
 
+    /** Drive to the coral station via a trajectory, *perpetually* */
     public GoToCoralStation(
             LoggerFactory parent,
             SwerveDriveSubsystem drive,

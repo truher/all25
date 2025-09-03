@@ -88,13 +88,9 @@ public class Elevator extends SubsystemBase {
                         ELEVATOR_MAXIMUM_POSITION);
 
                 starboardServo = new OutboardLinearPositionServo(
-                        starboardLogger,
-                        starboardMech,
-                        ref);
+                        starboardLogger, starboardMech, ref, 0.5, 0.5);
                 portServo = new OutboardLinearPositionServo(
-                        portLogger,
-                        portMech,
-                        ref);
+                        portLogger, portMech, ref, 0.5, 0.5);
 
             }
             default -> {
@@ -120,13 +116,9 @@ public class Elevator extends SubsystemBase {
                         ELEVATOR_MAXIMUM_POSITION);
 
                 starboardServo = new OutboardLinearPositionServo(
-                        starboardLogger,
-                        starboardMech,
-                        ref);
+                        starboardLogger, starboardMech, ref, 0.5, 0.5);
                 portServo = new OutboardLinearPositionServo(
-                        portLogger,
-                        portMech,
-                        ref);
+                        portLogger, portMech, ref, 0.5, 0.5);
             }
 
         }
@@ -155,11 +147,16 @@ public class Elevator extends SubsystemBase {
         return starboardServo.profileDone();
     }
 
+    public boolean atGoal() {
+        return starboardServo.atGoal();
+    }
+
     public void setPositionDirect(Setpoints1d x) {
         starboardServo.setPositionDirect(x, 1.3); // 54 max
         portServo.setPositionDirect(x, 1.3); // 54 max
     }
 
+    /** set position with profile */
     public void setPositionNoGravity(double x) {
         starboardServo.setPositionProfiled(x, 0); // 54 max
         portServo.setPositionProfiled(x, 0); // 54 max
@@ -181,7 +178,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public double getSetpointAcceleration() {
-        // i think there arel like 20 sanjan units per meter?
+        // i think there are like 20 sanjan units per meter?
         // you can adjust this factor so that the wrist doesn't rotate when the elevator
         // moves.
         double sanjanAccelFactor = 20;
@@ -221,12 +218,24 @@ public class Elevator extends SubsystemBase {
         m_viz.run();
     }
 
+    // OBSERVERS
+
+    public boolean isSafeToDrive() {
+        return getPosition() <= 30;
+    }
+
     // COMMANDS
 
     /** Use a profile to set the position perpetually. */
     public Command set(double v) {
         return runEnd(
                 () -> setPosition(v),
+                () -> stop());
+    }
+
+    public Command setNoGravity(double v) {
+        return runEnd(
+                () -> setPositionNoGravity(v),
                 () -> stop());
     }
 }

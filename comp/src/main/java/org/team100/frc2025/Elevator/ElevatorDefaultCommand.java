@@ -74,8 +74,6 @@ public class ElevatorDefaultCommand extends Command {
 
         m_holdPosition = m_elevator.getPosition();
 
-        // if (distanceToReef > 1.6) {
-
         if (!m_grip.hasAlgae()) {
             double goal = 0.2;
 
@@ -104,17 +102,6 @@ public class ElevatorDefaultCommand extends Command {
             }
 
         }
-        // } else {
-        // m_elevator.setPositionDirectly(m_holdPosition);
-        // }
-    }
 
-    @Override
-    public void end(boolean interrupted) {
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
     }
 }

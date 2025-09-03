@@ -74,6 +74,7 @@ public class OpenLoopSubsystem extends SubsystemBase  {
     // do it. Multi-subsystem actions would need to use the methods above.
     //
 
+    /** set duty cycle perpetually */
     public Command forward() {
         return run(() -> {
             setDutyCycle(1.0);

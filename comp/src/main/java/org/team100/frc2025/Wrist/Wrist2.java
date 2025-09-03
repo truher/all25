@@ -167,6 +167,10 @@ public class Wrist2 extends SubsystemBase {
         return wristServo.profileDone();
     }
 
+    public boolean atGoal() {
+        return wristServo.atGoal();
+    }
+
     public void setWristDutyCycle(double value) {
         m_wristMech.setDutyCycle(value);
     }
@@ -209,6 +213,12 @@ public class Wrist2 extends SubsystemBase {
         wristServo.stop();
     }
 
+    // OBSERVERS
+
+    public boolean isSafeToDrive() {
+        return getAngle() <= 0.9;
+    }
+
     // COMMANDS
 
     /** Set the duty cycle perpetually. */
@@ -218,10 +228,19 @@ public class Wrist2 extends SubsystemBase {
     }
 
     /** Use a profile to set the position perpetually. */
-    public Command setPosition(double v) {
+    public Command set(double v) {
         return runEnd(
                 () -> setAngleValue(v),
                 () -> setWristDutyCycle(0));
+    }
+
+    public Command set(DoubleSupplier v) {
+        return run(
+                () -> setAngleValue(v.getAsDouble()));
+    }
+
+    public Command readyUp() {
+        return set(0.4);
     }
 
 }

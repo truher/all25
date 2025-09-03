@@ -2,13 +2,13 @@ package org.team100.frc2025.Wrist;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-/**
- * Use high current limits to grasp the algae, and then reduce the current to
- * hold it.
- */
 public class IntakeAlgaeGrip extends Command {
     private final AlgaeGrip m_grip;
 
+    /**
+     * Use high current limits to grasp the algae, and then reduce the current to
+     * hold it, perpetually.
+     */
     public IntakeAlgaeGrip(AlgaeGrip grip) {
         m_grip = grip;
         addRequirements(m_grip);

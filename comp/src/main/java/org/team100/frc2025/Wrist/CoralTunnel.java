@@ -11,9 +11,10 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.Neo550CANSparkMotor;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CoralTunnel extends SubsystemBase  {
+public class CoralTunnel extends SubsystemBase {
     // private final LinearMechanism m_coralMech;
     // private LaserCan laserCAN;
 
@@ -75,5 +76,13 @@ public class CoralTunnel extends SubsystemBase  {
         if (m_motor == null)
             return;
         m_motor.setDutyCycle(value);
+    }
+
+    // COMMANDS
+
+    public Command go() {
+        return runEnd(
+                () -> setCoralMotor(1),
+                () -> setCoralMotor(0));
     }
 }
