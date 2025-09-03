@@ -30,8 +30,6 @@ import org.team100.frc2025.Wrist.WristDefaultCommand;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.commands.drivetrain.FieldConstants.FieldSector;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
 import org.team100.lib.commands.drivetrain.ResetPose;
 import org.team100.lib.commands.drivetrain.SetRotation;
@@ -356,73 +354,61 @@ public class RobotContainer {
 
         whileTrue(driverControl::driveToTag, buttons::a,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.AB, ReefDestination.LEFT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.A));
 
         whileTrue(driverControl::driveToTag, buttons::b,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.AB, ReefDestination.RIGHT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.B));
 
         whileTrue(driverControl::driveToTag, buttons::c,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.CD, ReefDestination.LEFT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.C));
 
         whileTrue(driverControl::driveToTag, buttons::d,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.CD, ReefDestination.RIGHT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.D));
 
         whileTrue(driverControl::driveToTag, buttons::e,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.EF, ReefDestination.LEFT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.E));
 
         whileTrue(driverControl::driveToTag, buttons::f,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.EF, ReefDestination.RIGHT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.F));
 
         whileTrue(driverControl::driveToTag, buttons::g,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.GH, ReefDestination.LEFT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.G));
 
         whileTrue(driverControl::driveToTag, buttons::h,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.GH, ReefDestination.RIGHT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.H));
 
         whileTrue(driverControl::driveToTag, buttons::i,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.IJ, ReefDestination.LEFT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.I));
 
         whileTrue(driverControl::driveToTag, buttons::j,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.IJ, ReefDestination.RIGHT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.J));
 
         whileTrue(driverControl::driveToTag, buttons::k,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.KL, ReefDestination.LEFT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.K));
 
         whileTrue(driverControl::driveToTag, buttons::l,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        FieldSector.KL, ReefDestination.RIGHT,
                         buttons::scoringPosition, holonomicController, profile,
                         m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.L));
 

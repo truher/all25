@@ -7,8 +7,6 @@ import java.util.function.Supplier;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.lib.commands.drivetrain.FieldConstants.FieldSector;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
 import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.controller.drivetrain.SwerveController;
@@ -24,8 +22,6 @@ public class ScoreCoralSmart {
             Wrist2 wrist,
             Elevator elevator,
             CoralTunnel tunnel,
-            FieldSector targetSector,
-            ReefDestination destination,
             Supplier<ScoringPosition> scoringPositionSupplier,
             SwerveController controller,
             HolonomicProfile profile,
@@ -36,15 +32,15 @@ public class ScoreCoralSmart {
                 Map.of(
                         ScoringPosition.L4,
                         ScoreL4Smart.get(logger, wrist, elevator, tunnel,
-                                targetSector, destination, scoringPositionSupplier, controller, profile,
+                                scoringPositionSupplier, controller, profile,
                                 m_drive, heedRadiusM, point),
                         ScoringPosition.L3,
                         ScoreL3Smart.get(logger, wrist, elevator, tunnel,
-                                targetSector, destination, scoringPositionSupplier, controller, profile,
+                                scoringPositionSupplier, controller, profile,
                                 m_drive, heedRadiusM, point),
                         ScoringPosition.L2,
                         ScoreL2Smart.get(logger, wrist, elevator, tunnel,
-                                targetSector, destination, scoringPositionSupplier, controller, profile,
+                                scoringPositionSupplier, controller, profile,
                                 m_drive, heedRadiusM, point)),
                 scoringPositionSupplier);
     }

@@ -118,7 +118,6 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
             final SwerveModel state,
             final DriverControl.Velocity twist1_1) {
         final FieldRelativeVelocity control = clipAndScale(twist1_1);
-        // System.out.println("AHHH");
         final double currentVelocity = state.velocity().norm();
 
         final TrapezoidProfile100 m_profile = makeProfile(currentVelocity);

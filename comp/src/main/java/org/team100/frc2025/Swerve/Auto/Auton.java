@@ -2,10 +2,6 @@ package org.team100.frc2025.Swerve.Auto;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import static org.team100.lib.commands.drivetrain.FieldConstants.FieldSector.CD;
-import static org.team100.lib.commands.drivetrain.FieldConstants.FieldSector.EF;
-import static org.team100.lib.commands.drivetrain.FieldConstants.FieldSector.IJ;
-import static org.team100.lib.commands.drivetrain.FieldConstants.FieldSector.KL;
 import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.C;
 import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.D;
 import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.F;
@@ -23,12 +19,11 @@ import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Swerve.SemiAuto.Embark;
+import org.team100.frc2025.Swerve.SemiAuto.Navigator;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.lib.commands.drivetrain.FieldConstants.CoralStation;
-import org.team100.lib.commands.drivetrain.FieldConstants.FieldSector;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
 import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.controller.drivetrain.SwerveController;
@@ -48,35 +43,30 @@ public record Auton(LoggerFactory logger, Wrist2 wrist, Elevator elevator, Funne
 
     public Command left() {
         return sequence(
-                embarkAndPreplace(IJ, ReefDestination.LEFT, L4, I),
+                embarkAndPreplace(L4, I),
                 scoreAndReload(CoralStation.Left),
-                embarkAndPreplace(KL, ReefDestination.LEFT, L4, K),
+                embarkAndPreplace(L4, K),
                 scoreAndReload(CoralStation.Left),
-                embarkAndPreplace(KL, ReefDestination.RIGHT, L4, L),
+                embarkAndPreplace(L4, L),
                 new PostDropCoralL4(wrist, elevator, 10)
                         .until(elevator::atGoal));
     }
 
     public Command right() {
         return sequence(
-                embarkAndPreplace(EF, ReefDestination.RIGHT, L4, F),
+                embarkAndPreplace(L4, F),
                 scoreAndReload(CoralStation.Right),
-                embarkAndPreplace(CD, ReefDestination.RIGHT, L4, D),
+                embarkAndPreplace(L4, D),
                 scoreAndReload(CoralStation.Right),
-                embarkAndPreplace(CD, ReefDestination.LEFT, L4, C),
+                embarkAndPreplace(L4, C),
                 new PostDropCoralL4(wrist, elevator, 10)
                         .until(elevator::atGoal));
     }
 
     /** Drive to the reef and go up. */
-    public Command embarkAndPreplace(
-            FieldSector sector,
-            ReefDestination destination,
-            ScoringPosition position,
-            ReefPoint point) {
+    public Command embarkAndPreplace(ScoringPosition position, ReefPoint point) {
         Embark toReef = new Embark(
-                logger, drive, heedRadiusM, controller, profile, sector,
-                destination, () -> position, point);
+                logger, drive, heedRadiusM, controller, profile, () -> position, point);
         PrePlaceCoralL4 prePlace = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
         return parallel(
                 toReef,
@@ -91,18 +81,19 @@ public record Auton(LoggerFactory logger, Wrist2 wrist, Elevator elevator, Funne
 
     /** Score, drive to the station, and pause briefly. */
     public Command scoreAndReload(CoralStation station) {
-        GoToCoralStation toStation = new GoToCoralStation(
-                logger, drive, controller, viz, kinodynamics, station, 0.5);
+
+        GoToCoralStation toStation = new GoToCoralStation(kinodynamics, station, 0.5);
+        Navigator navigator = new Navigator(drive, controller, viz, toStation);
         return sequence(
                 parallel(
                         ScoreSequence.get(wrist, elevator, 42, 10),
                         sequence(
                                 Commands.waitUntil(() -> (elevator.isSafeToDrive() && wrist.isSafeToDrive())),
                                 parallel(
-                                        toStation,
+                                        navigator,
                                         funnel.agitate(),
                                         tunnel.go())))
-                        .until(toStation::isDone),
+                        .until(navigator::isDone),
                 RunFunnelHandoff.get(
                         logger, elevator, wrist, funnel, tunnel, grip)
                         .withTimeout(0.5));

@@ -2,58 +2,57 @@ package org.team100.frc2025.Swerve.Auto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
-import org.team100.frc2025.Swerve.SemiAuto.Navigator;
 import org.team100.lib.commands.drivetrain.FieldConstants;
 import org.team100.lib.commands.drivetrain.FieldConstants.CoralStation;
-import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.Trajectory100;
-import org.team100.lib.visualization.TrajectoryVisualization;
+import org.team100.lib.trajectory.TrajectoryPlanner;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class GoToCoralStation extends Navigator {
-    private final double m_Scale;
+public class GoToCoralStation implements Function<Pose2d, Trajectory100> {
+    private final double m_scale;
     private final CoralStation m_station;
+    private final TrajectoryPlanner m_planner;
 
     /** Drive to the coral station via a trajectory, *perpetually* */
     public GoToCoralStation(
-            LoggerFactory parent,
-            SwerveDriveSubsystem drive,
-            SwerveController hcontroller,
-            TrajectoryVisualization viz,
             SwerveKinodynamics kinodynamics,
             CoralStation station,
             double scale) {
-        super(parent, drive, hcontroller, viz, kinodynamics);
         m_station = station;
-        m_Scale = scale;
+        m_scale = scale;
+        m_planner = new TrajectoryPlanner(new TimingConstraintFactory(kinodynamics).auto());
     }
 
     @Override
-    public Trajectory100 trajectory(Pose2d currentPose) {
-        Translation2d currTranslation = currentPose.getTranslation();
+    public Trajectory100 apply(Pose2d currentPose) {
+
         Translation2d goalTranslation;
         Rotation2d goalRotation;
+        double scaleAdjust;
 
-        double scaleAdjust = m_Scale;
-
-        if (m_station == CoralStation.Left) {
-            goalTranslation = new Translation2d(1.12, 7.14); // 1.2 7.0
-            goalRotation = Rotation2d.fromDegrees(-54);
-            scaleAdjust *= 1;
-
-        } else {
-            goalTranslation = new Translation2d(1.12, 0.98);
-            goalRotation = Rotation2d.fromDegrees(54);
-            scaleAdjust *= -1;
+        switch (m_station) {
+            case Left -> {
+                goalTranslation = new Translation2d(1.12, 7.14); // 1.2 7.0
+                goalRotation = Rotation2d.fromDegrees(-54);
+                scaleAdjust = m_scale;
+            }
+            case Right -> {
+                goalTranslation = new Translation2d(1.12, 0.98);
+                goalRotation = Rotation2d.fromDegrees(54);
+                scaleAdjust = -1.0 * m_scale;
+            }
+            default -> throw new IllegalArgumentException("invalid station");
         }
+
+        Translation2d currTranslation = currentPose.getTranslation();
 
         Rotation2d courseToGoal = goalTranslation.minus(currTranslation).getAngle();
 

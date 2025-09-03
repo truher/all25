@@ -31,7 +31,7 @@ public class WristDefaultCommand extends Command {
         LoggerFactory child = logger.type(this);
         m_log_activity = child.stringLogger(Level.TRACE, "activity");
         m_log_holdPosition = child.doubleLogger(Level.TRACE, "hold position (m)");
-        
+
         m_elevator = elevator;
         m_wrist = wrist;
         m_grip = grip;
@@ -53,7 +53,6 @@ public class WristDefaultCommand extends Command {
         m_log_holdPosition.log(() -> m_holdPosition);
         double distanceToReef = FieldConstants.getDistanceToReefCenter(m_drive.getPose().getTranslation());
         if (distanceToReef < 1.6) {
-            // System.out.println("IM TOO CLOSE HOLD");
             m_wrist.setAngleValue(m_holdPosition);
             m_log_activity.log(() -> "far away");
             return;
@@ -62,7 +61,6 @@ public class WristDefaultCommand extends Command {
         if (!m_grip.hasAlgae()) {
             m_log_activity.log(() -> "no algae");
             if (m_elevator.getPosition() > 17.5) {
-                // System.out.println("IM OVER 17.5");
                 m_wrist.setAngleValue(0.5);
                 if (m_wrist.getAngle() < 0.5 - DEADBAND) {
                     m_wrist.setSafeCondition(false);
@@ -75,8 +73,6 @@ public class WristDefaultCommand extends Command {
                     // m_wrist.setAngleValue(0.5);
                 }
             } else if (m_elevator.getPosition() > 2 && m_elevator.getPosition() < 17.5) {
-                // System.out.println("IM WITHIN THE FIRST STAGE");
-
                 m_wrist.setAngleValue(0.5);
 
                 if (m_wrist.getAngle() < 0.5 - DEADBAND) {
@@ -90,7 +86,6 @@ public class WristDefaultCommand extends Command {
                     // m_wrist.setAngleValue(0.5);
                 }
             } else {
-                // System.out.println("IM GOING IN");
                 if (m_elevator.getSafeCondition()) {
                     m_wrist.setSafeCondition(true);
                     m_wrist.setAngleValue(0.1);

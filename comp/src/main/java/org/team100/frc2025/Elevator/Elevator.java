@@ -1,6 +1,5 @@
 package org.team100.frc2025.Elevator;
 
-import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
@@ -45,8 +44,6 @@ public class Elevator extends SubsystemBase {
     private final Runnable m_viz;
 
     private boolean m_isSafe = false;
-
-    private ScoringPosition m_targetPosition = ScoringPosition.NONE;
 
     public Elevator(LoggerFactory parent, int starboardID, int portID) {
         LoggerFactory child = parent.type(this);
@@ -178,14 +175,6 @@ public class Elevator extends SubsystemBase {
 
     public void setSafeCondition(boolean isSafe) {
         m_isSafe = isSafe;
-    }
-
-    public void setTargetScoringPosition(ScoringPosition position) {
-        m_targetPosition = position;
-    }
-
-    public ScoringPosition getScoringPosition() {
-        return m_targetPosition;
     }
 
     public void close() {

@@ -11,8 +11,6 @@ import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Swerve.SemiAuto.Embark;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.lib.commands.drivetrain.FieldConstants.FieldSector;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
 import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.controller.drivetrain.SwerveController;
@@ -28,8 +26,6 @@ public class ScoreL2Smart {
             Wrist2 wrist,
             Elevator elevator,
             CoralTunnel tunnel,
-            FieldSector targetSector,
-            ReefDestination destination,
             Supplier<ScoringPosition> height,
             SwerveController controller,
             HolonomicProfile profile,
@@ -38,14 +34,7 @@ public class ScoreL2Smart {
             ReefPoint reefPoint) {
 
         Embark toReef = new Embark(
-                logger,
-                drive,
-                heedRadiusM,
-                controller, profile,
-                targetSector,
-                destination,
-                height,
-                reefPoint);
+                logger, drive, heedRadiusM, controller, profile, height, reefPoint);
         PrePlaceCoralL2 prePlace = new PrePlaceCoralL2(wrist, elevator, 10.5);
 
         return sequence(
