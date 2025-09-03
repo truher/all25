@@ -20,8 +20,7 @@ import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Funnel.FunnelDefault;
 import org.team100.frc2025.Funnel.ReleaseFunnel;
 import org.team100.frc2025.Swerve.DriveForwardSlowly;
-import org.team100.frc2025.Swerve.Auto.Coral2AutoLeftNewNew;
-import org.team100.frc2025.Swerve.Auto.Coral2AutoRightNewNew;
+import org.team100.frc2025.Swerve.Auto.Auton;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.AlgaeGripDefaultCommand;
 import org.team100.frc2025.Wrist.AlgaeOuttakeGroup;
@@ -339,12 +338,12 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        m_auton = Coral2AutoLeftNewNew.get(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
-                autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz);
+        m_auton = new Auton(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
+                autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz).left();
 
         whileTrue(driverControl::test,
-                Coral2AutoRightNewNew.get(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
-                        autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz));
+                new Auton(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
+                        autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz).right());
 
         // Driver/Operator Buttons
         onTrue(driverControl::resetRotation0, new ResetPose(m_drive, new Pose2d()));

@@ -69,9 +69,7 @@ public class Climber extends SubsystemBase {
                         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 m_servo = new OnboardAngularPositionServo(log, climberMech, ref, feedback);
             }
-
         }
-
     }
 
     @Override
