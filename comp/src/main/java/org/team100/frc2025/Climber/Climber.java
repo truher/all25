@@ -50,7 +50,8 @@ public class Climber extends SubsystemBase {
 
                 double gearRatio = 25 * 3 * 4;
                 RotaryMechanism rotaryMechanism = new RotaryMechanism(
-                        log, motor, sensor, gearRatio, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                        log, motor, sensor, gearRatio,
+                        Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
                 m_servo = new OnboardAngularPositionServo(log, rotaryMechanism, ref, feedback);
             }
@@ -62,10 +63,7 @@ public class Climber extends SubsystemBase {
                 SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
 
                 RotaryMechanism climberMech = new RotaryMechanism(
-                        log,
-                        climberMotor,
-                        sensor,
-                        1,
+                        log, climberMotor, sensor, 1,
                         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 m_servo = new OnboardAngularPositionServo(log, climberMech, ref, feedback);
             }

@@ -46,7 +46,6 @@ public class ElevatorDefaultCommand extends Command {
         m_log_distanceToReef.log(() -> distanceToReef);
 
         if (!m_wrist.getSafeCondition()) {
-            // System.out.println("IM RUNNING BUT IM UNSAFE");
             // elevator shouldn't move at all
             m_elevator.setPosition(m_holdPosition);
 

@@ -5,7 +5,7 @@ import org.team100.frc2025.Wrist.Wrist2;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** note unlike the L4 version this never finishes, i think due to L4 use in autos? */
+/** Move the elevator down, swinging the wrist in, perpetually. */
 public class PostDropCoralL3 extends Command {
     private final Wrist2 m_wrist;
     private final Elevator m_elevator;

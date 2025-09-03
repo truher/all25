@@ -49,20 +49,20 @@ public class Wrist2 extends SubsystemBase {
     private static final double WRIST_MIN_POSITION = -0.5;
     private static final double WRIST_MAX_POSITION = 4;
 
-    double maxVel = 40;
-    double maxAccel = 40;
-    double maxJerk = 40;
+    private static final double MAX_VEL = 40;
+    private static final double MAX_ACCEL = 40;
+    private static final double MAX_JERK = 40;
 
     // private LaserCan lc;
 
-    private boolean m_isSafe = false;
-
-    private final AngularPositionServo wristServo;
+    private final AngularPositionServo m_wristServo;
 
     private final RotaryMechanism m_wristMech;
     private final Torque m_gravityAndSpringTorque;
     private final BooleanLogger m_log_safe;
     private final Runnable m_viz;
+
+    private boolean m_isSafe = false;
 
     /** carriage acceleration is reported by the elevator */
     public Wrist2(LoggerFactory parent, int wristID, DoubleSupplier carriageAccel) {
@@ -75,7 +75,7 @@ public class Wrist2 extends SubsystemBase {
         Feedback100 wristFeedback = new FullStateFeedback(
                 logger, 4.5, 0.12, x -> x, 0.05, 0.05);
 
-        JerkLimitedProfile100 profile = new JerkLimitedProfile100(maxVel, maxAccel, maxJerk, false);
+        JerkLimitedProfile100 profile = new JerkLimitedProfile100(MAX_VEL, MAX_ACCEL, MAX_JERK, false);
 
         ProfileReference1d ref = new TimedProfileReference1d(profile);
 
@@ -83,10 +83,9 @@ public class Wrist2 extends SubsystemBase {
 
         switch (Identity.instance) {
             case COMP_BOT -> {
-
                 int wristSupplyLimit = 60;
                 int wristStatorLimit = 90;
-                Kraken6Motor wristMotor = new Kraken6Motor(logger, wristID, MotorPhase.REVERSE,
+                Kraken6Motor motor = new Kraken6Motor(logger, wristID, MotorPhase.REVERSE,
                         wristSupplyLimit, wristStatorLimit, wristPID, wristFF);
 
                 // this reads the wrist angle directly.
@@ -97,17 +96,11 @@ public class Wrist2 extends SubsystemBase {
                         EncoderDrive.DIRECT);
 
                 m_wristMech = new RotaryMechanism(
-                        logger,
-                        wristMotor,
-                        sensor,
-                        GEAR_RATIO,
-                        WRIST_MIN_POSITION,
-                        WRIST_MAX_POSITION);
+                        logger, motor, sensor,
+                        GEAR_RATIO, WRIST_MIN_POSITION, WRIST_MAX_POSITION);
 
-                wristServo = new OnboardAngularPositionServo(
+                m_wristServo = new OnboardAngularPositionServo(
                         logger, m_wristMech, ref, wristFeedback);
-
-                wristServo.reset();
 
                 double gravityNm = 9.0 + carriageAccel.getAsDouble();
                 Gravity gravity = new Gravity(logger, gravityNm, -0.451230);
@@ -121,12 +114,12 @@ public class Wrist2 extends SubsystemBase {
                 SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, motor);
                 SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(
                         logger, encoder, GEAR_RATIO);
-                RotaryMechanism wristMech = new RotaryMechanism(
+                m_wristMech = new RotaryMechanism(
                         logger, motor, sensor,
                         GEAR_RATIO, WRIST_MIN_POSITION, WRIST_MAX_POSITION);
 
-                wristServo = new OnboardAngularPositionServo(
-                        logger, wristMech, ref, wristFeedback);
+                m_wristServo = new OnboardAngularPositionServo(
+                        logger, m_wristMech, ref, wristFeedback);
 
                 // Gravity gravity = new Gravity(logger, 0, 0);
                 // Spring spring = new Spring(logger);
@@ -135,11 +128,10 @@ public class Wrist2 extends SubsystemBase {
                 // for now, no extra forces in simulation
                 // TODO: add physics to the sim
                 m_gravityAndSpringTorque = new Torque(x -> x);
-                m_wristMech = wristMech;
             }
 
         }
-        wristServo.reset();
+        m_wristServo.reset();
         if (VISUALIZE) {
             m_viz = new WristVisualization(this);
         } else {
@@ -150,25 +142,25 @@ public class Wrist2 extends SubsystemBase {
 
     @Override
     public void periodic() {
-        wristServo.periodic();
+        m_wristServo.periodic();
         m_log_safe.log(() -> m_isSafe);
         m_viz.run();
     }
 
     public void resetWristProfile() {
-        wristServo.reset();
+        m_wristServo.reset();
     }
 
     public boolean atSetpoint() {
-        return wristServo.atSetpoint();
+        return m_wristServo.atSetpoint();
     }
 
     public boolean profileDone() {
-        return wristServo.profileDone();
+        return m_wristServo.profileDone();
     }
 
     public boolean atGoal() {
-        return wristServo.atGoal();
+        return m_wristServo.atGoal();
     }
 
     public void setWristDutyCycle(double value) {
@@ -177,28 +169,28 @@ public class Wrist2 extends SubsystemBase {
 
     public double getAngle() {
         // note this default might be dangerous
-        return wristServo.getPosition().orElse(0);
+        return m_wristServo.getPosition().orElse(0);
     }
 
     public void setAngle() {
-        double torque = m_gravityAndSpringTorque.torque(wristServo.getPosition());
-        wristServo.setPositionProfiled(0.2, torque);
+        double torque = m_gravityAndSpringTorque.torque(m_wristServo.getPosition());
+        m_wristServo.setPositionProfiled(0.2, torque);
     }
 
     /** set angle via profile */
     public void setAngleValue(double goal) {
-        double torque = m_gravityAndSpringTorque.torque(wristServo.getPosition());
-        wristServo.setPositionProfiled(goal, torque);
+        double torque = m_gravityAndSpringTorque.torque(m_wristServo.getPosition());
+        m_wristServo.setPositionProfiled(goal, torque);
     }
 
     public void setAngleDirect(Setpoints1d setpoint) {
-        double torque = m_gravityAndSpringTorque.torque(wristServo.getPosition());
-        wristServo.setPositionDirect(setpoint, torque);
+        double torque = m_gravityAndSpringTorque.torque(m_wristServo.getPosition());
+        m_wristServo.setPositionDirect(setpoint, torque);
     }
 
     public void setAngleSafe() {
-        double torque = m_gravityAndSpringTorque.torque(wristServo.getPosition());
-        wristServo.setPositionProfiled(-0.1, torque);
+        double torque = m_gravityAndSpringTorque.torque(m_wristServo.getPosition());
+        m_wristServo.setPositionProfiled(-0.1, torque);
     }
 
     public boolean getSafeCondition() {
@@ -210,11 +202,12 @@ public class Wrist2 extends SubsystemBase {
     }
 
     public void stop() {
-        wristServo.stop();
+        m_wristServo.stop();
     }
 
     // OBSERVERS
 
+    /** Don't drive if the wrist is too far out (dragging on the floor). */
     public boolean isSafeToDrive() {
         return getAngle() <= 0.9;
     }
@@ -239,6 +232,7 @@ public class Wrist2 extends SubsystemBase {
                 () -> setAngleValue(v.getAsDouble()));
     }
 
+    /** Move the wrist out of the way of the elevator. */
     public Command readyUp() {
         return set(0.4);
     }
