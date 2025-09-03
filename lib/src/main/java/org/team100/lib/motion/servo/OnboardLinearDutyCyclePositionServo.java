@@ -153,12 +153,31 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
     }
 
     @Override
+    public boolean atSetpoint() {
+        OptionalDouble pos = m_mechanism.getPositionM();
+        if (pos.isEmpty())
+            return false;
+        OptionalDouble vel = m_mechanism.getVelocityM_S();
+        if (vel.isEmpty())
+            return false;
+        double pErr = m_setpoint.x() - pos.getAsDouble();
+        double vErr = m_setpoint.v() - vel.getAsDouble();
+        return Math.abs(pErr) < POSITION_TOLERANCE
+                && Math.abs(vErr) < VELOCITY_TOLERANCE;
+    }
+
+    @Override
     public boolean profileDone() {
         if (m_goal == null) {
             // if there's no profile, it's always done.
             return true;
         }
         return m_ref.profileDone();
+    }
+
+    @Override
+    public boolean atGoal() {
+        return atSetpoint() && profileDone();
     }
 
     @Override

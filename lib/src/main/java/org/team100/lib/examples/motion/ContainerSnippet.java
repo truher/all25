@@ -67,6 +67,6 @@ public class ContainerSnippet {
          * This is another way to do the same thing, using a separate class to keep the
          * container tidy.
          */
-        new Trigger(control::feedFunnel).whileTrue(new SimpleSequence(log, rotary, openloop));
+        new Trigger(control::feedFunnel).whileTrue(SimpleSequence.get(log, rotary, openloop));
     }
 }

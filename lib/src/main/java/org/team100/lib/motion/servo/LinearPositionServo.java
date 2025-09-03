@@ -36,7 +36,12 @@ public interface LinearPositionServo  {
 
     OptionalDouble getVelocity();
 
+    boolean atSetpoint();
+    
     boolean profileDone();
+
+    /** Profile is done and we're on the setpoint. */
+    boolean atGoal();
 
     void stop();
 

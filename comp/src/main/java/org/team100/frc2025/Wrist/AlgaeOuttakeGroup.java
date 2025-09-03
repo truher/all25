@@ -13,7 +13,7 @@ public class AlgaeOuttakeGroup extends ParallelCommandGroup100 {
         super(logger, "AlgaeOuttakeGroup");
         addCommands(
                 new OuttakeAlgaeGrip(grip),
-                wrist.setPosition(3.7),
+                wrist.set(3.7),
                 elevator.set(12));
     }
 }

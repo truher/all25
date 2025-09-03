@@ -12,15 +12,15 @@ import org.team100.lib.commands.drivetrain.FieldConstants.ReefDestination;
 import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
 import org.team100.lib.config.ElevatorUtil.ScoringPosition;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.framework.SequentialCommandGroup100;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 
-public class ScoreCoralSmart extends SequentialCommandGroup100 {
-    public ScoreCoralSmart(LoggerFactory logger,
+public class ScoreCoralSmart {
+    public static Command get(LoggerFactory logger,
             Wrist2 wrist,
             Elevator elevator,
             CoralTunnel tunnel,
@@ -32,22 +32,20 @@ public class ScoreCoralSmart extends SequentialCommandGroup100 {
             SwerveDriveSubsystem m_drive,
             DoubleConsumer heedRadiusM,
             ReefPoint point) {
-        super(logger, "ScoreCoralSmart");
-        addCommands(
-                new SelectCommand<>(
-                        Map.of(
-                                ScoringPosition.L4,
-                                new ScoreL4Smart(m_logger, wrist, elevator, tunnel,
-                                        targetSector, destination, scoringPositionSupplier, controller, profile,
-                                        m_drive, heedRadiusM, point),
-                                ScoringPosition.L3,
-                                new ScoreL3Smart(m_logger, wrist, elevator, tunnel,
-                                        targetSector, destination, scoringPositionSupplier, controller, profile,
-                                        m_drive, heedRadiusM, point),
-                                ScoringPosition.L2,
-                                new ScoreL2Smart(m_logger, wrist, elevator, tunnel,
-                                        targetSector, destination, scoringPositionSupplier, controller, profile,
-                                        m_drive, heedRadiusM, point)),
-                        scoringPositionSupplier));
+        return new SelectCommand<>(
+                Map.of(
+                        ScoringPosition.L4,
+                        ScoreL4Smart.get(logger, wrist, elevator, tunnel,
+                                targetSector, destination, scoringPositionSupplier, controller, profile,
+                                m_drive, heedRadiusM, point),
+                        ScoringPosition.L3,
+                        ScoreL3Smart.get(logger, wrist, elevator, tunnel,
+                                targetSector, destination, scoringPositionSupplier, controller, profile,
+                                m_drive, heedRadiusM, point),
+                        ScoringPosition.L2,
+                        ScoreL2Smart.get(logger, wrist, elevator, tunnel,
+                                targetSector, destination, scoringPositionSupplier, controller, profile,
+                                m_drive, heedRadiusM, point)),
+                scoringPositionSupplier);
     }
 }

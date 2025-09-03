@@ -7,7 +7,6 @@ import java.util.function.DoubleConsumer;
 
 import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
 import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
-import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Swerve.SemiAuto.Embark;
@@ -27,7 +26,8 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class Coral1Mid {
+public class EmbarkAndPreplace {
+    /** Drive to the reef and go up. */
     public static Command get(
             LoggerFactory logger,
             Wrist2 wrist,
@@ -40,25 +40,24 @@ public class Coral1Mid {
             SwerveDriveSubsystem drive,
             DoubleConsumer heedRadiusM,
             SwerveKinodynamics kinodynamics,
-            TrajectoryVisualization viz) {
-
+            TrajectoryVisualization viz,
+            FieldSector sector,
+            ReefDestination destination,
+            ScoringPosition position,
+            ReefPoint point) {
         Embark toReef = new Embark(
-                logger, drive, heedRadiusM, controller, profile, FieldSector.GH,
-                ReefDestination.LEFT, () -> ScoringPosition.L4, ReefPoint.H);
-
+                logger, drive, heedRadiusM, controller, profile, sector,
+                destination, () -> position, point);
         PrePlaceCoralL4 prePlace = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
-
-        return sequence(
-                parallel(
-                        toReef,
-                        sequence(
-                                RunFunnelHandoff.get(logger, elevator, wrist, funnel, tunnel, grip).withTimeout(0.5),
-                                parallel(
-                                        wrist.readyUp(),
-                                        elevator.set(1))
-                                        .until(() -> wrist.atGoal() && elevator.atGoal()),
-                                prePlace))
-                        .until(() -> (toReef.isDone() && prePlace.isDone())),
-                new PostDropCoralL4(wrist, elevator, 10));
+        return parallel(
+                toReef,
+                sequence(
+                        RunFunnelHandoff.get(
+                                logger, elevator, wrist, funnel, tunnel, grip)
+                                .withTimeout(0.5),
+                        wrist.readyUp().until(wrist::atGoal),
+                        prePlace))
+                .until(() -> (toReef.isDone() && prePlace.isDone()));
     }
+
 }

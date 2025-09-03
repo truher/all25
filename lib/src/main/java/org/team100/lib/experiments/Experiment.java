@@ -70,8 +70,4 @@ public enum Experiment {
      * motion -- it's faster and less work for the RoboRIO.
      */
     UnprofiledSteering,
-    /**
-     * End the wrist command when the profile completes, instead of using the timer.
-     */
-    UseProfileDone
 }

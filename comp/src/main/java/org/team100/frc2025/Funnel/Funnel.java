@@ -11,9 +11,10 @@ import org.team100.lib.motor.Neo550Factory;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Funnel extends SubsystemBase  {
+public class Funnel extends SubsystemBase {
 
     LinearMechanism m_starboardMech;
     LinearMechanism m_portMech;
@@ -79,7 +80,6 @@ public class Funnel extends SubsystemBase  {
     }
 
     public double getLatch1() {
-
         return latchingServo1.getAngle();
     }
 
@@ -100,7 +100,19 @@ public class Funnel extends SubsystemBase  {
             return;
         servoAngle1Log.log(() -> getLatch1());
         servoAngle2Log.log(() -> getLatch2());
+    }
 
+    // COMMANDS
+
+    public Command setLatch(double v1, double v2) {
+        return run(() -> {
+            setLatch1(v1);
+            setLatch2(v2);
+        });
+    }
+
+    public Command agitate() {
+        return new RunFunnel(this);
     }
 
 }

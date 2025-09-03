@@ -8,7 +8,6 @@ public class CheckFunnelDanger extends Command {
     private final Wrist2 m_wrist;
     private final Elevator m_elevator;
     private double m_initialElevatorValue;
-    private boolean finished = false;
 
     public CheckFunnelDanger(Wrist2 wrist, Elevator elevator) {
         m_wrist = wrist;
@@ -19,8 +18,6 @@ public class CheckFunnelDanger extends Command {
     @Override
     public void initialize() {
         m_initialElevatorValue = m_elevator.getPosition();
-        finished = false;
-
     }
 
     @Override
@@ -28,17 +25,11 @@ public class CheckFunnelDanger extends Command {
         if (m_wrist.getAngle() > 1.6) {
             m_wrist.setAngleValue(1.5);
             m_elevator.setPosition(m_initialElevatorValue);
-        } else {
-            finished = true;
         }
     }
 
     @Override
-    public void end(boolean interrupted) {
-    }
-
-    @Override
     public boolean isFinished() {
-        return finished;
+        return m_wrist.getAngle() <= 1.6;
     }
 }

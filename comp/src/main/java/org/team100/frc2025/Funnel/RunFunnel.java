@@ -28,15 +28,10 @@ public class RunFunnel extends Command {
         } else {
             timer.restart();
         }
-
-        // m_funnel.setFunnel(1);
-
     }
 
     @Override
     public void end(boolean interrupted) {
         m_funnel.setFunnel(0);
     }
-
-
 }

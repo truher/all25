@@ -1,10 +1,10 @@
 package org.team100.lib.examples.motion;
 
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
-import org.team100.lib.framework.ParallelDeadlineGroup100;
-import org.team100.lib.framework.SequentialCommandGroup100;
 import org.team100.lib.logging.LoggerFactory;
+
+import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * This illustrates a short sequence, contained within a separate file, instead
@@ -12,16 +12,14 @@ import org.team100.lib.logging.LoggerFactory;
  * it can get unwieldy, so making little classes like this helps keep things
  * tidy.
  */
-public class SimpleSequence extends SequentialCommandGroup100 {
-    public SimpleSequence(
+public class SimpleSequence {
+    public static Command get(
             LoggerFactory log,
             RotaryPositionSubsystem1d rotary,
             OpenLoopSubsystem openloop) {
-        super(log, "simple sequence",
+        return sequence(
                 rotary.goToTheSpot().until(rotary::isDone),
-                new ParallelDeadlineGroup100(log, "roll",
-                        waitSeconds(2),
-                        openloop.forward()),
+                openloop.forward().withTimeout(2),
                 rotary.goHome().until(rotary::isDone));
     }
 }

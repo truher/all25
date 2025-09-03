@@ -15,5 +15,6 @@ public interface ProfileReference1d {
 
     Setpoints1d get();
 
+    /** The profile has reached the goal. */
     boolean profileDone();
 }
