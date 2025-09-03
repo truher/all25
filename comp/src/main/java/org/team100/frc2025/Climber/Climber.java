@@ -1,6 +1,5 @@
 package org.team100.frc2025.Climber;
 
-import java.util.OptionalDouble;
 import java.util.function.DoubleSupplier;
 
 import org.team100.lib.config.Feedforward100;
@@ -23,7 +22,6 @@ import org.team100.lib.profile.incremental.Profile100;
 import org.team100.lib.profile.incremental.TrapezoidProfile100;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;

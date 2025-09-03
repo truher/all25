@@ -339,11 +339,11 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        m_auton = new Coral2AutoLeftNewNew(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
+        m_auton = Coral2AutoLeftNewNew.get(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
                 autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz);
 
         whileTrue(driverControl::test,
-                new Coral2AutoRightNewNew(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
+                Coral2AutoRightNewNew.get(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
                         autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz));
 
         // Driver/Operator Buttons
