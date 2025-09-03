@@ -19,8 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class GoToCoralStation extends Navigator {
-
-    private double kScale;
+    private final double m_Scale;
     private final CoralStation m_station;
 
     /** Drive to the coral station via a trajectory, *perpetually* */
@@ -34,27 +33,24 @@ public class GoToCoralStation extends Navigator {
             double scale) {
         super(parent, drive, hcontroller, viz, kinodynamics);
         m_station = station;
-        kScale = scale;
+        m_Scale = scale;
     }
 
     @Override
     public Trajectory100 trajectory(Pose2d currentPose) {
-
-        // System.out.println("RUNNING TRAJECTOR");
-
         Translation2d currTranslation = currentPose.getTranslation();
         Translation2d goalTranslation;
         Rotation2d goalRotation;
 
-        double scaleAdjust = kScale;
+        double scaleAdjust = m_Scale;
 
         if (m_station == CoralStation.Left) {
-            goalTranslation = new Translation2d(1.12, 7.14); //1.2 7.0
+            goalTranslation = new Translation2d(1.12, 7.14); // 1.2 7.0
             goalRotation = Rotation2d.fromDegrees(-54);
             scaleAdjust *= 1;
 
         } else {
-            goalTranslation = new Translation2d(1.12, 0.98); 
+            goalTranslation = new Translation2d(1.12, 0.98);
             goalRotation = Rotation2d.fromDegrees(54);
             scaleAdjust *= -1;
         }
@@ -62,14 +58,13 @@ public class GoToCoralStation extends Navigator {
         Rotation2d courseToGoal = goalTranslation.minus(currTranslation).getAngle();
 
         Rotation2d newInitialSpline = FieldConstants.calculateDeltaSpline(courseToGoal,
-                courseToGoal.rotateBy(Rotation2d.fromDegrees(-90)), null, scaleAdjust);
+                courseToGoal.rotateBy(Rotation2d.fromDegrees(-90)), scaleAdjust);
 
         List<HolonomicPose2d> waypoints = new ArrayList<>();
         waypoints.add(new HolonomicPose2d(currTranslation, currentPose.getRotation(), newInitialSpline));
         waypoints.add(new HolonomicPose2d(goalTranslation, goalRotation, courseToGoal));
 
         return m_planner.restToRest(waypoints);
-
     }
 
 }

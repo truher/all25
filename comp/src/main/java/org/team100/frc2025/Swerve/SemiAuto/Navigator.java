@@ -1,13 +1,7 @@
 package org.team100.frc2025.Swerve.SemiAuto;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.team100.lib.commands.drivetrain.FieldConstants;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefAproach;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -18,8 +12,6 @@ import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public abstract class Navigator extends Command {
@@ -81,8 +73,6 @@ public abstract class Navigator extends Command {
         System.out.println("I FINISHED");
     }
 
-
-
     public final boolean isDone() {
         if (m_referenceController == null) {
             return false;
@@ -95,71 +85,4 @@ public abstract class Navigator extends Command {
 
         return m_referenceController.isFinished();
     }
-
-    public static List<HolonomicPose2d> addRobotPose(Pose2d currPose, List<HolonomicPose2d> waypoints) {
-        Translation2d currTranslation = currPose.getTranslation();
-        Translation2d firstWaypoint = waypoints.get(0).translation();
-        Rotation2d initialSpline = firstWaypoint.minus(currTranslation).getAngle();
-
-        Rotation2d initialHeading = currPose.getRotation();
-        HolonomicPose2d initialWaypoint = new HolonomicPose2d(currTranslation, initialHeading, initialSpline);
-
-        List<HolonomicPose2d> waypointsWithPose = new ArrayList<>();
-        waypointsWithPose.add(initialWaypoint);
-        waypointsWithPose.addAll(waypoints);
-        return waypointsWithPose;
-    }
-
-    public static List<HolonomicPose2d> addRobotPose(
-            Pose2d currPose,
-            List<HolonomicPose2d> waypoints,
-            Rotation2d initialSpline) {
-        Translation2d currTranslation = currPose.getTranslation();
-        Rotation2d initialHeading = currPose.getRotation();
-        HolonomicPose2d initialWaypoint = new HolonomicPose2d(
-                currTranslation,
-                initialHeading,
-                initialSpline);
-        List<HolonomicPose2d> waypointsWithPose = new ArrayList<>();
-        waypointsWithPose.add(initialWaypoint);
-        waypointsWithPose.addAll(waypoints);
-        return waypointsWithPose;
-    }
-
-    public Rotation2d calculateInitialSpline(Translation2d targetPoint, Translation2d currTranslation,
-            Translation2d vectorFromCenterToRobot, ReefAproach approach, double magicNumber) {
-
-        double distanceToReef = FieldConstants.getDistanceToReefCenter(currTranslation);
-
-        Translation2d translationToTarget = targetPoint.minus(currTranslation);
-
-        Rotation2d rotationAngle = new Rotation2d();
-
-        switch (approach) {
-            case CCW:
-                rotationAngle = Rotation2d.fromDegrees(90);
-                break;
-            case CW:
-                rotationAngle = Rotation2d.fromDegrees(-90);
-                break;
-        }
-
-        Translation2d tangentVector = vectorFromCenterToRobot.rotateBy(rotationAngle);
-
-        // MAGIC NUMBER is a MAGIC NUMBER
-        Translation2d tangentVectorAdjusted = tangentVector.times((1 / distanceToReef) * magicNumber);
-
-        Translation2d finalVector = translationToTarget.plus(tangentVectorAdjusted);
-
-        Rotation2d finalAngle = finalVector.getAngle();
-
-        return finalAngle;
-    }
-
-    public static Rotation2d calculateInitialSpline(Translation2d targetPoint, Translation2d currTranslation) {
-        Rotation2d initialSpline = targetPoint.minus(currTranslation).getAngle();
-        return initialSpline;
-
-    }
-
 }

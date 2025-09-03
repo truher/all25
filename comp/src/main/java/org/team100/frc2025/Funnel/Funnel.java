@@ -15,14 +15,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Funnel extends SubsystemBase {
-
-    LinearMechanism m_starboardMech;
-    LinearMechanism m_portMech;
-    Servo latchingServo1;
-    Servo latchingServo2;
-
-    DoubleLogger servoAngle1Log;
-    DoubleLogger servoAngle2Log;
+    private final LinearMechanism m_starboardMech;
+    private final LinearMechanism m_portMech;
+    private Servo latchingServo1;
+    private Servo latchingServo2;
+    private DoubleLogger servoAngle1Log;
+    private DoubleLogger servoAngle2Log;
 
     public Funnel(
             LoggerFactory parent,
@@ -34,7 +32,6 @@ public class Funnel extends SubsystemBase {
 
         switch (Identity.instance) {
             case COMP_BOT -> {
-
                 m_starboardMech = Neo550Factory.getNEO550LinearMechanism(
                         getName(), child, funnelSupplyLimit, starboardID, 1, MotorPhase.REVERSE, 1);
                 m_portMech = Neo550Factory.getNEO550LinearMechanism(
