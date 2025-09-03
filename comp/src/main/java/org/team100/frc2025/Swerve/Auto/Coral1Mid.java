@@ -59,6 +59,7 @@ public class Coral1Mid {
                                         .until(() -> wrist.atGoal() && elevator.atGoal()),
                                 prePlace))
                         .until(() -> (toReef.isDone() && prePlace.isDone())),
-                new PostDropCoralL4(wrist, elevator, 10));
+                new PostDropCoralL4(wrist, elevator, 10)
+                        .until(elevator::atGoal));
     }
 }

@@ -1,17 +1,17 @@
 package org.team100.frc2025.Wrist;
 
-import org.team100.frc2025.Elevator.Elevator;
-import org.team100.lib.framework.ParallelCommandGroup100;
-import org.team100.lib.logging.LoggerFactory;
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
-public class AlgaeOuttakeGroup extends ParallelCommandGroup100 {
-    public AlgaeOuttakeGroup(
-            LoggerFactory logger,
+import org.team100.frc2025.Elevator.Elevator;
+
+import edu.wpi.first.wpilibj2.command.Command;
+
+public class AlgaeOuttakeGroup {
+    public static Command get(
             AlgaeGrip grip,
             Wrist2 wrist,
             Elevator elevator) {
-        super(logger, "AlgaeOuttakeGroup");
-        addCommands(
+        return parallel(
                 new OuttakeAlgaeGrip(grip),
                 wrist.set(3.7),
                 elevator.set(12));

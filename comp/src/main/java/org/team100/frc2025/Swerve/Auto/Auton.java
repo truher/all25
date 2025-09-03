@@ -53,7 +53,8 @@ public record Auton(LoggerFactory logger, Wrist2 wrist, Elevator elevator, Funne
                 embarkAndPreplace(KL, ReefDestination.LEFT, L4, K),
                 scoreAndReload(CoralStation.Left),
                 embarkAndPreplace(KL, ReefDestination.RIGHT, L4, L),
-                new PostDropCoralL4(wrist, elevator, 10));
+                new PostDropCoralL4(wrist, elevator, 10)
+                        .until(elevator::atGoal));
     }
 
     public Command right() {
@@ -63,7 +64,8 @@ public record Auton(LoggerFactory logger, Wrist2 wrist, Elevator elevator, Funne
                 embarkAndPreplace(CD, ReefDestination.RIGHT, L4, D),
                 scoreAndReload(CoralStation.Right),
                 embarkAndPreplace(CD, ReefDestination.LEFT, L4, C),
-                new PostDropCoralL4(wrist, elevator, 10));
+                new PostDropCoralL4(wrist, elevator, 10)
+                        .until(elevator::atGoal));
     }
 
     /** Drive to the reef and go up. */

@@ -434,7 +434,7 @@ public class RobotContainer {
         whileTrue(buttons::kl, GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
 
         whileTrue(buttons::red2,
-                new AlgaeOuttakeGroup(comLog, m_grip, m_wrist, m_elevator));
+                AlgaeOuttakeGroup.get(m_grip, m_wrist, m_elevator));
         whileTrue(buttons::red3,
                 new ScoreBargeSmart(m_elevator, m_wrist, m_grip, buttons::red4));
         whileTrue(buttons::barge,

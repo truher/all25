@@ -36,10 +36,6 @@ public class CoralTunnel extends SubsystemBase {
 
         switch (Identity.instance) {
             case COMP_BOT -> {
-                // m_coralMech = Neo550Factory.getNEO550LinearMechanism(getName(), child,
-                // coralCurrentLimit, coralID, 1,
-                // MotorPhase.FORWARD, 1);
-                // m_motor = new SparkMax(25, MotorType.kBrushless);
                 m_motor = new Neo550CANSparkMotor(
                         child,
                         25,

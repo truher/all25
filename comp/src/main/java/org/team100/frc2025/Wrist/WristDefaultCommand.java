@@ -11,22 +11,27 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class WristDefaultCommand extends Command {
+    private static final double DEADBAND = 0.03;
+
     private final StringLogger m_log_activity;
     private final Elevator m_elevator;
     private final Wrist2 m_wrist;
-    private static final double deadband = 0.03;
     private final AlgaeGrip m_grip;
     private final SwerveDriveSubsystem m_drive;
-
-    private double m_holdPosition;
     private final DoubleLogger m_log_holdPosition;
 
-    public WristDefaultCommand(LoggerFactory logger, Wrist2 wrist, Elevator elevator, AlgaeGrip grip,
+    private double m_holdPosition;
+
+    public WristDefaultCommand(
+            LoggerFactory logger,
+            Wrist2 wrist,
+            Elevator elevator,
+            AlgaeGrip grip,
             SwerveDriveSubsystem drive) {
         LoggerFactory child = logger.type(this);
         m_log_activity = child.stringLogger(Level.TRACE, "activity");
         m_log_holdPosition = child.doubleLogger(Level.TRACE, "hold position (m)");
-
+        
         m_elevator = elevator;
         m_wrist = wrist;
         m_grip = grip;
@@ -59,10 +64,10 @@ public class WristDefaultCommand extends Command {
             if (m_elevator.getPosition() > 17.5) {
                 // System.out.println("IM OVER 17.5");
                 m_wrist.setAngleValue(0.5);
-                if (m_wrist.getAngle() < 0.5 - deadband) {
+                if (m_wrist.getAngle() < 0.5 - DEADBAND) {
                     m_wrist.setSafeCondition(false);
                     // m_wrist.setAngleValue(0.5);
-                } else if (m_wrist.getAngle() > 0.5 - deadband && m_wrist.getAngle() < 1.78 + deadband) {
+                } else if (m_wrist.getAngle() > 0.5 - DEADBAND && m_wrist.getAngle() < 1.78 + DEADBAND) {
                     m_wrist.setSafeCondition(true);
                     // m_wrist.setAngleValue(0.5);
                 } else if (m_wrist.getAngle() > 1.78) {
@@ -74,10 +79,10 @@ public class WristDefaultCommand extends Command {
 
                 m_wrist.setAngleValue(0.5);
 
-                if (m_wrist.getAngle() < 0.5 - deadband) {
+                if (m_wrist.getAngle() < 0.5 - DEADBAND) {
                     m_wrist.setSafeCondition(false);
                     // m_wrist.setAngleValue(0.5);
-                } else if (m_wrist.getAngle() > 0.5 - deadband && m_wrist.getAngle() < 1.78 + deadband) {
+                } else if (m_wrist.getAngle() > 0.5 - DEADBAND && m_wrist.getAngle() < 1.78 + DEADBAND) {
                     m_wrist.setSafeCondition(true);
                     // m_wrist.setAngleValue(0.5);
                 } else if (m_wrist.getAngle() > 1.78) {

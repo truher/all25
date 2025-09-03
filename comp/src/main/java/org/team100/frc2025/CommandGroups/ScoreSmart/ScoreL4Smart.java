@@ -51,6 +51,7 @@ public class ScoreL4Smart {
                                 wrist.readyUp().until(wrist::atGoal),
                                 prePlaceCoralL4))
                         .until(() -> (toReef.isDone() && prePlaceCoralL4.isDone())),
-                new PostDropCoralL4(wrist, elevator, 10));
+                new PostDropCoralL4(wrist, elevator, 10)
+                        .until(elevator::atGoal));
     }
 }

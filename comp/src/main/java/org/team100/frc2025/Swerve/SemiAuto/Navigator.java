@@ -23,8 +23,6 @@ public abstract class Navigator extends Command {
     // used by trajectory()
     protected final TrajectoryPlanner m_planner;
 
-    private boolean ranOnce = false;
-
     // created in initialize()
     protected ReferenceController m_referenceController;
 
@@ -41,25 +39,22 @@ public abstract class Navigator extends Command {
         addRequirements(m_drive);
     }
 
+    /** Subclasses make trajectories. */
+    protected abstract Trajectory100 trajectory(Pose2d currentPose);
+
     @Override
     public void initialize() {
         System.out.println("I STARTED TO DRIVE");
-        ranOnce = false;
         Trajectory100 trajectory = trajectory(m_drive.getPose());
         m_viz.setViz(trajectory);
-
         m_referenceController = new ReferenceController(
                 m_drive,
                 m_controller,
                 new TrajectoryReference(trajectory), true);
     }
 
-    /** Subclasses make trajectories. */
-    protected abstract Trajectory100 trajectory(Pose2d currentPose);
-
     @Override
     public final void execute() {
-        ranOnce = true;
         m_referenceController.execute();
     }
 
@@ -67,22 +62,10 @@ public abstract class Navigator extends Command {
     public final void end(boolean interrupted) {
         m_drive.stop();
         m_viz.clear();
-
-        ranOnce = false;
-
         System.out.println("I FINISHED");
     }
 
     public final boolean isDone() {
-        if (m_referenceController == null) {
-            return false;
-        }
-
-        if (ranOnce == false) {
-            System.out.println(" I AM ALSE FALse fASLE");
-            return false;
-        }
-
-        return m_referenceController.isFinished();
+        return m_referenceController == null || m_referenceController.isFinished();
     }
 }

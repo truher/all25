@@ -5,6 +5,7 @@ import org.team100.frc2025.Wrist.Wrist2;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
+/** drop the elevator, pulling the wrist back, perpetually */
 public class PostDropCoralL4 extends Command {
     private final Wrist2 m_wrist;
     private final Elevator m_elevator;
@@ -35,11 +36,5 @@ public class PostDropCoralL4 extends Command {
         } else {
             m_wrist.setAngleValue(1.25);
         }
-    }
-
-    @Override
-    public boolean isFinished() {
-        // it doesn't matter if the wrist is done
-        return m_elevator.atGoal();
     }
 }
