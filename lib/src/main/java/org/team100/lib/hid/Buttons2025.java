@@ -1,7 +1,7 @@
 package org.team100.lib.hid;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import org.team100.lib.config.ElevatorUtil.ScoringPosition;
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 
 public class Buttons2025 implements ThirdControl {
     private final GenericHID m_controller;
@@ -41,18 +41,18 @@ public class Buttons2025 implements ThirdControl {
     }
 
     @Override
-    public ScoringPosition scoringPosition(){
+    public ScoringLevel scoringPosition(){
         if(l1()){
-            return ScoringPosition.L1;
+            return ScoringLevel.L1;
         } else if(l2()){
-            return ScoringPosition.L2;
+            return ScoringLevel.L2;
         } else if(l3()){
-            return ScoringPosition.L3;
+            return ScoringLevel.L3;
         } else if(l4()){
-            return ScoringPosition.L4;
+            return ScoringLevel.L4;
         }
 
-        return ScoringPosition.NONE;
+        return ScoringLevel.NONE;
     }
 
     @Override

@@ -5,10 +5,10 @@ import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
 import org.team100.frc2025.Elevator.Elevator;
+import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
-import org.team100.lib.config.ElevatorUtil.ScoringPosition;
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
@@ -22,7 +22,7 @@ public class ScoreCoralSmart {
             Wrist2 wrist,
             Elevator elevator,
             CoralTunnel tunnel,
-            Supplier<ScoringPosition> scoringPositionSupplier,
+            Supplier<ScoringLevel> scoringPositionSupplier,
             SwerveController controller,
             HolonomicProfile profile,
             SwerveDriveSubsystem m_drive,
@@ -30,15 +30,15 @@ public class ScoreCoralSmart {
             ReefPoint point) {
         return new SelectCommand<>(
                 Map.of(
-                        ScoringPosition.L4,
+                        ScoringLevel.L4,
                         ScoreL4Smart.get(logger, wrist, elevator, tunnel,
                                 scoringPositionSupplier, controller, profile,
                                 m_drive, heedRadiusM, point),
-                        ScoringPosition.L3,
+                        ScoringLevel.L3,
                         ScoreL3Smart.get(logger, wrist, elevator, tunnel,
                                 scoringPositionSupplier, controller, profile,
                                 m_drive, heedRadiusM, point),
-                        ScoringPosition.L2,
+                        ScoringLevel.L2,
                         ScoreL2Smart.get(logger, wrist, elevator, tunnel,
                                 scoringPositionSupplier, controller, profile,
                                 m_drive, heedRadiusM, point)),

@@ -1,7 +1,7 @@
 package org.team100.frc2025.Wrist;
 
 import org.team100.frc2025.Elevator.Elevator;
-import org.team100.lib.commands.drivetrain.FieldConstants;
+import org.team100.frc2025.Swerve.FieldConstants;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;

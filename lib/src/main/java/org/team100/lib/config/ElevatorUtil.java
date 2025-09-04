@@ -2,7 +2,7 @@ package org.team100.lib.config;
 
 public class ElevatorUtil {
     /** Which level. */
-    public enum ScoringPosition {
+    public enum ScoringLevel {
         L1,
         L2,
         L3,
