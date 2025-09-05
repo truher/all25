@@ -12,11 +12,6 @@ public class NullProfile implements Profile100 {
     }
 
     @Override
-    public ResultWithETA calculateWithETA(double dt, Control100 initial, Model100 goal) {
-        return new ResultWithETA(initial, 0);
-    }
-
-    @Override
     public NullProfile scale(double s) {
         return this;
     }

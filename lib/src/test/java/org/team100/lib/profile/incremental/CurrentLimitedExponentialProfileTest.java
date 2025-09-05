@@ -1,5 +1,6 @@
 package org.team100.lib.profile.incremental;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,6 +27,9 @@ public class CurrentLimitedExponentialProfileTest {
                 stallAccel);
         Control100 sample = new Control100(0, 0);
         final Model100 end = new Model100(3, 0);
+        double eta = profile.simulateForETA(0.2, sample, end);
+        // approximate
+        assertEquals(1.8, eta, 0.001);
         double tt = 0;
         for (int i = 0; i < 150; ++i) {
             tt += 0.02;

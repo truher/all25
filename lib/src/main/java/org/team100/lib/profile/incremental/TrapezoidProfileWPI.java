@@ -34,13 +34,6 @@ public class TrapezoidProfileWPI implements Profile100 {
     }
 
     @Override
-    public ResultWithETA calculateWithETA(double dt, Control100 initial, Model100 goal) {
-        Control100 result100 = calculate(dt, initial, goal);
-        double eta = m_profile.totalTime();
-        return new ResultWithETA(result100, eta);
-    }
-
-    @Override
     public TrapezoidProfileWPI scale(double s) {
         return new TrapezoidProfileWPI(m_constraints.maxVelocity, s * m_constraints.maxAcceleration);
     }

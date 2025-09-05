@@ -10,12 +10,12 @@ import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
 import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Funnel.Funnel;
+import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Swerve.SemiAuto.Embark;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
-import org.team100.lib.config.ElevatorUtil.ScoringPosition;
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
@@ -42,7 +42,7 @@ public class Coral1Mid {
 
         Embark toReef = new Embark(
                 logger, drive, heedRadiusM, controller, profile,
-                () -> ScoringPosition.L4, ReefPoint.H);
+                () -> ScoringLevel.L4, ReefPoint.H);
 
         PrePlaceCoralL4 prePlace = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
 

@@ -34,13 +34,6 @@ public class ExponentialProfileWPI implements Profile100 {
     }
 
     @Override
-    public ResultWithETA calculateWithETA(double dt, Control100 initial, Model100 goal) {
-        Control100 result100 = calculate(dt, initial, goal);
-        double eta = m_profile.timeLeftUntil(new State(initial.x(), initial.v()), new State(goal.x(), goal.v()));
-        return new ResultWithETA(result100, eta);
-    }
-
-    @Override
     public Profile100 scale(double s) {
         return new ExponentialProfileWPI(m_constraints.maxVelocity(), s * m_constraints.B);
     }

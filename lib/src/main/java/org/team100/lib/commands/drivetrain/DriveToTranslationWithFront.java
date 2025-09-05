@@ -55,7 +55,7 @@ public class DriveToTranslationWithFront extends Command  {
         updateGoal();
         if (m_goal == null)
             return;
-        m_reference = new ProfileReference(m_profile);
+        m_reference = new ProfileReference(m_profile, "drive to translation with front");
         m_reference.setGoal(new SwerveModel(m_goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }

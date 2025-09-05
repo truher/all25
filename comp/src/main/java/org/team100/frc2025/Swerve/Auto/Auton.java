@@ -2,13 +2,13 @@ package org.team100.frc2025.Swerve.Auto;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.C;
-import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.D;
-import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.F;
-import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.I;
-import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.K;
-import static org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint.L;
-import static org.team100.lib.config.ElevatorUtil.ScoringPosition.L4;
+import static org.team100.frc2025.Swerve.FieldConstants.ReefPoint.C;
+import static org.team100.frc2025.Swerve.FieldConstants.ReefPoint.D;
+import static org.team100.frc2025.Swerve.FieldConstants.ReefPoint.F;
+import static org.team100.frc2025.Swerve.FieldConstants.ReefPoint.I;
+import static org.team100.frc2025.Swerve.FieldConstants.ReefPoint.K;
+import static org.team100.frc2025.Swerve.FieldConstants.ReefPoint.L;
+import static org.team100.lib.config.ElevatorUtil.ScoringLevel.L4;
 
 import java.util.function.DoubleConsumer;
 
@@ -18,14 +18,14 @@ import org.team100.frc2025.CommandGroups.ScoreSequence;
 import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Funnel.Funnel;
+import org.team100.frc2025.Swerve.FieldConstants.CoralStation;
+import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Swerve.SemiAuto.Embark;
 import org.team100.frc2025.Swerve.SemiAuto.Navigator;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.lib.commands.drivetrain.FieldConstants.CoralStation;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
-import org.team100.lib.config.ElevatorUtil.ScoringPosition;
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
@@ -44,9 +44,9 @@ public record Auton(LoggerFactory logger, Wrist2 wrist, Elevator elevator, Funne
     public Command left() {
         return sequence(
                 embarkAndPreplace(L4, I),
-                scoreAndReload(CoralStation.Left),
+                scoreAndReload(CoralStation.LEFT),
                 embarkAndPreplace(L4, K),
-                scoreAndReload(CoralStation.Left),
+                scoreAndReload(CoralStation.LEFT),
                 embarkAndPreplace(L4, L),
                 new PostDropCoralL4(wrist, elevator, 10)
                         .until(elevator::atGoal));
@@ -55,16 +55,16 @@ public record Auton(LoggerFactory logger, Wrist2 wrist, Elevator elevator, Funne
     public Command right() {
         return sequence(
                 embarkAndPreplace(L4, F),
-                scoreAndReload(CoralStation.Right),
+                scoreAndReload(CoralStation.RIGHT),
                 embarkAndPreplace(L4, D),
-                scoreAndReload(CoralStation.Right),
+                scoreAndReload(CoralStation.RIGHT),
                 embarkAndPreplace(L4, C),
                 new PostDropCoralL4(wrist, elevator, 10)
                         .until(elevator::atGoal));
     }
 
     /** Drive to the reef and go up. */
-    public Command embarkAndPreplace(ScoringPosition position, ReefPoint point) {
+    public Command embarkAndPreplace(ScoringLevel position, ReefPoint point) {
         Embark toReef = new Embark(
                 logger, drive, heedRadiusM, controller, profile, () -> position, point);
         PrePlaceCoralL4 prePlace = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
