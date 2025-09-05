@@ -64,7 +64,7 @@ public class Embark extends Command {
         m_heedRadiusM.accept(HEED_RADIUS_M);
         Pose2d goal = FieldConstants.makeGoal(m_level.get(), m_point);
         m_log_goal.log(() -> goal);
-        m_reference = new ProfileReference(m_profile);
+        m_reference = new ProfileReference(m_profile, "embark");
         m_reference.setGoal(new SwerveModel(goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }

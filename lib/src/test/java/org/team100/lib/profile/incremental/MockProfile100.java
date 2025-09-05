@@ -15,11 +15,6 @@ public class MockProfile100 implements Profile100 {
     }
 
     @Override
-    public ResultWithETA calculateWithETA(double dt, Control100 initial, Model100 goal) {
-        return new ResultWithETA(result, eta);
-    }
-
-    @Override
     public MockProfile100 scale(double s) {
         return this;
     }

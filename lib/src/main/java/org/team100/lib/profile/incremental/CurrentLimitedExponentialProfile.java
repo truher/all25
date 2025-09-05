@@ -65,23 +65,6 @@ public class CurrentLimitedExponentialProfile implements Profile100 {
     }
 
     @Override
-    public ResultWithETA calculateWithETA(double dt, Control100 initial, Model100 goal) {
-        ResultWithETA trapezoid = m_trapezoid.calculateWithETA(dt, initial, goal);
-        ResultWithETA exponential = m_exponential.calculateWithETA(dt, initial, goal);
-        if (!isAccel(initial, exponential.state())) {
-            // exponential decel is more accurate ("plugging" torque is higher than stall)
-            return exponential;
-        }
-
-        if (initial.v() < m_limit) {
-            // Low speed is current limited.
-            return trapezoid;
-        }
-        // high speed is back-EMF limited.
-        return exponential;
-    }
-
-    @Override
     public Profile100 scale(double s) {
         return new CurrentLimitedExponentialProfile(
                 m_maxVel, s * m_limitedAccel, s * m_stallAccel);

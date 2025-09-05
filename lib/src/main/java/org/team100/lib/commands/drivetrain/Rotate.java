@@ -63,7 +63,7 @@ public class Rotate extends Command  {
         // instead, pick a goal at the stopping distance in the current direction.
         Translation2d dx = m_drive.getVelocity().stopping(m_swerveKinodynamics.getMaxDriveAccelerationM_S2());
         Pose2d goal = new Pose2d(measurement.getX() + dx.getX(), measurement.getY() + dx.getY(), m_target);
-        m_reference = new ProfileReference(m_profile);
+        m_reference = new ProfileReference(m_profile, "rotate");
         m_reference.setGoal(new SwerveModel(goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }

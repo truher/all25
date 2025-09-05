@@ -465,7 +465,6 @@ public class RobotContainer {
 
     public void onInit() {
         m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(Math.PI)));
-        m_auton.initialize();
     }
 
     public void onAuto() {

@@ -21,18 +21,6 @@ public interface Profile100 extends IncrementalProfile {
         Profile100 apply(double s);
     }
 
-    public static record ResultWithETA(Control100 state, double etaS) {
-    }
-
-    /**
-     * Return the control for dt in the future.
-     * 
-     * Note order here, initial first, goal second.
-     * 
-     * Initial is a Control100 so we can regulate jerk.
-     */
-    ResultWithETA calculateWithETA(double dt, Control100 initial, Model100 goal);
-
     /**
      * Return a new profile with acceleration scaled by s.
      */
@@ -70,11 +58,11 @@ public interface Profile100 extends IncrementalProfile {
         final double minS = 0.01;
         final double maxS = 1.0;
         double ss = Math100.findRoot(
-                s -> getEtaS(dt, initial, goal, eta, s, maker),
+                s -> getEtaDiff(dt, initial, goal, eta, s, maker),
                 minS,
-                getEtaS(dt, initial, goal, eta, minS, maker),
+                getEtaDiff(dt, initial, goal, eta, minS, maker),
                 maxS,
-                getEtaS(dt, initial, goal, eta, maxS, maker),
+                getEtaDiff(dt, initial, goal, eta, maxS, maker),
                 sTolerance,
                 100);
         if (DEBUG)
@@ -82,8 +70,8 @@ public interface Profile100 extends IncrementalProfile {
         return ss;
     }
 
-    /** Calculate the ETA from initial to goal */
-    static double getEtaS(
+    /** Calculate the ETA from initial to goal, compare to expected. */
+    static double getEtaDiff(
             double dt,
             Control100 initial,
             Model100 goal,
@@ -91,9 +79,7 @@ public interface Profile100 extends IncrementalProfile {
             double s,
             ProfileMaker maker) {
         Profile100 p = maker.apply(s);
-        ResultWithETA r = p.calculateWithETA(dt, initial, goal);
-        double etaS = r.etaS();
+        double etaS = p.simulateForETA(dt, initial, goal);
         return etaS - eta;
     }
-
 }

@@ -21,6 +21,7 @@ import org.team100.lib.profile.HolonomicProfile;
  * TODO: maybe implement this without the central Cache?
  */
 public class ProfileReference implements SwerveReference {
+    private static final boolean DEBUG = false;
     private static final double TOLERANCE = 0.01;
 
     /**
@@ -30,6 +31,8 @@ public class ProfileReference implements SwerveReference {
     }
 
     private final HolonomicProfile m_profile;
+    /** The name is for debugging. */
+    private final String m_name;
     private final CotemporalCache<References> m_references;
 
     private SwerveModel m_goal;
@@ -41,8 +44,9 @@ public class ProfileReference implements SwerveReference {
      */
     private SwerveModel m_next;
 
-    public ProfileReference(HolonomicProfile profile) {
+    public ProfileReference(HolonomicProfile profile, String name) {
         m_profile = profile;
+        m_name = name;
         // this will keep polling until we stop it.
         m_references = Cache.of(() -> refresh(m_next));
     }
@@ -90,6 +94,9 @@ public class ProfileReference implements SwerveReference {
     }
 
     private SwerveModel makeNext(SwerveModel current) {
+        if (DEBUG) {
+            System.out.printf("ProfileReference refreshing %s\n", m_name);
+        }
         if (current == null) {
             // happens at startup
             return null;

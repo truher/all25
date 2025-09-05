@@ -59,7 +59,7 @@ public class DriveToPoseWithProfile extends Command  {
         updateGoal();
         if (m_goal == null)
             return;
-        m_reference = new ProfileReference(m_profile);
+        m_reference = new ProfileReference(m_profile, "Drive to pose with profile");
         m_reference.setGoal(m_goal);
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }
