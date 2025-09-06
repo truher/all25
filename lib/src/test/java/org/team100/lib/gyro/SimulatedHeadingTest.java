@@ -77,7 +77,7 @@ class SimulatedHeadingTest implements Timeless {
         // target is 1 rad/sec, we went 0.4 sec. some of that time is spent accelerating
         // the module steering, though the drive motors respond instantly. so this
         // should be something less than 0.4, but it's a little too high?
-        assertEquals(0.42, h.getYawNWU().getRadians(), 0.03);
+        assertEquals(0.286, h.getYawNWU().getRadians(), 0.03);
         // the rate is what we asked for.
         assertEquals(1, h.getYawRateNWU(), DELTA);
     }

@@ -71,12 +71,12 @@ public class ReduxGyro implements Gyro {
         m_log_age.log(() -> now - t);
         // It's ok if takt is slightly behind the gyro, in case a CAN packet came in
         // before we got here.
-        if (dt < -0.1) {
+        if (dt < -0.04) {
             dt = 0;
         }
         // This seems to happen when the whole robot is running behind.
         // It's not that harmful, it just means we don't extrapolate.
-        if (dt > 0.1) {
+        if (dt > 0.04) {
             dt = 0;
         }
         final double correctedYaw = yaw + rate * dt;

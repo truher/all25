@@ -24,7 +24,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * It used to be that the turning servo would contain the profile, but now it's
  * here.
  */
-public abstract class SwerveModule100  {
+public abstract class SwerveModule100 {
     private final LinearVelocityServo m_driveServo;
     private final AngularPositionServo m_turningServo;
     /**
@@ -113,18 +113,27 @@ public abstract class SwerveModule100  {
         return scale * desiredSpeed;
     }
 
+    double dt() {
+        double now = Takt.get();
+        double dt = now - m_previousTime;
+        m_previousTime = now;
+        return dt;
+    }
+
     /** Correct the desired speed for steering coupling. */
     private double correctSpeedForSteering(double desiredSpeed, Rotation2d desiredAngle) {
         Rotation2d dtheta = desiredAngle.minus(m_previousDesiredAngle);
-        double now = Takt.get();
-        double dt = now - m_previousTime;
-        if (dt > 1e-6) {
+        double dt = dt();
+        if (dt > 0.04) {
+            // clock is unreliable
+            dt = 0;
+        }
+        if (dt > 0.01) {
             // avoid short intervals
             double omega = dtheta.getRadians() / dt;
             // TODO: should this be positive or negative?
             desiredSpeed += .0975 * (omega) / 3.8;
         }
-        m_previousTime = now;
         return desiredSpeed;
     }
 
