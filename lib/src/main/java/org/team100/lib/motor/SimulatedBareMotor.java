@@ -1,11 +1,12 @@
 package org.team100.lib.motor;
 
 import org.team100.lib.coherence.Cache;
-import org.team100.lib.coherence.DoubleCache;
+import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
+import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
@@ -21,11 +22,14 @@ public class SimulatedBareMotor implements BareMotor {
 
     private final DoubleLogger m_log_duty;
     private final DoubleLogger m_log_velocity;
-    private final DoubleCache m_velocityCache;
-    private final DoubleCache m_positionCache;
+    private final CotemporalCache<Model100> m_stateCache;
 
-    private double m_velocity = 0;
-    private double m_position = 0;
+    // just like in a real motor, the inputs remain until zeroed by the watchdog.
+    private Double m_velocityInput;
+    private Double m_positionInput;
+
+    private Model100 m_state = new Model100();
+
     private double m_time = Takt.get();
 
     public SimulatedBareMotor(LoggerFactory parent, double freeSpeedRad_S) {
@@ -33,12 +37,37 @@ public class SimulatedBareMotor implements BareMotor {
         m_freeSpeedRad_S = freeSpeedRad_S;
         m_log_duty = child.doubleLogger(Level.DEBUG, "duty_cycle");
         m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");
-        m_velocityCache = Cache.ofDouble(() -> m_velocity);
-        m_positionCache = Cache.ofDouble(() -> {
-            if (DEBUG)
-                Util.printf("resetting position cache to %f\n", m_position);
-            return m_position;
+        m_stateCache = Cache.of(() -> {
+            double dt = dt();
+            if (m_velocityInput != null) {
+                if (DEBUG)
+                    Util.printf("SimulatedBareMotor v %f\n", m_velocityInput);
+                if (dt > 0.04) {
+                    // probably we should not extrapolate
+                    m_state = new Model100(m_state.x(), m_velocityInput);
+                } else {
+                    m_state = new Model100(m_state.x() + m_velocityInput * dt, m_velocityInput);
+                }
+            }
+            if (m_positionInput != null) {
+                if (DEBUG)
+                    Util.printf("SimulatedBareMotor x %f\n", m_positionInput);
+                if (dt < 0.01) {
+                    // probably we should not differentiate
+                    m_state = new Model100(m_positionInput, m_state.v());
+                } else {
+                    m_state = new Model100(m_positionInput, (m_positionInput - m_state.x()) / dt);
+                }
+            }
+            return m_state;
         });
+    }
+
+    double dt() {
+        double now = Takt.get();
+        double dt = now - m_time;
+        m_time = now;
+        return dt;
     }
 
     @Override
@@ -52,42 +81,19 @@ public class SimulatedBareMotor implements BareMotor {
     /** ignores accel and torque */
     @Override
     public void setVelocity(double velocityRad_S, double accelRad_S2, double torqueNm) {
-        m_velocity = MathUtil.clamp(
+        m_velocityInput = MathUtil.clamp(
                 Util.notNaN(velocityRad_S), -m_freeSpeedRad_S, m_freeSpeedRad_S);
-        m_log_velocity.log(() -> m_velocity);
-
-        // this is also in the simulated encoder
-        double now = Takt.get();
-        double dt = now - m_time;
-        if (dt < 1e-6) {
-            // calling twice in the same cycle => nothing happens
-            return;
-        }
-        if (DEBUG)
-            Util.printf("motor set pos %f v %f dt %f now %f m_time %f\n", m_position, velocityRad_S, dt, now, m_time);
-        m_position += velocityRad_S * dt;
-        m_time = now;
-
+        m_log_velocity.log(() -> m_velocityInput);
+        // you can't use velocity and position control at the same time
+        m_positionInput = null;
     }
 
     /** ignores velocity and torque */
     @Override
     public void setPosition(double position, double velocity, double accel, double torque) {
-        if (DEBUG)
-            Util.printf("SimulatedBareMotor.setPosition %f\n", position);
-        double now = Takt.get();
-        double dt = now - m_time;
-        if (dt < 1e-6) {
-            if (DEBUG)
-                Util.println("calling twice in the same cycle => nothing happens");
-            return;
-        }
-        double dx = position - m_position;
-        m_velocity = dx / dt;
-        m_position = position;
-        m_time = now;
-        if (DEBUG)
-            Util.printf("set motor position %.6f\n", m_position);
+        m_positionInput = position;
+        // you can't use velocity and position control at the same time
+        m_velocityInput = null;
     }
 
     /** placeholder */
@@ -104,7 +110,7 @@ public class SimulatedBareMotor implements BareMotor {
 
     @Override
     public void stop() {
-        m_velocity = 0;
+        m_velocityInput = 0.0;
     }
 
     @Override
@@ -114,11 +120,11 @@ public class SimulatedBareMotor implements BareMotor {
 
     @Override
     public double getVelocityRad_S() {
-        return m_velocityCache.getAsDouble();
+        return m_stateCache.get().v();
     }
 
     public double getPositionRad() {
-        double pos = m_positionCache.getAsDouble();
+        double pos = m_stateCache.get().x();
         if (Double.isNaN(pos))
             throw new IllegalArgumentException("motor pos");
         return pos;
@@ -129,9 +135,8 @@ public class SimulatedBareMotor implements BareMotor {
     public void setEncoderPositionRad(double positionRad) {
         if (Double.isNaN(positionRad))
             throw new IllegalArgumentException("motor set position");
-        m_position = positionRad;
-        m_positionCache.reset();
-        m_velocityCache.reset();
+        m_positionInput = positionRad;
+        m_stateCache.reset();
     }
 
     @Override
@@ -146,9 +151,9 @@ public class SimulatedBareMotor implements BareMotor {
 
     /** resets the caches, so the new value is immediately available. */
     public void reset() {
-        m_position = 0;
+        m_positionInput = 0.0;
+        m_velocityInput = 0.0;
         m_time = Takt.get();
-        m_positionCache.reset();
-        m_velocityCache.reset();
+        m_stateCache.reset();
     }
 }
