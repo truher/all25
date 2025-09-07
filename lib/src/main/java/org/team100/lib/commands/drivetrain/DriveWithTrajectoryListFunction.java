@@ -15,11 +15,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
- * Follow a list of trajectories.
- * 
- * The list can be relative to the current pose.
+ * Follow a list of trajectories created at initialization time, given the pose
+ * at that time.
  */
-public class DriveWithTrajectoryList extends Command  {
+public class DriveWithTrajectoryListFunction extends Command {
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final Function<Pose2d, List<Trajectory100>> m_trajectories;
@@ -28,7 +27,7 @@ public class DriveWithTrajectoryList extends Command  {
     private Iterator<Trajectory100> m_trajectoryIter;
     private ReferenceController m_referenceController;
 
-    public DriveWithTrajectoryList(
+    public DriveWithTrajectoryListFunction(
             SwerveDriveSubsystem swerve,
             SwerveController controller,
             Function<Pose2d, List<Trajectory100>> trajectories,

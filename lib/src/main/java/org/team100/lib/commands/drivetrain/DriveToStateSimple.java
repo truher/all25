@@ -10,23 +10,22 @@ import org.team100.lib.reference.SwerveReference;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
- * Given a pose, drive there using only the feedback in the holonomic
+ * Given a swerve state, drive there using only the feedback in the holonomic
  * controller.
  * 
- * There's no profile, no trajectory. This doesn't seem to work well to follow
- * a trajectory or profile, don't use it for that, just give it a point
+ * There's no profile, no trajectory, just give it a point
  * you want to go to, and it will go there. It makes no attempt to
  * impose feasibility constraints or coordinate the axes, so it tries
  * to use the setpoint generator to moderate the output.
  */
-public class DriveToPoseSimple extends Command  {
+public class DriveToStateSimple extends Command {
     private final SwerveController m_controller;
     private final SwerveDriveSubsystem m_drive;
     private final SwerveReference m_reference;
 
     private ReferenceController m_referenceController;
 
-    public DriveToPoseSimple(
+    public DriveToStateSimple(
             SwerveController controller,
             SwerveDriveSubsystem drive,
             SwerveModel goal) {

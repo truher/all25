@@ -25,7 +25,7 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 
-class DriveWithTrajectoryListTest extends Fixtured implements Timeless {
+class DriveWithTrajectoryListFunctionTest extends Fixtured implements Timeless {
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);
@@ -42,7 +42,7 @@ class DriveWithTrajectoryListTest extends Fixtured implements Timeless {
     void testSimple() {
         Experiments.instance.testOverride(Experiment.UseSetpointGenerator, true);
         SwerveController control = SwerveControllerFactory.test(logger);
-        DriveWithTrajectoryList c = new DriveWithTrajectoryList(
+        DriveWithTrajectoryListFunction c = new DriveWithTrajectoryListFunction(
                 fixture.drive,
                 control,
                 x -> List.of(planner.line(x)),

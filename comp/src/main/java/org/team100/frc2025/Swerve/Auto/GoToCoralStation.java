@@ -16,19 +16,23 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
+/**
+ * Function to supply a rest-to-rest trajectory from the given starting point to
+ * the coral station.
+ */
 public class GoToCoralStation implements Function<Pose2d, Trajectory100> {
     private final double m_scale;
     private final CoralStation m_station;
     private final TrajectoryPlanner m_planner;
 
-    /** Drive to the coral station via a trajectory, *perpetually* */
     public GoToCoralStation(
             SwerveKinodynamics kinodynamics,
             CoralStation station,
             double scale) {
         m_station = station;
         m_scale = scale;
-        m_planner = new TrajectoryPlanner(new TimingConstraintFactory(kinodynamics).auto());
+        m_planner = new TrajectoryPlanner(
+                new TimingConstraintFactory(kinodynamics).auto());
     }
 
     @Override
