@@ -51,6 +51,11 @@ public class ProfileReference implements SwerveReference {
         m_references = Cache.of(() -> refresh(m_next));
     }
 
+    /**
+     * This does not solve for profile coordination, so if you update the goal after
+     * initialize(), you'll use the old scales. That's probably fine, if the goal
+     * hasn't moved much, but it's not appropriate to move the goal a lot.
+     */
     public void setGoal(SwerveModel goal) {
         m_goal = goal;
     }

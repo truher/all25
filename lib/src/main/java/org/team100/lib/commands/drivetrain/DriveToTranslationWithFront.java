@@ -73,8 +73,7 @@ public class DriveToTranslationWithFront extends Command  {
                 m_goal.getRotation().getRadians() });
     }
 
-    @Override
-    public boolean isFinished() {
+    public boolean isDone() {
         return m_referenceController != null && m_referenceController.isFinished();
     }
 

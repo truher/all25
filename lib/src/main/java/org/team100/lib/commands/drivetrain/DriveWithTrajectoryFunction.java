@@ -1,4 +1,4 @@
-package org.team100.frc2025.Swerve.SemiAuto;
+package org.team100.lib.commands.drivetrain;
 
 import java.util.function.Function;
 
@@ -12,7 +12,12 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class Navigator extends Command {
+/**
+ * Follow a trajectory created at initialization time, given the pose at that
+ * time. Since the trajectory function takes a pose, and not a state, then
+ * probably the returned trajectory should start from rest.
+ */
+public class DriveWithTrajectoryFunction extends Command {
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final TrajectoryVisualization m_viz;
@@ -24,7 +29,7 @@ public class Navigator extends Command {
      */
     private ReferenceController m_referenceController;
 
-    public Navigator(
+    public DriveWithTrajectoryFunction(
             SwerveDriveSubsystem drive,
             SwerveController controller,
             TrajectoryVisualization viz,
@@ -47,12 +52,12 @@ public class Navigator extends Command {
     }
 
     @Override
-    public final void execute() {
+    public void execute() {
         m_referenceController.execute();
     }
 
     @Override
-    public final void end(boolean interrupted) {
+    public void end(boolean interrupted) {
         m_drive.stop();
         m_viz.clear();
         m_referenceController = null;
@@ -62,7 +67,7 @@ public class Navigator extends Command {
      * Done if we've started and we're finished.
      * Note calling isDone after end will yield false.
      */
-    public final boolean isDone() {
+    public boolean isDone() {
         return m_referenceController != null && m_referenceController.isFinished();
     }
 }

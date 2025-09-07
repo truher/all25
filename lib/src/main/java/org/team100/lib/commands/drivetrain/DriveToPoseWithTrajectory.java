@@ -19,13 +19,13 @@ import edu.wpi.first.wpilibj2.command.Command;
  * 
  * The trajectory is supplied; the supplier is free to ignore the current state.
  */
-public class DriveToPoseWithTrajectory extends Command  {
+public class DriveToPoseWithTrajectory extends Command {
     private final Supplier<Pose2d> m_goal;
     private final SwerveDriveSubsystem m_drive;
     private final BiFunction<SwerveModel, Pose2d, Trajectory100> m_trajectories;
     private final SwerveController m_controller;
     private final TrajectoryVisualization m_viz;
- 
+
     private Trajectory100 m_trajectory;
 
     private ReferenceController m_referenceController;
@@ -52,7 +52,7 @@ public class DriveToPoseWithTrajectory extends Command  {
     public void initialize() {
         m_trajectory = m_trajectories.apply(m_drive.getState(), m_goal.get());
         if (m_trajectory.isEmpty()) {
-            m_trajectory = null; 
+            m_trajectory = null;
             return;
         }
         m_referenceController = new ReferenceController(
@@ -65,18 +65,22 @@ public class DriveToPoseWithTrajectory extends Command  {
 
     @Override
     public void execute() {
-        if (m_trajectory == null) return;
+        if (m_trajectory == null)
+            return;
         m_referenceController.execute();
     }
 
     @Override
     public boolean isFinished() {
-        return m_trajectory == null || m_referenceController.isFinished();
+        return m_trajectory == null
+                || m_referenceController == null
+                || m_referenceController.isFinished();
     }
 
     @Override
     public void end(boolean interrupted) {
         m_drive.stop();
         m_viz.clear();
+        m_referenceController = null;
     }
 }
