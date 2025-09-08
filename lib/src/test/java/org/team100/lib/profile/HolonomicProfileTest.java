@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 class HolonomicProfileTest {
-    private static final boolean PRINT = true;
+    private static final boolean DEBUG = false;
 
     /**
      * This uses the TrapezoidProfile100, which is the Team100 state-space thing.
@@ -25,7 +25,7 @@ class HolonomicProfileTest {
         SwerveControl s = i.control();
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
-            if (PRINT)
+            if (DEBUG)
                 Util.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
         }
     }
@@ -43,7 +43,7 @@ class HolonomicProfileTest {
         SwerveControl s = i.control();
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
-            if (PRINT)
+            if (DEBUG)
                 Util.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
         }
     }
@@ -57,7 +57,7 @@ class HolonomicProfileTest {
         SwerveControl s = i.control();
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
-            if (PRINT)
+            if (DEBUG)
                 Util.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
         }
     }
@@ -86,9 +86,9 @@ class HolonomicProfileTest {
             hp.solve(i, g);
         }
         double t1 = Takt.actual();
-        if (PRINT)
+        if (DEBUG)
             Util.printf("duration (ms)  %5.1f\n", 1e3 * (t1 - t0));
-        if (PRINT)
+        if (DEBUG)
             Util.printf("per op (ns)    %5.1f\n", 1e9 * (t1 - t0) / N);
     }
 }

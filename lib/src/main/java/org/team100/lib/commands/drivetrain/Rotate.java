@@ -76,9 +76,8 @@ public class Rotate extends Command  {
             m_referenceController.execute();
     }
 
-    @Override
-    public boolean isFinished() {
-        return m_referenceController != null && m_referenceController.isFinished();
+    public boolean isDone() {
+        return m_referenceController != null && m_referenceController.isDone();
     }
 
     @Override

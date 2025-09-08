@@ -50,7 +50,6 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         // initially at rest
         d.m_state = new SwerveModel();
 
-
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
 
         stepTime();
@@ -106,11 +105,11 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
         c.initialize();
 
-        // the measurement never changes but that doesn't affect "done" as far as the
-        // trajectory is concerned.
         for (int i = 0; i < 100; ++i) {
             stepTime();
             c.execute();
+            // we have magically reached the end
+            d.m_state = new SwerveModel(new Pose2d(1, 0, Rotation2d.kZero));
         }
         assertTrue(c.isDone());
 

@@ -6,12 +6,16 @@ Everything in here needs to be reviewed and covered with tests.
 
 If you're trying to learn about the library, you should start with the README in each package.
 
-Of particular note:
+__Packages of note__
 
 * [coherence](coherence/README.md)
   * A discrete clock and cache intended to manage observations (so they all represent the same instant) and anything else that depends on time (e.g. steps along a profile).
 * [commands](commands/README.md)
   * High level navigation commands, using manual control, profiles, and trajectories.
+* [config](config/README.md)
+  * The most interesting config is `Identity`, which is an enum of RoboRIO
+  serial numbers.  We use this identity to differentiate robot hardware within
+  a single code-base.
 * [controller](controller/README.md)
   * Feedback controllers for 1d and 2d-with-heading (this case also includes feedforward).
 * [encoder](encoder.README.md)
@@ -32,3 +36,21 @@ Of particular note:
   * Constrained motion in 1d and 2d-with-heading.  These should be used for all motion where a trajectory would be too expensive to compute on the fly.
 * [trajectory](trajectory/README.md)
   * A trajectory is a path based on splines, with a precalculated schedule meeting motion constraints.  Trajectories are good for paths that require curves around known obstacles.  Simple trajectories are not *that* time-consuming to create, so can be used on-the-fly in some cases.
+
+Other notable topics about the library:
+
+__Simulation__
+
+Our approach to simulation is completely different from the WPILib approach,
+in two important ways. First, WPILib attempts to simulate realistic mechanism
+physics: we do not.  Second, WPILib attempts to involve vendors (e.g. REV) in
+the simulation of their hardware: we do not.
+
+Our approach to simulation is to use simulated motors that respond instantly
+to their inputs.  The expectation is that inputs will be _feasible_.  Team
+100 simulation is not useful to understand mechanism physics, it is only
+useful for higher-level concerns, like designing paths to follow.
+
+Our simulated motor implementations have nothing to do with the vendor
+implementations; we use `Identity` in the constructor tree to select the
+simulated implementation (for the `BLANK` identity).

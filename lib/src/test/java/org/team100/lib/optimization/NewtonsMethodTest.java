@@ -1,4 +1,4 @@
-package org.team100.lib.math;
+package org.team100.lib.optimization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -130,7 +130,8 @@ public class NewtonsMethodTest {
         // jacobian at q0
         Matrix<N2, N2> j0 = NumericalJacobian100.numericalJacobian(
                 Nat.N2(), Nat.N2(), err, q0);
-        System.out.println(Util.matStr(j0));
+        if (DEBUG)
+            System.out.println(Util.matStr(j0));
         // dx/dq0
         assertEquals(-1, j0.get(0, 0), 1e-9);
         // dx/dq1
@@ -208,7 +209,8 @@ public class NewtonsMethodTest {
     }
 
     void printxy(Vector<N2> err) {
-        System.out.println(Util.vecStr(err));
+        if (DEBUG)
+            System.out.println(Util.vecStr(err));
     }
 
     @Test
@@ -237,7 +239,8 @@ public class NewtonsMethodTest {
 
         // jacobian at q0
         Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
-        System.out.println(Util.matStr(j0));
+        if (DEBUG)
+            System.out.println(Util.matStr(j0));
         // dx/dq0
         assertEquals(-1, j0.get(0, 0), 1e-9);
         // dx/dq1
@@ -308,7 +311,8 @@ public class NewtonsMethodTest {
         assertEquals(1, XX0.getY(), 1e-9);
         // jacobian at q0
         Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
-        System.out.println(Util.matStr(j0));
+        if (DEBUG)
+            System.out.println(Util.matStr(j0));
 
         // note the jacobian is different since the "log" is in there and we are far
         // from the goal.
@@ -408,7 +412,8 @@ public class NewtonsMethodTest {
 
         // jacobian at q0
         Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
-        System.out.println(Util.matStr(j0));
+        if (DEBUG)
+            System.out.println(Util.matStr(j0));
 
         // note the jacobian is different since the "log" is in there.
         assertEquals(1.024, j0.get(0, 0), 1e-3);
@@ -463,7 +468,8 @@ public class NewtonsMethodTest {
 
         // jacobian at q0
         Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
-        System.out.println(Util.matStr(j0));
+        if (DEBUG)
+            System.out.println(Util.matStr(j0));
         assertEquals(0.715, j0.get(0, 0), 1e-3);
         assertEquals(-0.270, j0.get(0, 1), 1e-3);
         assertEquals(0.913, j0.get(1, 0), 1e-3);

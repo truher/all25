@@ -74,7 +74,7 @@ public class DriveToTranslationWithFront extends Command  {
     }
 
     public boolean isDone() {
-        return m_referenceController != null && m_referenceController.isFinished();
+        return m_referenceController != null && m_referenceController.isDone();
     }
 
     @Override

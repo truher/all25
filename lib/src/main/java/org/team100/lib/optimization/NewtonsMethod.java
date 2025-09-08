@@ -1,4 +1,4 @@
-package org.team100.lib.math;
+package org.team100.lib.optimization;
 
 import java.util.Random;
 import java.util.function.Function;

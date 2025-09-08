@@ -1,4 +1,4 @@
-package org.team100.lib.math;
+package org.team100.lib.optimization;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 public class PoseInterpolationTest {
+    private static final boolean DEBUG = false;
+
     @Test
     void test1() {
         // does WPI pose interpolation make straight lines? no.
@@ -25,7 +27,8 @@ public class PoseInterpolationTest {
             Control100 c = profile.sample(t);
             double s = c.x() / distance;
             Pose3d setpoint = start.interpolate(end, s);
-            System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.poseStr(setpoint));
+            if (DEBUG)
+                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.poseStr(setpoint));
             ++i;
         }
     }
@@ -43,7 +46,8 @@ public class PoseInterpolationTest {
             Control100 c = profile.sample(t);
             double s = c.x() / distance;
             Pose3d setpoint = GeometryUtil.interpolate(start, end, s);
-            System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.poseStr(setpoint));
+            if (DEBUG)
+                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.poseStr(setpoint));
             ++i;
         }
     }
@@ -61,7 +65,8 @@ public class PoseInterpolationTest {
             Control100 c = profile.sample(t);
             double s = c.x() / distance;
             Rotation3d setpoint = start.interpolate(end, s);
-            System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.rotStr(setpoint));
+            if (DEBUG)
+                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.rotStr(setpoint));
             ++i;
         }
     }
@@ -79,7 +84,8 @@ public class PoseInterpolationTest {
             Control100 c = profile.sample(t);
             double s = c.x() / distance;
             Rotation3d setpoint = GeometryUtil.interpolate(start, end, s);
-            System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.rotStr(setpoint));
+            if (DEBUG)
+                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.rotStr(setpoint));
             ++i;
         }
     }
@@ -97,7 +103,8 @@ public class PoseInterpolationTest {
             Control100 c = profile.sample(t);
             double s = c.x() / distance;
             Translation3d setpoint = start.interpolate(end, s);
-            System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.transStr(setpoint));
+            if (DEBUG)
+                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.transStr(setpoint));
             ++i;
         }
     }

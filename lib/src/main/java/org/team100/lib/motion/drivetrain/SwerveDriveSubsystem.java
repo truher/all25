@@ -20,6 +20,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.util.Util;
 
@@ -266,14 +267,16 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      */
     private SwerveModel update() {
         double now = Takt.get();
+        SwerveModulePositions positions = m_swerveLocal.positions();
         m_poseEstimator.put(
                 now,
                 m_gyro,
-                m_swerveLocal.positions());
+                positions);
         m_cameraUpdater.run();
         SwerveModel swerveModel = m_poseEstimator.get(now);
         if (DEBUG)
-            Util.printf("update() estimated pose: %s\n", swerveModel);
+            Util.printf("update() positions %s estimated pose: %s\n",
+                    positions, swerveModel);
         return swerveModel;
     }
 

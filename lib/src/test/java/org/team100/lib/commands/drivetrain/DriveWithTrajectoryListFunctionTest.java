@@ -40,6 +40,8 @@ class DriveWithTrajectoryListFunctionTest extends Fixtured implements Timeless {
 
     @Test
     void testSimple() {
+        // this initial step is required since the timebase is different?
+        stepTime();
         Experiments.instance.testOverride(Experiment.UseSetpointGenerator, true);
         SwerveController control = SwerveControllerFactory.test(logger);
         DriveWithTrajectoryListFunction c = new DriveWithTrajectoryListFunction(
@@ -50,15 +52,14 @@ class DriveWithTrajectoryListFunctionTest extends Fixtured implements Timeless {
         c.initialize();
         assertEquals(0, fixture.drive.getPose().getX(), DELTA);
         c.execute();
-        assertFalse(c.isFinished());
+        assertFalse(c.isDone());
         // the trajectory takes a little over 3s
-        for (double t = 0; t < 3.1; t += TimedRobot100.LOOP_PERIOD_S) {
+        for (double t = 0; t < 3.2; t += TimedRobot100.LOOP_PERIOD_S) {
             stepTime();
             c.execute();
             fixture.drive.periodic(); // for updateOdometry
         }
-        // at goal; wide tolerance due to test timing
-        assertTrue(c.isFinished());
-        assertEquals(1.031, fixture.drive.getPose().getX(), 0.05);
+        assertTrue(c.isDone());
+        assertEquals(1.0, fixture.drive.getPose().getX(), 0.001);
     }
 }

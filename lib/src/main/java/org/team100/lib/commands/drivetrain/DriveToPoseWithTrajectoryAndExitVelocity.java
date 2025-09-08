@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Drive to a specified pose and exit velocity, using a trajectory constructed
  * at initialization time.
  */
-public class DriveToPoseWithTrajectoryAndExitVelocity extends Command  {
+public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
     private final Pose2d m_goal;
     private final FieldRelativeVelocity m_endVelocity;
     private final SwerveDriveSubsystem m_drive;
@@ -87,11 +87,10 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends Command  {
 
     }
 
-    @Override
-    public boolean isFinished() {
+    public boolean isDone() {
         if (m_referenceController == null)
             return true;
-        return m_referenceController.isFinished();
+        return m_referenceController.isDone();
     }
 
     @Override

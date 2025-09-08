@@ -85,10 +85,4 @@ public class DriveManuallySimple extends Command {
     public void end(boolean interrupted) {
         m_drive.stop();
     }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
 }

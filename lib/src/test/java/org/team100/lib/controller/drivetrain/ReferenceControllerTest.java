@@ -107,6 +107,8 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
         for (int i = 0; i < 100; ++i) {
             stepTime();
             c.execute();
+            // we have magically reached the end
+            drive.m_state = new SwerveModel(new Pose2d(1, 0, Rotation2d.kZero));
         }
         assertTrue(c.isDone());
 
@@ -147,15 +149,16 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
         command.execute();
         // this is the output from the previous takt
         // TODO: fix this test
-        // assertEquals(0.02, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        // assertEquals(0.02,
+        // fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
         assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
 
         // etc
         stepTime();
         command.execute();
-        // assertEquals(0.04, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        // assertEquals(0.04,
+        // fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
         assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
     }
-
 
 }

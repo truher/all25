@@ -39,6 +39,8 @@ public class SimulatedBareMotor implements BareMotor {
         m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");
         m_stateCache = Cache.of(() -> {
             double dt = dt();
+            if (DEBUG)
+                Util.printf("SimulatedBareMotor dt %f\n", dt);
             if (m_velocityInput != null) {
                 if (DEBUG)
                     Util.printf("SimulatedBareMotor v %f\n", m_velocityInput);
@@ -59,6 +61,8 @@ public class SimulatedBareMotor implements BareMotor {
                     m_state = new Model100(m_positionInput, (m_positionInput - m_state.x()) / dt);
                 }
             }
+            if (DEBUG)
+                Util.printf("SimulatedBareMotor state %s\n", m_state);
             return m_state;
         });
     }

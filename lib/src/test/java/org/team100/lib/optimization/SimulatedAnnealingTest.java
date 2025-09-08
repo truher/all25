@@ -1,4 +1,4 @@
-package org.team100.lib.math;
+package org.team100.lib.optimization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

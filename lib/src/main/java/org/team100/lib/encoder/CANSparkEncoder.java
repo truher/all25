@@ -38,6 +38,7 @@ public class CANSparkEncoder implements IncrementalBareEncoder {
     //////////////////////////////////
 
     /**
+     * Not latency-compensated.
      * Value is updated in Robot.robotPeriodic().
      */
     @Override
@@ -49,6 +50,7 @@ public class CANSparkEncoder implements IncrementalBareEncoder {
     }
 
     /**
+     * Not latency-compensated.
      * Value is updated in Robot.robotPeriodic().
      */
     @Override

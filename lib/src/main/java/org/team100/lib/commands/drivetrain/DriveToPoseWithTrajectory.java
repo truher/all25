@@ -70,11 +70,10 @@ public class DriveToPoseWithTrajectory extends Command {
         m_referenceController.execute();
     }
 
-    @Override
-    public boolean isFinished() {
+    public boolean isDone() {
         return m_trajectory == null
                 || m_referenceController == null
-                || m_referenceController.isFinished();
+                || m_referenceController.isDone();
     }
 
     @Override
