@@ -205,21 +205,6 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void testPeriodic() {
-        double elevatorControl = NetworkTableInstance.getDefault()
-                .getEntry("log/Elevator/Elevator/Starboard/OutboardLinearPositionServo/control (m)/x").getDouble(0);
-        double wristControl = NetworkTableInstance.getDefault()
-                .getEntry("log/Elevator/Wrist2/OnboardAngularPositionServo/control (rad)/x").getDouble(0);
-        double elevatorMeasurement = NetworkTableInstance.getDefault()
-                .getEntry("log/Elevator/Elevator/Starboard/OutboardLinearPositionServo/position (m)").getDouble(0);
-        double wristMeasurement = NetworkTableInstance.getDefault()
-                .getEntry("log/Elevator/Wrist2/OnboardAngularPositionServo/measurement (rad)/x").getDouble(0);
-        if (DEBUG)
-            Util.printf("%12.6f %12.6f %12.6f %12.6f\n",
-                    elevatorControl / 20,
-                    wristControl,
-                    elevatorMeasurement / 20,
-                    wristMeasurement);
-
     }
 
     //////////////////////////////////////////////////////////////////////

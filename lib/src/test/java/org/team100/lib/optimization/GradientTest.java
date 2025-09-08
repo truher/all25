@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.optimization.NumericalGradient;
 
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;

@@ -6,7 +6,6 @@ import java.util.function.DoubleUnaryOperator;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.optimization.GoldenSectionSearch;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.VecBuilder;

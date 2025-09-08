@@ -55,7 +55,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
         SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 5);
         // simulated gearing is 2 meter wheel, 1:1, so rad/s and m/s are the same.
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor, encoder, 1, 2, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         return new OutboardLinearVelocityServo(parent, mech);
     }

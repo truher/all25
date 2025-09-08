@@ -6,7 +6,6 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
 import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.util.Util;
 
@@ -16,8 +15,6 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     private final LinearMechanism m_mechanism;
     private final DoubleLogger m_log_setpoint_v;
     private final DoubleLogger m_log_setpoint_a;
-    private final OptionalDoubleLogger m_log_velocity;
-    private final OptionalDoubleLogger m_log_position;
 
     // for calculating acceleration
     private double previousSetpoint = 0;
@@ -28,8 +25,6 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
         m_mechanism = mechanism;
         m_log_setpoint_v = child.doubleLogger(Level.TRACE, "setpoint v (m_s)");
         m_log_setpoint_a = child.doubleLogger(Level.TRACE, "setpoint a (m_s2)");
-        m_log_velocity = child.optionalDoubleLogger(Level.TRACE, "velocity (m_s)");
-        m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (m)");
     }
 
     @Override
@@ -59,7 +54,6 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     @Override
     public OptionalDouble getVelocity() {
         final OptionalDouble velocityM_S = m_mechanism.getVelocityM_S();
-        m_log_velocity.log(() -> velocityM_S);
         return velocityM_S;
     }
 
@@ -71,7 +65,6 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     @Override
     public OptionalDouble getDistance() {
         final OptionalDouble positionM = m_mechanism.getPositionM();
-        m_log_position.log(() -> positionM);
         return positionM;
     }
 

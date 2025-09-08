@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.optimization.GradientDescent;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Nat;

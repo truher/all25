@@ -5,10 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.encoder.MockIncrementalBareEncoder;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motor.MockBareMotor;
 
 public class LinearMechanismTest {
     private static final double DELTA = 0.001;
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /** Show that the limits have effect. */
     @Test
@@ -18,7 +22,8 @@ public class LinearMechanismTest {
         MockIncrementalBareEncoder encoder = new MockIncrementalBareEncoder();
         double gearRatio = 1;
         double wheelDiameterM = 2;
-        LinearMechanism mech = new LinearMechanism(motor, encoder, gearRatio, wheelDiameterM, 1, 2);
+        LinearMechanism mech = new LinearMechanism(
+                logger, motor, encoder, gearRatio, wheelDiameterM, 1, 2);
 
         // duty cycle limit observes the encoder
         // within bounds => ok
@@ -57,8 +62,9 @@ public class LinearMechanismTest {
         MockIncrementalBareEncoder encoder = new MockIncrementalBareEncoder();
         double gearRatio = 1;
         double wheelDiameterM = 2;
-        LinearMechanism mech = new LinearMechanism(
-                motor, encoder, gearRatio, wheelDiameterM, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        LinearMechanism mech = new LinearMechanism(logger,
+                motor, encoder, gearRatio, wheelDiameterM,
+                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         // duty cycle limit observes the encoder
         // within bounds => ok
