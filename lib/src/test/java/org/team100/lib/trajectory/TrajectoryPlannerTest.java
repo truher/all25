@@ -8,10 +8,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.timing.ConstantConstraint;
 import org.team100.lib.timing.SwerveDriveDynamicsConstraint;

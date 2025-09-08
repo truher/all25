@@ -7,10 +7,10 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 
 public class FieldRelativeAccelerationLimiterTest {
     private static final double DELTA = 0.001;

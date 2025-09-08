@@ -47,7 +47,7 @@ public class DriveWithTrajectoryListFunction extends Command {
 
     @Override
     public void execute() {
-        if (m_referenceController == null || m_referenceController.isFinished()) {
+        if (m_referenceController == null || m_referenceController.isDone()) {
             // get the next trajectory
             if (m_trajectoryIter.hasNext()) {
                 Trajectory100 m_trajectory = m_trajectoryIter.next();
@@ -63,14 +63,14 @@ public class DriveWithTrajectoryListFunction extends Command {
         }
 
         // now there is a trajectory to follow
-        if (m_referenceController != null)
+        if (m_referenceController != null) {
             m_referenceController.execute();
+        }
 
     }
 
-    @Override
-    public boolean isFinished() {
-        return m_referenceController == null || m_referenceController.isFinished();
+    public boolean isDone() {
+        return m_referenceController == null || m_referenceController.isDone();
     }
 
     @Override

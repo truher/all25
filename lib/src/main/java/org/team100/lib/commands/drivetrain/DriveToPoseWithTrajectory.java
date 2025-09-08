@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.reference.TrajectoryReference;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -70,11 +70,10 @@ public class DriveToPoseWithTrajectory extends Command {
         m_referenceController.execute();
     }
 
-    @Override
-    public boolean isFinished() {
+    public boolean isDone() {
         return m_trajectory == null
                 || m_referenceController == null
-                || m_referenceController.isFinished();
+                || m_referenceController.isDone();
     }
 
     @Override

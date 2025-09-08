@@ -2,7 +2,7 @@ package org.team100.lib.reference;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.trajectory.Trajectory100;
 
 /** Produces references based on a trajectory. */

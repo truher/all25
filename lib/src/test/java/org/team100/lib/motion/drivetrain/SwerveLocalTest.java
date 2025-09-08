@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleState100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Rotation2d;

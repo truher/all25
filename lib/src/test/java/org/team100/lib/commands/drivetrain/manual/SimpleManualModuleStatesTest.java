@@ -8,7 +8,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 
 
 class SimpleManualModuleStatesTest {

@@ -51,12 +51,7 @@ public class DriveWithTrajectory extends Command  {
         m_referenceController.execute();
     }
 
-    @Override
-    public boolean isFinished() {
-        return m_referenceController.isFinished();
-    }
-
-    boolean isDone() {
+    public boolean isDone() {
         return m_referenceController.isDone();
     }
 

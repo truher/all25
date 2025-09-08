@@ -2,7 +2,7 @@ package org.team100.lib.reference;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 
 /**

@@ -2,11 +2,11 @@ package org.team100.lib.localization;
 
 import java.util.Objects;
 
-import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveDriveKinematics100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleDeltas;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;

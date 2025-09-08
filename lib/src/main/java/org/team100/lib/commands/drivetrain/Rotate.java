@@ -3,8 +3,8 @@ package org.team100.lib.commands.drivetrain;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.ProfileReference;
 import org.team100.lib.util.Util;
@@ -76,9 +76,8 @@ public class Rotate extends Command  {
             m_referenceController.execute();
     }
 
-    @Override
-    public boolean isFinished() {
-        return m_referenceController != null && m_referenceController.isFinished();
+    public boolean isDone() {
+        return m_referenceController != null && m_referenceController.isDone();
     }
 
     @Override

@@ -48,7 +48,7 @@ public class PermissiveTrajectoryListCommand extends Command  {
 
     @Override
     public void execute() {
-        if (m_referenceController == null || m_referenceController.isFinished()) {
+        if (m_referenceController == null || m_referenceController.isDone()) {
             // get the next trajectory
             if (m_trajectoryIter.hasNext()) {
                 Trajectory100 trajectory = m_trajectoryIter.next().apply(m_drive.getPose());
@@ -68,9 +68,8 @@ public class PermissiveTrajectoryListCommand extends Command  {
             m_referenceController.execute();
     }
 
-    @Override
-    public boolean isFinished() {
-        return m_referenceController == null || m_referenceController.isFinished();
+    public boolean isDone() {
+        return m_referenceController == null || m_referenceController.isDone();
     }
 
     @Override

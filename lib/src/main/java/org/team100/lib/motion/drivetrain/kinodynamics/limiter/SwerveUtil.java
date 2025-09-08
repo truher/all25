@@ -1,9 +1,9 @@
 package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.util.Math100;
 import org.team100.lib.util.Util;
 

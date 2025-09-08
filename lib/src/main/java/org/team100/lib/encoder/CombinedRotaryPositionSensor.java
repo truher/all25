@@ -18,7 +18,7 @@ import edu.wpi.first.math.MathUtil;
  * Synchronizes the incremental one to the absolute one, using a separate thread
  * with a delay of a few seconds.
  * 
- * Why delay? Because the dutycycle encoder seems to return slightly-wrong
+ * Why delay? Because the RoboRIO duty-cycle input seems to return slightly-wrong
  * values initially.
  * 
  * The use case is absolute + incremental encoders, in order to do outboard

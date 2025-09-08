@@ -6,6 +6,10 @@ import org.team100.lib.gyro.Gyro;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.VeeringCorrection;
+import org.team100.lib.motion.drivetrain.state.DiscreteSpeed;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.profile.incremental.Profile100;
 import org.team100.lib.profile.incremental.TrapezoidProfile100;
 

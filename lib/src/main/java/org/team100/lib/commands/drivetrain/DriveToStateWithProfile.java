@@ -6,7 +6,7 @@ import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.ProfileReference;
 
@@ -78,7 +78,7 @@ public class DriveToStateWithProfile extends Command {
      * Note calling isDone after end will yield false.
      */
     public boolean isDone() {
-        return m_referenceController != null && m_referenceController.isFinished();
+        return m_referenceController != null && m_referenceController.isDone();
     }
 
 }

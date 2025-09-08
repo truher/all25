@@ -68,6 +68,6 @@ public class DriveWithTrajectoryFunction extends Command {
      * Note calling isDone after end will yield false.
      */
     public boolean isDone() {
-        return m_referenceController != null && m_referenceController.isFinished();
+        return m_referenceController != null && m_referenceController.isDone();
     }
 }

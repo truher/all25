@@ -20,7 +20,10 @@ public class Talon6Encoder implements IncrementalBareEncoder {
         reset();
     }
 
-    /** Value is updated in Robot.robotPeriodic(). */
+    /**
+     * Not latency-compensated.
+     * Value is updated in Robot.robotPeriodic().
+     */
     @Override
     public OptionalDouble getVelocityRad_S() {
         double motorVelocityRev_S = m_motor.getVelocityRev_S();
@@ -28,7 +31,10 @@ public class Talon6Encoder implements IncrementalBareEncoder {
         return OptionalDouble.of(velocityRad_S);
     }
 
-    /** Value is updated in Robot.robotPeriodic(). */
+    /**
+     * Latency-compensated.
+     * Value is updated in Robot.robotPeriodic().
+     */
     @Override
     public OptionalDouble getPositionRad() {
         double motorPositionRev = m_motor.getPositionRev();
