@@ -8,8 +8,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.drivetrain.kinodynamics.struct.SwerveModulePosition100Struct;
-import org.team100.lib.motion.drivetrain.state.SwerveModuleDelta;
-import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 

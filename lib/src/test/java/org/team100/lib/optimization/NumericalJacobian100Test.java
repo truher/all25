@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.optimization.NumericalJacobian100;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;

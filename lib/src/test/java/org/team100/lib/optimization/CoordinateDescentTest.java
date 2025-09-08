@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.optimization.CoordinateDescent;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Nat;
