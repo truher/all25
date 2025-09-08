@@ -1,4 +1,4 @@
-package org.team100.lib.motion.drivetrain.kinodynamics;
+package org.team100.lib.motion.drivetrain.state;
 
 public record FieldRelativeJerk(double x, double y, double theta) {
     public double norm() {

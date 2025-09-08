@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.path.Path100;
 import org.team100.lib.path.PathFactory;
 import org.team100.lib.timing.ScheduleGenerator;

@@ -16,10 +16,11 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.logging.LoggerFactory.SwerveModelLogger;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -218,10 +219,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     @Override
     public SwerveModel getState() {
         return m_stateSupplier.get();
-    }
-
-    public SwerveLocalObserver getSwerveLocal() {
-        return m_swerveLocal;
     }
 
     ///////////////////////////////////////////////////////////////

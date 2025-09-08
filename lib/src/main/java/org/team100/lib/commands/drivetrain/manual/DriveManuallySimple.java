@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.wpilibj2.command.Command;
 

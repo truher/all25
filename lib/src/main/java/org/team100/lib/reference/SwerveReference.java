@@ -1,6 +1,6 @@
 package org.team100.lib.reference;
 
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 /** A source of references for drivetrain control. */
 public interface SwerveReference {

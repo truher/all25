@@ -7,6 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleDelta;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

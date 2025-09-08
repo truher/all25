@@ -1,4 +1,4 @@
-package org.team100.lib.motion.drivetrain.kinodynamics;
+package org.team100.lib.motion.drivetrain.state;
 
 /**
  * Container for swerve module deltas.

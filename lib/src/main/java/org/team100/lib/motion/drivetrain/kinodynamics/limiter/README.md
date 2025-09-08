@@ -2,7 +2,7 @@
 
 The limiter package is concerned with making the drivetrain inputs feasible.
 
-The entry point is SwerveLimiter, which applies the rest of the classes here in a
+The entry point is `SwerveLimiter`, which applies the rest of the classes here in a
 chain.
 
 The idea is distantly derived from 254's SwerveSetpointGenerator.  The most notable
@@ -11,7 +11,7 @@ difference is that the setpoint generator operated in robot-relative coordinates
 coordinates made veering correction difficult -- the "limits" would tend to mix
 rotational and translational inputs, making veering worse.
 
-The Team 100 SwerveLimiter operates in field-relative coordinates, and so doesn't
+The Team 100 `SwerveLimiter` operates in field-relative coordinates, and so doesn't
 have the veering problem.
 
 The limiters here are concerned with velocity and acceleration.  In the fall of 2024,

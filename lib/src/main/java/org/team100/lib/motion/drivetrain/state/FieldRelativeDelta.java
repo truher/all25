@@ -1,4 +1,4 @@
-package org.team100.lib.motion.drivetrain.kinodynamics;
+package org.team100.lib.motion.drivetrain.state;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -7,8 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * This is just a container for the field-relative difference between two poses.
- * 
- * Everywhere I used pose.minus() I think it's wrong.
  */
 public class FieldRelativeDelta {
     private final Translation2d m_translation;

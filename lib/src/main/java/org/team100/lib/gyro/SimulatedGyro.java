@@ -4,8 +4,8 @@ import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.DoubleCache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;

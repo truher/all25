@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePosition100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.state.Model100;
 
 import edu.wpi.first.math.geometry.Rotation2d;

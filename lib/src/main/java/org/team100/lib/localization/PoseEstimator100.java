@@ -1,6 +1,6 @@
 package org.team100.lib.localization;
 
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.math.geometry.Pose2d;
 

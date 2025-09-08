@@ -3,7 +3,7 @@ package org.team100.lib.commands.drivetrain;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.reference.ConstantReference;
 import org.team100.lib.reference.SwerveReference;
 

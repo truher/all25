@@ -1,4 +1,4 @@
-package org.team100.lib.motion.drivetrain.kinodynamics;
+package org.team100.lib.motion.drivetrain.state;
 
 import edu.wpi.first.math.geometry.Twist2d;
 

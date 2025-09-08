@@ -6,7 +6,7 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveDriveKinematics100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleDeltas;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;

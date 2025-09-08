@@ -1,8 +1,7 @@
-package org.team100.lib.motion.drivetrain;
+package org.team100.lib.motion.drivetrain.state;
 
 import java.util.Optional;
 
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.state.Model100;
 import org.team100.lib.timing.TimedPose;

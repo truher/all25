@@ -1,8 +1,9 @@
-package org.team100.lib.motion.drivetrain.kinodynamics;
+package org.team100.lib.motion.drivetrain.state;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
