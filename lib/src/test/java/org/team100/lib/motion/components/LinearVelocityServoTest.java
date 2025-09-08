@@ -19,7 +19,7 @@ class LinearVelocityServoTest {
     void testSimple() {
         MockBareMotor driveMotor = new MockBareMotor(Feedforward100.makeSimple());
         MockIncrementalBareEncoder driveEncoder = new MockIncrementalBareEncoder();
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(logger,
                 driveMotor, driveEncoder, 1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         OutboardLinearVelocityServo servo = new OutboardLinearVelocityServo(
                 logger,

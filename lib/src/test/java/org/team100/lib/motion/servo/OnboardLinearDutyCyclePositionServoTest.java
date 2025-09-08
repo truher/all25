@@ -24,7 +24,7 @@ public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
 
         SimulatedBareMotor driveMotor = new SimulatedBareMotor(logger, 100);
         SimulatedBareEncoder driveEncoder = new SimulatedBareEncoder(logger, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(logger,
                 driveMotor, driveEncoder, 1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         Profile100 profile = new TrapezoidProfile100(2, 1, 0.01);

@@ -362,7 +362,7 @@ public abstract class Talon6Motor implements BareMotor {
         return m_position.getAsDouble();
     }
 
-    /** Wait a long time for a new value, do not use outside testing. */
+    /** ait a long time for a new value, do not use outside testing. */
     public double getPositionBlockingRev() {
         return m_motor.getPosition().waitForUpdate(1).getValueAsDouble();
     }

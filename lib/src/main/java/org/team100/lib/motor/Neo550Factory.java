@@ -31,8 +31,9 @@ public class Neo550Factory {
                 Feedforward100.makeNeo550(),
                 new PIDConstants());
         CANSparkEncoder encoder = new CANSparkEncoder(moduleLogger, motor);
-        return new LinearMechanism(
-                motor, encoder, gearRatio, wheelDiameterM, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        return new LinearMechanism(parent,
+                motor, encoder, gearRatio, wheelDiameterM, Double.NEGATIVE_INFINITY,
+                Double.POSITIVE_INFINITY);
     }
 
     public static RotaryMechanism getNEO550RotaryMechanism(
@@ -98,6 +99,7 @@ public class Neo550Factory {
         // simulated gearing is 2 meter wheel, 1:1, so rad/s and m/s are the same.
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, driveMotor);
         return new LinearMechanism(
+                parent,
                 driveMotor, encoder, 1, 2, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 }

@@ -153,7 +153,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 pid,
                 ff);
         Talon6Encoder encoder = new Talon6Encoder(parent, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor,
                 encoder,
                 ratio.m_ratio,
@@ -180,7 +180,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 pid,
                 ff);
         Talon6Encoder encoder = new Talon6Encoder(parent, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor, encoder, ratio.m_ratio, WHEEL_DIAMETER_M, Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
         return new OutboardLinearVelocityServo(
