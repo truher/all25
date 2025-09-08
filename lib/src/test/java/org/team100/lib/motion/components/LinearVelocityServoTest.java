@@ -25,7 +25,7 @@ class LinearVelocityServoTest {
                 logger,
                 mech);
         // 0.5 m/s
-        servo.setVelocityM_S(0.5);
+        servo.setVelocity(0.5);
         // wheel radius is 0.5 m, so drive speed is 1 m/s
         assertEquals(1.0, driveMotor.velocity, 0.001);
     }

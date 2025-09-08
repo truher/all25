@@ -61,8 +61,8 @@ public class TankDriveSubsystem extends SubsystemBase {
     public void set(double translationSpeed, double rotSpeed) {
         WheelSpeeds s = DifferentialDrive.arcadeDriveIK(
                 translationSpeed, rotSpeed * ROT_SCALE, false);
-        m_left.setVelocityM_S(s.left * MAX_SPEED_M_S);
-        m_right.setVelocityM_S(s.right * MAX_SPEED_M_S);
+        m_left.setVelocity(s.left * MAX_SPEED_M_S);
+        m_right.setVelocity(s.right * MAX_SPEED_M_S);
     }
 
     /**
@@ -72,8 +72,8 @@ public class TankDriveSubsystem extends SubsystemBase {
     public void setRaw(double translationSpeed, double rotSpeed) {
         WheelSpeeds s = DifferentialDrive.arcadeDriveIK(
                 translationSpeed, rotSpeed * ROT_SCALE, false);
-        m_left.setVelocityM_S(s.left);
-        m_right.setVelocityM_S(s.right);
+        m_left.setVelocity(s.left);
+        m_right.setVelocity(s.right);
     }
 
     public void stop() {

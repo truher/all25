@@ -90,7 +90,7 @@ public abstract class SwerveModule100 {
                 speed = reduceCrossTrackError(measuredAngleRad, speed, desiredAngle);
             }
         }
-        m_driveServo.setVelocityM_S(speed);
+        m_driveServo.setVelocity(speed);
         if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
             // no profile, just low-level position
             Control100 control = new Control100(desiredAngle.getRadians(), 0);

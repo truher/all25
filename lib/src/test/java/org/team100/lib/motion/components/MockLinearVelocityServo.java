@@ -14,7 +14,7 @@ public class MockLinearVelocityServo implements LinearVelocityServo {
     }
 
     @Override
-    public void setVelocityM_S(double setpoint) {
+    public void setVelocity(double setpoint) {
         m_setpoint = setpoint;
     }
 
@@ -26,6 +26,11 @@ public class MockLinearVelocityServo implements LinearVelocityServo {
     @Override
     public OptionalDouble getVelocity() {
         return OptionalDouble.of(m_setpoint);
+    }
+
+    @Override
+    public boolean atGoal() {
+        return true;
     }
 
     @Override

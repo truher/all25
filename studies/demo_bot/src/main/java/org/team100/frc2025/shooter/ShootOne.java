@@ -24,7 +24,7 @@ public class ShootOne extends Command {
 
     @Override
     public void execute() {
-        if (m_shooter.atVelocity()) {
+        if (m_shooter.atGoal()) {
             m_indexer.set(angle + distanceDeg);
         }
     }
