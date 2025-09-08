@@ -17,7 +17,11 @@ public class Kinematics {
     private final double m_elbowAngle;
     private final double m_shoulderAngle;
     private final double m_zLength;
-
+    
+    //to do:
+    //no consideration for the arm going down not up
+    //no unit tests lmao
+    //
 
 
     public Kinematics(double armLength, double manipulatorLength, double elevatorMaxHeight, double goalX, double goalY, double goalR) {
@@ -27,7 +31,9 @@ public class Kinematics {
 
         m_goalX = goalX;
         m_goalY = goalY;
-        m_goalR = goalR;
+
+        //the +90 is because the reef angle's will be opposite our angles right?
+        m_goalR = goalR+90;
 
         //1. find the elbow position from the manipulator length and the goal 2dpose. ('p' in my notes) - KYM
         m_elbowPointY = manipulatorLength*Math.sin(Math.toRadians(goalR)); // vert side of triangle with hyp facing right
@@ -41,13 +47,13 @@ public class Kinematics {
         //find last side of triangle formed by both arms, vertex's being shoulderPt, goalPt, and elbowPt
         m_zLength = Math.sqrt(((goalX-0)*(goalX-0))+((goalY-m_shoulderHeight)*(goalY-m_shoulderHeight)));
         
-        //law of cosines to find the angle INSIDE the triangle that corresponds to the shoulder joint
-        // needs more work because that angle isn't relative to the angle of the elevator (-90)
-        m_shoulderAngle = Math.toDegrees(Math.acos((armLength*armLength + m_zLength*m_zLength - manipulatorLength*manipulatorLength) / (2 * armLength * m_zLength)));
+        //law of cosines to find the angle INSIDE the triangle that corresponds to the shoulder joint. second part is angle from 0 degrees to angle of elevation. gnarly
+        //this part needs to be edited for going negative angles with arm?
+        m_shoulderAngle = Math.toDegrees(Math.acos((armLength*armLength + m_zLength*m_zLength - manipulatorLength*manipulatorLength) / (2 * armLength * m_zLength)))+(Math.toDegrees(Math.asin((goalY-m_shoulderHeight)/m_zLength)));
 
-        //law of cosidnes but for the elbow instead
-        m_elbowAngle = Math.toDegrees(Math.acos((manipulatorLength*manipulatorLength + armLength*armLength - m_zLength*m_zLength) / (2 * manipulatorLength * armLength)));
-
+        //first part is law of cosidnes but for the elbow instead. 
+        //need to think about how this will work with negative angles?
+        m_elbowAngle = (Math.toDegrees(Math.acos((manipulatorLength*manipulatorLength + armLength*armLength - m_zLength*m_zLength) / (2 * manipulatorLength * armLength))));
     }
 
     public Pose2d forward(Config config) {
