@@ -101,6 +101,7 @@ public class Elevator extends SubsystemBase {
             IncrementalBareEncoder encoder,
             ProfileReference1d ref) {
         LinearMechanism mech = new LinearMechanism(
+                logger,
                 motor,
                 encoder,
                 ELEVATOR_REDUCTION,
