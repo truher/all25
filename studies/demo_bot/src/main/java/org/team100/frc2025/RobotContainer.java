@@ -3,8 +3,6 @@ package org.team100.frc2025;
 import java.io.IOException;
 import java.util.function.BooleanSupplier;
 
-import org.team100.frc2025.drivetrain.DriveManually;
-import org.team100.frc2025.drivetrain.TankDriveSubsystem;
 import org.team100.frc2025.shooter.DrumShooter;
 import org.team100.frc2025.shooter.IndexerServo;
 import org.team100.frc2025.shooter.PivotDefault;
@@ -12,6 +10,8 @@ import org.team100.frc2025.shooter.PivotSubsystem;
 import org.team100.frc2025.shooter.Shoot;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
+import org.team100.lib.examples.tank.DriveTank;
+import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.hid.DriverControlProxy;
@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
-    private final TankDriveSubsystem m_drive;
+    private final TankDrive m_drive;
     private final Command m_auton;
     private final DrumShooter m_shooter;
     private final IndexerServo m_indexer;
@@ -46,8 +46,8 @@ public class RobotContainer {
 
         final LoggerFactory sysLog = logger.name("Subsystems");
 
-        m_drive = new TankDriveSubsystem(logger, 20);
-        m_drive.setDefaultCommand(new DriveManually(driverControl::velocity, m_drive));
+        m_drive = TankFactory.make(logger, 20);
+        m_drive.setDefaultCommand(new DriveTank(driverControl::velocity, m_drive));
 
         m_shooter = new DrumShooter(sysLog, 20);
         m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));

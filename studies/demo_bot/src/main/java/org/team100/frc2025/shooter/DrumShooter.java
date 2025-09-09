@@ -3,7 +3,6 @@ package org.team100.frc2025.shooter;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
-import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.Neo550Factory;
