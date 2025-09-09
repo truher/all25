@@ -1,11 +1,11 @@
 package org.team100.lib.motor;
 
 /**
- * A bare motor is like a Motor100 but the methods pertain only to its output
- * shaft, not the motion of the attached mechanism. Accordingly, the units are
- * always rotational, and there should be no gear ratios in any implementation.
+ * Methods pertain only to the output shaft, not the motion of the attached
+ * mechanism. Accordingly, the units are always rotational, and there should be
+ * no gear ratios in any implementation.
  */
-public interface BareMotor  {
+public interface BareMotor {
 
     /**
      * Some motors allow torque limiting through current limiting.

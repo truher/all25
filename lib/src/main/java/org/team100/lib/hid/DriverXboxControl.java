@@ -143,7 +143,7 @@ public class DriverXboxControl implements DriverControl {
         m_log_speed.log(() -> speed);
 
         return new Velocity(SLOW * dx, SLOW * dy, SLOW * dtheta);
-        
+
     }
 
     public boolean shoot() {
@@ -191,7 +191,7 @@ public class DriverXboxControl implements DriverControl {
     public boolean driveToObject() {
         return m_controller.getYButton();
     }
-    
+
     @Override
     public boolean driveToTag() {
         return m_controller.getAButton();
@@ -212,23 +212,44 @@ public class DriverXboxControl implements DriverControl {
         return false;
     }
 
-    @Override 
-    public boolean useReefLock(){
-        if(m_controller.getLeftTriggerAxis() > 0.9){
+    @Override
+    public boolean useReefLock() {
+        if (m_controller.getLeftTriggerAxis() > 0.9) {
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean driveWithBargeAssist(){
+    public boolean driveWithBargeAssist() {
         return m_controller.getRightBumperButton();
     }
 
     @Override
-    public boolean climb(){
+    public boolean climb() {
         return m_controller.getYButton();
     }
 
+    // These are for prototyping with Xbox controllers.
+    // Please don't use these for comp.
+    @Override
+    public boolean x() {
+        return m_controller.getXButton();
+    }
+
+    @Override
+    public boolean y() {
+        return m_controller.getYButton();
+    }
+
+    @Override
+    public boolean a() {
+        return m_controller.getAButton();
+    }
+
+    @Override
+    public boolean b() {
+        return m_controller.getBButton();
+    }
 
 }

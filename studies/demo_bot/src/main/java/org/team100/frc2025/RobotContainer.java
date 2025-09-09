@@ -1,17 +1,22 @@
 package org.team100.frc2025;
 
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.repeatingSequence;
+import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
+
 import java.io.IOException;
 import java.util.function.BooleanSupplier;
 
-import org.team100.frc2025.drivetrain.DriveManually;
-import org.team100.frc2025.drivetrain.TankDriveSubsystem;
-import org.team100.frc2025.shooter.DrumShooter;
+import org.team100.frc2025.shooter.DrumShooterFactory;
 import org.team100.frc2025.shooter.IndexerServo;
 import org.team100.frc2025.shooter.PivotDefault;
 import org.team100.frc2025.shooter.PivotSubsystem;
 import org.team100.frc2025.shooter.Shoot;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
+import org.team100.lib.examples.shooter.DualDrumShooter;
+import org.team100.lib.examples.tank.DriveTank;
+import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.hid.DriverControlProxy;
@@ -26,9 +31,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
-    private final TankDriveSubsystem m_drive;
+    private final TankDrive m_drive;
     private final Command m_auton;
-    private final DrumShooter m_shooter;
+    private final DualDrumShooter m_shooter;
     private final IndexerServo m_indexer;
     private final PivotSubsystem m_pivot;
 
@@ -46,20 +51,33 @@ public class RobotContainer {
 
         final LoggerFactory sysLog = logger.name("Subsystems");
 
-        m_drive = new TankDriveSubsystem(logger, 20);
-        m_drive.setDefaultCommand(new DriveManually(driverControl::velocity, m_drive));
+        m_drive = TankFactory.make(logger, 20);
+        m_drive.setDefaultCommand(new DriveTank(driverControl::velocity, m_drive));
 
-        m_shooter = new DrumShooter(sysLog, 20);
+        m_shooter = DrumShooterFactory.make(sysLog, 20);
         m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
 
         m_indexer = new IndexerServo(sysLog, 0);
+        m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
 
         m_pivot = new PivotSubsystem(sysLog, 15);
         m_pivot.setDefaultCommand(new PivotDefault(driverControl::shooterPivot, m_pivot));
 
-        whileTrue(driverControl::driveToTag, new Shoot(m_shooter, m_indexer));
+        // this shows two ways to do the "shoot when spinning fast enough" thing.
+
+        // a command class that contains the condition
+        whileTrue(driverControl::a, new Shoot(m_shooter, m_indexer));
+
+        // "fluent" command assembly.
+        whileTrue(driverControl::y,
+                parallel(
+                        m_shooter.spin(),
+                        repeatingSequence(
+                                waitUntil(m_shooter::atGoal),
+                                m_indexer.feed().withTimeout(0.5))));
+
         // whileTrue(driverControl::fullCycle, new ShootOne(m_shooter, m_indexer));
-        whileTrue(driverControl::driveToObject, m_shooter.run(m_shooter::spinUp));
+        whileTrue(driverControl::x, m_shooter.spin());
 
         m_auton = null;
     }

@@ -194,4 +194,26 @@ public class DriverControlProxy implements DriverControl {
         return m_driverControl.climb();
     }
 
+    // These are for prototyping with Xbox controllers.
+    // Please don't use these for comp.
+    @Override
+    public boolean x() {
+        return m_driverControl.x();
+    }
+
+    @Override
+    public boolean y() {
+        return m_driverControl.y();
+    }
+
+    @Override
+    public boolean a() {
+        return m_driverControl.a();
+    }
+
+    @Override
+    public boolean b() {
+        return m_driverControl.b();
+    }
+
 }

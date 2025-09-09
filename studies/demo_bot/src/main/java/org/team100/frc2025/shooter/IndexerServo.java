@@ -5,10 +5,11 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 
 import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IndexerServo extends SubsystemBase {
-    
+
     private final PWM m_servo;
     private final DoubleLogger m_doubleLogger;
 
@@ -21,9 +22,13 @@ public class IndexerServo extends SubsystemBase {
     public void set(double value) {
         m_servo.setSpeed(-1.0 * value);
         m_doubleLogger.log(() -> value);
-    } 
+    }
 
     public void stop() {
         m_servo.setSpeed(0);
-    } 
+    }
+
+    public Command feed() {
+        return run(() -> set(1));
+    }
 }
