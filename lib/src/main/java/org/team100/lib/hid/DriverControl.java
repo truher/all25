@@ -45,8 +45,6 @@ public interface DriverControl {
             return new DriverControl.Velocity(ratio * x(), ratio * y(), theta());
         }
 
-        
-
     }
 
     public enum Speed {
@@ -169,4 +167,24 @@ public interface DriverControl {
     default boolean driveWithBargeAssist() {
         return false;
     }
+
+    // These are for prototyping with Xbox controllers.
+    // Please don't use these for comp.
+
+    default boolean x() {
+        return false;
+    }
+
+    default boolean y() {
+        return false;
+    }
+
+    default boolean a() {
+        return false;
+    }
+
+    default boolean b() {
+        return false;
+    }
+
 }

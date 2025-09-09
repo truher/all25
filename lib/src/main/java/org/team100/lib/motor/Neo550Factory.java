@@ -15,46 +15,42 @@ import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 public class Neo550Factory {
 
     public static LinearMechanism getNEO550LinearMechanism(
-            String name,
-            LoggerFactory parent,
+            LoggerFactory log,
             int currentLimit,
             int canID,
             double gearRatio,
             MotorPhase motorPhase,
             double wheelDiameterM) {
-        LoggerFactory moduleLogger = parent.name(name);
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
-                moduleLogger,
+                log,
                 canID,
                 motorPhase,
                 currentLimit,
                 Feedforward100.makeNeo550(),
                 new PIDConstants());
-        CANSparkEncoder encoder = new CANSparkEncoder(moduleLogger, motor);
-        return new LinearMechanism(parent,
-                motor, encoder, gearRatio, wheelDiameterM, Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY);
+        CANSparkEncoder encoder = new CANSparkEncoder(log, motor);
+        return new LinearMechanism(
+                log, motor, encoder, gearRatio, wheelDiameterM,
+                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
     public static RotaryMechanism getNEO550RotaryMechanism(
-            String name,
-            LoggerFactory parent,
+            LoggerFactory log,
             int currentLimit,
             int canID,
             double gearRatio,
             MotorPhase motorPhase) {
-        LoggerFactory moduleLogger = parent.name(name);
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
-                moduleLogger,
+                log,
                 canID,
                 motorPhase,
                 currentLimit,
                 Feedforward100.makeNeo550(),
                 PIDConstants.makePositionPID(1));
-        CANSparkEncoder encoder = new CANSparkEncoder(moduleLogger, motor);
+        CANSparkEncoder encoder = new CANSparkEncoder(log, motor);
         ProxyRotaryPositionSensor sensor = new ProxyRotaryPositionSensor(encoder, gearRatio);
         return new RotaryMechanism(
-                moduleLogger,
+                log,
                 motor,
                 sensor,
                 gearRatio,
@@ -62,21 +58,20 @@ public class Neo550Factory {
     }
 
     public static LinearVelocityServo getNEO550VelocityServo(
-            String name,
-            LoggerFactory parent,
+            LoggerFactory log,
             int currentLimit,
             int canID,
             double gearRatio,
             MotorPhase motorPhase,
             double wheelDiameterM) {
-        LoggerFactory moduleLogger = parent.name(name);
-        return new OutboardLinearVelocityServo(moduleLogger, getNEO550LinearMechanism(name,
-                moduleLogger,
-                currentLimit,
-                canID,
-                gearRatio,
-                motorPhase,
-                wheelDiameterM));
+        return new OutboardLinearVelocityServo(log,
+                getNEO550LinearMechanism(
+                        log,
+                        currentLimit,
+                        canID,
+                        gearRatio,
+                        motorPhase,
+                        wheelDiameterM));
     }
 
     public static OutboardLinearVelocityServo simulatedDriveServo(LoggerFactory parent) {

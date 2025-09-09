@@ -32,10 +32,10 @@ public class Funnel extends SubsystemBase {
             case COMP_BOT -> {
                 int funnelSupplyLimit = 20;
                 m_starboardMech = Neo550Factory.getNEO550LinearMechanism(
-                        getName(), child, funnelSupplyLimit, starboardID, 1,
+                        child.name("starboard"), funnelSupplyLimit, starboardID, 1,
                         MotorPhase.REVERSE, 1);
                 m_portMech = Neo550Factory.getNEO550LinearMechanism(
-                        getName(), child, funnelSupplyLimit, portID, 1,
+                        child.name("port"), funnelSupplyLimit, portID, 1,
                         MotorPhase.FORWARD, 1);
 
                 latchingServo1 = new Servo(3);

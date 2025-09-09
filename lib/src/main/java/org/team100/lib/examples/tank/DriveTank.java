@@ -30,9 +30,4 @@ public class DriveTank extends Command {
         DriverControl.Velocity input = m_twistSupplier.get();
         m_drive.set(input.x() * SCALE, input.y() * ROT_SCALE);
     }
-
-    @Override
-    public void end(boolean interrupted) {
-        m_drive.stop();
-    }
 }

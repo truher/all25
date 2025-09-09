@@ -1,17 +1,17 @@
 package org.team100.frc2025.shooter;
 
+import org.team100.lib.examples.shooter.DualDrumShooter;
+
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class ShootOne extends Command {
-    private final DrumShooter m_shooter;
+    private final DualDrumShooter m_shooter;
     private final IndexerSubsystem m_indexer;
     private final double distanceDeg = 90;
 
     private double angle;
 
-    public ShootOne(
-            DrumShooter shooter,
-            IndexerSubsystem indexer) {
+    public ShootOne(DualDrumShooter shooter, IndexerSubsystem indexer) {
         m_shooter = shooter;
         m_indexer = indexer;
         addRequirements(m_shooter, m_indexer);
@@ -27,11 +27,6 @@ public class ShootOne extends Command {
         if (m_shooter.atGoal()) {
             m_indexer.set(angle + distanceDeg);
         }
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        m_shooter.stop();
     }
 
     // @Override
