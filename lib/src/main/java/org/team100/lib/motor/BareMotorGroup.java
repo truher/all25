@@ -13,12 +13,12 @@ public class BareMotorGroup implements BareMotor {
 
     @Override
     public void setTorqueLimit(double torqueNm) {
-        apply((m) -> setTorqueLimit(torqueNm));
+        apply((m) -> m.setTorqueLimit(torqueNm));
     }
 
     @Override
     public void setDutyCycle(double output) {
-        apply((m) -> setDutyCycle(output));
+        apply((m) -> m.setDutyCycle(output));
     }
 
     @Override

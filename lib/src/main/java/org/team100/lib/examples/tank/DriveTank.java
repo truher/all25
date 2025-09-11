@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
  * xbox style control, this will be the right-hand stick).
  */
 public class DriveTank extends Command {
-    private static final double SCALE = 0.4;
-    private static final double ROT_SCALE = 0.3;
+    private static final double SCALE = 1;
+    private static final double ROT_SCALE = 1;
 
     private final Supplier<DriverControl.Velocity> m_twistSupplier;
     private final TankDrive m_drive;
@@ -28,6 +28,7 @@ public class DriveTank extends Command {
     @Override
     public void execute() {
         DriverControl.Velocity input = m_twistSupplier.get();
-        m_drive.set(input.x() * SCALE, input.y() * ROT_SCALE);
+        double rotscale = 1 - Math.abs(input.x());
+        m_drive.set(input.x() * SCALE, input.y() * rotscale);
     }
 }
