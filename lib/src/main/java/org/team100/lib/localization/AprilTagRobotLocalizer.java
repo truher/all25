@@ -38,12 +38,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
- * Extracts robot pose estimates from camera input.
- * 
- * This "24" version uses the "struct" method instead of the "msgpack" method,
- * which matches the TagFinder24 code on the camera.
+ * Extracts robot pose estimates from camera observations of AprilTags.
  */
-public class VisionDataProvider24  {
+public class AprilTagRobotLocalizer {
     private static final boolean DEBUG = false;
     /**
      * Five cameras, 50hz each => 250 hz of updates. Rio runs at 50 hz, so there
@@ -144,7 +141,7 @@ public class VisionDataProvider24  {
      * @param rotationSupplier rotation for the given time in seconds
      * @throws IOException
      */
-    public VisionDataProvider24(
+    public AprilTagRobotLocalizer(
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
             PoseEstimator100 poseEstimator) {
@@ -192,7 +189,8 @@ public class VisionDataProvider24  {
         final Optional<Alliance> alliance = DriverStation.getAlliance();
         if (!alliance.isPresent()) {
             // this happens on startup
-            // Util.warn("VisionDataProvider24: Alliance is not present!");
+            if (DEBUG)
+                Util.warn("VisionDataProvider24: Alliance is not present!");
             return;
         }
         m_log_alliance.log(() -> alliance.get());
@@ -280,7 +278,10 @@ public class VisionDataProvider24  {
         m_log_heedRadius.log(() -> m_heedRadiusM);
 
         // Robot-to-camera, offset from Camera.java
+        // in tests this offset is identity.
         final Transform3d cameraInRobot = Camera.get(cameraId).getOffset();
+        if (DEBUG)
+            Util.printf("camera offset %s\n", cameraInRobot);
 
         // The pose from the frame timestamp.
         final Pose2d historicalPose = m_poseEstimator.get(timestamp).pose();
@@ -292,15 +293,18 @@ public class VisionDataProvider24  {
 
         // The gyro rotation for the frame timestamp
         final Rotation2d gyroRotation = historicalPose.getRotation();
+        if (DEBUG)
+            Util.printf("gyro rotation %f\n", gyroRotation.getRadians());
 
         for (int i = 0; i < blips.length; ++i) {
             Blip24 blip = blips[i];
 
             // if (DEBUG) {
-            //     Translation3d t = blip.getRawPose().getTranslation();
-            //     Rotation3d r = blip.getRawPose().getRotation();
-            //     Util.printf("blip raw pose  %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
-            //             blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ());
+            // Translation3d t = blip.getRawPose().getTranslation();
+            // Rotation3d r = blip.getRawPose().getRotation();
+            // Util.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y
+            // %5.2f\n",
+            // blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ());
             // }
 
             // Look up the pose of the tag in the field frame.
@@ -369,10 +373,14 @@ public class VisionDataProvider24  {
             if (!Experiments.instance.enabled(Experiment.HeedVision)) {
                 // If we've turned vision off altogether, then don't apply this update to the
                 // pose estimator.
+                if (DEBUG)
+                    Util.println("heedvision is off");
                 continue;
             }
 
             if (blip.blipToTransform().getTranslation().getNorm() > m_heedRadiusM) {
+                if (DEBUG)
+                    Util.println("tag is too far");
                 // Skip too-far tags.
                 continue;
             }
@@ -380,6 +388,8 @@ public class VisionDataProvider24  {
             if (m_prevPose == null) {
                 // Ignore the very first update since we have no idea if it is far from the
                 // previous one.
+                if (DEBUG)
+                    Util.println("skip first update");
                 m_prevPose = pose;
                 continue;
             }
@@ -388,6 +398,8 @@ public class VisionDataProvider24  {
             if (distanceM > VISION_CHANGE_TOLERANCE_M) {
                 // The new estimate is too far from the previous one: it's probably garbage.
                 m_prevPose = pose;
+                if (DEBUG)
+                    Util.println("too far from previous");
                 continue;
             }
 

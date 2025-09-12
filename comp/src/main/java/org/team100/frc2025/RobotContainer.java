@@ -64,7 +64,7 @@ import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
-import org.team100.lib.localization.VisionDataProvider24;
+import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
@@ -199,7 +199,7 @@ public class RobotContainer {
 
         final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
-        final VisionDataProvider24 visionDataProvider = new VisionDataProvider24(
+        final AprilTagRobotLocalizer visionDataProvider = new AprilTagRobotLocalizer(
                 driveLog,
                 layout,
                 poseEstimator);

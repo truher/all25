@@ -10,7 +10,7 @@ import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.targeting.ObjectPosition24ArrayListener;
+import org.team100.lib.targeting.Targets;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,10 +27,10 @@ public class FloorPickSequence {
     public static Command get(
             FieldLogger.Log fieldLog,
             SwerveDriveSubsystem drive,
-            ObjectPosition24ArrayListener listener,
+            Targets targets,
             SwerveController controller,
             HolonomicProfile profile) {
-        Supplier<Optional<Translation2d>> target = listener::getClosestTranslation2d;
+        Supplier<Optional<Translation2d>> target = targets::getClosestTranslation2d;
         Supplier<Optional<Translation2d>> runway = () -> {
             Optional<Translation2d> t = target.get();
             if (t.isEmpty())

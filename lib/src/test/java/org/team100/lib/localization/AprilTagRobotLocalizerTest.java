@@ -1,6 +1,7 @@
 package org.team100.lib.localization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,20 +16,80 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.testing.Timeless;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructArrayTopic;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 
 /**
  * TODO: clean up these cases for 2025.
  */
-class VisionDataProviderTest implements Timeless {
+class AprilTagRobotLocalizerTest implements Timeless {
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
+
+    @Test
+    void testEndToEnd() throws IOException {
+        AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
+        // these lists receive the updates
+        final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
+        final List<Double> timeEstimate = new ArrayList<Double>();
+        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+            @Override
+            public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
+                poseEstimate.add(p);
+                timeEstimate.add(t);
+            }
+
+            @Override
+            public SwerveModel get(double timestampSeconds) {
+                return new SwerveModel(Rotation2d.kZero);
+            }
+        };
+
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+                logger, layout, poseEstimator);
+
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+        inst.startClient4("tag_finder24");
+        StructArrayTopic<Blip24> topic = inst.getStructArrayTopic(
+                "vision/1234/5678/blips", Blip24.struct);
+        StructArrayPublisher<Blip24> pub = topic.publish();
+        pub.set(new Blip24[] {
+                Blip24.fromXForward(1, new Transform3d(1, 0, 0, new Rotation3d())) });
+
+        assertTrue(poseEstimate.isEmpty());
+        // localizer needs alliance
+        DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+        DriverStationSim.notifyNewData();
+        vdp.update();
+        // skip first update
+        assertTrue(poseEstimate.isEmpty());
+        // a little bit different so NT will pass it along
+        // so about 1 meter ahead; camera offset is identity, but we
+        // use gyro rotation, which is zero, so our pose should be 1 meter
+        // back along the x axis.
+        pub.set(new Blip24[] {
+                Blip24.fromXForward(1, new Transform3d(1.01, 0, 0, new Rotation3d())) });
+        vdp.update();
+        assertEquals(1, poseEstimate.size());
+        Pose2d pose = poseEstimate.get(0);
+
+        // 1 meter back along x since we override the rotation
+        assertEquals(15.697, pose.getX(), DELTA);
+        // same y since rotation = 0
+        assertEquals(0.665, pose.getY(), DELTA);
+        // this is the gyro rotation we told it to use, not the tag rotation.
+        assertEquals(0.0, pose.getRotation().getRadians(), DELTA);
+    }
 
     @Test
     void testEstimateRobotPose() throws IOException {
@@ -50,7 +111,7 @@ class VisionDataProviderTest implements Timeless {
             }
         };
 
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         // in red layout blip 7 is on the other side of the field
@@ -103,7 +164,7 @@ class VisionDataProviderTest implements Timeless {
             }
         };
 
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         // camera sees the tag straight ahead in the center of the frame,
@@ -181,7 +242,7 @@ class VisionDataProviderTest implements Timeless {
                 return new SwerveModel(new Rotation2d(3 * Math.PI / 4));
             }
         };
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -225,7 +286,7 @@ class VisionDataProviderTest implements Timeless {
                 return new SwerveModel(new Rotation2d(Math.PI));
             }
         };
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         // tag is 1m away on bore
@@ -274,7 +335,7 @@ class VisionDataProviderTest implements Timeless {
             }
         };
 
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -317,7 +378,7 @@ class VisionDataProviderTest implements Timeless {
             }
         };
 
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         Blip24 tag3 = new Blip24(3, new Transform3d(
@@ -363,7 +424,7 @@ class VisionDataProviderTest implements Timeless {
             }
         };
 
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -406,7 +467,7 @@ class VisionDataProviderTest implements Timeless {
             }
         };
 
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -449,7 +510,7 @@ class VisionDataProviderTest implements Timeless {
             }
         };
 
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -491,7 +552,7 @@ class VisionDataProviderTest implements Timeless {
                 return new SwerveModel(new Rotation2d(3 * Math.PI / 4));
             }
         };
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -534,7 +595,7 @@ class VisionDataProviderTest implements Timeless {
                 return new SwerveModel(new Rotation2d(3 * Math.PI / 4));
             }
         };
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -577,7 +638,7 @@ class VisionDataProviderTest implements Timeless {
                 return new SwerveModel(new Rotation2d(3 * Math.PI / 4));
             }
         };
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         // 30 degrees, long side is sqrt2, so hypotenuse is sqrt2/sqrt3/2

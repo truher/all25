@@ -22,7 +22,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-class VisionDataProviderPerformanceTest {
+class AprilTagRobotLocalizerPerformanceTest {
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
@@ -46,7 +46,7 @@ class VisionDataProviderPerformanceTest {
             }
         };
 
-        VisionDataProvider24 vdp = new VisionDataProvider24(
+        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator);
 
         // camera sees the tag straight ahead in the center of the frame,

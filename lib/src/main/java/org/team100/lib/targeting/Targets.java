@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
 import org.team100.lib.config.Identity;
-import org.team100.lib.localization.PoseEstimator100;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,19 +31,19 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * Listen for updates from the object-detector camera and remember them for
  * awhile.
  */
-public class ObjectPosition24ArrayListener {
+public class Targets {
     /** Ignore sights older than this. */
     private static final double MAX_SIGHT_AGE = 0.1;
     
     private StructBuffer<Rotation3d> m_buf = StructBuffer.create(Rotation3d.struct);
-    private List<Translation2d> objects = new ArrayList<>();
-    private final PoseEstimator100 m_poseSupplier;
+    List<Translation2d> objects = new ArrayList<>();
+    private final DoubleFunction<Pose2d> m_robotPose;
     private final NetworkTableListenerPoller m_poller;
 
     private double latestTime = 0;
 
-    public ObjectPosition24ArrayListener(PoseEstimator100 poseEstimator) {
-        m_poseSupplier = poseEstimator;
+    public Targets(DoubleFunction<Pose2d> robotPose) {
+        m_robotPose = robotPose;
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_poller = new NetworkTableListenerPoller(inst);
         m_poller.addListener(
@@ -84,7 +84,7 @@ public class ObjectPosition24ArrayListener {
                     return;
                 }
                 Transform3d cameraInRobotCoordinates = Camera.get(fields[1]).getOffset();
-                Pose2d robotPose = m_poseSupplier.get(v.getServerTime() / 1000000.0).pose();
+                Pose2d robotPose = m_robotPose.apply(v.getServerTime() / 1000000.0);
                 objects = TargetLocalizer.cameraRotsToFieldRelativeArray(
                         robotPose,
                         cameraInRobotCoordinates,
@@ -102,7 +102,7 @@ public class ObjectPosition24ArrayListener {
         update();
         switch (Identity.instance) {
             case BLANK:
-                Pose2d robotPose = m_poseSupplier.get(Takt.get()).pose();
+                Pose2d robotPose = m_robotPose.apply(Takt.get());
                 Transform3d offset = new Transform3d(
                         new Translation3d(-0.1265, 0.03, 0.61),
                         new Rotation3d(0, Math.toRadians(31.5), Math.PI));
@@ -131,7 +131,7 @@ public class ObjectPosition24ArrayListener {
      */
     public Optional<Translation2d> getClosestTranslation2d() {
         update();
-        Pose2d robotPose = m_poseSupplier.get(Takt.get()).pose();
+        Pose2d robotPose = m_robotPose.apply(Takt.get());
         return ObjectPicker.closestObject(
                 getTranslation2dArray(),
                 robotPose);
