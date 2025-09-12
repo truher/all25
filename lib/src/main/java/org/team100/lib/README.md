@@ -18,7 +18,7 @@ __Packages of note__
   a single code-base.
 * [controller](controller/README.md)
   * Feedback controllers for 1d and 2d-with-heading (this case also includes feedforward).
-* [encoder](encoder.README.md)
+* [encoder](encoder/README.md)
   * Support for various ways to measure the position of a joint, including via combination of multiple sensors, e.g. an integrated incremental motor encoder and an external absolute position sensor.
 * [examples](examples/README.md) 
   * A few illustrations of using library features.
