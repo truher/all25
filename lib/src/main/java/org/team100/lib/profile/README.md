@@ -2,12 +2,16 @@
 
 The `lib.profile` package supports "profiled" motion.
 
-Team 100 profiles are stateless incremental reference generators:
-you construct a profile with constraints (e.g. on velocity)
-and then give the profile a setpoint: it produces the next setpoint.
+There are two types, "timed" and "incremental."
 
-The SimpleProfile100 interface covers the basic case.
+A `TimedProfile` is like a trajectory: you precalculate the schedule
+and then sample it.
 
-The Profile100 interface adds a few methods related to coordinating
-multiple profiles so that they arrive at their goals at the same time,
-e.g. for controlling multiple-DOF mechanisms, or the drivetrain.
+An `IncrementalProfile` has no state: you give it the current setpoint,
+and it produces the next one.  There are also a few methods related to
+coordinating multiple profiles so that they arrive at their goals
+at the same time, e.g. for controlling multiple-DOF mechanisms,
+or the drivetrain.
+
+There is also `HolonomicProfile` which simply wraps (any) set of
+three `IncrementalProfile`s and coordinates them.

@@ -11,8 +11,8 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
@@ -328,7 +328,7 @@ public class SwerveLimiterTest {
     @Test
     void testProfile() {
         // profile v and a constraints match the limits
-        Profile100 profile = new TrapezoidProfile100(3, 5, 0.01);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(3, 5, 0.01);
         final Model100 goal = new Model100(5, 0);
         final Model100 initial = new Model100(0, 0);
 

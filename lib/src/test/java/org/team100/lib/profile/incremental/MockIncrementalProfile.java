@@ -3,7 +3,7 @@ package org.team100.lib.profile.incremental;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 
-public class MockProfile100 implements Profile100 {
+public class MockIncrementalProfile implements IncrementalProfile {
     Control100 result;
     double eta;
     int count = 0;
@@ -15,11 +15,10 @@ public class MockProfile100 implements Profile100 {
     }
 
     @Override
-    public MockProfile100 scale(double s) {
+    public MockIncrementalProfile scale(double s) {
         return this;
     }
 
-    @Override
     public double getMaxVelocity() {
         return 0;
     }

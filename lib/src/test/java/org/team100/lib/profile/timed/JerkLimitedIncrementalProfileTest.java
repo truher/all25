@@ -5,12 +5,12 @@ import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
 
-public class JerkLimitedProfile100Test {
+public class JerkLimitedIncrementalProfileTest {
     private static final boolean DEBUG = false;
 
     @Test
     void testSimple() {
-        JerkLimitedProfile100 p = new JerkLimitedProfile100(2, 6, 25, false);
+        JerkLimitedIncrementalProfile p = new JerkLimitedIncrementalProfile(2, 6, 25, false);
         p.init(new Control100(), new Model100(1, 0));
         for (double t = 0; t < 2; t += 0.01) {
             Control100 c = p.sample(t);

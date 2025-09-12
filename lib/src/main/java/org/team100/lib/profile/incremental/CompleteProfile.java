@@ -69,7 +69,8 @@ public class CompleteProfile implements IncrementalProfile {
      *                  also used to sense "at goal"
      */
     public CompleteProfile(
-            double maxV, double maxA, double maxD, double stallA, double takeoffJ, double landingJ, double tolerance) {
+            double maxV, double maxA, double maxD, double stallA,
+            double takeoffJ, double landingJ, double tolerance) {
         if (maxV <= 0)
             throw new IllegalArgumentException("max V must be positive");
         if (maxA <= 0)
@@ -217,6 +218,15 @@ public class CompleteProfile implements IncrementalProfile {
             return control(dt, setpoint, goal, togo, 1.0, m_maxD);
         }
     }
+
+    @Override
+    public IncrementalProfile scale(double s) {
+        return new CompleteProfile(
+                m_maxV, s * m_maxA, s * m_maxD, s * m_stallA,
+                m_takeoffJ, m_landingJ, m_tolerance);
+    }
+
+    ///////////////////////////////////////
 
     private Control100 control(
             double dt,

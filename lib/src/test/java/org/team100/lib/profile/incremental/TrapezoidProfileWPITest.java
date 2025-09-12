@@ -55,6 +55,18 @@ class TrapezoidProfileWPITest {
         assertEquals(0.0, sample.v(), 0.05);
     }
 
+    @Test
+    void testSolve() {
+        double maxVel = 2;
+        double maxAccel = 10;
+        TrapezoidProfileWPI profile = new TrapezoidProfileWPI(maxVel, maxAccel);
+        Control100 sample = new Control100(0, 0);
+        final Model100 end = new Model100(3, 0);
+        final double ETA_TOLERANCE = 0.02;
+        double s = profile.solve(0.1, sample, end, 2.0, ETA_TOLERANCE);
+        assertEquals(0.4375, s, DELTA);
+    }
+
     /** Around 14 us per solve, using DT of 0.1. */
     @Test
     void testSolvePerformance() {
