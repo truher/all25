@@ -26,18 +26,25 @@ __Packages of note__
   * switches that control optional features using dashboard selectors.
 * [hid](hid/README.md) 
   * We push the "control domain" (what each button *means*) into the controller API, and allow hot-swapping controllers.
+* [localization](localization/README.md)
+  * We use camera sightings of canonical AprilTags, combined with odometry and gyro input, for full-field localization, used in navigation and pose-aware commands, e.g. maintaining a shooter aim point.
 * [logging](logging/README.md) 
   * Loggers are passed through constructors, so the tree in Network Tables mirrors the construction graph, as a starting point.
 * [motion](motion/README.md) 
   * High-level classes for motion control and kinematics, including support for both onboard computation (computed in Java) and offboard computation (partially computed by "smart" motor controllers).  There are packages for "mechanisms" (which include gear ratios), and "servos" (which include feedback and feedforward control).
 * [motor](motor/README.md) 
   * Wrappers for all the motors we use (including simulated motors), so they can be handled uniformly by the motion classes above.
+* [optimization](optimization/README.md)
+  * solvers used in applications like inverse kinematics, notably an implementation of Newton's method
+for finding the zero of a function.
 * [profile](profile/README.md)
   * Constrained motion in 1d and 2d-with-heading.  These should be used for all motion where a trajectory would be too expensive to compute on the fly.
 * [reference](reference/README.md)
   * Team 100 reference generators.  These use any sort of reference source, e.g. profile or trajectory, and produce "current" and "next" setpoints.  The reason for these classes is to make sure the time-alignment of observation and control are done correctly.  They use the `coherence` machinery mentioned above.
+* [targeting](targeting/README.md)
+  * A fundamental robot navigation task is to identify targets to drive to.  The `lib.targeting` package turns camera observations into field-relative targets.
 * [trajectory](trajectory/README.md)
-  * A trajectory is a path based on splines, with a precalculated schedule meeting motion constraints.  Trajectories are good for paths that require curves around known obstacles.  Simple trajectories are not *that* time-consuming to create, so can be used on-the-fly in some cases.
+  * A trajectory is a path based on splines, with a precalculated schedule meeting timing constraints.  Trajectories are good for paths that require curves around known obstacles.  Simple trajectories are not *that* time-consuming to create, so can be used on-the-fly in some cases.
 
 Other notable topics about the library:
 

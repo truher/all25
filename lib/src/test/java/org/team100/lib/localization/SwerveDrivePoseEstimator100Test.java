@@ -70,7 +70,7 @@ class SwerveDrivePoseEstimator100Test {
     @Test
     void testVisionStdDevs() {
         double targetRangeM = 1.0;
-        double[] visionStdDev = VisionDataProvider24.visionMeasurementStdDevs(targetRangeM);
+        double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
         assertEquals(3, visionStdDev.length);
         assertEquals(0.04, visionStdDev[0], DELTA);
         assertEquals(0.04, visionStdDev[1], DELTA);
@@ -81,7 +81,7 @@ class SwerveDrivePoseEstimator100Test {
     void testStateStdDevs() {
         // these are the "antijitter" values.
         // 1 mm, very low
-        double[] stateStdDev = VisionDataProvider24.tightStateStdDevs;
+        double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
         assertEquals(3, stateStdDev.length);
         assertEquals(0.001, stateStdDev[0], DELTA);
         assertEquals(0.001, stateStdDev[1], DELTA);
@@ -90,9 +90,9 @@ class SwerveDrivePoseEstimator100Test {
 
     @Test
     void testK() {
-        double[] stateStdDev = VisionDataProvider24.tightStateStdDevs;
+        double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
         double targetRangeM = 1.0;
-        double[] visionStdDev = VisionDataProvider24.visionMeasurementStdDevs(targetRangeM);
+        double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
         double[] k = SwerveDrivePoseEstimator100.getK(stateStdDev, visionStdDev);
         assertEquals(3, k.length);
         assertEquals(0.024, k[0], DELTA);
@@ -112,10 +112,10 @@ class SwerveDrivePoseEstimator100Test {
     @Test
     void testScaledTwist() {
         // 1 mm
-        double[] stateStdDev = VisionDataProvider24.tightStateStdDevs;
+        double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
         double targetRangeM = 1.0;
         // 2 cm stdev, 20x
-        double[] visionStdDev = VisionDataProvider24.visionMeasurementStdDevs(targetRangeM);
+        double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
         // 10 cm of difference between the vision update and the current pose
         Twist2d twist = new Twist2d(0.1, 0.1, 0);
         Twist2d scaled = SwerveDrivePoseEstimator100.getScaledTwist(stateStdDev, visionStdDev, twist);
