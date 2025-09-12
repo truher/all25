@@ -2,13 +2,17 @@ package org.team100.lib.profile.incremental;
 
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.util.Math100;
+import org.team100.lib.util.Util;
 
 /**
  * This profile takes incremental steps from the setpoint towards the goal.
  * 
- * One-dimensional, doesn't support coordination.
+ * Use the ETA to coordinate multiple dimensions.
  */
 public interface IncrementalProfile {
+    static final boolean DEBUG = false;
+
     /**
      * Return the control for dt in the future. The setpoint is a Control100 so that
      * we can regulate jerk.
@@ -36,6 +40,43 @@ public interface IncrementalProfile {
                 return Double.POSITIVE_INFINITY;
         }
         return t;
+    }
+
+    /**
+     * Return a new profile scaled by s. The choice of what the parameter actually
+     * does is up to the implementation. A good choice would be to scale
+     * acceleration, since that's what goes against the power budget.
+     */
+    IncrementalProfile scale(double s);
+
+    /**
+     * Find the scale factor that makes the profile complete in the specified time
+     * (ETA).
+     * 
+     * It never returns s > 1, and it also never scales more than 10X, i.e. never
+     * returns s < 0.01.
+     * 
+     * It is very approximate, in order to not run too long. It's very primitive.
+     */
+    default double solve(
+            double dt,
+            Control100 i,
+            Model100 g,
+            double goalETA,
+            double etaTolerance) {
+        final double minS = 0.01;
+        final double maxS = 1.0;
+        double ss = Math100.findRoot(
+                s -> scale(s).simulateForETA(dt, i, g) - goalETA,
+                minS,
+                scale(minS).simulateForETA(dt, i, g) - goalETA,
+                maxS,
+                scale(maxS).simulateForETA(dt, i, g) - goalETA,
+                etaTolerance,
+                100);
+        if (DEBUG)
+            Util.printf("s %5.2f\n", ss);
+        return ss;
     }
 
 }

@@ -7,8 +7,8 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.CurrentLimitedExponentialProfile;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
@@ -39,18 +39,23 @@ public class HolonomicProfile {
     private static final double SOLVE_DT = 0.1;
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
 
-    private final Profile100 px;
-    private final Profile100 py;
-    private final Profile100 ptheta;
+    private final IncrementalProfile px;
+    private final IncrementalProfile py;
+    private final IncrementalProfile ptheta;
 
-    private Profile100 ppx;
-    private Profile100 ppy;
-    private Profile100 pptheta;
+    // package-private for testing
+    IncrementalProfile ppx;
+    IncrementalProfile ppy;
+    IncrementalProfile pptheta;
+    // for testing only
+    double sx;
+    double sy;
+    double stheta;
 
     private HolonomicProfile(
-            Profile100 px,
-            Profile100 py,
-            Profile100 ptheta) {
+            IncrementalProfile px,
+            IncrementalProfile py,
+            IncrementalProfile ptheta) {
         this.px = px;
         this.py = py;
         this.ptheta = ptheta;
@@ -125,9 +130,9 @@ public class HolonomicProfile {
             double maxAngularAccel,
             double angularTolerance) {
         return new HolonomicProfile(
-                new TrapezoidProfile100(maxXYVel, maxXYAccel, xyTolerance),
-                new TrapezoidProfile100(maxXYVel, maxXYAccel, xyTolerance),
-                new TrapezoidProfile100(maxAngularVel, maxAngularAccel, angularTolerance));
+                new TrapezoidIncrementalProfile(maxXYVel, maxXYAccel, xyTolerance),
+                new TrapezoidIncrementalProfile(maxXYVel, maxXYAccel, xyTolerance),
+                new TrapezoidIncrementalProfile(maxAngularVel, maxAngularAccel, angularTolerance));
     }
 
     public static HolonomicProfile currentLimitedExponential(
@@ -146,7 +151,8 @@ public class HolonomicProfile {
     /**
      * Find scale factors that make the axes finish around the same time.
      * 
-     * This is a fairly coarse optimization, i.e. ETA within 0.1 sec or so,  Reset the scale factors.
+     * This is a fairly coarse optimization, i.e. ETA within 0.1 sec or so, Reset
+     * the scale factors.
      * 
      * @param i initial
      * @param g goal
@@ -161,13 +167,16 @@ public class HolonomicProfile {
         double yETA = py.simulateForETA(SOLVE_DT, i.y().control(), g.y());
         double thetaETA = ptheta.simulateForETA(SOLVE_DT, i.theta().control(), g.theta());
 
+        if (DEBUG) {
+            Util.printf("ETAs: %f %f %f\n", xETA, yETA, thetaETA);
+        }
         double slowETA = xETA;
         slowETA = Math.max(slowETA, yETA);
         slowETA = Math.max(slowETA, thetaETA);
 
-        double sx = px.solve(SOLVE_DT, i.x().control(), g.x(), slowETA, ETA_TOLERANCE);
-        double sy = py.solve(SOLVE_DT, i.y().control(), g.y(), slowETA, ETA_TOLERANCE);
-        double stheta = ptheta.solve(SOLVE_DT, i.theta().control(), g.theta(), slowETA, ETA_TOLERANCE);
+        sx = px.solve(SOLVE_DT, i.x().control(), g.x(), slowETA, ETA_TOLERANCE);
+        sy = py.solve(SOLVE_DT, i.y().control(), g.y(), slowETA, ETA_TOLERANCE);
+        stheta = ptheta.solve(SOLVE_DT, i.theta().control(), g.theta(), slowETA, ETA_TOLERANCE);
 
         if (DEBUG) {
             Util.printf("sx %.3f sy %.3f stheta %.3f\n", sx, sy, stheta);

@@ -34,6 +34,8 @@ __Packages of note__
   * Wrappers for all the motors we use (including simulated motors), so they can be handled uniformly by the motion classes above.
 * [profile](profile/README.md)
   * Constrained motion in 1d and 2d-with-heading.  These should be used for all motion where a trajectory would be too expensive to compute on the fly.
+* [reference](reference/README.md)
+  * Team 100 reference generators.  These use any sort of reference source, e.g. profile or trajectory, and produce "current" and "next" setpoints.  The reason for these classes is to make sure the time-alignment of observation and control are done correctly.  They use the `coherence` machinery mentioned above.
 * [trajectory](trajectory/README.md)
   * A trajectory is a path based on splines, with a precalculated schedule meeting motion constraints.  Trajectories are good for paths that require curves around known obstacles.  Simple trajectories are not *that* time-consuming to create, so can be used on-the-fly in some cases.
 

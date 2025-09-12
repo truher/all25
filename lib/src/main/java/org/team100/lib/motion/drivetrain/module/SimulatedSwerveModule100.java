@@ -16,7 +16,7 @@ import org.team100.lib.motion.servo.OnboardAngularPositionServo;
 import org.team100.lib.motion.servo.OutboardAngularPositionServo;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 
 /**
@@ -83,7 +83,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
                 true,
                 0.05, // note low tolerance
                 1);
-        Profile100 profile = kinodynamics.getSteeringProfile();
+        IncrementalProfile profile = kinodynamics.getSteeringProfile();
         IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         OnboardAngularPositionServo turningServo = new OnboardAngularPositionServo(
                 parent,
@@ -115,7 +115,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
         RotaryMechanism turningMech = new RotaryMechanism(
                 parent, motor, combinedEncoder, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
-        Profile100 profile = kinodynamics.getSteeringProfile();
+        IncrementalProfile profile = kinodynamics.getSteeringProfile();
         IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
 
         OutboardAngularPositionServo turningServo = new OutboardAngularPositionServo(

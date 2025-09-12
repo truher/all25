@@ -14,8 +14,8 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Math100;
@@ -48,7 +48,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
     private final SwerveKinodynamics m_swerveKinodynamics;
     private final Supplier<Optional<Translation2d>> m_target;
     private final Feedback100 m_controller;
-    private final Profile100 m_profile;
+    private final IncrementalProfile m_profile;
 
     private final DoubleLogger m_log_apparent_motion;
     private final FieldLogger.Log m_field_log;
@@ -68,7 +68,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
         m_swerveKinodynamics = swerveKinodynamics;
         m_target = target;
         m_controller = controller;
-        m_profile = new TrapezoidProfile100(
+        m_profile = new TrapezoidIncrementalProfile(
                 swerveKinodynamics.getMaxAngleSpeedRad_S() * ROTATION_SPEED,
                 swerveKinodynamics.getMaxAngleAccelRad_S2() * ROTATION_SPEED,
                 0.01);

@@ -18,8 +18,8 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.MockProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
@@ -36,7 +36,7 @@ class GravityServoTest implements Timeless {
     void testSetPosition() {
         Feedback100 pivotFeedback = new PIDFeedback(
                 logger, 4.5, 0.0, 0.000, false, 0.05, 1);
-        Profile100 profile = new TrapezoidProfile100(8, 8, 0.001);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(8, 8, 0.001);
         IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile,  0.05, 0.05);
         // motor speed is rad/s
         SimulatedBareMotor simMotor = new SimulatedBareMotor(logger, 600);

@@ -1,5 +1,7 @@
 package org.team100.lib.profile;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
@@ -12,9 +14,28 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 class HolonomicProfileTest {
     private static final boolean DEBUG = false;
+    private static final double DELTA = 0.001;
+
+    @Test
+    void testSolve() {
+        HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
+        SwerveModel i = new SwerveModel(
+                new Pose2d(0, 0, Rotation2d.kZero), new FieldRelativeVelocity(1, 0, 0));
+        SwerveModel g = new SwerveModel(
+                new Pose2d(0, 2, Rotation2d.kZero), new FieldRelativeVelocity(0, 0, 0));
+        hp.solve(i, g);
+        // scale factors
+        assertEquals(0.8125, hp.sx, DELTA);
+        assertEquals(1.0, hp.sy, DELTA);
+        assertEquals(1.0, hp.stheta, DELTA);
+        // now ETA's are the same
+        assertEquals(3.0, hp.ppx.simulateForETA(0.1, i.x().control(), g.x()), DELTA);
+        assertEquals(3.0, hp.ppy.simulateForETA(0.1, i.y().control(), g.y()), DELTA);
+        assertEquals(0, hp.pptheta.simulateForETA(0.1, i.theta().control(), g.theta()), DELTA);
+    }
 
     /**
-     * This uses the TrapezoidProfile100, which is the Team100 state-space thing.
+     * This uses the TrapezoidIncrementalProfile, which is the Team100 state-space thing.
      */
     @Test
     void test2d() {
@@ -69,7 +90,7 @@ class HolonomicProfileTest {
      * With the simulation approach to ETA with full-scale DT this takes 8 us.
      * With the 10x coarser DT it is 1.8 us.
      * 
-     * Removing the ETA calculation from the TrapezoidProfile100, i.e. using
+     * Removing the ETA calculation from the TrapezoidIncrementalProfile, i.e. using
      * simulation on it, makes this much slower, 0.1 ms. Since this happens
      * once at the start of the profile (for coordination), that's fine.
      * 

@@ -59,38 +59,23 @@ import edu.wpi.first.math.MathUtil;
  * the distance is reachable in one time step, i.e. high accel and velocity
  * limits.
  */
-public class TrapezoidProfile100 implements Profile100 {
+public class TrapezoidIncrementalProfile implements IncrementalProfile {
     private static final boolean DEBUG = false;
 
     private final double m_maxVelocity;
     private final double m_maxAcceleration;
     private final double m_tolerance;
 
-    public TrapezoidProfile100(double maxVel, double maxAccel, double tolerance) {
+    public TrapezoidIncrementalProfile(double maxVel, double maxAccel, double tolerance) {
         m_maxVelocity = maxVel;
         m_maxAcceleration = maxAccel;
         m_tolerance = tolerance;
     }
 
     @Override
-    public TrapezoidProfile100 scale(double s) {
-        return new TrapezoidProfile100(m_maxVelocity, s * m_maxAcceleration, m_tolerance);
-    }
-
-    @Override
-    public double solve(
-            double dt,
-            Control100 i,
-            Model100 g,
-            double eta,
-            double etaTolerance) {
-        return Profile100.solveForSlowerETA(
-                dt,
-                i,
-                g,
-                eta,
-                etaTolerance,
-                (s) -> new TrapezoidProfile100(m_maxVelocity, s * m_maxAcceleration, m_tolerance));
+    public TrapezoidIncrementalProfile scale(double s) {
+        return new TrapezoidIncrementalProfile(
+                m_maxVelocity, s * m_maxAcceleration, m_tolerance);
     }
 
     /**
@@ -561,7 +546,6 @@ public class TrapezoidProfile100 implements Profile100 {
         return 0;
     }
 
-    @Override
     public double getMaxVelocity() {
         return m_maxVelocity;
     }

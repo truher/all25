@@ -13,8 +13,8 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MockBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.testing.Timeless;
@@ -46,7 +46,7 @@ class AngularPositionProfileTest implements Timeless {
      */
     @Test
     void testTrapezoid() {
-        final Profile100 profile = new TrapezoidProfileWPI(1, 1);
+        final IncrementalProfile profile = new TrapezoidProfileWPI(1, 1);
         ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(
                 logger,
@@ -60,7 +60,7 @@ class AngularPositionProfileTest implements Timeless {
 
     @Test
     void testProfile() {
-        final Profile100 profile = new TrapezoidProfile100(1, 1, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
         ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(
                 logger,

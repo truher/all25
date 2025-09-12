@@ -2,7 +2,7 @@ package org.team100.lib.optimization;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.profile.timed.JerkLimitedProfile100;
+import org.team100.lib.profile.timed.JerkLimitedIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
@@ -20,7 +20,7 @@ public class PoseInterpolationTest {
         Pose3d start = new Pose3d();
         Pose3d end = new Pose3d(1, 1, 0, new Rotation3d(0, 0, -3));
         double distance = start.getTranslation().getDistance(end.getTranslation());
-        JerkLimitedProfile100 profile = new JerkLimitedProfile100(1, 5, 20, true);
+        JerkLimitedIncrementalProfile profile = new JerkLimitedIncrementalProfile(1, 5, 20, true);
         profile.init(new Control100(), new Model100(distance, 0));
         int i = 0;
         for (double t = 0; t < 2; t += 0.02) {
@@ -39,7 +39,7 @@ public class PoseInterpolationTest {
         Pose3d start = new Pose3d();
         Pose3d end = new Pose3d(1, 1, 0, new Rotation3d(0, 0, -3));
         double distance = start.getTranslation().getDistance(end.getTranslation());
-        JerkLimitedProfile100 profile = new JerkLimitedProfile100(1, 5, 20, true);
+        JerkLimitedIncrementalProfile profile = new JerkLimitedIncrementalProfile(1, 5, 20, true);
         profile.init(new Control100(), new Model100(distance, 0));
         int i = 0;
         for (double t = 0; t < 2; t += 0.02) {
@@ -58,7 +58,7 @@ public class PoseInterpolationTest {
         Rotation3d start = new Rotation3d();
         Rotation3d end = new Rotation3d(0, 1, -3);
         double distance = 1.5;
-        JerkLimitedProfile100 profile = new JerkLimitedProfile100(1, 5, 20, true);
+        JerkLimitedIncrementalProfile profile = new JerkLimitedIncrementalProfile(1, 5, 20, true);
         profile.init(new Control100(), new Model100(distance, 0));
         int i = 0;
         for (double t = 0; t < 2; t += 0.02) {
@@ -77,7 +77,7 @@ public class PoseInterpolationTest {
         Rotation3d start = new Rotation3d();
         Rotation3d end = new Rotation3d(0, 1, -3);
         double distance = 1.5;
-        JerkLimitedProfile100 profile = new JerkLimitedProfile100(1, 5, 20, true);
+        JerkLimitedIncrementalProfile profile = new JerkLimitedIncrementalProfile(1, 5, 20, true);
         profile.init(new Control100(), new Model100(distance, 0));
         int i = 0;
         for (double t = 0; t < 2; t += 0.02) {
@@ -96,7 +96,7 @@ public class PoseInterpolationTest {
         Translation3d start = new Translation3d();
         Translation3d end = new Translation3d(0, 1, -3);
         double distance = 1.5;
-        JerkLimitedProfile100 profile = new JerkLimitedProfile100(1, 5, 20, true);
+        JerkLimitedIncrementalProfile profile = new JerkLimitedIncrementalProfile(1, 5, 20, true);
         profile.init(new Control100(), new Model100(distance, 0));
         int i = 0;
         for (double t = 0; t < 2; t += 0.02) {
