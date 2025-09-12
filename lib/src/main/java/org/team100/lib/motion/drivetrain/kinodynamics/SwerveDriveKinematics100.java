@@ -3,7 +3,12 @@ package org.team100.lib.motion.drivetrain.kinodynamics;
 import java.util.Arrays;
 
 import org.ejml.simple.SimpleMatrix;
-import org.team100.lib.util.DriveUtil;
+import org.team100.lib.motion.drivetrain.state.DiscreteSpeed;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleDelta;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -139,7 +144,7 @@ public class SwerveDriveKinematics100 {
             SwerveModulePositions initial,
             Twist2d twist) {
         SwerveModuleDeltas deltas = toSwerveModuleDelta(twist);
-        return DriveUtil.modulePositionFromDelta(initial, deltas);
+        return SwerveModulePositions.modulePositionFromDelta(initial, deltas);
     }
 
     /**

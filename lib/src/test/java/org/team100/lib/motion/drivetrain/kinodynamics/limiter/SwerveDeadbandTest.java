@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 
 public class SwerveDeadbandTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
@@ -18,9 +18,9 @@ public class SwerveDeadbandTest {
         FieldRelativeVelocity input = new FieldRelativeVelocity(1, 0, 0);
         SwerveDeadband deadband = new SwerveDeadband(logger);
         FieldRelativeVelocity result = deadband.apply(input);
-        assertEquals(1, result.x(), kDelta);
-        assertEquals(0, result.y(), kDelta);
-        assertEquals(0, result.theta(), kDelta);
+        assertEquals(1, result.x(), DELTA);
+        assertEquals(0, result.y(), DELTA);
+        assertEquals(0, result.theta(), DELTA);
     }
 
     @Test
@@ -30,8 +30,8 @@ public class SwerveDeadbandTest {
         FieldRelativeVelocity input = new FieldRelativeVelocity(0.005, 0, 0);
         SwerveDeadband deadband = new SwerveDeadband(logger);
         FieldRelativeVelocity result = deadband.apply(input);
-        assertEquals(0, result.x(), kDelta);
-        assertEquals(0, result.y(), kDelta);
-        assertEquals(0, result.theta(), kDelta);
+        assertEquals(0, result.x(), DELTA);
+        assertEquals(0, result.y(), DELTA);
+        assertEquals(0, result.theta(), DELTA);
     }
 }

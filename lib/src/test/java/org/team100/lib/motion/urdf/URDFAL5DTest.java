@@ -17,8 +17,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N5;
 
 public class URDFAL5DTest {
-    private static final boolean DEBUG = false;
-
     @Test
     void testZeroForward() {
         URDFAL5D m = URDFAL5D.make();

@@ -123,16 +123,6 @@ public class AlgaeGrip extends SubsystemBase  {
         return hasAlgae;
     }
 
-    // public void intake() {
-    // if (!hasAlgae()) {
-    // position = m_linearMechanism.getPositionM().getAsDouble();
-    // m_linearMechanism.setDutyCycle(1);
-    // return;
-    // }
-    // // TODO get torque constant
-    // m_motor.setPosition(position, 0, 0, 0.1);
-    // }
-
     public double getPosition() {
         // return m_linearMechanism.getPositionM().getAsDouble();
         return 0;
@@ -167,6 +157,7 @@ public class AlgaeGrip extends SubsystemBase  {
 
     }
 
+    /** Set moderate current limits. */
     public void applyLowConfigs() {
         if (m_motor == null)
             return;
@@ -182,6 +173,7 @@ public class AlgaeGrip extends SubsystemBase  {
         talonFXConfigurator.apply(currentConfigs);
     }
 
+    /** Set high current limits. */
     public void applyHighConfigs() {
         if (m_motor == null)
             return;

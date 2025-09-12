@@ -12,7 +12,7 @@ import org.team100.lib.state.Model100;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 class HeadingLatchTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testInit() {
@@ -33,10 +33,10 @@ class HeadingLatchTest {
         Rotation2d pov = Rotation2d.kCCW_Pi_2;
         DriverControl.Velocity input = new DriverControl.Velocity(0, 0, 0);
         Rotation2d desiredRotation = l.latchedRotation(10, s, pov, input.theta());
-        assertEquals(Math.PI / 2, desiredRotation.getRadians(), kDelta);
+        assertEquals(Math.PI / 2, desiredRotation.getRadians(), DELTA);
         pov = null;
         desiredRotation = l.latchedRotation(10, s, pov, input.theta());
-        assertEquals(Math.PI / 2, desiredRotation.getRadians(), kDelta);
+        assertEquals(Math.PI / 2, desiredRotation.getRadians(), DELTA);
     }
 
     @Test
@@ -47,10 +47,10 @@ class HeadingLatchTest {
         Rotation2d pov = Rotation2d.kCCW_Pi_2;
         DriverControl.Velocity input = new DriverControl.Velocity(0, 0, 0);
         Rotation2d desiredRotation = l.latchedRotation(10, s, pov, input.theta());
-        assertEquals(Math.PI / 2, desiredRotation.getRadians(), kDelta);
+        assertEquals(Math.PI / 2, desiredRotation.getRadians(), DELTA);
         pov = null;
         desiredRotation = l.latchedRotation(10, s, pov, input.theta());
-        assertEquals(Math.PI / 2, desiredRotation.getRadians(), kDelta);
+        assertEquals(Math.PI / 2, desiredRotation.getRadians(), DELTA);
         input = new DriverControl.Velocity(0, 0, 1);
         desiredRotation = l.latchedRotation(10, s, pov, input.theta());
         assertNull(desiredRotation);
@@ -64,10 +64,10 @@ class HeadingLatchTest {
         Rotation2d pov = Rotation2d.kCCW_Pi_2;
         DriverControl.Velocity input = new DriverControl.Velocity(0, 0, 0);
         Rotation2d desiredRotation = l.latchedRotation(10, s, pov, input.theta());
-        assertEquals(Math.PI / 2, desiredRotation.getRadians(), kDelta);
+        assertEquals(Math.PI / 2, desiredRotation.getRadians(), DELTA);
         pov = null;
         desiredRotation = l.latchedRotation(10, s, pov, input.theta());
-        assertEquals(Math.PI / 2, desiredRotation.getRadians(), kDelta);
+        assertEquals(Math.PI / 2, desiredRotation.getRadians(), DELTA);
         l.unlatch();
         desiredRotation = l.latchedRotation(10, s, pov, input.theta());
         assertNull(desiredRotation);
@@ -93,10 +93,10 @@ class HeadingLatchTest {
         // t = 0.1 sec
         // dx = 0.05 rad
         // setpoint = 1.05 rad
-        assertEquals(1.05, desiredRotation.getRadians(), kDelta);
+        assertEquals(1.05, desiredRotation.getRadians(), DELTA);
 
         // latch remembers even when current changes
         desiredRotation = l.latchedRotation(10, s, pov, input.theta());
-        assertEquals(1.05, desiredRotation.getRadians(), kDelta);
+        assertEquals(1.05, desiredRotation.getRadians(), DELTA);
     }
 }

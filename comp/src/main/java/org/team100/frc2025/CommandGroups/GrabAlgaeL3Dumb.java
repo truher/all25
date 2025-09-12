@@ -1,29 +1,27 @@
 package org.team100.frc2025.CommandGroups;
 
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+
 import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Elevator.SetElevator;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CheckWristDanger;
 import org.team100.frc2025.Wrist.IntakeAlgaeGrip;
-import org.team100.frc2025.Wrist.SetWrist;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.lib.framework.ParallelDeadlineGroup100;
-import org.team100.lib.framework.SequentialCommandGroup100;
-import org.team100.lib.logging.LoggerFactory;
 
-public class GrabAlgaeL3Dumb extends SequentialCommandGroup100 {
-    public GrabAlgaeL3Dumb(
-            LoggerFactory logger,
+import edu.wpi.first.wpilibj2.command.Command;
+
+public class GrabAlgaeL3Dumb {
+
+    public static Command get(
             Wrist2 wrist,
             Elevator elevator,
             AlgaeGrip grip) {
-        super(logger, "GrabAlgaeL3Dumb");
-        addCommands(
-                // new SetAlgaeDescorePositionPrep(wrist, elevator),
+        return sequence(
                 new CheckWristDanger(wrist),
-                new ParallelDeadlineGroup100(m_logger, "grabL3",
-                        new SetElevator(m_logger, elevator, 35, true),
-                        new SetWrist(wrist, 3.7, true),
-                        new IntakeAlgaeGrip(grip, true)));
+                parallel(
+                        elevator.set(35),
+                        wrist.set(3.7),
+                        new IntakeAlgaeGrip(grip)));
     }
 }

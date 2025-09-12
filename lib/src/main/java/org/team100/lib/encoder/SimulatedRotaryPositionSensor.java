@@ -2,11 +2,11 @@ package org.team100.lib.encoder;
 
 import java.util.OptionalDouble;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
-import org.team100.lib.util.Takt;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -55,6 +55,10 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
     public OptionalDouble getPositionRad() {
         double nowS = Takt.get();
         double dtS = nowS - m_timeS;
+        if (dtS > 0.04) {
+            // clock is unreliable, skip  the update
+            dtS = 0;
+        }
         // this is the velocity at the current instant.
         // motor velocity is rad/s
         OptionalDouble velocityRad_S = encoderVelocityRad_S();

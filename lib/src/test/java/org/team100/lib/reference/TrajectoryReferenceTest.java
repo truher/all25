@@ -5,20 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.timing.TimingConstraint;
-import org.team100.lib.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class TrajectoryReferenceTest implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
     List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
     TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
@@ -33,19 +33,19 @@ public class TrajectoryReferenceTest implements Timeless {
         r.initialize(new SwerveModel());
         {
             SwerveModel c = r.current();
-            assertEquals(0, c.velocity().x(), kDelta);
-            assertEquals(0, c.pose().getX(), kDelta);
+            assertEquals(0, c.velocity().x(), DELTA);
+            assertEquals(0, c.pose().getX(), DELTA);
             SwerveModel n = r.next();
-            assertEquals(0.033, n.velocity().x(), kDelta);
-            assertEquals(0, n.pose().getX(), kDelta);
+            assertEquals(0.033, n.velocity().x(), DELTA);
+            assertEquals(0, n.pose().getX(), DELTA);
         }
         // no time step, nothing changes
         {
             SwerveModel c = r.current();
-            assertEquals(0, c.velocity().x(), kDelta);
-            assertEquals(0, c.pose().getX(), kDelta);
+            assertEquals(0, c.velocity().x(), DELTA);
+            assertEquals(0, c.pose().getX(), DELTA);
             SwerveModel n = r.next();
-            assertEquals(0.033, n.velocity().x(), kDelta);
+            assertEquals(0.033, n.velocity().x(), DELTA);
             // x is very small but not zero
             assertEquals(0.0003266, n.pose().getX(), 0.0000001);
         }
@@ -53,11 +53,11 @@ public class TrajectoryReferenceTest implements Timeless {
         stepTime();
         {
             SwerveModel c = r.current();
-            assertEquals(0.033, c.velocity().x(), kDelta);
-            assertEquals(0, c.pose().getX(), kDelta);
+            assertEquals(0.033, c.velocity().x(), DELTA);
+            assertEquals(0, c.pose().getX(), DELTA);
             SwerveModel n = r.next();
-            assertEquals(0.065, n.velocity().x(), kDelta);
-            assertEquals(0.001, n.pose().getX(), kDelta);
+            assertEquals(0.065, n.velocity().x(), DELTA);
+            assertEquals(0.001, n.pose().getX(), DELTA);
         }
         // way in the future, we're at the end.
         for (int i = 0; i < 500; ++i) {
@@ -65,11 +65,11 @@ public class TrajectoryReferenceTest implements Timeless {
         }
         {
             SwerveModel c = r.current();
-            assertEquals(0, c.velocity().x(), kDelta);
-            assertEquals(1, c.pose().getX(), kDelta);
+            assertEquals(0, c.velocity().x(), DELTA);
+            assertEquals(1, c.pose().getX(), DELTA);
             SwerveModel n = r.next();
-            assertEquals(0, n.velocity().x(), kDelta);
-            assertEquals(1, n.pose().getX(), kDelta);
+            assertEquals(0, n.velocity().x(), DELTA);
+            assertEquals(1, n.pose().getX(), DELTA);
         }
 
     }

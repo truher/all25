@@ -3,6 +3,9 @@ package org.team100.lib.motion.mechanism;
 import java.util.OptionalDouble;
 
 import org.team100.lib.encoder.IncrementalBareEncoder;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
 import org.team100.lib.motor.BareMotor;
 
 /**
@@ -19,8 +22,11 @@ public class LinearMechanism {
     private final double m_wheelRadiusM;
     private final double m_minPositionM;
     private final double m_maxPositionM;
+    private final OptionalDoubleLogger m_log_velocity;
+    private final OptionalDoubleLogger m_log_position;
 
     public LinearMechanism(
+            LoggerFactory parent,
             BareMotor motor,
             IncrementalBareEncoder encoder,
             double gearRatio,
@@ -33,9 +39,12 @@ public class LinearMechanism {
         m_wheelRadiusM = wheelDiameterM / 2;
         m_minPositionM = minPositionM;
         m_maxPositionM = maxPositionM;
+        LoggerFactory child = parent.type(this);
+        m_log_velocity = child.optionalDoubleLogger(Level.TRACE, "velocity (m_s)");
+        m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (m)");
     }
 
-    /** Should actuate immediately.  Use for homing. */
+    /** Should actuate immediately. Use for homing. */
     public void setDutyCycleUnlimited(double output) {
         m_motor.setDutyCycle(output);
     }
@@ -96,7 +105,10 @@ public class LinearMechanism {
                 outputForceN * m_wheelRadiusM / m_gearRatio);
     }
 
-    /** Should actuate immediately. Limits position using the argument to this function. */
+    /**
+     * Should actuate immediately. Limits position using the argument to this
+     * function.
+     */
     public void setPosition(
             double outputPositionM,
             double outputVelocityM_S,
@@ -149,10 +161,12 @@ public class LinearMechanism {
         m_encoder.reset();
     }
 
+    /** For logging. */
     public void periodic() {
-        // do some logging
         m_motor.periodic();
         m_encoder.periodic();
+        m_log_position.log(this::getPositionM);
+        m_log_velocity.log(this::getVelocityM_S);
     }
 
 }

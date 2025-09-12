@@ -16,7 +16,7 @@ import edu.wpi.first.math.interpolation.Interpolatable;
  * 
  * The buffer is never empty, so get() always returns *something*.
  */
-public final class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
+public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
     private static final boolean DEBUG = false;
 
     private final double m_historyS;

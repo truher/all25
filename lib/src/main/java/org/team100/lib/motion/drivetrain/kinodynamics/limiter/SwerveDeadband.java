@@ -3,7 +3,7 @@ package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 
 /**
  * Ignores very small inputs.
@@ -37,6 +37,6 @@ public class SwerveDeadband  {
             return target;
         }
         m_log_scale.log(() -> 0.0);
-        return FieldRelativeVelocity.kZero;
+        return FieldRelativeVelocity.ZERO;
     }
 }

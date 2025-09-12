@@ -19,7 +19,7 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 public class CompleteProfileTest {
     private static final boolean DEBUG = false;
     private static final double DT = 0.02;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     /** Dump the sliding mode curve */
     @Test
@@ -38,11 +38,11 @@ public class CompleteProfileTest {
         CompleteProfile p = new CompleteProfile(2, 6, 10, 40, 50, 50, 0.001);
         Control100 c = p.m_byDistance.get(-500.0);
         // we get back the x coord we provided
-        assertEquals(-500, c.x(), kDelta);
+        assertEquals(-500, c.x(), DELTA);
         // v is always maxv
-        assertEquals(2, c.v(), kDelta);
+        assertEquals(2, c.v(), DELTA);
         // a is always zero
-        assertEquals(0, c.a(), kDelta);
+        assertEquals(0, c.a(), DELTA);
     }
 
     @Test
@@ -117,11 +117,11 @@ public class CompleteProfileTest {
         m.put(-1.0, 1.0);
         m.put(1.0, -1.0);
         // it takes the endpoint forever
-        assertEquals(1, m.get(-3.0), kDelta);
-        assertEquals(1, m.get(-2.0), kDelta);
-        assertEquals(0, m.get(0.0), kDelta);
-        assertEquals(-1, m.get(2.0), kDelta);
-        assertEquals(-1, m.get(3.0), kDelta);
+        assertEquals(1, m.get(-3.0), DELTA);
+        assertEquals(1, m.get(-2.0), DELTA);
+        assertEquals(0, m.get(0.0), DELTA);
+        assertEquals(-1, m.get(2.0), DELTA);
+        assertEquals(-1, m.get(3.0), DELTA);
     }
 
     /** What if one of the points is really far away? */
@@ -136,11 +136,11 @@ public class CompleteProfileTest {
         m.put(1.0, new Control100(1, -1, 0));
         m.put(384400000.0, new Control100(384400000, -1, 0));
         // it takes the endpoint forever
-        assertEquals(-3, m.get(-3.0).x(), kDelta);
-        assertEquals(1, m.get(-3.0).v(), kDelta);
-        assertEquals(-2, m.get(-2.0).x(), kDelta);
-        assertEquals(0, m.get(0.0).x(), kDelta);
-        assertEquals(2, m.get(2.0).x(), kDelta);
-        assertEquals(3, m.get(3.0).x(), kDelta);
+        assertEquals(-3, m.get(-3.0).x(), DELTA);
+        assertEquals(1, m.get(-3.0).v(), DELTA);
+        assertEquals(-2, m.get(-2.0).x(), DELTA);
+        assertEquals(0, m.get(0.0).x(), DELTA);
+        assertEquals(2, m.get(2.0).x(), DELTA);
+        assertEquals(3, m.get(3.0).x(), DELTA);
     }
 }

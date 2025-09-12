@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.testing.TestUtil;
 import org.team100.lib.util.Util;
 
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;

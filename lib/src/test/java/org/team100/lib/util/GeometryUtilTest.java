@@ -16,7 +16,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 class GeometryUtilTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testProject() {
@@ -73,16 +73,16 @@ class GeometryUtilTest {
     void testSlog() {
         Twist2d twist = GeometryUtil.slog(
                 new Pose2d(1, 0, Rotation2d.kZero));
-        assertEquals(1, twist.dx, kDelta);
-        assertEquals(0, twist.dy, kDelta);
-        assertEquals(0, twist.dtheta, kDelta);
+        assertEquals(1, twist.dx, DELTA);
+        assertEquals(0, twist.dy, DELTA);
+        assertEquals(0, twist.dtheta, DELTA);
 
         // this twist represents an arc that ends up at the endpoint.
         twist = GeometryUtil.slog(
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2));
-        assertEquals(0.785, twist.dx, kDelta);
-        assertEquals(-0.785, twist.dy, kDelta);
-        assertEquals(1.571, twist.dtheta, kDelta);
+        assertEquals(0.785, twist.dx, DELTA);
+        assertEquals(-0.785, twist.dy, DELTA);
+        assertEquals(1.571, twist.dtheta, DELTA);
     }
 
     @Test
@@ -92,37 +92,37 @@ class GeometryUtilTest {
                 GeometryUtil.distance(
                         new Pose2d(1, 0, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kZero)),
-                kDelta);
+                DELTA);
         // 1d distance
         assertEquals(1,
                 GeometryUtil.distance(
                         new Pose2d(0, 0, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kZero)),
-                kDelta);
+                DELTA);
         // 2d distance
         assertEquals(1.414,
                 GeometryUtil.distance(
                         new Pose2d(0, 1, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kZero)),
-                kDelta);
+                DELTA);
         // rotation means a little arc, so the path length is a little longer.
         assertEquals(1.111,
                 GeometryUtil.distance(
                         new Pose2d(0, 0, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
-                kDelta);
+                DELTA);
         // the arc in this case is the entire quarter circle
         assertEquals(1.571,
                 GeometryUtil.distance(
                         new Pose2d(0, 1, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
-                kDelta);
+                DELTA);
         // order doesn't matter
         assertEquals(1.571,
                 GeometryUtil.distance(
                         new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
                         new Pose2d(0, 1, Rotation2d.kZero)),
-                kDelta);
+                DELTA);
 
     }
 
@@ -155,17 +155,17 @@ class GeometryUtilTest {
         // zero rotation.
         Rotation3d zforward = new Rotation3d();
         Quaternion q = zforward.getQuaternion();
-        assertEquals(0, q.getX(), kDelta);
-        assertEquals(0, q.getY(), kDelta);
-        assertEquals(0, q.getZ(), kDelta);
-        assertEquals(1, q.getW(), kDelta);
+        assertEquals(0, q.getX(), DELTA);
+        assertEquals(0, q.getY(), DELTA);
+        assertEquals(0, q.getZ(), DELTA);
+        assertEquals(1, q.getW(), DELTA);
 
         // robot coordinates are x-forward, y-left, z-up
         // in this frame the rotation is still zero.
         Rotation3d xforward = GeometryUtil.zForwardToXForward(zforward);
-        assertEquals(0, xforward.getX(), kDelta);
-        assertEquals(0, xforward.getY(), kDelta);
-        assertEquals(0, xforward.getZ(), kDelta);
+        assertEquals(0, xforward.getX(), DELTA);
+        assertEquals(0, xforward.getY(), DELTA);
+        assertEquals(0, xforward.getZ(), DELTA);
     }
 
     @Test
@@ -175,17 +175,17 @@ class GeometryUtilTest {
         // 45 degree rotation around z.
         Rotation3d zforward = new Rotation3d(0, 0, Math.PI / 4);
         Quaternion q = zforward.getQuaternion();
-        assertEquals(0, q.getX(), kDelta);
-        assertEquals(0, q.getY(), kDelta);
-        assertEquals(0.383, q.getZ(), kDelta);
-        assertEquals(0.924, q.getW(), kDelta);
+        assertEquals(0, q.getX(), DELTA);
+        assertEquals(0, q.getY(), DELTA);
+        assertEquals(0.383, q.getZ(), DELTA);
+        assertEquals(0.924, q.getW(), DELTA);
 
         // robot coordinates are x-forward, y-left, z-up
         // in this frame the rotation is around x.
         Rotation3d xforward = GeometryUtil.zForwardToXForward(zforward);
-        assertEquals(Math.PI / 4, xforward.getX(), kDelta);
-        assertEquals(0, xforward.getY(), kDelta);
-        assertEquals(0, xforward.getZ(), kDelta);
+        assertEquals(Math.PI / 4, xforward.getX(), DELTA);
+        assertEquals(0, xforward.getY(), DELTA);
+        assertEquals(0, xforward.getZ(), DELTA);
     }
 
     @Test
@@ -195,17 +195,17 @@ class GeometryUtilTest {
         // 45 degree rotation around x. (tilt up)
         Rotation3d zforward = new Rotation3d(Math.PI / 4, 0, 0);
         Quaternion q = zforward.getQuaternion();
-        assertEquals(0.383, q.getX(), kDelta);
-        assertEquals(0, q.getY(), kDelta);
-        assertEquals(0, q.getZ(), kDelta);
-        assertEquals(0.924, q.getW(), kDelta);
+        assertEquals(0.383, q.getX(), DELTA);
+        assertEquals(0, q.getY(), DELTA);
+        assertEquals(0, q.getZ(), DELTA);
+        assertEquals(0.924, q.getW(), DELTA);
 
         // robot coordinates are x-forward, y-left, z-up
         // in this frame the rotation is around y, negative.
         Rotation3d xforward = GeometryUtil.zForwardToXForward(zforward);
-        assertEquals(0, xforward.getX(), kDelta);
-        assertEquals(-Math.PI / 4, xforward.getY(), kDelta);
-        assertEquals(0, xforward.getZ(), kDelta);
+        assertEquals(0, xforward.getX(), DELTA);
+        assertEquals(-Math.PI / 4, xforward.getY(), DELTA);
+        assertEquals(0, xforward.getZ(), DELTA);
     }
 
     @Test
@@ -214,17 +214,17 @@ class GeometryUtilTest {
         // 45 degree rotation around y. (pan right)
         Rotation3d zforward = new Rotation3d(0, Math.PI / 4, 0);
         Quaternion q = zforward.getQuaternion();
-        assertEquals(0, q.getX(), kDelta);
-        assertEquals(0.383, q.getY(), kDelta);
-        assertEquals(0, q.getZ(), kDelta);
-        assertEquals(0.924, q.getW(), kDelta);
+        assertEquals(0, q.getX(), DELTA);
+        assertEquals(0.383, q.getY(), DELTA);
+        assertEquals(0, q.getZ(), DELTA);
+        assertEquals(0.924, q.getW(), DELTA);
 
         // robot coordinates are x-forward, y-left, z-up
         // in this frame the rotation is around y, negative.
         Rotation3d xforward = GeometryUtil.zForwardToXForward(zforward);
-        assertEquals(0, xforward.getX(), kDelta);
-        assertEquals(0, xforward.getY(), kDelta);
-        assertEquals(-Math.PI / 4, xforward.getZ(), kDelta);
+        assertEquals(0, xforward.getX(), DELTA);
+        assertEquals(0, xforward.getY(), DELTA);
+        assertEquals(-Math.PI / 4, xforward.getZ(), DELTA);
     }
 
     @Test
@@ -232,9 +232,9 @@ class GeometryUtilTest {
         Translation3d zforward = new Translation3d();
         // still zero
         Translation3d xforward = GeometryUtil.zForwardToXForward(zforward);
-        assertEquals(0, xforward.getX(), kDelta);
-        assertEquals(0, xforward.getY(), kDelta);
-        assertEquals(0, xforward.getZ(), kDelta);
+        assertEquals(0, xforward.getX(), DELTA);
+        assertEquals(0, xforward.getY(), DELTA);
+        assertEquals(0, xforward.getZ(), DELTA);
     }
 
     @Test
@@ -242,9 +242,9 @@ class GeometryUtilTest {
         Translation3d zforward = new Translation3d(0, 0, 1);
         // still zero
         Translation3d xforward = GeometryUtil.zForwardToXForward(zforward);
-        assertEquals(1, xforward.getX(), kDelta);
-        assertEquals(0, xforward.getY(), kDelta);
-        assertEquals(0, xforward.getZ(), kDelta);
+        assertEquals(1, xforward.getX(), DELTA);
+        assertEquals(0, xforward.getY(), DELTA);
+        assertEquals(0, xforward.getZ(), DELTA);
     }
 
     @Test
@@ -252,9 +252,9 @@ class GeometryUtilTest {
         Translation3d zforward = new Translation3d(1, 0, 0);
         // still zero
         Translation3d xforward = GeometryUtil.zForwardToXForward(zforward);
-        assertEquals(0, xforward.getX(), kDelta);
-        assertEquals(-1, xforward.getY(), kDelta);
-        assertEquals(0, xforward.getZ(), kDelta);
+        assertEquals(0, xforward.getX(), DELTA);
+        assertEquals(-1, xforward.getY(), DELTA);
+        assertEquals(0, xforward.getZ(), DELTA);
     }
 
     @Test
@@ -262,8 +262,8 @@ class GeometryUtilTest {
         Translation3d zforward = new Translation3d(0, 1, 0);
         // still zero
         Translation3d xforward = GeometryUtil.zForwardToXForward(zforward);
-        assertEquals(0, xforward.getX(), kDelta);
-        assertEquals(0, xforward.getY(), kDelta);
-        assertEquals(-1, xforward.getZ(), kDelta);
+        assertEquals(0, xforward.getX(), DELTA);
+        assertEquals(0, xforward.getY(), DELTA);
+        assertEquals(-1, xforward.getZ(), DELTA);
     }
 }

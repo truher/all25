@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 class ObjectPickerTest {
-    private static final double kDelta = 0.0001;
+    private static final double DELTA = 0.0001;
 
     @Test
     void noNote() {
@@ -29,8 +29,8 @@ class ObjectPickerTest {
         Pose2d robotPose = new Pose2d();
         Translation2d note = ObjectPicker.closestObject(sights, robotPose).get();
         // robot at origin -> closest note is at origin
-        assertEquals(0, note.getX(), kDelta);
-        assertEquals(0, note.getY(), kDelta);
+        assertEquals(0, note.getX(), DELTA);
+        assertEquals(0, note.getY(), DELTA);
     }
 
     @Test
@@ -41,8 +41,8 @@ class ObjectPickerTest {
         Pose2d robotPose = new Pose2d(new Translation2d(5, 5), new Rotation2d());
         Translation2d note = ObjectPicker.closestObject(sights, robotPose).get();
         // choose the note close to the current pose of (5, 5)
-        assertEquals(5, note.getX(), kDelta);
-        assertEquals(5, note.getY(), kDelta);
+        assertEquals(5, note.getX(), DELTA);
+        assertEquals(5, note.getY(), DELTA);
     }
 
     @Test
@@ -52,7 +52,7 @@ class ObjectPickerTest {
                 new Translation2d(1, 1));
         Pose2d robotPose = new Pose2d(new Translation2d(0.6, 0.6), new Rotation2d());
         Translation2d note = ObjectPicker.closestObject(sights, robotPose).get();
-        assertEquals(1, note.getX(), kDelta);
-        assertEquals(1, note.getY(), kDelta);
+        assertEquals(1, note.getX(), DELTA);
+        assertEquals(1, note.getY(), DELTA);
     }
 }

@@ -7,6 +7,7 @@ public class RunFunnel extends Command {
     Funnel m_funnel;
     Timer timer = new Timer();
 
+    /** runs the funnel perpetually */
     public RunFunnel(Funnel funnel) {
         m_funnel = funnel;
         addRequirements(m_funnel);
@@ -27,18 +28,10 @@ public class RunFunnel extends Command {
         } else {
             timer.restart();
         }
-
-        // m_funnel.setFunnel(1);
-
     }
 
     @Override
     public void end(boolean interrupted) {
         m_funnel.setFunnel(0);
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
     }
 }

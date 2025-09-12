@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class AnalyticTwoDofKinematicsTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testf1() {
@@ -70,7 +70,7 @@ public class AnalyticTwoDofKinematicsTest {
     }
 
     void verifyInv(TwoDofArmConfig expected, TwoDofArmConfig actual) {
-        assertEquals(expected.q1(), actual.q1(), kDelta, "inv q1");
-        assertEquals(expected.q2(), actual.q2(), kDelta, "inv q2");
+        assertEquals(expected.q1(), actual.q1(), DELTA, "inv q1");
+        assertEquals(expected.q2(), actual.q2(), DELTA, "inv q2");
     }
 }

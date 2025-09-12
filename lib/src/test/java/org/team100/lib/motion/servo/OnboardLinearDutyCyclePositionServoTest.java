@@ -9,8 +9,8 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.util.Util;
@@ -24,10 +24,10 @@ public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
 
         SimulatedBareMotor driveMotor = new SimulatedBareMotor(logger, 100);
         SimulatedBareEncoder driveEncoder = new SimulatedBareEncoder(logger, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(logger,
                 driveMotor, driveEncoder, 1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
-        Profile100 profile = new TrapezoidProfile100(2, 1, 0.01);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(2, 1, 0.01);
         IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
 
         final double k1 = 1.0;

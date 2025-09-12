@@ -3,12 +3,12 @@ package org.team100.lib.encoder;
 import java.util.OptionalDouble;
 import java.util.function.DoubleSupplier;
 
+import org.team100.lib.coherence.Cache;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
-import org.team100.lib.util.Memo;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.DutyCycle;
  * Robot.robotPeriodic().
  */
 public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositionSensor {
-    private static final int kFrequencyThreshold = 500;
+    private static final int FREQ_THRESHOLD = 500;
 
     private final int m_channel;
     private final DigitalInput m_digitalInput;
@@ -51,7 +51,7 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
         m_channel = channel;
         m_digitalInput = new DigitalInput(channel);
         m_dutyCycle = new DutyCycle(m_digitalInput);
-        m_duty = Memo.ofDouble(m_dutyCycle::getOutput);
+        m_duty = Cache.ofDouble(m_dutyCycle::getOutput);
         m_log_duty = child.doubleLogger(Level.COMP, "duty cycle");
         m_log_frequency = child.intLogger(Level.TRACE, "frequency");
         m_log_connected = child.booleanLogger(Level.TRACE, "connected");
@@ -90,6 +90,6 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
     private boolean isConnected() {
         int frequency = m_dutyCycle.getFrequency();
         m_log_frequency.log(() -> frequency);
-        return frequency > kFrequencyThreshold;
+        return frequency > FREQ_THRESHOLD;
     }
 }

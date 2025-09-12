@@ -17,10 +17,10 @@ import org.team100.lib.state.Model100;
  * motor controller hardware.
  */
 public class OutboardLinearPositionServo implements LinearPositionServo {
-    private static final double kPositionTolerance = 0.01;
-    private static final double kVelocityTolerance = 0.01;
     private final LinearMechanism m_mechanism;
     private final ProfileReference1d m_ref;
+    private final double m_positionTolerance; // 0.01
+    private final double m_velocityTolerance; // 0.01
 
     private final DoubleLogger m_log_goal;
     private final DoubleLogger m_log_ff_torque;
@@ -39,10 +39,14 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
     public OutboardLinearPositionServo(
             LoggerFactory parent,
             LinearMechanism mechanism,
-            ProfileReference1d ref) {
+            ProfileReference1d ref,
+            double positionTolerance,
+            double velocityTolerance) {
         LoggerFactory child = parent.type(this);
         m_mechanism = mechanism;
         m_ref = ref;
+        m_positionTolerance = positionTolerance;
+        m_velocityTolerance = velocityTolerance;
         m_log_goal = child.doubleLogger(Level.COMP, "goal (m)");
         m_log_ff_torque = child.doubleLogger(Level.TRACE, "Feedforward Torque (Nm)");
         m_log_control = child.control100Logger(Level.COMP, "control (m)");
@@ -73,7 +77,7 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
         m_log_goal.log(() -> goalM);
         Model100 goal = new Model100(goalM, 0);
 
-        if (!goal.near(m_goal, kPositionTolerance, kVelocityTolerance)) {
+        if (!goal.near(m_goal, m_positionTolerance, m_velocityTolerance)) {
             m_goal = goal;
             m_ref.setGoal(goal);
             if (m_nextSetpoint == null) {
@@ -130,12 +134,31 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
     }
 
     @Override
+    public boolean atSetpoint() {
+        OptionalDouble pos = m_mechanism.getPositionM();
+        if (pos.isEmpty())
+            return false;
+        OptionalDouble vel = m_mechanism.getVelocityM_S();
+        if (vel.isEmpty())
+            return false;
+        double pErr = m_nextSetpoint.x() - pos.getAsDouble();
+        double vErr = m_nextSetpoint.v() - vel.getAsDouble();
+        return Math.abs(pErr) < m_positionTolerance
+                && Math.abs(vErr) < m_velocityTolerance;
+    }
+
+    @Override
     public boolean profileDone() {
         if (m_goal == null) {
             // if there's no profile, it's always done.
             return true;
         }
         return m_ref.profileDone();
+    }
+
+    @Override
+    public boolean atGoal() {
+        return atSetpoint() && profileDone();
     }
 
     @Override
@@ -165,8 +188,8 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
      * @param setpoint desired velocity
      */
     // private double accel(double setpoint) {
-    //     double accel = (setpoint - previousSetpoint) / TimedRobot100.LOOP_PERIOD_S;
-    //     previousSetpoint = setpoint;
-    //     return accel;
+    // double accel = (setpoint - previousSetpoint) / TimedRobot100.LOOP_PERIOD_S;
+    // previousSetpoint = setpoint;
+    // return accel;
     // }
 }

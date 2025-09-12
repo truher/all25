@@ -1,15 +1,12 @@
 package org.team100.frc2025.Wrist;
 
-import org.team100.lib.experiments.Experiment;
-import org.team100.lib.experiments.Experiments;
-
 import edu.wpi.first.wpilibj2.command.Command;
 
+/** Move the wrist out of the way of the elevator. */
 public class CheckWristDanger extends Command {
-    Wrist2 m_wrist;
-    double m_angle;
-    boolean finished = false;
-    double count = 0;
+    private static final double SAFE = 0.1;
+
+    private final Wrist2 m_wrist;
 
     public CheckWristDanger(Wrist2 wrist) {
         m_wrist = wrist;
@@ -18,47 +15,24 @@ public class CheckWristDanger extends Command {
 
     @Override
     public void initialize() {
-        finished = false;
-        count = 0;
-        // resetting forces the setpoint velocity to zero, which is not always what we
-        // want
-        // m_wrist.resetWristProfile();
     }
 
     @Override
     public void execute() {
-        double m_angle = 0.1;
-
-        if (m_wrist.getAngle() < m_angle) {
-            m_wrist.setAngleValue(m_angle);
-
-            if (Math.abs(m_wrist.getAngle() - m_angle) < 0.05) {
-                count++;
-            } else {
-                count = 0;
-            }
-
-        } else {
-            finished = true;
+        if (m_wrist.getAngle() < SAFE) {
+            // a little extra to push it beyond the safe boundary
+            m_wrist.setAngleValue(SAFE + 0.05);
         }
-
-        if (count >= 20) {
-            finished = true;
-        }
-
     }
 
     @Override
     public void end(boolean interrupted) {
         m_wrist.setWristDutyCycle(0);
-        finished = false;
-        count = 0;
     }
 
     @Override
     public boolean isFinished() {
-        if (Experiments.instance.enabled(Experiment.UseProfileDone))
-            return finished && m_wrist.profileDone();
-        return finished;
+        // wrist is out of the way, maybe far out
+        return m_wrist.getAngle() > SAFE;
     }
 }

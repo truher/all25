@@ -5,20 +5,20 @@ import java.util.List;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
-import org.team100.lib.timing.TimedPose;
 import org.team100.lib.trajectory.Trajectory100;
+import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 
 public class TrajectoryVisualization {
-    private static final String kTrajectory = "trajectory";
+    private static final String TRAJECTORY = "trajectory";
 
     private final DoubleArrayLogger m_log_trajectory;
 
     public TrajectoryVisualization(LoggerFactory fieldLogger) {
-        m_log_trajectory = fieldLogger.doubleArrayLogger(Level.TRACE, kTrajectory);
+        m_log_trajectory = fieldLogger.doubleArrayLogger(Level.TRACE, TRAJECTORY);
     }
 
     public void setViz(Trajectory100 m_trajectory) {

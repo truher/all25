@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * This example illustrates this use-case: the simplest possible open-loop
  * control.
  * 
- * This class extends SubsystemBase, to be compatible with the scheduler, and it
- * , so that the logger will use the class name.
+ * This class extends SubsystemBase, to be compatible with the scheduler, and
+ * the logger will use the class name.
  */
 public class OpenLoopSubsystem extends SubsystemBase  {
     private final BareMotor m_motor;
@@ -74,6 +74,7 @@ public class OpenLoopSubsystem extends SubsystemBase  {
     // do it. Multi-subsystem actions would need to use the methods above.
     //
 
+    /** set duty cycle perpetually */
     public Command forward() {
         return run(() -> {
             setDutyCycle(1.0);
@@ -82,7 +83,7 @@ public class OpenLoopSubsystem extends SubsystemBase  {
 
     public Command reverse() {
         return run(() -> {
-            setDutyCycle(1.0);
+            setDutyCycle(-1.0);
         });
     }
 

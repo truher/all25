@@ -1,8 +1,8 @@
 package org.team100.frc2025.Elevator;
 
+import org.team100.frc2025.Swerve.FieldConstants;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.lib.commands.drivetrain.FieldConstants;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -10,21 +10,22 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ElevatorDefaultCommand extends Command  {
+public class ElevatorDefaultCommand extends Command {
     private final DoubleLogger m_log_distanceToReef;
     private final Elevator m_elevator;
     private final Wrist2 m_wrist;
     private final AlgaeGrip m_grip;
     private final SwerveDriveSubsystem m_drive;
     private double m_holdPosition;
-    // private final DoubleLogger m_log_holdPosition;
 
-    public ElevatorDefaultCommand(LoggerFactory logger, Elevator elevator, Wrist2 wrist, AlgaeGrip grip,
+    public ElevatorDefaultCommand(
+            LoggerFactory logger,
+            Elevator elevator,
+            Wrist2 wrist,
+            AlgaeGrip grip,
             SwerveDriveSubsystem drive) {
         LoggerFactory child = logger.type(this);
         m_log_distanceToReef = child.doubleLogger(Level.TRACE, "distance to reef (m)");
-        // m_log_holdPosition = child.doubleLogger(Level.TRACE, "hold position (m)");
-
         m_elevator = elevator;
         m_wrist = wrist;
         m_grip = grip;
@@ -45,7 +46,6 @@ public class ElevatorDefaultCommand extends Command  {
         m_log_distanceToReef.log(() -> distanceToReef);
 
         if (!m_wrist.getSafeCondition()) {
-            // System.out.println("IM RUNNING BUT IM UNSAFE");
             // elevator shouldn't move at all
             m_elevator.setPosition(m_holdPosition);
 
@@ -72,8 +72,6 @@ public class ElevatorDefaultCommand extends Command  {
         }
 
         m_holdPosition = m_elevator.getPosition();
-
-        // if (distanceToReef > 1.6) {
 
         if (!m_grip.hasAlgae()) {
             double goal = 0.2;
@@ -103,17 +101,6 @@ public class ElevatorDefaultCommand extends Command  {
             }
 
         }
-        // } else {
-        // m_elevator.setPositionDirectly(m_holdPosition);
-        // }
-    }
 
-    @Override
-    public void end(boolean interrupted) {
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
     }
 }

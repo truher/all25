@@ -2,11 +2,11 @@ package org.team100.lib.framework;
 
 import java.util.PriorityQueue;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.hal.DriverStationJNI;
@@ -189,7 +189,7 @@ public class TimedRobot100 extends IterativeRobotBase  {
      * @param callback      The callback to run.
      * @param periodSeconds The period at which to run the callback in seconds.
      */
-    public final void addPeriodic(Runnable callback, double periodSeconds, String name) {
+    public void addPeriodic(Runnable callback, double periodSeconds, String name) {
         m_callbacks.add(new Callback(m_robotLogger, callback, m_startTime, periodSeconds, 0.0, name));
     }
 
@@ -208,7 +208,7 @@ public class TimedRobot100 extends IterativeRobotBase  {
      *                      scheduling a callback in a different timeslot relative
      *                      to TimedRobot.
      */
-    public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds, String name) {
+    public void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds, String name) {
         m_callbacks.add(new Callback(m_robotLogger, callback, m_startTime, periodSeconds, offsetSeconds, name));
     }
 

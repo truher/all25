@@ -18,11 +18,11 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.timing.TimedPose;
-import org.team100.lib.timing.TimingConstraint;
-import org.team100.lib.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,7 +32,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);
 
@@ -55,7 +55,7 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
                 controller,
                 viz);
         command.initialize();
-        assertEquals(0, fixture.drive.getPose().getX(), kDelta);
+        assertEquals(0, fixture.drive.getPose().getX(), DELTA);
         command.execute();
         command.end(false);
     }
@@ -71,9 +71,9 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
                 Rotation2d.kZero);
 
         Pose2d goal = layout.getTagPose(Alliance.Blue, 1).get().toPose2d().plus(transform);
-        assertEquals(15.300, goal.getX(), kDelta);
-        assertEquals(0.876, goal.getY(), kDelta);
-        assertEquals(-0.942, goal.getRotation().getRadians(), kDelta);
+        assertEquals(15.300, goal.getX(), DELTA);
+        assertEquals(0.876, goal.getY(), DELTA);
+        assertEquals(-0.942, goal.getRotation().getRadians(), DELTA);
 
         SwerveController m_controller = SwerveControllerFactory.test(logger);
         DriveToPoseWithTrajectory command = new DriveToPoseWithTrajectory(
@@ -81,7 +81,7 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
                 (start, end) -> planner.movingToRest(start, end),
                 m_controller, viz);
         command.initialize();
-        assertEquals(0, fixture.drive.getPose().getX(), kDelta);
+        assertEquals(0, fixture.drive.getPose().getX(), DELTA);
         command.execute();
         command.end(false);
     }

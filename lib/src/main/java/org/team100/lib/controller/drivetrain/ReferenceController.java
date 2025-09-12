@@ -1,8 +1,8 @@
 package org.team100.lib.controller.drivetrain;
 
 import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
-import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.reference.SwerveReference;
 import org.team100.lib.util.Util;
 
@@ -62,20 +62,11 @@ public class ReferenceController  {
     }
 
     /** Trajectory is complete and controller error is within tolerance. */
-    public boolean isFinished() {
+    public boolean isDone() {
         return m_reference.done() && m_controller.atReference();
-
     }
 
     public boolean atReference() {
         return m_controller.atReference();
-    }
-
-    /**
-     * If you want just the trajectory completion, don't care about the controller
-     * error.
-     */
-    public boolean isDone() {
-        return m_reference.done();
     }
 }

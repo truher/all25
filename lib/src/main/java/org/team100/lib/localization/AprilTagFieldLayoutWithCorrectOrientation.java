@@ -43,17 +43,17 @@ import edu.wpi.first.wpilibj.Filesystem;
  * orientation.  Do not use the AprilTag object!
  */
 public class AprilTagFieldLayoutWithCorrectOrientation {
-    private static final String kProdFilename = "2025-reefscape.json";
+    private static final String FILENAME = "2025-reefscape.json";
 
     // Inverts yaw
-    private static final Transform3d kFix = new Transform3d(
+    private static final Transform3d FIX = new Transform3d(
             new Translation3d(),
             new Rotation3d(0, 0, Math.PI));
 
     private final Map<Alliance, AprilTagFieldLayout> layouts = new EnumMap<>(Alliance.class);
 
     public AprilTagFieldLayoutWithCorrectOrientation() throws IOException {
-        Path path = Filesystem.getDeployDirectory().toPath().resolve(kProdFilename);
+        Path path = Filesystem.getDeployDirectory().toPath().resolve(FILENAME);
 
         AprilTagFieldLayout blueLayout = new AprilTagFieldLayout(path);
         blueLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
@@ -74,6 +74,6 @@ public class AprilTagFieldLayoutWithCorrectOrientation {
         if (pose.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(pose.get().transformBy(kFix));
+        return Optional.of(pose.get().transformBy(FIX));
     }
 }

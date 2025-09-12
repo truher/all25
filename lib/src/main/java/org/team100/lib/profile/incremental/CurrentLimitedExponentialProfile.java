@@ -14,7 +14,7 @@ import org.team100.lib.util.Util;
  * The exponential profile maximum acceleration relates to the *unlimited* stall
  * torque.
  */
-public class CurrentLimitedExponentialProfile implements Profile100 {
+public class CurrentLimitedExponentialProfile implements IncrementalProfile {
     private static final boolean DEBUG = false;
     private final double m_maxVel;
     /** Unlimited stall torque */
@@ -65,47 +65,12 @@ public class CurrentLimitedExponentialProfile implements Profile100 {
     }
 
     @Override
-    public ResultWithETA calculateWithETA(double dt, Control100 initial, Model100 goal) {
-        ResultWithETA trapezoid = m_trapezoid.calculateWithETA(dt, initial, goal);
-        ResultWithETA exponential = m_exponential.calculateWithETA(dt, initial, goal);
-        if (!isAccel(initial, exponential.state())) {
-            // exponential decel is more accurate ("plugging" torque is higher than stall)
-            return exponential;
-        }
-
-        if (initial.v() < m_limit) {
-            // Low speed is current limited.
-            return trapezoid;
-        }
-        // high speed is back-EMF limited.
-        return exponential;
-    }
-
-    @Override
-    public Profile100 scale(double s) {
+    public IncrementalProfile scale(double s) {
         return new CurrentLimitedExponentialProfile(
                 m_maxVel, s * m_limitedAccel, s * m_stallAccel);
     }
 
-    @Override
     public double getMaxVelocity() {
         return m_maxVel;
     }
-
-    @Override
-    public double solve(
-            double dt,
-            Control100 i,
-            Model100 g,
-            double eta,
-            double etaTolerance) {
-        return Profile100.solveForSlowerETA(
-                dt,
-                i,
-                g,
-                eta,
-                etaTolerance,
-                (s) -> new CurrentLimitedExponentialProfile(m_maxVel, s * m_limitedAccel, s * m_stallAccel));
-    }
-
 }

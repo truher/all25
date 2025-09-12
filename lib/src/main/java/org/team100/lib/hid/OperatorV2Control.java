@@ -37,7 +37,7 @@ public class OperatorV2Control implements OperatorControl {
     }
 
     @Override
-    public double ramp() {
+    public double manualClimbSpeed() {
         return m_controller.getLeftX();
     }
  
@@ -52,7 +52,7 @@ public class OperatorV2Control implements OperatorControl {
     }
 
     @Override
-    public boolean downavate() {
+    public boolean activateManualClimb() {
         return m_controller.getYButton();
     }
 

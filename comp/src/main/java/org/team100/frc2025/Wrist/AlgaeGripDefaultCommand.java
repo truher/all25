@@ -23,13 +23,4 @@ public class AlgaeGripDefaultCommand extends Command {
             m_grip.setDutyCycle(1);
         }
     }
-
-    @Override
-    public void end(boolean interrupted) {
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
 }

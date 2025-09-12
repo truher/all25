@@ -19,7 +19,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 
 class TargetLocalizerTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testCameraRotsToFieldRelativeArray() {
@@ -53,8 +53,8 @@ class TargetLocalizerTest {
             assertEquals(1, translations.size());
             Translation2d t = translations.get(0);
             // camera is 1m high, pointing 45 down so 1m away
-            assertEquals(1, t.getX(), kDelta);
-            assertEquals(0, t.getY(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
+            assertEquals(0, t.getY(), DELTA);
         }
         {
             // robot at origin
@@ -70,8 +70,8 @@ class TargetLocalizerTest {
             assertEquals(1, translations.size());
             Translation2d t = translations.get(0);
             // camera is 1m high, pointing 45 down so 1m away
-            assertEquals(1, t.getX(), kDelta);
-            assertEquals(1, t.getY(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
+            assertEquals(1, t.getY(), DELTA);
         }
     }
 
@@ -85,8 +85,8 @@ class TargetLocalizerTest {
             Optional<Translation2d> target = TargetLocalizer.sightToRobotRelative(camera, sight);
             assertTrue(target.isPresent());
             Translation2d t = target.get();
-            assertEquals(1, t.getX(), kDelta);
-            assertEquals(0, t.getY(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
+            assertEquals(0, t.getY(), DELTA);
         }
         {
             // camera down 45
@@ -96,8 +96,8 @@ class TargetLocalizerTest {
             Optional<Translation2d> target = TargetLocalizer.sightToRobotRelative(camera, sight);
             assertTrue(target.isPresent());
             Translation2d t = target.get();
-            assertEquals(1, t.getX(), kDelta);
-            assertEquals(0, t.getY(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
+            assertEquals(0, t.getY(), DELTA);
         }
         {
             // pitch 45 down, straight ahead, roll doesn't matter for this case.
@@ -107,8 +107,8 @@ class TargetLocalizerTest {
             Optional<Translation2d> target = TargetLocalizer.sightToRobotRelative(camera, sight);
             assertTrue(target.isPresent());
             Translation2d t = target.get();
-            assertEquals(1, t.getX(), kDelta);
-            assertEquals(0, t.getY(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
+            assertEquals(0, t.getY(), DELTA);
         }
         {
             // camera roll 90, pitch 45 down
@@ -122,8 +122,8 @@ class TargetLocalizerTest {
             Translation2d t = target.get();
             // camera is rolled 90 right pitched 45 down, target is 45 more to the right
             // so target is at zero
-            assertEquals(0, t.getX(), kDelta);
-            assertEquals(0, t.getY(), kDelta);
+            assertEquals(0, t.getX(), DELTA);
+            assertEquals(0, t.getY(), DELTA);
         }
     }
 
@@ -137,18 +137,18 @@ class TargetLocalizerTest {
             // 45 to the left
             Vector<N3> last = VecBuilder.fill(1, 1, 0);
             Rotation3d r = new Rotation3d(initial, last);
-            assertEquals(0, r.getX(), kDelta);
-            assertEquals(0, r.getY(), kDelta);
-            assertEquals(Math.PI / 4, r.getZ(), kDelta);
+            assertEquals(0, r.getX(), DELTA);
+            assertEquals(0, r.getY(), DELTA);
+            assertEquals(Math.PI / 4, r.getZ(), DELTA);
         }
         {
             Vector<N3> initial = VecBuilder.fill(1, 0, 0);
             // 45 down
             Vector<N3> last = VecBuilder.fill(1, 0, -1);
             Rotation3d r = new Rotation3d(initial, last);
-            assertEquals(0, r.getX(), kDelta);
-            assertEquals(Math.PI / 4, r.getY(), kDelta);
-            assertEquals(0, r.getZ(), kDelta);
+            assertEquals(0, r.getX(), DELTA);
+            assertEquals(Math.PI / 4, r.getY(), DELTA);
+            assertEquals(0, r.getZ(), DELTA);
         }
         {
             Vector<N3> initial = VecBuilder.fill(1, 0, 0);
@@ -156,18 +156,18 @@ class TargetLocalizerTest {
             Vector<N3> last = VecBuilder.fill(1, 1, -1);
             Rotation3d r = new Rotation3d(initial, last);
             // roll we don't care about???
-            assertEquals(0.261, r.getX(), kDelta);
+            assertEquals(0.261, r.getX(), DELTA);
             // less pitch because the yaw pulls it in
-            assertEquals(0.615, r.getY(), kDelta);
-            assertEquals(Math.PI / 4, r.getZ(), kDelta);
+            assertEquals(0.615, r.getY(), DELTA);
+            assertEquals(Math.PI / 4, r.getZ(), DELTA);
 
             // what happens if we use this in the intersection?
             // we want (1, 1)
             // camera level
             Transform3d camera = new Transform3d(0, 0, 1, new Rotation3d(0, 0, 0));
             Translation2d t = TargetLocalizer.sightToRobotRelative(camera, r).get();
-            assertEquals(1, t.getX(), kDelta);
-            assertEquals(1, t.getY(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
+            assertEquals(1, t.getY(), DELTA);
         }
         {
             // as above with less tilt
@@ -175,18 +175,18 @@ class TargetLocalizerTest {
             Vector<N3> last = VecBuilder.fill(1, 1, -0.5);
             Rotation3d r = new Rotation3d(initial, last);
             // roll we don't care about???
-            assertEquals(0.142, r.getX(), kDelta);
+            assertEquals(0.142, r.getX(), DELTA);
             // less pitch because the yaw pulls it in
-            assertEquals(0.340, r.getY(), kDelta);
-            assertEquals(Math.PI / 4, r.getZ(), kDelta);
+            assertEquals(0.340, r.getY(), DELTA);
+            assertEquals(Math.PI / 4, r.getZ(), DELTA);
 
             // half the tilt == twice the distance
             // camera level
             Transform3d camera = new Transform3d(0, 0, 1, new Rotation3d(0, 0, 0));
             Translation2d t = TargetLocalizer.sightToRobotRelative(camera, r).get();
-            assertEquals(2, t.getX(), kDelta);
+            assertEquals(2, t.getX(), DELTA);
             // y is affected the same which is correct
-            assertEquals(2, t.getY(), kDelta);
+            assertEquals(2, t.getY(), DELTA);
         }
     }
 
@@ -196,14 +196,14 @@ class TargetLocalizerTest {
         // so this pitches down and then yaws.
         Rotation3d r = new Rotation3d(0, Math.PI / 2, -Math.PI / 2);
         // we get the same angles out
-        assertEquals(0, r.getX(), kDelta);
-        assertEquals(Math.PI / 2, r.getY(), kDelta);
-        assertEquals(-Math.PI / 2, r.getZ(), kDelta);
+        assertEquals(0, r.getX(), DELTA);
+        assertEquals(Math.PI / 2, r.getY(), DELTA);
+        assertEquals(-Math.PI / 2, r.getZ(), DELTA);
         // this is one of the ways to get back to zero
         Rotation3d r2 = r.rotateBy(new Rotation3d(-Math.PI / 2, 0, Math.PI / 2));
-        assertEquals(0, r2.getX(), kDelta);
-        assertEquals(0, r2.getY(), kDelta);
-        assertEquals(0, r2.getZ(), kDelta);
+        assertEquals(0, r2.getX(), DELTA);
+        assertEquals(0, r2.getY(), DELTA);
+        assertEquals(0, r2.getZ(), DELTA);
     }
 
     @Test
@@ -216,14 +216,14 @@ class TargetLocalizerTest {
             // sight on-bore
             Rotation3d sight = new Rotation3d();
             Transform3d robotRelative = TargetLocalizer.sightInRobotCoords(camera, sight);
-            assertEquals(0, robotRelative.getX(), kDelta);
-            assertEquals(0, robotRelative.getY(), kDelta);
-            assertEquals(1, robotRelative.getZ(), kDelta);
+            assertEquals(0, robotRelative.getX(), DELTA);
+            assertEquals(0, robotRelative.getY(), DELTA);
+            assertEquals(1, robotRelative.getZ(), DELTA);
             // robot relative rotation is the same as the camera-relative translation since
             // the camera is parallel
-            assertEquals(0, robotRelative.getRotation().getX(), kDelta);
-            assertEquals(0, robotRelative.getRotation().getY(), kDelta);
-            assertEquals(0, robotRelative.getRotation().getZ(), kDelta);
+            assertEquals(0, robotRelative.getRotation().getX(), DELTA);
+            assertEquals(0, robotRelative.getRotation().getY(), DELTA);
+            assertEquals(0, robotRelative.getRotation().getZ(), DELTA);
         }
         {
             // camera down 45
@@ -231,13 +231,13 @@ class TargetLocalizerTest {
             // sight on-bore
             Rotation3d sight = new Rotation3d();
             Transform3d robotRelative = TargetLocalizer.sightInRobotCoords(camera, sight);
-            assertEquals(0, robotRelative.getX(), kDelta);
-            assertEquals(0, robotRelative.getY(), kDelta);
-            assertEquals(1, robotRelative.getZ(), kDelta);
+            assertEquals(0, robotRelative.getX(), DELTA);
+            assertEquals(0, robotRelative.getY(), DELTA);
+            assertEquals(1, robotRelative.getZ(), DELTA);
             // robot relative rotation is down 45
-            assertEquals(0, robotRelative.getRotation().getX(), kDelta);
-            assertEquals(Math.PI / 4, robotRelative.getRotation().getY(), kDelta);
-            assertEquals(0, robotRelative.getRotation().getZ(), kDelta);
+            assertEquals(0, robotRelative.getRotation().getX(), DELTA);
+            assertEquals(Math.PI / 4, robotRelative.getRotation().getY(), DELTA);
+            assertEquals(0, robotRelative.getRotation().getZ(), DELTA);
         }
         {
             // camera down 90, facing the floor
@@ -245,15 +245,15 @@ class TargetLocalizerTest {
             // sight is on bore
             Rotation3d sight = new Rotation3d();
             Transform3d robotRelative = TargetLocalizer.sightInRobotCoords(camera, sight);
-            assertEquals(0, robotRelative.getX(), kDelta);
-            assertEquals(0, robotRelative.getY(), kDelta);
-            assertEquals(1, robotRelative.getZ(), kDelta);
+            assertEquals(0, robotRelative.getX(), DELTA);
+            assertEquals(0, robotRelative.getY(), DELTA);
+            assertEquals(1, robotRelative.getZ(), DELTA);
             //
-            assertEquals(0.0, robotRelative.getRotation().getX(), kDelta);
+            assertEquals(0.0, robotRelative.getRotation().getX(), DELTA);
             // this just yields the same thing as the camera
-            assertEquals(1.571, robotRelative.getRotation().getY(), kDelta);
+            assertEquals(1.571, robotRelative.getRotation().getY(), DELTA);
             //
-            assertEquals(0.0, robotRelative.getRotation().getZ(), kDelta);
+            assertEquals(0.0, robotRelative.getRotation().getZ(), DELTA);
         }
         {
             // camera is pitched down 90, facing the floor
@@ -261,15 +261,15 @@ class TargetLocalizerTest {
             // sight left 45
             Rotation3d sight = new Rotation3d(VecBuilder.fill(1, 0, 0), VecBuilder.fill(1, 1, 0));
             Transform3d robotRelative = TargetLocalizer.sightInRobotCoords(camera, sight);
-            assertEquals(0, robotRelative.getX(), kDelta);
-            assertEquals(0, robotRelative.getY(), kDelta);
-            assertEquals(1, robotRelative.getZ(), kDelta);
+            assertEquals(0, robotRelative.getX(), DELTA);
+            assertEquals(0, robotRelative.getY(), DELTA);
+            assertEquals(1, robotRelative.getZ(), DELTA);
             // pi/2 roll, this is irrelevant
-            assertEquals(1.571, robotRelative.getRotation().getX(), kDelta);
+            assertEquals(1.571, robotRelative.getRotation().getX(), DELTA);
             // pi/4 pitch
-            assertEquals(0.785, robotRelative.getRotation().getY(), kDelta);
+            assertEquals(0.785, robotRelative.getRotation().getY(), DELTA);
             // pi/2 yaw
-            assertEquals(1.571, robotRelative.getRotation().getZ(), kDelta);
+            assertEquals(1.571, robotRelative.getRotation().getZ(), DELTA);
             // result is 45 left, which is correct.
         }
         {
@@ -278,15 +278,15 @@ class TargetLocalizerTest {
             // sight left 45
             Rotation3d sight = new Rotation3d(VecBuilder.fill(1, 0, 0), VecBuilder.fill(1, 1, 0));
             Transform3d robotRelative = TargetLocalizer.sightInRobotCoords(camera, sight);
-            assertEquals(0, robotRelative.getX(), kDelta);
-            assertEquals(0, robotRelative.getY(), kDelta);
-            assertEquals(1, robotRelative.getZ(), kDelta);
+            assertEquals(0, robotRelative.getX(), DELTA);
+            assertEquals(0, robotRelative.getY(), DELTA);
+            assertEquals(1, robotRelative.getZ(), DELTA);
             // irrelevant roll
-            assertEquals(0.615, robotRelative.getRotation().getX(), kDelta);
+            assertEquals(0.615, robotRelative.getRotation().getX(), DELTA);
             // down less than 45, since the yaw pulls it down
-            assertEquals(0.523, robotRelative.getRotation().getY(), kDelta);
+            assertEquals(0.523, robotRelative.getRotation().getY(), DELTA);
             // left more than 45, due to the camera tilt
-            assertEquals(0.955, robotRelative.getRotation().getZ(), kDelta);
+            assertEquals(0.955, robotRelative.getRotation().getZ(), DELTA);
         }
         {
             // this case is similar to the case above, down and left
@@ -296,15 +296,15 @@ class TargetLocalizerTest {
             Rotation3d sight = new Rotation3d(VecBuilder.fill(1, 0, 0), VecBuilder.fill(1, 1, -1));
             Transform3d robotRelative = TargetLocalizer.sightInRobotCoords(camera, sight);
             // robot relative translation is the same as the camera translation
-            assertEquals(0, robotRelative.getX(), kDelta);
-            assertEquals(0, robotRelative.getY(), kDelta);
-            assertEquals(1, robotRelative.getZ(), kDelta);
+            assertEquals(0, robotRelative.getX(), DELTA);
+            assertEquals(0, robotRelative.getY(), DELTA);
+            assertEquals(1, robotRelative.getZ(), DELTA);
             // irrelevant roll
-            assertEquals(0.262, robotRelative.getRotation().getX(), kDelta);
+            assertEquals(0.262, robotRelative.getRotation().getX(), DELTA);
             // down less than 45 because the yaw pulls it down
-            assertEquals(0.615, robotRelative.getRotation().getY(), kDelta);
+            assertEquals(0.615, robotRelative.getRotation().getY(), DELTA);
             // left exactly 45 because the camera is level
-            assertEquals(0.785, robotRelative.getRotation().getZ(), kDelta);
+            assertEquals(0.785, robotRelative.getRotation().getZ(), DELTA);
         }
         {
             // camera is rolled 90 and pitched down 45
@@ -313,15 +313,15 @@ class TargetLocalizerTest {
             Rotation3d sight = new Rotation3d(VecBuilder.fill(1, 0, 0), VecBuilder.fill(1, 0, -1));
             Transform3d robotRelative = TargetLocalizer.sightInRobotCoords(camera, sight);
             // robot relative translation is the same as the camera translation
-            assertEquals(0, robotRelative.getX(), kDelta);
-            assertEquals(0, robotRelative.getY(), kDelta);
-            assertEquals(1, robotRelative.getZ(), kDelta);
+            assertEquals(0, robotRelative.getX(), DELTA);
+            assertEquals(0, robotRelative.getY(), DELTA);
+            assertEquals(1, robotRelative.getZ(), DELTA);
             // irrelevant roll
-            assertEquals(2.186, robotRelative.getRotation().getX(), kDelta);
+            assertEquals(2.186, robotRelative.getRotation().getX(), DELTA);
             // just like the non-rolled case
-            assertEquals(0.523, robotRelative.getRotation().getY(), kDelta);
+            assertEquals(0.523, robotRelative.getRotation().getY(), DELTA);
             // just like the non-rolled case.
-            assertEquals(0.955, robotRelative.getRotation().getZ(), kDelta);
+            assertEquals(0.955, robotRelative.getRotation().getZ(), DELTA);
         }
     }
 
@@ -334,9 +334,9 @@ class TargetLocalizerTest {
             Rotation3d sight = new Rotation3d(VecBuilder.fill(1, 0, 0), VecBuilder.fill(1, 1, 0));
             Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
             // bore is pointing at x=1
-            assertEquals(1, t.getX(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
             // distance to the floor is sqrt(2) so y is equal to that
-            assertEquals(1.414, t.getY(), kDelta);
+            assertEquals(1.414, t.getY(), DELTA);
         }
         {
             // camera level
@@ -344,8 +344,8 @@ class TargetLocalizerTest {
             // target is down and to the left
             Rotation3d sight = new Rotation3d(VecBuilder.fill(1, 0, 0), VecBuilder.fill(1, 1, -1));
             Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
-            assertEquals(1, t.getX(), kDelta);
-            assertEquals(1, t.getY(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
+            assertEquals(1, t.getY(), DELTA);
         }
         {
             // camera level
@@ -354,8 +354,8 @@ class TargetLocalizerTest {
             Rotation3d sight = new Rotation3d(VecBuilder.fill(1, 0, 0), VecBuilder.fill(1, 1, -0.5));
             Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
             // shallow angle means further away.
-            assertEquals(2, t.getX(), kDelta);
-            assertEquals(2, t.getY(), kDelta);
+            assertEquals(2, t.getX(), DELTA);
+            assertEquals(2, t.getY(), DELTA);
         }
         {
             // camera 90 down, facing the floor
@@ -363,9 +363,9 @@ class TargetLocalizerTest {
             // sight is to the left
             Rotation3d sight = new Rotation3d(VecBuilder.fill(1, 0, 0), VecBuilder.fill(1, 1, 0));
             Translation2d t = TargetLocalizer.sightToRobotRelative(camera, sight).get();
-            assertEquals(0, t.getX(), kDelta);
+            assertEquals(0, t.getX(), DELTA);
             // camera altitude is 1, sight is 45 off bore, so Y is 1
-            assertEquals(1, t.getY(), kDelta);
+            assertEquals(1, t.getY(), DELTA);
         }
     }
 
@@ -394,8 +394,8 @@ class TargetLocalizerTest {
                     robotPose,
                     cameraRotationRobotRelative);
             // since the robot is at the origin this doesn't do anything.
-            assertEquals(1, t.getX(), kDelta);
-            assertEquals(0, t.getY(), kDelta);
+            assertEquals(1, t.getX(), DELTA);
+            assertEquals(0, t.getY(), DELTA);
         }
         {
             Pose2d robotPose = new Pose2d(1, 0, new Rotation2d());
@@ -404,8 +404,8 @@ class TargetLocalizerTest {
                     robotPose,
                     cameraRotationRobotRelative);
             // since the robot is at the origin this doesn't do anything.
-            assertEquals(2, t.getX(), kDelta);
-            assertEquals(0, t.getY(), kDelta);
+            assertEquals(2, t.getX(), DELTA);
+            assertEquals(0, t.getY(), DELTA);
         }
         {
             Pose2d robotPose = new Pose2d(1, 0, new Rotation2d(Math.PI / 4));
@@ -414,8 +414,8 @@ class TargetLocalizerTest {
                     robotPose,
                     cameraRotationRobotRelative);
             // since the robot is at the origin this doesn't do anything.
-            assertEquals(1.707, t.getX(), kDelta);
-            assertEquals(0.707, t.getY(), kDelta);
+            assertEquals(1.707, t.getX(), DELTA);
+            assertEquals(0.707, t.getY(), DELTA);
         }
     }
 

@@ -1,6 +1,7 @@
 package org.team100.lib.motion.drivetrain;
 
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.wpilibj2.command.Subsystem;
 

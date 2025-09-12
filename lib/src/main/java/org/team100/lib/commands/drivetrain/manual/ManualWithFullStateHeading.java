@@ -12,12 +12,11 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.DriveUtil;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -120,9 +119,9 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
         final double yawRate = thetaState.v();
 
         // clip the input to the unit circle
-        final DriverControl.Velocity clipped = DriveUtil.clampTwist(twist1_1, 1.0);
+        final DriverControl.Velocity clipped = twist1_1.clip(1.0);
         // scale to max in both translation and rotation
-        final FieldRelativeVelocity scaled = DriveUtil.scale(
+        final FieldRelativeVelocity scaled = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());

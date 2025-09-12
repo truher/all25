@@ -13,8 +13,8 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MockBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.testing.Timeless;
@@ -22,7 +22,7 @@ import org.team100.lib.util.Util;
 
 class AngularPositionProfileTest implements Timeless {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     private final MockBareMotor motor;
@@ -46,7 +46,7 @@ class AngularPositionProfileTest implements Timeless {
      */
     @Test
     void testTrapezoid() {
-        final Profile100 profile = new TrapezoidProfileWPI(1, 1);
+        final IncrementalProfile profile = new TrapezoidProfileWPI(1, 1);
         ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(
                 logger,
@@ -60,7 +60,7 @@ class AngularPositionProfileTest implements Timeless {
 
     @Test
     void testProfile() {
-        final Profile100 profile = new TrapezoidProfile100(1, 1, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
         ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(
                 logger,
@@ -106,7 +106,7 @@ class AngularPositionProfileTest implements Timeless {
         if (DEBUG)
             Util.printf("verify(%5.3f, %5.3f, %5.3f);\n", motor.velocity,
                     servo.m_setpoint.x(), servo.m_setpoint.v());
-        assertEquals(setpointPosition, servo.m_setpoint.x(), kDelta, "position");
-        assertEquals(setpointVelocity, servo.m_setpoint.v(), kDelta, "velocity");
+        assertEquals(setpointPosition, servo.m_setpoint.x(), DELTA, "position");
+        assertEquals(setpointVelocity, servo.m_setpoint.v(), DELTA, "velocity");
     }
 }

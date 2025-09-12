@@ -11,17 +11,16 @@ import org.team100.lib.motor.Neo550Factory;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Funnel extends SubsystemBase  {
-
-    LinearMechanism m_starboardMech;
-    LinearMechanism m_portMech;
-    Servo latchingServo1;
-    Servo latchingServo2;
-
-    DoubleLogger servoAngle1Log;
-    DoubleLogger servoAngle2Log;
+public class Funnel extends SubsystemBase {
+    private final LinearMechanism m_starboardMech;
+    private final LinearMechanism m_portMech;
+    private Servo latchingServo1;
+    private Servo latchingServo2;
+    private DoubleLogger servoAngle1Log;
+    private DoubleLogger servoAngle2Log;
 
     public Funnel(
             LoggerFactory parent,
@@ -29,15 +28,15 @@ public class Funnel extends SubsystemBase  {
             int portID) {
         LoggerFactory child = parent.type(this);
 
-        int funnelSupplyLimit = 20;
-
         switch (Identity.instance) {
             case COMP_BOT -> {
-
+                int funnelSupplyLimit = 20;
                 m_starboardMech = Neo550Factory.getNEO550LinearMechanism(
-                        getName(), child, funnelSupplyLimit, starboardID, 1, MotorPhase.REVERSE, 1);
+                        child.name("starboard"), funnelSupplyLimit, starboardID, 1,
+                        MotorPhase.REVERSE, 1);
                 m_portMech = Neo550Factory.getNEO550LinearMechanism(
-                        getName(), child, funnelSupplyLimit, portID, 1, MotorPhase.FORWARD, 1);
+                        child.name("port"), funnelSupplyLimit, portID, 1,
+                        MotorPhase.FORWARD, 1);
 
                 latchingServo1 = new Servo(3);
                 latchingServo2 = new Servo(9);
@@ -52,9 +51,11 @@ public class Funnel extends SubsystemBase  {
                 SimulatedBareMotor portMotor = new SimulatedBareMotor(child, 100);
                 SimulatedBareEncoder portEncoder = new SimulatedBareEncoder(child, portMotor);
                 m_starboardMech = new LinearMechanism(
-                        starboardMotor, starboardEncoder, 1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                        child, starboardMotor, starboardEncoder, 1, 1,
+                        Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 m_portMech = new LinearMechanism(
-                        portMotor, portEncoder, 1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                        child, portMotor, portEncoder, 1, 1,
+                        Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
             }
         }
     }
@@ -79,7 +80,6 @@ public class Funnel extends SubsystemBase  {
     }
 
     public double getLatch1() {
-
         return latchingServo1.getAngle();
     }
 
@@ -100,7 +100,19 @@ public class Funnel extends SubsystemBase  {
             return;
         servoAngle1Log.log(() -> getLatch1());
         servoAngle2Log.log(() -> getLatch2());
+    }
 
+    // COMMANDS
+
+    public Command setLatch(double v1, double v2) {
+        return run(() -> {
+            setLatch1(v1);
+            setLatch2(v2);
+        });
+    }
+
+    public Command agitate() {
+        return new RunFunnel(this);
     }
 
 }

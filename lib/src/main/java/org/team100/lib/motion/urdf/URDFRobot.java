@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.math.NewtonsMethod;
+import org.team100.lib.optimization.NewtonsMethod;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Nat;
@@ -221,8 +221,8 @@ public class URDFRobot<Q extends Num> {
      * qDim needs to match the actual number of moveable joints.
      * TODO: remove it.
      */
-    public <Q extends Num> Vector<Q> minQ(Nat<Q> qDim) {
-        Vector<Q> v = new Vector<>(qDim);
+    public <QQ extends Num> Vector<QQ> minQ(Nat<QQ> qDim) {
+        Vector<QQ> v = new Vector<>(qDim);
         List<URDFJoint> joints = m_joints;
         for (int i = 0; i < joints.size(); ++i) {
             URDFJoint joint = joints.get(i);
@@ -237,8 +237,8 @@ public class URDFRobot<Q extends Num> {
      * qDim needs to match the actual number of moveable joints.
      * TODO: remove it.
      */
-    public <Q extends Num> Vector<Q> maxQ(Nat<Q> qDim) {
-        Vector<Q> v = new Vector<>(qDim);
+    public <QQ extends Num> Vector<QQ> maxQ(Nat<QQ> qDim) {
+        Vector<QQ> v = new Vector<>(qDim);
         List<URDFJoint> joints = m_joints;
         for (int i = 0; i < joints.size(); ++i) {
             URDFJoint joint = joints.get(i);

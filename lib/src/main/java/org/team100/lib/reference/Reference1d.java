@@ -2,9 +2,9 @@ package org.team100.lib.reference;
 
 import java.util.function.Supplier;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Takt;
 
 /**
  * Produces "next" and "current" references from a supplier, using the clock to

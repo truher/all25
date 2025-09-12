@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
-import org.team100.lib.path.Path100;
-import org.team100.lib.path.PathFactory;
-import org.team100.lib.timing.ScheduleGenerator;
-import org.team100.lib.timing.TimingConstraint;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.trajectory.path.Path100;
+import org.team100.lib.trajectory.path.PathFactory;
+import org.team100.lib.trajectory.timing.ScheduleGenerator;
+import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,9 +25,9 @@ import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGeneratio
 public class TrajectoryPlanner {
     // the tolerances here control the approximation of the list of poses to the
     // continuous spline. previously they were 1.2 cm and 1 radian.
-    private static final double kSplineSampleToleranceM = 0.05;
-    private static final double kSplineSampleToleranceRad = 0.2;
-    private static final double kTrajectoryStepM = 0.1;
+    private static final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;
+    private static final double SPLINE_SAMPLE_TOLERANCE_RAD = 0.2;
+    private static final double TRAJECTORY_STEP_M = 0.1;
     // if we try to start a trajectory while respecting initial velocity, but the
     // initial velocity is less than 0.01 m/s, just treat it as rest-to-rest.
     private static final double VELOCITY_EPSILON = 1e-2;
@@ -149,13 +149,13 @@ public class TrajectoryPlanner {
             // Create a path from splines.
             Path100 path = PathFactory.pathFromWaypoints(
                     waypoints,
-                    kSplineSampleToleranceM,
-                    kSplineSampleToleranceM,
-                    kSplineSampleToleranceRad);
+                    SPLINE_SAMPLE_TOLERANCE_M,
+                    SPLINE_SAMPLE_TOLERANCE_M,
+                    SPLINE_SAMPLE_TOLERANCE_RAD);
             // Generate the timed trajectory.
             return m_scheduleGenerator.timeParameterizeTrajectory(
                     path,
-                    kTrajectoryStepM,
+                    TRAJECTORY_STEP_M,
                     start_vel,
                     end_vel);
         } catch (IllegalArgumentException e) {
@@ -177,13 +177,13 @@ public class TrajectoryPlanner {
             // Create a path from splines.
             Path100 path = PathFactory.pathFromWaypoints(
                     waypoints,
-                    kSplineSampleToleranceM,
-                    kSplineSampleToleranceM,
-                    kSplineSampleToleranceRad, mN);
+                    SPLINE_SAMPLE_TOLERANCE_M,
+                    SPLINE_SAMPLE_TOLERANCE_M,
+                    SPLINE_SAMPLE_TOLERANCE_RAD, mN);
             // Generate the timed trajectory.
             return m_scheduleGenerator.timeParameterizeTrajectory(
                     path,
-                    kTrajectoryStepM,
+                    TRAJECTORY_STEP_M,
                     start_vel,
                     end_vel);
         } catch (IllegalArgumentException e) {

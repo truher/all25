@@ -21,19 +21,19 @@ import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.profile.incremental.Profile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
 
 public class WCPSwerveModule100 extends SwerveModule100 {
-    private static final double kSteeringPositionToleranceRad = 0.05;
-    private static final double kSteeringVelocityToleranceRad_S = 0.05;
+    private static final double STEERING_POSITION_TOLERANCE_RAD = 0.05;
+    private static final double STEERING_VELOCITY_TOLERANCE_RAD_S = 0.05;
     // https://github.com/frc1678/C2024-Public/blob/17e78272e65a6ce4f87c00a3514c79f787439ca1/src/main/java/com/team1678/frc2024/Constants.java#L212
     // 2/26/25 Joel increased the steering limits *a lot*, they were 10/20, now
     // 60/80, which may mean it's more imporant now to avoid twitching and
     // oscillating.
-    private static final double kSteeringSupplyLimit = 60;
-    private static final double kSteeringStatorLimit = 80;
+    private static final double STEERING_SUPPLY_LIMIT = 60;
+    private static final double STEERING_STATOR_LIMIT = 80;
     /**
      * WCP calls this "rotation ratio" here, we use the "flipped belt" which is the
      * fastest steering ratio.
@@ -42,7 +42,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
      * = 72 / 7
      * https://docs.wcproducts.com/wcp-swervex/misc/other-configurations/ratio-options
      */
-    private static final double kSteeringRatio = 10.28571429;
+    private static final double STEERING_RATIO = 10.28571429;
 
     /**
      * Flipped belt ratios.
@@ -62,7 +62,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
     }
 
     // WCP 4 inch wheel
-    private static final double kWheelDiameterM = 0.094; // 0.1015
+    private static final double WHEEL_DIAMETER_M = 0.094; // 0.1015
 
     /**
      * MAKE SURE THAT THE BEVELS ON THE WHEELS FOR ZEROING GO TO THE RIGHT
@@ -93,7 +93,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 turningMotorCanId,
                 turningEncoderChannel,
                 turningOffset,
-                kSteeringRatio,
+                STEERING_RATIO,
                 kinodynamics,
                 drive,
                 motorPhase);
@@ -128,7 +128,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 turningMotorCanId,
                 turningEncoderChannel,
                 turningOffset,
-                kSteeringRatio,
+                STEERING_RATIO,
                 kinodynamics,
                 drive,
                 motorPhase);
@@ -153,11 +153,11 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 pid,
                 ff);
         Talon6Encoder encoder = new Talon6Encoder(parent, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor,
                 encoder,
                 ratio.m_ratio,
-                kWheelDiameterM,
+                WHEEL_DIAMETER_M,
                 Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
         return new OutboardLinearVelocityServo(parent, mech);
@@ -180,8 +180,8 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 pid,
                 ff);
         Talon6Encoder encoder = new Talon6Encoder(parent, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
-                driveMotor, encoder, ratio.m_ratio, kWheelDiameterM, Double.NEGATIVE_INFINITY,
+        LinearMechanism mech = new LinearMechanism(parent,
+                driveMotor, encoder, ratio.m_ratio, WHEEL_DIAMETER_M, Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
         return new OutboardLinearVelocityServo(
                 parent,
@@ -211,8 +211,8 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 parent,
                 turningMotorCanId,
                 motorPhase,
-                kSteeringSupplyLimit,
-                kSteeringStatorLimit,
+                STEERING_SUPPLY_LIMIT,
+                STEERING_STATOR_LIMIT,
                 lowLevelPID,
                 ff);
 
@@ -240,9 +240,9 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             SwerveKinodynamics kinodynamics,
             RotaryMechanism mech,
             CombinedRotaryPositionSensor combinedEncoder) {
-        Profile100 profile = kinodynamics.getSteeringProfile();
+        IncrementalProfile profile = kinodynamics.getSteeringProfile();
         ProfileReference1d ref = new IncrementalProfileReference1d(
-                profile, kSteeringPositionToleranceRad, kSteeringVelocityToleranceRad_S);
+                profile, STEERING_POSITION_TOLERANCE_RAD, STEERING_VELOCITY_TOLERANCE_RAD_S);
         return new OutboardAngularPositionServo(parent, mech, ref);
     }
 

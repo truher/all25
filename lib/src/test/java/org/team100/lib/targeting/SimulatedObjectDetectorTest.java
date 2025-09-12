@@ -16,7 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 class SimulatedObjectDetectorTest {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
 
     @Test
     void testNotePose() {
@@ -37,9 +37,9 @@ class SimulatedObjectDetectorTest {
 
         assertEquals(1, sights.size());
         // on-bore
-        assertEquals(0, sights.get(0).getX(), kDelta);
-        assertEquals(0, sights.get(0).getY(), kDelta);
-        assertEquals(0, sights.get(0).getZ(), kDelta);
+        assertEquals(0, sights.get(0).getX(), DELTA);
+        assertEquals(0, sights.get(0).getY(), DELTA);
+        assertEquals(0, sights.get(0).getZ(), DELTA);
 
         List<Translation2d> targets = TargetLocalizer.cameraRotsToFieldRelativeArray(
                 robotPose,
@@ -47,8 +47,8 @@ class SimulatedObjectDetectorTest {
                 sights.toArray(new Rotation3d[0]));
         assertEquals(1, targets.size());
         // we should get back the goal
-        assertEquals(1, targets.get(0).getX(), kDelta);
-        assertEquals(0, targets.get(0).getY(), kDelta);
+        assertEquals(1, targets.get(0).getX(), DELTA);
+        assertEquals(0, targets.get(0).getY(), DELTA);
     }
 
     @Test
@@ -71,9 +71,9 @@ class SimulatedObjectDetectorTest {
 
         assertEquals(1, sights.size());
         // on-bore
-        assertEquals(0, sights.get(0).getX(), kDelta);
-        assertEquals(0.463, sights.get(0).getY(), kDelta);
-        assertEquals(0, sights.get(0).getZ(), kDelta);
+        assertEquals(0, sights.get(0).getX(), DELTA);
+        assertEquals(0.463, sights.get(0).getY(), DELTA);
+        assertEquals(0, sights.get(0).getZ(), DELTA);
 
         List<Translation2d> targets = TargetLocalizer.cameraRotsToFieldRelativeArray(
                 robotPose,
@@ -81,8 +81,8 @@ class SimulatedObjectDetectorTest {
                 sights.toArray(new Rotation3d[0]));
         assertEquals(1, targets.size());
         // we should get back the goal
-        assertEquals(2, targets.get(0).getX(), kDelta);
-        assertEquals(0, targets.get(0).getY(), kDelta);
+        assertEquals(2, targets.get(0).getX(), DELTA);
+        assertEquals(0, targets.get(0).getY(), DELTA);
     }
 
     @Test
@@ -104,11 +104,11 @@ class SimulatedObjectDetectorTest {
 
         assertEquals(1, sights.size());
         // roll?
-        assertEquals(0.101, sights.get(0).getX(), kDelta);
+        assertEquals(0.101, sights.get(0).getX(), DELTA);
         // less than the expected
-        assertEquals(0.420, sights.get(0).getY(), kDelta);
+        assertEquals(0.420, sights.get(0).getY(), DELTA);
         // exactly the expected
-        assertEquals(0.463, sights.get(0).getZ(), kDelta);
+        assertEquals(0.463, sights.get(0).getZ(), DELTA);
 
         List<Translation2d> targets = TargetLocalizer.cameraRotsToFieldRelativeArray(
                 robotPose,
@@ -116,8 +116,8 @@ class SimulatedObjectDetectorTest {
                 sights.toArray(new Rotation3d[0]));
         assertEquals(1, targets.size());
         // we should get back the goal
-        assertEquals(2, targets.get(0).getX(), kDelta);
-        assertEquals(1, targets.get(0).getY(), kDelta);
+        assertEquals(2, targets.get(0).getX(), DELTA);
+        assertEquals(1, targets.get(0).getY(), DELTA);
     }
 
     @Test
@@ -137,11 +137,11 @@ class SimulatedObjectDetectorTest {
         // this is what the camera should see.
         Rotation3d expectedSight = new Rotation3d(VecBuilder.fill(2, 0, 0), VecBuilder.fill(2, 1, -1));
         // irrelevant roll
-        assertEquals(0.101, expectedSight.getX(), kDelta);
+        assertEquals(0.101, expectedSight.getX(), DELTA);
         // a bit less than the expected pitch, since the yaw pulls it in
-        assertEquals(0.420, expectedSight.getY(), kDelta);
+        assertEquals(0.420, expectedSight.getY(), DELTA);
         // expected yaw
-        assertEquals(0.463, expectedSight.getZ(), kDelta);
+        assertEquals(0.463, expectedSight.getZ(), DELTA);
 
         Pose2d robotPose = new Pose2d();
 
@@ -149,9 +149,9 @@ class SimulatedObjectDetectorTest {
 
         assertEquals(1, sights.size());
         // roll doesn't matter
-        assertEquals(0.101, sights.get(0).getX(), kDelta);
-        assertEquals(0.420, sights.get(0).getY(), kDelta);
-        assertEquals(0.463, sights.get(0).getZ(), kDelta);
+        assertEquals(0.101, sights.get(0).getX(), DELTA);
+        assertEquals(0.420, sights.get(0).getY(), DELTA);
+        assertEquals(0.463, sights.get(0).getZ(), DELTA);
 
         List<Translation2d> targets = TargetLocalizer.cameraRotsToFieldRelativeArray(
                 robotPose,
@@ -159,8 +159,8 @@ class SimulatedObjectDetectorTest {
                 sights.toArray(new Rotation3d[0]));
         assertEquals(1, targets.size());
         // we should get back the goal
-        assertEquals(2, targets.get(0).getX(), kDelta);
-        assertEquals(1, targets.get(0).getY(), kDelta);
+        assertEquals(2, targets.get(0).getX(), DELTA);
+        assertEquals(1, targets.get(0).getY(), DELTA);
     }
 
     @Test
@@ -181,9 +181,9 @@ class SimulatedObjectDetectorTest {
 
         assertEquals(1, sights.size());
         // camera should see target straight ahead
-        assertEquals(0, sights.get(0).getX(), kDelta);
-        assertEquals(0.463, sights.get(0).getY(), kDelta);
-        assertEquals(0, sights.get(0).getZ(), kDelta);
+        assertEquals(0, sights.get(0).getX(), DELTA);
+        assertEquals(0.463, sights.get(0).getY(), DELTA);
+        assertEquals(0, sights.get(0).getZ(), DELTA);
 
         List<Translation2d> targets = TargetLocalizer.cameraRotsToFieldRelativeArray(
                 robotPose,
@@ -191,8 +191,8 @@ class SimulatedObjectDetectorTest {
                 sights.toArray(new Rotation3d[0]));
         assertEquals(1, targets.size());
         // we should get back the goal
-        assertEquals(0, targets.get(0).getX(), kDelta);
-        assertEquals(2, targets.get(0).getY(), kDelta);
+        assertEquals(0, targets.get(0).getX(), DELTA);
+        assertEquals(2, targets.get(0).getY(), DELTA);
     }
 
     @Test
@@ -202,16 +202,16 @@ class SimulatedObjectDetectorTest {
             Pose2d robotPose = new Pose2d();
             Pose2d notePose = new Pose2d(new Translation2d(2, 0), new Rotation2d());
             Translation2d relative = notePose.relativeTo(robotPose).getTranslation();
-            assertEquals(2, relative.getX(), kDelta);
-            assertEquals(0, relative.getY(), kDelta);
+            assertEquals(2, relative.getX(), DELTA);
+            assertEquals(0, relative.getY(), DELTA);
         }
         {
             // robot facing left
             Pose2d robotPose = new Pose2d(new Translation2d(), new Rotation2d(Math.PI / 2));
             Pose2d notePose = new Pose2d(new Translation2d(2, 0), new Rotation2d());
             Translation2d relative = notePose.relativeTo(robotPose).getTranslation();
-            assertEquals(0, relative.getX(), kDelta);
-            assertEquals(-2, relative.getY(), kDelta);
+            assertEquals(0, relative.getX(), DELTA);
+            assertEquals(-2, relative.getY(), DELTA);
         }
 
         {
@@ -220,8 +220,8 @@ class SimulatedObjectDetectorTest {
             // note 2m ahead
             Pose2d notePose = new Pose2d(new Translation2d(2, 0), new Rotation2d());
             Translation2d relative = notePose.relativeTo(robotPose).getTranslation();
-            assertEquals(2, relative.getX(), kDelta);
-            assertEquals(0, relative.getY(), kDelta);
+            assertEquals(2, relative.getX(), DELTA);
+            assertEquals(0, relative.getY(), DELTA);
             Transform3d noteInRobotCoords = new Transform3d(
                     new Translation3d(relative.getX(), relative.getY(), 0),
                     new Rotation3d());
@@ -230,14 +230,14 @@ class SimulatedObjectDetectorTest {
             Transform3d robotInCameraCoordinates = cameraInRobotCoordinates.inverse();
             Transform3d noteInCameraCoordinates = noteInRobotCoords.plus(robotInCameraCoordinates);
             // 2m ahead
-            assertEquals(2, noteInCameraCoordinates.getX(), kDelta);
-            assertEquals(0, noteInCameraCoordinates.getY(), kDelta);
+            assertEquals(2, noteInCameraCoordinates.getX(), DELTA);
+            assertEquals(0, noteInCameraCoordinates.getY(), DELTA);
             // 1m down from camera
-            assertEquals(-1, noteInCameraCoordinates.getZ(), kDelta);
+            assertEquals(-1, noteInCameraCoordinates.getZ(), DELTA);
             // no rotation
-            assertEquals(0, noteInCameraCoordinates.getRotation().getX(), kDelta);
-            assertEquals(0, noteInCameraCoordinates.getRotation().getY(), kDelta);
-            assertEquals(0, noteInCameraCoordinates.getRotation().getZ(), kDelta);
+            assertEquals(0, noteInCameraCoordinates.getRotation().getX(), DELTA);
+            assertEquals(0, noteInCameraCoordinates.getRotation().getY(), DELTA);
+            assertEquals(0, noteInCameraCoordinates.getRotation().getZ(), DELTA);
         }
     }
 
@@ -258,23 +258,23 @@ class SimulatedObjectDetectorTest {
         Transform3d noteInCameraCoordinates = cam.getNoteInCameraCoordinates(robotPose, note);
 
         // 1m ahead
-        assertEquals(1, noteInCameraCoordinates.getX(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getY(), kDelta);
+        assertEquals(1, noteInCameraCoordinates.getX(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getY(), DELTA);
         // 1m down from camera
-        assertEquals(-1, noteInCameraCoordinates.getZ(), kDelta);
+        assertEquals(-1, noteInCameraCoordinates.getZ(), DELTA);
         // no rotation
-        assertEquals(0, noteInCameraCoordinates.getRotation().getX(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getRotation().getY(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getRotation().getZ(), kDelta);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getX(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getY(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getZ(), DELTA);
 
         Optional<Rotation3d> rotInCamera = cam.getRotInCamera(robotPose, note);
 
         // roll is irrelevant anyway
-        assertEquals(0, rotInCamera.get().getX(), kDelta);
+        assertEquals(0, rotInCamera.get().getX(), DELTA);
         // this should be atan(1) = 0.785
-        assertEquals(0.785, rotInCamera.get().getY(), kDelta);
+        assertEquals(0.785, rotInCamera.get().getY(), DELTA);
         // dead ahead
-        assertEquals(0, rotInCamera.get().getZ(), kDelta);
+        assertEquals(0, rotInCamera.get().getZ(), DELTA);
 
         // do we get back the original pose?
 
@@ -283,8 +283,8 @@ class SimulatedObjectDetectorTest {
                 cameraInRobotCoordinates,
                 rotInCamera.get());
         // we should get back the goal
-        assertEquals(1, target.get().getX(), kDelta);
-        assertEquals(0, target.get().getY(), kDelta);
+        assertEquals(1, target.get().getX(), DELTA);
+        assertEquals(0, target.get().getY(), DELTA);
 
     }
 
@@ -307,23 +307,23 @@ class SimulatedObjectDetectorTest {
         Transform3d noteInCameraCoordinates = cam.getNoteInCameraCoordinates(robotPose, note);
 
         // 2m ahead
-        assertEquals(2, noteInCameraCoordinates.getX(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getY(), kDelta);
+        assertEquals(2, noteInCameraCoordinates.getX(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getY(), DELTA);
         // 1m down from camera
-        assertEquals(-1, noteInCameraCoordinates.getZ(), kDelta);
+        assertEquals(-1, noteInCameraCoordinates.getZ(), DELTA);
         // no rotation
-        assertEquals(0, noteInCameraCoordinates.getRotation().getX(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getRotation().getY(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getRotation().getZ(), kDelta);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getX(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getY(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getZ(), DELTA);
 
         Optional<Rotation3d> rotInCamera = cam.getRotInCamera(robotPose, note);
 
         // roll is irrelevant anyway
-        assertEquals(0, rotInCamera.get().getX(), kDelta);
+        assertEquals(0, rotInCamera.get().getX(), DELTA);
         // this should be atan(0.5) = 0.463
-        assertEquals(0.463, rotInCamera.get().getY(), kDelta);
+        assertEquals(0.463, rotInCamera.get().getY(), DELTA);
         // dead ahead
-        assertEquals(0, rotInCamera.get().getZ(), kDelta);
+        assertEquals(0, rotInCamera.get().getZ(), DELTA);
 
         // do we get back the original pose?
 
@@ -332,8 +332,8 @@ class SimulatedObjectDetectorTest {
                 cameraInRobotCoordinates,
                 rotInCamera.get());
         // we should get back the goal
-        assertEquals(2, target.get().getX(), kDelta);
-        assertEquals(0, target.get().getY(), kDelta);
+        assertEquals(2, target.get().getX(), DELTA);
+        assertEquals(0, target.get().getY(), DELTA);
 
     }
 
@@ -354,14 +354,14 @@ class SimulatedObjectDetectorTest {
         Transform3d noteInCameraCoordinates = cam.getNoteInCameraCoordinates(robotPose, note);
 
         // 2m ahead
-        assertEquals(2, noteInCameraCoordinates.getX(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getY(), kDelta);
+        assertEquals(2, noteInCameraCoordinates.getX(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getY(), DELTA);
         // 1m down from camera
-        assertEquals(-1, noteInCameraCoordinates.getZ(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getRotation().getX(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getRotation().getY(), kDelta);
+        assertEquals(-1, noteInCameraCoordinates.getZ(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getX(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getY(), DELTA);
         // -pi/2 yaw, doesn't matter
-        assertEquals(-1.571, noteInCameraCoordinates.getRotation().getZ(), kDelta);
+        assertEquals(-1.571, noteInCameraCoordinates.getRotation().getZ(), DELTA);
 
     }
 
@@ -381,16 +381,16 @@ class SimulatedObjectDetectorTest {
         Transform3d noteInCameraCoordinates = cam.getNoteInCameraCoordinates(robotPose, note);
 
         // a bit more than 2m ahead
-        assertEquals(2.121, noteInCameraCoordinates.getX(), kDelta);
+        assertEquals(2.121, noteInCameraCoordinates.getX(), DELTA);
         // dead ahead
-        assertEquals(0, noteInCameraCoordinates.getY(), kDelta);
+        assertEquals(0, noteInCameraCoordinates.getY(), DELTA);
         // above the bore
-        assertEquals(0.707, noteInCameraCoordinates.getZ(), kDelta);
+        assertEquals(0.707, noteInCameraCoordinates.getZ(), DELTA);
         // irrelevant
-        assertEquals(0.785, noteInCameraCoordinates.getRotation().getX(), kDelta);
-        assertEquals(0, noteInCameraCoordinates.getRotation().getY(), kDelta);
+        assertEquals(0.785, noteInCameraCoordinates.getRotation().getX(), DELTA);
+        assertEquals(0, noteInCameraCoordinates.getRotation().getY(), DELTA);
         // -pi/2 yaw, doesn't matter
-        assertEquals(-1.571, noteInCameraCoordinates.getRotation().getZ(), kDelta);
+        assertEquals(-1.571, noteInCameraCoordinates.getRotation().getZ(), DELTA);
 
     }
 
@@ -411,11 +411,11 @@ class SimulatedObjectDetectorTest {
         Optional<Rotation3d> rotInCamera = cam.getRotInCamera(robotPose, note);
 
         // roll is irrelevant anyway
-        assertEquals(0, rotInCamera.get().getX(), kDelta);
+        assertEquals(0, rotInCamera.get().getX(), DELTA);
         // a little pitch up
-        assertEquals(-0.321, rotInCamera.get().getY(), kDelta);
+        assertEquals(-0.321, rotInCamera.get().getY(), DELTA);
         // dead ahead
-        assertEquals(0, rotInCamera.get().getZ(), kDelta);
+        assertEquals(0, rotInCamera.get().getZ(), DELTA);
 
         // do we get back the original pose?
 
@@ -424,8 +424,8 @@ class SimulatedObjectDetectorTest {
                 cameraInRobotCoordinates,
                 rotInCamera.get());
         // we should get back the goal
-        assertEquals(0, target.get().getX(), kDelta);
-        assertEquals(2, target.get().getY(), kDelta);
+        assertEquals(0, target.get().getX(), DELTA);
+        assertEquals(2, target.get().getY(), DELTA);
 
     }
 
@@ -445,11 +445,11 @@ class SimulatedObjectDetectorTest {
         Optional<Rotation3d> rotInCamera = cam.getRotInCamera(robotPose, note);
 
         // roll is irrelevant anyway
-        assertEquals(0, rotInCamera.get().getX(), kDelta);
+        assertEquals(0, rotInCamera.get().getX(), DELTA);
         // on bore
-        assertEquals(0, rotInCamera.get().getY(), kDelta);
+        assertEquals(0, rotInCamera.get().getY(), DELTA);
         // dead ahead
-        assertEquals(0, rotInCamera.get().getZ(), kDelta);
+        assertEquals(0, rotInCamera.get().getZ(), DELTA);
 
         // do we get back the original pose?
 
@@ -458,8 +458,8 @@ class SimulatedObjectDetectorTest {
                 cameraInRobotCoordinates,
                 rotInCamera.get());
         // we should get back the goal
-        assertEquals(0, target.get().getX(), kDelta);
-        assertEquals(1, target.get().getY(), kDelta);
+        assertEquals(0, target.get().getX(), DELTA);
+        assertEquals(1, target.get().getY(), DELTA);
 
     }
 }

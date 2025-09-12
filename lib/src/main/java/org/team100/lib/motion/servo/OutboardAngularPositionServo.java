@@ -23,8 +23,8 @@ import edu.wpi.first.math.MathUtil;
  * Must be used with a combined encoder, to "zero" the motor encoder.
  */
 public class OutboardAngularPositionServo implements AngularPositionServo {
-    private static final double kPositionTolerance = 0.05;
-    private static final double kVelocityTolerance = 0.05;
+    private static final double POSITION_TOLERANCE = 0.05;
+    private static final double VELOCITY_TOLERANCE = 0.05;
 
     private final RotaryMechanism m_mechanism;
     private final ProfileReference1d m_ref;
@@ -95,7 +95,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
 
         Model100 goal = new Model100(mod(goalRad), 0);
 
-        if (!goal.near(m_goal, kPositionTolerance, kVelocityTolerance)) {
+        if (!goal.near(m_goal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
             m_goal = goal;
             m_ref.setGoal(goal);
             // make sure the setpoint is near the measurement
@@ -172,8 +172,8 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
             return false;
         double positionError = MathUtil.angleModulus(m_setpoint.x() - positionRad.getAsDouble());
         double velocityError = m_setpoint.v() - velocityRad_S.getAsDouble();
-        return Math.abs(positionError) < kPositionTolerance
-                && Math.abs(velocityError) < kVelocityTolerance;
+        return Math.abs(positionError) < POSITION_TOLERANCE
+                && Math.abs(velocityError) < VELOCITY_TOLERANCE;
     }
 
     @Override

@@ -19,13 +19,13 @@ class LinearVelocityServoTest {
     void testSimple() {
         MockBareMotor driveMotor = new MockBareMotor(Feedforward100.makeSimple());
         MockIncrementalBareEncoder driveEncoder = new MockIncrementalBareEncoder();
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(logger,
                 driveMotor, driveEncoder, 1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         OutboardLinearVelocityServo servo = new OutboardLinearVelocityServo(
                 logger,
                 mech);
         // 0.5 m/s
-        servo.setVelocityM_S(0.5);
+        servo.setVelocity(0.5);
         // wheel radius is 0.5 m, so drive speed is 1 m/s
         assertEquals(1.0, driveMotor.velocity, 0.001);
     }

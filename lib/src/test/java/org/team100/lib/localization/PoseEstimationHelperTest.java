@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 
 class PoseEstimationHelperTest {
     private static final boolean DEBUG = false;
-    private static final double kDelta = 0.01;
+    private static final double DELTA = 0.01;
 
     @Test
     void testGetRobotPoseInFieldCoords2() {
@@ -35,12 +35,12 @@ class PoseEstimationHelperTest {
                 cameraInField,
                 cameraInRobot);
 
-        assertEquals(0, robotInField.getX(), kDelta);
-        assertEquals(0, robotInField.getY(), kDelta);
-        assertEquals(0, robotInField.getZ(), kDelta);
-        assertEquals(0, robotInField.getRotation().getX(), kDelta);
-        assertEquals(0, robotInField.getRotation().getY(), kDelta);
-        assertEquals(0, robotInField.getRotation().getZ(), kDelta);
+        assertEquals(0, robotInField.getX(), DELTA);
+        assertEquals(0, robotInField.getY(), DELTA);
+        assertEquals(0, robotInField.getZ(), DELTA);
+        assertEquals(0, robotInField.getRotation().getX(), DELTA);
+        assertEquals(0, robotInField.getRotation().getY(), DELTA);
+        assertEquals(0, robotInField.getRotation().getZ(), DELTA);
     }
 
     @Test
@@ -56,12 +56,12 @@ class PoseEstimationHelperTest {
                 tagRotationInCamera);
         Pose3d cameraInField = PoseEstimationHelper.cameraInField(tagInField, tagInCamera);
         Pose3d robotInField = PoseEstimationHelper.robotInField(cameraInField, cameraInRobot);
-        assertEquals(0, robotInField.getX(), kDelta);
-        assertEquals(0, robotInField.getY(), kDelta);
-        assertEquals(0, robotInField.getZ(), kDelta);
-        assertEquals(0, robotInField.getRotation().getX(), kDelta);
-        assertEquals(0, robotInField.getRotation().getY(), kDelta);
-        assertEquals(0, robotInField.getRotation().getZ(), kDelta);
+        assertEquals(0, robotInField.getX(), DELTA);
+        assertEquals(0, robotInField.getY(), DELTA);
+        assertEquals(0, robotInField.getZ(), DELTA);
+        assertEquals(0, robotInField.getRotation().getX(), DELTA);
+        assertEquals(0, robotInField.getRotation().getY(), DELTA);
+        assertEquals(0, robotInField.getRotation().getZ(), DELTA);
     }
 
     @Test
@@ -91,12 +91,12 @@ class PoseEstimationHelperTest {
         Pose3d robotInField = PoseEstimationHelper.robotInField(
                 cameraInField,
                 cameraInRobot);
-        assertEquals(0, robotInField.getX(), kDelta);
-        assertEquals(0, robotInField.getY(), kDelta);
-        assertEquals(0, robotInField.getZ(), kDelta);
-        assertEquals(0, robotInField.getRotation().getX(), kDelta);
-        assertEquals(0, robotInField.getRotation().getY(), kDelta);
-        assertEquals(0, robotInField.getRotation().getZ(), kDelta);
+        assertEquals(0, robotInField.getX(), DELTA);
+        assertEquals(0, robotInField.getY(), DELTA);
+        assertEquals(0, robotInField.getZ(), DELTA);
+        assertEquals(0, robotInField.getRotation().getX(), DELTA);
+        assertEquals(0, robotInField.getRotation().getY(), DELTA);
+        assertEquals(0, robotInField.getRotation().getZ(), DELTA);
     }
 
     @Test
@@ -120,12 +120,12 @@ class PoseEstimationHelperTest {
                 tagInField,
                 tagInCamera);
 
-        assertEquals(0, robotInField.getX(), kDelta);
-        assertEquals(0, robotInField.getY(), kDelta);
-        assertEquals(0, robotInField.getZ(), kDelta);
-        assertEquals(0, robotInField.getRotation().getX(), kDelta);
-        assertEquals(0, robotInField.getRotation().getY(), kDelta);
-        assertEquals(0, robotInField.getRotation().getZ(), kDelta);
+        assertEquals(0, robotInField.getX(), DELTA);
+        assertEquals(0, robotInField.getY(), DELTA);
+        assertEquals(0, robotInField.getZ(), DELTA);
+        assertEquals(0, robotInField.getRotation().getX(), DELTA);
+        assertEquals(0, robotInField.getRotation().getY(), DELTA);
+        assertEquals(0, robotInField.getRotation().getZ(), DELTA);
     }
 
     @Test
@@ -157,12 +157,12 @@ class PoseEstimationHelperTest {
                 tagInField,
                 tagInCamera);
 
-        assertEquals(0, robotPoseInField.getX(), kDelta);
-        assertEquals(0, robotPoseInField.getY(), kDelta);
-        assertEquals(0, robotPoseInField.getZ(), kDelta);
-        assertEquals(0, robotPoseInField.getRotation().getX(), kDelta);
-        assertEquals(0, robotPoseInField.getRotation().getY(), kDelta);
-        assertEquals(0, robotPoseInField.getRotation().getZ(), kDelta);
+        assertEquals(0, robotPoseInField.getX(), DELTA);
+        assertEquals(0, robotPoseInField.getY(), DELTA);
+        assertEquals(0, robotPoseInField.getZ(), DELTA);
+        assertEquals(0, robotPoseInField.getRotation().getX(), DELTA);
+        assertEquals(0, robotPoseInField.getRotation().getY(), DELTA);
+        assertEquals(0, robotPoseInField.getRotation().getZ(), DELTA);
     }
 
     /**
@@ -221,9 +221,9 @@ class PoseEstimationHelperTest {
         Rotation3d cameraRotationInField = PoseEstimationHelper.cameraRotationInField(
                 cameraInRobot,
                 robotRotationInFieldCoordsFromGyro);
-        assertEquals(0, cameraRotationInField.getX(), kDelta); // still no roll
-        assertEquals(-Math.PI / 4, cameraRotationInField.getY(), kDelta); // same tilt
-        assertEquals(3 * Math.PI / 4, cameraRotationInField.getZ(), kDelta);
+        assertEquals(0, cameraRotationInField.getX(), DELTA); // still no roll
+        assertEquals(-Math.PI / 4, cameraRotationInField.getY(), DELTA); // same tilt
+        assertEquals(3 * Math.PI / 4, cameraRotationInField.getZ(), DELTA);
     }
 
     @Test
@@ -234,12 +234,12 @@ class PoseEstimationHelperTest {
                             new Translation3d(),
                             new Rotation3d()));
             Transform3d transform3d = blip.blipToTransform();
-            assertEquals(0, transform3d.getX(), kDelta);
-            assertEquals(0, transform3d.getY(), kDelta);
-            assertEquals(0, transform3d.getZ(), kDelta);
-            assertEquals(0, transform3d.getRotation().getX(), kDelta);
-            assertEquals(0, transform3d.getRotation().getY(), kDelta);
-            assertEquals(0, transform3d.getRotation().getZ(), kDelta);
+            assertEquals(0, transform3d.getX(), DELTA);
+            assertEquals(0, transform3d.getY(), DELTA);
+            assertEquals(0, transform3d.getZ(), DELTA);
+            assertEquals(0, transform3d.getRotation().getX(), DELTA);
+            assertEquals(0, transform3d.getRotation().getY(), DELTA);
+            assertEquals(0, transform3d.getRotation().getZ(), DELTA);
         }
         {
             Blip24 blip = new Blip24(5,
@@ -247,12 +247,12 @@ class PoseEstimationHelperTest {
                             new Translation3d(-2, -1, 3),
                             new Rotation3d(Math.PI / 4, 0, 0)));
             Transform3d transform3d = blip.blipToTransform();
-            assertEquals(3, transform3d.getX(), kDelta);
-            assertEquals(2, transform3d.getY(), kDelta);
-            assertEquals(1, transform3d.getZ(), kDelta);
-            assertEquals(0, transform3d.getRotation().getX(), kDelta);
-            assertEquals(-Math.PI / 4, transform3d.getRotation().getY(), kDelta);
-            assertEquals(0, transform3d.getRotation().getZ(), kDelta);
+            assertEquals(3, transform3d.getX(), DELTA);
+            assertEquals(2, transform3d.getY(), DELTA);
+            assertEquals(1, transform3d.getZ(), DELTA);
+            assertEquals(0, transform3d.getRotation().getX(), DELTA);
+            assertEquals(-Math.PI / 4, transform3d.getRotation().getY(), DELTA);
+            assertEquals(0, transform3d.getRotation().getZ(), DELTA);
         }
     }
 
@@ -268,9 +268,9 @@ class PoseEstimationHelperTest {
         Translation3d nwuTranslation = blip.blipToTransform().getTranslation();
 
         // NWU values now
-        assertEquals(3, nwuTranslation.getX(), kDelta);
-        assertEquals(2, nwuTranslation.getY(), kDelta);
-        assertEquals(1, nwuTranslation.getZ(), kDelta);
+        assertEquals(3, nwuTranslation.getX(), DELTA);
+        assertEquals(2, nwuTranslation.getY(), DELTA);
+        assertEquals(1, nwuTranslation.getZ(), DELTA);
     }
 
     @Test
@@ -282,9 +282,9 @@ class PoseEstimationHelperTest {
                             new Rotation3d()));
 
             Rotation3d nwuRotation = blip.blipToTransform().getRotation();
-            assertEquals(0, nwuRotation.getX(), kDelta);
-            assertEquals(0, nwuRotation.getY(), kDelta);
-            assertEquals(0, nwuRotation.getZ(), kDelta);
+            assertEquals(0, nwuRotation.getX(), DELTA);
+            assertEquals(0, nwuRotation.getY(), DELTA);
+            assertEquals(0, nwuRotation.getZ(), DELTA);
         }
         {
             // one meter range (Z forward)
@@ -296,9 +296,9 @@ class PoseEstimationHelperTest {
 
             Rotation3d nwuRotation = blip.blipToTransform().getRotation();
             // tilt up in NWU is -y
-            assertEquals(0, nwuRotation.getX(), kDelta);
-            assertEquals(-Math.PI / 4, nwuRotation.getY(), kDelta);
-            assertEquals(0, nwuRotation.getZ(), kDelta);
+            assertEquals(0, nwuRotation.getX(), DELTA);
+            assertEquals(-Math.PI / 4, nwuRotation.getY(), DELTA);
+            assertEquals(0, nwuRotation.getZ(), DELTA);
         }
         {
             // one meter range (Z forward)
@@ -310,9 +310,9 @@ class PoseEstimationHelperTest {
 
             Rotation3d nwuRotation = blip.blipToTransform().getRotation();
             // pan right in NWU is -z
-            assertEquals(0, nwuRotation.getX(), kDelta);
-            assertEquals(0, nwuRotation.getY(), kDelta);
-            assertEquals(-Math.PI / 4, nwuRotation.getZ(), kDelta);
+            assertEquals(0, nwuRotation.getX(), DELTA);
+            assertEquals(0, nwuRotation.getY(), DELTA);
+            assertEquals(-Math.PI / 4, nwuRotation.getZ(), DELTA);
         }
     }
 
@@ -330,9 +330,9 @@ class PoseEstimationHelperTest {
             Rotation3d tagRotationInCamera = PoseEstimationHelper.tagRotationInCamera(
                     tagRotationInField,
                     cameraRotationInField);
-            assertEquals(0, tagRotationInCamera.getX(), kDelta);
-            assertEquals(0, tagRotationInCamera.getY(), kDelta);
-            assertEquals(-Math.PI / 4, tagRotationInCamera.getZ(), kDelta); // 45 degrees right
+            assertEquals(0, tagRotationInCamera.getX(), DELTA);
+            assertEquals(0, tagRotationInCamera.getY(), DELTA);
+            assertEquals(-Math.PI / 4, tagRotationInCamera.getZ(), DELTA); // 45 degrees right
         }
         {
             Rotation3d tagRotationInField = new Rotation3d(0, 0, 0); // on the far wall
@@ -340,9 +340,9 @@ class PoseEstimationHelperTest {
             Rotation3d tagRotationInCamera = PoseEstimationHelper.tagRotationInCamera(
                     tagRotationInField,
                     cameraRotationInField);
-            assertEquals(0, tagRotationInCamera.getX(), kDelta);
-            assertEquals(Math.PI / 4, tagRotationInCamera.getY(), kDelta); // 45 degrees down
-            assertEquals(0, tagRotationInCamera.getZ(), kDelta);
+            assertEquals(0, tagRotationInCamera.getX(), DELTA);
+            assertEquals(Math.PI / 4, tagRotationInCamera.getY(), DELTA); // 45 degrees down
+            assertEquals(0, tagRotationInCamera.getZ(), DELTA);
         }
         {
             Rotation3d tagRotationInField = new Rotation3d(0, 0, 0); // on the far wall
@@ -351,9 +351,9 @@ class PoseEstimationHelperTest {
                     tagRotationInField,
                     cameraRotationInField);
             // composing and then inverting multiple rotations yields this:
-            assertEquals(-0.615, tagRotationInCamera.getX(), kDelta);
-            assertEquals(0.523, tagRotationInCamera.getY(), kDelta);
-            assertEquals(-0.955, tagRotationInCamera.getZ(), kDelta);
+            assertEquals(-0.615, tagRotationInCamera.getX(), DELTA);
+            assertEquals(0.523, tagRotationInCamera.getY(), DELTA);
+            assertEquals(-0.955, tagRotationInCamera.getZ(), DELTA);
         }
     }
 
@@ -368,12 +368,12 @@ class PoseEstimationHelperTest {
                     new Translation3d(1, 1, 0),
                     new Rotation3d());
             Pose3d cameraInField = PoseEstimationHelper.cameraInField(tagInFieldCords, tagInCameraCords);
-            assertEquals(0, cameraInField.getX(), kDelta);
-            assertEquals(0, cameraInField.getY(), kDelta);
-            assertEquals(0, cameraInField.getZ(), kDelta);
-            assertEquals(0, cameraInField.getRotation().getX(), kDelta);
-            assertEquals(0, cameraInField.getRotation().getY(), kDelta);
-            assertEquals(Math.PI / 4, cameraInField.getRotation().getZ(), kDelta); // pan45
+            assertEquals(0, cameraInField.getX(), DELTA);
+            assertEquals(0, cameraInField.getY(), DELTA);
+            assertEquals(0, cameraInField.getZ(), DELTA);
+            assertEquals(0, cameraInField.getRotation().getX(), DELTA);
+            assertEquals(0, cameraInField.getRotation().getY(), DELTA);
+            assertEquals(Math.PI / 4, cameraInField.getRotation().getZ(), DELTA); // pan45
         }
         {
             // in front, high
@@ -384,12 +384,12 @@ class PoseEstimationHelperTest {
                     new Translation3d(1, 0, 1),
                     new Rotation3d());
             Pose3d cameraInField = PoseEstimationHelper.cameraInField(tagInFieldCords, tagInCameraCords);
-            assertEquals(0, cameraInField.getX(), kDelta);
-            assertEquals(0, cameraInField.getY(), kDelta);
-            assertEquals(0, cameraInField.getZ(), kDelta);
-            assertEquals(0, cameraInField.getRotation().getX(), kDelta);
-            assertEquals(-Math.PI / 4, cameraInField.getRotation().getY(), kDelta); // tilt45
-            assertEquals(0, cameraInField.getRotation().getZ(), kDelta);
+            assertEquals(0, cameraInField.getX(), DELTA);
+            assertEquals(0, cameraInField.getY(), DELTA);
+            assertEquals(0, cameraInField.getZ(), DELTA);
+            assertEquals(0, cameraInField.getRotation().getX(), DELTA);
+            assertEquals(-Math.PI / 4, cameraInField.getRotation().getY(), DELTA); // tilt45
+            assertEquals(0, cameraInField.getRotation().getZ(), DELTA);
         }
     }
 
@@ -404,12 +404,12 @@ class PoseEstimationHelperTest {
                 new Translation3d(1, 1, 1),
                 new Rotation3d(0, 0, 0));
         Pose3d robotInField = PoseEstimationHelper.robotInField(cameraInField, cameraInRobot);
-        assertEquals(0, robotInField.getX(), kDelta);
-        assertEquals(0, robotInField.getY(), kDelta);
-        assertEquals(0, robotInField.getZ(), kDelta);
-        assertEquals(0, robotInField.getRotation().getX(), kDelta);
-        assertEquals(0, robotInField.getRotation().getY(), kDelta);
-        assertEquals(0, robotInField.getRotation().getZ(), kDelta);
+        assertEquals(0, robotInField.getX(), DELTA);
+        assertEquals(0, robotInField.getY(), DELTA);
+        assertEquals(0, robotInField.getZ(), DELTA);
+        assertEquals(0, robotInField.getRotation().getX(), DELTA);
+        assertEquals(0, robotInField.getRotation().getY(), DELTA);
+        assertEquals(0, robotInField.getRotation().getZ(), DELTA);
     }
 
     @Test
@@ -428,12 +428,12 @@ class PoseEstimationHelperTest {
                         new Rotation3d(0, 0, 0)));
 
         Transform3d tagInCamera = blip.blipToTransform();
-        assertEquals(1, tagInCamera.getX(), kDelta);
-        assertEquals(0, tagInCamera.getY(), kDelta);
-        assertEquals(0, tagInCamera.getZ(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getX(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getY(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getZ(), kDelta);
+        assertEquals(1, tagInCamera.getX(), DELTA);
+        assertEquals(0, tagInCamera.getY(), DELTA);
+        assertEquals(0, tagInCamera.getZ(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getX(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getY(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getZ(), DELTA);
 
         // "raw" layout, which is "out of the page" tag orientation.j
         // which is WRONG WRONG WRONG
@@ -446,13 +446,13 @@ class PoseEstimationHelperTest {
         Pose3d cameraInField = PoseEstimationHelper.cameraInField(tagInField, tagInCamera);
 
         // notice this is WRONG WRONG WRONG because the raw tag rotation is also WRONG
-        assertEquals(12.89, cameraInField.getX(), kDelta);
-        assertEquals(4.026, cameraInField.getY(), kDelta);
-        assertEquals(0.308, cameraInField.getZ(), kDelta);
-        assertEquals(0, cameraInField.getRotation().getX(), kDelta);
-        assertEquals(0, cameraInField.getRotation().getY(), kDelta);
+        assertEquals(12.89, cameraInField.getX(), DELTA);
+        assertEquals(4.026, cameraInField.getY(), DELTA);
+        assertEquals(0.308, cameraInField.getZ(), DELTA);
+        assertEquals(0, cameraInField.getRotation().getX(), DELTA);
+        assertEquals(0, cameraInField.getRotation().getY(), DELTA);
         // camera is facing down field which is WRONG WRONG WRONG
-        assertEquals(0, cameraInField.getRotation().getZ(), kDelta);
+        assertEquals(0, cameraInField.getRotation().getZ(), DELTA);
     }
 
     @Test
@@ -471,12 +471,12 @@ class PoseEstimationHelperTest {
                         new Rotation3d(0, 0, 0)));
 
         Transform3d tagInCamera = blip.blipToTransform();
-        assertEquals(1, tagInCamera.getX(), kDelta);
-        assertEquals(0, tagInCamera.getY(), kDelta);
-        assertEquals(0, tagInCamera.getZ(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getX(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getY(), kDelta);
-        assertEquals(0, tagInCamera.getRotation().getZ(), kDelta);
+        assertEquals(1, tagInCamera.getX(), DELTA);
+        assertEquals(0, tagInCamera.getY(), DELTA);
+        assertEquals(0, tagInCamera.getZ(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getX(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getY(), DELTA);
+        assertEquals(0, tagInCamera.getRotation().getZ(), DELTA);
 
         // first try the "corrected" layout, which is "into the page" tag orientation.
         // this is CORRECT
@@ -488,16 +488,16 @@ class PoseEstimationHelperTest {
 
         // the tag is a little bit behind the line, so we're a little closer to the line
         // than 1m.
-        assertEquals(14.890, cameraInField.getX(), kDelta);
+        assertEquals(14.890, cameraInField.getX(), DELTA);
         // the tag is over to the left; so is the camera
-        assertEquals(4.026, cameraInField.getY(), kDelta);
+        assertEquals(4.026, cameraInField.getY(), DELTA);
         // tag center is about 57 inches up; so is the camera
-        assertEquals(0.308, cameraInField.getZ(), kDelta);
+        assertEquals(0.308, cameraInField.getZ(), DELTA);
         // zero roll
-        assertEquals(0, cameraInField.getRotation().getX(), kDelta);
+        assertEquals(0, cameraInField.getRotation().getX(), DELTA);
         // zero tilt
-        assertEquals(0, cameraInField.getRotation().getY(), kDelta);
+        assertEquals(0, cameraInField.getRotation().getY(), DELTA);
         // camera is facing back towards the wall
-        assertEquals(Math.PI, cameraInField.getRotation().getZ(), kDelta);
+        assertEquals(Math.PI, cameraInField.getRotation().getZ(), DELTA);
     }
 }

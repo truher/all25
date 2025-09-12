@@ -4,10 +4,9 @@ import org.team100.lib.hid.DriverControl;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
-import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.util.DriveUtil;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 /**
  * Transform manual input into a field-relative velocity.
@@ -32,10 +31,10 @@ public class ManualFieldRelativeSpeeds implements FieldRelativeDriver {
     @Override
     public FieldRelativeVelocity apply(SwerveModel state, DriverControl.Velocity input) {
         // clip the input to the unit circle
-        final DriverControl.Velocity clipped = DriveUtil.clampTwist(input, 1.0);
+        final DriverControl.Velocity clipped = input.clip(1.0);
 
         // scale to max in both translation and rotation
-        final FieldRelativeVelocity scaled = DriveUtil.scale(
+        final FieldRelativeVelocity scaled = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());

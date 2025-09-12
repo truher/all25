@@ -1,5 +1,7 @@
 package org.team100.frc2025.Climber;
 
+import java.util.function.DoubleSupplier;
+
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
@@ -16,12 +18,12 @@ import org.team100.lib.motion.servo.OnboardAngularPositionServo;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
-import org.team100.lib.reference.Setpoints1d;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -31,7 +33,7 @@ public class Climber extends SubsystemBase {
     public Climber(LoggerFactory parent, int canID) {
         LoggerFactory log = parent.name("Climber");
 
-        Profile100 profile100 = new TrapezoidProfile100(0.5, 0.5, 0.05);
+        IncrementalProfile profile100 = new TrapezoidIncrementalProfile(0.5, 0.5, 0.05);
         ProfileReference1d ref = new IncrementalProfileReference1d(profile100, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 10, 0, 0, false, 0.05, 0.1);
 
@@ -48,7 +50,8 @@ public class Climber extends SubsystemBase {
 
                 double gearRatio = 25 * 3 * 4;
                 RotaryMechanism rotaryMechanism = new RotaryMechanism(
-                        log, motor, sensor, gearRatio, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                        log, motor, sensor, gearRatio,
+                        Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
                 m_servo = new OnboardAngularPositionServo(log, rotaryMechanism, ref, feedback);
             }
@@ -60,44 +63,54 @@ public class Climber extends SubsystemBase {
                 SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
 
                 RotaryMechanism climberMech = new RotaryMechanism(
-                        log,
-                        climberMotor,
-                        sensor,
-                        1,
+                        log, climberMotor, sensor, 1,
                         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 m_servo = new OnboardAngularPositionServo(log, climberMech, ref, feedback);
             }
-
         }
-
-    }
-
-    public void setDutyCycle(double dutyCycle) {
-        if (m_servo == null)
-            return;
-        m_servo.setDutyCycle(dutyCycle);
-    }
-
-    public void setAngle(double value) {
-        m_servo.setPositionProfiled(value, 0);
-    }
-
-    public void setAngleSetpoint(Setpoints1d setpoint) {
-        m_servo.setPositionDirect(setpoint, 0);
-    }
-
-    public double getAngle() {
-        return m_servo.getPosition().getAsDouble();
-    }
-
-    public void reset() {
-        m_servo.reset();
     }
 
     @Override
     public void periodic() {
-        if (m_servo == null)
-            return;
         m_servo.periodic();
+    }
+
+    public boolean atGoal() {
+        return m_servo.atGoal();
+    }
+
+    // COMMANDS
+
+    public Command stop() {
+        return run(
+                () -> setDutyCycle(0));
+    }
+
+    public Command manual(DoubleSupplier s) {
+        return runEnd(
+                () -> setDutyCycle(s.getAsDouble()),
+                () -> setDutyCycle(0));
+    }
+
+    /** Use a profile to set position perpetually. */
+    public Command setPosition(double v) {
+        return startRun(
+                () -> reset(),
+                () -> setAngle(v));
+    }
+
+    ////////////////////////////////
+
+    private void reset() {
+        m_servo.reset();
+    }
+
+    private void setDutyCycle(double dutyCycle) {
+        m_servo.setDutyCycle(dutyCycle);
+    }
+
+    /** Use a profile to set the position. */
+    private void setAngle(double value) {
+        m_servo.setPositionProfiled(value, 0);
     }
 }

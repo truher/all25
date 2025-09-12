@@ -1,7 +1,7 @@
 package org.team100.lib.hid;
 
 import org.team100.lib.async.Async;
-import org.team100.lib.config.ElevatorUtil.ScoringPosition;
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,20 +14,20 @@ public class ThirdControlProxy implements ThirdControl {
     private static class NoThirdControl implements ThirdControl {
     }
 
-    private static final int kPort = 2;
-    private static final double kFreq = 1;
+    private static final int PORT = 2;
+    private static final double FREQ = 1;
 
     private String m_name;
     private ThirdControl m_ThirdControl;
 
     public ThirdControlProxy(Async async) {
         refresh();
-        async.addPeriodic(this::refresh, kFreq, "ThirdControlProxy");
+        async.addPeriodic(this::refresh, FREQ, "ThirdControlProxy");
     }
 
     public void refresh() {
         // name is blank if not connected
-        String name = DriverStation.getJoystickName(kPort);
+        String name = DriverStation.getJoystickName(PORT);
         if (name.equals(m_name))
             return;
         m_name = name;
@@ -83,7 +83,7 @@ public class ThirdControlProxy implements ThirdControl {
     }
 
     @Override
-    public ScoringPosition scoringPosition() {
+    public ScoringLevel scoringPosition() {
         return m_ThirdControl.scoringPosition();
     }
 

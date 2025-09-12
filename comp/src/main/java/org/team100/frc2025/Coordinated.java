@@ -2,13 +2,12 @@ package org.team100.frc2025;
 
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Wrist.Wrist2;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.motion.CoordinatedKinematics;
 import org.team100.lib.motion.CoordinatedKinematics.Joints;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
-import org.team100.lib.util.Debug;
-import org.team100.lib.util.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -23,7 +22,8 @@ import edu.wpi.first.wpilibj2.command.Command;
  * see output here
  * https://docs.google.com/spreadsheets/d/1THzS5zsGuOULofmM7NmHzwKTza13R2BHfLIqsm1wSi4/edit?gid=1969770684#gid=1969770684
  */
-public class Coordinated extends Command implements Debug {
+public class Coordinated extends Command {
+    private static final boolean DEBUG = false;
     /** There are something like 20 sanjan units per meter? */
     private static final double sanjanunit = 20;
     /** Length of the arm. Not really 1 meter long, I guess? */
@@ -95,7 +95,7 @@ public class Coordinated extends Command implements Debug {
             cancel();
             return;
         }
-        // calculate implied velocity.  this is kinda wrong, but closer than zero
+        // calculate implied velocity. this is kinda wrong, but closer than zero
         double elevatorVelocity = sanjanunit * (nextJoints.height() - currentJoints.height())
                 / TimedRobot100.LOOP_PERIOD_S;
         double wristVelocity = (nextJoints.angle() - currentJoints.angle()) / TimedRobot100.LOOP_PERIOD_S;
@@ -106,7 +106,8 @@ public class Coordinated extends Command implements Debug {
         m_wrist.setAngleDirect(new Setpoints1d(
                 new Control100(currentJoints.angle(), wristVelocity),
                 new Control100(nextJoints.angle(), wristVelocity)));
-        debug("%12.6f %12.6f\n", currentJoints.height(), currentJoints.angle());
+        if (DEBUG)
+            Util.printf("%12.6f %12.6f\n", currentJoints.height(), currentJoints.angle());
     }
 
     @Override
@@ -114,10 +115,4 @@ public class Coordinated extends Command implements Debug {
         m_elevator.stop();
         m_wrist.stop();
     }
-
-    @Override
-    public boolean debug() {
-        return false;
-    }
-
 }

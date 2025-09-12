@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Random;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.profile.incremental.Profile100.ResultWithETA;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
@@ -16,10 +16,10 @@ import org.team100.lib.util.Util;
  * Note many of these cases were adjusted slightly to accommodate the treatment
  * of max velocity.
  */
-class TrapezoidProfile100Test {
+class TrapezoidIncrementalProfileTest {
     private static final boolean DEBUG = false;
-    private static final double k10ms = 0.01;
-    private static final double kDelta = 0.001;
+    private static final double TEN_MS = 0.01;
+    private static final double DELTA = 0.001;
 
     private void dump(double tt, Control100 sample) {
         if (DEBUG)
@@ -47,6 +47,40 @@ class TrapezoidProfile100Test {
         }
     }
 
+    @Test
+    void testSolve() {
+        double maxVel = 2;
+        double maxAccel = 10;
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(maxVel, maxAccel, 0.01);
+        Control100 sample = new Control100(0, 0);
+        final Model100 end = new Model100(3, 0);
+        final double ETA_TOLERANCE = 0.02;
+        double s = profile.solve(0.1, sample, end, 2.0, ETA_TOLERANCE);
+        assertEquals(0.4375, s, DELTA);
+    }
+
+    /** Around 25 us at 0.1 DT */
+    @Test
+    void testSolvePerformance() {
+        double maxVel = 2;
+        double maxAccel = 10;
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(maxVel, maxAccel, 0.01);
+        Control100 sample = new Control100(0, 0);
+        final Model100 end = new Model100(3, 0);
+        final double ETA_TOLERANCE = 0.02;
+
+        int N = 10000;
+        double t0 = Takt.actual();
+        for (int ii = 0; ii < N; ++ii) {
+            profile.solve(0.1, sample, end, 1, ETA_TOLERANCE);
+        }
+        double t1 = Takt.actual();
+        if (DEBUG)
+            Util.printf("duration (ms)  %5.1f\n", 1e3 * (t1 - t0));
+        if (DEBUG)
+            Util.printf("per op (ns)    %5.1f\n", 1e9 * (t1 - t0) / N);
+    }
+
     /**
      * see
      * https://docs.google.com/spreadsheets/d/19WbkNaxcRGHwYwLH1pu9ER3qxZrsYqDlZTdV-cmOM0I
@@ -55,7 +89,7 @@ class TrapezoidProfile100Test {
     @Test
     void testSample() {
         // see Spline1dTest.testSample()
-        final Profile100 p = new TrapezoidProfile100(2, 6, 0.01);
+        final IncrementalProfile p = new TrapezoidIncrementalProfile(2, 6, 0.01);
         Control100 setpoint = new Control100(0, 0);
         final Model100 goal = new Model100(1, 0);
         for (double t = 0; t < 1; t += 0.01) {
@@ -74,7 +108,7 @@ class TrapezoidProfile100Test {
     /** I think we're writing followers incorrectly, here's how to do it. */
     @Test
     void discreteTime1() {
-        final Profile100 profile = new TrapezoidProfile100(2, 1, 0.01);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(2, 1, 0.01);
         final Model100 initial = new Model100(0, 0);
         final Model100 goal = new Model100(1, 0);
         final double k1 = 5.0;
@@ -119,9 +153,8 @@ class TrapezoidProfile100Test {
             feedback = k1 * (setpointModel.x() - sim.y)
                     + k2 * (setpointModel.v() - sim.yDot);
 
-            ResultWithETA result = profile.calculateWithETA(0.02, setpointModel.control(), goal);
-            setpointControl = result.state();
-            etaS = result.etaS();
+            setpointControl = profile.calculate(0.02, setpointModel.control(), goal);
+            etaS = profile.simulateForETA(0.2, setpointModel.control(), goal);
             // this is the setpoint for the next time step
             setpointModel = setpointControl.model();
 
@@ -137,74 +170,81 @@ class TrapezoidProfile100Test {
     /** What if the entry velocity is above the cruise velocity? */
     @Test
     void testTooHighEntryVelocity() {
-        TrapezoidProfile100 p = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(1, 1, 0.01);
         // initial state velocity is higher than profile cruise
         Control100 initial = new Control100(0, 2);
         // goal is achievable with constant max decel
         Model100 goal = new Model100(2, 0);
-        ResultWithETA r = p.calculateWithETA(0.02, initial, goal);
-        assertEquals(2, r.etaS(), kDelta);
+        Control100 r = p.calculate(0.02, initial, goal);
+        double eta = p.simulateForETA(0.2, initial, goal);
+        assertEquals(2, eta, DELTA);
         // 2m/s * 0.02s = ~0.04
-        assertEquals(0.04, r.state().x(), kDelta);
-        assertEquals(1.98, r.state().v(), kDelta);
-        assertEquals(-1, r.state().a(), kDelta);
+        assertEquals(0.04, r.x(), DELTA);
+        assertEquals(1.98, r.v(), DELTA);
+        assertEquals(-1, r.a(), DELTA);
         for (double tt = 0.02; tt < 3; tt += 0.02) {
-            r = p.calculateWithETA(0.02, r.state(), goal);
-            dump(tt, r.state());
+            r = p.calculate(0.02, r, goal);
+            eta = p.simulateForETA(0.2, r, goal);
+            dump(tt, r);
         }
         // at the goal
-        assertEquals(0, r.etaS(), kDelta);
-        assertEquals(2, r.state().x(), kDelta);
-        assertEquals(0, r.state().v(), kDelta);
-        assertEquals(0, r.state().a(), kDelta);
+        assertEquals(0, eta, DELTA);
+        assertEquals(2, r.x(), DELTA);
+        assertEquals(0, r.v(), DELTA);
+        assertEquals(0, r.a(), DELTA);
     }
 
     @Test
     void testTooHighEntryVelocityInReverse() {
-        TrapezoidProfile100 p = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(1, 1, 0.01);
         // initial state velocity is higher than profile cruise
         Control100 initial = new Control100(0, -2);
         // goal is achievable with constant max decel
         Model100 goal = new Model100(-2, 0);
-        ResultWithETA r = p.calculateWithETA(0.02, initial, goal);
-        assertEquals(2, r.etaS(), kDelta);
+        Control100 r = p.calculate(0.02, initial, goal);
+        double eta = p.simulateForETA(0.2, initial, goal);
+        assertEquals(2, eta, DELTA);
         // 2m/s * 0.02s = ~0.04
-        assertEquals(-0.04, r.state().x(), kDelta);
-        assertEquals(-1.98, r.state().v(), kDelta);
-        assertEquals(1, r.state().a(), kDelta);
+        assertEquals(-0.04, r.x(), DELTA);
+        assertEquals(-1.98, r.v(), DELTA);
+        assertEquals(1, r.a(), DELTA);
         for (double tt = 0.02; tt < 3; tt += 0.02) {
-            r = p.calculateWithETA(0.02, r.state(), goal);
-            dump(tt, r.state());
+            r = p.calculate(0.02, r, goal);
+            eta = p.simulateForETA(0.2, r, goal);
+            dump(tt, r);
         }
         // at the goal
-        assertEquals(0, r.etaS(), kDelta);
-        assertEquals(-2, r.state().x(), kDelta);
-        assertEquals(0, r.state().v(), kDelta);
-        assertEquals(0, r.state().a(), kDelta);
+        assertEquals(0, eta, DELTA);
+        assertEquals(-2, r.x(), DELTA);
+        assertEquals(0, r.v(), DELTA);
+        assertEquals(0, r.a(), DELTA);
     }
 
     @Test
     void testTooHighEntryVelocityCruising() {
-        TrapezoidProfile100 p = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(1, 1, 0.01);
         // initial state velocity is higher than profile cruise
         Control100 initial = new Control100(0, 2);
         // goal is achievable with max decel 1s, cruise 1s, max decel 1s
         Model100 goal = new Model100(3, 0);
-        ResultWithETA r = p.calculateWithETA(0.02, initial, goal);
-        assertEquals(3, r.etaS(), kDelta);
+        Control100 r = p.calculate(0.02, initial, goal);
+        double eta = p.simulateForETA(0.2, initial, goal);
+        // approximate
+        assertEquals(3.2, eta, DELTA);
         // 2m/s * 0.02s = ~0.04
-        assertEquals(0.04, r.state().x(), kDelta);
-        assertEquals(1.98, r.state().v(), kDelta);
-        assertEquals(-1, r.state().a(), kDelta);
+        assertEquals(0.04, r.x(), DELTA);
+        assertEquals(1.98, r.v(), DELTA);
+        assertEquals(-1, r.a(), DELTA);
         for (double tt = 0.02; tt < 4; tt += 0.02) {
-            r = p.calculateWithETA(0.02, r.state(), goal);
-            dump(tt, r.state());
+            r = p.calculate(0.02, r, goal);
+            eta = p.simulateForETA(0.2, r, goal);
+            dump(tt, r);
         }
         // at the goal
-        assertEquals(0, r.etaS(), kDelta);
-        assertEquals(3, r.state().x(), kDelta);
-        assertEquals(0, r.state().v(), kDelta);
-        assertEquals(0, r.state().a(), kDelta);
+        assertEquals(0, eta, DELTA);
+        assertEquals(3, r.x(), DELTA);
+        assertEquals(0, r.v(), DELTA);
+        assertEquals(0, r.a(), DELTA);
     }
 
     /////////////////////////
@@ -215,28 +255,30 @@ class TrapezoidProfile100Test {
     /** If you're at the goal, the ETA is zero. */
     @Test
     void testETAAtGoal() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.01);
         Control100 initial = new Control100(0, 0);
         Model100 goal = new Model100(0, 0); // same
-        ResultWithETA r = p2.calculateWithETA(0.02, initial, goal);
+        Control100 r = p2.calculate(0.02, initial, goal);
         // the next state is just the goal
-        assertEquals(0, r.state().x(), kDelta);
+        assertEquals(0, r.x(), DELTA);
         // and it takes zero time
-        assertEquals(0, r.etaS(), kDelta);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        assertEquals(0, eta, DELTA);
     }
 
     /** Simple rest-to-rest case */
     @Test
     void testETARestToRest() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.01);
         Control100 initial = new Control100(0, 0);
         Model100 goal = new Model100(1, 0);
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
-        assertEquals(0.0002, s.state().x(), kDelta);
-        assertEquals(0.02, s.state().v(), kDelta);
-        assertEquals(1, s.state().a(), kDelta);
+        Control100 s = p2.calculate(0.02, initial, goal);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        assertEquals(0.0002, s.x(), DELTA);
+        assertEquals(0.02, s.v(), DELTA);
+        assertEquals(1, s.a(), DELTA);
         // this is a triangular velocity profile
-        assertEquals(2, s.etaS(), kDelta);
+        assertEquals(2, eta, DELTA);
     }
 
     /**
@@ -249,19 +291,19 @@ class TrapezoidProfile100Test {
     void testETASolve() {
         Control100 initial = new Control100(0, 0);
         Model100 goal = new Model100(1, 0);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(1, 1, 0.01);
         // this this is the default eta above, so s = 1.0.
-        double s = Profile100.solveForSlowerETA(0.02, initial, goal, 2, kDelta,
-                (ss) -> new TrapezoidProfile100(1, ss, 0.01));
-        assertEquals(1.0, s, kDelta);
-        s = Profile100.solveForSlowerETA(0.02, initial, goal, 3, kDelta,
-                (ss) -> new TrapezoidProfile100(1, ss, 0.01));
-        assertEquals(0.439, s, kDelta);
-        s = Profile100.solveForSlowerETA(0.02, initial, goal, 4, kDelta,
-                (ss) -> new TrapezoidProfile100(1, ss, 0.01));
-        assertEquals(0.242, s, kDelta);
-        s = Profile100.solveForSlowerETA(0.02, initial, goal, 8, kDelta,
-                (ss) -> new TrapezoidProfile100(1, ss, 0.01));
-        assertEquals(0.053, s, kDelta);
+        double s = p.solve(0.1, initial, goal, 2, DELTA);
+        assertEquals(1.0, s, DELTA);
+        s = p.solve(0.1, initial, goal, 3, DELTA);
+        // approximate
+        assertEquals(0.4375, s, DELTA);
+        s = p.solve(0.1, initial, goal, 4, DELTA);
+        // approximate
+        assertEquals(0.25, s, DELTA);
+        s = p.solve(0.1, initial, goal, 8, DELTA);
+        // approximate
+        assertEquals(0.051, s, DELTA);
     }
 
     /**
@@ -280,18 +322,15 @@ class TrapezoidProfile100Test {
         // high max accel
         double maxA = 10;
         double tol = 0.01;
-        TrapezoidProfile100 px = new TrapezoidProfile100(maxV, maxA, tol);
+        TrapezoidIncrementalProfile px = new TrapezoidIncrementalProfile(maxV, maxA, tol);
         Control100 initial = new Control100(2.2, -4.5);
         Model100 goal = new Model100(0, 0);
-        double dt = 0.02;
-        ResultWithETA rx = px.calculateWithETA(dt, initial, goal);
-        // Util.printf("**** result %s\n", rx);
-        assertEquals(119.200, rx.etaS(), kDelta);
+        double eta = px.simulateForETA(0.2, initial, goal);
+        // the simulator times out at 10 sec
+        assertTrue(Double.isInfinite(eta));
 
         // Util.println("**** then find S for this very same ETA");
-        double s = Profile100.solveForSlowerETA(
-                dt, initial, goal, 119.2, kDelta,
-                (ss) -> new TrapezoidProfile100(maxV, ss * maxA, tol));
+        double s = px.solve(0.1, initial, goal, 119.2, DELTA);
 
         // previously the "s" value here was 0.292, not 1.0, even though we're using
         // the very same parameters. Why?
@@ -303,7 +342,7 @@ class TrapezoidProfile100Test {
         // I fixed this by making the solver notice if one of the endpoints is the
         // solution.
 
-        assertEquals(1, s, kDelta);
+        assertEquals(1, s, DELTA);
     }
 
     @Test
@@ -318,150 +357,158 @@ class TrapezoidProfile100Test {
         // high max accel
         double maxA = 10;
         double tol = 0.01;
-        TrapezoidProfile100 px = new TrapezoidProfile100(maxV, maxA, tol);
+        TrapezoidIncrementalProfile px = new TrapezoidIncrementalProfile(maxV, maxA, tol);
         // heading away from the goal, this is a very slow u-turn
         Control100 initial = new Control100(5.0, 4.6);
         Model100 goal = new Model100(0, 0);
-        double dt = 0.02;
-        ResultWithETA rx = px.calculateWithETA(dt, initial, goal);
-        // Util.printf("**** result %s\n", rx);
-        assertEquals(606.261, rx.etaS(), kDelta);
+        double eta = px.simulateForETA(0.2, initial, goal);
+        assertTrue(Double.isInfinite(eta));
 
         // Util.println("**** then find S for this very same ETA");
-        double s = Profile100.solveForSlowerETA(
-                dt, initial, goal, 606.261, kDelta,
-                (ss) -> new TrapezoidProfile100(maxV, ss * maxA, tol));
+        double s = px.solve(0.1, initial, goal, 606.261, DELTA);
         // this is correct.
-        assertEquals(1, s, kDelta);
+        assertEquals(1, s, DELTA);
     }
 
     @Test
     void testETASolveStationary() {
         Control100 initial = new Control100(0, 0);
         Model100 goal = new Model100(0, 0);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(1, 1, 0.01);
         // this this is the default eta above, so s = 1.0.
-        double s = Profile100.solveForSlowerETA(0.02, initial, goal, 2, kDelta,
-                (ss) -> new TrapezoidProfile100(1, ss, 0.01));
-        assertEquals(1.0, s, kDelta);
+        double s = p.solve(0.1, initial, goal, 2, DELTA);
+        assertEquals(1.0, s, DELTA);
     }
 
     /** ETA is not a trivial function of V and A */
     @Test
     void testETARestToRestScaled1() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(0.5, 1, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(0.5, 1, 0.01);
         Control100 initial = new Control100(0, 0);
         Model100 goal = new Model100(1, 0);
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
-        assertEquals(0.0, s.state().x(), kDelta);
-        assertEquals(0.02, s.state().v(), kDelta);
-        assertEquals(1, s.state().a(), kDelta);
-        assertEquals(2.5, s.etaS(), kDelta);
+        Control100 s = p2.calculate(0.02, initial, goal);
+        assertEquals(0.0, s.x(), DELTA);
+        assertEquals(0.02, s.v(), DELTA);
+        assertEquals(1, s.a(), DELTA);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        // approximate
+        assertEquals(2.6, eta, DELTA);
     }
 
     /** ETA is not a trivial function of V and A */
     @Test
     void testETARestToRestScaled2() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(0.5, 0.5, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(0.5, 0.5, 0.01);
         Control100 initial = new Control100(0, 0);
         Model100 goal = new Model100(1, 0);
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
-        assertEquals(0.0, s.state().x(), kDelta);
-        assertEquals(0.01, s.state().v(), kDelta);
-        assertEquals(0.5, s.state().a(), kDelta);
+        Control100 s = p2.calculate(0.02, initial, goal);
+        assertEquals(0.0, s.x(), DELTA);
+        assertEquals(0.01, s.v(), DELTA);
+        assertEquals(0.5, s.a(), DELTA);
         // this is a trapezoidal velocity profile
-        assertEquals(3, s.etaS(), kDelta);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        assertEquals(3, eta, DELTA);
     }
 
     /** ETA is not a trivial function of V and A */
     @Test
     void testETARestToRestScaled3() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(0.25, 0.25, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(0.25, 0.25, 0.01);
         Control100 initial = new Control100(0, 0);
         Model100 goal = new Model100(1, 0);
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
-        assertEquals(0.0, s.state().x(), kDelta);
-        assertEquals(0.005, s.state().v(), kDelta);
-        assertEquals(0.25, s.state().a(), kDelta);
+        Control100 s = p2.calculate(0.02, initial, goal);
+        assertEquals(0.0, s.x(), DELTA);
+        assertEquals(0.005, s.v(), DELTA);
+        assertEquals(0.25, s.a(), DELTA);
         // this is a trapezoidal velocity profile
-        assertEquals(5, s.etaS(), kDelta);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        assertEquals(5, eta, DELTA);
     }
 
     /** Initially at max V, cruise and then slow to a stop */
     @Test
     void testETACruise() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.01);
         Control100 initial = new Control100(0, 1); // cruising at maxV
         Model100 goal = new Model100(1, 0); // want to go 1m, so cruise for 0.5m, 0.5s, then slow for 1s
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
+        Control100 s = p2.calculate(0.02, initial, goal);
         // the next state should be a small step in the direction of the goal
-        assertEquals(0.02, s.state().x(), kDelta);
+        assertEquals(0.02, s.x(), DELTA);
         // at the initial velocity
-        assertEquals(1, s.state().v(), kDelta);
+        assertEquals(1, s.v(), DELTA);
         // still cruising for now
-        assertEquals(0, s.state().a(), kDelta);
+        assertEquals(0, s.a(), DELTA);
         // cruise for 0.5s, then slow for 1s
-        assertEquals(1.5, s.etaS(), kDelta);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        // approximate
+        assertEquals(1.6, eta, DELTA);
     }
 
     /** Initially at max V, slow immediately */
     @Test
     void testETACruiseGMinus() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.01);
         Control100 initial = new Control100(0, 1); // cruising at maxV
         Model100 goal = new Model100(0.5, 0); // want to go 0.5m, so we're on G-
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
+        Control100 s = p2.calculate(0.02, initial, goal);
         // still moving at roughly initial v
-        assertEquals(0.02, s.state().x(), kDelta);
+        assertEquals(0.02, s.x(), DELTA);
         // slowing
-        assertEquals(0.98, s.state().v(), kDelta);
+        assertEquals(0.98, s.v(), DELTA);
         // braking
-        assertEquals(-1, s.state().a(), kDelta);
+        assertEquals(-1, s.a(), DELTA);
         // will take 1s
-        assertEquals(1, s.etaS(), kDelta);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        assertEquals(1, eta, DELTA);
     }
 
     /** Initially at cruise, goal is the same position */
     @Test
     void testETAReverse() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.01);
         Control100 initial = new Control100(0, 1);
         Model100 goal = new Model100(0, 0);
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
+        Control100 s = p2.calculate(0.02, initial, goal);
         // initial velocity carries us forward
-        assertEquals(0.02, s.state().x(), kDelta);
+        assertEquals(0.02, s.x(), DELTA);
         // starting to slow down
-        assertEquals(0.98, s.state().v(), kDelta);
+        assertEquals(0.98, s.v(), DELTA);
         // max braking
-        assertEquals(-1, s.state().a(), kDelta);
+        assertEquals(-1, s.a(), DELTA);
         // then slow to a stop for 1s (0.5m), then back up and stop (1.4s) so 2.414
         // total
-        assertEquals(2.414, s.etaS(), kDelta);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        // approximate
+        assertEquals(2.6, eta, DELTA);
     }
 
     /** Same as above in the other direction */
     @Test
     void testETACruiseMinus() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.01);
         Control100 initial = new Control100(0, -1);
         Model100 goal = new Model100(-1, 0);
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
-        assertEquals(-0.02, s.state().x(), kDelta);
-        assertEquals(-1, s.state().v(), kDelta);
-        assertEquals(0, s.state().a(), kDelta);
-        assertEquals(1.5, s.etaS(), kDelta);
+        Control100 s = p2.calculate(0.02, initial, goal);
+        assertEquals(-0.02, s.x(), DELTA);
+        assertEquals(-1, s.v(), DELTA);
+        assertEquals(0, s.a(), DELTA);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        // approximate
+        assertEquals(1.6, eta, DELTA);
     }
 
     /** Same as above in the other direction */
     @Test
     void testETACruiseMinusGPlus() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(1, 1, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.01);
         Control100 initial = new Control100(0, -1);
         Model100 goal = new Model100(-0.5, 0);
-        ResultWithETA s = p2.calculateWithETA(0.02, initial, goal);
-        assertEquals(-0.02, s.state().x(), kDelta);
-        assertEquals(-0.98, s.state().v(), kDelta);
-        assertEquals(1, s.state().a(), kDelta);
-        assertEquals(1, s.etaS(), kDelta);
+        Control100 s = p2.calculate(0.02, initial, goal);
+        assertEquals(-0.02, s.x(), DELTA);
+        assertEquals(-0.98, s.v(), DELTA);
+        assertEquals(1, s.a(), DELTA);
+        double eta = p2.simulateForETA(0.2, initial, goal);
+        assertEquals(1, eta, DELTA);
     }
 
     //////////////////////
@@ -472,7 +519,7 @@ class TrapezoidProfile100Test {
     /** Now we expose acceleration in the profile state, so make sure it's right. */
     @Test
     void testAccel1() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Model100 initial = new Model100(0, 0);
         Model100 goal = new Model100(1, 0);
         Control100 s = p2.calculate(0.02, initial.control(), goal);
@@ -486,7 +533,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testAccel2() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         // inverted
         Model100 initial = new Model100(0, 0);
         Model100 goal = new Model100(-1, 0);
@@ -501,7 +548,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testAccel3() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         // cruising
         Model100 initial = new Model100(0, 3);
         Model100 goal = new Model100(10, 0);
@@ -516,32 +563,32 @@ class TrapezoidProfile100Test {
 
     @Test
     void testIntercepts() {
-        TrapezoidProfile100 p = new TrapezoidProfile100(5, 0.5, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(5, 0.5, 0.01);
         Control100 s = new Control100(1, 1);
-        assertEquals(0, p.c_plus(s), kDelta);
-        assertEquals(2, p.c_minus(s), kDelta);
+        assertEquals(0, p.c_plus(s), DELTA);
+        assertEquals(2, p.c_minus(s), DELTA);
 
         // more accel
-        p = new TrapezoidProfile100(5, 1, 0.01);
+        p = new TrapezoidIncrementalProfile(5, 1, 0.01);
         s = new Control100(1, 1);
         // means less offset
-        assertEquals(0.5, p.c_plus(s), kDelta);
-        assertEquals(1.5, p.c_minus(s), kDelta);
+        assertEquals(0.5, p.c_plus(s), DELTA);
+        assertEquals(1.5, p.c_minus(s), DELTA);
 
         // negative velocity, result should be the same.
-        p = new TrapezoidProfile100(5, 1, 0.01);
+        p = new TrapezoidIncrementalProfile(5, 1, 0.01);
         s = new Control100(1, -1);
         // means less offset
-        assertEquals(0.5, p.c_plus(s), kDelta);
-        assertEquals(1.5, p.c_minus(s), kDelta);
+        assertEquals(0.5, p.c_plus(s), DELTA);
+        assertEquals(1.5, p.c_minus(s), DELTA);
     }
 
     // see studies/rrts TestRRTStar7
     @Test
     void testInterceptsFromRRT() {
-        TrapezoidProfile100 p = new TrapezoidProfile100(5, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(5, 1, 0.01);
 
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         assertEquals(0, p.c_minus(new Control100(0, 0)), 0.001);
         assertEquals(0, p.c_plus(new Control100(0, 0)), 0.001);
@@ -580,9 +627,9 @@ class TrapezoidProfile100Test {
 
     @Test
     void testQSwitch() {
-        TrapezoidProfile100 p = new TrapezoidProfile100(5, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(5, 1, 0.01);
 
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         assertEquals(0.375, p2.qSwitchIplusGminus(new Control100(0, 0), new Model100(0.5, 1.0)), 0.001);
         assertEquals(0.125, p2.qSwitchIminusGplus(new Control100(0, 0), new Model100(0.5, 1.0)), 0.001);
@@ -605,7 +652,7 @@ class TrapezoidProfile100Test {
     /** Verify some switching velocity cases */
     @Test
     void testQDotSwitch2() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         // good path, c(I)=-3, x=v^2/4, x=3, v=sqrt(12)
         assertEquals(3.464, p2.qDotSwitchIplusGminus(new Control100(-2, 2), new Model100(2, 2)), 0.001);
         // c(I)=-2, x=v^2/4, x=2, v=sqrt(8)
@@ -640,7 +687,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testQDotSwitch2a() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         // good path, c(I)=-3, x=v^2/4, x=3, v=sqrt(12)
         assertEquals(3.464, p2.qDotSwitchIplusGminus(new Control100(-2, 2), new Model100(2, -2)), 0.001);
         // c(I)=-2, x=v^2/4, x=2, v=sqrt(8)
@@ -674,7 +721,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testQDotSwitch2b() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         // good path, c(I)=-3, x=v^2/4, x=3, v=sqrt(12)
         assertEquals(3.464, p2.qDotSwitchIplusGminus(new Control100(-2, -2), new Model100(2, 2)), 0.001);
         // c(I)=-2, x=v^2/4, x=2, v=sqrt(8)
@@ -709,7 +756,7 @@ class TrapezoidProfile100Test {
     @Test
     void testOneLongT() {
         // if we supply a very long dt, we should end up at the goal
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Model100 initial = new Model100(0, 0);
         // goal is far, requires (brief) cruising
         Model100 goal = new Model100(5, 0);
@@ -722,7 +769,7 @@ class TrapezoidProfile100Test {
     @Test
     void testOneLongTReverse() {
         // if we supply a very long dt, we should end up at the goal
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Model100 initial = new Model100(0, 0);
         // goal is far, requires (brief) cruising
         Model100 goal = new Model100(-5, 0);
@@ -735,7 +782,7 @@ class TrapezoidProfile100Test {
     @Test
     void testManyLongT() {
         // if we supply a very long dt, we should end up at the goal
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Random random = new Random();
         for (int i = 0; i < 10000; ++i) {
             // random states in the square between (-2,-2) and (2,2)
@@ -750,7 +797,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void reciprocal() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Model100 initial = new Model100(-1, 1);
         Model100 goal = new Model100(-1, -1);
         Control100 s = p2.calculate(10, initial.control(), goal);
@@ -760,7 +807,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void endEarly() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         // in this case, t1 for I+G- is 0, and i think I-G+ is doing the wrong thing.
         // the delta v is 1, accel is 2, so this is a 0.5s solution.
         Control100 initial = new Control100(-1, 2);
@@ -789,7 +836,7 @@ class TrapezoidProfile100Test {
     // like above but with reciprocal starting point
     @Test
     void endEarly2() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
 
         Control100 initial = new Control100(-1, -2);
         Model100 goal = new Model100(-0.25, 1);
@@ -813,7 +860,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void anotherCase() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Control100 initial = new Control100(1.127310, -0.624930);
         Model100 goal = new Model100(1.937043, 0.502350);
         Control100 s = p2.calculate(10, initial, goal);
@@ -824,7 +871,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void yetAnother() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Control100 initial = new Control100(-1.178601, -1.534504);
         Model100 goal = new Model100(-0.848954, -1.916583);
         Control100 s = p2.calculate(10, initial, goal);
@@ -835,7 +882,7 @@ class TrapezoidProfile100Test {
     @Test
     void someTcase() {
         // this is an I-G+ path
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Model100 initial = new Model100(1.655231, 1.967906);
         Model100 goal = new Model100(0.080954, -1.693829);
         Control100 s = p2.calculate(10, initial.control(), goal);
@@ -846,7 +893,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void someTcase2() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
 
         Control100 initial = new Control100(1.747608, -0.147275);
         Model100 goal = new Model100(1.775148, 0.497717);
@@ -887,7 +934,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void someTcase3() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Model100 initial = new Model100(0.985792, 1.340926);
         Model100 goal = new Model100(-0.350934, -1.949649);
         Control100 s = p2.calculate(10, initial.control(), goal);
@@ -898,7 +945,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void someTcase4() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Model100 initial = new Model100(0, 1);
         Model100 goal = new Model100(0, -1);
         Control100 s = p2.calculate(10, initial.control(), goal);
@@ -909,7 +956,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void someTcase2a() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         Model100 initial = new Model100(1.747608, -0.147275);
         Model100 goal = new Model100(1.775148, 0.497717);
         Control100 s = p2.calculate(10, initial.control(), goal);
@@ -922,7 +969,7 @@ class TrapezoidProfile100Test {
     @Test
     void testVT() {
         // lower max V than the other cases here
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         // initial is (-2,2), vmax is 3, u is 2, so time to limit is 0.5.
         // at 0.5, v=2+2*0.5=3. x=-2+2*0.5+0.5*2*(0.5)^2 = -2+1+0.25=-0.75
         // so this is right at the limit, we should just proceed.
@@ -940,7 +987,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testVT2() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
 
         // if we're *near* the limit then there should be two segments.
         Control100 s = p2.calculate(0.02, new Control100(-0.78, 2.98), new Model100(2, 2));
@@ -958,7 +1005,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testVT3() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
 
         // if we're at the limit but right at the end, we should join G-.
         Control100 s = p2.calculate(0.02, new Control100(0.75, 3.00), new Model100(2, 2));
@@ -975,7 +1022,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testVT4() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(3, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(3, 2, 0.01);
         // if we're *near* the end, there should be two segments.
         // 0.75-0.01*3
         Control100 s = p2.calculate(0.02, new Control100(0.72, 3.00), new Model100(2, 2));
@@ -999,7 +1046,7 @@ class TrapezoidProfile100Test {
     /** Verify the time to the switching point via each path */
     @Test
     void testT() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         // dv=1.464, a=2
         assertEquals(0.732, p2.t1IplusGminus(new Control100(-2, 2), new Model100(2, 2)), 0.001);
         // dv=0.828, a=2
@@ -1033,7 +1080,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testTa() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         // dv=1.464
         assertEquals(0.732, p2.t1IplusGminus(new Control100(-2, 2), new Model100(2, -2)), 0.001);
@@ -1067,7 +1114,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testTb() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         // dv=5.464
         assertEquals(2.732, p2.t1IplusGminus(new Control100(-2, -2), new Model100(2, 2)), 0.001);
         // dv=4.828
@@ -1102,7 +1149,7 @@ class TrapezoidProfile100Test {
     /** Verify the time to the switching point */
     @Test
     void testT1() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         assertEquals(0.732, p2.t1(new Control100(-2, 2), new Model100(2, 2)), 0.001);
         assertEquals(0.414, p2.t1(new Control100(-1, 2), new Model100(1, 2)), 0.001);
         assertEquals(0.225, p2.t1(new Control100(-0.5, 2), new Model100(0.5, 2)), 0.001);
@@ -1131,7 +1178,7 @@ class TrapezoidProfile100Test {
     /** Verify paths taken */
     @Test
     void testCalculate() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         assertEquals(-1.959, p2.calculate(0.02, new Control100(-2, 2), new Model100(2, 2)).x(), 0.001);
         assertEquals(-0.959, p2.calculate(0.02, new Control100(-1, 2), new Model100(1, 2)).x(), 0.001);
         assertEquals(-0.459, p2.calculate(0.02, new Control100(-0.5, 2), new Model100(0.5, 2)).x(), 0.001);
@@ -1152,7 +1199,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testCalculateA() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         assertEquals(-1.959, p2.calculate(0.02, new Control100(-2, 2), new Model100(2, -2)).x(), 0.001);
         assertEquals(-0.959, p2.calculate(0.02, new Control100(-1, 2), new Model100(1, -2)).x(), 0.001);
         assertEquals(-0.459, p2.calculate(0.02, new Control100(-0.5, 2), new Model100(0.5, -2)).x(), 0.001);
@@ -1172,7 +1219,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testCalculateB() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         assertEquals(-2.039, p2.calculate(0.02, new Control100(-2, -2), new Model100(2, 2)).x(), 0.001);
         assertEquals(-1.039, p2.calculate(0.02, new Control100(-1, -2), new Model100(1, 2)).x(), 0.001);
         assertEquals(-0.539, p2.calculate(0.02, new Control100(-0.5, -2), new Model100(0.5, 2)).x(), 0.001);
@@ -1192,7 +1239,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testSwitchingTime() {
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
         // between (-2,2) and (2,2) the switching point is at (0, 3.464)
         // at the switching point,
         // u=-2, v=3.464, dt=0.02, dx = 0.0693 + 0.0004, dv=0.04
@@ -1217,9 +1264,9 @@ class TrapezoidProfile100Test {
 
     @Test
     void testQDotSwitch() {
-        TrapezoidProfile100 p = new TrapezoidProfile100(5, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(5, 1, 0.01);
 
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         assertEquals(1.224, p2.qDotSwitchIplusGminus(new Control100(0, 0), new Model100(0.5, 1.0)), 0.001);
         assertEquals(Double.NaN, p2.qDotSwitchIminusGplus(new Control100(0, 0), new Model100(0.5, 1.0)), 0.001);
@@ -1248,7 +1295,7 @@ class TrapezoidProfile100Test {
      */
     @Test
     void testTriangle() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.1);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.1);
         Control100 sample = new Control100(0, 0);
         final Model100 end = new Model100(1, 0);
 
@@ -1259,8 +1306,8 @@ class TrapezoidProfile100Test {
         sample = profileX.calculate(0.02, sample, end);
         tt += 0.02;
         dump(tt, sample);
-        assertEquals(0, sample.x(), kDelta);
-        assertEquals(0.04, sample.v(), kDelta);
+        assertEquals(0, sample.x(), DELTA);
+        assertEquals(0.04, sample.v(), DELTA);
 
         // step to the middle of the profile
         for (double t = 0; t < 0.68; t += 0.02) {
@@ -1288,15 +1335,15 @@ class TrapezoidProfile100Test {
      */
     @Test
     void testInvertedTriangle() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.01);
         Control100 sample = new Control100(0, 0);
         final Model100 end = new Model100(-1, 0);
 
         // the first sample is near the starting state
         dump(0, sample);
         sample = profileX.calculate(0.02, sample, end);
-        assertEquals(0, sample.x(), kDelta);
-        assertEquals(-0.04, sample.v(), kDelta);
+        assertEquals(0, sample.x(), DELTA);
+        assertEquals(-0.04, sample.v(), DELTA);
 
         // step to the middle of the profile
         for (double t = 0; t < 0.68; t += 0.02) {
@@ -1305,7 +1352,7 @@ class TrapezoidProfile100Test {
         }
         // halfway there, going fast
         assertEquals(-0.5, sample.x(), 0.01);
-        assertEquals(-1.4, sample.v(), kDelta);
+        assertEquals(-1.4, sample.v(), DELTA);
 
         // step to the end of the profile ... this was 0.72.
         for (double t = 0; t < 0.86; t += 0.02) {
@@ -1319,7 +1366,7 @@ class TrapezoidProfile100Test {
     /** with a lower top speed, this profile includes a cruise phase. */
     @Test
     void testCruise() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(1, 2, 0.01);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(1, 2, 0.01);
         Control100 sample = new Control100(0, 0);
         final Model100 end = new Model100(1, 0);
 
@@ -1332,8 +1379,8 @@ class TrapezoidProfile100Test {
         tt += 0.02;
         dump(tt, sample);
 
-        assertEquals(0, sample.x(), kDelta);
-        assertEquals(0.04, sample.v(), kDelta);
+        assertEquals(0, sample.x(), DELTA);
+        assertEquals(0.04, sample.v(), DELTA);
 
         // step to the cruise phase of the profile
         for (double t = 0; t < 0.48; t += 0.02) {
@@ -1342,7 +1389,7 @@ class TrapezoidProfile100Test {
             dump(tt, sample);
         }
         assertEquals(0.25, sample.x(), 0.01);
-        assertEquals(1.0, sample.v(), kDelta);
+        assertEquals(1.0, sample.v(), DELTA);
 
         // step to near the end of cruise
         for (double t = 0; t < 0.5; t += 0.02) {
@@ -1351,7 +1398,7 @@ class TrapezoidProfile100Test {
             dump(tt, sample);
         }
         assertEquals(0.75, sample.x(), 0.01);
-        assertEquals(1.00, sample.v(), kDelta);
+        assertEquals(1.00, sample.v(), DELTA);
 
         // step to the end of the profile // this used to be 0.5
         for (double t = 0; t < 0.66; t += 0.02) {
@@ -1369,7 +1416,7 @@ class TrapezoidProfile100Test {
      */
     @Test
     void testUTurn() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         // initially heading away from the goal
         Control100 sample = new Control100(0.1, 1);
@@ -1382,8 +1429,8 @@ class TrapezoidProfile100Test {
         sample = profileX.calculate(0.02, sample, end);
         tt += 0.02;
         dump(tt, sample);
-        assertEquals(0.120, sample.x(), kDelta);
-        assertEquals(0.96, sample.v(), kDelta);
+        assertEquals(0.120, sample.x(), DELTA);
+        assertEquals(0.96, sample.v(), DELTA);
 
         // step to the turn-around point
         for (double t = 0; t < 0.48; t += 0.02) {
@@ -1391,8 +1438,8 @@ class TrapezoidProfile100Test {
             tt += 0.02;
             dump(tt, sample);
         }
-        assertEquals(0.35, sample.x(), kDelta);
-        assertEquals(0.0, sample.v(), kDelta);
+        assertEquals(0.35, sample.x(), DELTA);
+        assertEquals(0.0, sample.v(), DELTA);
 
         // the next phase is triangular, this is the point at maximum speed
         for (double t = 0; t < 0.4; t += 0.02) {
@@ -1400,8 +1447,8 @@ class TrapezoidProfile100Test {
             tt += 0.02;
             dump(tt, sample);
         }
-        assertEquals(0.19, sample.x(), kDelta);
-        assertEquals(-0.8, sample.v(), kDelta);
+        assertEquals(0.19, sample.x(), DELTA);
+        assertEquals(-0.8, sample.v(), DELTA);
 
         // this is the end. this was 0.44
         for (double t = 0; t < 0.46; t += 0.02) {
@@ -1416,7 +1463,7 @@ class TrapezoidProfile100Test {
     /** Same as above but not inverted. */
     @Test
     void testUTurnNotInverted() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         // initially heading away from the goal
         Control100 sample = new Control100(-0.1, -1, 0);
@@ -1429,8 +1476,8 @@ class TrapezoidProfile100Test {
         tt += 0.02;
         dump(tt, sample);
 
-        assertEquals(-0.120, sample.x(), kDelta);
-        assertEquals(-0.96, sample.v(), kDelta);
+        assertEquals(-0.120, sample.x(), DELTA);
+        assertEquals(-0.96, sample.v(), DELTA);
 
         // step to the turn-around point
         for (double t = 0; t < 0.48; t += 0.02) {
@@ -1438,8 +1485,8 @@ class TrapezoidProfile100Test {
             tt += 0.02;
             dump(tt, sample);
         }
-        assertEquals(-0.35, sample.x(), kDelta);
-        assertEquals(0.0, sample.v(), kDelta);
+        assertEquals(-0.35, sample.x(), DELTA);
+        assertEquals(0.0, sample.v(), DELTA);
 
         // the next phase is triangular, this is the point at maximum speed
         for (double t = 0; t < 0.4; t += 0.02) {
@@ -1447,8 +1494,8 @@ class TrapezoidProfile100Test {
             tt += 0.02;
             dump(tt, sample);
         }
-        assertEquals(-0.19, sample.x(), kDelta);
-        assertEquals(0.8, sample.v(), kDelta);
+        assertEquals(-0.19, sample.x(), DELTA);
+        assertEquals(0.8, sample.v(), DELTA);
 
         // this is the end. this was 0.44.
         for (double t = 0; t < 0.46; t += 0.02) {
@@ -1467,7 +1514,7 @@ class TrapezoidProfile100Test {
      */
     @Test
     void testUTurn2() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         // initially at the goal with nonzero velocity
         Control100 sample = new Control100(0, 1);
@@ -1480,8 +1527,8 @@ class TrapezoidProfile100Test {
         tt += 0.02;
         dump(tt, sample);
 
-        assertEquals(0.02, sample.x(), kDelta);
-        assertEquals(0.96, sample.v(), kDelta);
+        assertEquals(0.02, sample.x(), DELTA);
+        assertEquals(0.96, sample.v(), DELTA);
 
         // step to the turn-around point
         // this takes the same time no matter the starting point.
@@ -1491,8 +1538,8 @@ class TrapezoidProfile100Test {
             dump(tt, sample);
 
         }
-        assertEquals(0.25, sample.x(), kDelta);
-        assertEquals(0.0, sample.v(), kDelta);
+        assertEquals(0.25, sample.x(), DELTA);
+        assertEquals(0.0, sample.v(), DELTA);
 
         // the next phase is triangular, this is the point at maximum speed
         // compared to the case above, this is a little sooner and a little slower.
@@ -1522,7 +1569,7 @@ class TrapezoidProfile100Test {
      */
     @Test
     void testUTurn2NotInverted() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         // initially at the goal with nonzero velocity
         Control100 sample = new Control100(0, -1);
@@ -1534,8 +1581,8 @@ class TrapezoidProfile100Test {
         sample = profileX.calculate(0.02, sample, end);
         tt += 0.02;
         dump(tt, sample);
-        assertEquals(-0.02, sample.x(), kDelta);
-        assertEquals(-0.96, sample.v(), kDelta);
+        assertEquals(-0.02, sample.x(), DELTA);
+        assertEquals(-0.96, sample.v(), DELTA);
 
         // step to the turn-around point
         // this takes the same time no matter the starting point.
@@ -1544,8 +1591,8 @@ class TrapezoidProfile100Test {
             tt += 0.02;
             dump(tt, sample);
         }
-        assertEquals(-0.25, sample.x(), kDelta);
-        assertEquals(0.0, sample.v(), kDelta);
+        assertEquals(-0.25, sample.x(), DELTA);
+        assertEquals(0.0, sample.v(), DELTA);
 
         // the next phase is triangular, this is the point at maximum speed
         // compared to the case above, this is a little sooner and a little slower.
@@ -1577,7 +1624,7 @@ class TrapezoidProfile100Test {
      */
     @Test
     void testUTurn3() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.01);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.01);
 
         // behind the goal, too fast to stop.
         Control100 sample = new Control100(-0.1, 1);
@@ -1589,8 +1636,8 @@ class TrapezoidProfile100Test {
         sample = profileX.calculate(0.02, sample, end);
         tt += 0.02;
         dump(tt, sample);
-        assertEquals(-0.08, sample.x(), kDelta);
-        assertEquals(0.96, sample.v(), kDelta);
+        assertEquals(-0.08, sample.x(), DELTA);
+        assertEquals(0.96, sample.v(), DELTA);
 
         // step to the turn-around point
         for (double t = 0; t < 0.48; t += 0.02) {
@@ -1598,8 +1645,8 @@ class TrapezoidProfile100Test {
             tt += 0.02;
             dump(tt, sample);
         }
-        assertEquals(0.15, sample.x(), kDelta);
-        assertEquals(0.0, sample.v(), kDelta);
+        assertEquals(0.15, sample.x(), DELTA);
+        assertEquals(0.0, sample.v(), DELTA);
 
         // the next phase is triangular, this is the point at maximum speed
         // compared to the case above, this is a little sooner and a little slower.
@@ -1624,7 +1671,7 @@ class TrapezoidProfile100Test {
 
     @Test
     void testWindupCase() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.05);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.05);
         Control100 sample = new Control100(0, 0);
         final Model100 end = new Model100(0, 1);
         sample = profileX.calculate(0.02, sample, end);
@@ -1645,7 +1692,7 @@ class TrapezoidProfile100Test {
      */
     @Test
     void testUTurnWindup() {
-        TrapezoidProfile100 profileX = new TrapezoidProfile100(5, 2, 0.05);
+        TrapezoidIncrementalProfile profileX = new TrapezoidIncrementalProfile(5, 2, 0.05);
 
         // initially at rest
         Control100 sample = new Control100(0, 0);
@@ -1659,8 +1706,8 @@ class TrapezoidProfile100Test {
         tt += 0.02;
         dump(tt, sample);
 
-        assertEquals(0, sample.x(), kDelta);
-        assertEquals(-0.04, sample.v(), kDelta);
+        assertEquals(0, sample.x(), DELTA);
+        assertEquals(-0.04, sample.v(), DELTA);
 
         // step to the turn-around point
         for (double t = 0; t < 0.7; t += 0.02) {
@@ -1729,9 +1776,9 @@ class TrapezoidProfile100Test {
         final Model100 goal = new Model100(3, 0);
         Control100 state = new Control100(0, 0);
 
-        TrapezoidProfile100 profile = new TrapezoidProfile100(1.75, 0.75, 0.01);
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(1.75, 0.75, 0.01);
         for (int i = 0; i < 450; ++i) {
-            state = profile.calculate(k10ms, state, goal);
+            state = profile.calculate(TEN_MS, state, goal);
         }
         assertEquals(goal.x(), state.x(), 0.05);
         assertEquals(goal.v(), state.v(), 0.05);
@@ -1747,18 +1794,18 @@ class TrapezoidProfile100Test {
     void posContinuousUnderVelChange() {
         Model100 goal = new Model100(12, 0);
 
-        TrapezoidProfile100 profile = new TrapezoidProfile100(1.75, 0.75, 0.01);
-        Control100 state = profile.calculate(k10ms, new Control100(0, 0), goal);
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(1.75, 0.75, 0.01);
+        Control100 state = profile.calculate(TEN_MS, new Control100(0, 0), goal);
 
         double lastPos = state.x();
         for (int i = 0; i < 1600; ++i) {
             if (i == 400) {
                 // impose new slower limit
-                profile = new TrapezoidProfile100(0.75, 0.75, 0.01);
+                profile = new TrapezoidIncrementalProfile(0.75, 0.75, 0.01);
             }
 
-            state = profile.calculate(k10ms, state, goal);
-            double estimatedVel = (state.x() - lastPos) / k10ms;
+            state = profile.calculate(TEN_MS, state, goal);
+            double estimatedVel = (state.x() - lastPos) / TEN_MS;
 
             // wait 1.35 sec to brake to the new max velocity
             if (i >= 535) {
@@ -1782,9 +1829,9 @@ class TrapezoidProfile100Test {
         final Model100 goal = new Model100(-2, 0);
         Control100 state = new Control100(0, 0);
 
-        TrapezoidProfile100 profile = new TrapezoidProfile100(0.75, 0.75, 0.01);
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(0.75, 0.75, 0.01);
         for (int i = 0; i < 400; ++i) {
-            state = profile.calculate(k10ms, state, goal);
+            state = profile.calculate(TEN_MS, state, goal);
         }
         assertEquals(goal.x(), state.x(), 0.05);
         assertEquals(goal.v(), state.v(), 0.05);
@@ -1795,16 +1842,16 @@ class TrapezoidProfile100Test {
         Model100 goal = new Model100(-2, 0);
         Control100 state = new Control100(0, 0);
 
-        TrapezoidProfile100 profile = new TrapezoidProfile100(0.75, 0.75, 0.01);
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(0.75, 0.75, 0.01);
         for (int i = 0; i < 200; ++i) {
-            state = profile.calculate(k10ms, state, goal);
+            state = profile.calculate(TEN_MS, state, goal);
         }
         assertNotEquals(state, goal);
 
         goal = new Model100(0.0, 0.0);
-        profile = new TrapezoidProfile100(0.75, 0.75, 0.01);
+        profile = new TrapezoidIncrementalProfile(0.75, 0.75, 0.01);
         for (int i = 0; i < 600; ++i) {
-            state = profile.calculate(k10ms, state, goal);
+            state = profile.calculate(TEN_MS, state, goal);
         }
         assertEquals(goal.x(), state.x(), 0.05);
         assertEquals(goal.v(), state.v(), 0.05);
@@ -1816,15 +1863,15 @@ class TrapezoidProfile100Test {
         final Model100 goal = new Model100(4, 0);
         Control100 state = new Control100(0, 0);
 
-        TrapezoidProfile100 profile = new TrapezoidProfile100(0.75, 0.75, 0.01);
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(0.75, 0.75, 0.01);
         for (int i = 0; i < 200; ++i) {
-            state = profile.calculate(k10ms, state, goal);
+            state = profile.calculate(TEN_MS, state, goal);
         }
         assertNear(0.75, state.v(), 10e-5);
 
-        profile = new TrapezoidProfile100(0.75, 0.75, 0.01);
+        profile = new TrapezoidIncrementalProfile(0.75, 0.75, 0.01);
         for (int i = 0; i < 2000; ++i) {
-            state = profile.calculate(k10ms, state, goal);
+            state = profile.calculate(TEN_MS, state, goal);
         }
         assertEquals(goal.x(), state.x(), 0.05);
         assertEquals(goal.v(), state.v(), 0.05);

@@ -18,8 +18,8 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.MockProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
@@ -29,14 +29,14 @@ import org.team100.lib.state.Model100;
 import org.team100.lib.testing.Timeless;
 
 class GravityServoTest implements Timeless {
-    private static final double kDelta = 0.001;
+    private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testSetPosition() {
         Feedback100 pivotFeedback = new PIDFeedback(
                 logger, 4.5, 0.0, 0.000, false, 0.05, 1);
-        Profile100 profile = new TrapezoidProfile100(8, 8, 0.001);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(8, 8, 0.001);
         IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile,  0.05, 0.05);
         // motor speed is rad/s
         SimulatedBareMotor simMotor = new SimulatedBareMotor(logger, 600);
@@ -55,7 +55,7 @@ class GravityServoTest implements Timeless {
         DoubleUnaryOperator torquefn = (x) -> gravity.applyAsDouble(x) + spring.applyAsDouble(x);
         Torque tt = new Torque(torquefn);
         // start at zero
-        assertEquals(0, servo.getPosition().getAsDouble(), kDelta);
+        assertEquals(0, servo.getPosition().getAsDouble(), DELTA);
         // one second
         for (int i = 0; i < 70; ++i) {
             double torque = tt.torque(servo.getPosition());
@@ -88,84 +88,84 @@ class GravityServoTest implements Timeless {
 
 
         sensor.angle = -0.1;
-        assertEquals(4.714, gravity.applyAsDouble(sensor.angle), kDelta);
-        assertEquals(-9.888, spring.applyAsDouble(sensor.angle), kDelta);
+        assertEquals(4.714, gravity.applyAsDouble(sensor.angle), DELTA);
+        assertEquals(-9.888, spring.applyAsDouble(sensor.angle), DELTA);
         double torque = tt.torque(servo.getPosition());
-        assertEquals(-5.175, torque, kDelta);
+        assertEquals(-5.175, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
-        assertEquals(0, motor.velocity, kDelta);
-        assertEquals(0, motor.accel, kDelta);
-        assertEquals(-5.175, motor.torque, kDelta);
+        assertEquals(0, motor.velocity, DELTA);
+        assertEquals(0, motor.accel, DELTA);
+        assertEquals(-5.175, motor.torque, DELTA);
 
         sensor.angle = 0;
-        assertEquals(3.925, gravity.applyAsDouble(sensor.angle), kDelta);
-        assertEquals(-9.050, spring.applyAsDouble(sensor.angle), kDelta);
+        assertEquals(3.925, gravity.applyAsDouble(sensor.angle), DELTA);
+        assertEquals(-9.050, spring.applyAsDouble(sensor.angle), DELTA);
         torque = tt.torque(servo.getPosition());
-        assertEquals(-5.125, torque, kDelta);
+        assertEquals(-5.125, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
-        assertEquals(0, motor.velocity, kDelta);
-        assertEquals(0, motor.accel, kDelta);
-        assertEquals(-5.125, motor.torque, kDelta);
+        assertEquals(0, motor.velocity, DELTA);
+        assertEquals(0, motor.accel, DELTA);
+        assertEquals(-5.125, motor.torque, DELTA);
 
         sensor.angle = 0.5;
-        assertEquals(-0.439, gravity.applyAsDouble(sensor.angle), kDelta);
-        assertEquals(-5.631, spring.applyAsDouble(sensor.angle), kDelta);
+        assertEquals(-0.439, gravity.applyAsDouble(sensor.angle), DELTA);
+        assertEquals(-5.631, spring.applyAsDouble(sensor.angle), DELTA);
         torque = tt.torque(servo.getPosition());
-        assertEquals(-6.069, torque, kDelta);
+        assertEquals(-6.069, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
-        assertEquals(0, motor.velocity, kDelta);
-        assertEquals(0, motor.accel, kDelta);
-        assertEquals(-6.069, motor.torque, kDelta);
+        assertEquals(0, motor.velocity, DELTA);
+        assertEquals(0, motor.accel, DELTA);
+        assertEquals(-6.069, motor.torque, DELTA);
 
         sensor.angle = 1.0;
-        assertEquals(-4.695, gravity.applyAsDouble(sensor.angle), kDelta);
-        assertEquals(-2.806, spring.applyAsDouble(sensor.angle), kDelta);
+        assertEquals(-4.695, gravity.applyAsDouble(sensor.angle), DELTA);
+        assertEquals(-2.806, spring.applyAsDouble(sensor.angle), DELTA);
         torque = tt.torque(servo.getPosition());
-        assertEquals(-7.500, torque, kDelta);
+        assertEquals(-7.500, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
-        assertEquals(0, motor.velocity, kDelta);
-        assertEquals(0, motor.accel, kDelta);
-        assertEquals(-7.500, motor.torque, kDelta);
+        assertEquals(0, motor.velocity, DELTA);
+        assertEquals(0, motor.accel, DELTA);
+        assertEquals(-7.500, motor.torque, DELTA);
 
         sensor.angle = 1.5;
-        assertEquals(-7.801, gravity.applyAsDouble(sensor.angle), kDelta);
-        assertEquals(-1.576, spring.applyAsDouble(sensor.angle), kDelta);
+        assertEquals(-7.801, gravity.applyAsDouble(sensor.angle), DELTA);
+        assertEquals(-1.576, spring.applyAsDouble(sensor.angle), DELTA);
         torque = tt.torque(servo.getPosition());
-        assertEquals(-9.377, torque, kDelta);
+        assertEquals(-9.377, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
-        assertEquals(0, motor.velocity, kDelta);
-        assertEquals(0, motor.accel, kDelta);
-        assertEquals(-9.377, motor.torque, kDelta);
+        assertEquals(0, motor.velocity, DELTA);
+        assertEquals(0, motor.accel, DELTA);
+        assertEquals(-9.377, motor.torque, DELTA);
 
         sensor.angle = 2.0;
-        assertEquals(-8.998, gravity.applyAsDouble(sensor.angle), kDelta);
-        assertEquals(-1.000, spring.applyAsDouble(sensor.angle), kDelta);
+        assertEquals(-8.998, gravity.applyAsDouble(sensor.angle), DELTA);
+        assertEquals(-1.000, spring.applyAsDouble(sensor.angle), DELTA);
         torque = tt.torque(servo.getPosition());
-        assertEquals(-9.998, torque, kDelta);
+        assertEquals(-9.998, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
-        assertEquals(0, motor.velocity, kDelta);
-        assertEquals(0, motor.accel, kDelta);
-        assertEquals(-9.998, motor.torque, kDelta);
+        assertEquals(0, motor.velocity, DELTA);
+        assertEquals(0, motor.accel, DELTA);
+        assertEquals(-9.998, motor.torque, DELTA);
 
         sensor.angle = 2.5;
-        assertEquals(-7.991, gravity.applyAsDouble(sensor.angle), kDelta);
-        assertEquals(-1.0, spring.applyAsDouble(sensor.angle), kDelta);
+        assertEquals(-7.991, gravity.applyAsDouble(sensor.angle), DELTA);
+        assertEquals(-1.0, spring.applyAsDouble(sensor.angle), DELTA);
         torque = tt.torque(servo.getPosition());
-        assertEquals(-8.991, torque, kDelta);
+        assertEquals(-8.991, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
-        assertEquals(0, motor.velocity, kDelta);
-        assertEquals(0, motor.accel, kDelta);
-        assertEquals(-8.991, motor.torque, kDelta);
+        assertEquals(0, motor.velocity, DELTA);
+        assertEquals(0, motor.accel, DELTA);
+        assertEquals(-8.991, motor.torque, DELTA);
 
         sensor.angle = 3.0;
-        assertEquals(-5.028, gravity.applyAsDouble(sensor.angle), kDelta);
-        assertEquals(-1.0, spring.applyAsDouble(sensor.angle), kDelta);
+        assertEquals(-5.028, gravity.applyAsDouble(sensor.angle), DELTA);
+        assertEquals(-1.0, spring.applyAsDouble(sensor.angle), DELTA);
         torque = tt.torque(servo.getPosition());
-        assertEquals(-6.028, torque, kDelta);
+        assertEquals(-6.028, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
-        assertEquals(0, motor.velocity, kDelta);
-        assertEquals(0, motor.accel, kDelta);
-        assertEquals(-6.028, motor.torque, kDelta);
+        assertEquals(0, motor.velocity, DELTA);
+        assertEquals(0, motor.accel, DELTA);
+        assertEquals(-6.028, motor.torque, DELTA);
     }
 
 }

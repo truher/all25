@@ -13,8 +13,7 @@ import org.team100.lib.state.Model100;
  * at the goal.
  * 
  * If the taper is linear, then the goal is never reached; we use the cube root
- * to obtain
- * roughly linear tapering with time, i.e. constant jerk
+ * to obtain roughly linear tapering with time, i.e. constant jerk
  */
 public class TaperedProfile implements TimedProfile {
     private final double vel;

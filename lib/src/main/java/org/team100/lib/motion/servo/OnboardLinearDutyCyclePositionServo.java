@@ -19,8 +19,8 @@ import edu.wpi.first.math.MathUtil;
  * Position control using duty cycle feature of linear mechanism
  */
 public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo {
-    private static final double kPositionTolerance = 0.01;
-    private static final double kVelocityTolerance = 0.01;
+    private static final double POSITION_TOLERANCE = 0.01;
+    private static final double VELOCITY_TOLERANCE = 0.01;
     private final LinearMechanism m_mechanism;
     private final ProfileReference1d m_ref;
     private final Feedback100 m_feedback;
@@ -92,7 +92,7 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
         m_log_goal.log(() -> goalM);
         final Model100 goal = new Model100(goalM, 0);
 
-        if (!goal.near(m_goal, kPositionTolerance, kVelocityTolerance)) {
+        if (!goal.near(m_goal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
             m_goal = goal;
             m_ref.setGoal(goal);
             // initialize with the setpoint, not the measurement, to avoid noise.
@@ -153,12 +153,31 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
     }
 
     @Override
+    public boolean atSetpoint() {
+        OptionalDouble pos = m_mechanism.getPositionM();
+        if (pos.isEmpty())
+            return false;
+        OptionalDouble vel = m_mechanism.getVelocityM_S();
+        if (vel.isEmpty())
+            return false;
+        double pErr = m_setpoint.x() - pos.getAsDouble();
+        double vErr = m_setpoint.v() - vel.getAsDouble();
+        return Math.abs(pErr) < POSITION_TOLERANCE
+                && Math.abs(vErr) < VELOCITY_TOLERANCE;
+    }
+
+    @Override
     public boolean profileDone() {
         if (m_goal == null) {
             // if there's no profile, it's always done.
             return true;
         }
         return m_ref.profileDone();
+    }
+
+    @Override
+    public boolean atGoal() {
+        return atSetpoint() && profileDone();
     }
 
     @Override

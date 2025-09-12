@@ -2,7 +2,7 @@ package org.team100.lib.geometry;
 
 import java.util.Optional;
 
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
@@ -114,11 +114,11 @@ public class GeometryUtil {
     }
 
     public static double WrapRadians(double radians) {
-        final double k2Pi = 2.0 * Math.PI;
-        radians = radians % k2Pi;
-        radians = (radians + k2Pi) % k2Pi;
+        final double twoPi = 2.0 * Math.PI;
+        radians = radians % twoPi;
+        radians = (radians + twoPi) % twoPi;
         if (radians > Math.PI)
-            radians -= k2Pi;
+            radians -= twoPi;
         return radians;
     }
 

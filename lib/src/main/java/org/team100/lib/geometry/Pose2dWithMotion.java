@@ -138,7 +138,7 @@ public class Pose2dWithMotion {
         m_dCurvatureDsRad_M2 = dCurvatureDsRad_M2;
     }
 
-    public final Pose2d getPose() {
+    public Pose2d getPose() {
         return m_pose;
     }
 
@@ -152,11 +152,11 @@ public class Pose2dWithMotion {
         return m_dCurvatureDsRad_M2;
     }
 
-    public final Translation2d getTranslation() {
+    public Translation2d getTranslation() {
         return getPose().getTranslation();
     }
 
-    public final Rotation2d getHeading() {
+    public Rotation2d getHeading() {
         return getPose().getRotation();
     }
 
