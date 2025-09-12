@@ -1,0 +1,74 @@
+package org.team100.lib.trajectory.timing;
+
+import org.team100.lib.geometry.Pose2dWithMotion;
+
+/**
+ * Timing constraints govern the assignment of a schedule to a path, creating a
+ * trajectory. Different implementations focus on different aspects, e.g.
+ * tippiness, wheel slip, etc. Different maneuvers may want different
+ * constraints, e.g. some should be slow and precise, others fast and risky.
+ */
+public interface TimingConstraint {
+    /**
+     * Maximum allowed velocity m/s.  This is always non-negative.
+     */
+    NonNegativeDouble getMaxVelocity(Pose2dWithMotion state);
+
+    class NonNegativeDouble {
+        private final double m_value;
+
+        public NonNegativeDouble(double value) {
+            if (value < 0)
+                throw new IllegalArgumentException();
+            m_value = value;
+        }
+
+        public double getValue() {
+            return m_value;
+        }
+    }
+
+    /**
+     * Minimum and maximum allowed acceleration m/s^2.
+     * 
+     * The acceleration here is purely *along* the path, it doesn't have anything to
+     * do with cross-track accelerations due to curvature.
+     */
+    MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocityM_S);
+
+    class MinMaxAcceleration {
+        public static final MinMaxAcceleration NO_LIMITS = new MinMaxAcceleration();
+
+        private final double m_minAccel;
+        private final double m_maxAccel;
+
+        private MinMaxAcceleration() {
+            this(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        }
+
+        /**
+         * @param minAccel a negative number
+         * @param maxAccel a positive number
+         */
+        public MinMaxAcceleration(double minAccel, double maxAccel) {
+            if (minAccel > 0) {
+                throw new IllegalArgumentException();
+            }
+            if (maxAccel < 0) {
+                throw new IllegalArgumentException();
+            }
+            m_minAccel = minAccel;
+            m_maxAccel = maxAccel;
+        }
+
+        /** Always negative (or zero). */
+        public double getMinAccel() {
+            return m_minAccel;
+        }
+
+        /** Always positive (or zero). */
+        public double getMaxAccel() {
+            return m_maxAccel;
+        }
+    }
+}

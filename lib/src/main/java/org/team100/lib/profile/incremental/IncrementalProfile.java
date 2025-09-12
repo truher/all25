@@ -1,8 +1,8 @@
 package org.team100.lib.profile.incremental;
 
+import org.team100.lib.optimization.Bisection1d;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Math100;
 import org.team100.lib.util.Util;
 
 /**
@@ -66,7 +66,7 @@ public interface IncrementalProfile {
             double etaTolerance) {
         final double minS = 0.01;
         final double maxS = 1.0;
-        double ss = Math100.findRoot(
+        double ss = Bisection1d.findRoot(
                 s -> scale(s).simulateForETA(dt, i, g) - goalETA,
                 minS,
                 scale(minS).simulateForETA(dt, i, g) - goalETA,

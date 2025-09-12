@@ -17,6 +17,8 @@ import org.team100.lib.util.Util;
  * 
  * This is faster than the TernarySearch method mainly because it only evaluates
  * once per step.
+ * 
+ * @see https://en.wikipedia.org/wiki/Golden-section_search
  */
 public class GoldenSectionSearch {
     private static final double INVPHI = (Math.sqrt(5) - 1) / 2; // 1 / phi

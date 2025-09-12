@@ -6,10 +6,10 @@ import java.util.function.Function;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.path.Path100;
-import org.team100.lib.path.PathFactory;
-import org.team100.lib.timing.ScheduleGenerator;
-import org.team100.lib.timing.TimingConstraint;
+import org.team100.lib.trajectory.path.Path100;
+import org.team100.lib.trajectory.path.PathFactory;
+import org.team100.lib.trajectory.timing.ScheduleGenerator;
+import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
