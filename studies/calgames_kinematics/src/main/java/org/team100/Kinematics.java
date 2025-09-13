@@ -30,11 +30,19 @@ public class Kinematics {
 
     public Pose2d forward(Config config) {
         // forward kinematics
-        
-        double xComp = m_armLength * Math.cos(m_shoulderAngle) + m_manipulatorLength * Math.cos(m_elbowAngle);
-        double yComp =  m_armLength * Math.sin(m_shoulderAngle) + m_manipulatorLength * Math.sin(m_elbowAngle)+m_shoulderHeight;
+        System.out.println("TESTING FORWARD KINEMATICS" );
+
+        System.out.println("Arm Length: " + m_armLength);
+        System.out.println("Manipulator Length: " + m_manipulatorLength);
+
+        double xComp = (m_armLength * Math.cos(m_shoulderAngle)) + (m_manipulatorLength * Math.cos(m_elbowAngle));
+        double yComp =  (m_armLength * Math.sin(m_shoulderAngle)) - (m_manipulatorLength * Math.sin(m_elbowAngle))+m_shoulderHeight;
         // m_goalX-xComp; the code you'd use to check if u got the right x,y (it should equal zero)
         // m_goalY-yComp;
+        System.out.println("X Distance: " + xComp);
+        System.out.println("Y Distance: " + yComp);
+        System.out.println("Manipulator Rotation: " + (m_shoulderAngle+m_elbowAngle));
+
         return new Pose2d(xComp, yComp, new Rotation2d(m_shoulderAngle+m_elbowAngle));
     }
 
@@ -63,6 +71,12 @@ public class Kinematics {
         //first part is law of cosidnes but for the elbow instead. 
         //need to think about how this will work with negative angles?
         m_elbowAngle = ((Math.acos((m_manipulatorLength*m_manipulatorLength + m_armLength*m_armLength - m_zLength*m_zLength) / (2 * m_manipulatorLength * m_armLength))));
+       
+        System.out.println("TESTING INVERSE KINEMATICS" );
+        System.out.println("Shoulder angle: "+ Math.toDegrees(m_shoulderAngle));
+        System.out.println("Shoulder Height: "+ m_shoulderHeight);
+        System.out.println("Elbow angle: "+ m_elbowAngle);
+
 
          return new Config(m_shoulderHeight, m_shoulderAngle, m_elbowAngle);
     }
