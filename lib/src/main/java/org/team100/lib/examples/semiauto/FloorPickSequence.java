@@ -14,7 +14,6 @@ import org.team100.lib.targeting.Targets;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -31,7 +30,7 @@ public class FloorPickSequence {
             Targets targets,
             SwerveController controller,
             HolonomicProfile profile) {
-        Supplier<Optional<Translation2d>> target = () -> targets.getClosestTranslation2d(DriverStation.getAlliance());
+        Supplier<Optional<Translation2d>> target = () -> targets.getClosestTranslation2d();
         Supplier<Optional<Translation2d>> runway = () -> {
             Optional<Translation2d> t = target.get();
             if (t.isEmpty())

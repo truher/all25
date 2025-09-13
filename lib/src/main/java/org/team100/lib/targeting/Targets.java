@@ -24,7 +24,6 @@ import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.ValueEventData;
 import edu.wpi.first.util.struct.StructBuffer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Listen for updates from the object-detector camera and remember them for
@@ -39,7 +38,7 @@ public class Targets {
     private static final double MAX_SIGHT_AGE = 0.1;
 
     private StructBuffer<Rotation3d> m_buf = StructBuffer.create(Rotation3d.struct);
-    List<Translation2d> objects = new ArrayList<>();
+    List<Translation2d> fieldRelativeTargets = new ArrayList<>();
     private final DoubleFunction<Pose2d> m_robotPose;
     private final NetworkTableListenerPoller m_poller;
 
@@ -57,6 +56,7 @@ public class Targets {
                 EnumSet.of(NetworkTableEvent.Kind.kValueAll));
     }
 
+    /** Read pending camera input, transform to field-relative targets. */
     public void update() {
         for (NetworkTableEvent e : m_poller.readQueue()) {
 
@@ -96,7 +96,9 @@ public class Targets {
                 if (DEBUG)
                     Util.printf("camera %s offset %s\n", fields[1], cameraInRobotCoordinates);
                 Pose2d robotPose = m_robotPose.apply(v.getServerTime() / 1000000.0);
-                objects = TargetLocalizer.cameraRotsToFieldRelativeArray(
+                // TODO: this overwrites the whole target set with whatever one camera sees
+                // TODO: instead it should merge the sights from several cameras.
+                fieldRelativeTargets = TargetLocalizer.cameraRotsToFieldRelativeArray(
                         robotPose,
                         cameraInRobotCoordinates,
                         sights);
@@ -109,47 +111,21 @@ public class Targets {
     /**
      * Field-relative translations of recent sights.
      */
-    public List<Translation2d> getTranslation2dArray(Optional<Alliance> alliance) {
+    public List<Translation2d> getTranslation2dArray() {
         update();
-        switch (Identity.instance) {
-            case BLANK:
-                if (DEBUG)
-                    Util.printf("blank\n");
-                Pose2d robotPose = m_robotPose.apply(Takt.get());
-                Transform3d offset = new Transform3d(
-                        new Translation3d(-0.1265, 0.03, 0.61),
-                        new Rotation3d(0, Math.toRadians(31.5), Math.PI));
-                SimulatedObjectDetector simCamera = new SimulatedObjectDetector(
-                        offset,
-                        Math.toRadians(40),
-                        Math.toRadians(31.5));
-                if (alliance.isEmpty()) {
-                    if (DEBUG)
-                        Util.printf("empty alliance\n");
-                    return new ArrayList<>();
-                }
-                List<Rotation3d> rot = simCamera.getKnownLocations(alliance.get(), robotPose);
-                if (DEBUG)
-                    Util.printf("rotsize %d\n", rot.size());
-                return TargetLocalizer.cameraRotsToFieldRelativeArray(
-                        robotPose,
-                        simCamera.getOffset(),
-                        rot.toArray(new Rotation3d[0]));
-            default:
-                if (latestTime > Takt.get() - MAX_SIGHT_AGE) {
-                    return objects;
-                }
-                return new ArrayList<>();
+        if (latestTime > Takt.get() - MAX_SIGHT_AGE) {
+            return fieldRelativeTargets;
         }
+        return new ArrayList<>();
     }
 
     /**
      * The field-relative translation of the closest object, if any.
      */
-    public Optional<Translation2d> getClosestTranslation2d(Optional<Alliance> alliance) {
+    public Optional<Translation2d> getClosestTranslation2d() {
         update();
         Pose2d robotPose = m_robotPose.apply(Takt.get());
-        List<Translation2d> translation2dArray = getTranslation2dArray(alliance);
+        List<Translation2d> translation2dArray = getTranslation2dArray();
         if (DEBUG)
             Util.printf("translations %d\n", translation2dArray.size());
         return ObjectPicker.closestObject(
