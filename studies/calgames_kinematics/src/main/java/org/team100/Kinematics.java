@@ -35,11 +35,28 @@ public class Kinematics {
         System.out.println("Arm Length: " + m_armLength);
         System.out.println("Manipulator Length: " + m_manipulatorLength);
 
-        double xComp = (m_armLength * Math.cos(m_shoulderAngle)) + (m_manipulatorLength * Math.cos(m_elbowAngle));
-        double yComp =  (m_armLength * Math.sin(m_shoulderAngle)) - (m_manipulatorLength * Math.sin(m_elbowAngle))+m_shoulderHeight;
+        double armXcomp  = (m_armLength * Math.cos(Math.toRadians(config.m_shoulderAngle())));
+
+
+
+        double armYcomp = (m_armLength * Math.sin(Math.toRadians(config.m_shoulderAngle())));
+        
+        double manipulatorXcomp = (m_manipulatorLength * Math.sin(config.m_elbowAngle()-(180-90-config.m_shoulderAngle())));
+        double manipulatorYcomp = (m_manipulatorLength * Math.cos(Math.toRadians(config.m_elbowAngle()-(180-90-config.m_shoulderAngle()))));
+        
+        System.out.println("armXcomp: " + armXcomp);
+        System.out.println("armYcomp: " + armYcomp);
+        System.out.println("manipulatorXcomp: " + manipulatorXcomp);
+        System.out.println("manipulaYcomp: " + manipulatorYcomp);
+
+
+        double xComp = (armXcomp)+ (manipulatorXcomp);
+        double yComp =  (armYcomp) - (manipulatorYcomp) + m_shoulderHeight;
+
+
         // m_goalX-xComp; the code you'd use to check if u got the right x,y (it should equal zero)
         // m_goalY-yComp;
-        System.out.println("X Distance: " + xComp);
+        System.out.println("X Success: " + (0.207-xComp));
         System.out.println("Y Distance: " + yComp);
         System.out.println("Manipulator Rotation: " + (m_shoulderAngle+m_elbowAngle));
 
