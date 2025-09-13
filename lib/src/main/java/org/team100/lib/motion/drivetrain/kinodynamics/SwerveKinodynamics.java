@@ -11,7 +11,6 @@ import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.profile.incremental.IncrementalProfile;
-import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 
 import edu.wpi.first.math.geometry.Pose2d;

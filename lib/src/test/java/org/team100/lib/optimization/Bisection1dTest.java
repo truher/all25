@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.function.DoubleUnaryOperator;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.util.Math100;
 
 public class Bisection1dTest {
     private static final double DELTA = 0.001;

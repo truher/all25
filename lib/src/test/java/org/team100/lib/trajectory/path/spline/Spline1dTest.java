@@ -1,7 +1,6 @@
 package org.team100.lib.trajectory.path.spline;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.trajectory.path.spline.Spline1d;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MatBuilder;
