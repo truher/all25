@@ -22,10 +22,7 @@ public enum FieldPoint2024 {
                 getTranslation(alliance, FieldPoint2024.NOTE5),
                 getTranslation(alliance, FieldPoint2024.NOTE6),
                 getTranslation(alliance, FieldPoint2024.NOTE7),
-                getTranslation(alliance, FieldPoint2024.NOTE8),
-                getTranslation(alliance, FieldPoint2024.NOTE9),
-                getTranslation(alliance, FieldPoint2024.NOTE10),
-                getTranslation(alliance, FieldPoint2024.NOTE11)
+                getTranslation(alliance, FieldPoint2024.NOTE8)
         };
     }
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.team100.lib.field.FieldPoint2024;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,6 +20,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * This was from 2024.
  */
 public class SimulatedObjectDetector {
+    private static final boolean DEBUG = true;
+
     private final Transform3d m_offset;
     private final double m_hFovHalfAngleRad;
     private final double m_vFovHalfAngleRad;
@@ -54,6 +57,8 @@ public class SimulatedObjectDetector {
     public List<Rotation3d> getRotations(Pose2d robotPose, Translation2d[] notes) {
         ArrayList<Rotation3d> list = new ArrayList<>();
         for (Translation2d note : notes) {
+            if (DEBUG)
+                Util.printf("note %s\n", note);
             getRotInCamera(robotPose, note).ifPresent(list::add);
         }
         return list;
@@ -69,11 +74,14 @@ public class SimulatedObjectDetector {
         double x = noteInCameraCoordinates.getX();
         double y = noteInCameraCoordinates.getY();
         double z = noteInCameraCoordinates.getZ();
-        if (Math.abs(Math.atan2(z, x)) >= m_vFovHalfAngleRad
-                && Math.abs(Math.atan2(y, x)) >= m_hFovHalfAngleRad) {
+        Rotation3d rot = new Rotation3d(VecBuilder.fill(x, 0, 0), VecBuilder.fill(x, y, z));
+        if (Math.abs(rot.getY()) >= m_vFovHalfAngleRad
+                && Math.abs(rot.getZ()) >= m_hFovHalfAngleRad) {
+            if (DEBUG)
+                Util.printf("out of frame\n");
             return Optional.empty();
         }
-        return Optional.of(new Rotation3d(VecBuilder.fill(x, 0, 0), VecBuilder.fill(x, y, z)));
+        return Optional.of(rot);
     }
 
     /**

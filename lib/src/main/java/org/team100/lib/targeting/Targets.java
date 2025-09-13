@@ -24,17 +24,20 @@ import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.ValueEventData;
 import edu.wpi.first.util.struct.StructBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Listen for updates from the object-detector camera and remember them for
  * awhile.
+ * 
+ * TODO: combine with AprilTagRobotLocalizer, extract the differences.
  */
 public class Targets {
+    private static final boolean DEBUG = true;
+
     /** Ignore sights older than this. */
     private static final double MAX_SIGHT_AGE = 0.1;
-    
+
     private StructBuffer<Rotation3d> m_buf = StructBuffer.create(Rotation3d.struct);
     List<Translation2d> objects = new ArrayList<>();
     private final DoubleFunction<Pose2d> m_robotPose;
@@ -56,9 +59,12 @@ public class Targets {
 
     public void update() {
         for (NetworkTableEvent e : m_poller.readQueue()) {
+
             ValueEventData ve = e.valueData;
             NetworkTableValue v = ve.value;
             String name = ve.getTopic().getName();
+            if (DEBUG)
+                Util.printf("poll %s\n", name);
             String[] fields = name.split("/");
             if (fields.length != 4) {
                 return;
@@ -68,6 +74,8 @@ public class Targets {
             } else if (fields[2].equals("latency")) {
                 // latency is not used by the robot
             } else if (fields[3].equals("Rotation3d")) {
+                if (DEBUG)
+                    Util.printf("found rotation\n");
                 // decode the way StructArrayEntryImpl does
                 byte[] b = v.getRaw();
                 if (b.length == 0) {
@@ -81,9 +89,12 @@ public class Targets {
                         latestTime = Takt.get();
                     }
                 } catch (RuntimeException ex) {
+                    Util.warnf("decoding failed for name: %s\n", name);
                     return;
                 }
                 Transform3d cameraInRobotCoordinates = Camera.get(fields[1]).getOffset();
+                if (DEBUG)
+                    Util.printf("camera %s offset %s\n", fields[1], cameraInRobotCoordinates);
                 Pose2d robotPose = m_robotPose.apply(v.getServerTime() / 1000000.0);
                 objects = TargetLocalizer.cameraRotsToFieldRelativeArray(
                         robotPose,
@@ -98,10 +109,12 @@ public class Targets {
     /**
      * Field-relative translations of recent sights.
      */
-    public List<Translation2d> getTranslation2dArray() {
+    public List<Translation2d> getTranslation2dArray(Optional<Alliance> alliance) {
         update();
         switch (Identity.instance) {
             case BLANK:
+                if (DEBUG)
+                    Util.printf("blank\n");
                 Pose2d robotPose = m_robotPose.apply(Takt.get());
                 Transform3d offset = new Transform3d(
                         new Translation3d(-0.1265, 0.03, 0.61),
@@ -110,10 +123,14 @@ public class Targets {
                         offset,
                         Math.toRadians(40),
                         Math.toRadians(31.5));
-                Optional<Alliance> alliance = DriverStation.getAlliance();
-                if (alliance.isEmpty())
+                if (alliance.isEmpty()) {
+                    if (DEBUG)
+                        Util.printf("empty alliance\n");
                     return new ArrayList<>();
+                }
                 List<Rotation3d> rot = simCamera.getKnownLocations(alliance.get(), robotPose);
+                if (DEBUG)
+                    Util.printf("rotsize %d\n", rot.size());
                 return TargetLocalizer.cameraRotsToFieldRelativeArray(
                         robotPose,
                         simCamera.getOffset(),
@@ -129,22 +146,14 @@ public class Targets {
     /**
      * The field-relative translation of the closest object, if any.
      */
-    public Optional<Translation2d> getClosestTranslation2d() {
+    public Optional<Translation2d> getClosestTranslation2d(Optional<Alliance> alliance) {
         update();
         Pose2d robotPose = m_robotPose.apply(Takt.get());
+        List<Translation2d> translation2dArray = getTranslation2dArray(alliance);
+        if (DEBUG)
+            Util.printf("translations %d\n", translation2dArray.size());
         return ObjectPicker.closestObject(
-                getTranslation2dArray(),
+                translation2dArray,
                 robotPose);
-    }
-
-    /**
-     * The field-relative translation of the closest object, if any.
-     */
-    public Translation2d getClosestTranslation2dNull() {
-        Optional<Translation2d> translation2d = getClosestTranslation2d();
-        if (translation2d.isEmpty()) {
-            return null;
-        }
-        return getClosestTranslation2d().get();
     }
 }
