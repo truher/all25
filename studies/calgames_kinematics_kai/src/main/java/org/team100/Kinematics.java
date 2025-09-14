@@ -125,7 +125,7 @@ public class Kinematics {
             
             //law of cosines to find the angle INSIDE the triangle that corresponds to the shoulder joint. second part is angle from 0 degrees to angle of elevation. gnarly
             //this part needs to be edited for going negative angles with arm?
-            double shoulderAngle = (Math.acos((m_armLength*m_armLength + zLength*zLength - m_manipulatorLength*m_manipulatorLength) / (2 * m_armLength * zLength)))+((Math.asin((pose.getY()-shoulderHeight)/zLength)));
+            double shoulderAngle = Math.atan((elbowPointY-shoulderHeight)/wristPointX);
 
             //first part is law of cosidnes but for the elbow instead. 
             //need to think about how this will work with negative angles?

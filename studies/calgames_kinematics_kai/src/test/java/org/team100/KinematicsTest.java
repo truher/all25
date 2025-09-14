@@ -41,7 +41,7 @@ public class KinematicsTest {
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
         Pose2d p = new Pose2d(0.4, 0.81, new Rotation2d(Math.toRadians(35)));
         Config c = k.inverse(p);
-        assertNull("Test failed succeslfully!");
+        assertNull(k.inverse(p));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class KinematicsTest {
         Kinematics k = new Kinematics(0.3, 0.1,3, 0.1, 1, 0.5, 3 );
         Pose2d p = new Pose2d(0.332, 0.81, new Rotation2d(Math.toRadians(35)));
         Config c = k.inverse(p);
-        assertNull("Test failed succeslfully!");
+        assertNull(k.inverse(p));
 
     }
 
