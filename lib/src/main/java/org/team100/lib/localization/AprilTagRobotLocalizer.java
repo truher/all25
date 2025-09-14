@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -135,19 +136,23 @@ public class AprilTagRobotLocalizer {
      */
     private final List<Pose3d> m_usedTags = new ArrayList<>();
 
+    private final String m_ntValueName;
+
     /**
+     * @param parent        logger
      * @param layout
      * @param poseEstimator
-     * @param rotationSupplier rotation for the given time in seconds
-     * @throws IOException
+     * @param ntValueName   key in NT for this value type
      */
     public AprilTagRobotLocalizer(
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            PoseEstimator100 poseEstimator) {
+            PoseEstimator100 poseEstimator,
+            String ntValueName) {
         LoggerFactory child = parent.type(this);
         m_layout = layout;
         m_poseEstimator = poseEstimator;
+        m_ntValueName = ntValueName;
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_poller = new NetworkTableListenerPoller(inst);
@@ -186,39 +191,40 @@ public class AprilTagRobotLocalizer {
      * Memo.updateAll(), which runs in Robot.robotPeriodic().
      */
     public void update() {
-        final Optional<Alliance> alliance = DriverStation.getAlliance();
-        if (!alliance.isPresent()) {
-            // this happens on startup
-            if (DEBUG)
-                Util.warn("VisionDataProvider24: Alliance is not present!");
-            return;
-        }
-        m_log_alliance.log(() -> alliance.get());
 
         // only publish new sights
         m_allTags.clear();
         m_usedTags.clear();
-        NetworkTableEvent[] events = m_poller.readQueue();
-        for (NetworkTableEvent e : events) {
-            ValueEventData ve = e.valueData;
-            NetworkTableValue v = ve.value;
-            String name = ve.getTopic().getName();
+
+        for (NetworkTableEvent e : m_poller.readQueue()) {
+            ValueEventData valueEventData = e.valueData;
+            NetworkTableValue ntValue = valueEventData.value;
+            String name = valueEventData.getTopic().getName();
+            if (DEBUG)
+                Util.printf("poll %s\n", name);
             String[] fields = name.split("/");
             if (fields.length != 4) {
-                Util.warnf("VisionDataProvider24: weird event name: %s\n", name);
+                Util.warnf("weird event name: %s\n", name);
                 continue;
             }
             if (fields[2].equals("fps")) {
                 // FPS is not used by the robot
             } else if (fields[2].equals("latency")) {
                 // latency is not used by the robot
-            } else if (fields[3].equals("blips")) {
+            } else if (fields[3].equals(m_ntValueName)) {
+                // e.g. "blips" or "Rotation3d"
+                if (DEBUG)
+                    Util.printf("found value\n");
                 // decode the way StructArrayEntryImpl does
-                byte[] b = v.getRaw();
+                byte[] b = ntValue.getRaw();
                 if (b.length == 0) {
                     // this should never happen, but it does, very occasionally.
                     continue;
                 }
+
+
+                
+
 
                 Blip24[] blips;
                 try {
@@ -237,12 +243,12 @@ public class AprilTagRobotLocalizer {
                 final double IMPORTANT_MAGIC_NUMBER = 0.027;
                 // server time is in microseconds
                 // https://docs.wpilib.org/en/stable/docs/software/networktables/networktables-intro.html#timestamps
-                long serverTimeUs = v.getServerTime();
+                long serverTimeUs = ntValue.getServerTime();
                 double blipTimeSec = (serverTimeUs / 1000000.0 - IMPORTANT_MAGIC_NUMBER);
 
                 // this seems to always be 1. ????
                 m_log_lag.log(() -> Takt.get() - blipTimeSec);
-                estimateRobotPose(cameraId, blips, blipTimeSec, alliance.get());
+                estimateRobotPose(cameraId, blips, blipTimeSec, DriverStation.getAlliance());
             } else {
                 // this event is not for us
                 // Util.println("weird vision update key: " + name);
@@ -268,13 +274,25 @@ public class AprilTagRobotLocalizer {
     /**
      * Compute the robot pose and put it in the pose estimator.
      * 
-     * @param cameraId  From proc/cpuinfo
-     * @param blips     The targets in the current camera frame
-     * @param timestamp Camera frame timestamp
-     * @param alliance  From the driver station
+     * @param cameraId    From proc/cpuinfo
+     * @param blips       The targets in the current camera frame
+     * @param timestamp   Camera frame timestamp
+     * @param optAlliance From the driver station
      * @return The apparent location of tags we can see
      */
-    void estimateRobotPose(String cameraId, Blip24[] blips, double timestamp, Alliance alliance) {
+    void estimateRobotPose(
+            String cameraId,
+            Blip24[] blips,
+            double timestamp,
+            Optional<Alliance> optAlliance) {
+        if (!optAlliance.isPresent()) {
+            // this happens on startup
+            if (DEBUG)
+                Util.warn("VisionDataProvider24: Alliance is not present!");
+            return;
+        }
+        Alliance alliance = optAlliance.get();
+        m_log_alliance.log(() -> alliance);
         m_log_heedRadius.log(() -> m_heedRadiusM);
 
         // Robot-to-camera, offset from Camera.java
@@ -299,13 +317,12 @@ public class AprilTagRobotLocalizer {
         for (int i = 0; i < blips.length; ++i) {
             Blip24 blip = blips[i];
 
-            // if (DEBUG) {
-            // Translation3d t = blip.getRawPose().getTranslation();
-            // Rotation3d r = blip.getRawPose().getRotation();
-            // Util.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y
-            // %5.2f\n",
-            // blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ());
-            // }
+            if (DEBUG) {
+                Translation3d t = blip.getRawPose().getTranslation();
+                Rotation3d r = blip.getRawPose().getRotation();
+                Util.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
+                        blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ());
+            }
 
             // Look up the pose of the tag in the field frame.
             Optional<Pose3d> tagInFieldCoordsOptional = m_layout.getTagPose(alliance, blip.getId());

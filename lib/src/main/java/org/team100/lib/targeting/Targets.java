@@ -8,14 +8,12 @@ import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
-import org.team100.lib.config.Identity;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -44,8 +42,13 @@ public class Targets {
 
     private double latestTime = 0;
 
-    public Targets(DoubleFunction<Pose2d> robotPose) {
+    private final String m_ntValueName;
+
+    public Targets(
+            DoubleFunction<Pose2d> robotPose, String ntValueName) {
         m_robotPose = robotPose;
+        m_ntValueName = ntValueName;
+
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_poller = new NetworkTableListenerPoller(inst);
         m_poller.addListener(
@@ -58,30 +61,38 @@ public class Targets {
 
     /** Read pending camera input, transform to field-relative targets. */
     public void update() {
-        for (NetworkTableEvent e : m_poller.readQueue()) {
 
-            ValueEventData ve = e.valueData;
-            NetworkTableValue v = ve.value;
-            String name = ve.getTopic().getName();
+        for (NetworkTableEvent e : m_poller.readQueue()) {
+            ValueEventData valueEventData = e.valueData;
+            NetworkTableValue ntValue = valueEventData.value;
+            String name = valueEventData.getTopic().getName();
             if (DEBUG)
                 Util.printf("poll %s\n", name);
             String[] fields = name.split("/");
             if (fields.length != 4) {
-                return;
+                Util.warnf("weird event name: %s\n", name);
+                continue;
             }
             if (fields[2].equals("fps")) {
                 // FPS is not used by the robot
             } else if (fields[2].equals("latency")) {
                 // latency is not used by the robot
             } else if (fields[3].equals("Rotation3d")) {
+                // e.g. "blips" or "Rotation3d"
                 if (DEBUG)
-                    Util.printf("found rotation\n");
+                    Util.printf("found value\n");
                 // decode the way StructArrayEntryImpl does
-                byte[] b = v.getRaw();
+                byte[] b = ntValue.getRaw();
                 if (b.length == 0) {
-                    return;
+                    // this should never happen, but it does, very occasionally.
+                    continue;
                 }
-                // object! sights are x-ahead WPI coordinates, not z-ahead camera coordinates.
+
+
+
+                
+
+                // object sights are x-ahead WPI coordinates, not z-ahead camera coordinates.
                 Rotation3d[] sights;
                 try {
                     synchronized (m_buf) {
@@ -95,7 +106,7 @@ public class Targets {
                 Transform3d cameraInRobotCoordinates = Camera.get(fields[1]).getOffset();
                 if (DEBUG)
                     Util.printf("camera %s offset %s\n", fields[1], cameraInRobotCoordinates);
-                Pose2d robotPose = m_robotPose.apply(v.getServerTime() / 1000000.0);
+                Pose2d robotPose = m_robotPose.apply(ntValue.getServerTime() / 1000000.0);
                 // TODO: this overwrites the whole target set with whatever one camera sees
                 // TODO: instead it should merge the sights from several cameras.
                 fieldRelativeTargets = TargetLocalizer.cameraRotsToFieldRelativeArray(

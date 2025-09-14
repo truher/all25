@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
@@ -47,7 +48,7 @@ class AprilTagRobotLocalizerPerformanceTest {
         };
 
         AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator);
+                logger, layout, poseEstimator, "blips");
 
         // camera sees the tag straight ahead in the center of the frame,
         // but rotated pi/4 to the left. this is ignored anyway.
@@ -71,7 +72,8 @@ class AprilTagRobotLocalizerPerformanceTest {
 
         // run forever so i can use the profiler
         while (true)
-            vdp.estimateRobotPose(cameraSerialNumber, blips, Takt.get(), Alliance.Red);
+            vdp.estimateRobotPose(
+                    cameraSerialNumber, blips, Takt.get(), Optional.of(Alliance.Red));
     }
 
     @Test

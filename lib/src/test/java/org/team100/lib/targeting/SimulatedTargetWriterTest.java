@@ -21,7 +21,7 @@ public class SimulatedTargetWriterTest {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets((x) -> p);
+        Targets reader = new Targets((x) -> p, "Rotation3d");
 
         Transform3d offset = Camera.get("test4").getOffset();
         writer.update(

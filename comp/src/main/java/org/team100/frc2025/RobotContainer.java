@@ -202,7 +202,8 @@ public class RobotContainer {
         final AprilTagRobotLocalizer visionDataProvider = new AprilTagRobotLocalizer(
                 driveLog,
                 layout,
-                poseEstimator);
+                poseEstimator,
+                "blips");
 
         final SwerveLocal swerveLocal = new SwerveLocal(
                 driveLog,

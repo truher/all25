@@ -23,7 +23,7 @@ public class TargetsTest {
     @Test
     void testTargets() {
         Pose2d p = new Pose2d(0, 0, Rotation2d.kZero);
-        Targets t = new Targets((x) -> p);
+        Targets t = new Targets((x) -> p, "Rotation3d");
         t.update();
         assertTrue(t.fieldRelativeTargets.isEmpty());
         // send some blips
@@ -55,7 +55,7 @@ public class TargetsTest {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets((x) -> p);
+        Targets reader = new Targets((x) -> p, "Rotation3d");
 
         Transform3d offset = Camera.get("test4").getOffset();
         writer.update(
