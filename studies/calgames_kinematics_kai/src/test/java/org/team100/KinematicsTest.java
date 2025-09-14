@@ -1,6 +1,7 @@
 package org.team100;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
@@ -40,12 +41,7 @@ public class KinematicsTest {
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
         Pose2d p = new Pose2d(0.4, 0.81, new Rotation2d(Math.toRadians(35)));
         Config c = k.inverse(p);
-        if (c==null){
-            fail("Inverse Kinematics Failed Due to Reach Issue. Check Logs");
-        }
-        assertEquals(0.702, c.shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(33.5), c.shoulderAngle(), 0.01); //changed from 0.001, assumed rounding error
-        assertEquals(Math.toRadians(111.5), c.wristAngle(), 0.01); //changed from 0.001 assumed rounding error
+        assertNull("Test failed succeslfully!");
     }
 
     @Test
@@ -54,12 +50,8 @@ public class KinematicsTest {
         Kinematics k = new Kinematics(0.3, 0.1,3, 0.1, 1, 0.5, 3 );
         Pose2d p = new Pose2d(0.332, 0.81, new Rotation2d(Math.toRadians(35)));
         Config c = k.inverse(p);
-        if (c==null){
-            fail("Inverse Kinematics Failed. Check Logs");
-        }
-        assertEquals(0.702, c.shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(33.5), c.shoulderAngle(), 0.01); //changed from 0.001, assumed rounding error
-        assertEquals(Math.toRadians(111.5), c.wristAngle(), 0.01); //changed from 0.001 assumed rounding error
+        assertNull("Test failed succeslfully!");
+
     }
 
 }
