@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class KinematicsTest {
     @Test
     void testForward() {
-        Kinematics k = new Kinematics(0.3, 0.1, 5, 5, 60);
+        Kinematics k = new Kinematics(0.3, 0.1);
         Config c = new Config(1, 60, 65);
         Pose2d p = k.forward(c);
         assertEquals(0.207, p.getX(), 0.001);
@@ -20,12 +20,12 @@ public class KinematicsTest {
 
     @Test
     void testInverse() {
-        Kinematics k = new Kinematics(0.3, 0.1, 0.356, 1.124, 60);
-        Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
+        Kinematics k = new Kinematics(0.3, 0.1);
+        Pose2d p = new Pose2d(0.332, 0.81, new Rotation2d(Math.toRadians(35)));
         Config c = k.inverse(p);
-        assertEquals(1, c.m_shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(60), c.m_shoulderAngle(), 0.01); //changed from 0.001, assumed rounding error
-        assertEquals(Math.toRadians(65), c.m_elbowAngle(), 0.01); //changed from 0.001 assumed rounding error
+        assertEquals(0.702, c.m_shoulderHeight(), 0.001);
+        assertEquals(Math.toRadians(33.5), c.m_shoulderAngle(), 0.01); //changed from 0.001, assumed rounding error
+        assertEquals(Math.toRadians(111.5), c.m_elbowAngle(), 0.01); //changed from 0.001 assumed rounding error
     }
 
 }

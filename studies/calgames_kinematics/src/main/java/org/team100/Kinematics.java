@@ -12,30 +12,22 @@ public class Kinematics {
     private double m_elbowAngle;
     private double m_shoulderAngle;
     private double m_zLength;
-    
-    //to do:
-    //no consideration for the arm going down not up
-    //no unit tests lmao
-    //
 
-
-    public Kinematics(double armLength, double manipulatorLength, double goalX, double goalY, double goalR) {
+    public Kinematics(double armLength, double manipulatorLength) {
         m_armLength = armLength;
         m_manipulatorLength = manipulatorLength;
-
     }
 
     public Pose2d forward(Config config) {
         // forward kinematics
-        System.out.println("TESTING FORWARD KINEMATICS \n" );
-        System.out.println("PRESETS" );
+        System.out.println("TESTING FORWARD KINEMATICS: \n" );
+        System.out.println("PRESETS:" );
 
         System.out.println("Arm Length: " + m_armLength);
         System.out.println("Manipulator Length: " + m_manipulatorLength);
         System.out.println("Shoulder Height: " + config.m_shoulderHeight());
         System.out.println("Shoulder Angle: " + config.m_shoulderAngle());
         System.out.println("Elbow Angle: " + config.m_elbowAngle());
-
 
         double armXcomp  = (m_armLength * Math.cos(Math.toRadians(config.m_shoulderAngle())));
         double manipulatorXcomp = (m_manipulatorLength * Math.sin(Math.toRadians(config.m_elbowAngle()-(180-90-config.m_shoulderAngle()))));
@@ -48,7 +40,7 @@ public class Kinematics {
 
         double manipulatorRotation = Math.toRadians(180-90-(config.m_elbowAngle()-(180-90-config.m_shoulderAngle())));
 
-        System.out.println("\nOUTPUTS");
+        System.out.println("\nOUTPUTS:");
         System.out.println("armXcomp: " + armXcomp);
         System.out.println("armYcomp: " + armYcomp);
         System.out.println("manipulatorXcomp: " + manipulatorXcomp);
@@ -63,9 +55,9 @@ public class Kinematics {
     public Config inverse(Pose2d pose) {
         // inverse kinematics
 
-        System.out.println("\nTESTING INVERSE KINEMATICS\n" );
+        System.out.println("\nTESTING INVERSE KINEMATICS:\n" );
 
-        System.out.println("PRESETS" );
+        System.out.println("PRESETS:" );
         System.out.println("Arm Length: " + m_armLength);
         System.out.println("Manipulator Length: " + m_manipulatorLength);
         System.out.println("Goal X: " + pose.getX());
@@ -91,16 +83,17 @@ public class Kinematics {
 
         //first part is law of cosidnes but for the elbow instead. 
         //need to think about how this will work with negative angles?
-        System.out.println(((m_manipulatorLength*m_manipulatorLength) + (m_armLength*m_armLength) - (m_zLength*m_zLength)) / (2 * m_manipulatorLength * m_armLength));
         m_elbowAngle = ((Math.acos((m_manipulatorLength*m_manipulatorLength + m_armLength*m_armLength - m_zLength*m_zLength) / (2 * m_manipulatorLength * m_armLength))));
         
-        System.out.println("\nOUTPUTS");
+        System.out.println("\nOUTPUTS:");
         System.out.println("Elbow Point (X,Y): (" + m_elbowPointX + "," + m_elbowPointY + ")");
         System.out.println("Z length: " + m_zLength);
         System.out.println("Shoulder angle: "+ Math.toDegrees(m_shoulderAngle));
         System.out.println("Shoulder Height: "+ m_shoulderHeight);
-        System.out.println("Elbow angle: "+ Math.toDegrees(m_elbowAngle));
-
+        System.out.println("Elbow angle: " + Math.toDegrees(m_elbowAngle));
+        
+        System.out.println("DEBUG:");
+        System.out.println("Make sure this isn't greater than 1: " + ((m_manipulatorLength*m_manipulatorLength) + (m_armLength*m_armLength) - (m_zLength*m_zLength)) / (2 * m_manipulatorLength * m_armLength));
 
          return new Config(m_shoulderHeight, m_shoulderAngle, m_elbowAngle);
     }
