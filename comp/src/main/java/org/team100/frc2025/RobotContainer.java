@@ -65,6 +65,7 @@ import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
+import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
@@ -86,6 +87,7 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -203,7 +205,9 @@ public class RobotContainer {
                 driveLog,
                 layout,
                 poseEstimator,
-                "blips");
+                "vision",
+                "blips",
+                StructBuffer.create(Blip24.struct));
 
         final SwerveLocal swerveLocal = new SwerveLocal(
                 driveLog,

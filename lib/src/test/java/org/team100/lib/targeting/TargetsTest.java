@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArrayTopic;
+import edu.wpi.first.util.struct.StructBuffer;
 
 public class TargetsTest {
     private static final double DELTA = 0.001;
@@ -23,7 +24,11 @@ public class TargetsTest {
     @Test
     void testTargets() {
         Pose2d p = new Pose2d(0, 0, Rotation2d.kZero);
-        Targets t = new Targets((x) -> p, "Rotation3d");
+        Targets t = new Targets(
+                (x) -> p,
+                "objectVision",
+                "Rotation3d",
+                StructBuffer.create(Rotation3d.struct));
         t.update();
         assertTrue(t.fieldRelativeTargets.isEmpty());
         // send some blips
@@ -55,7 +60,11 @@ public class TargetsTest {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets((x) -> p, "Rotation3d");
+        Targets reader = new Targets(
+                (x) -> p,
+                "objectVision",
+                "Rotation3d",
+                StructBuffer.create(Rotation3d.struct));
 
         Transform3d offset = Camera.get("test4").getOffset();
         writer.update(

@@ -7,8 +7,10 @@ import org.team100.lib.config.Camera;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.struct.StructBuffer;
 
 public class SimulatedTargetWriterTest {
     private static final double DELTA = 0.001;
@@ -21,7 +23,11 @@ public class SimulatedTargetWriterTest {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets((x) -> p, "Rotation3d");
+        Targets reader = new Targets(
+                (x) -> p,
+                "objectVision",
+                "Rotation3d",
+                StructBuffer.create(Rotation3d.struct));
 
         Transform3d offset = Camera.get("test4").getOffset();
         writer.update(

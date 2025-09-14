@@ -1,8 +1,6 @@
 package org.team100.lib.localization;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +15,7 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
+import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,15 +24,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.networktables.MultiSubscriber;
-import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableListenerPoller;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.networktables.ValueEventData;
 import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -41,13 +34,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 /**
  * Extracts robot pose estimates from camera observations of AprilTags.
  */
-public class AprilTagRobotLocalizer {
+public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     private static final boolean DEBUG = false;
-    /**
-     * Five cameras, 50hz each => 250 hz of updates. Rio runs at 50 hz, so there
-     * should be five messages waiting for us each cycle.
-     */
-    private static final int QUEUE_DEPTH = 10;
+
     /**
      * If the tag is closer than this threshold, then the camera's estimate of tag
      * rotation might be more accurate than the gyro, so we use the camera's
@@ -81,7 +70,7 @@ public class AprilTagRobotLocalizer {
 
     private final PoseEstimator100 m_poseEstimator;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
-    private final NetworkTableListenerPoller m_poller;
+
     /**
      * The apparent position of tags we see: this can be shown in AdvantageScope
      * using the Vision Target feature. The apparent position should match the
@@ -114,14 +103,10 @@ public class AprilTagRobotLocalizer {
     private final DoubleLogger m_log_lag;
 
     // Remember the previous vision-based pose estimate, so we can measure the
-    // distance
-    // between consecutive updates, and ignore too-far updates.
+    // distance between consecutive updates, and ignore too-far updates.
     private Pose2d m_prevPose;
 
-    // reuse the buffer since it takes some time to make
-    private StructBuffer<Blip24> m_buf = StructBuffer.create(Blip24.struct);
-
-    private double m_latestTimeSec = 0;
+    private double m_latestTime = 0;
 
     /** use tags closer than this; ignore tags further than this. */
     private double m_heedRadiusM = 3.5;
@@ -136,35 +121,21 @@ public class AprilTagRobotLocalizer {
      */
     private final List<Pose3d> m_usedTags = new ArrayList<>();
 
-    private final String m_ntValueName;
-
-    /**
-     * @param parent        logger
-     * @param layout
-     * @param poseEstimator
-     * @param ntValueName   key in NT for this value type
-     */
     public AprilTagRobotLocalizer(
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
             PoseEstimator100 poseEstimator,
-            String ntValueName) {
+            String ntRootName,
+            String ntValueName,
+            StructBuffer<Blip24> buf) {
+        super(ntRootName, ntValueName, buf);
         LoggerFactory child = parent.type(this);
         m_layout = layout;
         m_poseEstimator = poseEstimator;
-        m_ntValueName = ntValueName;
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        m_poller = new NetworkTableListenerPoller(inst);
-        m_poller.addListener(
-                new MultiSubscriber(
-                        inst,
-                        new String[] { "vision" },
-                        PubSubOption.pollStorage(QUEUE_DEPTH)),
-                EnumSet.of(NetworkTableEvent.Kind.kValueAll));
         m_pub_tags = inst.getStructArrayTopic("tags", Pose3d.struct).publish();
         m_pub_used_tags = inst.getStructArrayTopic("used tags", Pose3d.struct).publish();
-
         m_pub_pose = inst.getStructTopic("pose", Pose2d.struct).publish();
 
         m_log_alliance = child.enumLogger(Level.TRACE, "alliance");
@@ -181,79 +152,11 @@ public class AprilTagRobotLocalizer {
      */
     public double getPoseAgeSec() {
         double now = Takt.get();
-        return now - m_latestTimeSec;
+        return now - m_latestTime;
     }
 
-    /**
-     * Read queued network input, and give it to the pose estimator.
-     * 
-     * This runs once per cycle, in SwerveDriveSubsystem.update() which is called by
-     * Memo.updateAll(), which runs in Robot.robotPeriodic().
-     */
-    public void update() {
-
-        // only publish new sights
-        m_allTags.clear();
-        m_usedTags.clear();
-
-        for (NetworkTableEvent e : m_poller.readQueue()) {
-            ValueEventData valueEventData = e.valueData;
-            NetworkTableValue ntValue = valueEventData.value;
-            String name = valueEventData.getTopic().getName();
-            if (DEBUG)
-                Util.printf("poll %s\n", name);
-            String[] fields = name.split("/");
-            if (fields.length != 4) {
-                Util.warnf("weird event name: %s\n", name);
-                continue;
-            }
-            if (fields[2].equals("fps")) {
-                // FPS is not used by the robot
-            } else if (fields[2].equals("latency")) {
-                // latency is not used by the robot
-            } else if (fields[3].equals(m_ntValueName)) {
-                // e.g. "blips" or "Rotation3d"
-                if (DEBUG)
-                    Util.printf("found value\n");
-                // decode the way StructArrayEntryImpl does
-                byte[] b = ntValue.getRaw();
-                if (b.length == 0) {
-                    // this should never happen, but it does, very occasionally.
-                    continue;
-                }
-
-
-                
-
-
-                Blip24[] blips;
-                try {
-                    synchronized (m_buf) {
-                        blips = m_buf.readArray(b);
-                    }
-                } catch (RuntimeException ex) {
-                    Util.warnf("VisionDataProvider24: blip decoding failed for name: %s\n", name);
-                    continue;
-                }
-                // the ID of the camera
-                String cameraId = fields[1];
-
-                // Vasili added this extra delay after some experimentation that he should
-                // describe here.
-                final double IMPORTANT_MAGIC_NUMBER = 0.027;
-                // server time is in microseconds
-                // https://docs.wpilib.org/en/stable/docs/software/networktables/networktables-intro.html#timestamps
-                long serverTimeUs = ntValue.getServerTime();
-                double blipTimeSec = (serverTimeUs / 1000000.0 - IMPORTANT_MAGIC_NUMBER);
-
-                // this seems to always be 1. ????
-                m_log_lag.log(() -> Takt.get() - blipTimeSec);
-                estimateRobotPose(cameraId, blips, blipTimeSec, DriverStation.getAlliance());
-            } else {
-                // this event is not for us
-                // Util.println("weird vision update key: " + name);
-            }
-        }
+    @Override
+    public void finishUpdate() {
         // publish all the tags we've seen
         // TODO: publish blank if we haven't seen any for awhile
         // TODO: Network Tables ignores dupliciates, which makes it
@@ -262,6 +165,25 @@ public class AprilTagRobotLocalizer {
             m_pub_tags.set(m_allTags.toArray(new Pose3d[0]));
         if (m_usedTags.size() > 0)
             m_pub_used_tags.set(m_usedTags.toArray(new Pose3d[0]));
+    }
+
+    @Override
+    public void beginUpdate() {
+        // only publish new sights
+        m_allTags.clear();
+        m_usedTags.clear();
+    }
+
+    @Override
+    public void perValue(
+            Transform3d cameraOffset,
+            double valueTimestamp,
+            Blip24[] blips) {
+        estimateRobotPose(
+                cameraOffset,
+                blips,
+                valueTimestamp,
+                DriverStation.getAlliance());
     }
 
     /**
@@ -274,17 +196,26 @@ public class AprilTagRobotLocalizer {
     /**
      * Compute the robot pose and put it in the pose estimator.
      * 
-     * @param cameraId    From proc/cpuinfo
-     * @param blips       The targets in the current camera frame
-     * @param timestamp   Camera frame timestamp
-     * @param optAlliance From the driver station
-     * @return The apparent location of tags we can see
+     * @param cameraOffset   Camera pose in robot coordinates
+     * @param blips          The targets in the current camera frame
+     * @param valueTimestamp Camera frame timestamp
+     * @param optAlliance    From the driver station, it's here to make testing
+     *                       easier.
      */
     void estimateRobotPose(
-            String cameraId,
+            Transform3d cameraOffset,
             Blip24[] blips,
-            double timestamp,
+            double valueTimestamp,
             Optional<Alliance> optAlliance) {
+
+        // Vasili added this extra delay after some experimentation that he should
+        // describe here.
+        final double IMPORTANT_MAGIC_NUMBER = 0.027;
+        double correctedTimestamp = valueTimestamp - IMPORTANT_MAGIC_NUMBER;
+
+        // this seems to always be 1. ????
+        m_log_lag.log(() -> Takt.get() - correctedTimestamp);
+
         if (!optAlliance.isPresent()) {
             // this happens on startup
             if (DEBUG)
@@ -295,19 +226,13 @@ public class AprilTagRobotLocalizer {
         m_log_alliance.log(() -> alliance);
         m_log_heedRadius.log(() -> m_heedRadiusM);
 
-        // Robot-to-camera, offset from Camera.java
-        // in tests this offset is identity.
-        final Transform3d cameraInRobot = Camera.get(cameraId).getOffset();
-        if (DEBUG)
-            Util.printf("camera offset %s\n", cameraInRobot);
-
         // The pose from the frame timestamp.
-        final Pose2d historicalPose = m_poseEstimator.get(timestamp).pose();
+        final Pose2d historicalPose = m_poseEstimator.get(correctedTimestamp).pose();
 
         // Field-to-robot
         Pose3d historicalPose3d = new Pose3d(historicalPose);
         // Field-to-robot plus robot-to-camera = field-to-camera
-        Pose3d historicalCameraInField = historicalPose3d.transformBy(cameraInRobot);
+        Pose3d historicalCameraInField = historicalPose3d.transformBy(cameraOffset);
 
         // The gyro rotation for the frame timestamp
         final Rotation2d gyroRotation = historicalPose.getRotation();
@@ -341,7 +266,7 @@ public class AprilTagRobotLocalizer {
             if (DEBUG) {
                 // This is used for camera offset calibration. Place a tag at a known position,
                 // observe the offset, and add it to Camera.java, inverted.
-                Transform3d tagInRobot = cameraInRobot.plus(tagInCamera);
+                Transform3d tagInRobot = cameraOffset.plus(tagInCamera);
                 Util.printf("tagInRobot id %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
                         blip.getId(),
                         tagInRobot.getTranslation().getX(),
@@ -357,7 +282,7 @@ public class AprilTagRobotLocalizer {
                 // a rotation derived from the gyro.
                 m_log_using_gyro.log(() -> true);
                 tagInCamera = PoseEstimationHelper.tagInCamera(
-                        cameraInRobot,
+                        cameraOffset,
                         tagInField,
                         tagInCamera,
                         new Rotation3d(gyroRotation));
@@ -375,7 +300,7 @@ public class AprilTagRobotLocalizer {
 
             // Estimate of robot pose.
             Pose3d pose3d = PoseEstimationHelper.robotInField(
-                    cameraInRobot,
+                    cameraOffset,
                     tagInField,
                     tagInCamera);
 
@@ -422,12 +347,12 @@ public class AprilTagRobotLocalizer {
 
             m_usedTags.add(estimatedTagInField);
             m_poseEstimator.put(
-                    timestamp,
+                    correctedTimestamp,
                     pose,
                     stateStdDevs(),
                     visionMeasurementStdDevs(distanceM));
 
-            m_latestTimeSec = Takt.get();
+            m_latestTime = Takt.get();
             m_prevPose = pose;
         }
     }

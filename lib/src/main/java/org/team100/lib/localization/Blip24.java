@@ -6,7 +6,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
-/** Mirrors tag_finder24.py Blip24. */
+/**
+ * Mirrors tag_finder24.py Blip24.
+ * TODO: change the coordinate system to x-forward.
+ */
 public class Blip24 {
     private final int id;
     private final Transform3d pose;
