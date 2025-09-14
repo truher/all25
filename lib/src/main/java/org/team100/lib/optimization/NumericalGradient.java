@@ -8,7 +8,7 @@ import edu.wpi.first.math.Vector;
 
 /**
  * Gradient is scalar Jacobian. This is cribbed from WPI's
- * NumericalJacobian.java, just to make it simpler for folks who aren't familiar
+ * `NumericalJacobian`, just to make it simpler for folks who aren't familiar
  * with the Jacobian concept, matrices, etc.
  */
 public class NumericalGradient {

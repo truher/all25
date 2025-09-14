@@ -16,8 +16,8 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.MockProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
@@ -45,7 +45,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         final RotaryMechanism mech = new RotaryMechanism(
                 log, motor, combinedEncoder, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
-        final Profile100 profile = new TrapezoidProfile100(1, 1, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
         final IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.01, 0.01);
         final OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);

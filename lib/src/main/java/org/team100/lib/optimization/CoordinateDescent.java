@@ -7,7 +7,11 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
 
-/** Line search over each coordinate. */
+/**
+ * Line search over each coordinate.
+ * 
+ * @see https://en.wikipedia.org/wiki/Coordinate_descent
+ */
 public class CoordinateDescent<R extends Num> {
     private final Nat<R> m_rows;
     private final Function<Vector<R>, Double> m_f;

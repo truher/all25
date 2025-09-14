@@ -5,7 +5,7 @@ import org.team100.lib.hid.DriverControl;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.targeting.ObjectPosition24ArrayListener;
+import org.team100.lib.targeting.Targets;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -15,10 +15,10 @@ public class FloorPickSetup {
             FieldLogger.Log fieldLog,
             DriverControl control,
             SwerveDriveSubsystem drive,
-            ObjectPosition24ArrayListener listener,
+            Targets targets,
             SwerveController controller,
             HolonomicProfile profile) {
         new Trigger(control::button4).whileTrue(
-                FloorPickSequence.get(fieldLog, drive, listener, controller, profile));
+                FloorPickSequence.get(fieldLog, drive, targets, controller, profile));
     }
 }

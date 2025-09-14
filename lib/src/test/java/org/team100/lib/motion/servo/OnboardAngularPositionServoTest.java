@@ -12,8 +12,8 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MockBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.util.Util;
@@ -33,7 +33,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
                 Double.POSITIVE_INFINITY);
         final Feedback100 turningFeedback2 = new PIDFeedback(
                 logger, 1, 0, 0, false, 0.05, 1);
-        final Profile100 profile = new TrapezoidProfile100(1, 1, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
         final IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         final OnboardAngularPositionServo servo = new OnboardAngularPositionServo(
                 logger, mech, ref, turningFeedback2);

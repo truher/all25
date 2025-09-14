@@ -3,7 +3,7 @@ package org.team100.lib.trajectory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.team100.lib.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedPose;
 
 /**
  * A list of timed poses.

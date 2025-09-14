@@ -16,7 +16,7 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Math100;
@@ -120,7 +120,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
         final FieldRelativeVelocity control = clipAndScale(twist1_1);
         final double currentVelocity = state.velocity().norm();
 
-        final TrapezoidProfile100 m_profile = makeProfile(currentVelocity);
+        final TrapezoidIncrementalProfile m_profile = makeProfile(currentVelocity);
 
         if(!m_lockToReef.get() && !m_lockToFunnel.get()){
             m_goal = null;
@@ -220,7 +220,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
      * Note that the max speed and accel are inversely proportional to the current
      * velocity.
      */
-    public TrapezoidProfile100 makeProfile(double currentVelocity) {
+    public TrapezoidIncrementalProfile makeProfile(double currentVelocity) {
         // fraction of the maximum speed
         final double xyRatio = Math.min(1, currentVelocity / m_swerveKinodynamics.getMaxDriveVelocityM_S());
         // fraction left for rotation
@@ -235,7 +235,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
         m_log_max_speed.log(() -> maxSpeedRad_S);
         m_log_max_accel.log(() -> maxAccelRad_S2);
 
-        return new TrapezoidProfile100(
+        return new TrapezoidIncrementalProfile(
                 maxSpeedRad_S,
                 maxAccelRad_S2,
                 0.01);

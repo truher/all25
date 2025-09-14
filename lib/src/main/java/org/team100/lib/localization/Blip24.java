@@ -11,6 +11,11 @@ public class Blip24 {
     private final int id;
     private final Transform3d pose;
 
+    /**
+     * @param id   AprilTag id
+     * @param pose This uses the camera coordinate system, which has X to
+     *             the right, Y down, and Z forward.
+     */
     public Blip24(int id, Transform3d pose) {
         this.id = id;
         this.pose = pose;

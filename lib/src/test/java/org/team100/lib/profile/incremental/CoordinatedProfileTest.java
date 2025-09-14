@@ -40,8 +40,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // two profiles with the same parameters
-        TrapezoidProfile100 p1 = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p1 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
         // initial state at the origin at rest
         Model100 i1 = new Model100(0, 0);
         Model100 i2 = new Model100(0, 0);
@@ -164,8 +164,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // two profiles with the same parameters
-        TrapezoidProfile100 p1 = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p1 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
         // initial state at the origin at rest
         Model100 i1 = new Model100(0, 0);
         Model100 i2 = new Model100(0, 0);
@@ -208,8 +208,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // default x and y profiles
-        TrapezoidProfile100 px = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
-        TrapezoidProfile100 py = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile px = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile py = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
         // initial x state is moving fast
         Control100 ix = new Control100(0, 1);
         // initial y state is stationary
@@ -235,13 +235,11 @@ class CoordinatedProfileTest {
         // find the scale parameters for x and y.
 
         // in the X case, the given ETA is the default ETA
-        double sx = Profile100.solveForSlowerETA(
-                0.1, ix, gx, slowETA, DELTA,
-                (s) -> new TrapezoidProfile100(maxVel, s * maxAccel, PROFILE_TOLERANCE));
+        double sx = px.solve(
+                0.1, ix, gx, slowETA, DELTA);
         // in the Y case, it's slower
-        double sy = Profile100.solveForSlowerETA(
-                0.1, iy, gy, slowETA, DELTA,
-                (s) -> new TrapezoidProfile100(maxVel, s * maxAccel, PROFILE_TOLERANCE));
+        double sy = py.solve(
+                0.1, iy, gy, slowETA, DELTA);
 
         // this should be about 1.0
         assertEquals(0.937, sx, DELTA);

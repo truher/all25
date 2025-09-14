@@ -13,6 +13,8 @@ import org.team100.lib.util.Util;
  * scalar output (i.e. distance).
  * 
  * This partitions equally and evaluates at each point, so it is not fast.
+ * 
+ * @see https://en.wikipedia.org/wiki/Ternary_search
  */
 public class TernarySearch {
     private final DoubleUnaryOperator m_f;

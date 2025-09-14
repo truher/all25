@@ -7,7 +7,7 @@ import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.math.trajectory.ExponentialProfile.State;
 
-public class ExponentialProfileWPI implements Profile100 {
+public class ExponentialProfileWPI implements IncrementalProfile {
     private final Constraints m_constraints;
     private final ExponentialProfile m_profile;
 
@@ -34,24 +34,12 @@ public class ExponentialProfileWPI implements Profile100 {
     }
 
     @Override
-    public Profile100 scale(double s) {
-        return new ExponentialProfileWPI(m_constraints.maxVelocity(), s * m_constraints.B);
+    public IncrementalProfile scale(double s) {
+        return new ExponentialProfileWPI(
+                m_constraints.maxVelocity(), s * m_constraints.B);
     }
 
-    @Override
     public double getMaxVelocity() {
         return m_constraints.maxVelocity();
     }
-
-    @Override
-    public double solve(double dt, Control100 i, Model100 g, double eta, double etaTolerance) {
-        return Profile100.solveForSlowerETA(
-                dt,
-                i,
-                g,
-                eta,
-                etaTolerance,
-                (s) -> new ExponentialProfileWPI(m_constraints.maxVelocity(), s * m_constraints.B));
-    }
-
 }
