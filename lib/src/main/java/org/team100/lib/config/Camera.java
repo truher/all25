@@ -122,8 +122,8 @@ public enum Camera {
 
     TEST4("test4",
             new Transform3d(
-                    new Translation3d(0, 0, 0),
-                    new Rotation3d(0, -Math.PI / 4, 0))),
+                    new Translation3d(0, 0, 1),
+                    new Rotation3d(0, 0, 0))),
 
     UNKNOWN(null, new Transform3d());
 

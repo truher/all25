@@ -24,16 +24,13 @@ class SimulatedObjectDetectorTest {
         Transform3d cameraInRobotCoordinates = new Transform3d(
                 new Translation3d(0, 0, 1),
                 new Rotation3d(0, Math.toRadians(45), 0));
-        SimulatedObjectDetector simCamera = new SimulatedObjectDetector(
-                cameraInRobotCoordinates,
-                Math.toRadians(40),
-                Math.toRadians(31.5));
 
         Pose2d robotPose = new Pose2d();
 
         // goal is straight ahead, same as height, so should be on-bore
         Translation2d[] notes = { new Translation2d(1, 0) };
-        List<Rotation3d> sights = simCamera.getRotations(robotPose, notes);
+        List<Rotation3d> sights = SimulatedObjectDetector.getRotations(
+                robotPose, cameraInRobotCoordinates, notes);
 
         assertEquals(1, sights.size());
         // on-bore
@@ -57,17 +54,15 @@ class SimulatedObjectDetectorTest {
         Transform3d cameraInRobotCoordinates = new Transform3d(
                 new Translation3d(0, 0, 1),
                 new Rotation3d());
-        SimulatedObjectDetector simCamera = new SimulatedObjectDetector(
-                cameraInRobotCoordinates,
-                Math.toRadians(40),
-                Math.toRadians(31.5));
+
 
         Pose2d robotPose = new Pose2d();
 
         // goal is straight ahead, 2x further than height, so ~26 degrees down
         Translation2d[] notes = { new Translation2d(2, 0) };
 
-        List<Rotation3d> sights = simCamera.getRotations(robotPose, notes);
+        List<Rotation3d> sights = SimulatedObjectDetector.getRotations(
+                robotPose, cameraInRobotCoordinates, notes);
 
         assertEquals(1, sights.size());
         // on-bore
@@ -91,16 +86,14 @@ class SimulatedObjectDetectorTest {
         Transform3d cameraInRobotCoordinates = new Transform3d(
                 new Translation3d(0, 0, 1),
                 new Rotation3d());
-        SimulatedObjectDetector simCamera = new SimulatedObjectDetector(
-                cameraInRobotCoordinates,
-                Math.toRadians(40),
-                Math.toRadians(31.5));
+
 
         Pose2d robotPose = new Pose2d();
 
         // note is to the left, 2x further than height, so ~26 degrees
         Translation2d[] notes = { new Translation2d(2, 1) };
-        List<Rotation3d> sights = simCamera.getRotations(robotPose, notes);
+        List<Rotation3d> sights = SimulatedObjectDetector.getRotations(
+                robotPose, cameraInRobotCoordinates, notes);
 
         assertEquals(1, sights.size());
         // roll?
@@ -126,10 +119,7 @@ class SimulatedObjectDetectorTest {
         Transform3d cameraInRobotCoordinates = new Transform3d(
                 new Translation3d(0, 0, 1),
                 new Rotation3d());
-        SimulatedObjectDetector simCamera = new SimulatedObjectDetector(
-                cameraInRobotCoordinates,
-                Math.toRadians(40),
-                Math.toRadians(31.5));
+
 
         // note is to the left, 2x further than height, so ~26 degrees
         Translation2d[] notes = { new Translation2d(2, 1) };
@@ -145,7 +135,8 @@ class SimulatedObjectDetectorTest {
 
         Pose2d robotPose = new Pose2d();
 
-        List<Rotation3d> sights = simCamera.getRotations(robotPose, notes);
+        List<Rotation3d> sights = SimulatedObjectDetector.getRotations(
+                robotPose, cameraInRobotCoordinates, notes);
 
         assertEquals(1, sights.size());
         // roll doesn't matter
@@ -169,15 +160,13 @@ class SimulatedObjectDetectorTest {
         Transform3d cameraInRobotCoordinates = new Transform3d(
                 new Translation3d(0, 0, 1),
                 new Rotation3d(0, 0, Math.PI / 2));
-        SimulatedObjectDetector simCamera = new SimulatedObjectDetector(
-                cameraInRobotCoordinates,
-                Math.toRadians(40),
-                Math.toRadians(31.5));
+
 
         Pose2d robotPose = new Pose2d();
 
         Translation2d[] notes = { new Translation2d(0, 2) };
-        List<Rotation3d> sights = simCamera.getRotations(robotPose, notes);
+        List<Rotation3d> sights = SimulatedObjectDetector.getRotations(
+                robotPose, cameraInRobotCoordinates, notes);
 
         assertEquals(1, sights.size());
         // camera should see target straight ahead
@@ -253,9 +242,8 @@ class SimulatedObjectDetectorTest {
 
         Translation2d note = new Translation2d(1, 0);
 
-        SimulatedObjectDetector cam = new SimulatedObjectDetector(cameraInRobotCoordinates, Math.PI / 2,
-                Math.PI / 2);
-        Transform3d noteInCameraCoordinates = cam.getNoteInCameraCoordinates(robotPose, note);
+        Transform3d noteInCameraCoordinates = SimulatedObjectDetector.getNoteInCameraCoordinates(
+                robotPose, cameraInRobotCoordinates, note);
 
         // 1m ahead
         assertEquals(1, noteInCameraCoordinates.getX(), DELTA);
@@ -267,7 +255,8 @@ class SimulatedObjectDetectorTest {
         assertEquals(0, noteInCameraCoordinates.getRotation().getY(), DELTA);
         assertEquals(0, noteInCameraCoordinates.getRotation().getZ(), DELTA);
 
-        Optional<Rotation3d> rotInCamera = cam.getRotInCamera(robotPose, note);
+        Optional<Rotation3d> rotInCamera = SimulatedObjectDetector.getRotInCamera(
+                robotPose, cameraInRobotCoordinates, note);
 
         // roll is irrelevant anyway
         assertEquals(0, rotInCamera.get().getX(), DELTA);
@@ -302,9 +291,8 @@ class SimulatedObjectDetectorTest {
         // further away
         Translation2d note = new Translation2d(2, 0);
 
-        SimulatedObjectDetector cam = new SimulatedObjectDetector(cameraInRobotCoordinates, Math.PI / 2,
-                Math.PI / 2);
-        Transform3d noteInCameraCoordinates = cam.getNoteInCameraCoordinates(robotPose, note);
+        Transform3d noteInCameraCoordinates = SimulatedObjectDetector.getNoteInCameraCoordinates(
+                robotPose, cameraInRobotCoordinates, note);
 
         // 2m ahead
         assertEquals(2, noteInCameraCoordinates.getX(), DELTA);
@@ -316,7 +304,8 @@ class SimulatedObjectDetectorTest {
         assertEquals(0, noteInCameraCoordinates.getRotation().getY(), DELTA);
         assertEquals(0, noteInCameraCoordinates.getRotation().getZ(), DELTA);
 
-        Optional<Rotation3d> rotInCamera = cam.getRotInCamera(robotPose, note);
+        Optional<Rotation3d> rotInCamera = SimulatedObjectDetector.getRotInCamera(
+                robotPose, cameraInRobotCoordinates, note);
 
         // roll is irrelevant anyway
         assertEquals(0, rotInCamera.get().getX(), DELTA);
@@ -349,9 +338,8 @@ class SimulatedObjectDetectorTest {
 
         Translation2d note = new Translation2d(0, 2);
 
-        SimulatedObjectDetector cam = new SimulatedObjectDetector(cameraInRobotCoordinates, Math.PI / 2,
-                Math.PI / 2);
-        Transform3d noteInCameraCoordinates = cam.getNoteInCameraCoordinates(robotPose, note);
+        Transform3d noteInCameraCoordinates = SimulatedObjectDetector.getNoteInCameraCoordinates(
+                robotPose, cameraInRobotCoordinates, note);
 
         // 2m ahead
         assertEquals(2, noteInCameraCoordinates.getX(), DELTA);
@@ -376,9 +364,9 @@ class SimulatedObjectDetectorTest {
                 new Translation3d(0, 0, 1), new Rotation3d(0, Math.PI / 4, Math.PI / 2));
 
         Translation2d note = new Translation2d(0, 2);
-        SimulatedObjectDetector cam = new SimulatedObjectDetector(cameraInRobotCoordinates, Math.PI / 2,
-                Math.PI / 2);
-        Transform3d noteInCameraCoordinates = cam.getNoteInCameraCoordinates(robotPose, note);
+
+        Transform3d noteInCameraCoordinates = SimulatedObjectDetector.getNoteInCameraCoordinates(
+                robotPose, cameraInRobotCoordinates, note);
 
         // a bit more than 2m ahead
         assertEquals(2.121, noteInCameraCoordinates.getX(), DELTA);
@@ -405,10 +393,9 @@ class SimulatedObjectDetectorTest {
 
         Translation2d note = new Translation2d(0, 2);
 
-        SimulatedObjectDetector cam = new SimulatedObjectDetector(cameraInRobotCoordinates, Math.PI / 2,
-                Math.PI / 2);
 
-        Optional<Rotation3d> rotInCamera = cam.getRotInCamera(robotPose, note);
+        Optional<Rotation3d> rotInCamera = SimulatedObjectDetector.getRotInCamera(
+                robotPose, cameraInRobotCoordinates, note);
 
         // roll is irrelevant anyway
         assertEquals(0, rotInCamera.get().getX(), DELTA);
@@ -440,9 +427,8 @@ class SimulatedObjectDetectorTest {
 
         Translation2d note = new Translation2d(0, 1);
 
-        SimulatedObjectDetector cam = new SimulatedObjectDetector(cameraInRobotCoordinates, Math.PI / 2,
-                Math.PI / 2);
-        Optional<Rotation3d> rotInCamera = cam.getRotInCamera(robotPose, note);
+        Optional<Rotation3d> rotInCamera = SimulatedObjectDetector.getRotInCamera(
+                robotPose, cameraInRobotCoordinates, note);
 
         // roll is irrelevant anyway
         assertEquals(0, rotInCamera.get().getX(), DELTA);

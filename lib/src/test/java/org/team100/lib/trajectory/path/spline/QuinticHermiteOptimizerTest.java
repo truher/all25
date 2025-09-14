@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.trajectory.path.spline.HolonomicSpline;
-import org.team100.lib.trajectory.path.spline.SplineUtil;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;

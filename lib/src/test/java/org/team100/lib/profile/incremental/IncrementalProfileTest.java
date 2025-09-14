@@ -2,8 +2,6 @@ package org.team100.lib.profile.incremental;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.function.DoubleFunction;
-
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.state.Control100;
