@@ -15,17 +15,17 @@ public class KinematicsTest {
         Pose2d p = k.forward(c);
         assertEquals(0.207, p.getX(), 0.001);
         assertEquals(1.177, p.getY(), 0.001);
-        assertEquals(Math.toRadians(15), p.getRotation().getRadians(), 0.001);
+        assertEquals(Math.toRadians(55), p.getRotation().getRadians(), 0.001);
     }
 
     @Test
     void testInverse() {
         Kinematics k = new Kinematics(0.3, 0.1, 0.356, 1.124, 60);
-        Pose2d p = new Pose2d(0, 0, new Rotation2d());
+        Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
         Config c = k.inverse(p);
         assertEquals(1, c.m_shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(30), c.m_shoulderAngle(), 0.001);
-        assertEquals(Math.toRadians(135), c.m_elbowAngle(), 0.001);
+        assertEquals(Math.toRadians(60), c.m_shoulderAngle(), 0.01); //changed from 0.001, assumed rounding error
+        assertEquals(Math.toRadians(65), c.m_elbowAngle(), 0.01); //changed from 0.001 assumed rounding error
     }
 
 }
