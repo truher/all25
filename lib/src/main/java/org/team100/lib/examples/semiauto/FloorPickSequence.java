@@ -30,7 +30,7 @@ public class FloorPickSequence {
             Targets targets,
             SwerveController controller,
             HolonomicProfile profile) {
-        Supplier<Optional<Translation2d>> target = () -> targets.getClosestTranslation2d();
+        Supplier<Optional<Translation2d>> target = () -> targets.getClosestTarget();
         Supplier<Optional<Translation2d>> runway = () -> {
             Optional<Translation2d> t = target.get();
             if (t.isEmpty())

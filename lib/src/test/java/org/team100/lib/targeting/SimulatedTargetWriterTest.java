@@ -4,19 +4,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.config.Camera;
+import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.struct.StructBuffer;
 
-public class SimulatedTargetWriterTest {
+/** Timeless because the clock is used to decide to ignore (stale) input. */
+public class SimulatedTargetWriterTest implements Timeless {
     private static final double DELTA = 0.001;
 
     @Test
     void testOne() {
+        stepTime();
         SimulatedTargetWriter writer = new SimulatedTargetWriter();
 
         Pose2d p = new Pose2d(0, 0, Rotation2d.kZero);
@@ -26,8 +27,7 @@ public class SimulatedTargetWriterTest {
         Targets reader = new Targets(
                 (x) -> p,
                 "objectVision",
-                "Rotation3d",
-                StructBuffer.create(Rotation3d.struct));
+                "Rotation3d");
 
         Transform3d offset = Camera.get("test4").getOffset();
         writer.update(
@@ -36,8 +36,8 @@ public class SimulatedTargetWriterTest {
 
         reader.update();
 
-        assertEquals(1, reader.fieldRelativeTargets.size());
-        Translation2d target = reader.fieldRelativeTargets.get(0);
+        assertEquals(1, reader.getTargets().size());
+        Translation2d target = reader.getTargets().get(0);
         // camera is 1m up, tilted 45 down, so target is 1m away
         assertEquals(1.0, target.getX(), DELTA);
         // target is on bore

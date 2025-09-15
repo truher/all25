@@ -30,18 +30,13 @@ public abstract class CameraReader<T> {
 
     /** e.g. "blips" or "Rotation3d" */
     private final String m_ntValueName;
-    /** Deserializer */
-    private final StructBuffer<T> m_buf;
 
     private final NetworkTableListenerPoller m_poller;
 
     public CameraReader(
             String ntRootName,
-            String ntValueName,
-            StructBuffer<T> buf) {
+            String ntValueName) {
         m_ntValueName = ntValueName;
-        m_buf = buf;
-
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_poller = new NetworkTableListenerPoller(inst);
         m_poller.addListener(
@@ -88,7 +83,7 @@ public abstract class CameraReader<T> {
             }
             T[] valueArray;
             try {
-                valueArray = m_buf.readArray(valueBytes);
+                valueArray = getBuffer().readArray(valueBytes);
             } catch (RuntimeException ex) {
                 Util.warnf("decoding failed for name: %s\n", name);
                 continue;
@@ -108,6 +103,12 @@ public abstract class CameraReader<T> {
         }
         finishUpdate();
     }
+
+    /**
+     * Deserializer. This is time-consuming to make, so subclasses are encouraged to
+     * do so on initialization and keep it around.
+     */
+    public abstract StructBuffer<T> getBuffer();
 
     /** Called when update() starts. */
     public abstract void beginUpdate();

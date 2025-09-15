@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.config.Camera;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
@@ -69,6 +68,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             0.1 };
 
     private final PoseEstimator100 m_poseEstimator;
+    private final StructBuffer<Blip24> m_buf = StructBuffer.create(Blip24.struct);
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
 
     /**
@@ -126,9 +126,8 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             AprilTagFieldLayoutWithCorrectOrientation layout,
             PoseEstimator100 poseEstimator,
             String ntRootName,
-            String ntValueName,
-            StructBuffer<Blip24> buf) {
-        super(ntRootName, ntValueName, buf);
+            String ntValueName) {
+        super(ntRootName, ntValueName);
         LoggerFactory child = parent.type(this);
         m_layout = layout;
         m_poseEstimator = poseEstimator;
@@ -156,15 +155,8 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     }
 
     @Override
-    public void finishUpdate() {
-        // publish all the tags we've seen
-        // TODO: publish blank if we haven't seen any for awhile
-        // TODO: Network Tables ignores dupliciates, which makes it
-        // work poorly in simulation, so fix that.
-        if (m_allTags.size() > 0)
-            m_pub_tags.set(m_allTags.toArray(new Pose3d[0]));
-        if (m_usedTags.size() > 0)
-            m_pub_used_tags.set(m_usedTags.toArray(new Pose3d[0]));
+    public StructBuffer<Blip24> getBuffer() {
+        return m_buf;
     }
 
     @Override
@@ -184,6 +176,18 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 blips,
                 valueTimestamp,
                 DriverStation.getAlliance());
+    }
+
+    @Override
+    public void finishUpdate() {
+        // publish all the tags we've seen
+        // TODO: publish blank if we haven't seen any for awhile
+        // TODO: Network Tables ignores dupliciates, which makes it
+        // work poorly in simulation, so fix that.
+        if (m_allTags.size() > 0)
+            m_pub_tags.set(m_allTags.toArray(new Pose3d[0]));
+        if (m_usedTags.size() > 0)
+            m_pub_used_tags.set(m_usedTags.toArray(new Pose3d[0]));
     }
 
     /**

@@ -206,8 +206,7 @@ public class RobotContainer {
                 layout,
                 poseEstimator,
                 "vision",
-                "blips",
-                StructBuffer.create(Blip24.struct));
+                "blips");
 
         final SwerveLocal swerveLocal = new SwerveLocal(
                 driveLog,

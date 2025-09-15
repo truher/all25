@@ -67,6 +67,8 @@ public class Cache {
         update();
     }
 
+    /////////////////////////////////////////////////
+
     /**
      * Forgets all the stored values.
      */

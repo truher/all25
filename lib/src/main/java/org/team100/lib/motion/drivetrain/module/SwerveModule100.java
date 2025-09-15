@@ -196,6 +196,7 @@ public abstract class SwerveModule100 {
                 Optional.of(new Rotation2d(turningPosition.getAsDouble())));
     }
 
+    /** Uses Cache so the position is fresh and coherent. */
     public SwerveModulePosition100 getPosition() {
         OptionalDouble driveDistance = m_driveServo.getDistance();
         OptionalDouble turningPosition = m_turningServo.getPosition();
