@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.Test;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.MockGyro;
 import org.team100.lib.logging.LoggerFactory;
@@ -29,6 +30,8 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         SwerveModulePosition100 m = new SwerveModulePosition100(x, Optional.of(Rotation2d.kZero));
         return new SwerveModulePositions(m, m, m, m);
     }
+
+    private SwerveModulePositions positions;
 
     /*
      * Should we optimize the pose replay operation?
@@ -58,47 +61,22 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
 
+        Gyro gyro = new MockGyro();
         SwerveModelHistory history = new SwerveModelHistory(
                 logger,
                 kinodynamics);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, history, () -> p(0));
-        ou.reset(new MockGyro().getYawNWU(),
-                Pose2d.kZero,
-                0);
+        positions = p(0);
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, gyro, history, () -> positions);
+        ou.reset(Pose2d.kZero, 0);
         VisionUpdater vu = new VisionUpdater(history, ou);
         SwerveModelEstimate estimate = new SwerveModelEstimate(history);
-
-        Gyro g = new Gyro() {
-            @Override
-            public Rotation2d getYawNWU() {
-                return Rotation2d.kZero;
-            }
-
-            @Override
-            public double getYawRateNWU() {
-                return 0.0;
-            }
-
-            @Override
-            public Rotation2d getPitchNWU() {
-                return null;
-            }
-
-            @Override
-            public Rotation2d getRollNWU() {
-                return null;
-            }
-
-            @Override
-            public void periodic() {
-            }
-        };
 
         // fill the buffer with odometry
         double t = 0.0;
         double duration = 0.2; // SwerveDrivePoseEstimator100.BUFFER_DURATION;
         while (t < duration) {
-            ou.put(t, g, p(t));
+            positions = p(t);
+            ou.update(t);
             t += 0.02;
         }
         assertEquals(11, history.size());

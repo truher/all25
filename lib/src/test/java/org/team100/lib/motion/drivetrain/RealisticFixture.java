@@ -48,8 +48,8 @@ public class RealisticFixture {
                 logger,
                 swerveKinodynamics);
         estimate = new SwerveModelEstimate(history);
-        OdometryUpdater ou = new OdometryUpdater(swerveKinodynamics, history, collection::positions);
-        ou.reset(gyro.getYawNWU(), Pose2d.kZero, 0);
+        OdometryUpdater ou = new OdometryUpdater(swerveKinodynamics, gyro, history, collection::positions);
+        ou.reset(Pose2d.kZero, 0);
         SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
 
         drive = new SwerveDriveSubsystem(

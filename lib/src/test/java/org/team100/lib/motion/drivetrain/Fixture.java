@@ -51,8 +51,8 @@ public class Fixture {
                 swerveKinodynamics); // initial time is zero here for testing
         // history.reset(gyro.getYawNWU(), collection.positions(), Pose2d.kZero, 0);
         estimate = new SwerveModelEstimate(history);
-        ou = new OdometryUpdater(swerveKinodynamics, history, collection::positions);
-        ou.reset(gyro.getYawNWU(), Pose2d.kZero, 0);
+        ou = new OdometryUpdater(swerveKinodynamics, gyro, history, collection::positions);
+        ou.reset(Pose2d.kZero, 0);
 
         SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
         drive = new SwerveDriveSubsystem(

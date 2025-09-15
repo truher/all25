@@ -196,17 +196,10 @@ public class RobotContainer {
         final SwerveModelHistory history = new SwerveModelHistory(
                 driveLog,
                 m_swerveKinodynamics);
-        // history.reset(
-        // gyro.getYawNWU(),
-        // m_modules.positions(),
-        // Pose2d.kZero,
-        // Takt.get());
+
         final OdometryUpdater ou = new OdometryUpdater(
-                m_swerveKinodynamics, history, m_modules::positions);
-        ou.reset(
-                gyro.getYawNWU(),
-                Pose2d.kZero,
-                Takt.get());
+                m_swerveKinodynamics, gyro, history, m_modules::positions);
+        ou.reset(Pose2d.kZero);
         final VisionUpdater vu = new VisionUpdater(history, ou);
         final SwerveModelEstimate estimate = new SwerveModelEstimate(history);
 

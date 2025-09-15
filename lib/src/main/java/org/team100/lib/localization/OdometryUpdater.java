@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
@@ -30,7 +31,8 @@ public class OdometryUpdater {
     private static final boolean DEBUG = false;
 
     private final SwerveKinodynamics m_kinodynamics;
-    private final SwerveModelHistory m_poseEstimator;
+    private final Gyro m_gyro;
+    private final SwerveModelHistory m_history;
     // TODO: make this private
     public final Supplier<SwerveModulePositions> m_positions;
 
@@ -41,10 +43,12 @@ public class OdometryUpdater {
 
     public OdometryUpdater(
             SwerveKinodynamics kinodynamics,
+            Gyro gyro,
             SwerveModelHistory estimator,
             Supplier<SwerveModulePositions> positions) {
         m_kinodynamics = kinodynamics;
-        m_poseEstimator = estimator;
+        m_gyro = gyro;
+        m_history = estimator;
         m_positions = positions;
     }
 
@@ -53,8 +57,8 @@ public class OdometryUpdater {
     }
 
     /**
-     * Put a new state estimate based on gyro and wheel data. These are expected to
-     * be current measurements -- there is no history replay here, though it won't
+     * Put a new state estimate based on gyro and wheel data, from the suppliers
+     * passed to the constructor. There is no history replay here, though it won't
      * fail if you give it out-of-order input.
      * 
      * It Samples the history before the specified time, and records a new pose
@@ -65,22 +69,45 @@ public class OdometryUpdater {
      * the gyro rate overrides the rate derived from the difference to the previous
      * state.
      */
-    public void put(double timestamp, Gyro gyro, SwerveModulePositions positions) {
-        put(timestamp, gyro.getYawNWU(), gyro.getYawRateNWU(), positions);
+    public void update() {
+        update(Takt.get());
+    }
+
+    /** For testing. */
+    void update(double timestamp) {
+        put(timestamp, m_gyro.getYawNWU(), m_gyro.getYawRateNWU(), m_positions.get());
     }
 
     /**
      * Empty the history, reset the gyro offset, and add the given measurements.
      * Uses the module position supplier passed to the constructor.
-     * timestamp here is provided for testability; in prod it's always Takt.get().
+     * TODO: remove this one
+     */
+    public void reset(Rotation2d gyroAngle, Pose2d pose) {
+        reset(gyroAngle, pose, Takt.get());
+    }
+
+    public void reset(Pose2d pose) {
+        reset(m_gyro.getYawNWU(), pose);
+    }
+
+    /** For testing. */
+    public void reset(Pose2d pose, double timestampSeconds) {
+        Rotation2d gyroAngle = m_gyro.getYawNWU();
+        m_gyroOffset = pose.getRotation().minus(gyroAngle);
+        m_history.reset(gyroAngle, m_positions.get(), pose, timestampSeconds);
+    }
+
+    /**
+     * For testing.
+     * TODO: remove this one
      */
     public void reset(
             Rotation2d gyroAngle,
             Pose2d pose,
             double timestampSeconds) {
         m_gyroOffset = pose.getRotation().minus(gyroAngle);
-
-        m_poseEstimator.reset(gyroAngle, m_positions.get(), pose, timestampSeconds);
+        m_history.reset(gyroAngle, m_positions.get(), pose, timestampSeconds);
     }
 
     ////////////////////////////////////////////////////
@@ -92,7 +119,7 @@ public class OdometryUpdater {
             SwerveModulePositions wheelPositions) {
 
         // the entry right before this one, the basis for integration.
-        Entry<Double, InterpolationRecord> lowerEntry = m_poseEstimator.lowerEntry(
+        Entry<Double, InterpolationRecord> lowerEntry = m_history.lowerEntry(
                 currentTimeS);
 
         if (lowerEntry == null) {
@@ -142,13 +169,13 @@ public class OdometryUpdater {
 
         SwerveModel swerveState = new SwerveModel(newPose, velocity);
 
-        m_poseEstimator.put(currentTimeS, swerveState, wheelPositions);
+        m_history.put(currentTimeS, swerveState, wheelPositions);
     }
 
     /** Replay odometry after the sample time. */
     void replay(double timestamp) {
         // Note the exclusive tailmap: we don't see the entry at timestamp.
-        for (Map.Entry<Double, InterpolationRecord> entry : m_poseEstimator.exclusiveTailMap(timestamp).entrySet()) {
+        for (Map.Entry<Double, InterpolationRecord> entry : m_history.exclusiveTailMap(timestamp).entrySet()) {
             double entryTimestampS = entry.getKey();
             InterpolationRecord value = entry.getValue();
 

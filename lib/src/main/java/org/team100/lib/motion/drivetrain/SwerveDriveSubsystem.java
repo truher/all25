@@ -195,10 +195,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         if (DEBUG)
             Util.warn("Make sure resetting the swerve module collection doesn't break anything");
         m_swerveLocal.reset();
-        m_odometryUpdater.reset(
-                m_gyro.getYawNWU(),
-                robotPose,
-                Takt.get());
+        m_odometryUpdater.reset(robotPose);
         m_stateCache.reset();
     }
 
@@ -269,10 +266,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     private SwerveModel update() {
         double now = Takt.get();
         SwerveModulePositions positions = m_swerveLocal.positions();
-        m_odometryUpdater.put(
-                now,
-                m_gyro,
-                positions);
+        m_odometryUpdater.update();
         m_cameraUpdater.run();
         // by the time we get here, there should be something in the history.
         // TODO: make it work even without that
