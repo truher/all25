@@ -35,9 +35,9 @@ class InterpreterFactory:
                     "note" + str(camera_num),
                 )
 
-                # GREEN TARGET VALUES
-                object_lower = np.array((40, 50, 100))
-                object_higher = np.array((70, 255, 255))
+                # WHITE TARGET VALUES
+                object_lower = np.array((0, 0, 150))
+                object_higher = np.array((255, 100, 255))
                 return NoteDetector(
                     identity,
                     cam,
@@ -70,7 +70,7 @@ class InterpreterFactory:
                     int(scale * size.height),
                     "combined" + str(camera_num),
                 )
-                # GREEN TARGET VALUES
+                # WHITE TARGET VALUES
                 object_lower = np.array((0, 0, 150))
                 object_higher = np.array((255, 100, 255))
                 return CombinedDetector(identity, cam, camera_num, display, network, object_lower, object_higher)
