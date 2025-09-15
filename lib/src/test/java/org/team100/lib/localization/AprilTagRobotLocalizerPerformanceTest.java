@@ -49,7 +49,7 @@ class AprilTagRobotLocalizerPerformanceTest {
         };
 
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         // camera sees the tag straight ahead in the center of the frame,
@@ -72,7 +72,7 @@ class AprilTagRobotLocalizerPerformanceTest {
 
         // run forever so i can use the profiler
         while (true)
-            vdp.estimateRobotPose(
+            localizer.estimateRobotPose(
                     new Transform3d(), blips, Takt.get(), Optional.of(Alliance.Red));
     }
 

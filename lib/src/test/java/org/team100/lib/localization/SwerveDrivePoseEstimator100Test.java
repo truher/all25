@@ -92,9 +92,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
@@ -128,9 +129,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
@@ -165,9 +167,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
@@ -207,9 +210,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
@@ -316,9 +320,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
@@ -426,9 +431,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
@@ -477,9 +483,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 1.0, 1.0, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
@@ -528,9 +535,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.05, 0.05, 0.05 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
@@ -581,9 +589,10 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.001, 0.001, 0.01 };
         double[] visionMeasurementStdDevs = new double[] { 0.1, 0.1, Double.MAX_VALUE };
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                Rotation2d.kZero,
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time

@@ -41,9 +41,10 @@ public class RealisticFixture {
         collection = SwerveModuleCollection.get(logger, 10, 20, swerveKinodynamics);
         gyro = new SimulatedGyro(swerveKinodynamics, collection);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
-        poseEstimator = swerveKinodynamics.newPoseEstimator(
+        poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                gyro,
+                swerveKinodynamics,
+                gyro.getYawNWU(),
                 collection.positions(),
                 Pose2d.kZero,
                 0); // initial time is zero here for testing

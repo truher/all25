@@ -281,21 +281,6 @@ public class SwerveKinodynamics  {
                 angle.unaryMinus());
     }
 
-    public SwerveDrivePoseEstimator100 newPoseEstimator(
-            LoggerFactory parent,
-            Gyro gyro,
-            SwerveModulePositions modulePositions,
-            Pose2d initialPoseMeters,
-            double timestampSeconds) {
-        return new SwerveDrivePoseEstimator100(
-                parent,
-                this,
-                gyro.getYawNWU(),
-                modulePositions,
-                initialPoseMeters,
-                timestampSeconds);
-    }
-
     /**
      * Robot-relative speed, without discretization.
      * This simply rotates the velocity from the field frame to the robot frame.

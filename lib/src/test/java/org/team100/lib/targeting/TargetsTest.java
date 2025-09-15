@@ -48,6 +48,7 @@ public class TargetsTest implements Timeless {
         // tilt down 45
         pub.set(new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) },
                 (long) Takt.get() * 1000000);
+        stepTime();
         t.update();
         assertEquals(1, t.getTargets().size());
         Translation2d target = t.getTargets().get(0);
@@ -73,10 +74,12 @@ public class TargetsTest implements Timeless {
                 "Rotation3d");
 
         Transform3d offset = Camera.get("test4").getOffset();
+        stepTime();
         writer.update(
                 p, offset, new Translation2d[] {
                         new Translation2d(1, 0) });
 
+        stepTime();
         reader.update();
 
         Optional<Translation2d> tt = reader.getClosestTarget();

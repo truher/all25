@@ -44,9 +44,10 @@ public class SimulatedDrivingTest implements Timeless {
             SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics));
 
     Gyro gyro = new SimulatedGyro(swerveKinodynamics, collection);
-    SwerveDrivePoseEstimator100 poseEstimator = swerveKinodynamics.newPoseEstimator(
+    SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
             logger,
-            gyro,
+            swerveKinodynamics,
+            gyro.getYawNWU(),
             collection.positions(),
             Pose2d.kZero,
             0);

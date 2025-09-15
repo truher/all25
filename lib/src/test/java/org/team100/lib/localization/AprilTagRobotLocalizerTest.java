@@ -57,7 +57,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger,
                 layout,
                 poseEstimator,
@@ -78,7 +78,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         // localizer needs alliance
         DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
         DriverStationSim.notifyNewData();
-        vdp.update();
+        localizer.update();
         // skip first update
         assertTrue(poseEstimate.isEmpty());
         // a little bit different so NT will pass it along
@@ -88,7 +88,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         pub.set(new Blip24[] {
                 Blip24.fromXForward(1, new Transform3d(1.01, 0, 0, new Rotation3d())) },
                 (long) Takt.get() * 1000000);
-        vdp.update();
+        localizer.update();
         assertEquals(1, poseEstimate.size());
         Pose2d pose = poseEstimate.get(0);
 
@@ -122,7 +122,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         // in red layout blip 7 is on the other side of the field
@@ -146,9 +146,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         Transform3d cameraOffset = new Transform3d();
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, blips, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, blips, Takt.get(), alliance);
         // do it twice to convince vdp it's a good estimate
-        vdp.estimateRobotPose(cameraOffset, blips, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, blips, Takt.get(), alliance);
         assertEquals(1, poseEstimate.size());
         assertEquals(1, timeEstimate.size());
 
@@ -178,7 +178,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         // camera sees the tag straight ahead in the center of the frame,
@@ -200,9 +200,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         Transform3d cameraOffset = new Transform3d();
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, blips, Takt.get() - 0.075, alliance);
+        localizer.estimateRobotPose(cameraOffset, blips, Takt.get() - 0.075, alliance);
         // two good estimates are required, so do another one.
-        vdp.estimateRobotPose(cameraOffset, blips, Takt.get() - 0.075, alliance);
+        localizer.estimateRobotPose(cameraOffset, blips, Takt.get() - 0.075, alliance);
 
         assertEquals(1, poseEstimate.size());
         assertEquals(1, timeEstimate.size());
@@ -258,7 +258,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 assertEquals(-100, p.getY(), DELTA);
             }
         };
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -274,8 +274,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 new Translation3d(-0.1265, 0.03, 0.61),
                 new Rotation3d(0, Math.toRadians(31.5), Math.PI));
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
 
     }
 
@@ -307,7 +307,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 assertEquals(1.914, p.getY(), DELTA);
             }
         };
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         // tag is 1m away on bore
@@ -319,8 +319,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         Transform3d cameraOffset = new Transform3d();
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 
     @Test
@@ -351,7 +351,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -364,8 +364,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 new Translation3d(1, 0, 0),
                 new Rotation3d());
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 
     @Test
@@ -398,7 +398,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         Blip24 tag3 = new Blip24(3, new Transform3d(
@@ -412,8 +412,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         Transform3d cameraOffset = new Transform3d();
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 
     @Test
@@ -445,7 +445,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -458,8 +458,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 new Translation3d(),
                 new Rotation3d(0, Math.PI / 4, 0));
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 
     @Test
@@ -492,7 +492,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -503,8 +503,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         Transform3d cameraOffset = new Transform3d();
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 
     @Test
@@ -536,7 +536,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
 
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -547,8 +547,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         Transform3d cameraOffset = new Transform3d();
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 
     @Test
@@ -579,7 +579,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 assertEquals(0.914, p.getY(), DELTA);
             }
         };
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -589,8 +589,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
         final Blip24[] tags = new Blip24[] { tag4 };
         Transform3d cameraOffset = new Transform3d();
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 
     @Test
@@ -622,7 +622,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 assertEquals(0.914, p.getY(), DELTA);
             }
         };
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -635,8 +635,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 new Translation3d(),
                 new Rotation3d(0, Math.PI / 4, 0));
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 
     @Test
@@ -668,7 +668,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 assertEquals(0.914, p.getY(), DELTA);
             }
         };
-        AprilTagRobotLocalizer vdp = new AprilTagRobotLocalizer(
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");
 
         // 30 degrees, long side is sqrt2, so hypotenuse is sqrt2/sqrt3/2
@@ -682,7 +682,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 new Translation3d(0, 0, 0),
                 new Rotation3d(0, Math.PI / 6, 0));
         Optional<Alliance> alliance = Optional.of(Alliance.Red);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
-        vdp.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
+        localizer.estimateRobotPose(cameraOffset, tags, Takt.get(), alliance);
     }
 }

@@ -30,10 +30,11 @@ public class SimulatedTargetWriterTest implements Timeless {
                 "Rotation3d");
 
         Transform3d offset = Camera.get("test4").getOffset();
+        stepTime();
         writer.update(
                 p, offset, new Translation2d[] {
                         new Translation2d(1, 0) });
-
+        stepTime();
         reader.update();
 
         assertEquals(1, reader.getTargets().size());

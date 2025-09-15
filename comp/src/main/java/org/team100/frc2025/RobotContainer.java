@@ -192,9 +192,10 @@ public class RobotContainer {
                 m_modules);
 
         // ignores the rotation derived from vision.
-        final SwerveDrivePoseEstimator100 poseEstimator = m_swerveKinodynamics.newPoseEstimator(
+        final SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 driveLog,
-                gyro,
+                m_swerveKinodynamics,
+                gyro.getYawNWU(),
                 m_modules.positions(),
                 Pose2d.kZero,
                 Takt.get());
@@ -204,7 +205,7 @@ public class RobotContainer {
 
         final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
-        final AprilTagRobotLocalizer visionDataProvider = new AprilTagRobotLocalizer(
+        final AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 driveLog,
                 layout,
                 poseEstimator,
@@ -226,10 +227,10 @@ public class RobotContainer {
                 m_swerveKinodynamics,
                 poseEstimator,
                 swerveLocal,
-                visionDataProvider::update,
+                localizer::update,
                 limiter);
 
-        m_leds = new LEDIndicator(0, visionDataProvider::getPoseAgeSec);
+        m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -258,7 +259,7 @@ public class RobotContainer {
 
         final DriveManually driveManually = new DriveManually(
                 driverControl::velocity,
-                visionDataProvider::setHeedRadiusM,
+                localizer::setHeedRadiusM,
                 m_drive);
         final LoggerFactory manLog = comLog.type(driveManually);
 
@@ -320,7 +321,7 @@ public class RobotContainer {
 
         DriveManuallySimple driveDefault = new DriveManuallySimple(
                 driverControl::velocity,
-                visionDataProvider::setHeedRadiusM,
+                localizer::setHeedRadiusM,
                 m_drive,
                 new ManualWithProfiledReefLock(
                         manLog, m_swerveKinodynamics, driverControl::useReefLock, thetaFeedback,
@@ -346,11 +347,11 @@ public class RobotContainer {
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
         m_auton = new Auton(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
-                autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz).left();
+                autoProfile, m_drive, localizer::setHeedRadiusM, m_swerveKinodynamics, viz).left();
 
         whileTrue(driverControl::test,
                 new Auton(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
-                        autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz).right());
+                        autoProfile, m_drive, localizer::setHeedRadiusM, m_swerveKinodynamics, viz).right());
 
         // Driver/Operator Buttons
         onTrue(driverControl::resetRotation0, new ResetPose(m_drive, new Pose2d()));
@@ -364,62 +365,62 @@ public class RobotContainer {
         whileTrue(driverControl::driveToTag, buttons::a,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.A));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.A));
 
         whileTrue(driverControl::driveToTag, buttons::b,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.B));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.B));
 
         whileTrue(driverControl::driveToTag, buttons::c,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.C));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.C));
 
         whileTrue(driverControl::driveToTag, buttons::d,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.D));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.D));
 
         whileTrue(driverControl::driveToTag, buttons::e,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.E));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.E));
 
         whileTrue(driverControl::driveToTag, buttons::f,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.F));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.F));
 
         whileTrue(driverControl::driveToTag, buttons::g,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.G));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.G));
 
         whileTrue(driverControl::driveToTag, buttons::h,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.H));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.H));
 
         whileTrue(driverControl::driveToTag, buttons::i,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.I));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.I));
 
         whileTrue(driverControl::driveToTag, buttons::j,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.J));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.J));
 
         whileTrue(driverControl::driveToTag, buttons::k,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.K));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.K));
 
         whileTrue(driverControl::driveToTag, buttons::l,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.L));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.L));
 
         whileTrue(buttons::ab, GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
         whileTrue(buttons::cd, GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));

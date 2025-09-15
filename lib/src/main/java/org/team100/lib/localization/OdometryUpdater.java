@@ -1,5 +1,6 @@
 package org.team100.lib.localization;
 
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -102,6 +103,22 @@ public class OdometryUpdater {
         SwerveModel swerveState = new SwerveModel(newPose, velocity);
 
         m_poseEstimator.put(currentTimeS, swerveState, wheelPositions);
+    }
+
+    /** Replay odometry after the sample time. */
+    public void replay(double timestamp) {
+        // Note the exclusive tailmap: we don't see the entry at timestamp.
+        for (Map.Entry<Double, InterpolationRecord> entry : m_poseEstimator.exclusiveTailMap(timestamp).entrySet()) {
+            double entryTimestampS = entry.getKey();
+            InterpolationRecord value = entry.getValue();
+
+            // this is what the gyro must have been given the pose and offset
+            Rotation2d entryGyroAngle = value.m_state.pose().getRotation().minus(m_poseEstimator.getGyroOffset());
+            double entryGyroRate = value.m_state.theta().v();
+            SwerveModulePositions wheelPositions = value.m_wheelPositions;
+
+            put(entryTimestampS, entryGyroAngle, entryGyroRate, wheelPositions);
+        }
     }
 
 }

@@ -57,9 +57,10 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
 
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
                 logger,
-                new MockGyro(),
+                kinodynamics,
+                new MockGyro().getYawNWU(),
                 p(0),
                 Pose2d.kZero,
                 0);

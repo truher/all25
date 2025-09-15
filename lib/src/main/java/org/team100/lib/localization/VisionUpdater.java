@@ -1,12 +1,8 @@
 package org.team100.lib.localization;
 
-import java.util.Map;
-
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 /**
@@ -17,6 +13,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 public class VisionUpdater implements VisionUpdaterInterface {
 
     private final SwerveDrivePoseEstimator100 m_estimator;
+    /** For replay. */
     private final OdometryUpdater m_odometryUpdater;
 
     public VisionUpdater(
@@ -46,7 +43,8 @@ public class VisionUpdater implements VisionUpdaterInterface {
         InterpolationRecord sample = m_estimator.getRecord(timestampS);
 
         // Nudge the sample towards the measurement.
-        Pose2d nudged = VisionUpdater.nudge(sample.m_state.pose(), measurement, stateSigma, visionSigma);
+        Pose2d nudged = VisionUpdater.nudge(
+                sample.m_state.pose(), measurement, stateSigma, visionSigma);
 
         // Add the result
         m_estimator.put(
@@ -54,20 +52,7 @@ public class VisionUpdater implements VisionUpdaterInterface {
                 new SwerveModel(nudged, sample.m_state.velocity()),
                 sample.m_wheelPositions);
 
-        // Replay odometry after the sample time.
-        // (Note the exclusive tailmap: we don't need to see the entry we just added.)
-        for (Map.Entry<Double, InterpolationRecord> entry : m_estimator.exclusiveTailMap(timestampS).entrySet()) {
-            double entryTimestampS = entry.getKey();
-            InterpolationRecord value = entry.getValue();
-
-            // this is what the gyro must have been given the pose and offset
-            Rotation2d entryGyroAngle = value.m_state.pose().getRotation().minus(m_estimator.getGyroOffset());
-            double entryGyroRate = value.m_state.theta().v();
-            SwerveModulePositions wheelPositions = value.m_wheelPositions;
-
-            m_odometryUpdater.put(entryTimestampS, entryGyroAngle, entryGyroRate, wheelPositions);
-        }
-
+        m_odometryUpdater.replay(timestampS);
     }
 
     /**
