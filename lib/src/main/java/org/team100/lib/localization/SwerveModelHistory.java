@@ -4,9 +4,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.SortedMap;
 
-import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.LoggerFactory.Rotation2dLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
@@ -30,20 +28,20 @@ public class SwerveModelHistory {
     private final SwerveKinodynamics m_kinodynamics;
     private final TimeInterpolatableBuffer100<InterpolationRecord> m_poseBuffer;
 
-    private final Rotation2dLogger m_log_offset;
+    // private final Rotation2dLogger m_log_offset;
 
     /**
      * The gyro offset is only used when writing odometry, i.e. the gyro is really
      * only used at all by the odometry writer.
      * maintained in resetPosition().
      */
-    private Rotation2d m_gyroOffset;
+    // private Rotation2d m_gyroOffset;
 
     public SwerveModelHistory(LoggerFactory parent, SwerveKinodynamics kinodynamics) {
         LoggerFactory child = parent.type(this);
         m_kinodynamics = kinodynamics;
         m_poseBuffer = new TimeInterpolatableBuffer100<>(BUFFER_DURATION);
-        m_log_offset = child.rotation2dLogger(Level.TRACE, "GYRO OFFSET");
+        // m_log_offset = child.rotation2dLogger(Level.TRACE, "GYRO OFFSET");
     }
 
     /**
@@ -56,12 +54,12 @@ public class SwerveModelHistory {
     }
 
     /** Empty the buffer and add the given measurements. */
-    public void reset(
+    void reset(
             Rotation2d gyroAngle,
             SwerveModulePositions modulePositions,
             Pose2d pose,
             double timestampSeconds) {
-        m_gyroOffset = pose.getRotation().minus(gyroAngle);
+        // m_gyroOffset = pose.getRotation().minus(gyroAngle);
 
         // empty the buffer and add the current pose
         m_poseBuffer.reset(
@@ -71,7 +69,7 @@ public class SwerveModelHistory {
                         new SwerveModel(pose, new FieldRelativeVelocity(0, 0, 0)),
                         modulePositions));
 
-        m_log_offset.log(() -> m_gyroOffset);
+        // m_log_offset.log(() -> m_gyroOffset);
     }
 
     //////////////////////////////////////////////////
@@ -108,9 +106,9 @@ public class SwerveModelHistory {
         return m_poseBuffer.tailMap(timestamp, false);
     }
 
-    Rotation2d getGyroOffset() {
-        return m_gyroOffset;
-    }
+    // Rotation2d getGyroOffset() {
+    //     return m_gyroOffset;
+    // }
 
     int size() {
         return m_poseBuffer.size();

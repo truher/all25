@@ -56,9 +56,10 @@ public class SimulatedDrivingTest implements Timeless {
         poseEstimator = new SwerveModelHistory(
                 logger,
                 swerveKinodynamics);
-        poseEstimator.reset(gyro.getYawNWU(), collection.positions(), Pose2d.kZero, 0);
+        // poseEstimator.reset(gyro.getYawNWU(), collection.positions(), Pose2d.kZero, 0);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
         ou = new OdometryUpdater(swerveKinodynamics, poseEstimator, collection::positions);
+        ou.reset(gyro.getYawNWU(), Pose2d.kZero, 0);
         limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
         drive = new SwerveDriveSubsystem(
                 fieldLogger,

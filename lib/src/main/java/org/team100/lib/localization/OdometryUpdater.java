@@ -34,6 +34,11 @@ public class OdometryUpdater {
     // TODO: make this private
     public final Supplier<SwerveModulePositions> m_positions;
 
+    /**
+     * maintained in reset(). TODO: use a proxy gyro, not this class.
+     */
+    private Rotation2d m_gyroOffset;
+
     public OdometryUpdater(
             SwerveKinodynamics kinodynamics,
             SwerveModelHistory estimator,
@@ -41,6 +46,10 @@ public class OdometryUpdater {
         m_kinodynamics = kinodynamics;
         m_poseEstimator = estimator;
         m_positions = positions;
+    }
+
+    Rotation2d getGyroOffset() {
+        return m_gyroOffset;
     }
 
     /**
@@ -59,6 +68,22 @@ public class OdometryUpdater {
     public void put(double timestamp, Gyro gyro, SwerveModulePositions positions) {
         put(timestamp, gyro.getYawNWU(), gyro.getYawRateNWU(), positions);
     }
+
+    /**
+     * Empty the history, reset the gyro offset, and add the given measurements.
+     * Uses the module position supplier passed to the constructor.
+     * timestamp here is provided for testability; in prod it's always Takt.get().
+     */
+    public void reset(
+            Rotation2d gyroAngle,
+            Pose2d pose,
+            double timestampSeconds) {
+        m_gyroOffset = pose.getRotation().minus(gyroAngle);
+
+        m_poseEstimator.reset(gyroAngle, m_positions.get(), pose, timestampSeconds);
+    }
+
+    ////////////////////////////////////////////////////
 
     private void put(
             double currentTimeS,
@@ -95,7 +120,7 @@ public class OdometryUpdater {
         // replace the twist dtheta with one derived from the current
         // pose angle based on the gyro (which is more accurate)
 
-        Rotation2d angle = gyroAngleRadNWU.plus(m_poseEstimator.getGyroOffset());
+        Rotation2d angle = gyroAngleRadNWU.plus(getGyroOffset());
         if (DEBUG)
             Util.printf("angle %.6f\n", angle.getRadians());
         twist.dtheta = angle.minus(previousState.pose().getRotation()).getRadians();
@@ -121,14 +146,14 @@ public class OdometryUpdater {
     }
 
     /** Replay odometry after the sample time. */
-    public void replay(double timestamp) {
+    void replay(double timestamp) {
         // Note the exclusive tailmap: we don't see the entry at timestamp.
         for (Map.Entry<Double, InterpolationRecord> entry : m_poseEstimator.exclusiveTailMap(timestamp).entrySet()) {
             double entryTimestampS = entry.getKey();
             InterpolationRecord value = entry.getValue();
 
             // this is what the gyro must have been given the pose and offset
-            Rotation2d entryGyroAngle = value.m_state.pose().getRotation().minus(m_poseEstimator.getGyroOffset());
+            Rotation2d entryGyroAngle = value.m_state.pose().getRotation().minus(getGyroOffset());
             double entryGyroRate = value.m_state.theta().v();
             SwerveModulePositions wheelPositions = value.m_wheelPositions;
 

@@ -195,9 +195,8 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         if (DEBUG)
             Util.warn("Make sure resetting the swerve module collection doesn't break anything");
         m_swerveLocal.reset();
-        m_poseEstimator.reset(
+        m_odometryUpdater.reset(
                 m_gyro.getYawNWU(),
-                m_swerveLocal.positions(),
                 robotPose,
                 Takt.get());
         m_stateCache.reset();

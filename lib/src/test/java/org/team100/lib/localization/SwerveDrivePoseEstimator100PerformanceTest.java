@@ -61,11 +61,10 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         SwerveModelHistory history = new SwerveModelHistory(
                 logger,
                 kinodynamics);
-        history.reset(new MockGyro().getYawNWU(),
-                p(0),
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, history, () -> p(0));
+        ou.reset(new MockGyro().getYawNWU(),
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, history, () -> p(0));
         VisionUpdater vu = new VisionUpdater(history, ou);
         SwerveModelEstimate estimate = new SwerveModelEstimate(history);
 

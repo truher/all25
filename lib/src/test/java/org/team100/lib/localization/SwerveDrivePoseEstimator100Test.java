@@ -73,25 +73,26 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
         Pose2d p = poseEstimator.get(0).get().pose();
         assertEquals(0, p.getX(), DELTA);
         assertEquals(0, p.getY(), DELTA);
         assertEquals(0, p.getRotation().getRadians(), DELTA);
-        assertEquals(0, poseEstimator.getGyroOffset().getRadians(), DELTA);
+        assertEquals(0, ou.getGyroOffset().getRadians(), DELTA);
         // force the pose to rotate 90
-        poseEstimator.reset(
-                Rotation2d.kZero, positionZero, new Pose2d(0, 0, Rotation2d.kCCW_90deg), 0);
+        ou.reset(Rotation2d.kZero, new Pose2d(0, 0, Rotation2d.kCCW_90deg), 0);
         p = poseEstimator.get(0).get().pose();
         assertEquals(0, p.getX(), DELTA);
         assertEquals(0, p.getY(), DELTA);
         // and we get that back
         assertEquals(Math.PI / 2, p.getRotation().getRadians(), DELTA);
         // and the offset is correct since the gyro itself didn't change.
-        assertEquals(Math.PI / 2, poseEstimator.getGyroOffset().getRadians(), DELTA);
+        assertEquals(Math.PI / 2, ou.getGyroOffset().getRadians(), DELTA);
     }
 
     @Test
@@ -100,11 +101,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         ou.put(0.0, new MockGyro(), positionZero);
@@ -139,11 +141,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
         ou.put(0.0, new MockGyro(), positionZero);
         verify(0.000, poseEstimator.get(0.00));
@@ -177,11 +180,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
         ou.put(0.0, new MockGyro(), positionZero);
         verify(0.000, poseEstimator.get(0.00));
@@ -220,11 +224,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         // initial pose = 0
@@ -330,11 +335,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         // initial pose = 0
@@ -441,11 +447,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         verify(0.000, poseEstimator.get(0.00));
@@ -493,11 +500,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         verify(0.000, poseEstimator.get(0.00));
@@ -545,11 +553,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         verify(0.000, poseEstimator.get(0.00));
@@ -599,11 +608,12 @@ class SwerveDrivePoseEstimator100Test {
         SwerveModelHistory poseEstimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        poseEstimator.reset(Rotation2d.kZero,
-                positionZero,
+
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
+        ou.reset(
+                Rotation2d.kZero,
                 Pose2d.kZero,
                 0);
-        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator, () -> positionZero);
         VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         verify(0.000, poseEstimator.get(0.00));
@@ -662,12 +672,13 @@ class SwerveDrivePoseEstimator100Test {
         var estimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        estimator.reset(Rotation2d.kZero,
-                new SwerveModulePositions(fl, fr, bl, br),
-                new Pose2d(),
-                0);
+
         OdometryUpdater ou = new OdometryUpdater(kinodynamics, estimator,
                 () -> new SwerveModulePositions(fl, fr, bl, br));
+        ou.reset(
+                Rotation2d.kZero,
+                new Pose2d(),
+                0);
         VisionUpdater vu = new VisionUpdater(estimator, ou);
 
         var trajectory = TrajectoryGenerator.generateTrajectory(
@@ -706,10 +717,10 @@ class SwerveDrivePoseEstimator100Test {
     void testBadInitialPose() {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest();
 
-        var fl = new SwerveModulePosition100();
-        var fr = new SwerveModulePosition100();
-        var bl = new SwerveModulePosition100();
-        var br = new SwerveModulePosition100();
+        final SwerveModulePosition100 fl = new SwerveModulePosition100();
+        final SwerveModulePosition100 fr = new SwerveModulePosition100();
+        final SwerveModulePosition100 bl = new SwerveModulePosition100();
+        final SwerveModulePosition100 br = new SwerveModulePosition100();
 
         // estimator initial pose is at (-1,-1) rotated 60 degrees to the right.
 
@@ -721,13 +732,13 @@ class SwerveDrivePoseEstimator100Test {
         var estimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        estimator.reset(
-                Rotation2d.kZero,
-                new SwerveModulePositions(fl, fr, bl, br),
-                new Pose2d(-1, -1, Rotation2d.fromRadians(-1)),
-                0);
+
         OdometryUpdater ou = new OdometryUpdater(kinodynamics, estimator,
                 () -> new SwerveModulePositions(fl, fr, bl, br));
+        ou.reset(
+                Rotation2d.kZero,
+                new Pose2d(-1, -1, Rotation2d.fromRadians(-1)),
+                0);
         VisionUpdater vu = new VisionUpdater(estimator, ou);
 
         var trajectory = TrajectoryGenerator.generateTrajectory(
@@ -803,11 +814,9 @@ class SwerveDrivePoseEstimator100Test {
 
         // new starting pose here, so we don't actually use the earlier initial pose
 
-        estimator.reset(
-                Rotation2d.kZero,
-                positions,
+        ou.reset(Rotation2d.kZero,
                 startingPose,
-                0); // zero initial time
+                0);
 
         var rand = new Random(3538);
 
@@ -946,23 +955,23 @@ class SwerveDrivePoseEstimator100Test {
 
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest();
 
-        var fl = new SwerveModulePosition100();
-        var fr = new SwerveModulePosition100();
-        var bl = new SwerveModulePosition100();
-        var br = new SwerveModulePosition100();
+        final SwerveModulePosition100 fl = new SwerveModulePosition100();
+        final SwerveModulePosition100 fr = new SwerveModulePosition100();
+        final SwerveModulePosition100 bl = new SwerveModulePosition100();
+        final SwerveModulePosition100 br = new SwerveModulePosition100();
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.9, 0.9, 0.9 };
         var estimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        estimator.reset(
-                Rotation2d.kZero,
-                new SwerveModulePositions(fl, fr, bl, br),
-                new Pose2d(1, 2, Rotation2d.fromDegrees(270)),
-                0);
+
         OdometryUpdater ou = new OdometryUpdater(kinodynamics, estimator,
                 () -> new SwerveModulePositions(fl, fr, bl, br));
+        ou.reset(
+                Rotation2d.kZero,
+                new Pose2d(1, 2, Rotation2d.fromDegrees(270)),
+                0);
         VisionUpdater vu = new VisionUpdater(estimator, ou);
 
         ou.put(
@@ -1001,21 +1010,17 @@ class SwerveDrivePoseEstimator100Test {
         var estimator = new SwerveModelHistory(
                 logger,
                 kinodynamics); // zero initial time
-        estimator.reset(
-                Rotation2d.kZero,
-                new SwerveModulePositions(
-                        new SwerveModulePosition100(),
-                        new SwerveModulePosition100(),
-                        new SwerveModulePosition100(),
-                        new SwerveModulePosition100()),
-                Pose2d.kZero,
-                0);
+
 
         OdometryUpdater ou = new OdometryUpdater(kinodynamics, estimator, () -> new SwerveModulePositions(
                 new SwerveModulePosition100(),
                 new SwerveModulePosition100(),
                 new SwerveModulePosition100(),
                 new SwerveModulePosition100()));
+        ou.reset(
+                Rotation2d.kZero,
+                Pose2d.kZero,
+                0);
         VisionUpdater vu = new VisionUpdater(estimator, ou);
 
         double time = 0;
