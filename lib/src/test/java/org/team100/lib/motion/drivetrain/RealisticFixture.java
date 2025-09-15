@@ -54,6 +54,7 @@ public class RealisticFixture {
                 fieldLogger,
                 logger,
                 gyro,
+                swerveKinodynamics,
                 poseEstimator,
                 swerveLocal,
                 () -> {

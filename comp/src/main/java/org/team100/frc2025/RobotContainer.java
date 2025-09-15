@@ -62,10 +62,11 @@ import org.team100.lib.hid.ThirdControl;
 import org.team100.lib.hid.ThirdControlProxy;
 import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
+import org.team100.lib.localization.AprilTagRobotLocalizer;
+import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
-import org.team100.lib.localization.AprilTagRobotLocalizer;
-import org.team100.lib.localization.Blip24;
+import org.team100.lib.localization.VisionUpdater;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
@@ -87,7 +88,6 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -198,6 +198,9 @@ public class RobotContainer {
                 m_modules.positions(),
                 Pose2d.kZero,
                 Takt.get());
+        final OdometryUpdater ou = new OdometryUpdater(
+                m_swerveKinodynamics, poseEstimator);
+        final VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
@@ -205,6 +208,7 @@ public class RobotContainer {
                 driveLog,
                 layout,
                 poseEstimator,
+                vu,
                 "vision",
                 "blips");
 
@@ -219,6 +223,7 @@ public class RobotContainer {
                 fieldLogger,
                 driveLog,
                 gyro,
+                m_swerveKinodynamics,
                 poseEstimator,
                 swerveLocal,
                 visionDataProvider::update,

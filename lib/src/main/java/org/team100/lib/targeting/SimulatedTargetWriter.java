@@ -2,6 +2,7 @@ package org.team100.lib.targeting;
 
 import java.util.List;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,7 +50,7 @@ public class SimulatedTargetWriter {
         // tilt down 45
         // Rotation3d[] rots = new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) };
         Rotation3d[] rots = rot.toArray(new Rotation3d[0]);
-        m_pub.set(rots);
+        m_pub.set(rots, (long)Takt.get()*1000000);
     }
 
     public void close() {

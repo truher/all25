@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
 import org.team100.lib.testing.Timeless;
 
@@ -18,7 +19,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArrayTopic;
 
-/** Timeless because the clock is used to decide to ignore (stale) input. */
+/**
+ * Timeless because the clock is used to decide to ignore (stale) input.
+ * TODO: this is now intermittently failing due to timestamps.
+ */
 public class TargetsTest implements Timeless {
     private static final double DELTA = 0.001;
 
@@ -40,8 +44,10 @@ public class TargetsTest implements Timeless {
         StructArrayTopic<Rotation3d> topic = inst.getStructArrayTopic(
                 "objectVision/test4/5678/Rotation3d", Rotation3d.struct);
         StructArrayPublisher<Rotation3d> pub = topic.publish();
+        stepTime();
         // tilt down 45
-        pub.set(new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) });
+        pub.set(new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) },
+                (long) Takt.get() * 1000000);
         t.update();
         assertEquals(1, t.getTargets().size());
         Translation2d target = t.getTargets().get(0);

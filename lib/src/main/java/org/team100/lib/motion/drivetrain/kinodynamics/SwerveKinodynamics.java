@@ -290,7 +290,7 @@ public class SwerveKinodynamics  {
         return new SwerveDrivePoseEstimator100(
                 parent,
                 this,
-                gyro,
+                gyro.getYawNWU(),
                 modulePositions,
                 initialPoseMeters,
                 timestampSeconds);

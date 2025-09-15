@@ -58,6 +58,7 @@ public class SimulatedDrivingTest implements Timeless {
             fieldLogger,
             logger,
             gyro,
+            swerveKinodynamics,
             poseEstimator,
             swerveLocal,
             () -> {

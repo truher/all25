@@ -30,7 +30,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
@@ -89,140 +88,6 @@ class SwerveDrivePoseEstimator100Test {
     }
 
     @Test
-    void testK() {
-        double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
-        double targetRangeM = 1.0;
-        double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
-        double[] k = SwerveDrivePoseEstimator100.getK(stateStdDev, visionStdDev);
-        assertEquals(3, k.length);
-        assertEquals(0.024, k[0], DELTA);
-        assertEquals(0.024, k[1], DELTA);
-        assertEquals(0, k[2], DELTA);
-    }
-
-    @Test
-    void testMix() {
-        assertEquals(0.091, SwerveDrivePoseEstimator100.mix(1, 100), DELTA);
-        assertEquals(0.24, SwerveDrivePoseEstimator100.mix(1, 10), DELTA);
-        assertEquals(0.5, SwerveDrivePoseEstimator100.mix(1, 1), DELTA);
-        assertEquals(0.76, SwerveDrivePoseEstimator100.mix(10, 1), DELTA);
-        assertEquals(0.909, SwerveDrivePoseEstimator100.mix(100, 1), DELTA);
-    }
-
-    @Test
-    void testScaledTwist() {
-        // 1 mm
-        double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
-        double targetRangeM = 1.0;
-        // 2 cm stdev, 20x
-        double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
-        // 10 cm of difference between the vision update and the current pose
-        Twist2d twist = new Twist2d(0.1, 0.1, 0);
-        Twist2d scaled = SwerveDrivePoseEstimator100.getScaledTwist(stateStdDev, visionStdDev, twist);
-        // difference is discounted 20x
-        assertEquals(0.002439, scaled.dx, 1e-6);
-        assertEquals(0.002439, scaled.dy, 1e-6);
-        assertEquals(0, scaled.dtheta, 1e-6);
-    }
-
-    /**
-     * If the measurement is the same as the sample, nothing happens.
-     */
-    @Test
-    void testZeroNudge() {
-        double[] stateStdDev = new double[] {
-                0.001,
-                0.001,
-                0.1 };
-        double[] visionStdDev = new double[] {
-                0.02,
-                0.02,
-                Double.MAX_VALUE };
-        final Pose2d sample = new Pose2d();
-        final Pose2d measurement = new Pose2d();
-        final Pose2d nudged = SwerveDrivePoseEstimator100.nudge(sample, measurement, stateStdDev, visionStdDev);
-        assertEquals(0, nudged.getX(), 1e-6);
-        assertEquals(0, nudged.getY(), 1e-6);
-        assertEquals(0, nudged.getRotation().getRadians(), 1e-6);
-
-    }
-
-    /**
-     * Let's say the camera is correct, and it says the sample is 0.1 meters off.
-     * How long does it take for the pose buffer to contain the right pose? Kind of
-     * a long time.
-     */
-    @Test
-    void testGentleNudge() {
-        int frameRate = 50;
-        double[] stateStdDev = new double[] {
-                0.001,
-                0.001,
-                0.1 };
-        double[] visionStdDev = new double[] {
-                0.1,
-                0.1,
-                Double.MAX_VALUE };
-        final Pose2d sample = new Pose2d();
-        final Pose2d measurement = new Pose2d(0.1, 0, new Rotation2d());
-        Pose2d nudged = sample;
-        for (int i = 0; i < frameRate; ++i) {
-            nudged = SwerveDrivePoseEstimator100.nudge(nudged, measurement, stateStdDev, visionStdDev);
-        }
-        // after 1 sec the error is about 6 cm which is too slow.
-        Transform2d error = measurement.minus(nudged);
-        assertEquals(0.061, error.getX(), DELTA);
-        assertEquals(0, error.getY(), DELTA);
-        assertEquals(0, error.getRotation().getRadians(), DELTA);
-        //
-        for (int i = 0; i < frameRate; ++i) {
-            nudged = SwerveDrivePoseEstimator100.nudge(nudged, measurement, stateStdDev, visionStdDev);
-        }
-        // after 2 sec the error is about 4 cm.
-        error = measurement.minus(nudged);
-        assertEquals(0.037, error.getX(), DELTA);
-        assertEquals(0, error.getY(), DELTA);
-        assertEquals(0, error.getRotation().getRadians(), DELTA);
-    }
-
-    /**
-     * Same as above with firmer updates. We want error under 2cm within about 1s.
-     */
-    @Test
-    void testFirmerNudge() {
-        int frameRate = 50;
-        double[] stateStdDev = new double[] {
-                0.001,
-                0.001,
-                0.1 };
-        double[] visionStdDev = new double[] {
-                0.03,
-                0.03,
-                Double.MAX_VALUE };
-        final Pose2d sample = new Pose2d();
-        final Pose2d measurement = new Pose2d(0.1, 0, new Rotation2d());
-        Pose2d nudged = sample;
-        for (int i = 0; i < frameRate; ++i) {
-            nudged = SwerveDrivePoseEstimator100.nudge(nudged, measurement, stateStdDev, visionStdDev);
-        }
-        // after 1 sec the error is about 2 cm which is the target.
-        Transform2d error = measurement.minus(nudged);
-        assertEquals(0.019, error.getX(), DELTA);
-        assertEquals(0, error.getY(), DELTA);
-        assertEquals(0, error.getRotation().getRadians(), DELTA);
-        //
-        for (int i = 0; i < frameRate; ++i) {
-            nudged = SwerveDrivePoseEstimator100.nudge(nudged, measurement, stateStdDev, visionStdDev);
-        }
-        // after 2 sec the error is about 4 mm which seems plenty tight
-        error = measurement.minus(nudged);
-        assertEquals(0.004, error.getX(), DELTA);
-        assertEquals(0, error.getY(), DELTA);
-        assertEquals(0, error.getRotation().getRadians(), DELTA);
-
-    }
-
-    @Test
     void odo1() {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
@@ -233,11 +98,14 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
-        poseEstimator.put(0.0, Rotation2d.kZero, 0, positionZero);
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
+
+        ou.put(0.0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
         // 0.1 m
-        poseEstimator.put(0.02, Rotation2d.kZero, 0, position01);
+        ou.put(0.02, Rotation2d.kZero, 0, position01);
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
         // velocity is the delta
@@ -245,7 +113,7 @@ class SwerveDrivePoseEstimator100Test {
         verifyVelocity(5.000, poseEstimator.get(0.02));
 
         // big vision update
-        poseEstimator.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         // position slides over there
         verify(0.167, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
@@ -266,11 +134,13 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
-        poseEstimator.put(0.0, Rotation2d.kZero, 0, positionZero);
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
+        ou.put(0.0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
         // 0.1 m
-        poseEstimator.put(0.02, Rotation2d.kZero, 0, position01);
+        ou.put(0.02, Rotation2d.kZero, 0, position01);
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
         // velocity is the delta
@@ -278,7 +148,7 @@ class SwerveDrivePoseEstimator100Test {
         verifyVelocity(5.000, poseEstimator.get(0.02));
 
         // big vision update, but later
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         // initial position is unchanged
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
@@ -301,11 +171,13 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
-        poseEstimator.put(0.0, Rotation2d.kZero, 0, positionZero);
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
+        ou.put(0.0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
         // 0.1 m
-        poseEstimator.put(0.02, Rotation2d.kZero, 0, position01);
+        ou.put(0.02, Rotation2d.kZero, 0, position01);
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
         // velocity is the delta
@@ -313,7 +185,7 @@ class SwerveDrivePoseEstimator100Test {
         verifyVelocity(5.000, poseEstimator.get(0.02));
 
         // big vision update, even later
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         // initial position is unchanged
         verify(0.000, poseEstimator.get(0.00));
         verifyVelocity(0.000, poseEstimator.get(0.00));
@@ -341,6 +213,8 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         // initial pose = 0
         verify(0, poseEstimator.get(0.00));
@@ -348,13 +222,13 @@ class SwerveDrivePoseEstimator100Test {
         // pose stays zero when updated at time zero
         // if we try to update zero, there's nothing to compare it to,
         // so we should just ignore this update.
-        poseEstimator.put(0.0, Rotation2d.kZero, 0, positionZero);
+        ou.put(0.0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.01));
         verify(0.000, poseEstimator.get(0.02));
 
         // now vision says we're one meter away, so pose goes towards that
-        poseEstimator.put(0.01, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.01, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.01));
 
@@ -366,7 +240,7 @@ class SwerveDrivePoseEstimator100Test {
         // wheels haven't moved, so the "odometry opinion" should be zero
         // but it's not, it's applied relative to the vision update, so there's no
         // change.
-        poseEstimator.put(0.02, Rotation2d.kZero, 0, positionZero);
+        ou.put(0.02, Rotation2d.kZero, 0, positionZero);
 
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.01));
@@ -377,7 +251,7 @@ class SwerveDrivePoseEstimator100Test {
         // 0, but instead odometry is applied relative to the latest estimate, which
         // was based on vision. so the actual odometry stddev is like *zero*.
 
-        poseEstimator.put(0.04, Rotation2d.kZero, 0, position01);
+        ou.put(0.04, Rotation2d.kZero, 0, position01);
 
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
@@ -385,7 +259,7 @@ class SwerveDrivePoseEstimator100Test {
 
         // here's the delayed update from above, which moves the estimate to 0.305 and
         // then the odometry is applied on top of that, yielding 0.405.
-        poseEstimator.put(0.015, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.015, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.015));
         // odometry thinks no motion at 0.02 so repeat the vision estimate here
@@ -394,7 +268,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.04));
 
         // wheels are in the same position as the previous iteration,
-        poseEstimator.put(0.06, Rotation2d.kZero, 0, position01);
+        ou.put(0.06, Rotation2d.kZero, 0, position01);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.02));
         verify(0.405, poseEstimator.get(0.04));
@@ -402,7 +276,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.08));
 
         // a little earlier than the previous estimate does nothing
-        poseEstimator.put(0.014, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.014, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         // notices the vision input a bit earlier
         verify(0.305, poseEstimator.get(0.014));
@@ -416,7 +290,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.06));
 
         // a little later than the previous estimate works normally.
-        poseEstimator.put(0.016, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.016, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.014));
         verify(0.305, poseEstimator.get(0.015));
@@ -427,7 +301,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.521, poseEstimator.get(0.06));
 
         // wheels not moving -> no change,
-        poseEstimator.put(0.08, Rotation2d.kZero, 0, position01);
+        ou.put(0.08, Rotation2d.kZero, 0, position01);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.421, poseEstimator.get(0.02));
         verify(0.521, poseEstimator.get(0.04));
@@ -448,6 +322,8 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         // initial pose = 0
         verify(0.000, poseEstimator.get(0.00));
@@ -459,7 +335,7 @@ class SwerveDrivePoseEstimator100Test {
         // pose stays zero when updated at time zero
         // if we try to update zero, there's nothing to compare it to,
         // so we should just ignore this update.
-        poseEstimator.put(0.0, Rotation2d.kZero, 0, positionZero);
+        ou.put(0.0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
         verify(0.000, poseEstimator.get(0.04));
@@ -467,7 +343,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.08));
 
         // now vision says we're one meter away, so pose goes towards that
-        poseEstimator.put(0.01, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.01, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.167, poseEstimator.get(0.04));
@@ -482,7 +358,7 @@ class SwerveDrivePoseEstimator100Test {
         // wheels haven't moved, so the "odometry opinion" should be zero
         // but it's not, it's applied relative to the vision update, so there's no
         // change.
-        poseEstimator.put(0.02, Rotation2d.kZero, 0, positionZero);
+        ou.put(0.02, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.167, poseEstimator.get(0.04));
@@ -494,7 +370,7 @@ class SwerveDrivePoseEstimator100Test {
         // 0, but instead odometry is applied relative to the latest estimate, which
         // was based on vision. so the actual odometry stddev is like *zero*.
 
-        poseEstimator.put(0.04, Rotation2d.kZero, 0, position01);
+        ou.put(0.04, Rotation2d.kZero, 0, position01);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.267, poseEstimator.get(0.04));
@@ -503,7 +379,7 @@ class SwerveDrivePoseEstimator100Test {
 
         // here's the delayed update from above, which moves the estimate to 0.305 and
         // then the odometry is applied on top of that, yielding 0.405.
-        poseEstimator.put(0.015, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.015, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.02));
         verify(0.405, poseEstimator.get(0.04));
@@ -511,7 +387,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.08));
 
         // wheels are in the same position as the previous iteration
-        poseEstimator.put(0.06, Rotation2d.kZero, 0, position01);
+        ou.put(0.06, Rotation2d.kZero, 0, position01);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.02));
         verify(0.405, poseEstimator.get(0.04));
@@ -519,7 +395,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.08));
 
         // a little earlier than the previous estimate does nothing.
-        poseEstimator.put(0.014, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.014, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.305, poseEstimator.get(0.02));
         verify(0.405, poseEstimator.get(0.04));
@@ -527,7 +403,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.405, poseEstimator.get(0.08));
 
         // a little later than the previous estimate works normally.
-        poseEstimator.put(0.016, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.016, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.421, poseEstimator.get(0.02));
         verify(0.521, poseEstimator.get(0.04));
@@ -535,7 +411,7 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.521, poseEstimator.get(0.08));
 
         // wheels not moving -> no change
-        poseEstimator.put(0.08, Rotation2d.kZero, 0, position01);
+        ou.put(0.08, Rotation2d.kZero, 0, position01);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.421, poseEstimator.get(0.02));
         verify(0.521, poseEstimator.get(0.04));
@@ -556,6 +432,8 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
@@ -563,28 +441,28 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0, Rotation2d.kZero, 0, positionZero);
+        ou.put(0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
         verify(0.000, poseEstimator.get(0.04));
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.167, poseEstimator.get(0.04));
         verify(0.167, poseEstimator.get(0.06));
         verify(0.167, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.305, poseEstimator.get(0.04));
         verify(0.305, poseEstimator.get(0.06));
         verify(0.305, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.167, poseEstimator.get(0.02));
         verify(0.305, poseEstimator.get(0.04));
@@ -605,6 +483,8 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
@@ -612,28 +492,28 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0, Rotation2d.kZero, 0, positionZero);
+        ou.put(0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
         verify(0.000, poseEstimator.get(0.04));
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.091, poseEstimator.get(0.04));
         verify(0.091, poseEstimator.get(0.06));
         verify(0.091, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.173, poseEstimator.get(0.04));
         verify(0.173, poseEstimator.get(0.06));
         verify(0.173, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.173, poseEstimator.get(0.04));
@@ -654,6 +534,8 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
@@ -661,28 +543,28 @@ class SwerveDrivePoseEstimator100Test {
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0, Rotation2d.kZero, 0, positionZero);
+        ou.put(0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
         verify(0.000, poseEstimator.get(0.04));
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.091, poseEstimator.get(0.04));
         verify(0.091, poseEstimator.get(0.06));
         verify(0.091, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.173, poseEstimator.get(0.04));
         verify(0.173, poseEstimator.get(0.06));
         verify(0.173, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.091, poseEstimator.get(0.02));
         verify(0.173, poseEstimator.get(0.04));
@@ -705,34 +587,37 @@ class SwerveDrivePoseEstimator100Test {
                 positionZero,
                 Pose2d.kZero,
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
+
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
         verify(0.000, poseEstimator.get(0.04));
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0, Rotation2d.kZero, 0, positionZero);
+        ou.put(0, Rotation2d.kZero, 0, positionZero);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.000, poseEstimator.get(0.02));
         verify(0.000, poseEstimator.get(0.04));
         verify(0.000, poseEstimator.get(0.06));
         verify(0.000, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.02, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.010, poseEstimator.get(0.02));
         verify(0.010, poseEstimator.get(0.04));
         verify(0.010, poseEstimator.get(0.06));
         verify(0.010, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.04, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.010, poseEstimator.get(0.02));
         verify(0.020, poseEstimator.get(0.04));
         verify(0.020, poseEstimator.get(0.06));
         verify(0.020, poseEstimator.get(0.08));
 
-        poseEstimator.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+        vu.put(0.06, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         verify(0.000, poseEstimator.get(0.00));
         verify(0.010, poseEstimator.get(0.02));
         verify(0.020, poseEstimator.get(0.04));
@@ -761,10 +646,12 @@ class SwerveDrivePoseEstimator100Test {
         var estimator = new SwerveDrivePoseEstimator100(
                 logger,
                 kinodynamics,
-                new MockGyro(),
+                Rotation2d.kZero,
                 new SwerveModulePositions(fl, fr, bl, br),
                 new Pose2d(),
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, estimator);
+        VisionUpdater vu = new VisionUpdater(estimator, ou);
 
         var trajectory = TrajectoryGenerator.generateTrajectory(
                 List.of(
@@ -778,6 +665,8 @@ class SwerveDrivePoseEstimator100Test {
         testFollowTrajectory(
                 kinodynamics.getKinematics(),
                 estimator,
+                ou,
+                vu,
                 stateStdDevs,
                 visionMeasurementStdDevs,
                 trajectory,
@@ -815,10 +704,12 @@ class SwerveDrivePoseEstimator100Test {
         var estimator = new SwerveDrivePoseEstimator100(
                 logger,
                 kinodynamics,
-                new MockGyro(),
+                Rotation2d.kZero,
                 new SwerveModulePositions(fl, fr, bl, br),
                 new Pose2d(-1, -1, Rotation2d.fromRadians(-1)),
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, estimator);
+        VisionUpdater vu = new VisionUpdater(estimator, ou);
 
         var trajectory = TrajectoryGenerator.generateTrajectory(
                 List.of(
@@ -846,6 +737,8 @@ class SwerveDrivePoseEstimator100Test {
                 testFollowTrajectory(
                         kinodynamics.getKinematics(),
                         estimator,
+                        ou,
+                        vu,
                         stateStdDevs,
                         visionMeasurementStdDevs,
                         trajectory,
@@ -868,6 +761,8 @@ class SwerveDrivePoseEstimator100Test {
     void testFollowTrajectory(
             final SwerveDriveKinematics100 kinematics,
             final SwerveDrivePoseEstimator100 estimator,
+            final OdometryUpdater ou,
+            final VisionUpdater vu,
             final double[] stateStdDevs,
             final double[] visionMeasurementStdDevs,
             final Trajectory trajectory,
@@ -888,7 +783,7 @@ class SwerveDrivePoseEstimator100Test {
         // new starting pose here, so we don't actually use the earlier initial pose
 
         estimator.reset(
-                new MockGyro(),
+                Rotation2d.kZero,
                 positions,
                 startingPose,
                 0); // zero initial time
@@ -921,7 +816,7 @@ class SwerveDrivePoseEstimator100Test {
             // `visionUpdateDelay` seconds since it was measured
             if (!visionUpdateQueue.isEmpty() && visionUpdateQueue.firstKey() + visionUpdateDelay < t) {
                 var visionEntry = visionUpdateQueue.pollFirstEntry();
-                estimator.put(
+                vu.put(
                         visionEntry.getKey(),
                         visionEntry.getValue(),
                         stateStdDevs,
@@ -947,7 +842,7 @@ class SwerveDrivePoseEstimator100Test {
                 }
             }
 
-            estimator.put(
+            ou.put(
                     t,
                     groundTruthState.poseMeters
                             .getRotation()
@@ -1016,12 +911,14 @@ class SwerveDrivePoseEstimator100Test {
         var estimator = new SwerveDrivePoseEstimator100(
                 logger,
                 kinodynamics,
-                new MockGyro(),
+                Rotation2d.kZero,
                 new SwerveModulePositions(fl, fr, bl, br),
                 new Pose2d(1, 2, Rotation2d.fromDegrees(270)),
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, estimator);
+        VisionUpdater vu = new VisionUpdater(estimator, ou);
 
-        estimator.put(
+        ou.put(
                 0,
                 new Rotation2d(),
                 0,
@@ -1035,7 +932,7 @@ class SwerveDrivePoseEstimator100Test {
 
         for (int i = 0; i < 1000; i++) {
             for (var measurement : visionMeasurements) {
-                estimator.put(0.00, measurement, stateStdDevs, visionMeasurementStdDevs);
+                vu.put(0.00, measurement, stateStdDevs, visionMeasurementStdDevs);
             }
         }
 
@@ -1058,7 +955,7 @@ class SwerveDrivePoseEstimator100Test {
         var estimator = new SwerveDrivePoseEstimator100(
                 logger,
                 kinodynamics,
-                new MockGyro(),
+                Rotation2d.kZero,
                 new SwerveModulePositions(
                         new SwerveModulePosition100(),
                         new SwerveModulePosition100(),
@@ -1066,12 +963,14 @@ class SwerveDrivePoseEstimator100Test {
                         new SwerveModulePosition100()),
                 new Pose2d(),
                 0); // zero initial time
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, estimator);
+        VisionUpdater vu = new VisionUpdater(estimator, ou);
 
         double time = 0;
 
         // Add enough measurements to fill up the buffer
         for (; time < 4; time += 0.02) {
-            estimator.put(
+            ou.put(
                     time,
                     new Rotation2d(),
                     0,
@@ -1086,7 +985,7 @@ class SwerveDrivePoseEstimator100Test {
 
         // Apply a vision measurement made 3 seconds ago
         // This test passes if this does not cause a ConcurrentModificationException.
-        estimator.put(
+        vu.put(
                 1,
                 new Pose2d(new Translation2d(10, 10), new Rotation2d(0.1)),
                 new double[] { 0.1, 0.1, 0.1 },

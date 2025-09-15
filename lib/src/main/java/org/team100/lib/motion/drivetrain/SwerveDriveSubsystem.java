@@ -8,6 +8,7 @@ import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.gyro.Gyro;
+import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SwerveDrivePoseEstimator100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -39,6 +40,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     private static final boolean DEBUG = false;
     private final Gyro m_gyro;
     private final SwerveDrivePoseEstimator100 m_poseEstimator;
+    private final OdometryUpdater m_odometryUpdater;
     private final SwerveLocal m_swerveLocal;
     private final Runnable m_cameraUpdater;
     private final SwerveLimiter m_limiter;
@@ -59,6 +61,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
             LoggerFactory fieldLogger,
             LoggerFactory parent,
             Gyro gyro,
+            SwerveKinodynamics kinodynamics,
             SwerveDrivePoseEstimator100 poseEstimator,
             SwerveLocal swerveLocal,
             Runnable cameraUpdater,
@@ -66,6 +69,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         LoggerFactory child = parent.type(this);
         m_gyro = gyro;
         m_poseEstimator = poseEstimator;
+        m_odometryUpdater = new OdometryUpdater(kinodynamics, poseEstimator);
         m_swerveLocal = swerveLocal;
         m_cameraUpdater = cameraUpdater;
         m_limiter = limiter;
@@ -193,7 +197,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
             Util.warn("Make sure resetting the swerve module collection doesn't break anything");
         m_swerveLocal.reset();
         m_poseEstimator.reset(
-                m_gyro,
+                m_gyro.getYawNWU(),
                 m_swerveLocal.positions(),
                 robotPose,
                 Takt.get());
@@ -268,9 +272,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     private SwerveModel update() {
         double now = Takt.get();
         SwerveModulePositions positions = m_swerveLocal.positions();
-        m_poseEstimator.put(
+        m_odometryUpdater.put(
                 now,
-                m_gyro,
+                m_gyro.getYawNWU(),
+                m_gyro.getYawRateNWU(),
                 positions);
         m_cameraUpdater.run();
         SwerveModel swerveModel = m_poseEstimator.get(now);

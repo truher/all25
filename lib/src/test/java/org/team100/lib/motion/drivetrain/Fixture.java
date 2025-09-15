@@ -54,6 +54,7 @@ public class Fixture {
                 fieldLogger,
                 logger,
                 gyro,
+                swerveKinodynamics,
                 poseEstimator,
                 swerveLocal,
                 () -> {

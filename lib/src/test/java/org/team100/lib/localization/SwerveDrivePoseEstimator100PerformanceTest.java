@@ -63,12 +63,14 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
                 p(0),
                 Pose2d.kZero,
                 0);
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, poseEstimator);
+        VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
 
         // fill the buffer with odometry
         double t = 0.0;
-        double duration = SwerveDrivePoseEstimator100.BUFFER_DURATION;
+        double duration = 0.2; // SwerveDrivePoseEstimator100.BUFFER_DURATION;
         while (t < duration) {
-            poseEstimator.put(t, Rotation2d.kZero, 0, p(t));
+            ou.put(t, Rotation2d.kZero, 0, p(t));
             t += 0.02;
         }
         assertEquals(11, poseEstimator.size());
@@ -78,7 +80,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         int iterations = 100000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            poseEstimator.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+            vu.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {
@@ -92,7 +94,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         iterations = 1000000;
         startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            poseEstimator.put(duration - 0.1, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+            vu.put(duration - 0.1, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         }
         finishTime = System.currentTimeMillis();
         if (DEBUG) {

@@ -73,7 +73,8 @@ public class Targets extends CameraReader<Rotation3d> {
         double age = Takt.get() - valueTimestamp;
         if (age > MAX_SIGHT_AGE) {
             if (DEBUG)
-                Util.warnf("ignoring stale sight %f\n", age);
+                Util.warnf("ignoring stale sight %f %f\n",
+                        Takt.get(), valueTimestamp);
             return;
         }
         Pose2d robotPose = m_robotPose.apply(valueTimestamp);

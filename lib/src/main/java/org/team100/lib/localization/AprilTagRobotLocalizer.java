@@ -68,6 +68,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             0.1 };
 
     private final PoseEstimator100 m_poseEstimator;
+    private final VisionUpdaterInterface m_visionUpdater;
     private final StructBuffer<Blip24> m_buf = StructBuffer.create(Blip24.struct);
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
 
@@ -125,12 +126,14 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
             PoseEstimator100 poseEstimator,
+            VisionUpdaterInterface visionUpdater,
             String ntRootName,
             String ntValueName) {
         super(ntRootName, ntValueName);
         LoggerFactory child = parent.type(this);
         m_layout = layout;
         m_poseEstimator = poseEstimator;
+        m_visionUpdater = visionUpdater;
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_pub_tags = inst.getStructArrayTopic("tags", Pose3d.struct).publish();
@@ -350,7 +353,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             }
 
             m_usedTags.add(estimatedTagInField);
-            m_poseEstimator.put(
+            m_visionUpdater.put(
                     correctedTimestamp,
                     pose,
                     stateStdDevs(),
