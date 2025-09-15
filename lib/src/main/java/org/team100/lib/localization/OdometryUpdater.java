@@ -2,7 +2,9 @@ package org.team100.lib.localization;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
+import org.team100.lib.gyro.Gyro;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
@@ -18,18 +20,27 @@ import edu.wpi.first.math.geometry.Twist2d;
 /**
  * Updates the pose buffer with new odometry by selecting the most-recent pose
  * and applying the pose delta represented by the odometry.
+ * 
+ * Uses the gyro angle and rate instead of the odometry-derived values, because
+ * the gyro is more accurate.
+ * 
+ * Manages the gyro offset.
  */
 public class OdometryUpdater {
     private static final boolean DEBUG = false;
 
     private final SwerveKinodynamics m_kinodynamics;
-    private final SwerveDrivePoseEstimator100 m_poseEstimator;
+    private final SwerveModelHistory m_poseEstimator;
+    // TODO: make this private
+    public final Supplier<SwerveModulePositions> m_positions;
 
     public OdometryUpdater(
             SwerveKinodynamics kinodynamics,
-            SwerveDrivePoseEstimator100 estimator) {
+            SwerveModelHistory estimator,
+            Supplier<SwerveModulePositions> positions) {
         m_kinodynamics = kinodynamics;
         m_poseEstimator = estimator;
+        m_positions = positions;
     }
 
     /**
@@ -45,7 +56,11 @@ public class OdometryUpdater {
      * the gyro rate overrides the rate derived from the difference to the previous
      * state.
      */
-    public void put(
+    public void put(double timestamp, Gyro gyro, SwerveModulePositions positions) {
+        put(timestamp, gyro.getYawNWU(), gyro.getYawRateNWU(), positions);
+    }
+
+    private void put(
             double currentTimeS,
             Rotation2d gyroAngleRadNWU,
             double gyroRateRad_SNWU,
@@ -77,7 +92,7 @@ public class OdometryUpdater {
         Twist2d twist = m_kinodynamics.getKinematics().toTwist2d(modulePositionDelta);
         if (DEBUG)
             Util.printf("twist x %.6f y %.6f theta %.6f\n", twist.dx, twist.dy, twist.dtheta);
-        // replace the twist dtheta with one derived from the current pose
+        // replace the twist dtheta with one derived from the current
         // pose angle based on the gyro (which is more accurate)
 
         Rotation2d angle = gyroAngleRadNWU.plus(m_poseEstimator.getGyroOffset());

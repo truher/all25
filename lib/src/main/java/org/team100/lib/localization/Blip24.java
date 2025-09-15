@@ -50,6 +50,8 @@ public class Blip24 {
      * Extract translation and rotation from z-forward blip and return the same
      * translation and rotation as an NWU x-forward transform. Package-private for
      * testing.
+     * 
+     * TODO: remove this, make blips return x-forward
      */
     public Transform3d blipToTransform() {
         return new Transform3d(blipToTranslation(), blipToRotation());

@@ -51,7 +51,7 @@ public class SimulatedTagDetector {
 
     private final List<Camera> m_cameras;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
-    private final DoubleFunction<Pose2d> m_robotPose;
+    private final DoubleFunction<Optional<Pose2d>> m_robotPose;
 
     private final Map<Camera, StructArrayPublisher<Blip24>> m_publishers;
     private final NetworkTableInstance m_inst;
@@ -65,7 +65,7 @@ public class SimulatedTagDetector {
     public SimulatedTagDetector(
             List<Camera> cameras,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            DoubleFunction<Pose2d> robotPose) {
+            DoubleFunction<Optional<Pose2d>> robotPose) {
         m_cameras = cameras;
         m_layout = layout;
         m_robotPose = robotPose;
@@ -90,7 +90,14 @@ public class SimulatedTagDetector {
         if (opt.isEmpty())
             return;
         double timestampS = Takt.get() - DELAY;
-        Pose3d robotPose3d = new Pose3d(m_robotPose.apply(timestampS));
+        Optional<Pose2d> pose = m_robotPose.apply(timestampS);
+        if (pose.isEmpty()) {
+            if (DEBUG)
+                Util.println("no pose available");
+            return;
+        }
+
+        Pose3d robotPose3d = new Pose3d(pose.get());
         if (DEBUG) {
             Util.printf("robot pose X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f \n",
                     robotPose3d.getTranslation().getX(),

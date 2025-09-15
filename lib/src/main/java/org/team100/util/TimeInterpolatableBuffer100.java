@@ -1,7 +1,8 @@
-package org.team100.lib.localization;
+package org.team100.util;
 
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -13,13 +14,12 @@ import edu.wpi.first.math.interpolation.Interpolatable;
 
 /**
  * Uses an Interpolator to provide interpolated sampling with a history limit.
- * 
- * The buffer is never empty, so get() always returns *something*.
  */
-public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
+public class TimeInterpolatableBuffer100<T extends Interpolatable<T>> {
     private static final boolean DEBUG = false;
 
     private final double m_historyS;
+    /** key is timestamp in seconds */
     private final NavigableMap<Double, T> m_pastSnapshots = new ConcurrentSkipListMap<>();
 
     /**
@@ -31,10 +31,8 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
      */
     private final ReadWriteLock m_lock = new ReentrantReadWriteLock();
 
-    public TimeInterpolatableBuffer100(double historyS, double timeS, T initialValue) {
+    public TimeInterpolatableBuffer100(double historyS) {
         m_historyS = historyS;
-        // no lock needed in constructor
-        m_pastSnapshots.put(timeS, initialValue);
     }
 
     /**
@@ -79,14 +77,16 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
 
     /**
      * Sample the buffer at the given time.
+     * 
+     * If the buffer is empty, return empty.
      */
-    public T get(double timeSeconds) {
+    public Optional<T> get(double timeSeconds) {
         // Special case for when the requested time is the same as a sample
         T nowEntry = m_pastSnapshots.get(timeSeconds);
         if (nowEntry != null) {
             if (DEBUG)
                 Util.printf("record for now %.2f\n", timeSeconds);
-            return nowEntry;
+            return Optional.of(nowEntry);
         }
         Entry<Double, T> topBound = null;
         Entry<Double, T> bottomBound = null;
@@ -98,12 +98,15 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
         } finally {
             m_lock.writeLock().unlock();
         }
+        if (topBound == null && bottomBound == null) {
+            return Optional.empty();
+        }
         // Return the opposite bound if the other is null
         if (topBound == null) {
-            return bottomBound.getValue();
+            return Optional.of(bottomBound.getValue());
         }
         if (bottomBound == null) {
-            return topBound.getValue();
+            return Optional.of(topBound.getValue());
         }
 
         // If both bounds exist, interpolate between them.
@@ -116,8 +119,8 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
         double timeFraction = timeSinceBottom / timeSpan;
         if (DEBUG)
             Util.printf("interpolate %f\n", timeFraction);
-        return bottomBound.getValue().interpolate(topBound.getValue(), timeFraction);
-
+        return Optional.of(
+                bottomBound.getValue().interpolate(topBound.getValue(), timeFraction));
     }
 
     public SortedMap<Double, T> tailMap(double t, boolean inclusive) {
@@ -125,26 +128,34 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
     }
 
     /** True if the timestamp is older than the history window. */
-    boolean tooOld(double timestampS) {
+    public boolean tooOld(double timestampS) {
+        if (m_pastSnapshots.isEmpty()) {
+            return false;
+        }
         Double newestSeenS = m_pastSnapshots.lastKey();
         double oldestAcceptableS = newestSeenS - m_historyS;
         return timestampS < oldestAcceptableS;
     }
 
+    /** Null if empty */
     public Entry<Double, T> lowerEntry(double t) {
         return m_pastSnapshots.lowerEntry(t);
     }
 
+    /** Null if empty */
     public Entry<Double, T> ceilingEntry(double arg0) {
         return m_pastSnapshots.ceilingEntry(arg0);
     }
 
-    int size() {
+    public int size() {
         return m_pastSnapshots.size();
     }
 
-    /** Timestamp of the most-recent snapshot. */
-    double lastKey() {
+    /** Timestamp of the most-recent snapshot, or zero if empty. */
+    public double lastKey() {
+        if (m_pastSnapshots.isEmpty()) {
+            return 0;
+        }
         return m_pastSnapshots.lastKey();
     }
 }

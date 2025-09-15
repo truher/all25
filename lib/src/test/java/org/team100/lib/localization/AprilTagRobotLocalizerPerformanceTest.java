@@ -34,10 +34,10 @@ class AprilTagRobotLocalizerPerformanceTest {
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(-Math.PI / 4));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(-Math.PI / 4)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -47,7 +47,6 @@ class AprilTagRobotLocalizerPerformanceTest {
                 timeEstimate.add(t);
             }
         };
-
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger, layout, poseEstimator, vu, "vision", "blips");

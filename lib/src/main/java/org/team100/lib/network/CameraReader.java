@@ -97,7 +97,16 @@ public abstract class CameraReader<T> {
 
             // server time is in microseconds
             // https://docs.wpilib.org/en/stable/docs/software/networktables/networktables-intro.html#timestamps
-            double valueTimestamp = ntValue.getServerTime() / 1000000.0;
+            //
+            // ATTENTION! (sep 15 2025)
+            //
+            // using server time seems to break the tests, like server time ignores the test
+            // clock, which makes me wonder if it's just the wrong thing to use all the
+            // time, so this uses "local" time now.
+            // double valueTimestamp = ((double)ntValue.getServerTime()) / 1000000.0;
+            double valueTimestamp = ((double) ntValue.getTime()) / 1000000.0;
+            if (DEBUG)
+                Util.printf("reader timestamp %f\n", valueTimestamp);
 
             perValue(cameraOffset, valueTimestamp, valueArray);
         }

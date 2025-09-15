@@ -37,15 +37,36 @@ class AprilTagRobotLocalizerTest implements Timeless {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
+    void testVisionStdDevs() {
+        double targetRangeM = 1.0;
+        double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
+        assertEquals(3, visionStdDev.length);
+        assertEquals(0.04, visionStdDev[0], DELTA);
+        assertEquals(0.04, visionStdDev[1], DELTA);
+        assertEquals(Double.MAX_VALUE, visionStdDev[2], DELTA);
+    }
+
+    @Test
+    void testStateStdDevs() {
+        // these are the "antijitter" values.
+        // 1 mm, very low
+        double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
+        assertEquals(3, stateStdDev.length);
+        assertEquals(0.001, stateStdDev[0], DELTA);
+        assertEquals(0.001, stateStdDev[1], DELTA);
+        assertEquals(0.1, stateStdDev[2], DELTA);
+    }
+
+    @Test
     void testEndToEnd() throws IOException {
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         // these lists receive the updates
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(Rotation2d.kZero);
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(Rotation2d.kZero));
             }
         };
 
@@ -107,10 +128,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(Rotation2d.kZero);
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(Rotation2d.kZero));
             }
         };
 
@@ -164,10 +185,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(-Math.PI / 4));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(-Math.PI / 4)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -245,10 +266,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(3 * Math.PI / 4)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -294,10 +315,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(Math.PI));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -337,10 +358,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(Math.PI));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -383,10 +404,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(Math.PI));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
             }
         };
 
@@ -431,10 +452,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(Math.PI));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -477,11 +498,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
-
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(Math.PI));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -522,10 +542,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(-3 * Math.PI / 4));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(-3 * Math.PI / 4)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -566,10 +586,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(3 * Math.PI / 4)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -609,10 +629,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(3 * Math.PI / 4)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {
@@ -655,10 +675,10 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        PoseEstimator100 poseEstimator = new PoseEstimator100() {
+        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
             @Override
-            public SwerveModel get(double timestampSeconds) {
-                return new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+            public Optional<SwerveModel> get(double timestampSeconds) {
+                return Optional.of(new SwerveModel(new Rotation2d(3 * Math.PI / 4)));
             }
         };
         VisionUpdaterInterface vu = new VisionUpdaterInterface() {

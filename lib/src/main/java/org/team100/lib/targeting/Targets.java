@@ -22,7 +22,7 @@ import edu.wpi.first.util.struct.StructBuffer;
  * awhile.
  */
 public class Targets extends CameraReader<Rotation3d> {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /**
      * Ignore incoming sights older than this, because they're stale.

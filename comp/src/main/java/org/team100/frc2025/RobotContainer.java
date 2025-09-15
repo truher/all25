@@ -65,7 +65,8 @@ import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
-import org.team100.lib.localization.SwerveDrivePoseEstimator100;
+import org.team100.lib.localization.SwerveModelEstimate;
+import org.team100.lib.localization.SwerveModelHistory;
 import org.team100.lib.localization.VisionUpdater;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
@@ -192,23 +193,25 @@ public class RobotContainer {
                 m_modules);
 
         // ignores the rotation derived from vision.
-        final SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
+        final SwerveModelHistory history = new SwerveModelHistory(
                 driveLog,
-                m_swerveKinodynamics,
+                m_swerveKinodynamics);
+        history.reset(
                 gyro.getYawNWU(),
                 m_modules.positions(),
                 Pose2d.kZero,
                 Takt.get());
         final OdometryUpdater ou = new OdometryUpdater(
-                m_swerveKinodynamics, poseEstimator);
-        final VisionUpdater vu = new VisionUpdater(poseEstimator, ou);
+                m_swerveKinodynamics, history, m_modules::positions);
+        final VisionUpdater vu = new VisionUpdater(history, ou);
+        final SwerveModelEstimate estimate = new SwerveModelEstimate(history);
 
         final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
         final AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 driveLog,
                 layout,
-                poseEstimator,
+                estimate,
                 vu,
                 "vision",
                 "blips");
@@ -225,7 +228,8 @@ public class RobotContainer {
                 driveLog,
                 gyro,
                 m_swerveKinodynamics,
-                poseEstimator,
+                ou,
+                history,
                 swerveLocal,
                 localizer::update,
                 limiter);
@@ -246,7 +250,7 @@ public class RobotContainer {
                             Camera.CORAL_LEFT,
                             Camera.CORAL_RIGHT),
                     layout,
-                    (timestampS) -> poseEstimator.get(timestampS).pose());
+                    (timestampS) -> history.get(timestampS).map(x -> x.pose()));
             m_simulatedTagDetector = sim::periodic;
         }
 

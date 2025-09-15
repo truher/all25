@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class TargetLocalizer {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /**
      * Converts camera-relative sights to field relative translations.

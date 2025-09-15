@@ -19,7 +19,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
  * TODO: simulate multiple cameras to see if the reader combines them
  */
 public class SimulatedTargetWriter {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     // test4 camera offset is 0,0,1, without rotation
     private static final String CAMERA_IDENTITY = "test4";
@@ -50,7 +50,10 @@ public class SimulatedTargetWriter {
         // tilt down 45
         // Rotation3d[] rots = new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) };
         Rotation3d[] rots = rot.toArray(new Rotation3d[0]);
-        m_pub.set(rots, (long)Takt.get()*1000000);
+        double now = Takt.get();
+        if (DEBUG)
+            Util.printf("writer timestamp %f\n", now);
+        m_pub.set(rots, (long) (now * 1000000.0));
     }
 
     public void close() {

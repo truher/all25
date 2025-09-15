@@ -1,5 +1,8 @@
 package org.team100.lib.localization;
 
+import java.util.Optional;
+
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,12 +15,12 @@ import edu.wpi.first.math.geometry.Twist2d;
  */
 public class VisionUpdater implements VisionUpdaterInterface {
 
-    private final SwerveDrivePoseEstimator100 m_estimator;
+    private final SwerveModelHistory m_estimator;
     /** For replay. */
     private final OdometryUpdater m_odometryUpdater;
 
     public VisionUpdater(
-            SwerveDrivePoseEstimator100 estimator,
+            SwerveModelHistory estimator,
             OdometryUpdater odometryUpdater) {
         m_estimator = estimator;
         m_odometryUpdater = odometryUpdater;
@@ -40,19 +43,27 @@ public class VisionUpdater implements VisionUpdaterInterface {
         }
 
         // Sample the history at the measurement time.
-        InterpolationRecord sample = m_estimator.getRecord(timestampS);
+        Optional<InterpolationRecord> sample = m_estimator.getRecord(timestampS);
 
-        // Nudge the sample towards the measurement.
-        Pose2d nudged = VisionUpdater.nudge(
-                sample.m_state.pose(), measurement, stateSigma, visionSigma);
+        if (sample.isPresent()) {
+            // If there is a sample, nudge it towards the measurement.
+            Pose2d nudged = VisionUpdater.nudge(
+                    sample.get().m_state.pose(), measurement, stateSigma, visionSigma);
+            m_estimator.put(
+                    timestampS,
+                    new SwerveModel(nudged, sample.get().m_state.velocity()),
+                    sample.get().m_wheelPositions);
+            m_odometryUpdater.replay(timestampS);
+        } else {
+            // if there is no sample, just use the measurement exactly, assume zero
+            // velocity, and skip the replay since there's nothing to replay.
+            // this should never occur except at startup.
+            m_estimator.put(
+                    timestampS,
+                    new SwerveModel(measurement, new FieldRelativeVelocity(0, 0, 0)),
+                    m_odometryUpdater.m_positions.get());
+        }
 
-        // Add the result
-        m_estimator.put(
-                timestampS,
-                new SwerveModel(nudged, sample.m_state.velocity()),
-                sample.m_wheelPositions);
-
-        m_odometryUpdater.replay(timestampS);
     }
 
     /**

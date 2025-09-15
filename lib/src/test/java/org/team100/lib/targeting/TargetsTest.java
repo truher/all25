@@ -47,7 +47,7 @@ public class TargetsTest implements Timeless {
         stepTime();
         // tilt down 45
         pub.set(new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) },
-                (long) Takt.get() * 1000000);
+                (long) (Takt.get() * 1000000.0));
         stepTime();
         t.update();
         assertEquals(1, t.getTargets().size());

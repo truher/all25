@@ -9,7 +9,8 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.SimulatedGyro;
-import org.team100.lib.localization.SwerveDrivePoseEstimator100;
+import org.team100.lib.localization.OdometryUpdater;
+import org.team100.lib.localization.SwerveModelHistory;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -34,7 +35,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class SimulatedDrivingTest implements Timeless {
     private static final boolean DEBUG = false;
-    LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
+    final LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
     LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
     SwerveModuleCollection collection = new SwerveModuleCollection(
@@ -43,28 +44,34 @@ public class SimulatedDrivingTest implements Timeless {
             SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics),
             SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics));
 
-    Gyro gyro = new SimulatedGyro(swerveKinodynamics, collection);
-    SwerveDrivePoseEstimator100 poseEstimator = new SwerveDrivePoseEstimator100(
-            logger,
-            swerveKinodynamics,
-            gyro.getYawNWU(),
-            collection.positions(),
-            Pose2d.kZero,
-            0);
-    SwerveLocal swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
+    final Gyro gyro;
+    final SwerveModelHistory poseEstimator;
+    final SwerveLocal swerveLocal;
+    final OdometryUpdater ou;
+    final SwerveLimiter limiter;
+    final SwerveDriveSubsystem drive;
 
-    SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
-
-    SwerveDriveSubsystem drive = new SwerveDriveSubsystem(
-            fieldLogger,
-            logger,
-            gyro,
-            swerveKinodynamics,
-            poseEstimator,
-            swerveLocal,
-            () -> {
-            },
-            limiter);
+    SimulatedDrivingTest() {
+        gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
+        poseEstimator = new SwerveModelHistory(
+                logger,
+                swerveKinodynamics);
+        poseEstimator.reset(gyro.getYawNWU(), collection.positions(), Pose2d.kZero, 0);
+        swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
+        ou = new OdometryUpdater(swerveKinodynamics, poseEstimator, collection::positions);
+        limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
+        drive = new SwerveDriveSubsystem(
+                fieldLogger,
+                logger,
+                gyro,
+                swerveKinodynamics,
+                ou,
+                poseEstimator,
+                swerveLocal,
+                () -> {
+                },
+                limiter);
+    }
 
     @Test
     void testSteps() {
