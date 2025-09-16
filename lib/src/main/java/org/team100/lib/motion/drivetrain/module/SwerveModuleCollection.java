@@ -7,9 +7,9 @@ import org.team100.lib.encoder.DutyCycleRotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.module.WCPSwerveModule100.DriveRatio;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.util.Util;
 
@@ -214,6 +214,7 @@ public class SwerveModuleCollection {
     // Observers
     //
 
+    /** Uses Cache so the positions are fresh and coherent. */
     public SwerveModulePositions positions() {
         return new SwerveModulePositions(
                 m_frontLeft.getPosition(),

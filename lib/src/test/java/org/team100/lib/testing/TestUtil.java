@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 public class TestUtil {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public static void verify(Map<String, Double> expected, Map<String, Double> actual) {
         assertEquals(expected.size(), actual.size());

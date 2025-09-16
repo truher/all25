@@ -10,7 +10,7 @@ import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.ProfileReference;
 
@@ -55,7 +55,7 @@ public class DriveToTranslationWithFront extends Command  {
         updateGoal();
         if (m_goal == null)
             return;
-        m_reference = new ProfileReference(m_profile);
+        m_reference = new ProfileReference(m_profile, "drive to translation with front");
         m_reference.setGoal(new SwerveModel(m_goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }
@@ -73,9 +73,8 @@ public class DriveToTranslationWithFront extends Command  {
                 m_goal.getRotation().getRadians() });
     }
 
-    @Override
-    public boolean isFinished() {
-        return m_referenceController != null && m_referenceController.isFinished();
+    public boolean isDone() {
+        return m_referenceController != null && m_referenceController.isDone();
     }
 
     @Override

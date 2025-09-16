@@ -146,7 +146,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_position = Cache
                 .ofDouble(() -> {
                     double latency = Utils.fpgaToCurrentTime(Takt.get()) - motorPosition.getTimestamp().getTime();
-                    if (latency > 0.1) {
+                    if (latency > 0.04) {
                         Util.warn("!!!!!!! stale position! !!!!!!!" + canId);
                         latency = 0.1;
                     }
@@ -346,17 +346,23 @@ public abstract class Talon6Motor implements BareMotor {
         setEncoderPosition(motorPositionRev);
     }
 
-    /** Updated in Robot.robotPeriodic(). */
+    /**
+     * Not latency-compensated.
+     * Updated in Robot.robotPeriodic().
+     */
     public double getVelocityRev_S() {
         return m_velocity.getAsDouble();
     }
 
-    /** Updated in Robot.robotPeriodic(). */
+    /**
+     * Latency-compensated, represents the current Takt.
+     * Updated in `Robot.robotPeriodic()`.
+     */
     public double getPositionRev() {
         return m_position.getAsDouble();
     }
 
-    /** wait a long time for a new value, do not use outside testing. */
+    /** ait a long time for a new value, do not use outside testing. */
     public double getPositionBlockingRev() {
         return m_motor.getPosition().waitForUpdate(1).getValueAsDouble();
     }

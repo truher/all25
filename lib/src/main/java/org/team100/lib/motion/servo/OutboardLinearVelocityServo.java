@@ -6,30 +6,27 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
 import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.util.Util;
 
 /** There is no profile here. */
 public class OutboardLinearVelocityServo implements LinearVelocityServo {
     private static final boolean DEBUG = false;
+    private static final double VELOCITY_TOLERANCE = 1;
+
     private final LinearMechanism m_mechanism;
     private final DoubleLogger m_log_setpoint_v;
     private final DoubleLogger m_log_setpoint_a;
-    private final OptionalDoubleLogger m_log_velocity;
-    private final OptionalDoubleLogger m_log_position;
 
     // for calculating acceleration
-    private double previousSetpoint = 0;
-    // private double m_setpoint;
+    private double m_prevGoal = 0;
+    private double m_goal;
 
     public OutboardLinearVelocityServo(LoggerFactory parent, LinearMechanism mechanism) {
         LoggerFactory child = parent.type(this);
         m_mechanism = mechanism;
         m_log_setpoint_v = child.doubleLogger(Level.TRACE, "setpoint v (m_s)");
         m_log_setpoint_a = child.doubleLogger(Level.TRACE, "setpoint a (m_s2)");
-        m_log_velocity = child.optionalDoubleLogger(Level.TRACE, "velocity (m_s)");
-        m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (m)");
     }
 
     @Override
@@ -39,14 +36,16 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
         m_mechanism.resetEncoderPosition();
     }
 
+    /** Passthrough to the outboard control. */
     @Override
-    public void setVelocityM_S(double setpointM_S) {
+    public void setVelocity(double setpointM_S) {
         setVelocity(setpointM_S, accel(setpointM_S));
     }
 
+    /** Passthrough to the outboard control. */
     @Override
     public void setVelocity(double setpointM_S, double setpointM_S2) {
-        // m_setpoint = setpointM_S;
+        m_goal = setpointM_S;
         m_mechanism.setVelocity(setpointM_S, setpointM_S2, 0);
         m_log_setpoint_v.log(() -> setpointM_S);
         m_log_setpoint_a.log(() -> setpointM_S2);
@@ -59,8 +58,16 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     @Override
     public OptionalDouble getVelocity() {
         final OptionalDouble velocityM_S = m_mechanism.getVelocityM_S();
-        m_log_velocity.log(() -> velocityM_S);
         return velocityM_S;
+    }
+
+    @Override
+    public boolean atGoal() {
+        OptionalDouble optV = m_mechanism.getVelocityM_S();
+        if (optV.isEmpty())
+            return false;
+        double err = m_goal - optV.getAsDouble();
+        return Math.abs(err) < VELOCITY_TOLERANCE;
     }
 
     @Override
@@ -71,7 +78,6 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     @Override
     public OptionalDouble getDistance() {
         final OptionalDouble positionM = m_mechanism.getPositionM();
-        m_log_position.log(() -> positionM);
         return positionM;
     }
 
@@ -92,8 +98,8 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
      * @param setpoint desired velocity
      */
     private double accel(double setpoint) {
-        double accel = (setpoint - previousSetpoint) / TimedRobot100.LOOP_PERIOD_S;
-        previousSetpoint = setpoint;
+        double accel = (setpoint - m_prevGoal) / TimedRobot100.LOOP_PERIOD_S;
+        m_prevGoal = setpoint;
         return accel;
     }
 }

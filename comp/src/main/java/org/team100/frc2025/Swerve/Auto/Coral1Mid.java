@@ -1,6 +1,7 @@
 package org.team100.frc2025.Swerve.Auto;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.function.DoubleConsumer;
@@ -10,12 +11,13 @@ import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
 import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Funnel.Funnel;
-import org.team100.frc2025.Swerve.SemiAuto.Embark;
+import org.team100.frc2025.Swerve.FieldConstants;
+import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.lib.commands.drivetrain.FieldConstants.ReefPoint;
-import org.team100.lib.config.ElevatorUtil.ScoringPosition;
+import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
@@ -26,6 +28,9 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class Coral1Mid {
+    /** While driving to scoring tag, pay attention only to very close tags. */
+    private static final double HEED_RADIUS_M = 3;
+
     public static Command get(
             LoggerFactory logger,
             Wrist2 wrist,
@@ -40,14 +45,16 @@ public class Coral1Mid {
             SwerveKinodynamics kinodynamics,
             TrajectoryVisualization viz) {
 
-        Embark toReef = new Embark(
-                logger, drive, heedRadiusM, controller, profile,
-                () -> ScoringPosition.L4, ReefPoint.H);
+        DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
+                logger, drive, controller, profile,
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.H));
 
         PrePlaceCoralL4 prePlace = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
 
         return sequence(
                 parallel(
+                        runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
+
                         toReef,
                         sequence(
                                 RunFunnelHandoff.get(logger, elevator, wrist, funnel, tunnel, grip).withTimeout(0.5),

@@ -10,12 +10,12 @@ import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.drivetrain.SwerveModel;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeDelta;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.state.Model100;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

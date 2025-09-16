@@ -7,8 +7,8 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Identity;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePosition100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleState100;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
 import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.reference.Setpoints1d;
@@ -24,7 +24,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * It used to be that the turning servo would contain the profile, but now it's
  * here.
  */
-public abstract class SwerveModule100  {
+public abstract class SwerveModule100 {
     private final LinearVelocityServo m_driveServo;
     private final AngularPositionServo m_turningServo;
     /**
@@ -90,7 +90,7 @@ public abstract class SwerveModule100  {
                 speed = reduceCrossTrackError(measuredAngleRad, speed, desiredAngle);
             }
         }
-        m_driveServo.setVelocityM_S(speed);
+        m_driveServo.setVelocity(speed);
         if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
             // no profile, just low-level position
             Control100 control = new Control100(desiredAngle.getRadians(), 0);
@@ -113,18 +113,27 @@ public abstract class SwerveModule100  {
         return scale * desiredSpeed;
     }
 
+    double dt() {
+        double now = Takt.get();
+        double dt = now - m_previousTime;
+        m_previousTime = now;
+        return dt;
+    }
+
     /** Correct the desired speed for steering coupling. */
     private double correctSpeedForSteering(double desiredSpeed, Rotation2d desiredAngle) {
         Rotation2d dtheta = desiredAngle.minus(m_previousDesiredAngle);
-        double now = Takt.get();
-        double dt = now - m_previousTime;
-        if (dt > 1e-6) {
+        double dt = dt();
+        if (dt > 0.04) {
+            // clock is unreliable
+            dt = 0;
+        }
+        if (dt > 0.01) {
             // avoid short intervals
             double omega = dtheta.getRadians() / dt;
             // TODO: should this be positive or negative?
             desiredSpeed += .0975 * (omega) / 3.8;
         }
-        m_previousTime = now;
         return desiredSpeed;
     }
 
@@ -187,6 +196,7 @@ public abstract class SwerveModule100  {
                 Optional.of(new Rotation2d(turningPosition.getAsDouble())));
     }
 
+    /** Uses Cache so the position is fresh and coherent. */
     public SwerveModulePosition100 getPosition() {
         OptionalDouble driveDistance = m_driveServo.getDistance();
         OptionalDouble turningPosition = m_turningServo.getPosition();

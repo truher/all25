@@ -21,7 +21,7 @@ import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.profile.incremental.Profile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
 
@@ -153,7 +153,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 pid,
                 ff);
         Talon6Encoder encoder = new Talon6Encoder(parent, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor,
                 encoder,
                 ratio.m_ratio,
@@ -180,7 +180,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 pid,
                 ff);
         Talon6Encoder encoder = new Talon6Encoder(parent, driveMotor);
-        LinearMechanism mech = new LinearMechanism(
+        LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor, encoder, ratio.m_ratio, WHEEL_DIAMETER_M, Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
         return new OutboardLinearVelocityServo(
@@ -240,7 +240,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             SwerveKinodynamics kinodynamics,
             RotaryMechanism mech,
             CombinedRotaryPositionSensor combinedEncoder) {
-        Profile100 profile = kinodynamics.getSteeringProfile();
+        IncrementalProfile profile = kinodynamics.getSteeringProfile();
         ProfileReference1d ref = new IncrementalProfileReference1d(
                 profile, STEERING_POSITION_TOLERANCE_RAD, STEERING_VELOCITY_TOLERANCE_RAD_S);
         return new OutboardAngularPositionServo(parent, mech, ref);

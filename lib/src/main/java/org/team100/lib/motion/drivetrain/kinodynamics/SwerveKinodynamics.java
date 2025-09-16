@@ -2,12 +2,12 @@ package org.team100.lib.motion.drivetrain.kinodynamics;
 
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.gyro.Gyro;
-import org.team100.lib.localization.SwerveDrivePoseEstimator100;
-import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.VeeringCorrection;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.motion.drivetrain.state.DiscreteSpeed;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -49,7 +49,7 @@ public class SwerveKinodynamics  {
     private final double m_maxAngleSpeedRad_S;
     private final double m_maxAngleAccelRad_S2;
     private final double m_maxAngleStallAccelRad_S2;
-    private final Profile100 m_steeringProfile;
+    private final IncrementalProfile m_steeringProfile;
     // fulcrum is the distance from the center to the nearest edge.
     private final double m_fulcrum;
 
@@ -122,13 +122,13 @@ public class SwerveKinodynamics  {
         m_maxAngleStallAccelRad_S2 = 12 * m_stallAccelerationM_S2 * m_radius
                 / (m_fronttrack * m_backtrack + m_wheelbase * m_wheelbase);
 
-        m_steeringProfile = new TrapezoidProfile100(
+        m_steeringProfile = new TrapezoidIncrementalProfile(
                 m_maxSteeringVelocityRad_S,
                 maxSteeringAcceleration,
                 0.02); // one degree
     }
 
-    public Profile100 getSteeringProfile() {
+    public IncrementalProfile getSteeringProfile() {
         return m_steeringProfile;
     }
 
@@ -275,21 +275,6 @@ public class SwerveKinodynamics  {
                 continuousSpeeds.vyMetersPerSecond,
                 continuousSpeeds.omegaRadiansPerSecond,
                 angle.unaryMinus());
-    }
-
-    public SwerveDrivePoseEstimator100 newPoseEstimator(
-            LoggerFactory parent,
-            Gyro gyro,
-            SwerveModulePositions modulePositions,
-            Pose2d initialPoseMeters,
-            double timestampSeconds) {
-        return new SwerveDrivePoseEstimator100(
-                parent,
-                this,
-                gyro,
-                modulePositions,
-                initialPoseMeters,
-                timestampSeconds);
     }
 
     /**

@@ -4,7 +4,9 @@ import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.SimulatedGyro;
-import org.team100.lib.localization.SwerveDrivePoseEstimator100;
+import org.team100.lib.localization.OdometryUpdater;
+import org.team100.lib.localization.SwerveModelEstimate;
+import org.team100.lib.localization.SwerveModelHistory;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -26,7 +28,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 public class RealisticFixture {
     public SwerveModuleCollection collection;
     public Gyro gyro;
-    public SwerveDrivePoseEstimator100 poseEstimator;
+    public SwerveModelHistory history;
+    public SwerveModelEstimate estimate;
     public SwerveKinodynamics swerveKinodynamics;
     public SwerveLocal swerveLocal;
     public SwerveDriveSubsystem drive;
@@ -39,22 +42,23 @@ public class RealisticFixture {
         fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
         swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         collection = SwerveModuleCollection.get(logger, 10, 20, swerveKinodynamics);
-        gyro = new SimulatedGyro(swerveKinodynamics, collection);
+        gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
-        poseEstimator = swerveKinodynamics.newPoseEstimator(
+        history = new SwerveModelHistory(
                 logger,
-                gyro,
-                collection.positions(),
-                Pose2d.kZero,
-                0); // initial time is zero here for testing
-
+                swerveKinodynamics);
+        estimate = new SwerveModelEstimate(history);
+        OdometryUpdater ou = new OdometryUpdater(swerveKinodynamics, gyro, history, collection::positions);
+        ou.reset(Pose2d.kZero, 0);
         SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
 
         drive = new SwerveDriveSubsystem(
                 fieldLogger,
                 logger,
                 gyro,
-                poseEstimator,
+                swerveKinodynamics,
+                ou,
+                history,
                 swerveLocal,
                 () -> {
                 },

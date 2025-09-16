@@ -3,8 +3,8 @@ package org.team100.lib.commands.drivetrain;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.ProfileReference;
 import org.team100.lib.util.Util;
@@ -63,7 +63,7 @@ public class Rotate extends Command  {
         // instead, pick a goal at the stopping distance in the current direction.
         Translation2d dx = m_drive.getVelocity().stopping(m_swerveKinodynamics.getMaxDriveAccelerationM_S2());
         Pose2d goal = new Pose2d(measurement.getX() + dx.getX(), measurement.getY() + dx.getY(), m_target);
-        m_reference = new ProfileReference(m_profile);
+        m_reference = new ProfileReference(m_profile, "rotate");
         m_reference.setGoal(new SwerveModel(goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }
@@ -76,9 +76,8 @@ public class Rotate extends Command  {
             m_referenceController.execute();
     }
 
-    @Override
-    public boolean isFinished() {
-        return m_referenceController != null && m_referenceController.isFinished();
+    public boolean isDone() {
+        return m_referenceController != null && m_referenceController.isDone();
     }
 
     @Override

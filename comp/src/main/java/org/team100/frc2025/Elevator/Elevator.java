@@ -13,8 +13,8 @@ import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.incremental.Profile100;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.IncrementalProfile;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
@@ -52,7 +52,7 @@ public class Elevator extends SubsystemBase {
         LoggerFactory starboardMotorLogger = child.name("Starboard Motor");
         LoggerFactory portMotorLogger = child.name("Port Motor");
 
-        Profile100 profile = new TrapezoidProfile100(MAX_VEL, MAX_ACCEL, POSITION_TOLERANCE);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(MAX_VEL, MAX_ACCEL, POSITION_TOLERANCE);
         ProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
 
         switch (Identity.instance) {
@@ -101,6 +101,7 @@ public class Elevator extends SubsystemBase {
             IncrementalBareEncoder encoder,
             ProfileReference1d ref) {
         LinearMechanism mech = new LinearMechanism(
+                logger,
                 motor,
                 encoder,
                 ELEVATOR_REDUCTION,

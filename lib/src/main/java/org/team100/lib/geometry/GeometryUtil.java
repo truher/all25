@@ -2,7 +2,7 @@ package org.team100.lib.geometry;
 
 import java.util.Optional;
 
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;

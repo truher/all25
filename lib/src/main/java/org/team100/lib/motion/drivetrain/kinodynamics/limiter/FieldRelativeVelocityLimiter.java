@@ -5,7 +5,7 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.util.Util;
 
 /**

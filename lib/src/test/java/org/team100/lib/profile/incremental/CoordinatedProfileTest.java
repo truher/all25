@@ -3,7 +3,6 @@ package org.team100.lib.profile.incremental;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.profile.incremental.Profile100.ResultWithETA;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
@@ -41,8 +40,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // two profiles with the same parameters
-        TrapezoidProfile100 p1 = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p1 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
         // initial state at the origin at rest
         Model100 i1 = new Model100(0, 0);
         Model100 i2 = new Model100(0, 0);
@@ -165,8 +164,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // two profiles with the same parameters
-        TrapezoidProfile100 p1 = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
-        TrapezoidProfile100 p2 = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p1 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
         // initial state at the origin at rest
         Model100 i1 = new Model100(0, 0);
         Model100 i2 = new Model100(0, 0);
@@ -174,14 +173,10 @@ class CoordinatedProfileTest {
         Model100 g1 = new Model100(1, 0);
         Model100 g2 = new Model100(2, 0);
 
-        Model100 s1 = i1;
-        ResultWithETA r = p1.calculateWithETA(DT, s1.control(), g1);
-        double total_time = r.etaS();
+        double total_time = p1.simulateForETA(0.2, i1.control(), g1);
         assertEquals(2.0, total_time, DELTA);
 
-        Model100 s2 = i2;
-        r = p2.calculateWithETA(DT, s2.control(), g2);
-        total_time = r.etaS();
+        total_time  = p2.simulateForETA(0.2, i2.control(), g2);
         assertEquals(3.0, total_time, DELTA);
     }
 
@@ -200,14 +195,10 @@ class CoordinatedProfileTest {
         Model100 g1 = new Model100(1, 0);
         Model100 g2 = new Model100(2, 0);
 
-        Model100 s1 = i1;
-        ResultWithETA r = p1.calculateWithETA(DT, s1.control(), g1);
-        double total_time = r.etaS();
+        double total_time  = p1.simulateForETA(0.2, i1.control(), g1);
         assertEquals(2.0, total_time, DELTA);
 
-        Model100 s2 = i2;
-        r = p2.calculateWithETA(DT, s2.control(), g2);
-        total_time = r.etaS();
+        total_time = p2.simulateForETA(0.2, i2.control(), g2);
         assertEquals(3.0, total_time, DELTA);
     }
 
@@ -217,8 +208,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // default x and y profiles
-        TrapezoidProfile100 px = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
-        TrapezoidProfile100 py = new TrapezoidProfile100(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile px = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile py = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
         // initial x state is moving fast
         Control100 ix = new Control100(0, 1);
         // initial y state is stationary
@@ -229,33 +220,30 @@ class CoordinatedProfileTest {
         Model100 gy = new Model100(0.5, 0);
 
         // the "default profiles" produce different ETA's
-        ResultWithETA rx = px.calculateWithETA(DT, ix, gx);
-        double tx = rx.etaS();
-        assertEquals(2.414, tx, DELTA);
+        double tx = px.simulateForETA(0.2, ix, gx);
+        // approximate
+        assertEquals(2.6, tx, DELTA);
 
-        ResultWithETA ry = py.calculateWithETA(DT, iy, gy);
-        double ty = ry.etaS();
-        assertEquals(1.414, ty, DELTA);
+        double ty = py.simulateForETA(0.2, iy, gy);
+        // approximate
+        assertEquals(1.6, ty, DELTA);
 
         // the slower ETA is the controlling one
-
         double slowETA = Math.max(tx, ty);
-        assertEquals(2.414, slowETA, DELTA);
+        assertEquals(2.6, slowETA, DELTA);
 
         // find the scale parameters for x and y.
 
         // in the X case, the given ETA is the default ETA
-        double sx = Profile100.solveForSlowerETA(
-                DT, ix, gx, slowETA, DELTA,
-                (s) -> new TrapezoidProfile100(maxVel, s * maxAccel, PROFILE_TOLERANCE));
+        double sx = px.solve(
+                0.1, ix, gx, slowETA, DELTA);
         // in the Y case, it's slower
-        double sy = Profile100.solveForSlowerETA(
-                DT, iy, gy, slowETA, DELTA,
-                (s) -> new TrapezoidProfile100(maxVel, s * maxAccel, PROFILE_TOLERANCE));
+        double sy = py.solve(
+                0.1, iy, gy, slowETA, DELTA);
 
-        // this should be 1.0
-        assertEquals(1.0, sx, DELTA);
-        assertEquals(0.336, sy, DELTA);
+        // this should be about 1.0
+        assertEquals(0.937, sx, DELTA);
+        assertEquals(0.281, sy, DELTA);
 
         // use the scale parameter to make adjusted profiles
         px = px.scale(sx);

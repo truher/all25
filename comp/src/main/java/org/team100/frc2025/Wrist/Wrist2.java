@@ -24,7 +24,7 @@ import org.team100.lib.motion.servo.Torque;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.timed.JerkLimitedProfile100;
+import org.team100.lib.profile.timed.JerkLimitedIncrementalProfile;
 import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.reference.TimedProfileReference1d;
@@ -75,7 +75,7 @@ public class Wrist2 extends SubsystemBase {
         Feedback100 wristFeedback = new FullStateFeedback(
                 logger, 4.5, 0.12, x -> x, 0.05, 0.05);
 
-        JerkLimitedProfile100 profile = new JerkLimitedProfile100(MAX_VEL, MAX_ACCEL, MAX_JERK, false);
+        JerkLimitedIncrementalProfile profile = new JerkLimitedIncrementalProfile(MAX_VEL, MAX_ACCEL, MAX_JERK, false);
 
         ProfileReference1d ref = new TimedProfileReference1d(profile);
 

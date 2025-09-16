@@ -9,21 +9,22 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.SimulatedGyro;
-import org.team100.lib.localization.SwerveDrivePoseEstimator100;
+import org.team100.lib.localization.OdometryUpdater;
+import org.team100.lib.localization.SwerveModelHistory;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveLocal;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleDeltas;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePosition100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.module.SimulatedSwerveModule100;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.util.Util;
 
@@ -34,7 +35,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class SimulatedDrivingTest implements Timeless {
     private static final boolean DEBUG = false;
-    LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
+    final LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
     LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
     SwerveModuleCollection collection = new SwerveModuleCollection(
@@ -43,26 +44,34 @@ public class SimulatedDrivingTest implements Timeless {
             SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics),
             SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics));
 
-    Gyro gyro = new SimulatedGyro(swerveKinodynamics, collection);
-    SwerveDrivePoseEstimator100 poseEstimator = swerveKinodynamics.newPoseEstimator(
-            logger,
-            gyro,
-            collection.positions(),
-            Pose2d.kZero,
-            0);
-    SwerveLocal swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
+    final Gyro gyro;
+    final SwerveModelHistory poseEstimator;
+    final SwerveLocal swerveLocal;
+    final OdometryUpdater ou;
+    final SwerveLimiter limiter;
+    final SwerveDriveSubsystem drive;
 
-    SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
-
-    SwerveDriveSubsystem drive = new SwerveDriveSubsystem(
-            fieldLogger,
-            logger,
-            gyro,
-            poseEstimator,
-            swerveLocal,
-            () -> {
-            },
-            limiter);
+    SimulatedDrivingTest() {
+        gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
+        poseEstimator = new SwerveModelHistory(
+                logger,
+                swerveKinodynamics);
+        swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
+        ou = new OdometryUpdater(swerveKinodynamics, gyro, poseEstimator, collection::positions);
+        ou.reset(Pose2d.kZero, 0);
+        limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
+        drive = new SwerveDriveSubsystem(
+                fieldLogger,
+                logger,
+                gyro,
+                swerveKinodynamics,
+                ou,
+                poseEstimator,
+                swerveLocal,
+                () -> {
+                },
+                limiter);
+    }
 
     @Test
     void testSteps() {

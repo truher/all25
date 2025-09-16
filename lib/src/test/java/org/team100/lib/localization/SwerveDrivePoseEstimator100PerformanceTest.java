@@ -4,14 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.Test;
+import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.MockGyro;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePosition100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,6 +30,8 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         SwerveModulePosition100 m = new SwerveModulePosition100(x, Optional.of(Rotation2d.kZero));
         return new SwerveModulePositions(m, m, m, m);
     }
+
+    private SwerveModulePositions positions;
 
     /*
      * Should we optimize the pose replay operation?
@@ -57,49 +61,53 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
 
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
+        Gyro gyro = new MockGyro();
+        SwerveModelHistory history = new SwerveModelHistory(
                 logger,
-                new MockGyro(),
-                p(0),
-                Pose2d.kZero,
-                0);
+                kinodynamics);
+        positions = p(0);
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, gyro, history, () -> positions);
+        ou.reset(Pose2d.kZero, 0);
+        VisionUpdater vu = new VisionUpdater(history, ou);
+        SwerveModelEstimate estimate = new SwerveModelEstimate(history);
 
         // fill the buffer with odometry
         double t = 0.0;
-        double duration = SwerveDrivePoseEstimator100.BUFFER_DURATION;
+        double duration = 0.2; // SwerveDrivePoseEstimator100.BUFFER_DURATION;
         while (t < duration) {
-            poseEstimator.put(t, Rotation2d.kZero, 0, p(t));
+            positions = p(t);
+            ou.update(t);
             t += 0.02;
         }
-        assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
+        assertEquals(11, history.size());
+        assertEquals(0.2, history.lastKey(), DELTA);
 
         // add a very old vision estimate, which triggers replay of the entire buffer.
         int iterations = 100000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            poseEstimator.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+            vu.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {
             Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
-        assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
+        assertEquals(11, history.size());
+        assertEquals(0.2, history.lastKey(), DELTA);
 
         // add a recent vision estimate, which triggers replay of a few samples.
         iterations = 1000000;
         startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            poseEstimator.put(duration - 0.1, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+            vu.put(duration - 0.1, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         }
         finishTime = System.currentTimeMillis();
         if (DEBUG) {
             Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
-        assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
+        assertEquals(11, history.size());
+        assertEquals(0.2, history.lastKey(), DELTA);
     }
 }

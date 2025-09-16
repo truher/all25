@@ -8,7 +8,8 @@ import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.gyro.Gyro;
-import org.team100.lib.localization.SwerveDrivePoseEstimator100;
+import org.team100.lib.localization.OdometryUpdater;
+import org.team100.lib.localization.SwerveModelHistory;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
@@ -16,10 +17,12 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.logging.LoggerFactory.SwerveModelLogger;
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -36,20 +39,20 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     // at it.
     private static final boolean DEBUG = false;
     private final Gyro m_gyro;
-    private final SwerveDrivePoseEstimator100 m_poseEstimator;
+    private final SwerveModelHistory m_poseEstimator;
+    private final OdometryUpdater m_odometryUpdater;
     private final SwerveLocal m_swerveLocal;
     private final Runnable m_cameraUpdater;
     private final SwerveLimiter m_limiter;
 
     // CACHES
-    private final CotemporalCache<SwerveModel> m_stateSupplier;
+    private final CotemporalCache<SwerveModel> m_stateCache;
 
     // LOGGERS
     private final SwerveModelLogger m_log_state;
     private final DoubleLogger m_log_turning;
     private final DoubleArrayLogger m_log_pose_array;
     private final DoubleArrayLogger m_log_field_robot;
-    private final DoubleLogger m_log_yaw_rate;
     private final EnumLogger m_log_skill;
     private final FieldRelativeVelocityLogger m_log_input;
 
@@ -57,23 +60,25 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
             LoggerFactory fieldLogger,
             LoggerFactory parent,
             Gyro gyro,
-            SwerveDrivePoseEstimator100 poseEstimator,
+            SwerveKinodynamics kinodynamics,
+            OdometryUpdater odo,
+            SwerveModelHistory poseEstimator,
             SwerveLocal swerveLocal,
             Runnable cameraUpdater,
             SwerveLimiter limiter) {
         LoggerFactory child = parent.type(this);
         m_gyro = gyro;
         m_poseEstimator = poseEstimator;
+        m_odometryUpdater = odo;
         m_swerveLocal = swerveLocal;
         m_cameraUpdater = cameraUpdater;
         m_limiter = limiter;
-        m_stateSupplier = Cache.of(this::update);
+        m_stateCache = Cache.of(this::update);
         stop();
         m_log_state = child.swerveModelLogger(Level.COMP, "state");
         m_log_turning = child.doubleLogger(Level.TRACE, "Tur Deg");
         m_log_pose_array = child.doubleArrayLogger(Level.COMP, "pose array");
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
-        m_log_yaw_rate = child.doubleLogger(Level.TRACE, "heading rate rad_s");
         m_log_skill = child.enumLogger(Level.TRACE, "skill level");
         m_log_input = child.fieldRelativeVelocityLogger(Level.TRACE, "drive input");
     }
@@ -190,12 +195,8 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         if (DEBUG)
             Util.warn("Make sure resetting the swerve module collection doesn't break anything");
         m_swerveLocal.reset();
-        m_poseEstimator.reset(
-                m_gyro,
-                m_swerveLocal.positions(),
-                robotPose,
-                Takt.get());
-        m_stateSupplier.reset();
+        m_odometryUpdater.reset(robotPose);
+        m_stateCache.reset();
     }
 
     @Override
@@ -217,11 +218,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      */
     @Override
     public SwerveModel getState() {
-        return m_stateSupplier.get();
-    }
-
-    public SwerveLocalObserver getSwerveLocal() {
-        return m_swerveLocal;
+        return m_stateCache.get();
     }
 
     ///////////////////////////////////////////////////////////////
@@ -253,7 +250,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
                 getPose().getY(),
                 getPose().getRotation().getDegrees()
         });
-        m_log_yaw_rate.log(m_gyro::getYawRateNWU);
         m_swerveLocal.periodic();
     }
 
@@ -269,30 +265,31 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      */
     private SwerveModel update() {
         double now = Takt.get();
-        m_poseEstimator.put(
-                now,
-                m_gyro,
-                m_swerveLocal.positions());
+        SwerveModulePositions positions = m_swerveLocal.positions();
+        m_odometryUpdater.update();
         m_cameraUpdater.run();
-        SwerveModel swerveModel = m_poseEstimator.get(now);
+        // by the time we get here, there should be something in the history.
+        // TODO: make it work even without that
+        SwerveModel swerveModel = m_poseEstimator.get(now).orElseThrow();
         if (DEBUG)
-            Util.printf("update() estimated pose: %s\n", swerveModel);
+            Util.printf("update() positions %s estimated pose: %s\n",
+                    positions, swerveModel);
         return swerveModel;
     }
 
     /** Return cached pose. */
     public Pose2d getPose() {
-        return m_stateSupplier.get().pose();
+        return m_stateCache.get().pose();
     }
 
     /** Return cached velocity. */
     public FieldRelativeVelocity getVelocity() {
-        return m_stateSupplier.get().velocity();
+        return m_stateCache.get().velocity();
     }
 
     /** Return cached speeds. */
     public ChassisSpeeds getChassisSpeeds() {
-        return m_stateSupplier.get().chassisSpeeds();
+        return m_stateCache.get().chassisSpeeds();
     }
 
 }

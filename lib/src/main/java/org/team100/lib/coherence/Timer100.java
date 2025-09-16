@@ -28,7 +28,7 @@ public class Timer100 {
         return !m_running;
     }
 
-    public final void reset() {
+    public void reset() {
         m_accumulatedTime = 0;
         m_startTime = getMsClock();
     }

@@ -6,11 +6,19 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
-/** Mirrors tag_finder24.py Blip24. */
+/**
+ * Mirrors tag_finder24.py Blip24.
+ * TODO: change the coordinate system to x-forward.
+ */
 public class Blip24 {
     private final int id;
     private final Transform3d pose;
 
+    /**
+     * @param id   AprilTag id
+     * @param pose This uses the camera coordinate system, which has X to
+     *             the right, Y down, and Z forward.
+     */
     public Blip24(int id, Transform3d pose) {
         this.id = id;
         this.pose = pose;
@@ -42,6 +50,8 @@ public class Blip24 {
      * Extract translation and rotation from z-forward blip and return the same
      * translation and rotation as an NWU x-forward transform. Package-private for
      * testing.
+     * 
+     * TODO: remove this, make blips return x-forward
      */
     public Transform3d blipToTransform() {
         return new Transform3d(blipToTranslation(), blipToRotation());

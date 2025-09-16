@@ -2,7 +2,7 @@ package org.team100.lib.motion.drivetrain.kinodynamics.struct;
 
 import java.nio.ByteBuffer;
 
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePosition100;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.util.OptionalRotation2d;
 
 import edu.wpi.first.util.struct.Struct;

@@ -8,8 +8,8 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.Rotation2dLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleState100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 

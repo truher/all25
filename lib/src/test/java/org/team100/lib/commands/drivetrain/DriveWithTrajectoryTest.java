@@ -16,14 +16,14 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.Fixtured;
 import org.team100.lib.motion.drivetrain.MockDrive;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.SwerveModel;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.timing.TimingConstraint;
-import org.team100.lib.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,7 +49,6 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         MockDrive d = new MockDrive();
         // initially at rest
         d.m_state = new SwerveModel();
-
 
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
 
@@ -106,11 +105,11 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
         c.initialize();
 
-        // the measurement never changes but that doesn't affect "done" as far as the
-        // trajectory is concerned.
         for (int i = 0; i < 100; ++i) {
             stepTime();
             c.execute();
+            // we have magically reached the end
+            d.m_state = new SwerveModel(new Pose2d(1, 0, Rotation2d.kZero));
         }
         assertTrue(c.isDone());
 

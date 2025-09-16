@@ -1,6 +1,7 @@
 package org.team100.lib.motion.drivetrain;
 
-import org.team100.lib.motion.drivetrain.kinodynamics.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 public class MockDrive implements DriveSubsystemInterface {
     public FieldRelativeVelocity m_setpoint;

@@ -1,5 +1,5 @@
 package org.team100.lib.hid;
-import org.team100.lib.config.ElevatorUtil.ScoringPosition;
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 
 /**
  * Represents a third control beyond the driver and operator, for example, knobs
@@ -33,8 +33,8 @@ public interface ThirdControl {
 
     // Coral Scoring Levels
 
-    default ScoringPosition scoringPosition() {
-        return ScoringPosition.NONE;
+    default ScoringLevel scoringPosition() {
+        return ScoringLevel.NONE;
     }
 
     default boolean l1() {
@@ -102,6 +102,8 @@ public interface ThirdControl {
     default boolean l() {
         return false;
     }
+
+    // Algae locations between the poles
 
     default boolean ab() {
         return false;

@@ -3,7 +3,7 @@ package org.team100.lib.reference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.drivetrain.SwerveModel;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.testing.Timeless;
 
@@ -18,7 +18,7 @@ public class ProfileReferenceTest implements Timeless {
         SwerveModel measurement = new SwerveModel(new Pose2d(0, 0, Rotation2d.kZero));
         SwerveModel goal = new SwerveModel(new Pose2d(1, 0, Rotation2d.kZero));
         HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
-        ProfileReference r = new ProfileReference(hp);
+        ProfileReference r = new ProfileReference(hp, "test");
         r.setGoal(goal);
         r.initialize(measurement);
         {

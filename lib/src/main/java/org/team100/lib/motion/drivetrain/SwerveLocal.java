@@ -1,45 +1,27 @@
 package org.team100.lib.motion.drivetrain;
 
-import java.util.Optional;
-
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ChassisSpeedsLogger;
 import org.team100.lib.logging.LoggerFactory.SwerveModulePosition100Logger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleState100;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.util.Util;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 /**
  * The swerve drive in local, or robot, reference frame. This class knows
  * nothing about the outside world, it just accepts chassis speeds.
+ * 
+ * Most methods in this class should be package-private, they're only used by
+ * SwerveDriveSubsystem, and by tests.
  */
-public class SwerveLocal implements SwerveLocalObserver {
+public class SwerveLocal {
     private static final boolean DEBUG = false;
-    private static final SwerveModuleStates states0 = new SwerveModuleStates(
-            new SwerveModuleState100(0, Optional.of(Rotation2d.kZero)),
-            new SwerveModuleState100(0, Optional.of(Rotation2d.kZero)),
-            new SwerveModuleState100(0, Optional.of(Rotation2d.kZero)),
-            new SwerveModuleState100(0, Optional.of(Rotation2d.kZero)));
-    private static final SwerveModuleStates states90 = new SwerveModuleStates(
-            new SwerveModuleState100(0, Optional.of(new Rotation2d(Math.PI / 2))),
-            new SwerveModuleState100(0, Optional.of(new Rotation2d(Math.PI / 2))),
-            new SwerveModuleState100(0, Optional.of(new Rotation2d(Math.PI / 2))),
-            new SwerveModuleState100(0, Optional.of(new Rotation2d(Math.PI / 2))));
-    private static final SwerveModuleStates statesX = new SwerveModuleStates(
-            // note range is [-pi,pi]
-            new SwerveModuleState100(0, Optional.of(new Rotation2d(Math.PI / 4))),
-            new SwerveModuleState100(0, Optional.of(new Rotation2d(-1 * Math.PI / 4))),
-            new SwerveModuleState100(0, Optional.of(new Rotation2d(3 * Math.PI / 4))),
-            new SwerveModuleState100(0, Optional.of(new Rotation2d(-3 * Math.PI / 4))));
-
     private final SwerveKinodynamics m_swerveKinodynamics;
     private final SwerveModuleCollection m_modules;
     private final SwerveModulePosition100Logger m_swerveModuleFrontLeftPosition;
@@ -71,7 +53,7 @@ public class SwerveLocal implements SwerveLocalObserver {
      * Discretizes the speeds, calculates the inverse kinematic module states, and
      * sets the module states.
      */
-    public void setChassisSpeeds(ChassisSpeeds speeds) {
+    void setChassisSpeeds(ChassisSpeeds speeds) {
         SwerveModuleStates states = m_swerveKinodynamics.toSwerveModuleStates(speeds);
         setModuleStates(states);
         m_log_chassis_speed.log(() -> speeds);
@@ -80,26 +62,26 @@ public class SwerveLocal implements SwerveLocalObserver {
     /**
      * Sets the wheels to make an "X" pattern.
      */
-    public void defense() {
+    void defense() {
         // not optimizing makes it easier to test, not sure it's worth the slowness.
-        setRawModuleStates(statesX);
+        setRawModuleStates(SwerveModuleStates.statesX);
     }
 
     /**
      * Sets wheel rotation to zero, for optimizing steering control.
      */
-    public void steer0() {
-        setRawModuleStates(states0);
+    void steer0() {
+        setRawModuleStates(SwerveModuleStates.states0);
     }
 
     /**
      * Sets wheel rotation to 90 degrees, for optimizing steering control.
      */
-    public void steer90() {
-        setRawModuleStates(states90);
+    void steer90() {
+        setRawModuleStates(SwerveModuleStates.states90);
     }
 
-    public void stop() {
+    void stop() {
         m_modules.stop();
     }
 
@@ -110,7 +92,7 @@ public class SwerveLocal implements SwerveLocalObserver {
      * 
      * This "raw" mode is just for testing.
      */
-    public void setRawModuleStates(SwerveModuleStates targetModuleStates) {
+    void setRawModuleStates(SwerveModuleStates targetModuleStates) {
         m_modules.setRawDesiredStates(targetModuleStates);
     }
 
@@ -118,27 +100,27 @@ public class SwerveLocal implements SwerveLocalObserver {
     //
     // Observers
     //
-
-    @Override
-    public SwerveModulePositions positions() {
+    
+    /** Uses Cache so the position is fresh and coherent. */
+    SwerveModulePositions positions() {
         return m_modules.positions();
     }
 
-    public Translation2d[] getModuleLocations() {
+    Translation2d[] getModuleLocations() {
         return m_swerveKinodynamics.getKinematics().getModuleLocations();
     }
 
-    public boolean[] atSetpoint() {
+    boolean[] atSetpoint() {
         return m_modules.atSetpoint();
     }
 
     ///////////////////////////////////////////
 
-    public void close() {
+    void close() {
         m_modules.close();
     }
 
-    public void reset() {
+    void reset() {
         if (DEBUG)
             Util.warn("make sure resetting in SwerveLocal doesn't break anything");
         m_modules.reset();

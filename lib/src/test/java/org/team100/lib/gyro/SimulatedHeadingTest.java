@@ -8,9 +8,9 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModulePositions;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveModuleStates;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,7 +23,7 @@ class SimulatedHeadingTest implements Timeless {
     void testInitial() {
         SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest();
         SwerveModuleCollection c = SwerveModuleCollection.get(logger, 10, 20, l);
-        SimulatedGyro h = new SimulatedGyro(l, c);
+        SimulatedGyro h = new SimulatedGyro(logger, l, c);
         assertEquals(0, h.getYawNWU().getRadians(), DELTA);
         assertEquals(0, h.getYawRateNWU(), DELTA);
     }
@@ -37,7 +37,7 @@ class SimulatedHeadingTest implements Timeless {
         assertEquals(0, p.frontRight().distanceMeters, DELTA);
         assertEquals(0, p.rearLeft().distanceMeters, DELTA);
         assertEquals(0, p.rearRight().distanceMeters, DELTA);
-        SimulatedGyro h = new SimulatedGyro(l, c);
+        SimulatedGyro h = new SimulatedGyro(logger, l, c);
         ChassisSpeeds speeds = new ChassisSpeeds(1, 0, 0);
         // includes discretization
         SwerveModuleStates states = l.toSwerveModuleStates(speeds);
@@ -61,7 +61,7 @@ class SimulatedHeadingTest implements Timeless {
     void testRotation() {
         SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest();
         SwerveModuleCollection c = SwerveModuleCollection.get(logger, 10, 20, l);
-        SimulatedGyro h = new SimulatedGyro(l, c);
+        SimulatedGyro h = new SimulatedGyro(logger, l, c);
         ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 1);
         // includes discretization
         SwerveModuleStates states = l.toSwerveModuleStates(speeds);
@@ -77,7 +77,7 @@ class SimulatedHeadingTest implements Timeless {
         // target is 1 rad/sec, we went 0.4 sec. some of that time is spent accelerating
         // the module steering, though the drive motors respond instantly. so this
         // should be something less than 0.4, but it's a little too high?
-        assertEquals(0.42, h.getYawNWU().getRadians(), 0.03);
+        assertEquals(0.286, h.getYawNWU().getRadians(), 0.03);
         // the rate is what we asked for.
         assertEquals(1, h.getYawRateNWU(), DELTA);
     }
@@ -100,7 +100,7 @@ class SimulatedHeadingTest implements Timeless {
         assertEquals(-0.205, states.rearRight().angle().get().getRadians(), DELTA);
 
         SwerveModuleCollection c = SwerveModuleCollection.get(logger, 10, 20, l);
-        SimulatedGyro h = new SimulatedGyro(l, c);
+        SimulatedGyro h = new SimulatedGyro(logger, l, c);
         c.reset();
 
         // steering velocity is 13 rad/s, we need to go about 2 rad? so wait 0.2 sec?
