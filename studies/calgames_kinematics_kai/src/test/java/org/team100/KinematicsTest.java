@@ -54,4 +54,17 @@ public class KinematicsTest {
 
     }
 
+    @Test
+    void testRoundTrip(){
+        System.out.println("TESTING ROUND TRIP KINEMATICS");
+        Kinematics k = new Kinematics(0.3, 0.1, 3, 0, 0, 0, 0);
+        Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
+        Config c = k.inverse(p);
+        Pose2d p2 = k.forward(c);
+
+        assertEquals(p.getX(), p2.getX(), 0.001); //check if (given pose x) = (recieved pose x from forward)
+        assertEquals(p.getY(), p2.getY(), 0.001); 
+        
+    }
+
 }
