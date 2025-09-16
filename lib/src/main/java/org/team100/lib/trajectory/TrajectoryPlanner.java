@@ -19,17 +19,35 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGenerationException;
 
 /**
- * joel 20240311: this class no longer applies default constraints (drive, yaw,
- * centripetal) so if you want those, supply them.
+ * Creates a trajectory in four steps:
+ * 
+ * 1. create a spline
+ * 2. create points along the spline so that the secants between the points are
+ * within the spline sample tolerance
+ * 3. walk down the secant lines using the step distance
+ * 4. assign timestamps to each step
  */
 public class TrajectoryPlanner {
-    // the tolerances here control the approximation of the list of poses to the
-    // continuous spline. previously they were 1.2 cm and 1 radian.
-    private static final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;
+    /*
+     * Maximum distance of the secant lines to the continuous spline. The resulting
+     * path will have little scallops if it involves rotation. In SE(2), a constant
+     * "twist" segment with rotation is a curve. If the scallops are too big, make
+     * this number smaller. If the trajectories are too slow to generate, make this
+     * number bigger.
+     */
+    private static final double SPLINE_SAMPLE_TOLERANCE_M = 0.02;
+    /** Maximum theta error. */
     private static final double SPLINE_SAMPLE_TOLERANCE_RAD = 0.2;
+    /**
+     * Size of steps along the path. Make this number smaller for tight curves to
+     * look better. Make it bigger to make trajectories (a little) faster to
+     * generate.
+     */
     private static final double TRAJECTORY_STEP_M = 0.1;
-    // if we try to start a trajectory while respecting initial velocity, but the
-    // initial velocity is less than 0.01 m/s, just treat it as rest-to-rest.
+    /*
+     * If we try to start a trajectory while respecting initial velocity, but the
+     * initial velocity is less than 0.01 m/s, just treat it as rest-to-rest.
+     */
     private static final double VELOCITY_EPSILON = 1e-2;
 
     private final ScheduleGenerator m_scheduleGenerator;

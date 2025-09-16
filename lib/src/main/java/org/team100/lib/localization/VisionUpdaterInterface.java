@@ -1,18 +1,18 @@
 package org.team100.lib.localization;
 
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
-
 import edu.wpi.first.math.geometry.Pose2d;
 
+/** For testing. */
+public interface VisionUpdaterInterface {
 
-public interface PoseEstimator100 {
-
+    /**
+     * Put a new state estimate based on the supplied pose. If not current,
+     * subsequent wheel updates are replayed.
+     */
     void put(
             double timestampS,
             Pose2d measurement,
             double[] stateSigma,
             double[] visionSigma);
 
-
-    SwerveModel get(double timestampS);
 }
