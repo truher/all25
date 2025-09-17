@@ -9,6 +9,7 @@ import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Vector;
@@ -51,7 +52,7 @@ public class SimulatedTagDetector {
 
     private final List<Camera> m_cameras;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
-    private final DoubleFunction<Pose2d> m_robotPose;
+    private final DoubleFunction<SwerveModel> m_history;
 
     private final Map<Camera, StructArrayPublisher<Blip24>> m_publishers;
     /** client instance, not the default */
@@ -61,15 +62,15 @@ public class SimulatedTagDetector {
      * 
      * @param cameras
      * @param layout
-     * @param robotPose look up pose by timestamp (sec)
+     * @param history pose history by timestamp (sec)
      */
     public SimulatedTagDetector(
             List<Camera> cameras,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            DoubleFunction<Pose2d> robotPose) {
+            DoubleFunction<SwerveModel> history) {
         m_cameras = cameras;
         m_layout = layout;
-        m_robotPose = robotPose;
+        m_history = history;
         m_publishers = new HashMap<>();
         m_inst = NetworkTableInstance.create();
         // this is a client just like the camera is a client.
@@ -91,8 +92,10 @@ public class SimulatedTagDetector {
         Optional<Alliance> opt = DriverStation.getAlliance();
         if (opt.isEmpty())
             return;
+
+        // fetch the pose from a little while ago
         double timestampS = Takt.get() - DELAY;
-        Pose2d pose = m_robotPose.apply(timestampS);
+        Pose2d pose = m_history.apply(timestampS).pose();
 
         Pose3d robotPose3d = new Pose3d(pose);
         if (DEBUG) {
@@ -168,7 +171,7 @@ public class SimulatedTagDetector {
             // use a microsecond timestamp as specified here
             // https://docs.wpilib.org/en/stable/docs/software/networktables/publish-and-subscribe.html
 
-            // guess about a reasonable delay
+            // provide timestamp matching the pose above
             long delayUs = (long) DELAY * 1000000;
             long timestampUs = NetworkTablesJNI.now();
             publisher.set(

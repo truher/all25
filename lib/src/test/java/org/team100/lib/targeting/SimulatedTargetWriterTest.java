@@ -25,19 +25,19 @@ public class SimulatedTargetWriterTest implements Timeless {
     @Test
     void testOne() {
         stepTime();
-        SimulatedTargetWriter writer = new SimulatedTargetWriter(
-                List.of(Camera.TEST4));
-
         SwerveModel p = new SwerveModel();
+        SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                List.of(Camera.TEST4),
+                x -> p,
+                new Translation2d[] {
+                        new Translation2d(1, 0) });
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(fieldLog, (x) -> p);
+        Targets reader = new Targets(fieldLog, x -> p);
 
         stepTime();
-        writer.update(
-                p.pose(),
-                new Translation2d[] { new Translation2d(1, 0) });
+        writer.update();
         stepTime();
         reader.update();
 

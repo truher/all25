@@ -66,19 +66,18 @@ public class TargetsTest implements Timeless {
     void testTranslations() {
         stepTime();
 
-        SimulatedTargetWriter writer = new SimulatedTargetWriter(
-                List.of(Camera.TEST4));
-
         SwerveModel p = new SwerveModel();
+        SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                List.of(Camera.TEST4),
+                x -> p,
+                new Translation2d[] { new Translation2d(1, 0) });
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
         Targets reader = new Targets(fieldLog, (x) -> p);
 
         stepTime();
-        writer.update(
-                p.pose(),
-                new Translation2d[] { new Translation2d(1, 0) });
+        writer.update();
 
         stepTime();
         reader.update();
@@ -98,20 +97,19 @@ public class TargetsTest implements Timeless {
     @Test
     void testMultipleCameras() {
         stepTime();
+        SwerveModel p = new SwerveModel();
 
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
-                List.of(Camera.TEST4, Camera.TEST5));
-
-        SwerveModel p = new SwerveModel();
+                List.of(Camera.TEST4, Camera.TEST5),
+                x -> p,
+                new Translation2d[] { new Translation2d(1, 0) });
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
         Targets reader = new Targets(fieldLog, (x) -> p);
 
         stepTime();
-        writer.update(
-                p.pose(),
-                new Translation2d[] { new Translation2d(1, 0) });
+        writer.update();
 
         stepTime();
         reader.update();
@@ -132,21 +130,20 @@ public class TargetsTest implements Timeless {
     void testMultipleTargets() {
         stepTime();
 
-        SimulatedTargetWriter writer = new SimulatedTargetWriter(
-                List.of(Camera.TEST4));
-
         SwerveModel p = new SwerveModel();
-
-        // need to instantiate the reader prior to the writer update because the poller
-        // ignores things that came before.
-        Targets reader = new Targets(fieldLog, (x) -> p);
-
-        stepTime();
-        writer.update(
-                p.pose(),
+        SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                List.of(Camera.TEST4),
+                x -> p,
                 new Translation2d[] {
                         new Translation2d(1, 0),
                         new Translation2d(2, 0) });
+
+        // need to instantiate the reader prior to the writer update because the poller
+        // ignores things that came before.
+        Targets reader = new Targets(fieldLog, x -> p);
+
+        stepTime();
+        writer.update();
 
         stepTime();
         reader.update();
@@ -166,22 +163,21 @@ public class TargetsTest implements Timeless {
     @Test
     void testMultipleTargetsAndCameras() {
         stepTime();
+        SwerveModel p = new SwerveModel();
 
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
-                List.of(Camera.TEST4, Camera.TEST5));
-
-        SwerveModel p = new SwerveModel();
+                List.of(Camera.TEST4, Camera.TEST5),
+                x -> p,
+                new Translation2d[] {
+                        new Translation2d(1, 0),
+                        new Translation2d(2, 0) });
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
         Targets reader = new Targets(fieldLog, (x) -> p);
 
         stepTime();
-        writer.update(
-                p.pose(),
-                new Translation2d[] {
-                        new Translation2d(1, 0),
-                        new Translation2d(2, 0) });
+        writer.update();
 
         stepTime();
         reader.update();

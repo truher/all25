@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Cache;
-import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.coherence.SideEffect;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.FieldLogger;
