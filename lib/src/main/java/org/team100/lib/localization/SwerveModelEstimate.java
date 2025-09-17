@@ -1,24 +1,20 @@
 package org.team100.lib.localization;
 
-import java.util.Optional;
+import java.util.function.DoubleFunction;
 
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 /**
- * Pull the estimate from the history after making sure that the history is up
- * to date.
+ * The SwerveModelEstimate is a proxy around the history that first makes sure
+ * the history has received any updates that may mutate it. Clients should use
+ * this interface to query the robot state, not the history directly.
  */
-public class SwerveModelEstimate implements SwerveModelEstimateInterface {
+public interface SwerveModelEstimate extends DoubleFunction<SwerveModel> {
 
-    private final SwerveModelHistory m_history;
-
-    public SwerveModelEstimate(SwerveModelHistory history) {
-        m_history = history;
-    }
-
+    /**
+     * Provide the best estimate for SwerveModel at the given timestamp, first
+     * making sure any pending updates from vision or odometry have been applied.
+     */
     @Override
-    public Optional<SwerveModel> get(double timestampS) {
-        return m_history.get(timestampS);
-    }
-
+    SwerveModel apply(double timestampS);
 }

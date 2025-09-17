@@ -34,13 +34,9 @@ class AprilTagRobotLocalizerPerformanceTest {
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(-Math.PI / 4)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t -> new SwerveModel(new Rotation2d(-Math.PI / 4));
+
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 poseEstimate.add(p);
@@ -49,7 +45,7 @@ class AprilTagRobotLocalizerPerformanceTest {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         // camera sees the tag straight ahead in the center of the frame,
         // but rotated pi/4 to the left. this is ignored anyway.

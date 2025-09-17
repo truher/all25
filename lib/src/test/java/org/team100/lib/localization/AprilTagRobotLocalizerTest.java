@@ -63,14 +63,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         // these lists receive the updates
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(Rotation2d.kZero));
-            }
-        };
+        SwerveModelHistory history = t -> new SwerveModel();
 
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 poseEstimate.add(p);
@@ -81,8 +76,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 logger,
                 layout,
-                poseEstimator,
-                vu,
+                history,
+                visionUpdater,
                 "vision",
                 "blips");
 
@@ -128,14 +123,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(Rotation2d.kZero));
-            }
-        };
+        SwerveModelHistory history = t -> new SwerveModel();
 
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 poseEstimate.add(p);
@@ -144,7 +134,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         // in red layout blip 7 is on the other side of the field
 
@@ -185,13 +175,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(-Math.PI / 4)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t -> new SwerveModel(new Rotation2d(-Math.PI / 4));
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 poseEstimate.add(p);
@@ -200,7 +185,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         // camera sees the tag straight ahead in the center of the frame,
         // but rotated pi/4 to the left. this is ignored anyway.
@@ -266,13 +251,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(3 * Math.PI / 4)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t -> new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(-100, p.getX(), DELTA);
@@ -280,7 +261,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
                 new Translation3d(0, 0, 2.4),
@@ -315,13 +296,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t -> new SwerveModel(new Rotation2d(Math.PI));
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(9.272, p.getX(), DELTA);
@@ -329,7 +305,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         // tag is 1m away on bore
         final Blip24 tag4 = new Blip24(4, new Transform3d(
@@ -358,13 +334,8 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t -> new SwerveModel(new Rotation2d(Math.PI));
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(10.272, p.getX(), DELTA);
@@ -373,7 +344,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
                 new Translation3d(0, 0, 1),
@@ -404,14 +375,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
-            }
-        };
+        SwerveModelHistory history = t -> new SwerveModel(new Rotation2d(Math.PI));
 
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(0.96, p.getX(), DELTA);
@@ -420,7 +386,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         Blip24 tag3 = new Blip24(3, new Transform3d(
                 new Translation3d(0.561, 0, 1),
@@ -452,13 +418,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t-> new SwerveModel(new Rotation2d(Math.PI));
+
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(9.272, p.getX(), DELTA);
@@ -467,7 +429,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
                 new Translation3d(0, 0, 1.4142),
@@ -498,13 +460,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(Math.PI)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t-> new SwerveModel(new Rotation2d(Math.PI));
+
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(9.272, p.getX(), DELTA);
@@ -513,7 +471,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
                 new Translation3d(-1, 0, 1),
@@ -542,13 +500,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(-3 * Math.PI / 4)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t-> new SwerveModel(new Rotation2d(-3 * Math.PI / 4));
+
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(9.272, p.getX(), DELTA);
@@ -557,7 +511,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
                 new Translation3d(0, 0, 1.4142),
@@ -586,13 +540,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(3 * Math.PI / 4)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t->new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+        
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(9.272, p.getX(), DELTA);
@@ -600,7 +550,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
                 new Translation3d(0, 0, 1.4142),
@@ -629,13 +579,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(3 * Math.PI / 4)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t-> new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(9.272, p.getX(), DELTA);
@@ -643,7 +589,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         Blip24 tag4 = new Blip24(4, new Transform3d(
                 new Translation3d(0, 0, 2),
@@ -675,13 +621,9 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        SwerveModelEstimateInterface poseEstimator = new SwerveModelEstimateInterface() {
-            @Override
-            public Optional<SwerveModel> get(double timestampSeconds) {
-                return Optional.of(new SwerveModel(new Rotation2d(3 * Math.PI / 4)));
-            }
-        };
-        VisionUpdaterInterface vu = new VisionUpdaterInterface() {
+        SwerveModelHistory history = t->new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+        
+        VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
                 assertEquals(9.272, p.getX(), DELTA);
@@ -689,7 +631,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
             }
         };
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, poseEstimator, vu, "vision", "blips");
+                logger, layout, history, visionUpdater, "vision", "blips");
 
         // 30 degrees, long side is sqrt2, so hypotenuse is sqrt2/sqrt3/2
         Blip24 tag4 = new Blip24(4, new Transform3d(

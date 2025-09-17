@@ -55,21 +55,23 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
      * writer to the pose reader, and save something like 20 us (0.4%) on average.
      */
     // There's no need to run this all the time
-    // @Test
+    //@Test
     void test0() {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
 
         Gyro gyro = new MockGyro();
-        SwerveModelHistory history = new SwerveModelHistory(
-                logger,
-                kinodynamics);
+        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+                kinodynamics,
+                Rotation2d.kZero,
+                SwerveModulePositions.kZero(),
+                Pose2d.kZero,
+                0);
         positions = p(0);
         OdometryUpdater ou = new OdometryUpdater(kinodynamics, gyro, history, () -> positions);
         ou.reset(Pose2d.kZero, 0);
-        VisionUpdater vu = new VisionUpdater(history, ou);
-        SwerveModelEstimate estimate = new SwerveModelEstimate(history);
+        NudgingVisionUpdater vu = new NudgingVisionUpdater(history, ou);
 
         // fill the buffer with odometry
         double t = 0.0;

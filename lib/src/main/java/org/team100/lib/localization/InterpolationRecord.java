@@ -33,6 +33,7 @@ class InterpolationRecord implements Interpolatable<InterpolationRecord> {
             SwerveModulePositions wheelPositions) {
         m_kinematics = kinematics;
         m_state = state;
+        // this copy is important, don't keep the passed one.
         m_wheelPositions = new SwerveModulePositions(wheelPositions);
     }
 

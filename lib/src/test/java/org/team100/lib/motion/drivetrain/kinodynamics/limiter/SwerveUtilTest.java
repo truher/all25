@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.drivetrain.Fixture;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -59,7 +61,7 @@ class SwerveUtilTest {
     }
 
     @Test
-    void testGetAccelLimit() {
+    void testGetAccelLimit() throws IOException {
         // this is to figure out why the Oscillate test isn't returning
         // exactly the right result
         SwerveKinodynamics limits = new Fixture().swerveKinodynamics;
@@ -71,7 +73,7 @@ class SwerveUtilTest {
     }
 
     @Test
-    void testMinAccel() {
+    void testMinAccel() throws IOException {
         // this is to figure out why the Oscillate test isn't returning
         // exactly the right result
         SwerveKinodynamics limits = new Fixture().swerveKinodynamics;

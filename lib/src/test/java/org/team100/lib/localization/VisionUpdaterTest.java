@@ -21,7 +21,7 @@ public class VisionUpdaterTest {
         double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
         // 10 cm of difference between the vision update and the current pose
         Twist2d twist = new Twist2d(0.1, 0.1, 0);
-        Twist2d scaled = VisionUpdater.getScaledTwist(stateStdDev, visionStdDev, twist);
+        Twist2d scaled = NudgingVisionUpdater.getScaledTwist(stateStdDev, visionStdDev, twist);
         // difference is discounted 20x
         assertEquals(0.002439, scaled.dx, 1e-6);
         assertEquals(0.002439, scaled.dy, 1e-6);
@@ -43,7 +43,7 @@ public class VisionUpdaterTest {
                 Double.MAX_VALUE };
         final Pose2d sample = new Pose2d();
         final Pose2d measurement = new Pose2d();
-        final Pose2d nudged = VisionUpdater.nudge(sample, measurement, stateStdDev, visionStdDev);
+        final Pose2d nudged = NudgingVisionUpdater.nudge(sample, measurement, stateStdDev, visionStdDev);
         assertEquals(0, nudged.getX(), 1e-6);
         assertEquals(0, nudged.getY(), 1e-6);
         assertEquals(0, nudged.getRotation().getRadians(), 1e-6);
@@ -70,7 +70,7 @@ public class VisionUpdaterTest {
         final Pose2d measurement = new Pose2d(0.1, 0, new Rotation2d());
         Pose2d nudged = sample;
         for (int i = 0; i < frameRate; ++i) {
-            nudged = VisionUpdater.nudge(nudged, measurement, stateStdDev, visionStdDev);
+            nudged = NudgingVisionUpdater.nudge(nudged, measurement, stateStdDev, visionStdDev);
         }
         // after 1 sec the error is about 6 cm which is too slow.
         Transform2d error = measurement.minus(nudged);
@@ -79,7 +79,7 @@ public class VisionUpdaterTest {
         assertEquals(0, error.getRotation().getRadians(), DELTA);
         //
         for (int i = 0; i < frameRate; ++i) {
-            nudged = VisionUpdater.nudge(nudged, measurement, stateStdDev, visionStdDev);
+            nudged = NudgingVisionUpdater.nudge(nudged, measurement, stateStdDev, visionStdDev);
         }
         // after 2 sec the error is about 4 cm.
         error = measurement.minus(nudged);
@@ -106,7 +106,7 @@ public class VisionUpdaterTest {
         final Pose2d measurement = new Pose2d(0.1, 0, new Rotation2d());
         Pose2d nudged = sample;
         for (int i = 0; i < frameRate; ++i) {
-            nudged = VisionUpdater.nudge(nudged, measurement, stateStdDev, visionStdDev);
+            nudged = NudgingVisionUpdater.nudge(nudged, measurement, stateStdDev, visionStdDev);
         }
         // after 1 sec the error is about 2 cm which is the target.
         Transform2d error = measurement.minus(nudged);
@@ -115,7 +115,7 @@ public class VisionUpdaterTest {
         assertEquals(0, error.getRotation().getRadians(), DELTA);
         //
         for (int i = 0; i < frameRate; ++i) {
-            nudged = VisionUpdater.nudge(nudged, measurement, stateStdDev, visionStdDev);
+            nudged = NudgingVisionUpdater.nudge(nudged, measurement, stateStdDev, visionStdDev);
         }
         // after 2 sec the error is about 4 mm which seems plenty tight
         error = measurement.minus(nudged);
@@ -130,7 +130,7 @@ public class VisionUpdaterTest {
         double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
         double targetRangeM = 1.0;
         double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
-        double[] k = VisionUpdater.getK(stateStdDev, visionStdDev);
+        double[] k = NudgingVisionUpdater.getK(stateStdDev, visionStdDev);
         assertEquals(3, k.length);
         assertEquals(0.024, k[0], DELTA);
         assertEquals(0.024, k[1], DELTA);
@@ -139,11 +139,11 @@ public class VisionUpdaterTest {
 
     @Test
     void testMix() {
-        assertEquals(0.091, VisionUpdater.mix(1, 100), DELTA);
-        assertEquals(0.24, VisionUpdater.mix(1, 10), DELTA);
-        assertEquals(0.5, VisionUpdater.mix(1, 1), DELTA);
-        assertEquals(0.76, VisionUpdater.mix(10, 1), DELTA);
-        assertEquals(0.909, VisionUpdater.mix(100, 1), DELTA);
+        assertEquals(0.091, NudgingVisionUpdater.mix(1, 100), DELTA);
+        assertEquals(0.24, NudgingVisionUpdater.mix(1, 10), DELTA);
+        assertEquals(0.5, NudgingVisionUpdater.mix(1, 1), DELTA);
+        assertEquals(0.76, NudgingVisionUpdater.mix(10, 1), DELTA);
+        assertEquals(0.909, NudgingVisionUpdater.mix(100, 1), DELTA);
     }
 
 }
