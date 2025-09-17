@@ -6,7 +6,9 @@ import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
+import org.team100.lib.coherence.SideEffect;
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.TrailingHistory;
@@ -33,38 +35,30 @@ public class Targets extends CameraReader<Rotation3d> {
     /** Forget sights older than this. */
     private static final double HISTORY_DURATION = 1.0;
 
-    /** robotpose = f(takt seconds); the PoseEstimator does this. */
-    private final DoubleFunction<Pose2d> m_robotPose;
+    private final FieldLogger.Log m_field_log;
+
+    /** state = f(takt seconds) from history. */
+    private final DoubleFunction<SwerveModel> m_history;
+    /** Accumulation of targets we see. */
     private final TrailingHistory<Translation2d> m_targets;
-    private final StructBuffer<Rotation3d> m_buf;
-    /**
-     * this is just an indicator for whether we've run update().
-     * It's null after the cache refresh and true after the update runs.
-     */
-    private final CotemporalCache<Boolean> m_hot;
+    /** Side effect mutates targets. */
+    private final SideEffect m_vision;
 
-    public Targets(DoubleFunction<SwerveModel> robotPose) {
-        super("objectVision", "Rotation3d");
-        m_robotPose = t -> robotPose.apply(t).pose();
+    public Targets(
+            FieldLogger.Log fieldLogger,
+            DoubleFunction<SwerveModel> history) {
+        super(
+                "objectVision",
+                "Rotation3d",
+                StructBuffer.create(Rotation3d.struct));
+        m_field_log = fieldLogger;
+        m_history = history;
         m_targets = new TrailingHistory<>(HISTORY_DURATION);
-        m_buf = StructBuffer.create(Rotation3d.struct);
-        m_hot = Cache.of(() -> {
-            update();
-            return true;
-        });
+        m_vision = Cache.ofSideEffect(this::update);
     }
 
     @Override
-    public StructBuffer<Rotation3d> getBuffer() {
-        return m_buf;
-    }
-
-    @Override
-    public void beginUpdate() {
-    }
-
-    @Override
-    public void perValue(
+    protected void perValue(
             Transform3d cameraOffset,
             double valueTimestamp,
             Rotation3d[] sights) {
@@ -75,7 +69,7 @@ public class Targets extends CameraReader<Rotation3d> {
                         Takt.get(), valueTimestamp);
             return;
         }
-        Pose2d robotPose = m_robotPose.apply(valueTimestamp);
+        Pose2d robotPose = m_history.apply(valueTimestamp).pose();
         m_targets.addAll(
                 valueTimestamp,
                 TargetLocalizer.cameraRotsToFieldRelativeArray(
@@ -84,14 +78,11 @@ public class Targets extends CameraReader<Rotation3d> {
                         sights));
     }
 
-    @Override
-    public void finishUpdate() {
-    }
-
     /**
      * Field-relative translations of recent sights.
      */
     public List<Translation2d> getTargets() {
+        m_vision.run();
         return m_targets.getAll();
     }
 
@@ -99,10 +90,17 @@ public class Targets extends CameraReader<Rotation3d> {
      * The field-relative translation of the closest object, if any.
      */
     public Optional<Translation2d> getClosestTarget() {
-        Pose2d robotPose = m_robotPose.apply(Takt.get());
+        Pose2d robotPose = m_history.apply(Takt.get()).pose();
         List<Translation2d> targets = getTargets();
         if (DEBUG)
             Util.printf("translations %d\n", targets.size());
         return ObjectPicker.closestObject(targets, robotPose);
+    }
+
+    public void periodic() {
+        // show the closest target we can see on the field2d widget.
+        getClosestTarget().ifPresent(
+                x -> m_field_log.m_log_target.log(
+                        () -> new double[] { x.getX(), x.getY(), 0 }));
     }
 }

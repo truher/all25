@@ -13,7 +13,9 @@ import org.team100.lib.motion.drivetrain.state.SwerveModel;
  */
 public class FreshSwerveEstimate implements DoubleFunction<SwerveModel> {
     private final SwerveHistory m_history;
+    /** Side effect mutates history. */
     private final SideEffect m_vision;
+    /** Side effect mutates history. */
     private final SideEffect m_odometry;
 
     public FreshSwerveEstimate(

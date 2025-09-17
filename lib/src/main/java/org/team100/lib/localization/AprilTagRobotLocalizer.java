@@ -1,7 +1,5 @@
 package org.team100.lib.localization;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleFunction;
 
@@ -17,6 +15,7 @@ import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
+import org.team100.lib.util.TrailingHistory;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -41,6 +40,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  */
 public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     private static final boolean DEBUG = false;
+    /** Maximum age of the sights we publish for diagnosis. */
+    private static final double HISTORY_DURATION = 1.0;
 
     /**
      * If the tag is closer than this threshold, then the camera's estimate of tag
@@ -75,7 +76,6 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
 
     private final DoubleFunction<SwerveModel> m_history;
     private final VisionUpdater m_visionUpdater;
-    private final StructBuffer<Blip24> m_buf = StructBuffer.create(Blip24.struct);
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
 
     /**
@@ -121,15 +121,14 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     /**
      * Accumulates all tags we receive in each cycle, whether we use them or not.
      */
-    private final List<Pose3d> m_allTags = new ArrayList<>();
+    private final TrailingHistory<Pose3d> m_allTags;
     /**
      * Just the tags we use for pose estimation, i.e. not ones that are too far
      * away.
      */
-    private final List<Pose3d> m_usedTags = new ArrayList<>();
+    private final TrailingHistory<Pose3d> m_usedTags;
 
     /**
-     * 
      * @param parent        logger
      * @param layout        map of apriltags
      * @param history       f(timestamp) = swerve state, use SwerveModelHistory.
@@ -140,11 +139,13 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             AprilTagFieldLayoutWithCorrectOrientation layout,
             DoubleFunction<SwerveModel> history,
             VisionUpdater visionUpdater) {
-        super("vision", "blips");
+        super("vision", "blips", StructBuffer.create(Blip24.struct));
         LoggerFactory child = parent.type(this);
         m_layout = layout;
         m_history = history;
         m_visionUpdater = visionUpdater;
+        m_allTags = new TrailingHistory<>(HISTORY_DURATION);
+        m_usedTags = new TrailingHistory<>(HISTORY_DURATION);
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_pub_tags = inst.getStructArrayTopic("tags", Pose3d.struct).publish();
@@ -169,19 +170,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     }
 
     @Override
-    public StructBuffer<Blip24> getBuffer() {
-        return m_buf;
-    }
-
-    @Override
-    public void beginUpdate() {
-        // only publish new sights
-        m_allTags.clear();
-        m_usedTags.clear();
-    }
-
-    @Override
-    public void perValue(
+    protected void perValue(
             Transform3d cameraOffset,
             double valueTimestamp,
             Blip24[] blips) {
@@ -193,15 +182,9 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     }
 
     @Override
-    public void finishUpdate() {
-        // publish all the tags we've seen
-        // TODO: publish blank if we haven't seen any for awhile
-        // TODO: Network Tables ignores dupliciates, which makes it
-        // work poorly in simulation, so fix that.
-        if (m_allTags.size() > 0)
-            m_pub_tags.set(m_allTags.toArray(new Pose3d[0]));
-        if (m_usedTags.size() > 0)
-            m_pub_used_tags.set(m_usedTags.toArray(new Pose3d[0]));
+    protected void finishUpdate() {
+        m_pub_tags.set(m_allTags.getAll().toArray(new Pose3d[0]));
+        m_pub_used_tags.set(m_usedTags.getAll().toArray(new Pose3d[0]));
     }
 
     /**
@@ -307,7 +290,12 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 m_log_using_gyro.log(() -> false);
             }
 
-            extralog(historicalPose, cameraOffset, tagInCamera, tagInField);
+            extralog(
+                    correctedTimestamp,
+                    historicalPose,
+                    cameraOffset,
+                    tagInCamera,
+                    tagInField);
 
             // Estimate of robot pose.
             Pose3d pose3d = PoseEstimationHelper.robotInField(
@@ -369,23 +357,22 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
 
     /** visualization stuff, not used in computation */
     private void extralog(
+            double correctedTimestamp,
             Pose2d historicalPose,
             Transform3d cameraOffset,
             Transform3d tagInCamera,
             Pose3d tagInField) {
-
         // Field-to-robot
         Pose3d historicalPose3d = new Pose3d(historicalPose);
         // Field-to-robot plus robot-to-camera = field-to-camera
         Pose3d historicalCameraInField = historicalPose3d.transformBy(cameraOffset);
         // given the historical pose, where do we think the tag is?
         Pose3d estimatedTagInField = historicalCameraInField.transformBy(tagInCamera);
-        m_allTags.add(estimatedTagInField);
+        m_allTags.add(correctedTimestamp, estimatedTagInField);
         // log the norm of the translational error of the tag.
         Transform3d tagError = tagInField.minus(estimatedTagInField);
         m_log_tag_error.log(() -> tagError.getTranslation().getNorm());
-
-        m_usedTags.add(estimatedTagInField);
+        m_usedTags.add(correctedTimestamp, estimatedTagInField);
     }
 
     static double[] stateStdDevs() {
