@@ -90,7 +90,10 @@ public class SimulatedTagDetector {
         if (opt.isEmpty())
             return;
         double timestampS = Takt.get() - DELAY;
-        Pose3d robotPose3d = new Pose3d(m_robotPose.apply(timestampS));
+        Pose2d pose = m_robotPose.apply(timestampS);
+
+
+        Pose3d robotPose3d = new Pose3d(pose);
         if (DEBUG) {
             Util.printf("robot pose X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f \n",
                     robotPose3d.getTranslation().getX(),

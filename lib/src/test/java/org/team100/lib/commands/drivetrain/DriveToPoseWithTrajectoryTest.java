@@ -32,6 +32,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
+    public DriveToPoseWithTrajectoryTest() throws IOException {
+    }
+
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);

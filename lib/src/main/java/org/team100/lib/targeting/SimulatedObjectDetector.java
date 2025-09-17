@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 public class SimulatedObjectDetector {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     /** horizontal field of view, half-angle */
     private final static double HFOV_HALF = Math.toRadians(40);
     /** vertical field of view, half-angle */

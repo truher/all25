@@ -1,6 +1,9 @@
-package org.team100.lib.localization;
+package org.team100.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +28,7 @@ class TimeInterpolatableBuffer100Test {
 
     /** It interpolates proportionally. */
     @Test
-    void testSimple() {
+    void testSimple2() {
         TimeInterpolatableBuffer100<Item> b = new TimeInterpolatableBuffer100<>(10, 0, new Item(0));
         assertEquals(0, b.get(0).value, DELTA);
         b.put(1, new Item(10));
@@ -35,10 +38,11 @@ class TimeInterpolatableBuffer100Test {
 
     /** For off-the-end requests, it returns the last item. */
     @Test
-    void testOffTheEnd() {
+    void testOffTheEnd2() {
         TimeInterpolatableBuffer100<Item> b = new TimeInterpolatableBuffer100<>(10, 0, new Item(0));
         assertEquals(0, b.get(1).value, DELTA);
         b.put(1, new Item(10));
         assertEquals(10, b.get(1.5).value, DELTA);
     }
+
 }
