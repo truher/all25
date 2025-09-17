@@ -54,6 +54,7 @@ public class SimulatedTagDetector {
     private final DoubleFunction<Pose2d> m_robotPose;
 
     private final Map<Camera, StructArrayPublisher<Blip24>> m_publishers;
+    /** client instance, not the default */
     private final NetworkTableInstance m_inst;
 
     /**
@@ -71,15 +72,16 @@ public class SimulatedTagDetector {
         m_robotPose = robotPose;
         m_publishers = new HashMap<>();
         m_inst = NetworkTableInstance.create();
+        // this is a client just like the camera is a client.
         m_inst.startClient4("SimulatedTagDetector");
         m_inst.setServer("localhost");
         for (Camera camera : m_cameras) {
             // see tag_detector.py
-            String path = "vision/" + camera.getSerial() + "/0";
-            String name = path + "/blips";
-            var topic = m_inst.getStructArrayTopic(name, Blip24.struct);
-            StructArrayPublisher<Blip24> publisher = topic.publish();
-            m_publishers.put(camera, publisher);
+            String name = "vision/" + camera.getSerial() + "/0/blips";
+            m_publishers.put(
+                    camera,
+                    m_inst.getStructArrayTopic(
+                            name, Blip24.struct).publish());
         }
     }
 
@@ -92,7 +94,6 @@ public class SimulatedTagDetector {
         double timestampS = Takt.get() - DELAY;
         Pose2d pose = m_robotPose.apply(timestampS);
 
-
         Pose3d robotPose3d = new Pose3d(pose);
         if (DEBUG) {
             Util.printf("robot pose X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f \n",
@@ -103,7 +104,10 @@ public class SimulatedTagDetector {
                     robotPose3d.getRotation().getY(),
                     robotPose3d.getRotation().getZ());
         }
-        for (Camera camera : m_cameras) {
+        for (Map.Entry<Camera, StructArrayPublisher<Blip24>> entry : m_publishers.entrySet()) {
+            Camera camera = entry.getKey();
+            StructArrayPublisher<Blip24> publisher = entry.getValue();
+
             List<Blip24> blips = new ArrayList<>();
             Transform3d cameraOffset = camera.getOffset();
             Pose3d cameraPose3d = robotPose3d.plus(cameraOffset);
@@ -167,7 +171,8 @@ public class SimulatedTagDetector {
             // guess about a reasonable delay
             long delayUs = (long) DELAY * 1000000;
             long timestampUs = NetworkTablesJNI.now();
-            m_publishers.get(camera).set(blips.toArray(new Blip24[0]), timestampUs - delayUs);
+            publisher.set(
+                    blips.toArray(new Blip24[0]), timestampUs - delayUs);
             if (PUBLISH_DEBUG) {
                 Util.printf("%s\n", blips);
             }

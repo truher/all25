@@ -2,6 +2,8 @@ package org.team100.lib.targeting;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.team100.lib.config.Camera;
 import org.team100.lib.logging.FieldLogger;
@@ -11,7 +13,6 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.testing.Timeless;
 
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /** Timeless because the clock is used to decide to ignore (stale) input. */
@@ -24,7 +25,8 @@ public class SimulatedTargetWriterTest implements Timeless {
     @Test
     void testOne() {
         stepTime();
-        SimulatedTargetWriter writer = new SimulatedTargetWriter();
+        SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                List.of(Camera.TEST4));
 
         SwerveModel p = new SwerveModel();
 
@@ -32,11 +34,10 @@ public class SimulatedTargetWriterTest implements Timeless {
         // ignores things that came before.
         Targets reader = new Targets(fieldLog, (x) -> p);
 
-        Transform3d offset = Camera.get("test4").getOffset();
         stepTime();
         writer.update(
-                p.pose(), offset, new Translation2d[] {
-                        new Translation2d(1, 0) });
+                p.pose(),
+                new Translation2d[] { new Translation2d(1, 0) });
         stepTime();
         reader.update();
 
