@@ -2,6 +2,8 @@ package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.experiments.Experiment;
@@ -9,8 +11,13 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.SimulatedGyro;
+import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
+import org.team100.lib.localization.AprilTagRobotLocalizer;
+import org.team100.lib.localization.LimitedInterpolatingSwerveModelHistory;
 import org.team100.lib.localization.OdometryUpdater;
-import org.team100.lib.localization.SwerveModelHistory;
+import org.team100.lib.localization.SwerveModelEstimate;
+import org.team100.lib.localization.VisionAndOdometrySwerveModelEstimate;
+import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -45,31 +52,46 @@ public class SimulatedDrivingTest implements Timeless {
             SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics));
 
     final Gyro gyro;
-    final SwerveModelHistory poseEstimator;
+    final LimitedInterpolatingSwerveModelHistory history;
     final SwerveLocal swerveLocal;
-    final OdometryUpdater ou;
+    final OdometryUpdater odometryUpdater;
     final SwerveLimiter limiter;
     final SwerveDriveSubsystem drive;
 
-    SimulatedDrivingTest() {
+    SimulatedDrivingTest() throws IOException {
         gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
-        poseEstimator = new SwerveModelHistory(
-                logger,
-                swerveKinodynamics);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
-        ou = new OdometryUpdater(swerveKinodynamics, gyro, poseEstimator, collection::positions);
-        ou.reset(Pose2d.kZero, 0);
+        history = new LimitedInterpolatingSwerveModelHistory(
+                swerveKinodynamics,
+                Rotation2d.kZero,
+                SwerveModulePositions.kZero(),
+                Pose2d.kZero,
+                0);
+        odometryUpdater = new OdometryUpdater(swerveKinodynamics, gyro, history, collection::positions);
+        odometryUpdater.reset(Pose2d.kZero, 0);
+
+        final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(history, odometryUpdater);
+        final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
+
+        final AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
+                logger,
+                layout,
+                history,
+                visionUpdater,
+                "vision",
+                "blips");
+
+        final SwerveModelEstimate estimate = new VisionAndOdometrySwerveModelEstimate(
+                localizer, odometryUpdater, history);
         limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
+
         drive = new SwerveDriveSubsystem(
                 fieldLogger,
                 logger,
-                gyro,
                 swerveKinodynamics,
-                ou,
-                poseEstimator,
+                odometryUpdater,
+                estimate,
                 swerveLocal,
-                () -> {
-                },
                 limiter);
     }
 

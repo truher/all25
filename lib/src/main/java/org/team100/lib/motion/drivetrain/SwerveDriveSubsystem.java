@@ -7,9 +7,8 @@ import org.team100.lib.config.DriverSkill;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.gyro.Gyro;
 import org.team100.lib.localization.OdometryUpdater;
-import org.team100.lib.localization.SwerveModelHistory;
+import org.team100.lib.localization.SwerveModelEstimate;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
@@ -33,16 +32,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 /**
  * There are four mutually exclusive drive methods.
  * We depend on CommandScheduler to enforce the mutex.
+ * 
+ * This class used to depend on the gyro directly, but no longer does: the only
+ * direct gyro access is in the odometry updater. Consumers should get rotation
+ * from the state estimate.
  */
 public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsystemInterface {
-    // this produces a LOT of output, you should only enable it while you're looking
+    // DEBUG produces a LOT of output, you should only enable it while you're looking
     // at it.
     private static final boolean DEBUG = false;
-    private final Gyro m_gyro;
-    private final SwerveModelHistory m_poseEstimator;
+    private final SwerveModelEstimate m_poseEstimator;
     private final OdometryUpdater m_odometryUpdater;
     private final SwerveLocal m_swerveLocal;
-    private final Runnable m_cameraUpdater;
     private final SwerveLimiter m_limiter;
 
     // CACHES
@@ -59,19 +60,15 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     public SwerveDriveSubsystem(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
-            Gyro gyro,
             SwerveKinodynamics kinodynamics,
-            OdometryUpdater odo,
-            SwerveModelHistory poseEstimator,
+            OdometryUpdater odometryUpdater,
+            SwerveModelEstimate poseEstimator,
             SwerveLocal swerveLocal,
-            Runnable cameraUpdater,
             SwerveLimiter limiter) {
         LoggerFactory child = parent.type(this);
-        m_gyro = gyro;
         m_poseEstimator = poseEstimator;
-        m_odometryUpdater = odo;
+        m_odometryUpdater = odometryUpdater;
         m_swerveLocal = swerveLocal;
-        m_cameraUpdater = cameraUpdater;
         m_limiter = limiter;
         m_stateCache = Cache.of(this::update);
         stop();
@@ -266,11 +263,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     private SwerveModel update() {
         double now = Takt.get();
         SwerveModulePositions positions = m_swerveLocal.positions();
-        m_odometryUpdater.update();
-        m_cameraUpdater.run();
-        // by the time we get here, there should be something in the history.
-        // TODO: make it work even without that
-        SwerveModel swerveModel = m_poseEstimator.get(now).orElseThrow();
+        // now that the pose estimator uses the SideEffect thing, we don't need this.
+        // m_odometryUpdater.update();
+        // m_cameraUpdater.run();
+        SwerveModel swerveModel = m_poseEstimator.apply(now);
         if (DEBUG)
             Util.printf("update() positions %s estimated pose: %s\n",
                     positions, swerveModel);

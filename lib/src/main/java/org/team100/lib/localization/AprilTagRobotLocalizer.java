@@ -32,6 +32,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Extracts robot pose estimates from camera observations of AprilTags.
+ * 
+ * Note this class depends only on the state *history*, not on the coherent sate
+ * *estimate*. The camera input doesn't require fresh odometry, it modifies the
+ * past (and replays up to the present).
  */
 public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     private static final boolean DEBUG = false;
@@ -67,8 +71,8 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             0.001,
             0.1 };
 
-    private final SwerveModelEstimateInterface m_poseEstimator;
-    private final VisionUpdaterInterface m_visionUpdater;
+    private final SwerveModelHistory m_history;
+    private final VisionUpdater m_visionUpdater;
     private final StructBuffer<Blip24> m_buf = StructBuffer.create(Blip24.struct);
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
 
@@ -125,14 +129,14 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     public AprilTagRobotLocalizer(
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            SwerveModelEstimateInterface poseEstimator,
-            VisionUpdaterInterface visionUpdater,
+            SwerveModelHistory history,
+            VisionUpdater visionUpdater,
             String ntRootName,
             String ntValueName) {
         super(ntRootName, ntValueName);
         LoggerFactory child = parent.type(this);
         m_layout = layout;
-        m_poseEstimator = poseEstimator;
+        m_history = history;
         m_visionUpdater = visionUpdater;
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -234,12 +238,16 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         m_log_heedRadius.log(() -> m_heedRadiusM);
 
         // The pose from the frame timestamp.
-        final Optional<Pose2d> historicalPose = m_poseEstimator.get(correctedTimestamp).map(x -> x.pose());
+        // note this pulls from the *old history* not the *odometry-updated history*
+        // because we don't care about the latest odometry update: we're trying to
+        // affect the history from several cycles ago -- and replaying that. it's ok for
+        // new odometry to be the last thing.
+        final Pose2d historicalPose = m_history.apply(correctedTimestamp).pose();
 
         // The gyro rotation for the frame timestamp
-        final Optional<Rotation2d> gyroRotation = historicalPose.map(x -> x.getRotation());
-        if (DEBUG && gyroRotation.isPresent())
-            Util.printf("gyro rotation %f\n", gyroRotation.get().getRadians());
+        final Rotation2d gyroRotation = historicalPose.getRotation();
+        if (DEBUG)
+            Util.printf("gyro rotation %f\n", gyroRotation.getRadians());
 
         for (int i = 0; i < blips.length; ++i) {
             Blip24 blip = blips[i];
@@ -279,8 +287,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                         tagInRobot.getRotation().getZ());
             }
 
-            if (tagInCamera.getTranslation().getNorm() > TAG_ROTATION_BELIEF_THRESHOLD_M
-                    && gyroRotation.isPresent()) {
+            if (tagInCamera.getTranslation().getNorm() > TAG_ROTATION_BELIEF_THRESHOLD_M) {
                 // If the tag is further than the threshold, replace the tag rotation with
                 // a rotation derived from the gyro, if available.
                 m_log_using_gyro.log(() -> true);
@@ -288,13 +295,12 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                         cameraOffset,
                         tagInField,
                         tagInCamera,
-                        new Rotation3d(gyroRotation.get()));
+                        new Rotation3d(gyroRotation));
             } else {
                 m_log_using_gyro.log(() -> false);
             }
 
-            if (historicalPose.isPresent())
-                extralog(historicalPose.get(), cameraOffset, tagInCamera, tagInField);
+            extralog(historicalPose, cameraOffset, tagInCamera, tagInField);
 
             // Estimate of robot pose.
             Pose3d pose3d = PoseEstimationHelper.robotInField(
@@ -305,7 +311,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             // Robot in field frame. Use the gyro for rotation if available.
             final Pose2d pose = new Pose2d(
                     pose3d.getTranslation().toTranslation2d(),
-                    gyroRotation.orElse(pose3d.getRotation().toRotation2d()));
+                    gyroRotation);
 
             m_log_pose.log(() -> pose);
             m_pub_pose.set(pose);

@@ -19,22 +19,24 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 /**
- * Updates the pose buffer with new odometry by selecting the most-recent pose
+ * Updates SwerveModelHistory with new odometry by selecting the most-recent pose
  * and applying the pose delta represented by the odometry.
  * 
  * Uses the gyro angle and rate instead of the odometry-derived values, because
  * the gyro is more accurate.
  * 
  * Manages the gyro offset.
+ * 
+ * Note we use methods on the specific history implementation; the interface
+ * won't work here.
  */
 public class OdometryUpdater {
     private static final boolean DEBUG = false;
 
     private final SwerveKinodynamics m_kinodynamics;
     private final Gyro m_gyro;
-    private final SwerveModelHistory m_history;
-    // TODO: make this private
-    public final Supplier<SwerveModulePositions> m_positions;
+    private final LimitedInterpolatingSwerveModelHistory m_history;
+    private final Supplier<SwerveModulePositions> m_positions;
 
     /**
      * maintained in reset(). TODO: use a proxy gyro, not this class.
@@ -44,7 +46,7 @@ public class OdometryUpdater {
     public OdometryUpdater(
             SwerveKinodynamics kinodynamics,
             Gyro gyro,
-            SwerveModelHistory estimator,
+            LimitedInterpolatingSwerveModelHistory estimator,
             Supplier<SwerveModulePositions> positions) {
         m_kinodynamics = kinodynamics;
         m_gyro = gyro;
@@ -81,21 +83,15 @@ public class OdometryUpdater {
     /**
      * Empty the history, reset the gyro offset, and add the given measurements.
      * Uses the module position supplier passed to the constructor.
-     * TODO: remove this one
      */
-    public void reset(Rotation2d gyroAngle, Pose2d pose) {
-        reset(gyroAngle, pose, Takt.get());
-    }
-
     public void reset(Pose2d pose) {
-        reset(m_gyro.getYawNWU(), pose);
+        reset(m_gyro.getYawNWU(), pose, Takt.get());
     }
 
     /** For testing. */
     public void reset(Pose2d pose, double timestampSeconds) {
-        Rotation2d gyroAngle = m_gyro.getYawNWU();
-        m_gyroOffset = pose.getRotation().minus(gyroAngle);
-        m_history.reset(gyroAngle, m_positions.get(), pose, timestampSeconds);
+        m_gyroOffset = pose.getRotation().minus(m_gyro.getYawNWU());
+        m_history.reset(m_positions.get(), pose, timestampSeconds);
     }
 
     /**
@@ -107,7 +103,7 @@ public class OdometryUpdater {
             Pose2d pose,
             double timestampSeconds) {
         m_gyroOffset = pose.getRotation().minus(gyroAngle);
-        m_history.reset(gyroAngle, m_positions.get(), pose, timestampSeconds);
+        m_history.reset(m_positions.get(), pose, timestampSeconds);
     }
 
     ////////////////////////////////////////////////////
@@ -147,7 +143,7 @@ public class OdometryUpdater {
         // replace the twist dtheta with one derived from the current
         // pose angle based on the gyro (which is more accurate)
 
-        Rotation2d angle = gyroAngleRadNWU.plus(getGyroOffset());
+        Rotation2d angle = gyroAngleRadNWU.plus(m_gyroOffset);
         if (DEBUG)
             Util.printf("angle %.6f\n", angle.getRadians());
         twist.dtheta = angle.minus(previousState.pose().getRotation()).getRadians();
@@ -180,7 +176,9 @@ public class OdometryUpdater {
             InterpolationRecord value = entry.getValue();
 
             // this is what the gyro must have been given the pose and offset
-            Rotation2d entryGyroAngle = value.m_state.pose().getRotation().minus(getGyroOffset());
+            // note that stale gyro offsets never occur, because the gyro offset is
+            // reset at the same time the buffer is emptied.
+            Rotation2d entryGyroAngle = value.m_state.pose().getRotation().minus(m_gyroOffset);
             double entryGyroRate = value.m_state.theta().v();
             SwerveModulePositions wheelPositions = value.m_wheelPositions;
 

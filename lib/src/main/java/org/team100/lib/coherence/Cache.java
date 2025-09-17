@@ -20,13 +20,14 @@ import com.ctre.phoenix6.StatusCode;
  * thing in the middle of the sandwich is simple arithmetic. So if a "motor"
  * implements caching of its sensors, then the "sensor" that uses the "motor"
  * doesn't need to apply its own cache layer. Accordingly, most of the
- * observations we actually cache seem to be from motors.  On the other hand,
+ * observations we actually cache seem to be from motors. On the other hand,
  * it doesn't hurt anything to cache at multiple levels -- the updater makes
  * everything consistent.
  */
 public class Cache {
     static final List<CotemporalCache<?>> caches = new ArrayList<>();
     private static final List<DoubleCache> doubles = new ArrayList<>();
+    private static final List<SideEffect> sideEffects = new ArrayList<>();
     private static final List<BaseStatusSignal> signals = new ArrayList<>();
 
     /**
@@ -45,6 +46,12 @@ public class Cache {
         DoubleCache cache = new DoubleCache(delegate);
         doubles.add(cache);
         return cache;
+    }
+
+    public static SideEffect ofSideEffect(Runnable delegate) {
+        SideEffect sideEffect = new SideEffect(delegate);
+        sideEffects.add(sideEffect);
+        return sideEffect;
     }
 
     /**
@@ -79,6 +86,9 @@ public class Cache {
         for (DoubleCache r : doubles) {
             r.reset();
         }
+        for (SideEffect r : sideEffects) {
+            r.reset();
+        }
     }
 
     /** Fetches fresh values for every stale cache. Should be called after reset. */
@@ -94,6 +104,9 @@ public class Cache {
         }
         for (DoubleCache r : doubles) {
             r.getAsDouble();
+        }
+        for (SideEffect r : sideEffects) {
+            r.run();
         }
     }
 

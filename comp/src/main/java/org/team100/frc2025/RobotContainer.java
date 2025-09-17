@@ -63,11 +63,12 @@ import org.team100.lib.hid.ThirdControlProxy;
 import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
+import org.team100.lib.localization.LimitedInterpolatingSwerveModelHistory;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveModelEstimate;
-import org.team100.lib.localization.SwerveModelHistory;
-import org.team100.lib.localization.VisionUpdater;
+import org.team100.lib.localization.VisionAndOdometrySwerveModelEstimate;
+import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
@@ -193,25 +194,30 @@ public class RobotContainer {
                 m_modules);
 
         // ignores the rotation derived from vision.
-        final SwerveModelHistory history = new SwerveModelHistory(
-                driveLog,
-                m_swerveKinodynamics);
+        final LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+                m_swerveKinodynamics,
+                gyro.getYawNWU(),
+                m_modules.positions(),
+                Pose2d.kZero,
+                Takt.get());
 
-        final OdometryUpdater ou = new OdometryUpdater(
+        final OdometryUpdater odometryUpdater = new OdometryUpdater(
                 m_swerveKinodynamics, gyro, history, m_modules::positions);
-        ou.reset(Pose2d.kZero);
-        final VisionUpdater vu = new VisionUpdater(history, ou);
-        final SwerveModelEstimate estimate = new SwerveModelEstimate(history);
+        odometryUpdater.reset(Pose2d.kZero);
+        final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(history, odometryUpdater);
 
         final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
         final AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 driveLog,
                 layout,
-                estimate,
-                vu,
+                history,
+                visionUpdater,
                 "vision",
                 "blips");
+
+        final SwerveModelEstimate estimate = new VisionAndOdometrySwerveModelEstimate(
+                localizer, odometryUpdater, history);
 
         final SwerveLocal swerveLocal = new SwerveLocal(
                 driveLog,
@@ -223,12 +229,10 @@ public class RobotContainer {
         m_drive = new SwerveDriveSubsystem(
                 fieldLogger,
                 driveLog,
-                gyro,
                 m_swerveKinodynamics,
-                ou,
-                history,
+                odometryUpdater,
+                estimate,
                 swerveLocal,
-                localizer::update,
                 limiter);
 
         m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
@@ -247,7 +251,7 @@ public class RobotContainer {
                             Camera.CORAL_LEFT,
                             Camera.CORAL_RIGHT),
                     layout,
-                    (timestampS) -> history.get(timestampS).map(x -> x.pose()));
+                    (timestampS) -> estimate.apply(timestampS).pose());
             m_simulatedTagDetector = sim::periodic;
         }
 

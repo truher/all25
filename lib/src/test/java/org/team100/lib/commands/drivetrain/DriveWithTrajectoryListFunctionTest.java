@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,9 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 import edu.wpi.first.wpilibj.DataLogManager;
 
 class DriveWithTrajectoryListFunctionTest extends Fixtured implements Timeless {
+    public DriveWithTrajectoryListFunctionTest() throws IOException {
+    }
+
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);

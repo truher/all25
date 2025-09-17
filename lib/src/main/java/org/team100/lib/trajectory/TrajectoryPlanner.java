@@ -36,7 +36,9 @@ public class TrajectoryPlanner {
      * number bigger.
      */
     private static final double SPLINE_SAMPLE_TOLERANCE_M = 0.02;
-    /** Maximum theta error. */
+    /**
+     * Maximum theta error.
+     */
     private static final double SPLINE_SAMPLE_TOLERANCE_RAD = 0.2;
     /**
      * Size of steps along the path. Make this number smaller for tight curves to
@@ -50,10 +52,26 @@ public class TrajectoryPlanner {
      */
     private static final double VELOCITY_EPSILON = 1e-2;
 
+    private final double m_splineTolerance;
+    private final double m_splineRotationTolerance;
+    private final double m_trajectoryStep;
+
     private final ScheduleGenerator m_scheduleGenerator;
 
     public TrajectoryPlanner(List<TimingConstraint> constraints) {
+        this(SPLINE_SAMPLE_TOLERANCE_M, SPLINE_SAMPLE_TOLERANCE_RAD, TRAJECTORY_STEP_M, constraints);
+    }
+
+    public TrajectoryPlanner(
+            double splineTolerance,
+            double splineRotationTolerance,
+            double trajectoryStep,
+            List<TimingConstraint> constraints) {
+        m_splineTolerance = splineTolerance;
+        m_splineRotationTolerance = splineRotationTolerance;
+        m_trajectoryStep = trajectoryStep;
         m_scheduleGenerator = new ScheduleGenerator(constraints);
+
     }
 
     /** A square counterclockwise starting with +x. */
@@ -167,13 +185,13 @@ public class TrajectoryPlanner {
             // Create a path from splines.
             Path100 path = PathFactory.pathFromWaypoints(
                     waypoints,
-                    SPLINE_SAMPLE_TOLERANCE_M,
-                    SPLINE_SAMPLE_TOLERANCE_M,
-                    SPLINE_SAMPLE_TOLERANCE_RAD);
+                    m_splineTolerance,
+                    m_splineTolerance,
+                    m_splineRotationTolerance);
             // Generate the timed trajectory.
             return m_scheduleGenerator.timeParameterizeTrajectory(
                     path,
-                    TRAJECTORY_STEP_M,
+                    m_trajectoryStep,
                     start_vel,
                     end_vel);
         } catch (IllegalArgumentException e) {
@@ -195,13 +213,14 @@ public class TrajectoryPlanner {
             // Create a path from splines.
             Path100 path = PathFactory.pathFromWaypoints(
                     waypoints,
-                    SPLINE_SAMPLE_TOLERANCE_M,
-                    SPLINE_SAMPLE_TOLERANCE_M,
-                    SPLINE_SAMPLE_TOLERANCE_RAD, mN);
+                    m_splineTolerance,
+                    m_splineTolerance,
+                    m_splineRotationTolerance,
+                    mN);
             // Generate the timed trajectory.
             return m_scheduleGenerator.timeParameterizeTrajectory(
                     path,
-                    TRAJECTORY_STEP_M,
+                    m_trajectoryStep,
                     start_vel,
                     end_vel);
         } catch (IllegalArgumentException e) {
