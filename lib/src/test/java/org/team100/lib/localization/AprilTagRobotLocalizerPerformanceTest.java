@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.DoubleFunction;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
@@ -34,7 +35,7 @@ class AprilTagRobotLocalizerPerformanceTest {
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        SwerveModelHistory history = t -> new SwerveModel(new Rotation2d(-Math.PI / 4));
+        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(-Math.PI / 4));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override

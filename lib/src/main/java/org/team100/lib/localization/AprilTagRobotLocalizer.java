@@ -3,6 +3,7 @@ package org.team100.lib.localization;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.experiments.Experiment;
@@ -14,6 +15,7 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.Util;
 
@@ -71,7 +73,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             0.001,
             0.1 };
 
-    private final SwerveModelHistory m_history;
+    private final DoubleFunction<SwerveModel> m_history;
     private final VisionUpdater m_visionUpdater;
     private final StructBuffer<Blip24> m_buf = StructBuffer.create(Blip24.struct);
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
@@ -126,10 +128,19 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
      */
     private final List<Pose3d> m_usedTags = new ArrayList<>();
 
+    /**
+     * 
+     * @param parent
+     * @param layout
+     * @param history f(timestamp) = swerve state, use SwerveModelHistory.
+     * @param visionUpdater
+     * @param ntRootName
+     * @param ntValueName
+     */
     public AprilTagRobotLocalizer(
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            SwerveModelHistory history,
+            DoubleFunction<SwerveModel> history,
             VisionUpdater visionUpdater,
             String ntRootName,
             String ntValueName) {

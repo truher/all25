@@ -63,12 +63,11 @@ import org.team100.lib.hid.ThirdControlProxy;
 import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
-import org.team100.lib.localization.LimitedInterpolatingSwerveModelHistory;
+import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
-import org.team100.lib.localization.SwerveModelEstimate;
-import org.team100.lib.localization.VisionAndOdometrySwerveModelEstimate;
-import org.team100.lib.localization.NudgingVisionUpdater;
+import org.team100.lib.localization.SwerveHistory;
+import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
@@ -194,7 +193,7 @@ public class RobotContainer {
                 m_modules);
 
         // ignores the rotation derived from vision.
-        final LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        final SwerveHistory history = new SwerveHistory(
                 m_swerveKinodynamics,
                 gyro.getYawNWU(),
                 m_modules.positions(),
@@ -216,7 +215,7 @@ public class RobotContainer {
                 "vision",
                 "blips");
 
-        final SwerveModelEstimate estimate = new VisionAndOdometrySwerveModelEstimate(
+        final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);
 
         final SwerveLocal swerveLocal = new SwerveLocal(

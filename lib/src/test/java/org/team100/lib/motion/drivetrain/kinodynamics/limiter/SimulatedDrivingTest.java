@@ -13,11 +13,10 @@ import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.SimulatedGyro;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
-import org.team100.lib.localization.LimitedInterpolatingSwerveModelHistory;
-import org.team100.lib.localization.OdometryUpdater;
-import org.team100.lib.localization.SwerveModelEstimate;
-import org.team100.lib.localization.VisionAndOdometrySwerveModelEstimate;
+import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.localization.NudgingVisionUpdater;
+import org.team100.lib.localization.OdometryUpdater;
+import org.team100.lib.localization.SwerveHistory;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -52,7 +51,7 @@ public class SimulatedDrivingTest implements Timeless {
             SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics));
 
     final Gyro gyro;
-    final LimitedInterpolatingSwerveModelHistory history;
+    final SwerveHistory history;
     final SwerveLocal swerveLocal;
     final OdometryUpdater odometryUpdater;
     final SwerveLimiter limiter;
@@ -61,7 +60,7 @@ public class SimulatedDrivingTest implements Timeless {
     SimulatedDrivingTest() throws IOException {
         gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
-        history = new LimitedInterpolatingSwerveModelHistory(
+        history = new SwerveHistory(
                 swerveKinodynamics,
                 Rotation2d.kZero,
                 SwerveModulePositions.kZero(),
@@ -81,7 +80,7 @@ public class SimulatedDrivingTest implements Timeless {
                 "vision",
                 "blips");
 
-        final SwerveModelEstimate estimate = new VisionAndOdometrySwerveModelEstimate(
+        final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);
         limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
 
