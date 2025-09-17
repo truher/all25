@@ -130,21 +130,17 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
 
     /**
      * 
-     * @param parent
-     * @param layout
-     * @param history f(timestamp) = swerve state, use SwerveModelHistory.
-     * @param visionUpdater
-     * @param ntRootName
-     * @param ntValueName
+     * @param parent        logger
+     * @param layout        map of apriltags
+     * @param history       f(timestamp) = swerve state, use SwerveModelHistory.
+     * @param visionUpdater mutates history
      */
     public AprilTagRobotLocalizer(
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
             DoubleFunction<SwerveModel> history,
-            VisionUpdater visionUpdater,
-            String ntRootName,
-            String ntValueName) {
-        super(ntRootName, ntValueName);
+            VisionUpdater visionUpdater) {
+        super("vision", "blips");
         LoggerFactory child = parent.type(this);
         m_layout = layout;
         m_history = history;

@@ -69,18 +69,13 @@ public class SimulatedDrivingTest implements Timeless {
         odometryUpdater = new OdometryUpdater(swerveKinodynamics, gyro, history, collection::positions);
         odometryUpdater.reset(Pose2d.kZero, 0);
 
-        final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(history, odometryUpdater);
-        final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
+        NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(history, odometryUpdater);
+        AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
-        final AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger,
-                layout,
-                history,
-                visionUpdater,
-                "vision",
-                "blips");
+        AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
+                logger, layout, history, visionUpdater);
 
-        final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
+        FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);
         limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
 

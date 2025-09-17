@@ -7,6 +7,7 @@ import java.util.function.DoubleFunction;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.TrailingHistory;
 import org.team100.lib.util.Util;
@@ -42,12 +43,9 @@ public class Targets extends CameraReader<Rotation3d> {
      */
     private final CotemporalCache<Boolean> m_hot;
 
-    public Targets(
-            DoubleFunction<Pose2d> robotPose,
-            String ntRootName,
-            String ntValueName) {
-        super(ntRootName, ntValueName);
-        m_robotPose = robotPose;
+    public Targets(DoubleFunction<SwerveModel> robotPose) {
+        super("objectVision", "Rotation3d");
+        m_robotPose = t -> robotPose.apply(t).pose();
         m_targets = new TrailingHistory<>(HISTORY_DURATION);
         m_buf = StructBuffer.create(Rotation3d.struct);
         m_hot = Cache.of(() -> {

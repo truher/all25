@@ -63,11 +63,11 @@ import org.team100.lib.hid.ThirdControlProxy;
 import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
+import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveHistory;
-import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
@@ -81,6 +81,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.targeting.Targets;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.Util;
@@ -211,9 +212,9 @@ public class RobotContainer {
                 driveLog,
                 layout,
                 history,
-                visionUpdater,
-                "vision",
-                "blips");
+                visionUpdater);
+
+        final Targets targets = new Targets(history);
 
         final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);

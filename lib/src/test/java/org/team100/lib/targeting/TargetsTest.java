@@ -8,10 +8,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.testing.Timeless;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,11 +28,8 @@ public class TargetsTest implements Timeless {
     @Test
     void testTargets() {
         stepTime();
-        Pose2d p = new Pose2d(0, 0, Rotation2d.kZero);
-        Targets t = new Targets(
-                (x) -> p,
-                "objectVision",
-                "Rotation3d");
+        SwerveModel p = new SwerveModel();
+        Targets t = new Targets((x) -> p);
         t.update();
         assertTrue(t.getTargets().isEmpty());
         // send some blips
@@ -64,19 +60,16 @@ public class TargetsTest implements Timeless {
         stepTime();
         SimulatedTargetWriter writer = new SimulatedTargetWriter();
 
-        Pose2d p = new Pose2d(0, 0, Rotation2d.kZero);
+        SwerveModel p = new SwerveModel();
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(
-                (x) -> p,
-                "objectVision",
-                "Rotation3d");
+        Targets reader = new Targets((x) -> p);
 
         Transform3d offset = Camera.get("test4").getOffset();
         stepTime();
         writer.update(
-                p, offset, new Translation2d[] {
+                p.pose(), offset, new Translation2d[] {
                         new Translation2d(1, 0) });
 
         stepTime();
