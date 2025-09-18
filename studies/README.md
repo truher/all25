@@ -24,3 +24,11 @@ sourceSets {
 4. In VSCode, click File::Save Workspace As... and choose your study directory.
 
 I usually rebuild the whole project at this point: Explorer::Java Projects::three dots::Clean Workspace.
+
+I would also appreciate it if you set your workspace settings so that some of the default VSCode features are turned off:
+
+* inlay
+* minimap
+* detect indentation (we always use 4)
+* also use some "light" theme so I can read it.
+* also turn on "reveal if open" so you can use multiple little windows correctly
