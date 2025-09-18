@@ -48,20 +48,26 @@ public class Viz {
 
     ///////////////////////////////
 
-    /** config is in meters, viz wants pixels */
+    /**
+     * config is in meters, viz wants pixels.
+     * elevator zero is the floor
+     */
     private static double shoulderHeight(Config q) {
         return SCALE * q.shoulderHeight();
     }
 
     /**
      * config is in radians, viz wants degrees.
-     * also the shoulder zero is to the side, 90 degrees relative to the elevator
+     * shoulder zero is parallel to the elevator
      */
     private static double shoulderAngle(Config q) {
-        return Math.toDegrees(q.shoulderAngle()) - 90;
+        return Math.toDegrees(q.shoulderAngle());
     }
 
-    /** config is in radians, viz wants degrees */
+    /**
+     * config is in radians, viz wants degrees.
+     * wrist zero is parallel to the arm.
+     */
     private static double wristAngle(Config q) {
         return Math.toDegrees(q.wristAngle());
     }

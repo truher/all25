@@ -2,6 +2,7 @@ package org.team100;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -10,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Mech extends SubsystemBase {
     private final double m_armLength;
     private final double m_handLength;
-    private final Kinematics m_kinematics;
+    private final JoelsKinematics m_kinematics;
     /**
      * The current mechanism joint configuration. For a real mechanism this would be
      * represented by the sensors of the real mechanism.
@@ -20,7 +21,7 @@ public class Mech extends SubsystemBase {
     public Mech(double armLength, double handLength) {
         m_armLength = armLength;
         m_handLength = handLength;
-        m_kinematics = new Kinematics(armLength, handLength, 2.0, 0, 0, 0, 0);
+        m_kinematics = new JoelsKinematics(armLength, handLength);
         // in reality you wouldn't be able to just choose a default
         // configuration, you'd have to do something with the sensors.
         m_config = new Config(0.5, 0, 0);
@@ -73,9 +74,22 @@ public class Mech extends SubsystemBase {
     }
 
     private void addCartesian(double x, double y, double r) {
-        set(m_kinematics.inverse(
-                m_kinematics.forward(m_config)
-                        .plus(new Transform2d(x, y, new Rotation2d(r)))));
+        Transform2d t = new Transform2d(x, y, new Rotation2d(r));
+        Pose2d p = m_kinematics.forward(m_config);
+        // Pose2d.add() method uses the pose frame so we don't use it.
+        // We transform p in the global frame by adding components
+        double x2 = p.getX() + t.getX();
+        double y2 = p.getY() + t.getY();
+        Rotation2d r2 = p.getRotation().plus(t.getRotation());
+        Pose2d newP = new Pose2d(x2, y2, r2);
+        Config c = m_kinematics.inverse(newP);
+        if (Double.isNaN(c.shoulderHeight())
+                || Double.isNaN(c.shoulderAngle())
+                || Double.isNaN(c.wristAngle())) {
+            System.out.println("skipping invalid config");
+            return;
+        }
+        set(c);
     }
 
 }
