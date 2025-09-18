@@ -117,9 +117,6 @@ public class Kinematics {
             double wristPointY = (m_manipulatorLength*Math.sin(pose.getRotation().getRadians())) + pose.getY(); // vert side of triangle with hyp facing right, add key point height
             double wristPointX = pose.getX()-(m_manipulatorLength*Math.cos(pose.getRotation().getRadians())); //bottom of triangle with hyp facing right, subtract from key point
 
-            System.out.println("\n\n\n\n\n\nwpX" + wristPointX);
-            System.out.println("\n\n\n\n\n\nwpY" + wristPointY);
-
 
             //2. find the third leg of the triange formed by elbowPointX, hyp = armLength, and subtract that from the height 
             //of wristPointY to find the actual shoulder joint height - KYM
@@ -127,6 +124,7 @@ public class Kinematics {
 
 
             //find last side of triangle formed by both arms, vertex's being shoulderPt, goalPt, and elbowPt
+            // i think this assumes arm is below goal point, needs fixing - KYM
             double zLength = Math.sqrt((pose.getX()*(pose.getX()))+((pose.getY()-shoulderHeight)*(pose.getY()-shoulderHeight)));
             
             //law of cosines to find the angle INSIDE the triangle that corresponds to the shoulder joint. second part is angle from 0 degrees to angle of elevation. gnarly

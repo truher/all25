@@ -31,8 +31,8 @@ public class KinematicsTest {
             fail("Inverse Kinematics Failed. Check Logs");
         }
         assertEquals(0.702, c.shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(33.5), c.shoulderAngle(), 0.01); //changed from 0.001, assumed rounding error
-        assertEquals(Math.toRadians(111.5), c.wristAngle(), 0.01); //changed from 0.001 assumed rounding error
+        assertEquals(Math.toRadians(33.5), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
+        assertEquals(Math.toRadians(111.5), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
     }
 
     @Test
@@ -73,7 +73,7 @@ public class KinematicsTest {
         System.out.println("\n\nTESTING ROUND TRIP KINEMATICS (Inverse First)");
         Kinematics k = new Kinematics(0.3, 0.1, 3, 0, 0, 0, 0);
         Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
-        Config c = new Config(1, 60, 65); //basic config for forward
+        Config c = new Config(0.9999, 60.0788, 64.921159); //desmos config
 
 
         Config c2 = k.inverse(p);
