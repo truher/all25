@@ -32,3 +32,4 @@ I would also appreciate it if you set your workspace settings so that some of th
 * detect indentation (we always use 4)
 * also use some "light" theme so I can read it.
 * also turn on "reveal if open" so you can use multiple little windows correctly
+* and turn off "sticky scrolling"
