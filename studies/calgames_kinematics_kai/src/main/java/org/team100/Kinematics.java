@@ -12,6 +12,20 @@ public class Kinematics {
     private final double m_deadBX;
     private final double m_deadBY;
 
+    
+/**
+ * Kinematics coordinates are as follows:
+ * 
+ * x axis is pointing right
+ * y axis is pointing up
+ * 
+ * shoulder height is along y
+ * shoulder angle is relative to true horizontal, positive counterclockwise
+ * wrist angle is relative to the arm, positive counterclockwise
+ * 
+ * I chose these coordinates because they were intuitive when I was figuring out the kinematics on paper
+ */
+
 
 
     public Kinematics(double armLength, double manipulatorLength, double shoulderMaxHeight, double deadAX, double deadAY, double deadBX, double deadBY) {
@@ -56,16 +70,16 @@ public class Kinematics {
         System.out.println("Shoulder Angle: " + config.shoulderAngle());
         System.out.println("Elbow Angle: " + config.wristAngle());
 
-        double armXcomp  = (m_armLength * Math.cos(Math.toRadians(config.shoulderAngle())));
-        double manipulatorXcomp = (m_manipulatorLength * Math.sin(Math.toRadians(config.wristAngle()-(180-90-config.shoulderAngle()))));
+        double armXcomp  = (m_armLength * Math.cos(config.shoulderAngle()));
+        double manipulatorXcomp = (m_manipulatorLength * Math.sin((config.wristAngle())-(Math.PI-(Math.PI/2)-(config.shoulderAngle())))); //should be fixed for radians
         double xComp = (armXcomp)+ (manipulatorXcomp);
 
 
-        double armYcomp = (m_armLength * Math.sin(Math.toRadians(config.shoulderAngle())));
-        double manipulatorYcomp = (m_manipulatorLength * Math.cos(Math.toRadians(config.wristAngle()-(180-90-config.shoulderAngle()))));
+        double armYcomp = (m_armLength * Math.sin(config.shoulderAngle()));
+        double manipulatorYcomp = (m_manipulatorLength * Math.cos((config.wristAngle())-(Math.PI-(Math.PI/2)-(config.shoulderAngle()))));
         double yComp =  (armYcomp) - (manipulatorYcomp) + config.shoulderHeight(); //subtraction becuse the manipulator is always pointing down?
 
-        double manipulatorRotation = Math.toRadians(180-90-(config.wristAngle()-(180-90-config.shoulderAngle())));
+        double manipulatorRotation = (Math.PI-(Math.PI/2)-((config.wristAngle())-(Math.PI-(Math.PI/2)-(config.shoulderAngle())))); //something is broken here, failing
 
         System.out.println("\nOUTPUTS:");
         System.out.println("armXcomp: " + armXcomp);

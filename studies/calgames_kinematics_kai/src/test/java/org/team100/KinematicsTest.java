@@ -14,7 +14,7 @@ public class KinematicsTest {
     void testForwardBaseline() {
         System.out.println("\n\nTESTING BASELINE FORWARD KINEMATICS");
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0);
-        Config c = new Config(1, 60, 65);
+        Config c = new Config(1, Math.toRadians(60), Math.toRadians(65));
         Pose2d p = k.forward(c);
         assertEquals(0.207, p.getX(), 0.001);
         assertEquals(1.178, p.getY(), 0.001);
