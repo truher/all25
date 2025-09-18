@@ -45,6 +45,8 @@
 		"editor.minimap.enabled": false,
 		"workbench.colorTheme": "Default Light Modern",
         "editor.detectIndentation": false,
-        "workbench.editor.revealIfOpen": true
+        "workbench.editor.revealIfOpen": true,
+        "debug.console.collapseIdenticalLines": false,
+        "editor.stickyScroll.enabled": false
 	}
 }
