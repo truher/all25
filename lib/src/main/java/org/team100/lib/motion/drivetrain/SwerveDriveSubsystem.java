@@ -8,7 +8,7 @@ import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.localization.OdometryUpdater;
-import org.team100.lib.localization.SwerveModelEstimate;
+import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
@@ -41,7 +41,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     // DEBUG produces a LOT of output, you should only enable it while you're looking
     // at it.
     private static final boolean DEBUG = false;
-    private final SwerveModelEstimate m_poseEstimator;
+    private final FreshSwerveEstimate m_estimate;
     private final OdometryUpdater m_odometryUpdater;
     private final SwerveLocal m_swerveLocal;
     private final SwerveLimiter m_limiter;
@@ -62,11 +62,11 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics,
             OdometryUpdater odometryUpdater,
-            SwerveModelEstimate poseEstimator,
+            FreshSwerveEstimate estimate,
             SwerveLocal swerveLocal,
             SwerveLimiter limiter) {
         LoggerFactory child = parent.type(this);
-        m_poseEstimator = poseEstimator;
+        m_estimate = estimate;
         m_odometryUpdater = odometryUpdater;
         m_swerveLocal = swerveLocal;
         m_limiter = limiter;
@@ -266,7 +266,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         // now that the pose estimator uses the SideEffect thing, we don't need this.
         // m_odometryUpdater.update();
         // m_cameraUpdater.run();
-        SwerveModel swerveModel = m_poseEstimator.apply(now);
+        SwerveModel swerveModel = m_estimate.apply(now);
         if (DEBUG)
             Util.printf("update() positions %s estimated pose: %s\n",
                     positions, swerveModel);

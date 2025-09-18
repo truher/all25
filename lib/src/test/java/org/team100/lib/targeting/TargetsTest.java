@@ -3,17 +3,20 @@ package org.team100.lib.targeting;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
+import org.team100.lib.logging.FieldLogger;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.testing.Timeless;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -25,15 +28,15 @@ import edu.wpi.first.networktables.StructArrayTopic;
  */
 public class TargetsTest implements Timeless {
     private static final double DELTA = 0.001;
+    private static final LoggerFactory logger = new TestLoggerFactory(
+            new TestPrimitiveLogger());
+    private static final FieldLogger.Log fieldLog = new FieldLogger.Log(logger);
 
     @Test
     void testTargets() {
         stepTime();
-        Pose2d p = new Pose2d(0, 0, Rotation2d.kZero);
-        Targets t = new Targets(
-                (x) -> p,
-                "objectVision",
-                "Rotation3d");
+        SwerveModel p = new SwerveModel();
+        Targets t = new Targets(fieldLog, (x) -> p);
         t.update();
         assertTrue(t.getTargets().isEmpty());
         // send some blips
@@ -62,25 +65,25 @@ public class TargetsTest implements Timeless {
     @Test
     void testTranslations() {
         stepTime();
-        SimulatedTargetWriter writer = new SimulatedTargetWriter();
 
-        Pose2d p = new Pose2d(0, 0, Rotation2d.kZero);
+        SwerveModel p = new SwerveModel();
+        SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                List.of(Camera.TEST4),
+                x -> p,
+                new Translation2d[] { new Translation2d(1, 0) });
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(
-                (x) -> p,
-                "objectVision",
-                "Rotation3d");
+        Targets reader = new Targets(fieldLog, (x) -> p);
 
-        Transform3d offset = Camera.get("test4").getOffset();
         stepTime();
-        writer.update(
-                p, offset, new Translation2d[] {
-                        new Translation2d(1, 0) });
+        writer.update();
 
         stepTime();
         reader.update();
+
+        List<Translation2d> allTargets = reader.getTargets();
+        assertEquals(1, allTargets.size());
 
         Optional<Translation2d> tt = reader.getClosestTarget();
         assertTrue(tt.isPresent());
@@ -91,4 +94,103 @@ public class TargetsTest implements Timeless {
         writer.close();
     }
 
+    @Test
+    void testMultipleCameras() {
+        stepTime();
+        SwerveModel p = new SwerveModel();
+
+        SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                List.of(Camera.TEST4, Camera.TEST5),
+                x -> p,
+                new Translation2d[] { new Translation2d(1, 0) });
+
+        // need to instantiate the reader prior to the writer update because the poller
+        // ignores things that came before.
+        Targets reader = new Targets(fieldLog, (x) -> p);
+
+        stepTime();
+        writer.update();
+
+        stepTime();
+        reader.update();
+
+        List<Translation2d> allTargets = reader.getTargets();
+        assertEquals(2, allTargets.size());
+
+        Optional<Translation2d> tt = reader.getClosestTarget();
+        assertTrue(tt.isPresent());
+        Translation2d ttt = tt.get();
+        assertEquals(1.0, ttt.getX(), DELTA);
+        assertEquals(0, ttt.getY(), DELTA);
+
+        writer.close();
+    }
+
+    @Test
+    void testMultipleTargets() {
+        stepTime();
+
+        SwerveModel p = new SwerveModel();
+        SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                List.of(Camera.TEST4),
+                x -> p,
+                new Translation2d[] {
+                        new Translation2d(1, 0),
+                        new Translation2d(2, 0) });
+
+        // need to instantiate the reader prior to the writer update because the poller
+        // ignores things that came before.
+        Targets reader = new Targets(fieldLog, x -> p);
+
+        stepTime();
+        writer.update();
+
+        stepTime();
+        reader.update();
+
+        List<Translation2d> allTargets = reader.getTargets();
+        assertEquals(2, allTargets.size());
+
+        Optional<Translation2d> tt = reader.getClosestTarget();
+        assertTrue(tt.isPresent());
+        Translation2d ttt = tt.get();
+        assertEquals(1.0, ttt.getX(), DELTA);
+        assertEquals(0, ttt.getY(), DELTA);
+
+        writer.close();
+    }
+
+    @Test
+    void testMultipleTargetsAndCameras() {
+        stepTime();
+        SwerveModel p = new SwerveModel();
+
+        SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                List.of(Camera.TEST4, Camera.TEST5),
+                x -> p,
+                new Translation2d[] {
+                        new Translation2d(1, 0),
+                        new Translation2d(2, 0) });
+
+        // need to instantiate the reader prior to the writer update because the poller
+        // ignores things that came before.
+        Targets reader = new Targets(fieldLog, (x) -> p);
+
+        stepTime();
+        writer.update();
+
+        stepTime();
+        reader.update();
+
+        List<Translation2d> allTargets = reader.getTargets();
+        assertEquals(4, allTargets.size());
+
+        Optional<Translation2d> tt = reader.getClosestTarget();
+        assertTrue(tt.isPresent());
+        Translation2d ttt = tt.get();
+        assertEquals(1.0, ttt.getX(), DELTA);
+        assertEquals(0, ttt.getY(), DELTA);
+
+        writer.close();
+    }
 }

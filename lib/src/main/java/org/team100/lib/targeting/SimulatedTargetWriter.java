@@ -1,15 +1,20 @@
 package org.team100.lib.targeting;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.config.Camera;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.StructArrayPublisher;
 
 /**
@@ -21,42 +26,70 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 public class SimulatedTargetWriter {
     private static final boolean DEBUG = false;
 
-    // test4 camera offset is 0,0,1, without rotation
-    private static final String CAMERA_IDENTITY = "test4";
-    // the simulated pi has just one camera attached
-    private static final String CAMERA_NUM = "0";
-    StructArrayPublisher<Rotation3d> m_pub;
+    // camera frame is from 85 ms ago
+    // TODO: make this jitter a little
+    private static final double DELAY = 0.085;
 
-    public SimulatedTargetWriter() {
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        inst.startClient4("tag_finder24");
-        m_pub = inst.getStructArrayTopic(
-                "objectVision/"
-                        + CAMERA_IDENTITY
-                        + "/"
-                        + CAMERA_NUM
-                        + "/Rotation3d",
-                Rotation3d.struct).publish();
+    private final Map<Camera, StructArrayPublisher<Rotation3d>> m_publishers;
+    private final List<Camera> m_cameras;
+    private final DoubleFunction<SwerveModel> m_history;
+
+    /** For now, a fixed list of targets */
+    private final Translation2d[] m_targets;
+    /** client instance, not the default */
+    private final NetworkTableInstance m_inst;
+
+    public SimulatedTargetWriter(
+            List<Camera> cameras,
+            DoubleFunction<SwerveModel> history,
+            Translation2d[] targets) {
+        m_cameras = cameras;
+        m_history = history;
+        m_targets = targets;
+        m_publishers = new HashMap<>();
+        m_inst = NetworkTableInstance.getDefault();
+        m_inst.startClient4("tag_finder24");
+        m_inst.setServer("localhost");
+        for (Camera camera : m_cameras) {
+            String name = "objectVision/"
+                    + camera.getSerial() + "/0/Rotation3d";
+            m_publishers.put(
+                    camera,
+                    m_inst.getStructArrayTopic(
+                            name, Rotation3d.struct).publish());
+        }
     }
 
-    public void update(
-            Pose2d robotPose,
-            Transform3d offset,
-            Translation2d[] allTargets) {
-        List<Rotation3d> rot = SimulatedObjectDetector.getRotations(
-                robotPose, offset, allTargets);
+    public void update() {
         if (DEBUG)
-            Util.printf("rot size %d\n", rot.size());
-        // tilt down 45
-        // Rotation3d[] rots = new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) };
-        Rotation3d[] rots = rot.toArray(new Rotation3d[0]);
-        double now = Takt.get();
-        if (DEBUG)
-            Util.printf("writer timestamp %f\n", now);
-        m_pub.set(rots, (long) (now * 1000000.0));
+            Util.println("simulated target write update");
+        // select pose from a little while ago
+        double timestampS = Takt.get() - DELAY;
+        Pose2d pose = m_history.apply(timestampS).pose();
+
+        for (Map.Entry<Camera, StructArrayPublisher<Rotation3d>> entry : m_publishers.entrySet()) {
+            Camera camera = entry.getKey();
+            StructArrayPublisher<Rotation3d> publisher = entry.getValue();
+            List<Rotation3d> rot = SimulatedObjectDetector.getRotations(
+                    pose, camera.getOffset(), m_targets);
+            if (DEBUG)
+                Util.printf("rot size %d\n", rot.size());
+            // tilt down 45
+            // Rotation3d[] rots = new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) };
+            Rotation3d[] rots = rot.toArray(new Rotation3d[0]);
+
+            // write timestamp corresponding to pose
+            long delayUs = (long) DELAY * 1000000;
+            long timestampUs = NetworkTablesJNI.now();
+
+            long time = timestampUs - delayUs;
+            if (DEBUG)
+                Util.printf("writer timestamp %d\n", time);
+            publisher.set(rots, time);
+        }
     }
 
     public void close() {
-        m_pub.close();
+        m_publishers.values().forEach(p -> p.close());
     }
 }
