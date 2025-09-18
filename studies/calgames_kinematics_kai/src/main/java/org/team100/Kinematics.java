@@ -44,6 +44,9 @@ public class Kinematics {
 
     public Pose2d forward(Config config) {
         // forward kinematics
+
+
+        //all VECTORS
         System.out.println("\nRUNNING FORWARD KINEMATICS: \n" );
         System.out.println("PRESETS:" );
 
@@ -111,13 +114,16 @@ public class Kinematics {
         } else {
 
             //1. find the elbow position from the manipulator length and the goal 2dpose. ('p' in my notes) - KYM (CORRECT - 9/13/2025)
-            double elbowPointY = m_manipulatorLength*Math.sin(pose.getRotation().getRadians()) + pose.getY(); // vert side of triangle with hyp facing right, add key point height
+            double wristPointY = (m_manipulatorLength*Math.sin(pose.getRotation().getRadians())) + pose.getY(); // vert side of triangle with hyp facing right, add key point height
             double wristPointX = pose.getX()-(m_manipulatorLength*Math.cos(pose.getRotation().getRadians())); //bottom of triangle with hyp facing right, subtract from key point
 
-            
+            System.out.println("\n\n\n\n\n\nwpX" + wristPointX);
+            System.out.println("\n\n\n\n\n\nwpY" + wristPointY);
+
+
             //2. find the third leg of the triange formed by elbowPointX, hyp = armLength, and subtract that from the height 
-            //of elbowpointY to find the actual shoulder joint height - KYM
-            double shoulderHeight = elbowPointY-(Math.sqrt((m_armLength*m_armLength)-(wristPointX*wristPointX)));
+            //of wristPointY to find the actual shoulder joint height - KYM
+            double shoulderHeight = wristPointY-(Math.sqrt((m_armLength*m_armLength)-(wristPointX*wristPointX)));
 
 
             //find last side of triangle formed by both arms, vertex's being shoulderPt, goalPt, and elbowPt
@@ -125,14 +131,14 @@ public class Kinematics {
             
             //law of cosines to find the angle INSIDE the triangle that corresponds to the shoulder joint. second part is angle from 0 degrees to angle of elevation. gnarly
             //this part needs to be edited for going negative angles with arm?
-            double shoulderAngle = Math.atan((elbowPointY-shoulderHeight)/wristPointX);
+            double shoulderAngle = Math.atan((wristPointY-shoulderHeight)/wristPointX);
 
             //first part is law of cosidnes but for the elbow instead. 
             //need to think about how this will work with negative angles?
             double wristAngle = ((Math.acos((m_manipulatorLength*m_manipulatorLength + m_armLength*m_armLength - zLength*zLength) / (2 * m_manipulatorLength * m_armLength))));
             
             System.out.println("\nOUTPUTS:");
-            System.out.println("Wrist Point (X,Y): (" + wristPointX + "," + elbowPointY + ")");
+            System.out.println("Wrist Point (X,Y): (" + wristPointX + "," + wristPointY + ")");
             System.out.println("Z length: " + zLength);
             System.out.println("Shoulder angle: "+ Math.toDegrees(shoulderAngle));
             System.out.println("Shoulder Height: "+ shoulderHeight);
