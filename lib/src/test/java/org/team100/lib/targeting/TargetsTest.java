@@ -115,7 +115,8 @@ public class TargetsTest implements Timeless {
         reader.update();
 
         List<Translation2d> allTargets = reader.getTargets();
-        assertEquals(2, allTargets.size());
+        // both cameras see the sme target
+        assertEquals(1, allTargets.size());
 
         Optional<Translation2d> tt = reader.getClosestTarget();
         assertTrue(tt.isPresent());
@@ -183,7 +184,8 @@ public class TargetsTest implements Timeless {
         reader.update();
 
         List<Translation2d> allTargets = reader.getTargets();
-        assertEquals(4, allTargets.size());
+        // multi-camera views of the same target are coalesced
+        assertEquals(2, allTargets.size());
 
         Optional<Translation2d> tt = reader.getClosestTarget();
         assertTrue(tt.isPresent());

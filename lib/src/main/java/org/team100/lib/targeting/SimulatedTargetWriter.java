@@ -81,6 +81,7 @@ public class SimulatedTargetWriter {
             // write timestamp corresponding to pose
             long delayUs = (long) DELAY * 1000000;
             long timestampUs = NetworkTablesJNI.now();
+            // long timestampUs = (long)(Takt.get() * 1000000.0);
 
             long time = timestampUs - delayUs;
             if (DEBUG)
