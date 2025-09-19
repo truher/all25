@@ -36,7 +36,7 @@ public class TargetsTest implements Timeless {
     void testTargets() {
         stepTime();
         SwerveModel p = new SwerveModel();
-        Targets t = new Targets(fieldLog, (x) -> p);
+        Targets t = new Targets(logger, fieldLog, (x) -> p);
         t.update();
         assertTrue(t.getTargets().isEmpty());
         // send some blips
@@ -74,7 +74,7 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(fieldLog, (x) -> p);
+        Targets reader = new Targets(logger, fieldLog, (x) -> p);
 
         stepTime();
         writer.update();
@@ -106,7 +106,7 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(fieldLog, (x) -> p);
+        Targets reader = new Targets(logger, fieldLog, (x) -> p);
 
         stepTime();
         writer.update();
@@ -140,7 +140,7 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(fieldLog, x -> p);
+        Targets reader = new Targets(logger, fieldLog, x -> p);
 
         stepTime();
         writer.update();
@@ -174,7 +174,7 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(fieldLog, (x) -> p);
+        Targets reader = new Targets(logger, fieldLog, (x) -> p);
 
         stepTime();
         writer.update();

@@ -217,7 +217,7 @@ public class RobotContainer {
                 history,
                 visionUpdater);
 
-        m_targets = new Targets(fieldLog, history);
+        m_targets = new Targets(driveLog, fieldLog, history);
 
         final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);
