@@ -1,5 +1,9 @@
 package org.team100;
 
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.Logging;
+
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -7,11 +11,16 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class CartesianSetup implements Runnable {
     private static final double CONTROL_SCALE = 0.1;
-    private final Mech m_mech;
+    // private final Mech m_mech;
+    private final RealMech m_mech;
     private final Viz m_viz;
 
     public CartesianSetup() {
-        m_mech = Mech.make2025();
+        Logging logging = Logging.instance();
+        logging.setLevel(Level.TRACE);
+        LoggerFactory logger = logging.rootLogger;
+        // m_mech = Mech.make2025(logger);
+        m_mech = RealMech.make2025(logger);
         m_viz = new Viz(m_mech);
         XboxController controller = new XboxController(0);
         m_mech.setDefaultCommand(m_mech.cartesian(
@@ -24,6 +33,7 @@ public class CartesianSetup implements Runnable {
 
     @Override
     public void run() {
+        m_mech.periodic();
         m_viz.periodic();
     }
 }

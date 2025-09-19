@@ -18,7 +18,7 @@ import org.team100.lib.util.Util;
  * The position limits used to be enforced by a proxy, but now they're here: it
  * seems simpler that way.
  */
-public class RotaryMechanism  {
+public class RotaryMechanism {
     private static final boolean DEBUG = false;
     private final BareMotor m_motor;
     private final RotaryPositionSensor m_sensor;
@@ -124,14 +124,12 @@ public class RotaryMechanism  {
             double outputAccelRad_S2,
             double outputTorqueNm) {
         if (outputPositionRad < m_minPositionRad) {
-            if (DEBUG)
-                Util.println("min");
+            Util.warnf("requested position %8.3f less than min %8.3f\nn", outputPositionRad, m_minPositionRad);
             m_motor.stop();
             return;
         }
         if (outputPositionRad > m_maxPositionRad) {
-            if (DEBUG)
-                Util.println("max");
+            Util.warnf("requested position %8.3f more than max %8.3f\n", outputPositionRad, m_maxPositionRad);
             m_motor.stop();
             return;
         }
