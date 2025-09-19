@@ -9,14 +9,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Viz {
     private static final double SCALE = 100;
     private static final Translation2d ORIGIN = new Translation2d(50, 0);
-    private final Mech m_mech;
+    private final MechInterface m_mech;
     private final Mechanism2d m_view;
     private final MechanismRoot2d m_root;
     private final MechanismLigament2d m_elevator;
     private final MechanismLigament2d m_arm;
     private final MechanismLigament2d m_hand;
 
-    public Viz(Mech mech) {
+    public Viz(MechInterface mech) {
         m_mech = mech;
         m_view = new Mechanism2d(SCALE, SCALE);
         m_root = m_view.getRoot("root", ORIGIN.getX(), ORIGIN.getY());

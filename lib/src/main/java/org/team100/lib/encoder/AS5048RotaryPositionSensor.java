@@ -18,6 +18,12 @@ import org.team100.lib.logging.LoggerFactory;
  * The maximum value is (12+4+4095) / 4119 or 0.998058
  * 
  * https://docs.google.com/document/d/1Znb4MQAqJWQ_Wk_SDJvLRaJxrAjNylkQKeC4OdLdMco/edit
+ * 
+ * The 5048 encoder (and, I think, all AMS sensors) produce clockwise-positive
+ * output, which is opposite our convention. Accordingly, you'll want to use
+ * EncoderDrive.INVERSE in most cases.
+ * 
+ * TODO: fix that, make this class produce conventional output.
  */
 public class AS5048RotaryPositionSensor extends DutyCycleRotaryPositionSensor {
 

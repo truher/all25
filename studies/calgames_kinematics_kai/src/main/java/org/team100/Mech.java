@@ -4,11 +4,10 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Mech extends SubsystemBase {
+public class Mech extends SubsystemBase implements MechInterface {
     private final double m_armLength;
     private final double m_handLength;
     private final JoelsKinematics m_kinematics;
@@ -31,14 +30,17 @@ public class Mech extends SubsystemBase {
         return new Mech(0.3, 0.1);
     }
 
+    @Override
     public double getArmLength() {
         return m_armLength;
     }
 
+    @Override
     public double getHandLength() {
         return m_handLength;
     }
 
+    @Override
     public Config getConfig() {
         return m_config;
     }
@@ -74,13 +76,12 @@ public class Mech extends SubsystemBase {
     }
 
     private void addCartesian(double x, double y, double r) {
-        Transform2d t = new Transform2d(x, y, new Rotation2d(r));
         Pose2d p = m_kinematics.forward(m_config);
         // Pose2d.add() method uses the pose frame so we don't use it.
         // We transform p in the global frame by adding components
-        double x2 = p.getX() + t.getX();
-        double y2 = p.getY() + t.getY();
-        Rotation2d r2 = p.getRotation().plus(t.getRotation());
+        double x2 = p.getX() + x;
+        double y2 = p.getY() + y;
+        Rotation2d r2 = p.getRotation().plus(new Rotation2d(r));
         Pose2d newP = new Pose2d(x2, y2, r2);
         Config c = m_kinematics.inverse(newP);
         if (Double.isNaN(c.shoulderHeight())
@@ -90,6 +91,11 @@ public class Mech extends SubsystemBase {
             return;
         }
         set(c);
+    }
+
+    @Override
+    public void periodic() {
+        // nothing to do
     }
 
 }

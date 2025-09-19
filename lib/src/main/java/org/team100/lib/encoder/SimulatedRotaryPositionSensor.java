@@ -56,7 +56,7 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
         double nowS = Takt.get();
         double dtS = nowS - m_timeS;
         if (dtS > 0.04) {
-            // clock is unreliable, skip  the update
+            // clock is unreliable, skip the update
             dtS = 0;
         }
         // this is the velocity at the current instant.
@@ -71,7 +71,7 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
 
         m_positionRad = MathUtil.angleModulus(m_positionRad);
         m_timeS = nowS;
-        m_log_position.log(() -> m_positionRad);
+        // m_log_position.log(() -> m_positionRad);
         return OptionalDouble.of(m_positionRad);
     }
 
@@ -87,6 +87,8 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
 
     @Override
     public void periodic() {
+        m_encoder.periodic();
+        m_log_position.log(() -> m_positionRad);
     }
 
     @Override

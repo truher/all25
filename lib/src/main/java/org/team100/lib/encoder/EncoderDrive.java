@@ -1,6 +1,12 @@
 package org.team100.lib.encoder;
 
-/** Describes how the encoder angle is linked to the steering angle. */
+/**
+ * Describes how the encoder angle is linked to the steering angle.
+ * 
+ * Note: currently we use this to correct the (inverted) AS5048 output, which is
+ * not a good use of this concept. We should fix the AS5048 class so it produces
+ * conventional output.
+ */
 public enum EncoderDrive {
     /**
      * Encoder moves the same as the module, e.g. via a belt, as in the WCP modules,
