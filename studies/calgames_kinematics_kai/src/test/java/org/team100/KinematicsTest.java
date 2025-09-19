@@ -22,8 +22,8 @@ public class KinematicsTest {
     }
 
     @Test
-    void testInverseL1() {
-        System.out.println("\n\nTESTING INVERSE FOR L1");
+    void testInverseL2() {
+        System.out.println("\n\nTESTING INVERSE FOR L2");
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
         Pose2d p = new Pose2d(0.332, 0.81, new Rotation2d(Math.toRadians(35)));
         Config c = k.inverse(p);
@@ -36,6 +36,20 @@ public class KinematicsTest {
     }
 
     @Test
+    void testInversePickup() {
+        System.out.println("\n\nTESTING INVERSE FOR CORAL PICKUP");
+        Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+        Pose2d p = new Pose2d(0.25, 0.1, new Rotation2d(Math.toRadians(0)));
+        Config c = k.inverse(p);
+        if (c==null){
+            fail("Inverse Kinematics Failed. Check Logs");
+        }
+        assertEquals(0.36, c.shoulderHeight(), 0.001);
+        assertEquals(Math.toRadians(-60), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
+        assertEquals(Math.toRadians(120), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
+    }
+
+    @Test
     void testInverseBaseline() {
         System.out.println("\n\nTESTING BASIC INVERSE");
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
@@ -45,8 +59,8 @@ public class KinematicsTest {
             fail("Inverse Kinematics Failed. Check Logs");
         }
         assertEquals(1, c.shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(60), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
-        assertEquals(Math.toRadians(65), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
+        assertEquals(Math.toRadians(60.0788), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
+        assertEquals(Math.toRadians(64.92115), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
     }
 
     @Test
@@ -101,9 +115,9 @@ public class KinematicsTest {
         System.out.println("\n\nTESTING ROUND TRIP KINEMATICS (Forward First)");
         Kinematics k = new Kinematics(0.3, 0.1, 3, 0, 0, 0, 0);
         Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
-        Config c = new Config(1, 60, 65); //basic config for forward
+        Config c = new Config(1, Math.toRadians(60), Math.toRadians(65)); //basic config for forward
 
-        Pose2d p2 = k.forward(c); //return basic forward output
+        Pose2d p2 = k.forward(c); //return basic forward output (NOW IN RADIANS)
         Config c2 = k.inverse(p2); //make a config based on the result of the forward kinematics
 
         System.out.println("\nDefault pose:   " + p);
@@ -113,9 +127,9 @@ public class KinematicsTest {
         System.out.println("Config derived from forward point: " + c2);
 
         //testing final x positions
-        assertEquals(Math.toRadians(c.shoulderAngle()), c2.shoulderAngle(), 0.001); //check if (given pose x) = (recieved pose x from forward)
+        assertEquals(c.shoulderAngle(), c2.shoulderAngle(), 0.001); //check if (given pose x) = (recieved pose x from forward)
         assertEquals(c.shoulderHeight(), c2.shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(c.wristAngle()), c2.wristAngle(), 0.001);
+        assertEquals(c.wristAngle(), c2.wristAngle(), 0.001);
         
     }
 

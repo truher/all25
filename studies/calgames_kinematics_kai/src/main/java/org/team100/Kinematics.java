@@ -129,12 +129,25 @@ public class Kinematics {
 
             //1. find the elbow position from the manipulator length and the goal 2dpose. ('p' in my notes) - KYM (CORRECT - 9/13/2025)
             double wristPointY = (m_manipulatorLength*Math.sin(pose.getRotation().getRadians())) + pose.getY(); // vert side of triangle with hyp facing right, add key point height
-            double wristPointX = pose.getX()-(m_manipulatorLength*Math.cos(pose.getRotation().getRadians())); //bottom of triangle with hyp facing right, subtract from key point
-
+            double wristPointX = pose.getX()-(m_manipulatorLength*Math.cos((pose.getRotation().getRadians()))); //bottom of triangle with hyp facing right, subtract from key point
+            System.out.println("\n\nahshawsdhifheirhefiehr" + wristPointX); 
+            System.out.println(Math.cos(Math.toRadians(0))*0.1);
+            System.out.println(pose.getX()-(m_manipulatorLength*Math.cos((pose.getRotation().getRadians()))));
 
             //2. find the third leg of the triange formed by elbowPointX, hyp = armLength, and subtract that from the height 
             //of wristPointY to find the actual shoulder joint height - KYM
-            double shoulderHeight = wristPointY-(Math.sqrt((m_armLength*m_armLength)-(wristPointX*wristPointX)));
+
+            double shoulderHeight = 1;
+            int directionChosen = 0;
+            if(pose.getY()<0.25){
+                shoulderHeight = wristPointY+(Math.sqrt((m_armLength*m_armLength)-(wristPointX*wristPointX)));
+                directionChosen = 1; //if the arm is going to be above the manipulator, note that here by making it 1
+
+            } else { //should generally be below the manipulator, to lower CG
+
+                shoulderHeight = wristPointY-(Math.sqrt((m_armLength*m_armLength)-(wristPointX*wristPointX)));
+                directionChosen = 0; //if the arm is going to be below the manipulator, note that here by making it 0
+            }
 
 
             //find last side of triangle formed by both arms, vertex's being shoulderPt, goalPt, and elbowPt
@@ -155,6 +168,11 @@ public class Kinematics {
             System.out.println("Shoulder angle: "+ Math.toDegrees(shoulderAngle));
             System.out.println("Shoulder Height: "+ shoulderHeight);
             System.out.println("Wrist angle: " + Math.toDegrees(wristAngle));
+            if(directionChosen==1){
+                System.out.println("Arm is going to be above wrist, going down");
+            } else {
+                System.out.println("Arm is going to be below wrist, going up.");
+            }
             
             System.out.println("\nDEBUG:");
             System.out.println("Make sure this isn't greater than 1: " + ((m_manipulatorLength*m_manipulatorLength) + (m_armLength*m_armLength) - (zLength*zLength)) / (2 * m_manipulatorLength * m_armLength));
