@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.config.Camera;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
@@ -44,8 +44,10 @@ public class SimulatedTagDetectorTest {
                 Camera.CORAL_RIGHT);
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         // right in front of tag 7
-        Pose2d pose = new Pose2d(2.6576, 4.0259, Rotation2d.kZero);
-        SimulatedTagDetector sim = new SimulatedTagDetector(cameras, layout, (x) -> pose);
+        SimulatedTagDetector sim = new SimulatedTagDetector(
+                cameras,
+                layout,
+                x -> new SwerveModel(new Pose2d(2.6576, 4.0259, Rotation2d.kZero)));
         // sim uses alliance from driver station
         DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
         DriverStationSim.notifyNewData();

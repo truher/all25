@@ -35,7 +35,7 @@ public class OdometryUpdater {
 
     private final SwerveKinodynamics m_kinodynamics;
     private final Gyro m_gyro;
-    private final LimitedInterpolatingSwerveModelHistory m_history;
+    private final SwerveHistory m_history;
     private final Supplier<SwerveModulePositions> m_positions;
 
     /**
@@ -46,7 +46,7 @@ public class OdometryUpdater {
     public OdometryUpdater(
             SwerveKinodynamics kinodynamics,
             Gyro gyro,
-            LimitedInterpolatingSwerveModelHistory estimator,
+            SwerveHistory estimator,
             Supplier<SwerveModulePositions> positions) {
         m_kinodynamics = kinodynamics;
         m_gyro = gyro;

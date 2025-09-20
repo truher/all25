@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.DoubleFunction;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
@@ -32,9 +33,9 @@ class AprilTagRobotLocalizerPerformanceTest {
     void testEstimateRobotPose2() throws IOException {
         // robot is panned right 45, translation is ignored.
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
-        final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
-        final List<Double> timeEstimate = new ArrayList<Double>();
-        SwerveModelHistory history = t -> new SwerveModel(new Rotation2d(-Math.PI / 4));
+        List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
+        List<Double> timeEstimate = new ArrayList<Double>();
+        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(-Math.PI / 4));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -45,7 +46,7 @@ class AprilTagRobotLocalizerPerformanceTest {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, history, visionUpdater, "vision", "blips");
+                logger, layout, history, visionUpdater);
 
         // camera sees the tag straight ahead in the center of the frame,
         // but rotated pi/4 to the left. this is ignored anyway.

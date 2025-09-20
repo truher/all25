@@ -8,11 +8,10 @@ import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.SimulatedGyro;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
-import org.team100.lib.localization.LimitedInterpolatingSwerveModelHistory;
-import org.team100.lib.localization.OdometryUpdater;
-import org.team100.lib.localization.SwerveModelEstimate;
-import org.team100.lib.localization.VisionAndOdometrySwerveModelEstimate;
+import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.localization.NudgingVisionUpdater;
+import org.team100.lib.localization.OdometryUpdater;
+import org.team100.lib.localization.SwerveHistory;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -36,8 +35,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class Fixture {
     public SwerveModuleCollection collection;
     public Gyro gyro;
-    public LimitedInterpolatingSwerveModelHistory history;
-    public SwerveModelEstimate estimate;
+    public SwerveHistory history;
+    public FreshSwerveEstimate estimate;
     public SwerveKinodynamics swerveKinodynamics;
     public SwerveLocal swerveLocal;
     public OdometryUpdater odometryUpdater;
@@ -54,7 +53,7 @@ public class Fixture {
         collection = SwerveModuleCollection.get(logger, 10, 20, swerveKinodynamics);
         gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
-        history = new LimitedInterpolatingSwerveModelHistory(
+        history = new SwerveHistory(
                 swerveKinodynamics,
                 Rotation2d.kZero,
                 SwerveModulePositions.kZero(),
@@ -70,8 +69,8 @@ public class Fixture {
         final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, history, visionUpdater, "foo", "bar");
-        estimate = new VisionAndOdometrySwerveModelEstimate(localizer, odometryUpdater, history);
+                logger, layout, history, visionUpdater);
+        estimate = new FreshSwerveEstimate(localizer, odometryUpdater, history);
 
         SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
         drive = new SwerveDriveSubsystem(

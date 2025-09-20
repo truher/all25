@@ -187,6 +187,24 @@ public class GeometryUtil {
         return a.rotateBy(Rotation2d.fromRadians(angle_diff * x));
     }
 
+    /** Straight-line (not constant-twist) interpolation. */
+    public static Pose2d interpolate(Pose2d a, Pose2d b, double x) {
+        if (x <= 0.0) {
+            return a;
+        } else if (x >= 1.0) {
+            return b;
+        }
+        Translation2d aT = a.getTranslation();
+        Translation2d bT = b.getTranslation();
+        Rotation2d aR = a.getRotation();
+        Rotation2d bR = b.getRotation();
+        // each translation axis is interpolated separately
+        Translation2d lerpT = aT.interpolate(bT, x);
+        // Rotation2d lerpR = aR.interpolate(bR, x);
+        Rotation2d lerpR = interpolate2(aR, bR, x);
+        return new Pose2d(lerpT, lerpR);        
+    }
+
     /**
      * Interpolate between a and b, treating each dimension separately. This will
      * make straight lines, whereas the WPI Pose3d interpolator will make

@@ -3,9 +3,14 @@ package org.team100.lib.motion.drivetrain.state;
 import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 /**
  * Just like ChassisSpeeds, but field-relative, to avoid mixing them up.
@@ -95,5 +100,17 @@ public record FieldRelativeVelocity(double x, double y, double theta) {
     @Override
     public String toString() {
         return String.format("(%5.2f, %5.2f, %5.2f)", x, y, theta);
+    }
+
+    public static FieldRelativeVelocity fromVector(Vector<N3> v) {
+        return new FieldRelativeVelocity(v.get(0), v.get(1), v.get(2));
+    }
+
+    public static FieldRelativeVelocity fromVector(Matrix<N3, N1> v) {
+        return new FieldRelativeVelocity(v.get(0, 0), v.get(1, 0), v.get(2, 0));
+    }
+
+    public Vector<N3> toVector() {
+        return VecBuilder.fill(x, y, theta);
     }
 }

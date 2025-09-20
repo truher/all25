@@ -41,13 +41,14 @@ public class FloorPickSequence {
             return Optional.of(landing);
         };
         
+        // this ends after alignment
         DriveToTranslationWithFront toRunway = new DriveToTranslationWithFront(
                 fieldLog, runway, drive, controller, profile);
         DriveToTranslationWithFront toTarget = new DriveToTranslationWithFront(
                 fieldLog, target, drive, controller, profile);
 
         return sequence(
-                toRunway.until(toRunway::isDone),
+                toRunway.until(toRunway::thetaAligned),
                 toTarget.until(toTarget::isDone));
     }
 

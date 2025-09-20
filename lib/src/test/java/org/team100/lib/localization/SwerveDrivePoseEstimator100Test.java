@@ -72,7 +72,7 @@ class SwerveDrivePoseEstimator100Test {
     void testGyroOffset() {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         Gyro gyro = new MockGyro();
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -103,7 +103,7 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         Gyro gyro = new MockGyro();
 
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -147,7 +147,7 @@ class SwerveDrivePoseEstimator100Test {
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -191,7 +191,7 @@ class SwerveDrivePoseEstimator100Test {
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -241,7 +241,7 @@ class SwerveDrivePoseEstimator100Test {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         positions = positionZero;
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -359,7 +359,7 @@ class SwerveDrivePoseEstimator100Test {
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -480,7 +480,7 @@ class SwerveDrivePoseEstimator100Test {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         positions = positionZero;
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -538,7 +538,7 @@ class SwerveDrivePoseEstimator100Test {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 1.0, 1.0, Double.MAX_VALUE };
         positions = positionZero;
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -595,7 +595,7 @@ class SwerveDrivePoseEstimator100Test {
         double[] stateStdDevs = new double[] { 0.05, 0.05, 0.05 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         positions = positionZero;
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -653,7 +653,7 @@ class SwerveDrivePoseEstimator100Test {
 
         double[] stateStdDevs = new double[] { 0.001, 0.001, 0.01 };
         double[] visionMeasurementStdDevs = new double[] { 0.1, 0.1, Double.MAX_VALUE };
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -752,7 +752,7 @@ class SwerveDrivePoseEstimator100Test {
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, 0.5 };
-        var estimator = new LimitedInterpolatingSwerveModelHistory(
+        var estimator = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -905,7 +905,7 @@ class SwerveDrivePoseEstimator100Test {
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.9, 0.9, 0.9 };
-        var estimator = new LimitedInterpolatingSwerveModelHistory(
+        var estimator = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -949,7 +949,7 @@ class SwerveDrivePoseEstimator100Test {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest();
         Gyro gyro = new MockGyro();
 
-        var estimator = new LimitedInterpolatingSwerveModelHistory(
+        var estimator = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,

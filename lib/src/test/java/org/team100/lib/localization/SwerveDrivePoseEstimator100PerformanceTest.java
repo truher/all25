@@ -62,7 +62,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
 
         Gyro gyro = new MockGyro();
-        LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        SwerveHistory history = new SwerveHistory(
                 kinodynamics,
                 Rotation2d.kZero,
                 SwerveModulePositions.kZero(),
