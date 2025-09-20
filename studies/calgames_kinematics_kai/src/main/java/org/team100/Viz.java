@@ -1,5 +1,7 @@
 package org.team100;
 
+import org.team100.lib.motion.Config;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;

@@ -1,9 +1,11 @@
 package org.team100;
 
+import org.team100.lib.motion.Config;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class Kinematics {
+public class KaisKinematics {
     private final double m_armLength;
     private final double m_manipulatorLength;
     private final double m_shoulderMaxHeight;
@@ -28,7 +30,7 @@ public class Kinematics {
 
 
 
-    public Kinematics(double armLength, double manipulatorLength, double shoulderMaxHeight, double deadAX, double deadAY, double deadBX, double deadBY) {
+    public KaisKinematics(double armLength, double manipulatorLength, double shoulderMaxHeight, double deadAX, double deadAY, double deadBX, double deadBY) {
         m_armLength = armLength;
         m_manipulatorLength = manipulatorLength;
         m_shoulderMaxHeight=shoulderMaxHeight;
@@ -109,23 +111,23 @@ public class Kinematics {
         double xReach = (pose.getRotation().getCos()*m_manipulatorLength)+m_armLength;
         System.out.println("X reach: " +xReach);
         
-        if (Math.abs(pose.getX())>xReach || pose.getY()>m_shoulderMaxHeight || pose.getY() <= 0) {
+        // if (Math.abs(pose.getX())>xReach || pose.getY()>m_shoulderMaxHeight || pose.getY() <= 0) {
 
-            if (pose.getX()>xReach){
-                System.out.println("Desired X (" + pose.getX() + ") is greater than reach (" + xReach + ") and is not achievable! Please test a different value.");
-            }
+        //     if (pose.getX()>xReach){
+        //         System.out.println("Desired X (" + pose.getX() + ") is greater than reach (" + xReach + ") and is not achievable! Please test a different value.");
+        //     }
 
-            if (pose.getY()>m_shoulderMaxHeight || pose.getY() <= 0){
-                System.out.println("Desired Y (" + pose.getY() + "is greater than max height (" + m_shoulderMaxHeight + ") or less than zero, and is not achievable! Please test a different value.");
-            }
-            return null; //should cancel the program
+        //     if (pose.getY()>m_shoulderMaxHeight || pose.getY() <= 0){
+        //         System.out.println("Desired Y (" + pose.getY() + "is greater than max height (" + m_shoulderMaxHeight + ") or less than zero, and is not achievable! Please test a different value.");
+        //     }
+        //     return null; //should cancel the program
 
         
-        } else if(inDeadzone(pose)){ //checking if desired point is in deadzone
-            System.out.println("Desired XY is in deadzone, aborting");
-            return null; //detects that in deadzone and must abort
+        // // } else if(inDeadzone(pose)){ //checking if desired point is in deadzone
+        // //     System.out.println("Desired XY is in deadzone, aborting");
+        // //     return null; //detects that in deadzone and must abort
 
-        } else {
+        // } else {
 
             //1. find the elbow position from the manipulator length and the goal 2dpose. ('p' in my notes) - KYM (CORRECT - 9/13/2025)
             double wristPointY = (m_manipulatorLength*Math.sin(pose.getRotation().getRadians())) + pose.getY(); // vert side of triangle with hyp facing right, add key point height
@@ -178,5 +180,3 @@ public class Kinematics {
             return new Config(shoulderHeight, shoulderAngle, wristAngle);
         }
     }
-
-}

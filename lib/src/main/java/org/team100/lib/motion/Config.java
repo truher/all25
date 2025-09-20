@@ -1,5 +1,5 @@
-package org.team100;
-
+package org.team100.lib.motion;
+//should be renamed to match the EWAK Convention (elevator wrist arm kinematics)
 /**
  * @param shoulderHeight meters relative to the floor
  * @param shoulderAngle  radians relative to the base of the elevator, i.e. zero is

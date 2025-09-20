@@ -1,19 +1,21 @@
-package org.team100;
+package org.team100.lib.motion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.motion.Config;
+import org.team100.lib.motion.ElevatorArmWristKinematics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class JoelsKinematicsTest {
+public class ElevatorArmWristKinematicsTest {
     // one micrometer tolerance since all the math here is exact
     private static final double DELTA = 0.000001;
 
     @Test
     void testForward0() {
-        JoelsKinematics k = new JoelsKinematics(0.3, 0.1);
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(0.3, 0.1);
         Config c = new Config(1, Math.toRadians(60), Math.toRadians(0));
         Pose2d p = k.forward(c);
         // 60 degrees so x is half the total length
@@ -26,7 +28,7 @@ public class JoelsKinematicsTest {
 
     @Test
     void testForward1() {
-        JoelsKinematics k = new JoelsKinematics(2, 1);
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         // one meter high, zero shoulder (so to the right along x), zero wrist (also
         // along x)
         Config c = new Config(1, 0, 0);
@@ -42,7 +44,7 @@ public class JoelsKinematicsTest {
     @Test
     void testInverse0() {
         // should be straight up
-        JoelsKinematics k = new JoelsKinematics(2, 1);
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         Pose2d p = new Pose2d(4, 0, Rotation2d.kZero);
         Config c = k.inverse(p);
         // pose at 4, total is 3 long, so shoulder at 1
@@ -52,9 +54,21 @@ public class JoelsKinematicsTest {
     }
 
     @Test
+    void testInverseDownArm() {
+        //built for a 45 45 90 triangle for
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics((2*Math.sqrt(2)), 1);
+        Pose2d p = new Pose2d(0.1, 3, Rotation2d.kCCW_90deg);
+        Config c = k.inverse(p);
+
+        assertEquals(2.1, c.shoulderHeight(), 0.001);
+        assertEquals(2.35619, c.shoulderAngle(), 0.001);
+        assertEquals(2.35619, c.wristAngle(), 0.001);
+    }
+
+    @Test
     void testInverse1() {
         // arm up, wrist to the side
-        JoelsKinematics k = new JoelsKinematics(2, 1);
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         Pose2d p = new Pose2d(3, 1, Rotation2d.kCCW_90deg);
         Config c = k.inverse(p);
         // arm length is 2, wrist location is at 3
@@ -66,7 +80,7 @@ public class JoelsKinematicsTest {
     @Test
     void testInverse2() {
         // arm to the side, wrist down
-        JoelsKinematics k = new JoelsKinematics(2, 1);
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         Pose2d p = new Pose2d(0, 2, Rotation2d.k180deg);
         Config c = k.inverse(p);
         assertEquals(1, c.shoulderHeight(), DELTA);
@@ -76,7 +90,7 @@ public class JoelsKinematicsTest {
 
     @Test
     void testRoundTripInverseFirst() {
-        JoelsKinematics k = new JoelsKinematics(0.3, 0.1);
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(0.3, 0.1);
         Pose2d p = new Pose2d(1.178, 0.207, new Rotation2d(Math.toRadians(55)));
 
         Config c2 = k.inverse(p);
@@ -90,7 +104,7 @@ public class JoelsKinematicsTest {
 
     @Test
     void testRoundTripForwardFirst() {
-        JoelsKinematics k = new JoelsKinematics(0.3, 0.1);
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(0.3, 0.1);
         Config c = new Config(1, Math.toRadians(60), Math.toRadians(60));
 
         Pose2d p2 = k.forward(c);
