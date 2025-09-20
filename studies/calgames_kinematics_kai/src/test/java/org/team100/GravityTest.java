@@ -13,7 +13,7 @@ public class GravityTest {
         // arm and hand both horizontal = maximum torque
         JointForce jf = g.get(new Config(1, Math.PI/2, 0));
         // total mass is 2kg, g is 10
-        assertEquals(20, jf.elevator(), DELTA);
+        assertEquals(-20, jf.elevator(), DELTA);
         // 1kg * g * 1.1m + 1kg * g * 0.5
         assertEquals(16, jf.shoulder(), DELTA);
         // 1kg * g * 0.1m
@@ -26,7 +26,7 @@ public class GravityTest {
         // arm horizontal, hand facing up
         JointForce jf = g.get(new Config(1, Math.PI/2, -Math.PI/2));
         // total mass is 2kg, g is 10
-        assertEquals(20, jf.elevator(), DELTA);
+        assertEquals(-20, jf.elevator(), DELTA);
         // 1kg * g * 0.5
         assertEquals(15, jf.shoulder(), DELTA);
         // no lever arm here
@@ -39,7 +39,7 @@ public class GravityTest {
         // arm up, hand out
         JointForce jf = g.get(new Config(1, 0, Math.PI/2));
         // total mass is 2kg, g is 10
-        assertEquals(20, jf.elevator(), DELTA);
+        assertEquals(-20, jf.elevator(), DELTA);
         // 1kg * g * 0.1
         assertEquals(1, jf.shoulder(), DELTA);
         // 1kg * g * 0.1
@@ -52,7 +52,7 @@ public class GravityTest {
         // reaching backwards
         JointForce jf = g.get(new Config(1, -Math.PI/2, 0));
         // total mass is 2kg, g is 10
-        assertEquals(20, jf.elevator(), DELTA);
+        assertEquals(-20, jf.elevator(), DELTA);
         // 1kg * g * 1.1m + 1kg * g * 0.5
         assertEquals(-16, jf.shoulder(), DELTA);
         // 1kg * g * 0.1m
