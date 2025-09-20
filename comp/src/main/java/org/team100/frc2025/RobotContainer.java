@@ -50,6 +50,7 @@ import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
+import org.team100.lib.examples.semiauto.FloorPickSetup;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.gyro.Gyro;
@@ -217,7 +218,7 @@ public class RobotContainer {
                 history,
                 visionUpdater);
 
-        m_targets = new Targets(fieldLog, history);
+        m_targets = new Targets(driveLog, fieldLog, history);
 
         final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);
@@ -459,6 +460,11 @@ public class RobotContainer {
 
         whileTrue(operatorControl::activateManualClimb,
                 m_climber.manual(operatorControl::manualClimbSpeed));
+
+        // this is for developing autopick.
+        new FloorPickSetup(
+                fieldLog, driverControl, m_drive, m_targets, 
+                SwerveControllerFactory.pick(driveLog), autoProfile);
 
         m_initializer = Executors.newSingleThreadScheduledExecutor();
         m_initializer.schedule(this::initStuff, 0, TimeUnit.SECONDS);
