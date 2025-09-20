@@ -78,6 +78,7 @@ public interface BareMotor {
         return torqueFFAmps * kROhms();
     }
 
+    /** This is not "hold position" this is "torque off". */
     void stop();
 
     /**

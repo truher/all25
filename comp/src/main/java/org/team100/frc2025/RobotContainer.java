@@ -62,9 +62,12 @@ import org.team100.lib.hid.ThirdControl;
 import org.team100.lib.hid.ThirdControlProxy;
 import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
-import org.team100.lib.localization.SimulatedTagDetector;
-import org.team100.lib.localization.SwerveDrivePoseEstimator100;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
+import org.team100.lib.localization.FreshSwerveEstimate;
+import org.team100.lib.localization.NudgingVisionUpdater;
+import org.team100.lib.localization.OdometryUpdater;
+import org.team100.lib.localization.SimulatedTagDetector;
+import org.team100.lib.localization.SwerveHistory;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
@@ -78,6 +81,8 @@ import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.targeting.SimulatedTargetWriter;
+import org.team100.lib.targeting.Targets;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.Util;
@@ -132,7 +137,9 @@ public class RobotContainer {
     private final ScheduledExecutorService m_initializer;
 
     private final Runnable m_simulatedTagDetector;
+    private final Runnable m_targetSimulator;
     private final Runnable m_combinedViz;
+    private final Targets m_targets;
 
     public RobotContainer(TimedRobot100 robot) throws IOException {
         final AsyncFactory asyncFactory = new AsyncFactory(robot);
@@ -190,19 +197,30 @@ public class RobotContainer {
                 m_modules);
 
         // ignores the rotation derived from vision.
-        final SwerveDrivePoseEstimator100 poseEstimator = m_swerveKinodynamics.newPoseEstimator(
-                driveLog,
-                gyro,
+        final SwerveHistory history = new SwerveHistory(
+                m_swerveKinodynamics,
+                gyro.getYawNWU(),
                 m_modules.positions(),
                 Pose2d.kZero,
                 Takt.get());
 
+        final OdometryUpdater odometryUpdater = new OdometryUpdater(
+                m_swerveKinodynamics, gyro, history, m_modules::positions);
+        odometryUpdater.reset(Pose2d.kZero);
+        final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(history, odometryUpdater);
+
         final AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
-        final AprilTagRobotLocalizer visionDataProvider = new AprilTagRobotLocalizer(
+        final AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
                 driveLog,
                 layout,
-                poseEstimator);
+                history,
+                visionUpdater);
+
+        m_targets = new Targets(fieldLog, history);
+
+        final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
+                localizer, odometryUpdater, history);
 
         final SwerveLocal swerveLocal = new SwerveLocal(
                 driveLog,
@@ -214,17 +232,19 @@ public class RobotContainer {
         m_drive = new SwerveDriveSubsystem(
                 fieldLogger,
                 driveLog,
-                gyro,
-                poseEstimator,
+                m_swerveKinodynamics,
+                odometryUpdater,
+                estimate,
                 swerveLocal,
-                visionDataProvider::update,
                 limiter);
 
-        m_leds = new LEDIndicator(0, visionDataProvider::getPoseAgeSec);
+        m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
             m_simulatedTagDetector = () -> {
+            };
+            m_targetSimulator = () -> {
             };
         } else {
             // In simulation, we want the real simulated tag detector.
@@ -236,8 +256,19 @@ public class RobotContainer {
                             Camera.CORAL_LEFT,
                             Camera.CORAL_RIGHT),
                     layout,
-                    (timestampS) -> poseEstimator.get(timestampS).pose());
+                    history);
             m_simulatedTagDetector = sim::periodic;
+            // for now, one target, near the corner.
+            SimulatedTargetWriter tsim = new SimulatedTargetWriter(
+                    List.of(Camera.SWERVE_LEFT,
+                            Camera.SWERVE_RIGHT,
+                            Camera.FUNNEL,
+                            Camera.CORAL_LEFT,
+                            Camera.CORAL_RIGHT),
+                    history,
+                    new Translation2d[] {
+                            new Translation2d(1.5, 1.5) });
+            m_targetSimulator = tsim::update;
         }
 
         ///////////////////////////
@@ -249,7 +280,7 @@ public class RobotContainer {
 
         final DriveManually driveManually = new DriveManually(
                 driverControl::velocity,
-                visionDataProvider::setHeedRadiusM,
+                localizer::setHeedRadiusM,
                 m_drive);
         final LoggerFactory manLog = comLog.type(driveManually);
 
@@ -311,7 +342,7 @@ public class RobotContainer {
 
         DriveManuallySimple driveDefault = new DriveManuallySimple(
                 driverControl::velocity,
-                visionDataProvider::setHeedRadiusM,
+                localizer::setHeedRadiusM,
                 m_drive,
                 new ManualWithProfiledReefLock(
                         manLog, m_swerveKinodynamics, driverControl::useReefLock, thetaFeedback,
@@ -337,11 +368,11 @@ public class RobotContainer {
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
         m_auton = new Auton(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
-                autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz).left();
+                autoProfile, m_drive, localizer::setHeedRadiusM, m_swerveKinodynamics, viz).left();
 
         whileTrue(driverControl::test,
                 new Auton(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
-                        autoProfile, m_drive, visionDataProvider::setHeedRadiusM, m_swerveKinodynamics, viz).right());
+                        autoProfile, m_drive, localizer::setHeedRadiusM, m_swerveKinodynamics, viz).right());
 
         // Driver/Operator Buttons
         onTrue(driverControl::resetRotation0, new ResetPose(m_drive, new Pose2d()));
@@ -355,62 +386,62 @@ public class RobotContainer {
         whileTrue(driverControl::driveToTag, buttons::a,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.A));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.A));
 
         whileTrue(driverControl::driveToTag, buttons::b,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.B));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.B));
 
         whileTrue(driverControl::driveToTag, buttons::c,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.C));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.C));
 
         whileTrue(driverControl::driveToTag, buttons::d,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.D));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.D));
 
         whileTrue(driverControl::driveToTag, buttons::e,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.E));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.E));
 
         whileTrue(driverControl::driveToTag, buttons::f,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.F));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.F));
 
         whileTrue(driverControl::driveToTag, buttons::g,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.G));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.G));
 
         whileTrue(driverControl::driveToTag, buttons::h,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.H));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.H));
 
         whileTrue(driverControl::driveToTag, buttons::i,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.I));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.I));
 
         whileTrue(driverControl::driveToTag, buttons::j,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.J));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.J));
 
         whileTrue(driverControl::driveToTag, buttons::k,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.K));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.K));
 
         whileTrue(driverControl::driveToTag, buttons::l,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
                         buttons::scoringPosition, holonomicController, profile,
-                        m_drive, visionDataProvider::setHeedRadiusM, ReefPoint.L));
+                        m_drive, localizer::setHeedRadiusM, ReefPoint.L));
 
         whileTrue(buttons::ab, GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
         whileTrue(buttons::cd, GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
@@ -500,6 +531,10 @@ public class RobotContainer {
     public void periodic() {
         // publish the simulated tag sightings.
         m_simulatedTagDetector.run();
+        // publish simulated target sightings
+        m_targetSimulator.run();
+        // show the closest target on field2d
+        m_targets.periodic();
         m_leds.periodic();
         m_combinedViz.run();
     }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.team100.lib.field.FieldPoint2024;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,48 +13,34 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-/**
- * This was from 2024.
- */
 public class SimulatedObjectDetector {
-    private final Transform3d m_offset;
-    private final double m_hFovHalfAngleRad;
-    private final double m_vFovHalfAngleRad;
+    private static final boolean DEBUG = false;
+    /** horizontal field of view, half-angle */
+    private final static double HFOV_HALF = Math.toRadians(40);
+    /** vertical field of view, half-angle */
+    private final static double VFOV_HALF = Math.toRadians(31.5);
 
-    /**
-     * @param offset           robot-relative
-     * @param hFovHalfAngleRad horizontal field of view, half-angle
-     * @param vFovHalfAngleRad vertical field of view, half-angle
-     */
-    public SimulatedObjectDetector(
-            Transform3d offset,
-            double hFovHalfAngleRad,
-            double vFovHalfAngleRad) {
-        m_offset = offset;
-        m_hFovHalfAngleRad = hFovHalfAngleRad;
-        m_vFovHalfAngleRad = vFovHalfAngleRad;
-    }
+    private SimulatedObjectDetector() {
 
-    public Transform3d getOffset() {
-        return m_offset;
-    }
-
-    public List<Rotation3d> getKnownLocations(Alliance alliance, Pose2d robotPose) {
-        return getRotations(robotPose, FieldPoint2024.allNotes(alliance));
     }
 
     /**
      * Gets the rotation to the object in the frame
      * 
-     * @param robotPose Pose of the robot
-     * @param notes     field relative translation of any objects
+     * @param robotPose    Pose of the robot
+     * @param cameraOffset relative to the robot
+     * @param objects        field relative translation of any objects
      */
-    public List<Rotation3d> getRotations(Pose2d robotPose, Translation2d[] notes) {
+    public static List<Rotation3d> getRotations(
+            Pose2d robotPose,
+            Transform3d cameraOffset,
+            Translation2d[] objects) {
         ArrayList<Rotation3d> list = new ArrayList<>();
-        for (Translation2d note : notes) {
-            getRotInCamera(robotPose, note).ifPresent(list::add);
+        for (Translation2d object : objects) {
+            if (DEBUG)
+                Util.printf("object %s\n", object);
+            getRotInCamera(robotPose, cameraOffset, object).ifPresent(list::add);
         }
         return list;
     }
@@ -64,37 +50,43 @@ public class SimulatedObjectDetector {
     /**
      * Return the camera-relative rotation for the note, given the robot pose.
      */
-    Optional<Rotation3d> getRotInCamera(Pose2d robotPose, Translation2d note) {
-        Transform3d noteInCameraCoordinates = getNoteInCameraCoordinates(robotPose, note);
+    static Optional<Rotation3d> getRotInCamera(Pose2d robotPose, Transform3d cameraOffset, Translation2d note) {
+        Transform3d noteInCameraCoordinates = getNoteInCameraCoordinates(
+                robotPose, cameraOffset, note);
         double x = noteInCameraCoordinates.getX();
         double y = noteInCameraCoordinates.getY();
         double z = noteInCameraCoordinates.getZ();
-        if (Math.abs(Math.atan2(z, x)) >= m_vFovHalfAngleRad
-                && Math.abs(Math.atan2(y, x)) >= m_hFovHalfAngleRad) {
+        Rotation3d rot = new Rotation3d(VecBuilder.fill(x, 0, 0), VecBuilder.fill(x, y, z));
+        if (Math.abs(rot.getY()) >= VFOV_HALF
+                && Math.abs(rot.getZ()) >= HFOV_HALF) {
+            if (DEBUG)
+                Util.printf("out of frame\n");
             return Optional.empty();
         }
-        return Optional.of(new Rotation3d(VecBuilder.fill(x, 0, 0), VecBuilder.fill(x, y, z)));
+        if (DEBUG)
+            Util.printf("rot %s\n", rot);
+        return Optional.of(rot);
     }
 
     /**
      * Find the note transform relative to the camera, given the field-relative
      * robot pose and note translation
      */
-    Transform3d getNoteInCameraCoordinates(Pose2d robotPose, Translation2d note) {
+    static Transform3d getNoteInCameraCoordinates(Pose2d robotPose, Transform3d cameraOffset, Translation2d note) {
         Pose2d notePose = new Pose2d(note, new Rotation2d());
         Translation2d relative = notePose.relativeTo(robotPose).getTranslation();
-        return getNoteInCameraCoordinates(relative);
+        return getNoteInCameraCoordinates(cameraOffset, relative);
     }
 
     /**
      * Given a translation on the floor relative to the robot, return the transform
      * relative to the camera.
      */
-    Transform3d getNoteInCameraCoordinates(Translation2d relative) {
+    static Transform3d getNoteInCameraCoordinates(Transform3d cameraOffset, Translation2d relative) {
         Transform3d noteInRobotCoords = new Transform3d(
                 new Translation3d(relative.getX(), relative.getY(), 0),
                 new Rotation3d());
-        Transform3d robotInCameraCoordinates = m_offset.inverse();
+        Transform3d robotInCameraCoordinates = cameraOffset.inverse();
         return robotInCameraCoordinates.plus(noteInRobotCoords);
     }
 }

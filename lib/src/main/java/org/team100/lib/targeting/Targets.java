@@ -1,150 +1,105 @@
 package org.team100.lib.targeting;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleFunction;
 
+import org.team100.lib.coherence.Cache;
+import org.team100.lib.coherence.SideEffect;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.config.Camera;
-import org.team100.lib.config.Identity;
+import org.team100.lib.logging.FieldLogger;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.network.CameraReader;
+import org.team100.lib.util.TrailingHistory;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.networktables.MultiSubscriber;
-import edu.wpi.first.networktables.NetworkTableEvent;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableListenerPoller;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.networktables.ValueEventData;
 import edu.wpi.first.util.struct.StructBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Listen for updates from the object-detector camera and remember them for
  * awhile.
  */
-public class Targets {
-    /** Ignore sights older than this. */
-    private static final double MAX_SIGHT_AGE = 0.1;
-    
-    private StructBuffer<Rotation3d> m_buf = StructBuffer.create(Rotation3d.struct);
-    List<Translation2d> objects = new ArrayList<>();
-    private final DoubleFunction<Pose2d> m_robotPose;
-    private final NetworkTableListenerPoller m_poller;
+public class Targets extends CameraReader<Rotation3d> {
+    private static final boolean DEBUG = false;
 
-    private double latestTime = 0;
+    /**
+     * Ignore incoming sights older than this, because they're stale.
+     * This shouldn't happen if the camera is working well.
+     */
+    private static final double MAX_SIGHT_AGE = 0.2;
+    /** Forget sights older than this. */
+    private static final double HISTORY_DURATION = 1.0;
 
-    public Targets(DoubleFunction<Pose2d> robotPose) {
-        m_robotPose = robotPose;
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        m_poller = new NetworkTableListenerPoller(inst);
-        m_poller.addListener(
-                new MultiSubscriber(
-                        inst,
-                        new String[] { "objectVision" },
-                        PubSubOption.keepDuplicates(true)),
-                EnumSet.of(NetworkTableEvent.Kind.kValueAll));
+    private final FieldLogger.Log m_field_log;
+
+    /** state = f(takt seconds) from history. */
+    private final DoubleFunction<SwerveModel> m_history;
+    /** Accumulation of targets we see. */
+    private final TrailingHistory<Translation2d> m_targets;
+    /** Side effect mutates targets. */
+    private final SideEffect m_vision;
+
+    public Targets(
+            FieldLogger.Log fieldLogger,
+            DoubleFunction<SwerveModel> history) {
+        super(
+                "objectVision",
+                "Rotation3d",
+                StructBuffer.create(Rotation3d.struct));
+        m_field_log = fieldLogger;
+        m_history = history;
+        m_targets = new TrailingHistory<>(HISTORY_DURATION);
+        m_vision = Cache.ofSideEffect(this::update);
     }
 
-    public void update() {
-        for (NetworkTableEvent e : m_poller.readQueue()) {
-            ValueEventData ve = e.valueData;
-            NetworkTableValue v = ve.value;
-            String name = ve.getTopic().getName();
-            String[] fields = name.split("/");
-            if (fields.length != 4) {
-                return;
-            }
-            if (fields[2].equals("fps")) {
-                // FPS is not used by the robot
-            } else if (fields[2].equals("latency")) {
-                // latency is not used by the robot
-            } else if (fields[3].equals("Rotation3d")) {
-                // decode the way StructArrayEntryImpl does
-                byte[] b = v.getRaw();
-                if (b.length == 0) {
-                    return;
-                }
-                // object! sights are x-ahead WPI coordinates, not z-ahead camera coordinates.
-                Rotation3d[] sights;
-                try {
-                    synchronized (m_buf) {
-                        sights = m_buf.readArray(b);
-                        latestTime = Takt.get();
-                    }
-                } catch (RuntimeException ex) {
-                    return;
-                }
-                Transform3d cameraInRobotCoordinates = Camera.get(fields[1]).getOffset();
-                Pose2d robotPose = m_robotPose.apply(v.getServerTime() / 1000000.0);
-                objects = TargetLocalizer.cameraRotsToFieldRelativeArray(
-                        robotPose,
-                        cameraInRobotCoordinates,
-                        sights);
-            } else {
-                Util.warn("object weird vision update key: " + name);
-            }
+    @Override
+    protected void perValue(
+            Transform3d cameraOffset,
+            double valueTimestamp,
+            Rotation3d[] sights) {
+        double age = Takt.get() - valueTimestamp;
+        if (age > MAX_SIGHT_AGE) {
+            if (DEBUG)
+                Util.warnf("ignoring stale sight %f %f\n",
+                        Takt.get(), valueTimestamp);
+            return;
         }
+        Pose2d robotPose = m_history.apply(valueTimestamp).pose();
+        m_targets.addAll(
+                valueTimestamp,
+                TargetLocalizer.cameraRotsToFieldRelativeArray(
+                        robotPose,
+                        cameraOffset,
+                        sights));
     }
 
     /**
      * Field-relative translations of recent sights.
      */
-    public List<Translation2d> getTranslation2dArray() {
-        update();
-        switch (Identity.instance) {
-            case BLANK:
-                Pose2d robotPose = m_robotPose.apply(Takt.get());
-                Transform3d offset = new Transform3d(
-                        new Translation3d(-0.1265, 0.03, 0.61),
-                        new Rotation3d(0, Math.toRadians(31.5), Math.PI));
-                SimulatedObjectDetector simCamera = new SimulatedObjectDetector(
-                        offset,
-                        Math.toRadians(40),
-                        Math.toRadians(31.5));
-                Optional<Alliance> alliance = DriverStation.getAlliance();
-                if (alliance.isEmpty())
-                    return new ArrayList<>();
-                List<Rotation3d> rot = simCamera.getKnownLocations(alliance.get(), robotPose);
-                return TargetLocalizer.cameraRotsToFieldRelativeArray(
-                        robotPose,
-                        simCamera.getOffset(),
-                        rot.toArray(new Rotation3d[0]));
-            default:
-                if (latestTime > Takt.get() - MAX_SIGHT_AGE) {
-                    return objects;
-                }
-                return new ArrayList<>();
-        }
+    public List<Translation2d> getTargets() {
+        m_vision.run();
+        return m_targets.getAll();
     }
 
     /**
      * The field-relative translation of the closest object, if any.
      */
-    public Optional<Translation2d> getClosestTranslation2d() {
-        update();
-        Pose2d robotPose = m_robotPose.apply(Takt.get());
-        return ObjectPicker.closestObject(
-                getTranslation2dArray(),
-                robotPose);
+    public Optional<Translation2d> getClosestTarget() {
+        Pose2d robotPose = m_history.apply(Takt.get()).pose();
+        List<Translation2d> targets = getTargets();
+        if (DEBUG)
+            Util.printf("translations %d\n", targets.size());
+        return ObjectPicker.closestObject(targets, robotPose);
     }
 
-    /**
-     * The field-relative translation of the closest object, if any.
-     */
-    public Translation2d getClosestTranslation2dNull() {
-        Optional<Translation2d> translation2d = getClosestTranslation2d();
-        if (translation2d.isEmpty()) {
-            return null;
-        }
-        return getClosestTranslation2d().get();
+    public void periodic() {
+        // show the closest target we can see on the field2d widget.
+        getClosestTarget().ifPresent(
+                x -> m_field_log.m_log_target.log(
+                        () -> new double[] { x.getX(), x.getY(), 0 }));
     }
 }

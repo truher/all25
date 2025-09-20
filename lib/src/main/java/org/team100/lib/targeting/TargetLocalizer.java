@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.team100.lib.util.Util;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class TargetLocalizer {
+    private static final boolean DEBUG = false;
 
     /**
      * Converts camera-relative sights to field relative translations.
@@ -23,8 +26,13 @@ public class TargetLocalizer {
             Pose2d robotPose,
             Transform3d cameraInRobotCoordinates,
             Rotation3d[] sights) {
+        if (DEBUG)
+            Util.printf("camera rots\n");
+
         ArrayList<Translation2d> Tnotes = new ArrayList<>();
         for (Rotation3d note : sights) {
+            if (DEBUG)
+                Util.printf("rotation %s\n", note);
             cameraRotToFieldRelative(
                     robotPose,
                     cameraInRobotCoordinates,
@@ -47,6 +55,8 @@ public class TargetLocalizer {
         Optional<Translation2d> robotRelative = TargetLocalizer
                 .sightToRobotRelative(cameraInRobotCoordinates, note);
         if (robotRelative.isEmpty()) {
+            if (DEBUG)
+                Util.printf("empty\n");
             return Optional.empty();
         }
         return Optional.of(TargetLocalizer.robotRelativeToFieldRelative(
@@ -84,13 +94,15 @@ public class TargetLocalizer {
             Transform3d robotRelativeSight) {
         double h = robotRelativeSight.getZ();
         if (h <= 0) {
-            // camera is below the floor
+            if (DEBUG)
+                Util.printf("camera is below the floor %f\n", h);
             return Optional.empty();
         }
         double yaw = robotRelativeSight.getRotation().getZ();
         double pitch = robotRelativeSight.getRotation().getY();
         if (pitch <= 0) {
-            // above the horizon
+            if (DEBUG)
+                Util.printf("target is above the horizon %f\n", pitch);
             return Optional.empty();
         }
         double d = h / Math.tan(pitch);
@@ -105,12 +117,12 @@ public class TargetLocalizer {
         //
     }
 
-	/** Convert robot-relative translation to field-relative translation. */
-	public static Translation2d robotRelativeToFieldRelative(
-	        Pose2d currentPose,
-	        Translation2d robotRelative) {
-	    return currentPose
-	            .transformBy(new Transform2d(robotRelative, new Rotation2d()))
-	            .getTranslation();
-	}
+    /** Convert robot-relative translation to field-relative translation. */
+    public static Translation2d robotRelativeToFieldRelative(
+            Pose2d currentPose,
+            Translation2d robotRelative) {
+        return currentPose
+                .transformBy(new Transform2d(robotRelative, new Rotation2d()))
+                .getTranslation();
+    }
 }

@@ -2,6 +2,7 @@ package org.team100.lib.commands.drivetrain.manual;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,9 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 
 class DriveManuallyTest extends Fixtured implements Timeless {
+    public DriveManuallyTest() throws IOException {
+    }
+
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     String desiredMode = null;

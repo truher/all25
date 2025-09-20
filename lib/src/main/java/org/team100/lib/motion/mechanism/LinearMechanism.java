@@ -145,6 +145,7 @@ public class LinearMechanism {
         return OptionalDouble.of(positionRad.getAsDouble() * m_wheelRadiusM / m_gearRatio);
     }
 
+    /** This is not "hold position" this is "torque off". */
     public void stop() {
         m_motor.stop();
     }

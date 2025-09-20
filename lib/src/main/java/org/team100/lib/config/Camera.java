@@ -78,11 +78,10 @@ public enum Camera {
      * Funnel
      */
 
-    //Turn off all rotation, get tag in robot numbers then add unary minus 
+    // Turn off all rotation, get tag in robot numbers then add unary minus
     FUNNEL("1e5acbaa5a7f9d10",
             new Transform3d(
                     new Translation3d(-0.034, -0.213, 0.902),
-                    // new Rotation3d(0.087, 0.455, 0.216).unaryMinus().plus(new Rotation3d(0, 0, Math.PI)))),
                     new Rotation3d(0.07, 0.48, 0.20).unaryMinus().plus(new Rotation3d(0, 0, Math.PI)))),
 
     /**
@@ -105,25 +104,14 @@ public enum Camera {
                     // new Rotation3d(0.020, -0.84, -0.195).unaryMinus())),
                     new Rotation3d(0.015, -0.915, -0.170).unaryMinus())),
 
-    TEST1("test1",
-            new Transform3d(
-                    new Translation3d(),
-                    new Rotation3d(0, Math.PI / 4, 0))),
-
-    TEST2("test2",
-            new Transform3d(
-                    new Translation3d(1, 0, 0),
-                    new Rotation3d())),
-
-    TEST3("test3",
-            new Transform3d(
-                    new Translation3d(0, 0, 0),
-                    new Rotation3d(0, Math.PI / 6, 0))),
-
     TEST4("test4",
             new Transform3d(
-                    new Translation3d(0, 0, 0),
-                    new Rotation3d(0, -Math.PI / 4, 0))),
+                    new Translation3d(0, 0, 1),
+                    new Rotation3d(0, 0, 0))),
+    TEST5("test5",
+            new Transform3d(
+                    new Translation3d(0, 0.1, 1),
+                    new Rotation3d(0, 0, 0))),
 
     UNKNOWN(null, new Transform3d());
 
