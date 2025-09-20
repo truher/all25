@@ -20,6 +20,7 @@ import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Funnel.FunnelDefault;
 import org.team100.frc2025.Funnel.ReleaseFunnel;
 import org.team100.frc2025.Swerve.DriveForwardSlowly;
+import org.team100.frc2025.Swerve.FieldConstants;
 import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
@@ -268,7 +269,9 @@ public class RobotContainer {
                             Camera.CORAL_RIGHT),
                     history,
                     new Translation2d[] {
-                            new Translation2d(1.5, 1.5) });
+                            FieldConstants.CoralMark.LEFT.value,
+                            FieldConstants.CoralMark.CENTER.value,
+                            FieldConstants.CoralMark.RIGHT.value });
             m_targetSimulator = tsim::update;
         }
 

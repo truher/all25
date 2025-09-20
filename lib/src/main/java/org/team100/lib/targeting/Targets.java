@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
+import java.util.stream.DoubleStream;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.SideEffect;
@@ -127,9 +128,15 @@ public class Targets extends CameraReader<Rotation3d> {
 
     public void periodic() {
         // show the closest target we can see on the field2d widget.
-        getClosestTarget().ifPresent(
-                x -> m_field_log.m_log_target.log(
-                        () -> new double[] { x.getX(), x.getY(), 0 }));
+        // getClosestTarget().ifPresent(
+        //         x -> m_field_log.m_log_target.log(
+        //                 () -> new double[] { x.getX(), x.getY(), 0 }));
+
+        // show *all* targets on the field2d widget.
+        m_field_log.m_log_target.log(
+                () -> getTargets().stream().flatMapToDouble(
+                        x -> DoubleStream.of(x.getX(), x.getY(), 0.0)).toArray());
+
         m_log_historySize.log(() -> m_targets.size());
     }
 }
