@@ -50,6 +50,20 @@ public class KinematicsTest {
     }
 
     @Test
+    void testInverseSingluraity() {
+        System.out.println("\n\nTESTING SINGULARITY IN INVERSE OPERATIONS");
+        Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+        Pose2d p = new Pose2d(0.4, 0.25, new Rotation2d(Math.toRadians(0)));
+        Config c = k.inverse(p);
+        if (c==null){
+            fail("Inverse Kinematics Singularity Failed. Check Logs");
+        }
+        assertEquals(0.25, c.shoulderHeight(), 0.001);
+        assertEquals(Math.toRadians(0), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
+        assertEquals(Math.toRadians(180), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
+    }
+
+    @Test
     void testInverseBaseline() {
         System.out.println("\n\nTESTING BASIC INVERSE");
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );

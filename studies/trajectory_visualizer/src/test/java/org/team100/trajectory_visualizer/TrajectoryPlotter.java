@@ -36,7 +36,7 @@ public class TrajectoryPlotter {
         frame.pack();
         frame.setVisible(true);
         try {
-            Thread.sleep(5000);
+            Thread.sleep(50000);
         } catch (InterruptedException e) {
         }
     }

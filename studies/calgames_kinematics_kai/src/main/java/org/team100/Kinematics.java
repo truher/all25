@@ -130,15 +130,13 @@ public class Kinematics {
             //1. find the elbow position from the manipulator length and the goal 2dpose. ('p' in my notes) - KYM (CORRECT - 9/13/2025)
             double wristPointY = (m_manipulatorLength*Math.sin(pose.getRotation().getRadians())) + pose.getY(); // vert side of triangle with hyp facing right, add key point height
             double wristPointX = pose.getX()-(m_manipulatorLength*Math.cos((pose.getRotation().getRadians()))); //bottom of triangle with hyp facing right, subtract from key point
-            System.out.println("\n\nahshawsdhifheirhefiehr" + wristPointX); 
-            System.out.println(Math.cos(Math.toRadians(0))*0.1);
-            System.out.println(pose.getX()-(m_manipulatorLength*Math.cos((pose.getRotation().getRadians()))));
 
             //2. find the third leg of the triange formed by elbowPointX, hyp = armLength, and subtract that from the height 
             //of wristPointY to find the actual shoulder joint height - KYM
 
             double shoulderHeight = 1;
             int directionChosen = 0;
+            
             if(pose.getY()<0.25){
                 shoulderHeight = wristPointY+(Math.sqrt((m_armLength*m_armLength)-(wristPointX*wristPointX)));
                 directionChosen = 1; //if the arm is going to be above the manipulator, note that here by making it 1
