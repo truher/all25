@@ -30,12 +30,15 @@ public abstract class CameraReader<T> {
 
     /** e.g. "blips" or "Rotation3d" */
     private final String m_ntValueName;
-
+    /** Manages the queue of incoming messages. */
     private final NetworkTableListenerPoller m_poller;
+    /** Deserializer used in update(). */
+    private final StructBuffer<T> m_buf;
 
     public CameraReader(
             String ntRootName,
-            String ntValueName) {
+            String ntValueName,
+            StructBuffer<T> buf) {
         m_ntValueName = ntValueName;
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_poller = new NetworkTableListenerPoller(inst);
@@ -46,6 +49,7 @@ public abstract class CameraReader<T> {
                         PubSubOption.keepDuplicates(true),
                         PubSubOption.pollStorage(QUEUE_DEPTH)),
                 EnumSet.of(NetworkTableEvent.Kind.kValueAll));
+        m_buf = buf;
     }
 
     /**
@@ -83,7 +87,7 @@ public abstract class CameraReader<T> {
             }
             T[] valueArray;
             try {
-                valueArray = getBuffer().readArray(valueBytes);
+                valueArray = m_buf.readArray(valueBytes);
             } catch (RuntimeException ex) {
                 Util.warnf("decoding failed for name: %s\n", name);
                 continue;
@@ -113,28 +117,24 @@ public abstract class CameraReader<T> {
         finishUpdate();
     }
 
-    /**
-     * Deserializer. This is time-consuming to make, so subclasses are encouraged to
-     * do so on initialization and keep it around.
-     */
-    public abstract StructBuffer<T> getBuffer();
-
     /** Called when update() starts. */
-    public abstract void beginUpdate();
+    protected void beginUpdate() {
+    };
 
     /**
      * Called for each StructArray received.
      * 
      * @param cameraOffset   camera pose in robot coordinates
-     * @param valueTimestamp network server time in seconds
+     * @param valueTimestamp network tables local time in seconds
      * @param valueArray     payload array
      */
-    public abstract void perValue(
+    protected abstract void perValue(
             Transform3d cameraOffset,
             double valueTimestamp,
             T[] value);
 
     /** Called when update() ends. */
-    public abstract void finishUpdate();
+    protected void finishUpdate() {
+    }
 
 }

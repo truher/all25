@@ -20,6 +20,7 @@ import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Funnel.FunnelDefault;
 import org.team100.frc2025.Funnel.ReleaseFunnel;
 import org.team100.frc2025.Swerve.DriveForwardSlowly;
+import org.team100.frc2025.Swerve.FieldConstants;
 import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
@@ -50,6 +51,7 @@ import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
+import org.team100.lib.examples.semiauto.FloorPickSetup;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.gyro.Gyro;
@@ -63,12 +65,11 @@ import org.team100.lib.hid.ThirdControlProxy;
 import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
-import org.team100.lib.localization.LimitedInterpolatingSwerveModelHistory;
+import org.team100.lib.localization.FreshSwerveEstimate;
+import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
-import org.team100.lib.localization.SwerveModelEstimate;
-import org.team100.lib.localization.VisionAndOdometrySwerveModelEstimate;
-import org.team100.lib.localization.NudgingVisionUpdater;
+import org.team100.lib.localization.SwerveHistory;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
@@ -82,6 +83,8 @@ import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.targeting.SimulatedTargetWriter;
+import org.team100.lib.targeting.Targets;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.Util;
@@ -136,7 +139,9 @@ public class RobotContainer {
     private final ScheduledExecutorService m_initializer;
 
     private final Runnable m_simulatedTagDetector;
+    private final Runnable m_targetSimulator;
     private final Runnable m_combinedViz;
+    private final Targets m_targets;
 
     public RobotContainer(TimedRobot100 robot) throws IOException {
         final AsyncFactory asyncFactory = new AsyncFactory(robot);
@@ -194,7 +199,7 @@ public class RobotContainer {
                 m_modules);
 
         // ignores the rotation derived from vision.
-        final LimitedInterpolatingSwerveModelHistory history = new LimitedInterpolatingSwerveModelHistory(
+        final SwerveHistory history = new SwerveHistory(
                 m_swerveKinodynamics,
                 gyro.getYawNWU(),
                 m_modules.positions(),
@@ -212,11 +217,11 @@ public class RobotContainer {
                 driveLog,
                 layout,
                 history,
-                visionUpdater,
-                "vision",
-                "blips");
+                visionUpdater);
 
-        final SwerveModelEstimate estimate = new VisionAndOdometrySwerveModelEstimate(
+        m_targets = new Targets(driveLog, fieldLog, history);
+
+        final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);
 
         final SwerveLocal swerveLocal = new SwerveLocal(
@@ -241,6 +246,8 @@ public class RobotContainer {
             // Real robots get an empty simulated tag detector.
             m_simulatedTagDetector = () -> {
             };
+            m_targetSimulator = () -> {
+            };
         } else {
             // In simulation, we want the real simulated tag detector.
             SimulatedTagDetector sim = new SimulatedTagDetector(
@@ -251,8 +258,21 @@ public class RobotContainer {
                             Camera.CORAL_LEFT,
                             Camera.CORAL_RIGHT),
                     layout,
-                    (timestampS) -> estimate.apply(timestampS).pose());
+                    history);
             m_simulatedTagDetector = sim::periodic;
+            // for now, one target, near the corner.
+            SimulatedTargetWriter tsim = new SimulatedTargetWriter(
+                    List.of(Camera.SWERVE_LEFT,
+                            Camera.SWERVE_RIGHT,
+                            Camera.FUNNEL,
+                            Camera.CORAL_LEFT,
+                            Camera.CORAL_RIGHT),
+                    history,
+                    new Translation2d[] {
+                            FieldConstants.CoralMark.LEFT.value,
+                            FieldConstants.CoralMark.CENTER.value,
+                            FieldConstants.CoralMark.RIGHT.value });
+            m_targetSimulator = tsim::update;
         }
 
         ///////////////////////////
@@ -444,6 +464,11 @@ public class RobotContainer {
         whileTrue(operatorControl::activateManualClimb,
                 m_climber.manual(operatorControl::manualClimbSpeed));
 
+        // this is for developing autopick.
+        new FloorPickSetup(
+                fieldLog, driverControl, m_drive, m_targets, 
+                SwerveControllerFactory.pick(driveLog), autoProfile);
+
         m_initializer = Executors.newSingleThreadScheduledExecutor();
         m_initializer.schedule(this::initStuff, 0, TimeUnit.SECONDS);
 
@@ -515,6 +540,10 @@ public class RobotContainer {
     public void periodic() {
         // publish the simulated tag sightings.
         m_simulatedTagDetector.run();
+        // publish simulated target sightings
+        m_targetSimulator.run();
+        // show the closest target on field2d
+        m_targets.periodic();
         m_leds.periodic();
         m_combinedViz.run();
     }

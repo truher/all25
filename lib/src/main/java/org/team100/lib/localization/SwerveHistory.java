@@ -2,6 +2,7 @@ package org.team100.lib.localization;
 
 import java.util.Map.Entry;
 import java.util.SortedMap;
+import java.util.function.DoubleFunction;
 
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
@@ -15,8 +16,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 /**
  * History is just a container, in fact the implementation is little more than a
  * wrapper around TimeInterpolatableBuffer.
+ * 
+ * The history always has *something* in it, even the initial zero pose.
+ * 
+ * There are no dependencies managed here; for that, use SwerveModelEstimate.
+ * 
+ * Note this should only be used from within the localization package.
+ * 
+ * Other SwerveModel consumers should use SwerveModelEstimate.
  */
-public class LimitedInterpolatingSwerveModelHistory implements SwerveModelHistory {
+public class SwerveHistory implements DoubleFunction<SwerveModel> {
     /**
      * The buffer only needs to be long enough to catch stale-but-still-helpful
      * vision updates.
@@ -30,7 +39,7 @@ public class LimitedInterpolatingSwerveModelHistory implements SwerveModelHistor
     private final SwerveKinodynamics m_kinodynamics;
     private final TimeInterpolatableBuffer100<InterpolationRecord> m_poseBuffer;
 
-    public LimitedInterpolatingSwerveModelHistory(
+    public SwerveHistory(
             SwerveKinodynamics kinodynamics,
             Rotation2d gyroAngle,
             SwerveModulePositions modulePositions,

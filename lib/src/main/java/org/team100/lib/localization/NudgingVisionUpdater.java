@@ -16,12 +16,12 @@ import edu.wpi.first.math.geometry.Twist2d;
  */
 public class NudgingVisionUpdater implements VisionUpdater {
 
-    private final LimitedInterpolatingSwerveModelHistory m_history;
+    private final SwerveHistory m_history;
     /** For replay. */
     private final OdometryUpdater m_odometryUpdater;
 
     public NudgingVisionUpdater(
-            LimitedInterpolatingSwerveModelHistory history,
+            SwerveHistory history,
             OdometryUpdater odometryUpdater) {
         m_history = history;
         m_odometryUpdater = odometryUpdater;

@@ -3,11 +3,8 @@ package org.team100.lib.commands.drivetrain;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.team100.lib.config.Identity;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.experiments.Experiment;
-import org.team100.lib.experiments.Experiments;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
@@ -25,7 +22,10 @@ import edu.wpi.first.wpilibj2.command.Command;
  * 
  * If the supplier starts delivering empties, retain the old goal.
  */
-public class DriveToTranslationWithFront extends Command  {
+public class DriveToTranslationWithFront extends Command {
+    private static final boolean DEBUG = true;
+    /** verrrrrry loose. */
+    private static final double THETA_TOLERANCE = 0.1;
     private final FieldLogger.Log m_field_log;
     private final Supplier<Optional<Translation2d>> m_goals;
     private final SwerveDriveSubsystem m_drive;
@@ -77,6 +77,16 @@ public class DriveToTranslationWithFront extends Command  {
         return m_referenceController != null && m_referenceController.isDone();
     }
 
+    /** For the runway path we can switch to "go to goal" after we're aligned. */
+    public boolean thetaAligned() {
+        if (m_goal == null)
+            return false;
+        Pose2d pose = m_drive.getPose();
+        Rotation2d goalTheta = goalTheta(m_goal.getTranslation(), pose);
+        return Math.abs(
+                goalTheta.minus(pose.getRotation()).getRadians()) < THETA_TOLERANCE;
+    }
+
     @Override
     public void end(boolean interrupted) {
         m_drive.stop();
@@ -94,19 +104,22 @@ public class DriveToTranslationWithFront extends Command  {
     }
 
     private static Rotation2d goalTheta(Translation2d goal, Pose2d pose) {
-        if (Experiments.instance.enabled(Experiment.DriveToNoteWithRotation)) {
-            // face the rear of the robot towards the goal.
-            Rotation2d toGoal = goal.minus(pose.getTranslation()).getAngle();
-            switch (Identity.instance) {
-                case COMP_BOT:
-                case BLANK:
-                    return toGoal.plus(Rotation2d.kPi);
-                default:
-                    return toGoal;
-            }
-        } else {
-            // leave the rotation alone
-            return pose.getRotation();
-        }
+
+        return goal.minus(pose.getTranslation()).getAngle();
+
+        // if (Experiments.instance.enabled(Experiment.DriveToNoteWithRotation)) {
+        // // face the rear of the robot towards the goal.
+        // Rotation2d toGoal = goal.minus(pose.getTranslation()).getAngle();
+        // switch (Identity.instance) {
+        // case COMP_BOT:
+        // case BLANK:
+        // return toGoal.plus(Rotation2d.kPi);
+        // default:
+        // return toGoal;
+        // }
+        // } else {
+        // // leave the rotation alone
+        // return pose.getRotation();
+        // }
     }
 }
