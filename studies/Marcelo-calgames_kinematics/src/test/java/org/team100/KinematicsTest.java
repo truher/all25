@@ -26,9 +26,6 @@ public class KinematicsTest {
         assertEquals(0.0, c.pivotHeightM(), 0.001);
         assertEquals(0.0, c.pivotAngleRad(), 0.001);
         assertEquals(0.0, c.wristAngleRad(), 0.001);
-        System.out.println("Pivot angle: " + c.pivotAngleRad());
-        System.out.println("Wrist angle: " + c.wristAngleRad());
-        System.out.println("Pivot height: " + c.pivotHeightM());
     }
 
 }
