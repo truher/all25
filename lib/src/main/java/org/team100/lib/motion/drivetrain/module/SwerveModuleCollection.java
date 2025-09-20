@@ -214,6 +214,7 @@ public class SwerveModuleCollection {
     // Observers
     //
 
+    /** Uses Cache so the positions are fresh and coherent. */
     public SwerveModulePositions positions() {
         return new SwerveModulePositions(
                 m_frontLeft.getPosition(),

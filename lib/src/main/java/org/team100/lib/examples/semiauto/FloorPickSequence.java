@@ -30,7 +30,7 @@ public class FloorPickSequence {
             Targets targets,
             SwerveController controller,
             HolonomicProfile profile) {
-        Supplier<Optional<Translation2d>> target = () -> targets.getClosestTranslation2d();
+        Supplier<Optional<Translation2d>> target = () -> targets.getClosestTarget();
         Supplier<Optional<Translation2d>> runway = () -> {
             Optional<Translation2d> t = target.get();
             if (t.isEmpty())
@@ -41,13 +41,14 @@ public class FloorPickSequence {
             return Optional.of(landing);
         };
         
+        // this ends after alignment
         DriveToTranslationWithFront toRunway = new DriveToTranslationWithFront(
                 fieldLog, runway, drive, controller, profile);
         DriveToTranslationWithFront toTarget = new DriveToTranslationWithFront(
                 fieldLog, target, drive, controller, profile);
 
         return sequence(
-                toRunway.until(toRunway::isDone),
+                toRunway.until(toRunway::thetaAligned),
                 toTarget.until(toTarget::isDone));
     }
 

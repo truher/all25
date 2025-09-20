@@ -40,6 +40,7 @@ public interface LinearVelocityServo {
 
     void stop();
 
+    /** Implementations should use the Cache mechanism. */
     OptionalDouble getDistance();
 
     /** For logging */

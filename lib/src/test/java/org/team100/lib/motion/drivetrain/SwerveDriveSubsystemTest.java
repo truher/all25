@@ -2,6 +2,8 @@ package org.team100.lib.motion.drivetrain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
@@ -11,6 +13,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 class SwerveDriveSubsystemTest extends Fixtured implements Timeless {
+    public SwerveDriveSubsystemTest() throws IOException {
+    }
+
     private static final double DELTA = 0.01;
 
     @Test

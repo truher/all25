@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 public class SimulatedObjectDetector {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     /** horizontal field of view, half-angle */
     private final static double HFOV_HALF = Math.toRadians(40);
     /** vertical field of view, half-angle */
@@ -28,18 +28,19 @@ public class SimulatedObjectDetector {
     /**
      * Gets the rotation to the object in the frame
      * 
-     * @param simulatedObjectDetector
-     * 
-     * @param robotPose               Pose of the robot
-     * @param notes                   field relative translation of any objects
+     * @param robotPose    Pose of the robot
+     * @param cameraOffset relative to the robot
+     * @param objects        field relative translation of any objects
      */
     public static List<Rotation3d> getRotations(
-            Pose2d robotPose, Transform3d cameraOffset, Translation2d[] notes) {
+            Pose2d robotPose,
+            Transform3d cameraOffset,
+            Translation2d[] objects) {
         ArrayList<Rotation3d> list = new ArrayList<>();
-        for (Translation2d note : notes) {
+        for (Translation2d object : objects) {
             if (DEBUG)
-                Util.printf("note %s\n", note);
-            getRotInCamera(robotPose, cameraOffset, note).ifPresent(list::add);
+                Util.printf("object %s\n", object);
+            getRotInCamera(robotPose, cameraOffset, object).ifPresent(list::add);
         }
         return list;
     }

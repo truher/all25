@@ -1,4 +1,4 @@
-package org.team100.lib.localization;
+package org.team100.util;
 
 import java.util.Map.Entry;
 import java.util.NavigableMap;
@@ -15,11 +15,17 @@ import edu.wpi.first.math.interpolation.Interpolatable;
  * Uses an Interpolator to provide interpolated sampling with a history limit.
  * 
  * The buffer is never empty, so get() always returns *something*.
+ * 
+ * I tried making this "maybe empty" but it makes the client handle empty cases
+ * that never actually occur (at startup, the pose really is unknown (so we
+ * use zero) and the module positions really are zero). It's simpler not to do
+ * that.
  */
-public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
+public class TimeInterpolatableBuffer100<T extends Interpolatable<T>> {
     private static final boolean DEBUG = false;
 
     private final double m_historyS;
+    /** key is timestamp in seconds */
     private final NavigableMap<Double, T> m_pastSnapshots = new ConcurrentSkipListMap<>();
 
     /**
@@ -33,7 +39,6 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
 
     public TimeInterpolatableBuffer100(double historyS, double timeS, T initialValue) {
         m_historyS = historyS;
-        // no lock needed in constructor
         m_pastSnapshots.put(timeS, initialValue);
     }
 
@@ -98,6 +103,9 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
         } finally {
             m_lock.writeLock().unlock();
         }
+        if (topBound == null && bottomBound == null) {
+            throw new IllegalStateException();
+        }
         // Return the opposite bound if the other is null
         if (topBound == null) {
             return bottomBound.getValue();
@@ -117,7 +125,6 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
         if (DEBUG)
             Util.printf("interpolate %f\n", timeFraction);
         return bottomBound.getValue().interpolate(topBound.getValue(), timeFraction);
-
     }
 
     public SortedMap<Double, T> tailMap(double t, boolean inclusive) {
@@ -125,7 +132,7 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
     }
 
     /** True if the timestamp is older than the history window. */
-    boolean tooOld(double timestampS) {
+    public boolean tooOld(double timestampS) {
         Double newestSeenS = m_pastSnapshots.lastKey();
         double oldestAcceptableS = newestSeenS - m_historyS;
         return timestampS < oldestAcceptableS;
@@ -139,12 +146,12 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>>  {
         return m_pastSnapshots.ceilingEntry(arg0);
     }
 
-    int size() {
+    public int size() {
         return m_pastSnapshots.size();
     }
 
     /** Timestamp of the most-recent snapshot. */
-    double lastKey() {
+    public double lastKey() {
         return m_pastSnapshots.lastKey();
     }
 }

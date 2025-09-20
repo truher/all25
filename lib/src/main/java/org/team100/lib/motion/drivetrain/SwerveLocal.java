@@ -100,7 +100,8 @@ public class SwerveLocal {
     //
     // Observers
     //
-
+    
+    /** Uses Cache so the position is fresh and coherent. */
     SwerveModulePositions positions() {
         return m_modules.positions();
     }

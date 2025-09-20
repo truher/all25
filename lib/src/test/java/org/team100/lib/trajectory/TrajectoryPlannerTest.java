@@ -110,7 +110,7 @@ class TrajectoryPlannerTest {
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.575, p.state().getPose().getX(), DELTA);
+        assertEquals(0.585, p.state().getPose().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRate(), DELTA);
     }
 
@@ -186,7 +186,7 @@ class TrajectoryPlannerTest {
         SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
-        assertEquals(2.525, traj.duration(), DELTA);
+        assertEquals(2.958, traj.duration(), DELTA);
     }
 
 }

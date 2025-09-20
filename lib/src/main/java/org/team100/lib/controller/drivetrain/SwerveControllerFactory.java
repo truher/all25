@@ -44,10 +44,29 @@ public class SwerveControllerFactory {
     }
 
     public static FullStateSwerveController auto2025LooseTolerance(LoggerFactory log) {
-        return new FullStateSwerveController(log, 7.2, 3.5, 0.055, 0.01, 0.035, 0.1, 1, 1);
+        return new FullStateSwerveController(log,
+                7.2, // p cartesian
+                3.5, // p theta
+                0.055, // p cartesian v
+                0.01, // ptheta v
+                0.035, // x tol
+                0.1, // theta tol
+                1, // xdot tol
+                1); // omega tol
     }
 
-
+    /** pick tolerance is *very* loose */
+    public static FullStateSwerveController pick(LoggerFactory log) {
+        return new FullStateSwerveController(log,
+                7.2, // p cartesian
+                3.5, // p theta
+                0.055, // p cartesian v
+                0.01, // ptheta v
+                0.15, // x tol
+                0.4, // theta tol
+                4, // xdot tol
+                4); // omega tol
+    }
 
     ////////////////
     //
@@ -56,7 +75,7 @@ public class SwerveControllerFactory {
 
     public static FullStateSwerveController testFieldRelativePIDF(LoggerFactory log) {
         return new FullStateSwerveController(log, 2.4, 2.4, 0.1, 0.1, 0.01, 0.02, 0.01, 0.02);
-    }   
+    }
 
     public static FullStateSwerveController testFieldRelativeFFOnly(LoggerFactory log) {
         return new FullStateSwerveController(log, 0, 0, 0, 0, 0.01, 0.02, 0.01, 0.02);

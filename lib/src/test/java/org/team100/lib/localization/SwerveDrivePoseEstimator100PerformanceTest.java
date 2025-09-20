@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.Test;
+import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.MockGyro;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -29,6 +31,8 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         return new SwerveModulePositions(m, m, m, m);
     }
 
+    private SwerveModulePositions positions;
+
     /*
      * Should we optimize the pose replay operation?
      * 
@@ -51,55 +55,61 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
      * writer to the pose reader, and save something like 20 us (0.4%) on average.
      */
     // There's no need to run this all the time
-    // @Test
+    //@Test
     void test0() {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
 
-        SwerveDrivePoseEstimator100 poseEstimator = kinodynamics.newPoseEstimator(
-                logger,
-                new MockGyro(),
-                p(0),
+        Gyro gyro = new MockGyro();
+        SwerveHistory history = new SwerveHistory(
+                kinodynamics,
+                Rotation2d.kZero,
+                SwerveModulePositions.kZero(),
                 Pose2d.kZero,
                 0);
+        positions = p(0);
+        OdometryUpdater ou = new OdometryUpdater(kinodynamics, gyro, history, () -> positions);
+        ou.reset(Pose2d.kZero, 0);
+        NudgingVisionUpdater vu = new NudgingVisionUpdater(history, ou);
 
         // fill the buffer with odometry
         double t = 0.0;
-        double duration = SwerveDrivePoseEstimator100.BUFFER_DURATION;
+        double duration = 0.2; // SwerveDrivePoseEstimator100.BUFFER_DURATION;
         while (t < duration) {
-            poseEstimator.put(t, Rotation2d.kZero, 0, p(t));
+            positions = p(t);
+            ou.update(t);
             t += 0.02;
         }
-        assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
+        assertEquals(11, history.size());
+        assertEquals(0.2, history.lastKey(), DELTA);
 
         // add a very old vision estimate, which triggers replay of the entire buffer.
         int iterations = 100000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            poseEstimator.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+            vu.put(0.00, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {
             Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
-        assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
+        assertEquals(11, history.size());
+        assertEquals(0.2, history.lastKey(), DELTA);
 
         // add a recent vision estimate, which triggers replay of a few samples.
         iterations = 1000000;
         startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            poseEstimator.put(duration - 0.1, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
+            vu.put(duration - 0.1, visionRobotPoseMeters, stateStdDevs, visionMeasurementStdDevs);
         }
         finishTime = System.currentTimeMillis();
         if (DEBUG) {
             Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
             Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
-        assertEquals(11, poseEstimator.size());
-        assertEquals(0.2, poseEstimator.lastKey(), DELTA);
+        assertEquals(11, history.size());
+        assertEquals(0.2, history.lastKey(), DELTA);
     }
 }
