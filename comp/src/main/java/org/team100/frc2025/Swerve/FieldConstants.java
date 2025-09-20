@@ -10,6 +10,19 @@ import edu.wpi.first.math.geometry.Translation2d;
  * Positions on the field used as waypoints.
  */
 public class FieldConstants {
+    /** Staged coral ("lollipop") locations. */
+    public enum CoralMark {
+        LEFT(new Translation2d(1.219, 5.855)),
+        CENTER(new Translation2d(1.219, 4.026)),
+        RIGHT(new Translation2d(1.219, 2.197));
+
+        public final Translation2d value;
+
+        private CoralMark(Translation2d t) {
+            this.value = t;
+        }
+    }
+
     /**
      * Half the distance between the poles, i.e. offset from the center, in meters.
      */
