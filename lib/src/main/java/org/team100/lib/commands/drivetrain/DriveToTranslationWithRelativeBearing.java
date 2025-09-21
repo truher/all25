@@ -17,36 +17,39 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
- * Drive to the supplied translation using a profile, and facing the front (or
- * back, depending on identity) of the robot to the goal, i.e. for intaking.
+ * Drive to the supplied target using a profile, so that the target is at
+ * the specified relative bearing, e.g. the for intaking.
  * 
- * If the supplier starts delivering empties, retain the old goal.
+ * If the supplier starts delivering empties (e.g. the camera loses sight of the
+ * goal), retain the old goal (forever).
  */
-public class DriveToTranslationWithFront extends Command {
-    private static final boolean DEBUG = true;
+public class DriveToTranslationWithRelativeBearing extends Command {
     /** verrrrrry loose. */
     private static final double THETA_TOLERANCE = 0.1;
     private final FieldLogger.Log m_field_log;
-    private final Supplier<Optional<Translation2d>> m_goals;
+    private final Supplier<Optional<Translation2d>> m_targets;
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final HolonomicProfile m_profile;
+    private final Rotation2d m_relativeBearing;
 
     private Pose2d m_goal;
     private ProfileReference m_reference;
     private ReferenceController m_referenceController;
 
-    public DriveToTranslationWithFront(
+    public DriveToTranslationWithRelativeBearing(
             FieldLogger.Log fieldLogger,
-            Supplier<Optional<Translation2d>> goals,
+            Supplier<Optional<Translation2d>> targetes,
             SwerveDriveSubsystem drive,
             SwerveController controller,
-            HolonomicProfile profile) {
+            HolonomicProfile profile,
+            Rotation2d relativeBearing) {
         m_field_log = fieldLogger;
-        m_goals = goals;
+        m_targets = targetes;
         m_drive = drive;
         m_controller = controller;
         m_profile = profile;
+        m_relativeBearing = relativeBearing;
         addRequirements(m_drive);
     }
 
@@ -55,7 +58,7 @@ public class DriveToTranslationWithFront extends Command {
         updateGoal();
         if (m_goal == null)
             return;
-        m_reference = new ProfileReference(m_profile, "drive to translation with front");
+        m_reference = new ProfileReference(m_profile, "DriveToTranslationWithRelativeBearing");
         m_reference.setGoal(new SwerveModel(m_goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }
@@ -82,9 +85,9 @@ public class DriveToTranslationWithFront extends Command {
         if (m_goal == null)
             return false;
         Pose2d pose = m_drive.getPose();
-        Rotation2d goalTheta = goalTheta(m_goal.getTranslation(), pose);
-        return Math.abs(
-                goalTheta.minus(pose.getRotation()).getRadians()) < THETA_TOLERANCE;
+        Rotation2d goalR = m_goal.getRotation();
+        Rotation2d poseR = pose.getRotation();
+        return Math.abs(goalR.minus(poseR).getRadians()) < THETA_TOLERANCE;
     }
 
     @Override
@@ -97,29 +100,19 @@ public class DriveToTranslationWithFront extends Command {
     }
 
     private void updateGoal() {
-        m_goals.get().ifPresent(
-                (x) -> m_goal = new Pose2d(
-                        x,
-                        goalTheta(x, m_drive.getPose())));
+        m_targets.get().ifPresent(
+                (target) -> m_goal = new Pose2d(
+                        target,
+                        heading(target)));
     }
 
-    private static Rotation2d goalTheta(Translation2d goal, Pose2d pose) {
+    /** Robot heading to achieve the desired relative bearing to the target. */
+    private Rotation2d heading(Translation2d target) {
+        return absoluteBearing(m_drive.getPose(), target).minus(m_relativeBearing);
+    }
 
-        return goal.minus(pose.getTranslation()).getAngle();
-
-        // if (Experiments.instance.enabled(Experiment.DriveToNoteWithRotation)) {
-        // // face the rear of the robot towards the goal.
-        // Rotation2d toGoal = goal.minus(pose.getTranslation()).getAngle();
-        // switch (Identity.instance) {
-        // case COMP_BOT:
-        // case BLANK:
-        // return toGoal.plus(Rotation2d.kPi);
-        // default:
-        // return toGoal;
-        // }
-        // } else {
-        // // leave the rotation alone
-        // return pose.getRotation();
-        // }
+    /** Field relative bearing from the robot to the target */
+    private static Rotation2d absoluteBearing(Pose2d robot, Translation2d target) {
+        return target.minus(robot.getTranslation()).getAngle();
     }
 }
