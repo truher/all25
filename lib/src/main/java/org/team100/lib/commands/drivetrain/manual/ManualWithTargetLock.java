@@ -107,13 +107,13 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
         final double targetMotion = TargetUtil.targetMotion(state, target);
 
         final Translation2d currentTranslation = state.pose().getTranslation();
-        Rotation2d bearing = TargetUtil.bearing(currentTranslation, target);
+        Rotation2d absoluteBearing = TargetUtil.bearing(currentTranslation, target);
 
         final double yaw = state.theta().x();
-        bearing = new Rotation2d(
-                Math100.getMinDistance(yaw, bearing.getRadians()));
+        absoluteBearing = new Rotation2d(
+                Math100.getMinDistance(yaw, absoluteBearing.getRadians()));
 
-        final Model100 goal = new Model100(bearing.getRadians(), targetMotion);
+        final Model100 goal = new Model100(absoluteBearing.getRadians(), targetMotion);
 
         // make sure the setpoint uses the modulus close to the measurement.
         m_thetaSetpoint = new Control100(

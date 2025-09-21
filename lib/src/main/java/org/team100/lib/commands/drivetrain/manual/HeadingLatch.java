@@ -1,4 +1,4 @@
-package org.team100.lib.commands.drivetrain;
+package org.team100.lib.commands.drivetrain.manual;
 
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;

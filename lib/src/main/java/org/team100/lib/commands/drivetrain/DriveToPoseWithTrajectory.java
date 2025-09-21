@@ -17,7 +17,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 /**
  * Drive from the current state to a field-relative goal.
  * 
- * The trajectory is supplied; the supplier is free to ignore the current state.
+ * The goal is supplied at initialization time.
+ * 
+ * The trajectory is supplied by a function that takes both the current pose and
+ * the goal. You could use something like `TrajectoryPlanner.movingToRest()` for
+ * this function.
  */
 public class DriveToPoseWithTrajectory extends Command {
     private final Supplier<Pose2d> m_goal;
