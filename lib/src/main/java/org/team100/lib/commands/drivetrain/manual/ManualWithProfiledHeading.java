@@ -2,7 +2,6 @@ package org.team100.lib.commands.drivetrain.manual;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.commands.drivetrain.HeadingLatch;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverControl;
@@ -28,7 +27,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * 
  * Rotation uses a profile, velocity feedforward, and positional feedback.
  * 
- * The profile depends on robot speed, making rotation the lowest priority.
+ * The profile speed and accel limits are inversely proportional to the
+ * current robot speed. The reason is that, when moving near their maximum
+ * speeds, the drive motors have very little torque available. If you try to
+ * rotate faster, the robot just won't keep up with the profile, it will result
+ * in controller error and overshoot. To the driver, the variable profile means
+ * that the robot won't rotate much when you're driving fast, and it will
+ * "catch up" when you slow down. This may, or may not, match the driver's
+ * expectations.
  */
 public class ManualWithProfiledHeading implements FieldRelativeDriver {
     // don't try to go full speed
@@ -117,7 +123,7 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
         final TrapezoidIncrementalProfile m_profile = makeProfile(currentVelocity);
 
         final Rotation2d pov = m_desiredRotation.get();
-        
+
         m_goal = m_latch.latchedRotation(
                 m_profile.getMaxAcceleration(),
                 state.theta(),
@@ -174,15 +180,12 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
         m_log_theta_FB.log(() -> thetaFB);
         m_log_output_omega.log(() -> omega);
 
-
         return twistWithSnapM_S;
     }
 
     public FieldRelativeVelocity clipAndScale(DriverControl.Velocity twist1_1) {
         // clip the input to the unit circle
         final DriverControl.Velocity clipped = twist1_1.clip(1.0);
-
- 
 
         // scale to max in both translation and rotation
         return FieldRelativeDriver.scale(

@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Rotate in place to the specified angle.
+ * 
+ * This is probably only useful for testing.
  */
 public class Rotate extends Command  {
     /** For testing */

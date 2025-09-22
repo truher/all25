@@ -9,7 +9,6 @@ import org.team100.lib.hid.DriverControl;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.util.NamedChooser;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,11 +27,12 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Use the mode supplier to choose which mode to use, e.g. using a Sendable
  * Chooser.
  */
-public class DriveManually extends Command  {
-    /** While driving manually, pay attention to tags even if they are somewhat far away. */
+public class DriveManually extends Command {
+    /**
+     * While driving manually, pay attention to tags even if they are somewhat far
+     * away.
+     */
     private static final double HEED_RADIUS_M = 6.0;
-
-    private static final boolean DEBUG = false;
 
     private static final SendableChooser<String> m_manualModeChooser = new NamedChooser<>("Manual Drive Mode");
 
@@ -44,8 +44,8 @@ public class DriveManually extends Command  {
     private final Supplier<DriverControl.Velocity> m_twistSupplier;
     private final DoubleConsumer m_heedRadiusM;
     private final SwerveDriveSubsystem m_drive;
-    private final Map<String, Driver> m_drivers;
-    private final Driver m_defaultDriver;
+    private final Map<String, DriverAdapter> m_drivers;
+    private final DriverAdapter m_defaultDriver;
     String currentManualMode = null;
 
     public DriveManually(
@@ -56,7 +56,7 @@ public class DriveManually extends Command  {
         m_twistSupplier = twistSupplier;
         m_heedRadiusM = heedRadiusM;
         m_drive = drive;
-        m_defaultDriver = stop();
+        m_defaultDriver = new StopDriver(m_drive);
         m_drivers = new ConcurrentHashMap<>();
         SmartDashboard.putData(m_manualModeChooser);
         addRequirements(m_drive);
@@ -67,7 +67,7 @@ public class DriveManually extends Command  {
         m_heedRadiusM.accept(HEED_RADIUS_M);
         m_drive.resetLimiter();
         SwerveModel p = m_drive.getState();
-        for (Driver d : m_drivers.values()) {
+        for (DriverAdapter d : m_drivers.values()) {
             d.reset(p);
         }
     }
@@ -83,7 +83,7 @@ public class DriveManually extends Command  {
             currentManualMode = manualMode;
             // there's state in there we'd like to forget
             SwerveModel p = m_drive.getState();
-            for (Driver d : m_drivers.values()) {
+            for (DriverAdapter d : m_drivers.values()) {
                 d.reset(p);
             }
         }
@@ -91,7 +91,7 @@ public class DriveManually extends Command  {
         // input in [-1,1] control units
         DriverControl.Velocity input = m_twistSupplier.get();
         SwerveModel state = m_drive.getState();
-        Driver d = m_drivers.getOrDefault(manualMode, m_defaultDriver);
+        DriverAdapter d = m_drivers.getOrDefault(manualMode, m_defaultDriver);
         d.apply(state, input);
 
     }
@@ -113,70 +113,22 @@ public class DriveManually extends Command  {
     /** Register a driver for module state mode */
     public void register(String name, boolean isDefault, ModuleStateDriver d) {
         addName(name, isDefault);
-        m_drivers.put(
-                name,
-                new Driver() {
-                    public void apply(SwerveModel s, DriverControl.Velocity t) {
-                        if (DEBUG)
-                            Util.printf("ModuleStateDriver %s\n", t);
-                        m_drive.setRawModuleStates(d.apply(t));
-                    }
-
-                    public void reset(SwerveModel p) {
-                        //
-                    }
-                });
+        m_drivers.put(name, new ModuleStateAdapter(m_drive, d));
     }
 
     /** Register a driver for robot-relative speed mode */
     public void register(String name, boolean isDefault, ChassisSpeedDriver d) {
         addName(name, isDefault);
-        m_drivers.put(
-                name,
-                new Driver() {
-                    public void apply(SwerveModel s, DriverControl.Velocity t) {
-                        if (DEBUG)
-                            Util.printf("ChassisSpeedDriver %s\n", t);
-                        m_drive.setChassisSpeeds(d.apply(s, t));
-                    }
-
-                    public void reset(SwerveModel p) {
-                        d.reset(p);
-                    }
-                });
+        m_drivers.put(name, new ChassisSpeedAdapter(m_drive, d));
     }
 
     /** Register a driver for field-relative speed mode */
     public void register(String name, boolean isDefault, FieldRelativeDriver d) {
         addName(name, isDefault);
-        m_drivers.put(
-                name,
-                new Driver() {
-                    public void apply(SwerveModel s, DriverControl.Velocity t) {
-                        if (DEBUG)
-                            Util.printf("FieldRelativeDriver %s\n", t);
-                        m_drive.driveInFieldCoords(d.apply(s, t));
-                    }
-
-                    public void reset(SwerveModel p) {
-                        d.reset(p);
-                    }
-                });
+        m_drivers.put(name, new FieldRelativeAdapter(m_drive, d));
     }
 
     //////////////
-
-    private Driver stop() {
-        return new Driver() {
-            public void apply(SwerveModel s, DriverControl.Velocity t) {
-                m_drive.stop();
-            }
-
-            public void reset(SwerveModel p) {
-                //
-            }
-        };
-    }
 
     private void addName(String name, boolean isDefault) {
         m_manualModeChooser.addOption(name, name);
