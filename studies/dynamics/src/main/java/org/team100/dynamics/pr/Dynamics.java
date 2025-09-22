@@ -1,9 +1,8 @@
 package org.team100.dynamics.pr;
 
-import static edu.wpi.first.units.Units.derive;
-
 public class Dynamics {
-    private static final double g = -9.8;
+    /** Gravity */
+    private static final double g = 9.8;
     /** Mass of the moving elevator parts. */
     private final double m1;
     /** Mass of the arm. */
@@ -20,6 +19,10 @@ public class Dynamics {
         this.izz = izz;
     }
 
+    /**
+     * Generalized force (torque or force) to achieve the required
+     * velocity and acceleration, and also to oppose gravity.
+     */
     public Torque torque(Config q, Velocity v, Acceleration a) {
         double s2 = Math.sin(q.q2());
         double c2 = Math.cos(q.q2());
@@ -27,7 +30,7 @@ public class Dynamics {
                 - m2 * d * s2 * a.q2ddot()
                 - m2 * d * c2 * v.q2dot() * v.q2dot()
                 + (m1 + m2) * g;
-        double t2 = -m2 * d * s2 * a.q2ddot()
+        double t2 = -m2 * d * s2 * a.q1ddot()
                 + (izz + m2 * d * d) * a.q2ddot()
                 - d * s2 * m2 * g;
         return new Torque(f1, t2);
