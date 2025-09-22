@@ -17,28 +17,30 @@ public class AllianceCommand extends SelectCommand<AllianceCommand.Select> {
      * We can't use null as a selector output so make an explicit unknown.
      */
     public enum Select {
-        Red,
-        Blue,
-        Unknown
+        RED,
+        BLUE,
+        UNKNOWN
     }
 
     public AllianceCommand(Command red, Command blue) {
-        // Leaving unknown out of the map means we get the default PrintCommand.
-        super(Map.of(Select.Red, red, Select.Blue, blue, Select.Unknown, err()),
+        super(Map.of(
+                Select.RED, red,
+                Select.BLUE, blue,
+                Select.UNKNOWN, err()),
                 AllianceCommand::selector);
     }
 
     private static Select selector() {
         Optional<Alliance> opt = DriverStation.getAlliance();
         if (opt.isEmpty())
-            return Select.Unknown;
+            return Select.UNKNOWN;
         switch (opt.get()) {
             case Red:
-                return Select.Red;
+                return Select.RED;
             case Blue:
-                return Select.Blue;
+                return Select.BLUE;
             default:
-                return Select.Unknown;
+                return Select.UNKNOWN;
         }
     }
 

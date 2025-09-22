@@ -24,10 +24,6 @@ public enum Experiment {
      */
     StickyHeading,
     /**
-     * Drive to note turns toward the note
-     */
-    DriveToNoteWithRotation,
-    /**
      * Use softer vision update gains
      */
     AvoidVisionJitter,
