@@ -201,6 +201,9 @@ public abstract class Talon6Motor implements BareMotor {
         TalonFXConfigurator talonFXConfigurator = m_motor.getConfigurator();
         Phoenix100.currentConfig(talonFXConfigurator, m_supplyLimit, currentA);
     }
+    public double getCurrent(){
+return m_motor.getStatorCurrent().getValueAsDouble();
+    }
 
     /**
      * Use VelocityVoltage outboard PID control to hold the given velocity, with
