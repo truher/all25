@@ -132,7 +132,7 @@ public class RobotContainer {
     final Wrist2 m_wrist;
     final Climber m_climber;
     final Funnel m_funnel;
-    final LEDIndicator m_leds;
+    //final LEDIndicator m_leds;
 
     final CoralTunnel m_tunnel;
     final AlgaeGrip m_grip;
@@ -242,7 +242,7 @@ public class RobotContainer {
                 swerveLocal,
                 limiter);
 
-        m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
+        //m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -561,7 +561,7 @@ public class RobotContainer {
         m_targetSimulator.run();
         // show the closest target on field2d
         m_targets.periodic();
-        m_leds.periodic();
+        //m_leds.periodic();
         m_combinedViz.run();
     }
 
@@ -572,7 +572,7 @@ public class RobotContainer {
     // this keeps the tests from conflicting via the use of simulated HAL ports.
     public void close() {
         m_modules.close();
-        m_leds.close();
+        //m_leds.close();
         m_elevator.close();
     }
 }
