@@ -24,7 +24,6 @@ public class Kinematics {
         m_elevatorHeight = elevatorHeight;
     }
     public Pose2d forward(Config config) {
-<<<<<<< Updated upstream
     // Calculates the end effector position and orientation using forward kinematics.
     // 1. Compute the height of the pivot point (base + elevator + offset)
     double pivotHeight = m_elevatorHeight + config.pivotHeightM();
@@ -50,20 +49,6 @@ public class Kinematics {
 
     // 6. Return the pose (position and orientation) of the end effector
     return new Pose2d(FinalX, FinalY, new Rotation2d(config.pivotAngleRad() + config.wristAngleRad()));
-=======
-        // Calculate the height of the pivot point above the ground
-        double pivotHeight = m_elevatorHeight + config.pivotHeightM();
-        // Calculate the X position of the wrist
-        double WristX = m_armLength * Math.cos(config.pivotAngleRad()) + m_wristLength * Math.cos(config.pivotAngleRad() + config.wristAngleRad());
-        // Calculate the Y position of the wrist
-        double WristY = pivotHeight + m_armLength * Math.sin(config.pivotAngleRad()) + m_wristLength * Math.sin(config.pivotAngleRad() + config.wristAngleRad());
-        // Calculate the final X position of the grip
-        double FinalX = WristX + m_wristLength * Math.cos(config.pivotAngleRad() + config.wristAngleRad());
-        // Calculate the final Y position of the grip
-        double FinalY = WristY + m_wristLength * Math.sin(config.pivotAngleRad() + config.wristAngleRad());
-        // Return the pose of the grip
-        return new Pose2d(FinalX, FinalY, new Rotation2d(config.pivotAngleRad() + config.wristAngleRad()));
->>>>>>> Stashed changes
     }
 
 
@@ -82,7 +67,7 @@ public class Kinematics {
         System.out.println("WristX: " + WristX);
         System.out.println("WristY: " + WristY);
         // Calculate the grip position relative to the elevator height
-        double GripX = WristX;
+        double GripX = WristX - m_wristLength * Math.cos(Angel);
         double GripY = WristY - m_elevatorHeight;
         System.out.println("GripX: " + GripX);
         System.out.println("GripY: " + GripY);
@@ -93,20 +78,20 @@ public class Kinematics {
         System.out.println("Distance: " + distance);
         System.out.println("Pivot to target angle: " + pivotTOTArgetAngle);
         // Law of cosines to find the bend angle at the shoulder joint
-        double cosbendAngle = (distance * distance + m_armLength * m_armLength - m_wristLength * m_wristLength) / (2 * distance * m_armLength);
+        double cosbendAngle = (-(distance * distance) + m_armLength * m_armLength + m_elevatorHeight * m_elevatorHeight) / (2 * m_elevatorHeight * m_armLength);
         cosbendAngle = Math.max(-1, Math.min(1, cosbendAngle)); // Constrct to valid range
         System.out.println("Cosine bend angle: " + cosbendAngle);
         double bendAngle = Math.acos(cosbendAngle);
-        System.out.println("Bend angle: " + bendAngle);
+        //System.out.println("Bend angle: " + bendAngle);
         // Calculate the required pivot angle
         double secondPivotAngle = pivotTOTArgetAngle + bendAngle;
         System.out.println("Second pivot angle: " + secondPivotAngle);
         // Calculate the required wrist angle
         double wristAngle = Angel - secondPivotAngle;
-        System.out.println("Wrist angle: " + wristAngle);
+        //System.out.println("Wrist angle: " + wristAngle);
         // The pivot height is the elevator height
         double pivotHeight = m_elevatorHeight;
-        System.out.println("Pivot height: " + pivotHeight);
+        //System.out.println("Pivot height: " + pivotHeight);
         // Return the config needed to reach the pose
         return new Config(secondPivotAngle, wristAngle, pivotHeight);
     }
