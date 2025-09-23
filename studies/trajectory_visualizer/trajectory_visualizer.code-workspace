@@ -44,6 +44,7 @@
 		"editor.inlayHints.enabled": "off",
 		"editor.minimap.enabled": false,
 		"workbench.colorTheme": "Default Light Modern",
-		"workbench.editor.revealIfOpen": true
+		"workbench.editor.revealIfOpen": true,
+		"editor.detectIndentation": false
 	}
 }
