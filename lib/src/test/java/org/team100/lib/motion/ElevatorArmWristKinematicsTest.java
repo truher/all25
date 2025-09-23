@@ -17,11 +17,10 @@ public class ElevatorArmWristKinematicsTest {
     @Test
     void testArmHeightComp(){
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(5, 1);
-        Translation2d wristPosition = new Translation2d(3, 0.1);
-        double h = new ElevatorArmWristKinematics(3, 1).armHeightComp(5, 1);
-
+        Translation2d wristPosition = new Translation2d(3, 3);
+        double h = new ElevatorArmWristKinematics(5, 1).armHeightComp(wristPosition);
+        System.out.println(wristPosition.getY());
         assertEquals(4, h);
-        
 
     }
 
@@ -68,7 +67,7 @@ public class ElevatorArmWristKinematicsTest {
     }
 
     @Test
-    void testInverseDownArm() {
+    void testInverseDownArm45Triangle() {
         //built for a 45 45 90 triangle for
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics((2*Math.sqrt(2)), 1);
         Pose2d p = new Pose2d(0.1, 3, Rotation2d.kCCW_90deg);
@@ -77,6 +76,18 @@ public class ElevatorArmWristKinematicsTest {
         assertEquals(2.1, c.shoulderHeight(), 0.001);
         assertEquals(2.35619, c.shoulderAngle(), 0.001);
         assertEquals(2.35619, c.wristAngle(), 0.001);
+    }
+
+    @Test
+    void testInverseDownArm() {
+        //built for a 45 45 90 triangle for
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
+        Pose2d p = new Pose2d(0.1, 2, Rotation2d.kCCW_90deg);
+        Config c = k.inverse(p);
+
+        assertEquals(Math.sqrt(3)+0.1, c.shoulderHeight(), 0.001);
+        assertEquals(2.61799, c.shoulderAngle(), 0.001);
+        assertEquals(2.0944, c.wristAngle(), 0.001);
     }
 
     @Test
