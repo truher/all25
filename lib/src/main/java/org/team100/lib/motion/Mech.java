@@ -1,9 +1,6 @@
-package org.team100;
+package org.team100.lib.motion;
 
 import java.util.function.DoubleSupplier;
-
-import org.team100.lib.motion.Config;
-import org.team100.lib.motion.ElevatorArmWristKinematics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

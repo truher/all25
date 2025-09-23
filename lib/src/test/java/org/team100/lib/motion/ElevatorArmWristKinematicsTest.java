@@ -8,10 +8,24 @@ import org.team100.lib.motion.ElevatorArmWristKinematics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class ElevatorArmWristKinematicsTest {
     // one micrometer tolerance since all the math here is exact
     private static final double DELTA = 0.000001;
+
+    @Test
+    void testArmHeightComp(){
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(5, 1);
+        Translation2d wristPosition = new Translation2d(3, 0.1);
+        double h = new ElevatorArmWristKinematics(3, 1).armHeightComp(5, 1);
+
+        assertEquals(4, h);
+        
+
+    }
+
+
 
     @Test
     void testForward0() {

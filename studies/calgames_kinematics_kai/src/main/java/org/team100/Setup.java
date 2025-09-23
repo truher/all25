@@ -1,5 +1,8 @@
 package org.team100;
 
+import org.team100.lib.motion.Mech;
+import org.team100.lib.motion.Viz;
+
 import edu.wpi.first.wpilibj.XboxController;
 
 /**

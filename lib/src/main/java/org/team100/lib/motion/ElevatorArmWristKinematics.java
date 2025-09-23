@@ -38,33 +38,39 @@ public class ElevatorArmWristKinematics {
     }
 
 
+    public double armHeightComp(double y, double x){ //inverted for new coord systm
+        return Math.sqrt(m_armLength * m_armLength - y * y);
+    }
+
     public Config inverse(Pose2d pose) {
         Translation2d wristPosition = pose.getTranslation()
                 .minus(new Translation2d(m_manipulatorLength, pose.getRotation()));
 
         double direction, wristAngle;
-        if (pose.getX()<m_armCrossoverHeight) { //should be reaching down here
-                direction = -1.0;
-        } else {
-                direction = 1.0;
+
+
+        double insideSqrt = (m_armLength * m_armLength - wristPosition.getY() * wristPosition.getY());
+
+        if((m_armLength * m_armLength - wristPosition.getY() * wristPosition.getY())<0){
+                insideSqrt=0;
         }
 
-        Translation2d wristToShoulder = new Translation2d(
-                (direction*(Math.sqrt(m_armLength * m_armLength - wristPosition.getY() * wristPosition.getY()))),
+        Translation2d ArmTranslation = new Translation2d(
+                ((Math.sqrt(insideSqrt))),
                 wristPosition.getY()); //the minus in sqrt is to flip arm to facing down
-                System.out.println(wristToShoulder);
-        Translation2d shoulderPosition = wristPosition.minus(wristToShoulder); 
+                System.out.println(ArmTranslation);
+
+
+        Translation2d shoulderHeight = wristPosition.minus(ArmTranslation); 
         
-        if (direction>0) {
-                wristAngle= direction*(pose.getRotation().minus(wristToShoulder.getAngle()).getRadians()); //for going up
-        } else {
-                wristAngle = direction*(pose.getRotation().plus(wristToShoulder.getAngle()).getRadians()); //going down
-        } //-KYM
+                wristAngle= (pose.getRotation().minus(ArmTranslation.getAngle()).getRadians()); //for going up
+                wristAngle = (pose.getRotation().plus(ArmTranslation.getAngle()).getRadians()); //going down
+         //-KYM
 
         return new Config(
-                shoulderPosition.getX(),
-                wristToShoulder.getAngle().getRadians(),
+                shoulderHeight.getX(),
+                ArmTranslation.getAngle().getRadians(),
                 wristAngle);
     }
-
 }
+
