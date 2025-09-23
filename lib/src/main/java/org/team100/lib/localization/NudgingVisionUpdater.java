@@ -47,11 +47,7 @@ public class NudgingVisionUpdater implements VisionUpdater {
         InterpolationRecord sample = m_history.getRecord(timestampS);
 
         // If there is a sample, nudge it towards the measurement.
-<<<<<<< Updated upstream
         Pose2d nudged = nudge(
-=======
-        Pose2d nudged = NudgingVisionUpdater.nudge(
->>>>>>> Stashed changes
                 sample.m_state.pose(), measurement, stateSigma, visionSigma);
         m_history.put(
                 timestampS,

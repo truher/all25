@@ -1,10 +1,5 @@
 package org.team100;
 
-<<<<<<< Updated upstream
-=======
-import org.team100.lib.motion.Config;
-
->>>>>>> Stashed changes
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -14,22 +9,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Viz {
     private static final double SCALE = 100;
     private static final Translation2d ORIGIN = new Translation2d(50, 0);
-<<<<<<< Updated upstream
     private final MechInterface m_mech;
-=======
-    private final Mech m_mech;
->>>>>>> Stashed changes
     private final Mechanism2d m_view;
     private final MechanismRoot2d m_root;
     private final MechanismLigament2d m_elevator;
     private final MechanismLigament2d m_arm;
     private final MechanismLigament2d m_hand;
 
-<<<<<<< Updated upstream
     public Viz(MechInterface mech) {
-=======
-    public Viz(Mech mech) {
->>>>>>> Stashed changes
         m_mech = mech;
         m_view = new Mechanism2d(SCALE, SCALE);
         m_root = m_view.getRoot("root", ORIGIN.getX(), ORIGIN.getY());

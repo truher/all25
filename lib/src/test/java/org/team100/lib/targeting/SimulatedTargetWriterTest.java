@@ -34,11 +34,7 @@ public class SimulatedTargetWriterTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-<<<<<<< Updated upstream
         Targets reader = new Targets(logger, fieldLog, x -> p);
-=======
-        Targets reader = new Targets(fieldLog, x -> p);
->>>>>>> Stashed changes
 
         stepTime();
         writer.update();

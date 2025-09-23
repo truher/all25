@@ -21,19 +21,12 @@ public class SimulatedBareMotor implements BareMotor {
     private final double m_freeSpeedRad_S;
 
     private final DoubleLogger m_log_duty;
-<<<<<<< Updated upstream
     private final DoubleLogger m_log_velocityInput;
     private final DoubleLogger m_log_positionInput;
     private final CotemporalCache<Model100> m_stateCache;
 
     // just like in a real motor, the inputs remain until zeroed by the watchdog.
     // nullable; only one (velocity or position) is used at a time.
-=======
-    private final DoubleLogger m_log_velocity;
-    private final CotemporalCache<Model100> m_stateCache;
-
-    // just like in a real motor, the inputs remain until zeroed by the watchdog.
->>>>>>> Stashed changes
     private Double m_velocityInput;
     private Double m_positionInput;
 
@@ -45,12 +38,8 @@ public class SimulatedBareMotor implements BareMotor {
         LoggerFactory child = parent.type(this);
         m_freeSpeedRad_S = freeSpeedRad_S;
         m_log_duty = child.doubleLogger(Level.DEBUG, "duty_cycle");
-<<<<<<< Updated upstream
         m_log_velocityInput = child.doubleLogger(Level.DEBUG, "velocity input");
         m_log_positionInput = child.doubleLogger(Level.DEBUG, "position input");
-=======
-        m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");
->>>>>>> Stashed changes
         m_stateCache = Cache.of(() -> {
             double dt = dt();
             if (DEBUG)
@@ -101,10 +90,6 @@ public class SimulatedBareMotor implements BareMotor {
     public void setVelocity(double velocityRad_S, double accelRad_S2, double torqueNm) {
         m_velocityInput = MathUtil.clamp(
                 Util.notNaN(velocityRad_S), -m_freeSpeedRad_S, m_freeSpeedRad_S);
-<<<<<<< Updated upstream
-=======
-        m_log_velocity.log(() -> m_velocityInput);
->>>>>>> Stashed changes
         // you can't use velocity and position control at the same time
         m_positionInput = null;
     }

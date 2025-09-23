@@ -45,12 +45,8 @@
 		"editor.minimap.enabled": false,
 		"workbench.colorTheme": "Default Light Modern",
         "editor.detectIndentation": false,
-<<<<<<< Updated upstream
         "workbench.editor.revealIfOpen": true,
         "debug.console.collapseIdenticalLines": false,
         "editor.stickyScroll.enabled": false
-=======
-        "workbench.editor.revealIfOpen": true
->>>>>>> Stashed changes
 	}
 }

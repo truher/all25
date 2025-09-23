@@ -16,11 +16,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     m_robotContainer = new RobotContainer();
   }
-<<<<<<< Updated upstream
 
-=======
-//desmos is peak
->>>>>>> Stashed changes
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();

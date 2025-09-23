@@ -2,10 +2,7 @@ package org.team100.lib.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-<<<<<<< Updated upstream
 import java.util.Iterator;
-=======
->>>>>>> Stashed changes
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,11 +10,7 @@ import java.util.stream.Collectors;
  * A collection that evicts old entries.
  */
 public class TrailingHistory<T> {
-<<<<<<< Updated upstream
     public record ValueRecord<T>(double time, T value) {
-=======
-    private record ValueRecord<T>(double time, T value) {
->>>>>>> Stashed changes
     };
 
     /** Entry timeout in seconds */
@@ -53,7 +46,6 @@ public class TrailingHistory<T> {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-<<<<<<< Updated upstream
     /** Mutating iterator for filtering. */
     public Iterator<ValueRecord<T>> iterator() {
         return m_entries.iterator();
@@ -63,8 +55,6 @@ public class TrailingHistory<T> {
         return m_entries.size();
     }
 
-=======
->>>>>>> Stashed changes
     //////////////////
 
     private void cleanup(double time) {

@@ -36,11 +36,7 @@ public class TrajectoryPlotter {
         frame.pack();
         frame.setVisible(true);
         try {
-<<<<<<< Updated upstream
             Thread.sleep(5000);
-=======
-            Thread.sleep(50000);
->>>>>>> Stashed changes
         } catch (InterruptedException e) {
         }
     }

@@ -20,10 +20,7 @@ import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Funnel.FunnelDefault;
 import org.team100.frc2025.Funnel.ReleaseFunnel;
 import org.team100.frc2025.Swerve.DriveForwardSlowly;
-<<<<<<< Updated upstream
 import org.team100.frc2025.Swerve.FieldConstants;
-=======
->>>>>>> Stashed changes
 import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
@@ -222,11 +219,7 @@ public class RobotContainer {
                 history,
                 visionUpdater);
 
-<<<<<<< Updated upstream
         m_targets = new Targets(driveLog, fieldLog, history);
-=======
-        m_targets = new Targets(fieldLog, history);
->>>>>>> Stashed changes
 
         final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);
@@ -276,13 +269,9 @@ public class RobotContainer {
                             Camera.CORAL_RIGHT),
                     history,
                     new Translation2d[] {
-<<<<<<< Updated upstream
                             FieldConstants.CoralMark.LEFT.value,
                             FieldConstants.CoralMark.CENTER.value,
                             FieldConstants.CoralMark.RIGHT.value });
-=======
-                            new Translation2d(1.5, 1.5) });
->>>>>>> Stashed changes
             m_targetSimulator = tsim::update;
         }
 
