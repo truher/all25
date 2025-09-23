@@ -12,9 +12,15 @@ import org.jfree.data.xy.VectorSeriesCollection;
 import org.team100.lib.trajectory.Trajectory100;
 
 public class TrajectoryPlotter {
-    public static void plot(Trajectory100 t, String name) {
+    private final TrajectoryToVectorSeries converter;
+
+    public TrajectoryPlotter(double arrowLength) {
+        converter = new TrajectoryToVectorSeries(arrowLength);
+    }
+
+    public void plot(Trajectory100 t, String name) {
         VectorSeriesCollection dataSet = new VectorSeriesCollection();
-        dataSet.addSeries(TrajectoryToVectorSeries.convert(t));
+        dataSet.addSeries(converter.convertRotated(t));
         XYPlot plot = new XYPlot(
                 dataSet,
                 new NumberAxis("X"),
@@ -23,21 +29,14 @@ public class TrajectoryPlotter {
         NumberAxis domain = (NumberAxis) plot.getDomainAxis();
         NumberAxis range = (NumberAxis) plot.getRangeAxis();
         // make the x and y scales the same
-        domain.setRange(0, 10);
-        range.setRange(0, 10);
+        domain.setRange(-1, 1);
+        range.setRange(0, 2);
         domain.setTickUnit(new NumberTickUnit(1));
         range.setTickUnit(new NumberTickUnit(1));
 
-        ChartFrame frame = new ChartFrame(
-                name,
-                new JFreeChart(
-                        plot));
+        ChartFrame frame = new ChartFrame(name, new JFreeChart(plot));
         frame.setPreferredSize(new Dimension(500, 500));
         frame.pack();
         frame.setVisible(true);
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-        }
     }
 }

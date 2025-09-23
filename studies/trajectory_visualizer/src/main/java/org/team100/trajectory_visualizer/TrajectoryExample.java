@@ -10,28 +10,42 @@ import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 /** This is an example of how we might make a little library of trajectories. */
 public class TrajectoryExample {
-    public static Trajectory100 oneToTwo() {
+
+    private final TrajectoryPlanner m_planner;
+
+    public TrajectoryExample() {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(1, 1),
                 new YawRateConstraint(1, 1));
-
-        TrajectoryPlanner p = new TrajectoryPlanner(c);
-
-        return p.restToRest(
-                CanonicalPose.POSE_ONE.pose,
-                CanonicalPose.POSE_TWO.pose);
+        m_planner = new TrajectoryPlanner(c);
     }
 
-    public static Trajectory100 twoToOne() {
-        List<TimingConstraint> c = List.of(
-                new ConstantConstraint(1, 1),
-                new YawRateConstraint(1, 1));
+    public Trajectory100 pickToL4() {
+        return m_planner.restToRest(List.of(
+                Waypoint.FROM_PICK.hPose,
+                Waypoint.GOING_FORWARD.hPose,
+                Waypoint.TO_L4.hPose));
+    }
 
-        TrajectoryPlanner p = new TrajectoryPlanner(c);
+    public Trajectory100 pickToL3() {
+        return m_planner.restToRest(List.of(
+                Waypoint.FROM_PICK.hPose,
+                Waypoint.GOING_FORWARD.hPose,
+                Waypoint.TO_L3.hPose));
+    }
 
-        return p.restToRest(
-                CanonicalPose.POSE_TWO.pose,
-                CanonicalPose.POSE_ONE.pose);
+    public Trajectory100 pickToL2() {
+        return m_planner.restToRest(List.of(
+                Waypoint.FROM_PICK.hPose,
+                Waypoint.GOING_FORWARD.hPose,
+                Waypoint.TO_L2.hPose));
+    }
+
+    public Trajectory100 pickToL1() {
+        return m_planner.restToRest(List.of(
+                Waypoint.FROM_PICK.hPose,
+                Waypoint.GOING_FORWARD.hPose,
+                Waypoint.TO_L1.hPose));
     }
 
 }

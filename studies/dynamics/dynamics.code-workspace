@@ -41,10 +41,9 @@
 			"edu.wpi.first.math.**.proto.*",
 			"edu.wpi.first.math.**.struct.*"
 		],
-		"editor.inlayHints.enabled": "off",
+		"workbench.tree.enableStickyScroll": false,
+		"editor.stickyScroll.enabled": false,
 		"editor.minimap.enabled": false,
-		"workbench.colorTheme": "Default Light Modern",
-		"workbench.editor.revealIfOpen": true,
-		"editor.detectIndentation": false
+		"editor.inlayHints.enabled": "off"
 	}
 }
