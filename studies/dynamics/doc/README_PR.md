@@ -1,21 +1,8 @@
 # PR Kinematics
 
-This is a study of second-order dynamics applied to the prismatic-revolute (PR)
-mechanism.  The reason to explore this topic is to improve the accuracy of the
-feedforward terms in actuation, to include joint acceleration, centrifugal force,
-and Coriolis force.
+This is the Chemnitz prismatic-revolute (PR) example that begins on slide 72.
 
-The actual Calgames arm is not PR, it is PRR, so this study could be considered
-a first step towards what we really want.
-
-Most resources on second-order dynamics involve a lot of abstraction and not
-a lot of examples, but I did find one reference that did include several examples:
-
-https://www.tu-chemnitz.de/informatik/KI/edu/robotik/ws2017/Dyn.pdf
-
-Let's work through the PR example that begins on slide 72.
-
-<img src="image.png">
+<img src="image_pr.png">
 
 The setup is:
 
@@ -28,9 +15,184 @@ The important results are as follows (remember that
 joint configurations are $q_1$ and $q_2$ and
 things like $s_2$ really mean $sin(q_2)$):
 
+
 ## Mass
 
-The mass matrix is:
+For the PR case, let's start with the locations of the centers of mass.  We're using
+three dimensions here even though this is a 2d drawing, just because the real thing
+has 3d aspects which appear in the moment of inertia matrix -- for rotations in the
+x-y plane, we'll use the "z" component of inertia.
+
+So the center of mass of the first link is:
+
+$$
+p_{c_1} =
+\begin{bmatrix}
+q_1 - l \\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+$$
+
+The center of mass of the second link is:
+
+$$
+p_{c_2} =
+\begin{bmatrix}
+q_1 + d c_2\\[4pt]
+d s_2\\[4pt]
+0
+\end{bmatrix}
+$$
+
+We can write the Jacobians by inspection.  The translational velocity of the center of mass
+of the first link depends only on the first joint, $q_1$, so it has only one
+non-zero value:
+
+$$
+J_{v_1} =
+\begin{bmatrix}
+1 & 0 \\[4pt]
+0 & 0 \\[4pt]
+0 & 0
+\end{bmatrix}
+$$
+
+The translational velocity of the center of mass of the second link depends on both joints,
+translation in the first column (from $q_1$) and rotation in the second (from $q_2$):
+
+$$
+J_{v_2} =
+\begin{bmatrix}
+1 & -ds_2 \\[4pt]
+0 & dc_2 \\[4pt]
+0 & 0
+\end{bmatrix}
+$$
+
+The angular velocity of the center of mass of the first link is always zero, because
+the first joint is prismatic:
+
+$$
+J_{\omega_1} =
+\begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0 \\[4pt]
+0 & 0
+\end{bmatrix}
+$$
+
+The angular velocity of the center of mass of the second link is always the same
+as the angular velocity of the joint itself:
+
+$$
+J_{\omega_2} =
+\begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0 \\[4pt]
+0 & 1
+\end{bmatrix}
+$$
+
+Now we can put all these terms together into the expression for the mass matrix:
+
+$$
+M =
+m_1 J_{v_1}^T J_{v_1}
++
+J_{\omega_1}^T I_{c_1} J_{\omega_1}
++
+m_2 J_{v_2}^T J_{v_2}
++
+J_{\omega_2}^T  I_{c_2} J_{\omega_2}
+$$
+
+Which is:
+
+$$
+M =
+m_1
+\begin{bmatrix}
+1 & 0 & 0\\[4pt]
+0 & 0 & 0\\[4pt]
+\end{bmatrix}
+\begin{bmatrix}
+1 & 0 \\[4pt]
+0 & 0 \\[4pt]
+0 & 0
+\end{bmatrix}
+\\
++
+\begin{bmatrix}
+0 & 0 & 0\\[4pt]
+0 & 0 & 0\\[4pt]
+\end{bmatrix}
+\begin{bmatrix}
+I_{xx} & -I_{xy} & -I_{xz} \\[4pt]
+-I_{yx} & I_{yy} & -I_{yz} \\[4pt]
+-I_{zx} & -I_{zy} & I_{zz} \\[4pt]
+\end{bmatrix}
+\begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0 \\[4pt]
+0 & 0
+\end{bmatrix}
+\\
++
+m_2
+\begin{bmatrix}
+1 & 0 & 0\\[4pt]
+-ds_2 & dc_2 & 0\\[4pt]
+\end{bmatrix}
+\begin{bmatrix}
+1 & -ds_2 \\[4pt]
+0 & dc_2 \\[4pt]
+0 & 0
+\end{bmatrix}
+\\
++
+\begin{bmatrix}
+0 & 0 & 0\\[4pt]
+0 & 0 & 1\\[4pt]
+\end{bmatrix}
+\begin{bmatrix}
+I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\[4pt]
+-I_{yx_2} & I_{yy_2} & -I_{yz_2} \\[4pt]
+-I_{zx_2} & -I_{zy_2} & I_{zz_2} \\[4pt]
+\end{bmatrix}
+\begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0 \\[4pt]
+0 & 1
+\end{bmatrix}
+$$
+
+Which is:
+
+$$
+M =
+\begin{bmatrix}
+m_1 & 0 \\[4pt]
+0 & 0
+\end{bmatrix}
++
+\begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0
+\end{bmatrix}
++
+\begin{bmatrix}
+m_2 & -m_2 d s_2 \\[4pt]
+-m_2 d s_2 & m_2 d^2
+\end{bmatrix}
++
+\begin{bmatrix}
+0 & 0 \\[4pt]
+0 & I_{zz_2}
+\end{bmatrix}
+$$
+
+Which gives us the mass matrix:
 
 $$
 M =
@@ -56,9 +218,40 @@ the force felt by the prismatic joint is less.
 Similarly, the revolute joint feels the acceleration
 of the pivot by the prismatic joint.
 
-Note the derivation of $M$ in the reference uses a "Jacobian" concept
-which is different from the joint Jacobian we use
-elsewhere: this is the Jacobian __of the centers of masses__.
+
+## Centrifugal and Coriolis
+
+The combined vector $V$ is given as:
+
+$$
+V(q,\dot{q}) = 
+\begin{bmatrix}
+0\\[4pt]
+0
+\end{bmatrix}
+\begin{bmatrix}
+\dot{q}_1 & \dot{q}_2
+\end{bmatrix}
++
+\begin{bmatrix}
+0 & -m_2dc_2 \\[4pt]
+0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+\dot{q}_1^2 \\[4pt]
+\dot{q}_2^2
+\end{bmatrix}
+$$
+
+The first term is the coriolis force: it
+appears *across* radial motion.  The second term
+is centrifugal force: it appears *along* the radius
+of motion.
+
+In the PR case, there is no coriolis term, and the
+centrifugal term affects only the P joint, proportional
+to its position (greatest at full extension).
+
 
 ## Gravity
 
@@ -129,44 +322,15 @@ $$
 down on the prismatic joint, and the arm mass pushing
 on the revolute joint.
 
-## Centrifugal and Coriolis
 
-The combined vector $V$ is given as:
 
-$$
-V(q,\dot{q}) = 
-\begin{bmatrix}
-0\\[4pt]
-0
-\end{bmatrix}
-\begin{bmatrix}
-\dot{q}_1 & \dot{q}_2
-\end{bmatrix}
-+
-\begin{bmatrix}
-0 & -m_2dc_2 \\[4pt]
-0 & 0
-\end{bmatrix}
-\begin{bmatrix}
-\dot{q}_1^2 \\[4pt]
-\dot{q}_2^2
-\end{bmatrix}
-$$
 
-The first term is the coriolis force: it
-appears *across* radial motion.  The second term
-is centrifugal force: it appears *along* the radius
-of motion.
 
-In the PR case, there is no coriolis term, and the
-centrifugal term affects only the P joint, proportional
-to its position (greatest at full extension).
 
 ## Equation of Motion
 
 Finally (using our corrected gravity expression),
-we can write the expressions for the P joint
-force, $f_1$:
+we can write the equation of motion for the P joint force, $f_1$:
 
 $$
 f_1 =
