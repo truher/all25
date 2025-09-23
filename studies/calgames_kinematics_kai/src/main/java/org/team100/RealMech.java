@@ -252,12 +252,13 @@ public class RealMech extends SubsystemBase implements MechInterface {
         }
         // velocity
         JointVelocities jv = m_jacobian.inverse(control.model());
-        // force
+        // this is the force *of* gravity
         JointForce jf = m_gravity.get(c);
         // set each mechanism
-        m_elevator.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
-        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
-        m_wrist.setPosition(c.wristAngle(), jv.wrist(), 0, jf.wrist());
+        // force should *oppose* gravity.
+        m_elevator.setPosition(c.shoulderHeight(), jv.elevator(), 0, -1.0 * jf.elevator());
+        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, -1.0 * jf.shoulder());
+        m_wrist.setPosition(c.wristAngle(), jv.wrist(), 0, -1.0 * jf.wrist());
     }
 
     /** Controls are configuration axes. */
@@ -296,10 +297,12 @@ public class RealMech extends SubsystemBase implements MechInterface {
     /** Sets each mechanism, with zero velocity */
     private void set(Config c) {
         logConfig(c);
+        // this is the force *of* gravity
         JointForce jf = m_gravity.get(c);
-        m_elevator.setPosition(c.shoulderHeight(), 0, 0, jf.elevator());
-        m_shoulder.setPosition(c.shoulderAngle(), 0, 0, jf.shoulder());
-        m_wrist.setPosition(c.wristAngle(), 0, 0, jf.wrist());
+        // force should *oppose* gravity.
+        m_elevator.setPosition(c.shoulderHeight(), 0, 0, -1.0 * jf.elevator());
+        m_shoulder.setPosition(c.shoulderAngle(), 0, 0, -1.0 * jf.shoulder());
+        m_wrist.setPosition(c.wristAngle(), 0, 0, -1.0 * jf.wrist());
     }
 
     private void addConfig(double height, double shoulder, double wrist) {

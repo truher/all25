@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 /**
  * Follow a list of trajectories created at initialization time, given the pose
  * at that time.
+ * 
+ * A list of trajectories is probably only useful for testing.
  */
 public class DriveWithTrajectoryListFunction extends Command {
     private final SwerveDriveSubsystem m_drive;

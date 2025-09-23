@@ -20,6 +20,7 @@ import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Funnel.FunnelDefault;
 import org.team100.frc2025.Funnel.ReleaseFunnel;
 import org.team100.frc2025.Swerve.DriveForwardSlowly;
+import org.team100.frc2025.Swerve.FieldConstants;
 import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
@@ -50,6 +51,7 @@ import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
+import org.team100.lib.examples.semiauto.FloorPickSetup;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.gyro.Gyro;
@@ -217,7 +219,7 @@ public class RobotContainer {
                 history,
                 visionUpdater);
 
-        m_targets = new Targets(fieldLog, history);
+        m_targets = new Targets(driveLog, fieldLog, history);
 
         final FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer, odometryUpdater, history);
@@ -267,7 +269,9 @@ public class RobotContainer {
                             Camera.CORAL_RIGHT),
                     history,
                     new Translation2d[] {
-                            new Translation2d(1.5, 1.5) });
+                            FieldConstants.CoralMark.LEFT.value,
+                            FieldConstants.CoralMark.CENTER.value,
+                            FieldConstants.CoralMark.RIGHT.value });
             m_targetSimulator = tsim::update;
         }
 
@@ -459,6 +463,11 @@ public class RobotContainer {
 
         whileTrue(operatorControl::activateManualClimb,
                 m_climber.manual(operatorControl::manualClimbSpeed));
+
+        // this is for developing autopick.
+        new FloorPickSetup(
+                fieldLog, driverControl, m_drive, m_targets, 
+                SwerveControllerFactory.pick(driveLog), autoProfile);
 
         m_initializer = Executors.newSingleThreadScheduledExecutor();
         m_initializer.schedule(this::initStuff, 0, TimeUnit.SECONDS);

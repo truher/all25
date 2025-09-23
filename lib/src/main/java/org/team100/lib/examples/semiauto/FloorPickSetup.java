@@ -19,6 +19,7 @@ public class FloorPickSetup {
             SwerveController controller,
             HolonomicProfile profile) {
         new Trigger(control::button4).whileTrue(
-                FloorPickSequence.get(fieldLog, drive, targets, controller, profile));
+                FloorPickSequence.get(fieldLog, drive, targets, controller, profile)
+                        .withName("Floor Pick"));
     }
 }
