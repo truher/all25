@@ -2,8 +2,8 @@ package org.team100.frc2025.Swerve;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.commands.drivetrain.HeadingLatch;
 import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
+import org.team100.lib.commands.drivetrain.manual.HeadingLatch;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverControl;

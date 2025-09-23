@@ -2,6 +2,7 @@ package org.team100.lib.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
  * A collection that evicts old entries.
  */
 public class TrailingHistory<T> {
-    private record ValueRecord<T>(double time, T value) {
+    public record ValueRecord<T>(double time, T value) {
     };
 
     /** Entry timeout in seconds */
@@ -43,6 +44,15 @@ public class TrailingHistory<T> {
         return m_entries.stream()
                 .map((x) -> x.value)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    /** Mutating iterator for filtering. */
+    public Iterator<ValueRecord<T>> iterator() {
+        return m_entries.iterator();
+    }
+
+    public int size() {
+        return m_entries.size();
     }
 
     //////////////////

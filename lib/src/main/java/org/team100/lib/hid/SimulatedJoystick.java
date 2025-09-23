@@ -59,6 +59,11 @@ public class SimulatedJoystick implements DriverControl {
     }
 
     @Override
+    public boolean button4() {
+        return button(4);
+    }
+
+    @Override
     public boolean driveToObject() {
         return button(4);
     }

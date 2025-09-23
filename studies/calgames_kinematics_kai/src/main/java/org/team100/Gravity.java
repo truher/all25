@@ -43,22 +43,26 @@ public class Gravity {
         double handForce = m_handMass * m_g;
         // since the zero is pointing up, the projection of the level arm is sin().
         double handWristLever = m_handCm * Math.sin(globalWristAngle);
+        // angle is positive-CCW so gravity is pulling positive
         double wristTorque = handForce * handWristLever;
 
         // torque of the arm on the shoulder
         double armForce = m_armMass * m_g;
         double armShoulderLever = m_armCm * Math.sin(c.shoulderAngle());
+        // angle is positive-CCW so gravity is pulling positive
         double armShoulderTorque = armForce * armShoulderLever;
 
         // torque of the hand on the shoulder
         double wristShoulderLever = m_armLength * Math.sin(c.shoulderAngle());
         double handShoulderLever = handWristLever + wristShoulderLever;
+        // angle is positive-CCW so gravity is pulling positive
         double handShoulderTorque = handForce * handShoulderLever;
 
         double shoulderTorque = handShoulderTorque + armShoulderTorque;
 
         // force on the elevator is just the sum
-        double elevatorForce = handForce + armForce;
+        // elevator is positive-up so gravity is pulling negative.
+        double elevatorForce = -1.0 * (handForce + armForce);
 
         return new JointForce(elevatorForce, shoulderTorque, wristTorque);
     }
