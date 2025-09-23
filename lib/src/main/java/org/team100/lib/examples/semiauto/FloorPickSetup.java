@@ -19,7 +19,11 @@ public class FloorPickSetup {
             SwerveController controller,
             HolonomicProfile profile) {
         new Trigger(control::button4).whileTrue(
+<<<<<<< Updated upstream
                 FloorPickSequence.get(fieldLog, drive, targets, controller, profile)
                         .withName("Floor Pick"));
+=======
+                FloorPickSequence.get(fieldLog, drive, targets, controller, profile));
+>>>>>>> Stashed changes
     }
 }

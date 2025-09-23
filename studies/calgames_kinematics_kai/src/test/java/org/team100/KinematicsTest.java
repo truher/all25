@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
+<<<<<<< Updated upstream
+=======
+import org.team100.lib.motion.Config;
+>>>>>>> Stashed changes
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,8 +17,13 @@ public class KinematicsTest {
     @Test
     void testForwardBaseline() {
         System.out.println("\n\nTESTING BASELINE FORWARD KINEMATICS");
+<<<<<<< Updated upstream
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0);
         Config c = new Config(1, 60, 65);
+=======
+        KaisKinematics k = new KaisKinematics(0.3, 0.1,3, 0, 0, 0, 0);
+        Config c = new Config(1, Math.toRadians(60), Math.toRadians(65));
+>>>>>>> Stashed changes
         Pose2d p = k.forward(c);
         assertEquals(0.207, p.getX(), 0.001);
         assertEquals(1.178, p.getY(), 0.001);
@@ -22,9 +31,15 @@ public class KinematicsTest {
     }
 
     @Test
+<<<<<<< Updated upstream
     void testInverseL1() {
         System.out.println("\n\nTESTING INVERSE FOR L1");
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+=======
+    void testInverseL2() {
+        System.out.println("\n\nTESTING INVERSE FOR L2");
+        KaisKinematics k = new KaisKinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+>>>>>>> Stashed changes
         Pose2d p = new Pose2d(0.332, 0.81, new Rotation2d(Math.toRadians(35)));
         Config c = k.inverse(p);
         if (c==null){
@@ -36,15 +51,51 @@ public class KinematicsTest {
     }
 
     @Test
+<<<<<<< Updated upstream
     void testInverseBaseline() {
         System.out.println("\n\nTESTING BASIC INVERSE");
         Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+=======
+    void testInversePickup() {
+        System.out.println("\n\nTESTING INVERSE FOR CORAL PICKUP");
+        KaisKinematics k = new KaisKinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+        Pose2d p = new Pose2d(0.25, 0.1, new Rotation2d(Math.toRadians(0)));
+        Config c = k.inverse(p);
+        if (c==null){
+            fail("Inverse Kinematics Failed. Check Logs");
+        }
+        assertEquals(0.36, c.shoulderHeight(), 0.001);
+        assertEquals(Math.toRadians(-60), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
+        assertEquals(Math.toRadians(120), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
+    }
+
+    // @Test
+    // void testInverseSingluraity() {
+    //     System.out.println("\n\nTESTING SINGULARITY IN INVERSE OPERATIONS");
+    //     Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+    //     Pose2d p = new Pose2d(0.4, 0.25, new Rotation2d(Math.toRadians(0)));
+    //     Config c = k.inverse(p);
+    //     if (c==null){
+    //         fail("Inverse Kinematics Singularity Failed. Check Logs");
+    //     }
+    //     assertEquals(0.25, c.shoulderHeight(), 0.001);
+    //     assertEquals(Math.toRadians(0), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
+    //     assertEquals(Math.toRadians(180), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
+    // }
+    
+
+    @Test
+    void testInverseBaseline() {
+        System.out.println("\n\nTESTING BASIC INVERSE");
+        KaisKinematics k = new KaisKinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+>>>>>>> Stashed changes
         Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
         Config c = k.inverse(p);
         if (c==null){
             fail("Inverse Kinematics Failed. Check Logs");
         }
         assertEquals(1, c.shoulderHeight(), 0.001);
+<<<<<<< Updated upstream
         assertEquals(Math.toRadians(60), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
         assertEquals(Math.toRadians(65), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
     }
@@ -67,11 +118,39 @@ public class KinematicsTest {
         assertNull(k.inverse(p));
 
     }
+=======
+        assertEquals(Math.toRadians(60.0788), c.shoulderAngle(), 0.001); //changed from 0.001, assumed rounding error
+        assertEquals(Math.toRadians(64.92115), c.wristAngle(), 0.001); //changed from 0.001 assumed rounding error
+    }
+
+    // @Test
+    // void testInverseReachFailures() {
+    //     System.out.println("\n\nTESTING INVERSE REACH FAILURES");
+    //     Kinematics k = new Kinematics(0.3, 0.1,3, 0, 0, 0, 0 );
+    //     Pose2d p = new Pose2d(0.4, 0.81, new Rotation2d(Math.toRadians(35))); //impornt bits 
+    //     Config c = k.inverse(p);
+    //     assertNull(k.inverse(p));
+    // }
+
+    // @Test
+    // void testInverseDeadzoneFailures() {
+    //     System.out.println("\n\nTESTING INVERSE DEADZONE FAILURES");
+    //     Kinematics k = new Kinematics(0.3, 0.1,3, 0.1, 1, 0.5, 3 ); //important bits (O.5 AND 3)
+    //     Pose2d p = new Pose2d(0.332, 0.81, new Rotation2d(Math.toRadians(35)));
+    //     Config c = k.inverse(p);
+    //     assertNull(k.inverse(p));
+
+    // }
+>>>>>>> Stashed changes
 
     @Test
     void testRoundTripInverseFirst(){ //NOT WORKING, OFF BY 0.007, CHECK IF ROUNDING ERROR ON P.X PART?
         System.out.println("\n\nTESTING ROUND TRIP KINEMATICS (Inverse First)");
+<<<<<<< Updated upstream
         Kinematics k = new Kinematics(0.3, 0.1, 3, 0, 0, 0, 0);
+=======
+        KaisKinematics k = new KaisKinematics(0.3, 0.1, 3, 0, 0, 0, 0);
+>>>>>>> Stashed changes
         Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
         Config c = new Config(0.9999, 60.0788, 64.921159); //desmos config
 
@@ -99,11 +178,19 @@ public class KinematicsTest {
     @Test
     void testRoundTripForwardFirst(){ //NOT WORKING, OFF BY 0.007, CHECK IF ROUNDING ERROR ON P.X PART?
         System.out.println("\n\nTESTING ROUND TRIP KINEMATICS (Forward First)");
+<<<<<<< Updated upstream
         Kinematics k = new Kinematics(0.3, 0.1, 3, 0, 0, 0, 0);
         Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
         Config c = new Config(1, 60, 65); //basic config for forward
 
         Pose2d p2 = k.forward(c); //return basic forward output
+=======
+        KaisKinematics k = new KaisKinematics(0.3, 0.1, 3, 0, 0, 0, 0);
+        Pose2d p = new Pose2d(0.207, 1.178, new Rotation2d(Math.toRadians(55)));
+        Config c = new Config(1, Math.toRadians(60), Math.toRadians(65)); //basic config for forward
+
+        Pose2d p2 = k.forward(c); //return basic forward output (NOW IN RADIANS)
+>>>>>>> Stashed changes
         Config c2 = k.inverse(p2); //make a config based on the result of the forward kinematics
 
         System.out.println("\nDefault pose:   " + p);
@@ -113,9 +200,15 @@ public class KinematicsTest {
         System.out.println("Config derived from forward point: " + c2);
 
         //testing final x positions
+<<<<<<< Updated upstream
         assertEquals(Math.toRadians(c.shoulderAngle()), c2.shoulderAngle(), 0.001); //check if (given pose x) = (recieved pose x from forward)
         assertEquals(c.shoulderHeight(), c2.shoulderHeight(), 0.001);
         assertEquals(Math.toRadians(c.wristAngle()), c2.wristAngle(), 0.001);
+=======
+        assertEquals(c.shoulderAngle(), c2.shoulderAngle(), 0.001); //check if (given pose x) = (recieved pose x from forward)
+        assertEquals(c.shoulderHeight(), c2.shoulderHeight(), 0.001);
+        assertEquals(c.wristAngle(), c2.wristAngle(), 0.001);
+>>>>>>> Stashed changes
         
     }
 

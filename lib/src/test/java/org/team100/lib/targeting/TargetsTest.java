@@ -36,7 +36,11 @@ public class TargetsTest implements Timeless {
     void testTargets() {
         stepTime();
         SwerveModel p = new SwerveModel();
+<<<<<<< Updated upstream
         Targets t = new Targets(logger, fieldLog, (x) -> p);
+=======
+        Targets t = new Targets(fieldLog, (x) -> p);
+>>>>>>> Stashed changes
         t.update();
         assertTrue(t.getTargets().isEmpty());
         // send some blips
@@ -74,7 +78,11 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
+<<<<<<< Updated upstream
         Targets reader = new Targets(logger, fieldLog, (x) -> p);
+=======
+        Targets reader = new Targets(fieldLog, (x) -> p);
+>>>>>>> Stashed changes
 
         stepTime();
         writer.update();
@@ -106,7 +114,11 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
+<<<<<<< Updated upstream
         Targets reader = new Targets(logger, fieldLog, (x) -> p);
+=======
+        Targets reader = new Targets(fieldLog, (x) -> p);
+>>>>>>> Stashed changes
 
         stepTime();
         writer.update();
@@ -115,8 +127,12 @@ public class TargetsTest implements Timeless {
         reader.update();
 
         List<Translation2d> allTargets = reader.getTargets();
+<<<<<<< Updated upstream
         // both cameras see the sme target
         assertEquals(1, allTargets.size());
+=======
+        assertEquals(2, allTargets.size());
+>>>>>>> Stashed changes
 
         Optional<Translation2d> tt = reader.getClosestTarget();
         assertTrue(tt.isPresent());
@@ -141,7 +157,11 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
+<<<<<<< Updated upstream
         Targets reader = new Targets(logger, fieldLog, x -> p);
+=======
+        Targets reader = new Targets(fieldLog, x -> p);
+>>>>>>> Stashed changes
 
         stepTime();
         writer.update();
@@ -175,7 +195,11 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
+<<<<<<< Updated upstream
         Targets reader = new Targets(logger, fieldLog, (x) -> p);
+=======
+        Targets reader = new Targets(fieldLog, (x) -> p);
+>>>>>>> Stashed changes
 
         stepTime();
         writer.update();
@@ -184,8 +208,12 @@ public class TargetsTest implements Timeless {
         reader.update();
 
         List<Translation2d> allTargets = reader.getTargets();
+<<<<<<< Updated upstream
         // multi-camera views of the same target are coalesced
         assertEquals(2, allTargets.size());
+=======
+        assertEquals(4, allTargets.size());
+>>>>>>> Stashed changes
 
         Optional<Translation2d> tt = reader.getClosestTarget();
         assertTrue(tt.isPresent());

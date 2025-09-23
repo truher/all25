@@ -79,9 +79,14 @@ public class SimulatedTargetWriter {
             Rotation3d[] rots = rot.toArray(new Rotation3d[0]);
 
             // write timestamp corresponding to pose
+<<<<<<< Updated upstream
             long delayUs = (long) (DELAY * 1000000.0);
             long timestampUs = NetworkTablesJNI.now();
             // long timestampUs = (long)(Takt.get() * 1000000.0);
+=======
+            long delayUs = (long) DELAY * 1000000;
+            long timestampUs = NetworkTablesJNI.now();
+>>>>>>> Stashed changes
 
             long time = timestampUs - delayUs;
             if (DEBUG)

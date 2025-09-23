@@ -79,6 +79,45 @@ public class TrajectoryTest {
         TrajectoryPlotter.plot(t, "simple");
     }
 
+<<<<<<< Updated upstream
+=======
+    @Test
+    void testPickupToPlace() {
+        List<TimingConstraint> c = List.of(
+                new ConstantConstraint(2, 0.5),
+                new YawRateConstraint(1, 1));
+        TrajectoryPlanner p = new TrajectoryPlanner(c);
+        List<HolonomicPose2d> waypoints = List.of(
+                new HolonomicPose2d(
+                        new Translation2d(1, 0.1), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //pickup
+                new HolonomicPose2d(
+                        new Translation2d(3, 7), new Rotation2d(Math.PI/2), new Rotation2d()), //place for gateway point?
+                new HolonomicPose2d(
+                        new Translation2d(6, 9), new Rotation2d(-((7*Math.PI)/36)), new Rotation2d(Math.PI / 2)));
+        Trajectory100 t = p.restToRest(waypoints);
+        TrajectoryPlotter.plot(t, "simple");    
+    }
+
+    @Test
+    void testSingularityDemo() {
+        List<TimingConstraint> c = List.of(
+                new ConstantConstraint(2, 0.5),
+                new YawRateConstraint(1, 1));
+        TrajectoryPlanner p = new TrajectoryPlanner(c);
+        List<HolonomicPose2d> waypoints = List.of(
+                new HolonomicPose2d(
+                        new Translation2d(1, 0.1), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //pickup
+                new HolonomicPose2d(
+                        new Translation2d(0.75, 3), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //place for gateway point
+                new HolonomicPose2d(
+                        new Translation2d(3, 7), new Rotation2d(Math.PI/2), new Rotation2d()), //place for gateway point
+                new HolonomicPose2d(
+                        new Translation2d(6, 9), new Rotation2d(-((7*Math.PI)/36)), new Rotation2d(Math.PI / 2)));
+        Trajectory100 t = p.restToRest(waypoints);
+        TrajectoryPlotter.plot(t, "simple");    
+    }
+
+>>>>>>> Stashed changes
     /** Example of using a trajectory library. */
     @Test
     void testExample() {

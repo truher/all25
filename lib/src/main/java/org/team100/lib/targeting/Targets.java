@@ -1,22 +1,33 @@
 package org.team100.lib.targeting;
 
+<<<<<<< Updated upstream
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.stream.DoubleStream;
+=======
+import java.util.List;
+import java.util.Optional;
+import java.util.function.DoubleFunction;
+>>>>>>> Stashed changes
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.SideEffect;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.FieldLogger;
+<<<<<<< Updated upstream
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.CoalescingCollection;
+=======
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.network.CameraReader;
+>>>>>>> Stashed changes
 import org.team100.lib.util.TrailingHistory;
 import org.team100.lib.util.Util;
 
@@ -31,6 +42,7 @@ import edu.wpi.first.util.struct.StructBuffer;
  * awhile.
  */
 public class Targets extends CameraReader<Rotation3d> {
+<<<<<<< Updated upstream
     public static class Mean implements Function<Collection<Translation2d>, Translation2d> {
         @Override
         public Translation2d apply(Collection<Translation2d> c) {
@@ -44,6 +56,8 @@ public class Targets extends CameraReader<Rotation3d> {
         }
     }
 
+=======
+>>>>>>> Stashed changes
     private static final boolean DEBUG = false;
 
     /**
@@ -53,14 +67,18 @@ public class Targets extends CameraReader<Rotation3d> {
     private static final double MAX_SIGHT_AGE = 0.2;
     /** Forget sights older than this. */
     private static final double HISTORY_DURATION = 1.0;
+<<<<<<< Updated upstream
     /** Targets closer than this to each other are combined */
     private static final double RESOLUTION = 0.15;
+=======
+>>>>>>> Stashed changes
 
     private final FieldLogger.Log m_field_log;
 
     /** state = f(takt seconds) from history. */
     private final DoubleFunction<SwerveModel> m_history;
     /** Accumulation of targets we see. */
+<<<<<<< Updated upstream
     // private final TrailingHistory<Translation2d> m_targets;
     private final CoalescingCollection<Translation2d> m_targets;
     /** Side effect mutates targets. */
@@ -69,12 +87,20 @@ public class Targets extends CameraReader<Rotation3d> {
 
     public Targets(
             LoggerFactory log,
+=======
+    private final TrailingHistory<Translation2d> m_targets;
+    /** Side effect mutates targets. */
+    private final SideEffect m_vision;
+
+    public Targets(
+>>>>>>> Stashed changes
             FieldLogger.Log fieldLogger,
             DoubleFunction<SwerveModel> history) {
         super(
                 "objectVision",
                 "Rotation3d",
                 StructBuffer.create(Rotation3d.struct));
+<<<<<<< Updated upstream
         m_log_historySize = log.type(this).intLogger(Level.TRACE, "history size");
         m_field_log = fieldLogger;
         m_history = history;
@@ -83,6 +109,11 @@ public class Targets extends CameraReader<Rotation3d> {
                 new TrailingHistory<>(HISTORY_DURATION),
                 (a, b) -> a.getDistance(b) < RESOLUTION,
                 new Mean());
+=======
+        m_field_log = fieldLogger;
+        m_history = history;
+        m_targets = new TrailingHistory<>(HISTORY_DURATION);
+>>>>>>> Stashed changes
         m_vision = Cache.ofSideEffect(this::update);
     }
 
@@ -128,6 +159,7 @@ public class Targets extends CameraReader<Rotation3d> {
 
     public void periodic() {
         // show the closest target we can see on the field2d widget.
+<<<<<<< Updated upstream
         // getClosestTarget().ifPresent(
         //         x -> m_field_log.m_log_target.log(
         //                 () -> new double[] { x.getX(), x.getY(), 0 }));
@@ -138,5 +170,10 @@ public class Targets extends CameraReader<Rotation3d> {
                         x -> DoubleStream.of(x.getX(), x.getY(), 0.0)).toArray());
 
         m_log_historySize.log(() -> m_targets.size());
+=======
+        getClosestTarget().ifPresent(
+                x -> m_field_log.m_log_target.log(
+                        () -> new double[] { x.getX(), x.getY(), 0 }));
+>>>>>>> Stashed changes
     }
 }

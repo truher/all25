@@ -56,7 +56,11 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
         double nowS = Takt.get();
         double dtS = nowS - m_timeS;
         if (dtS > 0.04) {
+<<<<<<< Updated upstream
             // clock is unreliable, skip the update
+=======
+            // clock is unreliable, skip  the update
+>>>>>>> Stashed changes
             dtS = 0;
         }
         // this is the velocity at the current instant.

@@ -24,7 +24,10 @@ public class Setup implements Runnable {
 
     @Override
     public void run() {
+<<<<<<< Updated upstream
         m_mech.periodic();
+=======
+>>>>>>> Stashed changes
         m_viz.periodic();
     }
 }

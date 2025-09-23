@@ -5,7 +5,11 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+<<<<<<< Updated upstream
 import org.team100.lib.commands.drivetrain.DriveToTranslationWithRelativeBearing;
+=======
+import org.team100.lib.commands.drivetrain.DriveToTranslationWithFront;
+>>>>>>> Stashed changes
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
@@ -23,8 +27,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class FloorPickSequence {
     // landing point distance to target
     private static final double DISTANCE = 1.0;
+<<<<<<< Updated upstream
     // pick is from the back
     private static final Rotation2d RELATIVE_BEARING = Rotation2d.k180deg;
+=======
+>>>>>>> Stashed changes
 
     public static Command get(
             FieldLogger.Log fieldLog,
@@ -42,6 +49,7 @@ public class FloorPickSequence {
             Translation2d landing = goal.minus(new Translation2d(DISTANCE, course));
             return Optional.of(landing);
         };
+<<<<<<< Updated upstream
 
         DriveToTranslationWithRelativeBearing toRunway = new DriveToTranslationWithRelativeBearing(
                 fieldLog, runway, drive, controller, profile, RELATIVE_BEARING);
@@ -50,6 +58,16 @@ public class FloorPickSequence {
 
         return sequence(
                 toRunway.until(toRunway::thetaAligned),
+=======
+        
+        DriveToTranslationWithFront toRunway = new DriveToTranslationWithFront(
+                fieldLog, runway, drive, controller, profile);
+        DriveToTranslationWithFront toTarget = new DriveToTranslationWithFront(
+                fieldLog, target, drive, controller, profile);
+
+        return sequence(
+                toRunway.until(toRunway::isDone),
+>>>>>>> Stashed changes
                 toTarget.until(toTarget::isDone));
     }
 

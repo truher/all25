@@ -58,7 +58,11 @@ public class DriveToTranslationWithRelativeBearing extends Command {
         updateGoal();
         if (m_goal == null)
             return;
+<<<<<<< Updated upstream:lib/src/main/java/org/team100/lib/commands/drivetrain/DriveToTranslationWithRelativeBearing.java
         m_reference = new ProfileReference(m_profile, "DriveToTranslationWithRelativeBearing");
+=======
+        m_reference = new ProfileReference(m_profile, "drive to translation with front");
+>>>>>>> Stashed changes:lib/src/main/java/org/team100/lib/commands/drivetrain/DriveToTranslationWithFront.java
         m_reference.setGoal(new SwerveModel(m_goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }
@@ -78,6 +82,7 @@ public class DriveToTranslationWithRelativeBearing extends Command {
 
     public boolean isDone() {
         return m_referenceController != null && m_referenceController.isDone();
+<<<<<<< Updated upstream:lib/src/main/java/org/team100/lib/commands/drivetrain/DriveToTranslationWithRelativeBearing.java
     }
 
     /** For the runway path we can switch to "go to goal" after we're aligned. */
@@ -88,6 +93,8 @@ public class DriveToTranslationWithRelativeBearing extends Command {
         Rotation2d goalR = m_goal.getRotation();
         Rotation2d poseR = pose.getRotation();
         return Math.abs(goalR.minus(poseR).getRadians()) < THETA_TOLERANCE;
+=======
+>>>>>>> Stashed changes:lib/src/main/java/org/team100/lib/commands/drivetrain/DriveToTranslationWithFront.java
     }
 
     @Override
