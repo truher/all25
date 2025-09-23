@@ -8,6 +8,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
+import static edu.wpi.first.wpilibj2.command.Commands.*;
+
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.CommandGroups.GrabAlgaeL2Dumb;
 import org.team100.frc2025.CommandGroups.GrabAlgaeL3Dumb;
@@ -379,9 +381,24 @@ public class RobotContainer {
         onTrue(driverControl::resetRotation180, new SetRotation(m_drive, Rotation2d.kPi));
         whileTrue(driverControl::feedFunnel,
                 RunFunnelHandoff.get(comLog, m_elevator, m_wrist, m_funnel, m_tunnel, m_grip));
+        /*
+         * whileTrue(driverControl::climb,
+         * new ParallelCommandGroup(
+         * m_climber.setPosition(0.53), new DriveForwardSlowly(m_drive)));
+         */
+        // When climb pressed, set arm position, then start spinning; stop spinning when
+        // spin velocity slows;
         whileTrue(driverControl::climb,
-                new ParallelCommandGroup(
-                        m_climber.setPosition(0.53), new DriveForwardSlowly(m_drive)));
+                parallel(
+                        m_climber.setPosition(.53),
+                        m_climber.startIntake())
+                        .raceWith(
+                                sequence(
+                                        waitSeconds(1),
+                                        waitUntil(() -> m_climber.getIntakeSpinningVelocity() < 10))));
+        //
+        //
+        //
 
         whileTrue(driverControl::driveToTag, buttons::a,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,

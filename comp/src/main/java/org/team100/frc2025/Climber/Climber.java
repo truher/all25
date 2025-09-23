@@ -1,5 +1,11 @@
 package org.team100.frc2025.Climber;
 
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static org.team100.lib.hid.ControlUtil.deadband;
+
+import static edu.wpi.first.wpilibj2.command.Commands.*;
+
+
 import java.util.function.DoubleSupplier;
 
 import org.team100.lib.config.Feedforward100;
@@ -8,6 +14,7 @@ import org.team100.lib.config.PIDConstants;
 import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.encoder.AS5048RotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
+import org.team100.lib.encoder.IncrementalBareEncoder;
 import org.team100.lib.encoder.RotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
@@ -15,7 +22,9 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.OnboardAngularPositionServo;
+import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Falcon6Motor;
+import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
@@ -29,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climber extends SubsystemBase {
 
     private final AngularPositionServo m_servo;
+    private final BareMotor m_intakeMotor;
 
     public Climber(LoggerFactory parent, int canID) {
         LoggerFactory log = parent.name("Climber");
@@ -54,6 +64,10 @@ public class Climber extends SubsystemBase {
                         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
                 m_servo = new OnboardAngularPositionServo(log, rotaryMechanism, ref, feedback);
+
+                // TO-DO, actually have this work irl
+
+                m_intakeMotor = motor;
             }
 
             default -> {
@@ -65,9 +79,25 @@ public class Climber extends SubsystemBase {
                 RotaryMechanism climberMech = new RotaryMechanism(
                         log, climberMotor, sensor, 1,
                         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+
                 m_servo = new OnboardAngularPositionServo(log, climberMech, ref, feedback);
+
+                // add the X44 Kraken motor for the active intake
+                SimulatedBareMotor intakeMotor = new SimulatedBareMotor(log, 100);
+
+                m_intakeMotor = intakeMotor;
             }
         }
+    }
+
+    // Get Velocity of X44
+    public Double getIntakeSpinningVelocity() {
+        return m_intakeMotor.getVelocityRad_S();
+    }
+
+    // Set Duty Cycle of X44
+    public void setIntakeDutyCycle(double value) {
+        m_intakeMotor.setDutyCycle(value);
     }
 
     @Override
@@ -79,11 +109,20 @@ public class Climber extends SubsystemBase {
         return m_servo.atGoal();
     }
 
+    public void setDutyCycles(double value, double value2){
+        m_intakeMotor.setDutyCycle(value2);
+        m_intakeMotor.setDutyCycle(value);
+    }
+
     // COMMANDS
+    public Command startIntake() {
+        return run(
+                () -> setIntakeDutyCycle(1));
+    }
 
     public Command stop() {
         return run(
-                () -> setDutyCycle(0));
+                    () -> setDutyCycles(0, 0));
     }
 
     public Command manual(DoubleSupplier s) {
