@@ -23,7 +23,7 @@ public class TrajectoryTest {
      * two non-holonomic poses draws a straight line between them.
      */
     @Test
-    void testSimple() {
+    void testSimple() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(1, 0.1),
                 new YawRateConstraint(1, 1));
@@ -31,7 +31,8 @@ public class TrajectoryTest {
         Trajectory100 t = p.restToRest(
                 new Pose2d(0, 0, new Rotation2d()),
                 new Pose2d(10, 1, new Rotation2d()));
-        TrajectoryPlotter.plot(t, "simple");
+        new TrajectoryPlotter(0.1).plot(t, "simple");
+        Thread.sleep(5000);
     }
 
     /**
@@ -44,7 +45,7 @@ public class TrajectoryTest {
      * facing the other way (i.e. backwards)
      */
     @Test
-    void testCurved() {
+    void testCurved() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(2, 0.5),
                 new YawRateConstraint(1, 1));
@@ -54,7 +55,8 @@ public class TrajectoryTest {
                 new HolonomicPose2d(new Translation2d(9, 9), new Rotation2d(-Math.PI / 2),
                         new Rotation2d(Math.PI / 2)));
         Trajectory100 t = p.restToRest(waypoints);
-        TrajectoryPlotter.plot(t, "simple");
+        new TrajectoryPlotter(0.1).plot(t, "simple");
+        Thread.sleep(5000);
     }
 
     /**
@@ -63,7 +65,7 @@ public class TrajectoryTest {
      * harder to make smooth.
      */
     @Test
-    void testMultipleWaypoints() {
+    void testMultipleWaypoints() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(2, 0.5),
                 new YawRateConstraint(1, 1));
@@ -76,13 +78,56 @@ public class TrajectoryTest {
                 new HolonomicPose2d(
                         new Translation2d(9, 9), new Rotation2d(-Math.PI / 2), new Rotation2d(Math.PI / 2)));
         Trajectory100 t = p.restToRest(waypoints);
-        TrajectoryPlotter.plot(t, "simple");
+        new TrajectoryPlotter(0.1).plot(t, "simple");
+        Thread.sleep(5000);
+    }
+
+    /** Example of using a trajectory library for 2025 scoring paths */
+    @Test
+    void testPickupToPlace() {
+        List<TimingConstraint> c = List.of(
+                new ConstantConstraint(2, 0.5),
+                new YawRateConstraint(1, 1));
+        TrajectoryPlanner p = new TrajectoryPlanner(c);
+        List<HolonomicPose2d> waypoints = List.of(
+                new HolonomicPose2d(
+                        new Translation2d(1, 0.1), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //pickup
+                new HolonomicPose2d(
+                        new Translation2d(3, 7), new Rotation2d(Math.PI/2), new Rotation2d()), //place for gateway point?
+                new HolonomicPose2d(
+                        new Translation2d(6, 9), new Rotation2d(-((7*Math.PI)/36)), new Rotation2d(Math.PI / 2)));
+        Trajectory100 t = p.restToRest(waypoints);
+        TrajectoryPlotter.plot(t, "simple");    
+    }
+
+    @Test
+    void testSingularityDemo() {
+        List<TimingConstraint> c = List.of(
+                new ConstantConstraint(2, 0.5),
+                new YawRateConstraint(1, 1));
+        TrajectoryPlanner p = new TrajectoryPlanner(c);
+        List<HolonomicPose2d> waypoints = List.of(
+                new HolonomicPose2d(
+                        new Translation2d(1, 0.1), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //pickup
+                new HolonomicPose2d(
+                        new Translation2d(0.75, 3), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //place for gateway point
+                new HolonomicPose2d(
+                        new Translation2d(3, 7), new Rotation2d(Math.PI/2), new Rotation2d()), //place for gateway point
+                new HolonomicPose2d(
+                        new Translation2d(6, 9), new Rotation2d(-((7*Math.PI)/36)), new Rotation2d(Math.PI / 2)));
+        Trajectory100 t = p.restToRest(waypoints);
+        TrajectoryPlotter.plot(t, "simple");    
     }
 
     /** Example of using a trajectory library. */
     @Test
-    void testExample() {
-        TrajectoryPlotter.plot(TrajectoryExample.oneToTwo(), "library example");
+    void testExample() throws InterruptedException {
+        TrajectoryExample e = new TrajectoryExample();
+        new TrajectoryPlotter(0.1).plot(e.pickToL4(), "pick to L4, X UP");
+        new TrajectoryPlotter(0.1).plot(e.pickToL3(), "pick to L3, X UP");
+        new TrajectoryPlotter(0.1).plot(e.pickToL2(), "pick to L2, X UP");
+        new TrajectoryPlotter(0.1).plot(e.pickToL1(), "pick to L1, X UP");
+        Thread.sleep(100000);
     }
 
 }

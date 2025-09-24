@@ -12,7 +12,9 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.timing.TimedPose;
@@ -37,10 +39,10 @@ class FullStateSwerveControllerTest implements Timeless {
                         new Model100(0, 0),
                         new Model100(0, 0),
                         new Model100(0, 0)),
-                new SwerveModel(
-                        new Model100(0, 0),
-                        new Model100(0, 0),
-                        new Model100(0, 0)));
+                new SwerveControl(
+                        new Control100(0, 0),
+                        new Control100(0, 0),
+                        new Control100(0, 0)));
         assertEquals(0, t.x(), DELTA);
         assertEquals(0, t.y(), DELTA);
         assertEquals(0, t.theta(), DELTA);
@@ -61,10 +63,10 @@ class FullStateSwerveControllerTest implements Timeless {
                         new Model100(1, 0),
                         new Model100(0, 0),
                         new Model100(0, 0)),
-                new SwerveModel(
-                        new Model100(1, 0),
-                        new Model100(0, 0),
-                        new Model100(0, 0)));
+                new SwerveControl(
+                        new Control100(1, 0),
+                        new Control100(0, 0),
+                        new Control100(0, 0)));
         // 1m error so dx should be K*e = 1
         assertEquals(4, t.x(), DELTA);
         assertEquals(0, t.y(), DELTA);
@@ -85,10 +87,10 @@ class FullStateSwerveControllerTest implements Timeless {
                         new Model100(0, 1), // produces error = 1
                         new Model100(0, 0),
                         new Model100(0, 0)),
-                new SwerveModel(
-                        new Model100(0, 1), // produces FF = 1
-                        new Model100(0, 0),
-                        new Model100(0, 0)));
+                new SwerveControl(
+                        new Control100(0, 1), // produces FF = 1
+                        new Control100(0, 0),
+                        new Control100(0, 0)));
         // position err is zero but velocity error is 1 and feedforward is also 1 so dx
         // should be FF + K*e = 2
         assertEquals(1.25, t.x(), DELTA);
@@ -110,10 +112,10 @@ class FullStateSwerveControllerTest implements Timeless {
                         new Model100(-1, 0.5), // position + velocity error
                         new Model100(0, 0),
                         new Model100(0, 0)),
-                new SwerveModel(
-                        new Model100(-1, 0.5), // velocity reference
-                        new Model100(0, 0),
-                        new Model100(0, 0)));
+                new SwerveControl(
+                        new Control100(-1, 0.5), // velocity reference
+                        new Control100(0, 0),
+                        new Control100(0, 0)));
         // position and velocity controls are opposite, so just cruise
         assertEquals(-3.375, t.x(), DELTA);
         assertEquals(0, t.y(), DELTA);
@@ -135,10 +137,10 @@ class FullStateSwerveControllerTest implements Timeless {
                         new Model100(1, 0),
                         new Model100(2, 0),
                         new Model100(3, 0)),
-                new SwerveModel(
-                        new Model100(2, 0),
-                        new Model100(4, 0),
-                        new Model100(6, 0)));
+                new SwerveControl(
+                        new Control100(2, 0),
+                        new Control100(4, 0),
+                        new Control100(6, 0)));
         // 1m error so dx should be K*e = 1
         assertEquals(4, t.x(), DELTA);
         assertEquals(8, t.y(), DELTA);
@@ -159,10 +161,10 @@ class FullStateSwerveControllerTest implements Timeless {
                         new Model100(0, 0),
                         new Model100(0, 0),
                         new Model100(-3, 0)),
-                new SwerveModel(
-                        new Model100(0, 0),
-                        new Model100(0, 0),
-                        new Model100(-3, 0)));
+                new SwerveControl(
+                        new Control100(0, 0),
+                        new Control100(0, 0),
+                        new Control100(-3, 0)));
         assertEquals(0, t.x(), DELTA);
         assertEquals(0, t.y(), DELTA);
         // we want to rotate +
@@ -347,7 +349,7 @@ class FullStateSwerveControllerTest implements Timeless {
         double acceleration = 0;
         TimedPose setpoint = new TimedPose(state, t, velocity, acceleration);
         // feedforward should be straight ahead, no rotation.
-        SwerveModel nextReference = SwerveModel.fromTimedPose(setpoint);
+        SwerveControl nextReference = SwerveControl.fromTimedPose(setpoint);
         FieldRelativeVelocity speeds = controller.feedforward(nextReference);
         assertEquals(1, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -372,7 +374,7 @@ class FullStateSwerveControllerTest implements Timeless {
         double acceleration = 0;
         TimedPose setpoint = new TimedPose(state, t, velocity, acceleration);
         // feedforward should be -y, robot relative, no rotation.
-        SwerveModel nextReference = SwerveModel.fromTimedPose(setpoint);
+        SwerveControl nextReference = SwerveControl.fromTimedPose(setpoint);
         FieldRelativeVelocity speeds = controller.feedforward(nextReference);
         assertEquals(1, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -395,7 +397,7 @@ class FullStateSwerveControllerTest implements Timeless {
         double velocity = 1;
         // constant speed
         double acceleration = 0;
-        SwerveModel nextReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
+        SwerveControl nextReference = SwerveControl.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
         FieldRelativeVelocity speeds = controller.feedforward(nextReference);
         // feedforward should be ahead and rotating.
         assertEquals(1, speeds.x(), DELTA);

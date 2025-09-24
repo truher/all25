@@ -6,9 +6,11 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeDeltaLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
+import org.team100.lib.logging.LoggerFactory.SwerveControlLogger;
 import org.team100.lib.logging.LoggerFactory.SwerveModelLogger;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.util.Util;
 
@@ -26,7 +28,7 @@ public class FullStateSwerveController implements SwerveController {
 
 
     private final SwerveModelLogger m_log_currentReference;
-    private final SwerveModelLogger m_log_nextReference;
+    private final SwerveControlLogger m_log_nextReference;
     private final FieldRelativeVelocityLogger m_log_u_FF;
     private final FieldRelativeDeltaLogger m_log_position_error;
     private final FieldRelativeVelocityLogger m_log_u_FB;
@@ -57,7 +59,7 @@ public class FullStateSwerveController implements SwerveController {
         LoggerFactory log = parent.type(this);
         m_log_measurement = log.swerveModelLogger(Level.DEBUG, "measurement");
         m_log_currentReference = log.swerveModelLogger(Level.DEBUG, "currentReference");
-        m_log_nextReference = log.swerveModelLogger(Level.DEBUG, "nextReference");
+        m_log_nextReference = log.swerveControlLogger(Level.DEBUG, "nextReference");
         m_log_u_FF = log.fieldRelativeVelocityLogger(Level.TRACE, "u_FF");
         m_log_position_error = log.fieldRelativeDeltaLogger(Level.TRACE, "positionError");
         m_log_u_FB = log.fieldRelativeVelocityLogger(Level.TRACE, "u_FB");
@@ -87,7 +89,7 @@ public class FullStateSwerveController implements SwerveController {
     public FieldRelativeVelocity calculate(
             SwerveModel measurement,
             SwerveModel currentReference,
-            SwerveModel nextReference) {
+            SwerveControl nextReference) {
         if (DEBUG)
             Util.printf("measurement %s current %s next %s\n",
                     measurement, currentReference, nextReference);
@@ -115,7 +117,7 @@ public class FullStateSwerveController implements SwerveController {
     //
     // package-private for testing
 
-    FieldRelativeVelocity feedforward(SwerveModel nextReference) {
+    FieldRelativeVelocity feedforward(SwerveControl nextReference) {
         m_log_u_FF.log(() -> nextReference.velocity());
         return nextReference.velocity();
     }

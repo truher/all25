@@ -1,5 +1,6 @@
 package org.team100.lib.reference;
 
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 /** Always returns the same reference. */
@@ -21,8 +22,8 @@ public class ConstantReference implements SwerveReference {
     }
 
     @Override
-    public SwerveModel next() {
-        return m_goal;
+    public SwerveControl next() {
+        return m_goal.control();
     }
 
     @Override
