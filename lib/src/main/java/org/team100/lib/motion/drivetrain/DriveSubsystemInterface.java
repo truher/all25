@@ -17,7 +17,7 @@ public interface DriveSubsystemInterface extends Subsystem {
     /** Drive state for the current Takt. */
     SwerveModel getState();
 
-    /** Passthrough to motor stop. */
+    /** Passthrough to motor stop. This is not "hold position", it is "disable". */
     void stop();
 
     /** Set the swerve limiter setpoint to the current velocity measurement. */

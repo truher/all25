@@ -1,6 +1,7 @@
 package org.team100.lib.controller.drivetrain;
 
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 /**
@@ -25,7 +26,7 @@ public interface SwerveController  {
     FieldRelativeVelocity calculate(
             SwerveModel measurement,
             SwerveModel currentReference,
-            SwerveModel nextReference);
+            SwerveControl nextReference);
 
     /**
      * True if the error is within tolerance of the reference. The definitions of

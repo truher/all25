@@ -3,6 +3,7 @@ package org.team100.lib.reference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.testing.Timeless;
@@ -25,7 +26,7 @@ public class ProfileReferenceTest implements Timeless {
             SwerveModel c = r.current();
             assertEquals(0, c.velocity().x(), DELTA);
             assertEquals(0, c.pose().getX(), DELTA);
-            SwerveModel n = r.next();
+            SwerveControl n = r.next();
             assertEquals(0.02, n.velocity().x(), DELTA);
             assertEquals(0, n.pose().getX(), DELTA);
         }
@@ -34,7 +35,7 @@ public class ProfileReferenceTest implements Timeless {
             SwerveModel c = r.current();
             assertEquals(0, c.velocity().x(), DELTA);
             assertEquals(0, c.pose().getX(), DELTA);
-            SwerveModel n = r.next();
+            SwerveControl n = r.next();
             assertEquals(0.02, n.velocity().x(), DELTA);
             // x is very small but not zero
             assertEquals(0.0002, n.pose().getX(), 0.00001);
@@ -45,7 +46,7 @@ public class ProfileReferenceTest implements Timeless {
             SwerveModel c = r.current();
             assertEquals(0.02, c.velocity().x(), DELTA);
             assertEquals(0, c.pose().getX(), DELTA);
-            SwerveModel n = r.next();
+            SwerveControl n = r.next();
             assertEquals(0.04, n.velocity().x(), DELTA);
             assertEquals(0.00078, n.pose().getX(), DELTA);
         }
@@ -57,7 +58,7 @@ public class ProfileReferenceTest implements Timeless {
             SwerveModel c = r.current();
             assertEquals(0, c.velocity().x(), DELTA);
             assertEquals(1, c.pose().getX(), DELTA);
-            SwerveModel n = r.next();
+            SwerveControl n = r.next();
             assertEquals(0, n.velocity().x(), DELTA);
             assertEquals(1, n.pose().getX(), DELTA);
         }
