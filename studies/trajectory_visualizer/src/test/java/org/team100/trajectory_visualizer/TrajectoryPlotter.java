@@ -38,5 +38,9 @@ public class TrajectoryPlotter {
         frame.setPreferredSize(new Dimension(500, 500));
         frame.pack();
         frame.setVisible(true);
+        try {
+            Thread.sleep(50000);
+        } catch (InterruptedException e) {
+        }
     }
 }
