@@ -116,6 +116,8 @@ l_{c_1} c_1 & 0 \\[4pt]
 \\
 +
 \begin{bmatrix}
+0 & 0 & 1 \\[4pt]
+0 & 0 & 0
 \end{bmatrix}
 \begin{bmatrix}
 I_{xx_1} & -I_{xy_1} & -I_{xz_1} \\[4pt]
@@ -123,6 +125,9 @@ I_{xx_1} & -I_{xy_1} & -I_{xz_1} \\[4pt]
 -I_{zx_1} & -I_{zy_1} & I_{zz_1} \\[4pt]
 \end{bmatrix}
 \begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0 \\[4pt]
+1 & 0
 \end{bmatrix}
 \\
 +
@@ -139,6 +144,8 @@ l_{c_2} c_{12} + l_1 c_1 & l_{c_2}c_{12} \\[4pt]
 \\
 +
 \begin{bmatrix}
+0 & 0 & 1 \\[4pt]
+0 & 0 & 1
 \end{bmatrix}
 \begin{bmatrix}
 I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\[4pt]
@@ -146,5 +153,130 @@ I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\[4pt]
 -I_{zx_2} & -I_{zy_2} & I_{zz_2} \\[4pt]
 \end{bmatrix}
 \begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0 \\[4pt]
+1 & 1
+\end{bmatrix}
+$$
+
+Which is:
+
+$$
+M = 
+m_1
+\begin{bmatrix}
+l_{c_1}^2 & 0\\[4pt]
+0 & 0
+\end{bmatrix}
++
+\begin{bmatrix}
+I_{zz_1} & 0\\[4pt]
+0 & 0
+\end{bmatrix}
++
+m_2
+\begin{bmatrix}
+l_1^2 + 2l_1l_{c_2}c_2 + l_{c_2}^2 & l_1l_{c_2}c_2+l_{c_2}^2\\[4pt]
+l_1l_{c_2}c_2+l_{c_2}^2 & l_{c_2}^2
+\end{bmatrix}
++
+\begin{bmatrix}
+I_{zz_2} & I_{zz_2}\\[4pt]
+I_{zz_2} & I_{zz_2}
+\end{bmatrix}
+$$
+
+So altogether:
+
+$$
+M=
+\begin{bmatrix}
+m_1 l_{c_1}^2 
++ I_{zz_1}
++ m_2(l_1^2 + 2l_1l_{c_2}c_2 + l_{c_2}^2) 
++ I_{zz_2}
+& 
+m_2(l_1l_{c_2}c_2+l_{c_2}^2) + I_{zz_2}\\[4pt]
+m_2(l_1l_{c_2}c_2+l_{c_2}^2) + I_{zz_2}
+&
+m_2 l_{c_2} + I_{zz_2}
+\end{bmatrix}
+$$
+
+## Centrifugal and Coriolis
+
+The combined vector $V$ is given as:
+
+
+## Gravity
+
+Start with the expression for gravity:
+
+$$
+G = -
+\begin{bmatrix}
+m_1 g & m_2 g & \cdots m_n g \\
+\end{bmatrix}
+\begin{bmatrix}
+J_{v_1}^T\\
+J_{v_2}^T\\
+\vdots\\
+J_{v_n}^T
+\end{bmatrix}
+$$
+
+So in our case:
+
+$$
+G = 
+-J_{v_1}^T m_1 g  
+- J_{v_2}^T m_2 g
+$$
+
+Our gravity acts along the x axis:
+
+$$
+g=
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+$$
+
+Thus our gravity vector is:
+
+$$
+G=
+-m_1
+\begin{bmatrix}
+-l_{c_1} s_1 & l_{c_1} c_1 & 0 \\[4pt]
+0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+
+-m_2
+\begin{bmatrix}
+-l_{c_2} s_{12} - l_1 s_1 & l_{c_2} c_{12} + l_1 c_1 & 0  \\[4pt]
+-l_{c_2}s_{12}  & l_{c_2}c_{12} & 0
+\end{bmatrix}
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+$$
+
+Or
+
+$$
+G = 
+\begin{bmatrix}
+-m_1gl_{c_1}s_1 - m_2g(l_{c_2}s_{12} + l_1s_1)\\[4pt]
+-m_2gl_{c_2}s_{12}x
 \end{bmatrix}
 $$

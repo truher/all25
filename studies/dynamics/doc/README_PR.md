@@ -171,8 +171,9 @@ Which is:
 
 $$
 M =
+m_1
 \begin{bmatrix}
-m_1 & 0 \\[4pt]
+1 & 0 \\[4pt]
 0 & 0
 \end{bmatrix}
 +
@@ -181,9 +182,10 @@ m_1 & 0 \\[4pt]
 0 & 0
 \end{bmatrix}
 +
+m_2
 \begin{bmatrix}
-m_2 & -m_2 d s_2 \\[4pt]
--m_2 d s_2 & m_2 d^2
+1 & - d s_2 \\[4pt]
+- d s_2 & d^2
 \end{bmatrix}
 +
 \begin{bmatrix}

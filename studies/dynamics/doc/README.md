@@ -67,7 +67,11 @@ J_{v_i}
 \end{bmatrix}
 $$
 
-where p_{C_i} is the position of the center of mass of each link.
+where $p_{C_i}$ is the position of the center of mass of each link.
+
+So the procedure for deriving the Jacobians is to simply write the
+expression for position, and then take the derivative with respect
+to each config axis.
 
 There are trailing zeros (to $n$) because the configuration of links beyond
 $i$ don't affect the position of the $i$'th one, i.e. this is a "serial chain".
@@ -128,7 +132,6 @@ The latter expression, ${\partial p_{c_i} \over \partial q{k}}$, is
 exactly the Jacobian, so we can then rewrite:
 
 $$
-
 G = -
 \begin{bmatrix}
 m_1 g & m_2 g & \cdots m_n g \\
