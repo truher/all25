@@ -8,7 +8,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
+import static edu.wpi.first.wpilibj2.command.Commands.*;
+
 import org.team100.frc2025.Climber.Climber;
+import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.CommandGroups.GrabAlgaeL2Dumb;
 import org.team100.frc2025.CommandGroups.GrabAlgaeL3Dumb;
 import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
@@ -108,39 +111,40 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * don't need right now, cut and paste it into {@link RobotContainerParkingLot}.
  */
 public class RobotContainer {
-    // for background on drive current limits:
-    // https://v6.docs.ctr-electronics.com/en/stable/docs/hardware-reference/talonfx/improving-performance-with-current-limits.html
-    // https://www.chiefdelphi.com/t/the-brushless-era-needs-sensible-default-current-limits/461056/51
-    // https://docs.google.com/document/d/10uXdmu62AFxyolmwtDY8_9UNnci7eVcev4Y64ZS0Aqk
-    // https://github.com/frc1678/C2024-Public/blob/17e78272e65a6ce4f87c00a3514c79f787439ca1/src/main/java/com/team1678/frc2024/Constants.java#L195
-    // 2/26/25: Joel updated the supply limit to 90A, see 1678 code above. This is
-    // essentially unlimited, so you'll need to run some other kind of limiter (e.g.
-    // acceleration) to keep from browning out.
-    private static final double DRIVE_SUPPLY_LIMIT = 90;
-    private static final double DRIVE_STATOR_LIMIT = 110;
+        // for background on drive current limits:
+        // https://v6.docs.ctr-electronics.com/en/stable/docs/hardware-reference/talonfx/improving-performance-with-current-limits.html
+        // https://www.chiefdelphi.com/t/the-brushless-era-needs-sensible-default-current-limits/461056/51
+        // https://docs.google.com/document/d/10uXdmu62AFxyolmwtDY8_9UNnci7eVcev4Y64ZS0Aqk
+        // https://github.com/frc1678/C2024-Public/blob/17e78272e65a6ce4f87c00a3514c79f787439ca1/src/main/java/com/team1678/frc2024/Constants.java#L195
+        // 2/26/25: Joel updated the supply limit to 90A, see 1678 code above. This is
+        // essentially unlimited, so you'll need to run some other kind of limiter (e.g.
+        // acceleration) to keep from browning out.
+        private static final double DRIVE_SUPPLY_LIMIT = 90;
+        private static final double DRIVE_STATOR_LIMIT = 110;
 
-    private final SwerveModuleCollection m_modules;
-    private final Command m_auton;
-    /**
-     * This runs on enable for test, so i can run stuff in simulation without
-     * fiddling with buttons. But it will also run in real life, so be careful.
-     */
-    private final Command m_test;
+        private final SwerveModuleCollection m_modules;
+        private final Command m_auton;
+        /**
+         * This runs on enable for test, so i can run stuff in simulation without
+         * fiddling with buttons. But it will also run in real life, so be careful.
+         */
+        private final Command m_test;
 
-    // SUBSYSTEMS
-    final SwerveDriveSubsystem m_drive;
+        // SUBSYSTEMS
+        final SwerveDriveSubsystem m_drive;
 
-    final Elevator m_elevator;
-    final Wrist2 m_wrist;
-    final Climber m_climber;
-    final Funnel m_funnel;
-    final LEDIndicator m_leds;
+        final Elevator m_elevator;
+        final Wrist2 m_wrist;
+        final Climber m_climber;
+    final ClimberIntake m_climberIntake;
+        final Funnel m_funnel;
+        // final LEDIndicator m_leds;
 
-    final CoralTunnel m_tunnel;
-    final AlgaeGrip m_grip;
-    final SwerveKinodynamics m_swerveKinodynamics;
+        final CoralTunnel m_tunnel;
+        final AlgaeGrip m_grip;
+        final SwerveKinodynamics m_swerveKinodynamics;
 
-    private final ScheduledExecutorService m_initializer;
+        private final ScheduledExecutorService m_initializer;
 
     private final Runnable m_simulatedTagDetector;
     private final Runnable m_targetSimulator;
@@ -178,6 +182,9 @@ public class RobotContainer {
             m_funnel = new Funnel(logger, 23, 14);
             m_grip = new AlgaeGrip(logger, m_tunnel);
             m_climber = new Climber(logger, 15);
+
+            // put in 0 as placeholder
+            m_climberIntake = new ClimberIntake(logger, 0);
             m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
             m_manipulator = new Manipulator(logger);
         } else {
@@ -189,6 +196,9 @@ public class RobotContainer {
             m_funnel = new Funnel(logger, 23, 14);
             m_climber = new Climber(logger, 18);
             m_manipulator = new Manipulator(logger);
+
+            //put in 0 as placeholder value
+            m_climberIntake = new ClimberIntake(logger, 0);
         }
 
         m_combinedViz = new CombinedVisualization(m_elevator, m_wrist);
@@ -248,7 +258,7 @@ public class RobotContainer {
                 swerveLocal,
                 limiter);
 
-        m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
+        //m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -366,6 +376,7 @@ public class RobotContainer {
 
         m_drive.setDefaultCommand(driveDefault);
         m_climber.setDefaultCommand(m_climber.stop());
+        m_climberIntake.setDefaultCommand(m_climberIntake.stop());
         m_elevator.setDefaultCommand(new ElevatorDefaultCommand(elevatorLog, m_elevator, m_wrist, m_grip, m_drive));
         m_wrist.setDefaultCommand(new WristDefaultCommand(elevatorLog, m_wrist, m_elevator, m_grip, m_drive));
         m_grip.setDefaultCommand(new AlgaeGripDefaultCommand(m_grip));
@@ -392,9 +403,24 @@ public class RobotContainer {
         onTrue(driverControl::resetRotation180, new SetRotation(m_drive, Rotation2d.kPi));
         whileTrue(driverControl::feedFunnel,
                 RunFunnelHandoff.get(comLog, m_elevator, m_wrist, m_funnel, m_tunnel, m_grip));
+        /*
+         * whileTrue(driverControl::climb,
+         * new ParallelCommandGroup(
+         * m_climber.setPosition(0.53), new DriveForwardSlowly(m_drive)));
+         */
+        // When climb pressed, set arm position, then start spinning; stop spinning when
+        // spin velocity slows;
         whileTrue(driverControl::climb,
-                new ParallelCommandGroup(
-                        m_climber.setPosition(0.53), new DriveForwardSlowly(m_drive)));
+                parallel(
+                        m_climber.setPosition(.53),
+                        m_climberIntake.startIntake()
+                        .raceWith(
+                                sequence(
+                                        waitSeconds(1),
+                                        waitUntil(() -> m_climberIntake.getVelocityRad_S() < 10)))));
+        //
+        //
+        //
 
         whileTrue(driverControl::driveToTag, buttons::a,
                 ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
@@ -490,85 +516,86 @@ public class RobotContainer {
         m_initializer.schedule(System::gc, 3, TimeUnit.SECONDS);
     }
 
-    public void initStuff() {
-        Util.println("\n******** Pre-initializing some expensive things ... ");
-        double startS = Takt.actual();
+        public void initStuff() {
+                Util.println("\n******** Pre-initializing some expensive things ... ");
+                double startS = Takt.actual();
 
-        List<HolonomicPose2d> waypoints = new ArrayList<>();
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(),
-                Rotation2d.kZero,
-                Rotation2d.kZero));
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(1, 0),
-                Rotation2d.kZero,
-                Rotation2d.kZero));
-        TrajectoryPlanner m_planner = new TrajectoryPlanner(new TimingConstraintFactory(m_swerveKinodynamics).medium());
-        m_planner.restToRest(waypoints);
-        m_drive.driveInFieldCoords(new FieldRelativeVelocity(0, 0, 0));
-        System.gc();
+                List<HolonomicPose2d> waypoints = new ArrayList<>();
+                waypoints.add(new HolonomicPose2d(
+                                new Translation2d(),
+                                Rotation2d.kZero,
+                                Rotation2d.kZero));
+                waypoints.add(new HolonomicPose2d(
+                                new Translation2d(1, 0),
+                                Rotation2d.kZero,
+                                Rotation2d.kZero));
+                TrajectoryPlanner m_planner = new TrajectoryPlanner(
+                                new TimingConstraintFactory(m_swerveKinodynamics).medium());
+                m_planner.restToRest(waypoints);
+                m_drive.driveInFieldCoords(new FieldRelativeVelocity(0, 0, 0));
+                System.gc();
 
-        double endS = Takt.actual();
-        Util.printf("\n... Initialization ET: %f\n", endS - startS);
-    }
+                double endS = Takt.actual();
+                Util.printf("\n... Initialization ET: %f\n", endS - startS);
+        }
 
-    public void onTeleop() {
-        // TODO: remove
-    }
+        public void onTeleop() {
+                // TODO: remove
+        }
 
-    public void onInit() {
-        m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(Math.PI)));
-    }
+        public void onInit() {
+                m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(Math.PI)));
+        }
 
-    public void onAuto() {
-        // TODO: remove
-    }
+        public void onAuto() {
+                // TODO: remove
+        }
 
-    private void whileTrue(BooleanSupplier condition, Command command) {
-        new Trigger(condition).whileTrue(command);
-    }
+        private void whileTrue(BooleanSupplier condition, Command command) {
+                new Trigger(condition).whileTrue(command);
+        }
 
-    private void whileTrue(BooleanSupplier condition1, BooleanSupplier condition2, Command command) {
-        Trigger trigger1 = new Trigger(condition1);
-        Trigger trigger2 = new Trigger(condition2);
-        trigger1.and(trigger2).whileTrue(command);
-    }
+        private void whileTrue(BooleanSupplier condition1, BooleanSupplier condition2, Command command) {
+                Trigger trigger1 = new Trigger(condition1);
+                Trigger trigger2 = new Trigger(condition2);
+                trigger1.and(trigger2).whileTrue(command);
+        }
 
-    private void onTrue(BooleanSupplier condition, Command command) {
-        new Trigger(condition).onTrue(command);
-    }
+        private void onTrue(BooleanSupplier condition, Command command) {
+                new Trigger(condition).onTrue(command);
+        }
 
-    public void scheduleAuton() {
-        if (m_auton == null)
-            return;
-        m_auton.schedule();
-    }
+        public void scheduleAuton() {
+                if (m_auton == null)
+                        return;
+                m_auton.schedule();
+        }
 
-    public void scheduleTest() {
-        if (m_test == null)
-            return;
-        m_test.schedule();
-    }
+        public void scheduleTest() {
+                if (m_test == null)
+                        return;
+                m_test.schedule();
+        }
 
-    public void periodic() {
-        // publish the simulated tag sightings.
-        m_simulatedTagDetector.run();
-        // publish simulated target sightings
-        m_targetSimulator.run();
-        // show the closest target on field2d
-        m_targets.periodic();
-        m_leds.periodic();
-        m_combinedViz.run();
-    }
+        public void periodic() {
+                // publish the simulated tag sightings.
+                m_simulatedTagDetector.run();
+                // publish simulated target sightings
+                m_targetSimulator.run();
+                // show the closest target on field2d
+                m_targets.periodic();
+                // m_leds.periodic();
+                m_combinedViz.run();
+        }
 
-    public void cancelAuton() {
-        // TODO: remove
-    }
+        public void cancelAuton() {
+                // TODO: remove
+        }
 
-    // this keeps the tests from conflicting via the use of simulated HAL ports.
-    public void close() {
-        m_modules.close();
-        m_leds.close();
-        m_elevator.close();
-    }
+        // this keeps the tests from conflicting via the use of simulated HAL ports.
+        public void close() {
+                m_modules.close();
+                // m_leds.close();
+                m_elevator.close();
+        }
 }
