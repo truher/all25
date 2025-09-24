@@ -3,6 +3,8 @@ package org.team100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
+import org.team100.lib.motion.Mech;
+import org.team100.lib.motion.Viz;
 
 import edu.wpi.first.wpilibj.XboxController;
 
