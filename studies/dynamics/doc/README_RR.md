@@ -28,14 +28,14 @@ l_{c_1} s_1\\[4pt]
 \end{bmatrix}
 $$
 
-The center of mass of the second link is a rotation on top
-of wherever the first link end is:
+The center of mass of the second link is a rotation added
+to wherever the end of the first link is:
 
 $$
 p_{c_2} =
 \begin{bmatrix}
-l_{c_2} c_{12} + l_1 c_1\\[4pt]
-l_{c_2} s_{12} + l_1 s_1\\[4pt]
+l_1 c_1 + l_{c_2} c_{12} \\[4pt]
+l_1 s_1 + l_{c_2} s_{12} \\[4pt]
 0
 \end{bmatrix}
 $$
@@ -57,8 +57,8 @@ And the same for the second link:
 $$
 J_{v_2} =
 \begin{bmatrix}
--l_{c_2} s_{12} - l_1 s_1 & -l_{c_2}s_{12} \\[4pt]
-l_{c_2} c_{12} + l_1 c_1 & l_{c_2}c_{12} \\[4pt]
+- l_1 s_1 - l_{c_2} s_{12}  & -l_{c_2}s_{12} \\[4pt]
+l_1 c_1 + l_{c_2} c_{12}  & l_{c_2}c_{12} \\[4pt]
 0 & 0
 \end{bmatrix}
 $$

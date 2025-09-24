@@ -6,9 +6,9 @@ This is the Chemnitz prismatic-revolute (PR) example that begins on slide 72.
 
 The setup is:
 
-* a prismatic link at the origin, parameterized by $q_1$, the distance to the second link.
+* a prismatic joint at the origin, parameterized by $q_1$, the distance to the second joint.
 * a link of mass $m_1$ centered $l$ from the far end (so that $l$ doesn't depend on $q_1$), with inertia $I_{c1}$.
-* a revolute joint parameterized by $q_2$, the angle measured from the x axis
+* a revolute joint parameterized by $q_2$, the angle measured from the x axis.
 * a link of mass $m_2$ centered at $d$ from the joint, with intertia $I_{c2}$.
 
 The important results are as follows (remember that
