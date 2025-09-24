@@ -192,21 +192,91 @@ $$
 M=
 \begin{bmatrix}
 m_1 l_{c_1}^2 
++ m_2l_1^2 + 2m_2l_1l_{c_2}c_2 + m_2l_{c_2}^2 
 + I_{zz_1}
-+ m_2(l_1^2 + 2l_1l_{c_2}c_2 + l_{c_2}^2) 
 + I_{zz_2}
 & 
-m_2(l_1l_{c_2}c_2+l_{c_2}^2) + I_{zz_2}\\[4pt]
-m_2(l_1l_{c_2}c_2+l_{c_2}^2) + I_{zz_2}
+m_2l_1l_{c_2}c_2+m_2l_{c_2}^2 + I_{zz_2}\\[4pt]
+m_2l_1l_{c_2}c_2+m_2l_{c_2}^2 + I_{zz_2}
 &
-m_2 l_{c_2} + I_{zz_2}
+m_2 l_{c_2}^2 + I_{zz_2}
 \end{bmatrix}
 $$
 
+Note that only $q_2$ is involved in $M$ (through $c_2$), so the
+derivatives below will be simple:
+
 ## Centrifugal and Coriolis
 
-The combined vector $V$ is given as:
 
+To derive the centrifugal/Coriolis term, start by writing out
+the Christoffel symbol permutations:
+
+$$
+\Gamma_{111} = {1\over2}
+\left( {\partial m_{11} \over \partial q_1}
++ {\partial m_{11} \over \partial q_1}
+- {\partial m_{11} \over \partial q_1} \right) = 0
+$$
+
+$$
+\Gamma_{112} = {1\over2}
+\left( {\partial m_{11} \over \partial q_2}
++ {\partial m_{12} \over \partial q_1}
+- {\partial m_{12} \over \partial q_1} \right) = -m_2l_1l_{c_2}s_2
+$$
+
+$$
+\Gamma_{121} = {1\over2}
+\left( {\partial m_{12} \over \partial q_1}
++ {\partial m_{11} \over \partial q_2}
+- {\partial m_{21} \over \partial q_1} \right) = -m_2l_1l_{c_2}s_2
+$$
+
+$$
+\Gamma_{122} = {1\over2}
+\left( {\partial m_{12} \over \partial q_2}
++ {\partial m_{12} \over \partial q_2}
+- {\partial m_{22} \over \partial q_1} \right) = -m_2l_1l_{c_2}s_2
+$$
+
+$$
+\Gamma_{211} = {1\over2}
+\left( {\partial m_{21} \over \partial q_1}
++ {\partial m_{21} \over \partial q_1}
+- {\partial m_{11} \over \partial q_2} \right) = m_2l_1l_{c_2}s_2
+$$
+
+$$
+\Gamma_{212} = {1\over2}
+\left( {\partial m_{21} \over \partial q_2}
++ {\partial m_{22} \over \partial q_1}
+- {\partial m_{12} \over \partial q_2} \right) = 0
+$$
+
+$$
+\Gamma_{221} = {1\over2}
+\left( {\partial m_{22} \over \partial q_1}
++ {\partial m_{21} \over \partial q_2}
+- {\partial m_{21} \over \partial q_2} \right) = 0
+$$
+
+$$
+\Gamma_{222} = {1\over2}
+\left( {\partial m_{22} \over \partial q_2}
++ {\partial m_{22} \over \partial q_2}
+- {\partial m_{22} \over \partial q_2} \right) = 0
+$$
+
+Then we can write the $C$ matrix:
+
+$$
+C = 
+\begin{bmatrix}
+-m_2l_1l_{c_2}s_2\dot{q_2} & -m_2l_1l_{c_2}s_2\dot{q_1} -m_2l_1l_{c_2}s_2\dot{q_2}  \\[4pt]
+m_2l_1l_{c_2}s_2\dot{q_1} & 0
+\end{bmatrix}
+$$
 
 ## Gravity
 
@@ -280,3 +350,55 @@ G =
 -m_2gl_{c_2}s_{12}x
 \end{bmatrix}
 $$
+
+
+## Equation of Motion
+
+Finally (using our corrected gravity expression),
+we can write the equation of motion, starting with the definition:
+
+$$
+\tau = M(q)\ddot{q} + C(q,\dot{q})\dot{q} + G(q)
+$$
+
+and substituting the matrices we computed above:
+
+$$
+\tau = 
+\\[20pt]
+\begin{bmatrix}
+m_1 l_{c_1}^2 
++ m_2l_1^2 + 2m_2l_1l_{c_2}c_2 + m_2l_{c_2}^2 
++ I_{zz_1}
++ I_{zz_2}
+& 
+m_2l_1l_{c_2}c_2+m_2l_{c_2}^2 + I_{zz_2}\\[4pt]
+m_2l_1l_{c_2}c_2+m_2l_{c_2}^2 + I_{zz_2}
+&
+m_2 l_{c_2}^2 + I_{zz_2}
+\end{bmatrix}
+\ddot{q}
+\\[20pt]
++
+\begin{bmatrix}
+-m_2l_1l_{c_2}s_2\dot{q_2} & -m_2l_1l_{c_2}s_2\dot{q_1} -m_2l_1l_{c_2}s_2\dot{q_2}  \\[4pt]
+m_2l_1l_{c_2}s_2\dot{q_1} & 0
+\end{bmatrix}
+\dot{q}
+\\[20pt]
++
+\begin{bmatrix}
+-m_1gl_{c_1}s_1 - m_2g(l_{c_2}s_{12} + l_1s_1)\\[4pt]
+-m_2gl_{c_2}s_{12}x
+\end{bmatrix}
+
+$$
+
+
+The mass term contains cosine of the second joint: the intuition
+is that the interaction between the axes is maximum when the arm
+is fully extended.
+
+The Coriolis term contains the sine, so the intuition is that the
+Coriolis and centrifugal effects are maximum when the links are
+perpendicular.

@@ -223,32 +223,75 @@ of the pivot by the prismatic joint.
 
 ## Centrifugal and Coriolis
 
-The combined vector $V$ is given as:
+To derive the centrifugal/Coriolis term, start by writing out
+the Christoffel symbol permutations:
 
 $$
-V(q,\dot{q}) = 
+\Gamma_{111} = {1\over2}
+\left( {\partial m_{11} \over \partial q_1}
++ {\partial m_{11} \over \partial q_1}
+- {\partial m_{11} \over \partial q_1} \right) = 0
+$$
+
+$$
+\Gamma_{112} = {1\over2}
+\left( {\partial m_{11} \over \partial q_2}
++ {\partial m_{12} \over \partial q_1}
+- {\partial m_{12} \over \partial q_1} \right) = 0
+$$
+
+$$
+\Gamma_{121} = {1\over2}
+\left( {\partial m_{12} \over \partial q_1}
++ {\partial m_{11} \over \partial q_2}
+- {\partial m_{21} \over \partial q_1} \right) = 0
+$$
+
+$$
+\Gamma_{122} = {1\over2}
+\left( {\partial m_{12} \over \partial q_2}
++ {\partial m_{12} \over \partial q_2}
+- {\partial m_{22} \over \partial q_1} \right) = -m_2dc_2
+$$
+
+$$
+\Gamma_{211} = {1\over2}
+\left( {\partial m_{21} \over \partial q_1}
++ {\partial m_{21} \over \partial q_1}
+- {\partial m_{11} \over \partial q_2} \right) = 0
+$$
+
+$$
+\Gamma_{212} = {1\over2}
+\left( {\partial m_{21} \over \partial q_2}
++ {\partial m_{22} \over \partial q_1}
+- {\partial m_{12} \over \partial q_2} \right) = 0
+$$
+
+$$
+\Gamma_{221} = {1\over2}
+\left( {\partial m_{22} \over \partial q_1}
++ {\partial m_{21} \over \partial q_2}
+- {\partial m_{21} \over \partial q_2} \right) = 0
+$$
+
+$$
+\Gamma_{222} = {1\over2}
+\left( {\partial m_{22} \over \partial q_2}
++ {\partial m_{22} \over \partial q_2}
+- {\partial m_{22} \over \partial q_2} \right) = 0
+$$
+
+Then we can write the $C$ matrix:
+
+$$
+C = 
 \begin{bmatrix}
-0\\[4pt]
-0
-\end{bmatrix}
-\begin{bmatrix}
-\dot{q}_1 & \dot{q}_2
-\end{bmatrix}
-+
-\begin{bmatrix}
-0 & -m_2dc_2 \\[4pt]
+0 & -m_2dc_2\dot{q_2}\\[4pt]
 0 & 0
 \end{bmatrix}
-\begin{bmatrix}
-\dot{q}_1^2 \\[4pt]
-\dot{q}_2^2
-\end{bmatrix}
 $$
 
-The first term is the coriolis force: it
-appears *across* radial motion.  The second term
-is centrifugal force: it appears *along* the radius
-of motion.
 
 In the PR case, there is no coriolis term, and the
 centrifugal term affects only the P joint, proportional
@@ -320,6 +363,7 @@ G =
 -ds_2m_2g
 \end{bmatrix}
 $$
+
 ... so this represents the total mass pushing
 down on the prismatic joint, and the arm mass pushing
 on the revolute joint.
@@ -327,12 +371,41 @@ on the revolute joint.
 
 
 
-
-
 ## Equation of Motion
 
 Finally (using our corrected gravity expression),
-we can write the equation of motion for the P joint force, $f_1$:
+we can write the equation of motion, starting with the definition:
+
+$$
+\tau = M(q)\ddot{q} + C(q,\dot{q})\dot{q} + G(q)
+$$
+
+and substituting the matrices we computed above:
+
+$$
+\tau = 
+\begin{bmatrix}
+m_1+m_2 & -m_2ds_2 \\[4pt]
+-m_2ds_2 & I_{zz2}+m_2d^2
+\end{bmatrix}
+\ddot{q}
++
+\begin{bmatrix}
+0 & -m_2dc_2\dot{q_2}\\[4pt]
+0 & 0
+\end{bmatrix}
+\dot{q}
++
+\begin{bmatrix}
+(m_1+m_2)g \\[4pt]
+-ds_2m_2g
+\end{bmatrix}
+$$
+
+
+So the scalar expressions for each component are as follows:
+
+P joint force, $f_1$:
 
 $$
 f_1 =
@@ -342,7 +415,8 @@ f_1 =
 + (m_1+m_2)g
 $$
 
-and the R joint torque, $\tau_2$:
+R joint torque, $\tau_2$:
+
 $$
 \tau_2 =
 -m_2ds_2\ddot{q}_1
