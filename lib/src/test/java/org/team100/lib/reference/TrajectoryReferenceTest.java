@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
@@ -35,7 +36,7 @@ public class TrajectoryReferenceTest implements Timeless {
             SwerveModel c = r.current();
             assertEquals(0, c.velocity().x(), DELTA);
             assertEquals(0, c.pose().getX(), DELTA);
-            SwerveModel n = r.next();
+            SwerveControl n = r.next();
             assertEquals(0.033, n.velocity().x(), DELTA);
             assertEquals(0, n.pose().getX(), DELTA);
         }
@@ -44,7 +45,7 @@ public class TrajectoryReferenceTest implements Timeless {
             SwerveModel c = r.current();
             assertEquals(0, c.velocity().x(), DELTA);
             assertEquals(0, c.pose().getX(), DELTA);
-            SwerveModel n = r.next();
+            SwerveControl n = r.next();
             assertEquals(0.033, n.velocity().x(), DELTA);
             // x is very small but not zero
             assertEquals(0.0003266, n.pose().getX(), 0.0000001);
@@ -55,7 +56,7 @@ public class TrajectoryReferenceTest implements Timeless {
             SwerveModel c = r.current();
             assertEquals(0.033, c.velocity().x(), DELTA);
             assertEquals(0, c.pose().getX(), DELTA);
-            SwerveModel n = r.next();
+            SwerveControl n = r.next();
             assertEquals(0.065, n.velocity().x(), DELTA);
             assertEquals(0.001, n.pose().getX(), DELTA);
         }
@@ -67,7 +68,7 @@ public class TrajectoryReferenceTest implements Timeless {
             SwerveModel c = r.current();
             assertEquals(0, c.velocity().x(), DELTA);
             assertEquals(1, c.pose().getX(), DELTA);
-            SwerveModel n = r.next();
+            SwerveControl n = r.next();
             assertEquals(0, n.velocity().x(), DELTA);
             assertEquals(1, n.pose().getX(), DELTA);
         }

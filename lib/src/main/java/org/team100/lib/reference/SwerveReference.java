@@ -1,5 +1,6 @@
 package org.team100.lib.reference;
 
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 /** A source of references for drivetrain control. */
@@ -21,7 +22,7 @@ public interface SwerveReference {
      * Reference for 0.02 sec in the future. This can be null (e.g. between
      * instantiation and initialization).
      */
-    SwerveModel next();
+    SwerveControl next();
 
     boolean done();
 }

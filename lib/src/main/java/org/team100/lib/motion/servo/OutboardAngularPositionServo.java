@@ -59,11 +59,6 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
         // m_log_position = child.optionalDoubleLogger(Level.TRACE, "Position");
     }
 
-    public OutboardAngularPositionServo(LoggerFactory log, RotaryMechanism rotaryMechanism, ProfileReference1d ref,
-            PIDFeedback feedback) {
-        //TODO Auto-generated constructor stub
-    }
-
     @Override
     public void reset() {
         OptionalDouble position = getPosition();

@@ -13,6 +13,4 @@ result in positional controller error.  We had trouble with this coupling
 last season, with the wrist flailing around due to the motion of the
 elevator.
 
-To start with, let's work out the dynamics of a simpler, two-joint mechanism,
-[Prismatic-Revolute {PR}](doc/README_PR.md)
-
+See [doc/README](doc/README.md) for analysis.
