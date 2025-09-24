@@ -2,6 +2,7 @@ package org.team100.lib.reference;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 
@@ -27,7 +28,7 @@ public class ProfileReference implements SwerveReference {
     /**
      * Putting these in the same class allows us to refresh them both atomically.
      */
-    private record References(SwerveModel m_current, SwerveModel m_next) {
+    private record References(SwerveModel m_current, SwerveControl m_next) {
     }
 
     private final HolonomicProfile m_profile;
@@ -42,13 +43,13 @@ public class ProfileReference implements SwerveReference {
      * The most-recently calculated "next" reference, which will be a future
      * "current" reference.
      */
-    private SwerveModel m_next;
+    private SwerveControl m_next;
 
     public ProfileReference(HolonomicProfile profile, String name) {
         m_profile = profile;
         m_name = name;
         // this will keep polling until we stop it.
-        m_references = Cache.of(() -> refresh(m_next));
+        m_references = Cache.of(() -> refresh(m_next.model()));
     }
 
     /**
@@ -74,7 +75,7 @@ public class ProfileReference implements SwerveReference {
     }
 
     @Override
-    public SwerveModel next() {
+    public SwerveControl next() {
         return m_references.get().m_next;
     }
 
@@ -98,7 +99,7 @@ public class ProfileReference implements SwerveReference {
         return new References(newCurrent, m_next);
     }
 
-    private SwerveModel makeNext(SwerveModel current) {
+    private SwerveControl makeNext(SwerveModel current) {
         if (DEBUG) {
             System.out.printf("ProfileReference refreshing %s\n", m_name);
         }
@@ -107,9 +108,9 @@ public class ProfileReference implements SwerveReference {
             return null;
         }
         if (m_goal == null) {
-            return current;
+            return current.control();
         }
-        SwerveModel next = m_profile.calculate(current, m_goal).model();
+        SwerveControl next = m_profile.calculate(current, m_goal);
         if (current.near(m_goal, TOLERANCE))
             m_done = true;
         return next;

@@ -2,6 +2,7 @@ package org.team100.lib.reference;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.trajectory.Trajectory100;
 
@@ -22,11 +23,11 @@ public class TrajectoryReference implements SwerveReference {
 
     @Override
     public SwerveModel current() {
-        return sample(progress());
+        return sample(progress()).model();
     }
 
     @Override
-    public SwerveModel next() {
+    public SwerveControl next() {
         return sample(progress() + TimedRobot100.LOOP_PERIOD_S);
     }
 
@@ -39,8 +40,8 @@ public class TrajectoryReference implements SwerveReference {
         return Takt.get() - m_startTimeS;
     }
 
-    private SwerveModel sample(double t) {
-        return SwerveModel.fromTimedPose(m_trajectory.sample(t));
+    private SwerveControl sample(double t) {
+        return SwerveControl.fromTimedPose(m_trajectory.sample(t));
     }
 
 }

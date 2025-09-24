@@ -1,0 +1,47 @@
+package org.team100.lib.controller.r3;
+
+import org.team100.lib.commands.r3.SubsystemR3;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.reference.SwerveReference;
+import org.team100.lib.util.Util;
+
+/**
+ * Like the drivetrain ReferenceController, but it does
+ * outboard positional control, so it just passes through the "next" reference.
+ */
+public class ReferenceControllerR3 {
+    private static final boolean DEBUG = false;
+
+    private final SubsystemR3 m_subsystem;
+    private final SwerveReference m_reference;
+
+    public ReferenceControllerR3(SubsystemR3 subsystem, SwerveReference reference) {
+        m_subsystem = subsystem;
+        m_reference = reference;
+    }
+
+    public void execute() {
+        SwerveModel measurement = m_subsystem.getState();
+        SwerveModel current = m_reference.current();
+        SwerveModel error = current.minus(measurement);
+        if (DEBUG)
+            Util.printf("error %s\n", error);
+
+        SwerveControl next = m_reference.next();
+        m_subsystem.set(next);
+    }
+
+    /**
+     * Trajectory is complete and controller error is within tolerance.
+     * 
+     * Since positional feedback is outboard, the "at reference" thing is unknown.
+     * 
+     * TODO: make it known.
+     * 
+     */
+    public boolean isDone() {
+        return m_reference.done();// && m_controller.atReference();
+    }
+
+}
