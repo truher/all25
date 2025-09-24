@@ -1,4 +1,4 @@
-package org.team100;
+package org.team100.lib.motion;
 
 import java.util.function.DoubleSupplier;
 
@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Mech extends SubsystemBase implements MechInterface {
     private final double m_armLength;
     private final double m_handLength;
-    private final JoelsKinematics m_kinematics;
+    private final ElevatorArmWristKinematics m_kinematics;
     /**
      * The current mechanism joint configuration. For a real mechanism this would be
      * represented by the sensors of the real mechanism.
@@ -20,7 +20,7 @@ public class Mech extends SubsystemBase implements MechInterface {
     public Mech(double armLength, double handLength) {
         m_armLength = armLength;
         m_handLength = handLength;
-        m_kinematics = new JoelsKinematics(armLength, handLength);
+        m_kinematics = new ElevatorArmWristKinematics(armLength, handLength);
         // in reality you wouldn't be able to just choose a default
         // configuration, you'd have to do something with the sensors.
         m_config = new Config(0.5, 0, 0);

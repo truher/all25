@@ -2,6 +2,7 @@ package org.team100.lib.motion.servo;
 
 import java.util.OptionalDouble;
 
+import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
@@ -56,6 +57,11 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
         m_log_measurement = child.doubleLogger(Level.TRACE, "measurement (rad)");
         m_log_setpoint = child.control100Logger(Level.TRACE, "setpoint (rad)");
         // m_log_position = child.optionalDoubleLogger(Level.TRACE, "Position");
+    }
+
+    public OutboardAngularPositionServo(LoggerFactory log, RotaryMechanism rotaryMechanism, ProfileReference1d ref,
+            PIDFeedback feedback) {
+        //TODO Auto-generated constructor stub
     }
 
     @Override
