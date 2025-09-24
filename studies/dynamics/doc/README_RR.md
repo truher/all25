@@ -347,7 +347,7 @@ $$
 G = 
 \begin{bmatrix}
 -m_1gl_{c_1}s_1 - m_2g(l_{c_2}s_{12} + l_1s_1)\\[4pt]
--m_2gl_{c_2}s_{12}x
+-m_2gl_{c_2}s_{12}
 \end{bmatrix}
 $$
 
@@ -389,7 +389,7 @@ m_2l_1l_{c_2}s_2\dot{q_1} & 0
 +
 \begin{bmatrix}
 -m_1gl_{c_1}s_1 - m_2g(l_{c_2}s_{12} + l_1s_1)\\[4pt]
--m_2gl_{c_2}s_{12}x
+-m_2gl_{c_2}s_{12}
 \end{bmatrix}
 
 $$

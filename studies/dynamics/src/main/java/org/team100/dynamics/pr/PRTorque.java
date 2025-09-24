@@ -6,6 +6,6 @@ package org.team100.dynamics.pr;
  * @param f1 force on the P joint
  * @param t2 torque on the R joint
  */
-public record Torque(double f1, double t2) {
+public record PRTorque(double f1, double t2) {
 
 }
