@@ -1,4 +1,4 @@
-# RR Kinematics
+# RR Dynamics
 
 This is the Chemnitz revolute-revolute (RR) example that begins on slide 79.
 
@@ -83,5 +83,68 @@ J_{\omega_2} =
 0 & 0 \\[4pt]
 0 & 0 \\[4pt]
 1 & 1
+\end{bmatrix}
+$$
+
+Now we can put all these terms together into the expression for the mass matrix:
+
+$$
+M =
+m_1 J_{v_1}^T J_{v_1}
++
+J_{\omega_1}^T I_{c_1} J_{\omega_1}
++
+m_2 J_{v_2}^T J_{v_2}
++
+J_{\omega_2}^T  I_{c_2} J_{\omega_2}
+$$
+
+To obtain:
+
+$$
+M =
+m_1
+\begin{bmatrix}
+-l_{c_1} s_1 & l_{c_1} c_1 & 0 \\[4pt]
+0 & 0  & 0
+\end{bmatrix}
+\begin{bmatrix}
+-l_{c_1} s_1 & 0 \\[4pt]
+l_{c_1} c_1 & 0 \\[4pt]
+0 & 0
+\end{bmatrix}
+\\
++
+\begin{bmatrix}
+\end{bmatrix}
+\begin{bmatrix}
+I_{xx_1} & -I_{xy_1} & -I_{xz_1} \\[4pt]
+-I_{yx_1} & I_{yy_1} & -I_{yz_1} \\[4pt]
+-I_{zx_1} & -I_{zy_1} & I_{zz_1} \\[4pt]
+\end{bmatrix}
+\begin{bmatrix}
+\end{bmatrix}
+\\
++
+m_2
+\begin{bmatrix}
+-l_{c_2} s_{12} - l_1 s_1 & l_{c_2} c_{12} + l_1 c_1 & 0\\[4pt]
+-l_{c_2}s_{12}  & l_{c_2}c_{12} & 0
+\end{bmatrix}
+\begin{bmatrix}
+-l_{c_2} s_{12} - l_1 s_1 & -l_{c_2}s_{12} \\[4pt]
+l_{c_2} c_{12} + l_1 c_1 & l_{c_2}c_{12} \\[4pt]
+0 & 0
+\end{bmatrix}
+\\
++
+\begin{bmatrix}
+\end{bmatrix}
+\begin{bmatrix}
+I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\[4pt]
+-I_{yx_2} & I_{yy_2} & -I_{yz_2} \\[4pt]
+-I_{zx_2} & -I_{zy_2} & I_{zz_2} \\[4pt]
+\end{bmatrix}
+\begin{bmatrix}
 \end{bmatrix}
 $$

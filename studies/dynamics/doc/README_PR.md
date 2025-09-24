@@ -1,4 +1,4 @@
-# PR Kinematics
+# PR Dynamics
 
 This is the Chemnitz prismatic-revolute (PR) example that begins on slide 72.
 
