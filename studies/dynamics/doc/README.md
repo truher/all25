@@ -28,10 +28,10 @@ $$
 The derivation of this equation is beyond the scope of this analysis;
 it comes from the Lagrange equation:
 
-$$
+```math
 \tau = {d \over dt}\left({\partial L \over \partial \dot{q}}\right)
 - {\partial L \over \partial q}
-$$
+```
 
 For more about Lagrange methods, see [this reference](https://ocw.mit.edu/courses/16-07-dynamics-fall-2009/b39e882f1524a0f6a98553ee33ea6f35_MIT16_07F09_Lec20.pdf).
 
