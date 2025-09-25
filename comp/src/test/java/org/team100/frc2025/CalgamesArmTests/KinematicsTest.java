@@ -1,10 +1,11 @@
-package org.team100;
+package org.team100.frc2025.CalgamesArmTests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
+import org.team100.frc2025.CalgamesArm.KaisKinematics;
 import org.team100.lib.motion.Config;
 
 import edu.wpi.first.math.geometry.Pose2d;

@@ -1,6 +1,6 @@
 package frc.robot;
 
-import org.team100.CartesianSetup;
+import org.team100.frc2025.CalgamesArm.CartesianSetup;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 

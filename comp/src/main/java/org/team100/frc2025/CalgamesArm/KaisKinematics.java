@@ -1,4 +1,4 @@
-package org.team100;
+package org.team100.frc2025.CalgamesArm;
 
 import org.team100.lib.motion.Config;
 

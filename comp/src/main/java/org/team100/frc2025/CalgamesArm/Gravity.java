@@ -1,5 +1,7 @@
-package org.team100;
+package org.team100.frc2025.CalgamesArm;
 
+import org.team100.frc2025.CalgamesArm.JointForce;
+import org.team100.lib.motion.Config;
 /** Models the force of gravity on each joint. */
 public class Gravity {
     /** making g variable means i can make it 10 in tests. */
