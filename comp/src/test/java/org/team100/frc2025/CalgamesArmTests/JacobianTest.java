@@ -1,12 +1,15 @@
-package org.team100;
+package org.team100.frc2025.CalgamesArmTests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.function.Function;
-
+import org.team100.lib.motion.Config;
 import org.junit.jupiter.api.Test;
+import org.team100.frc2025.CalgamesArm.Jacobian;
+import org.team100.frc2025.CalgamesArm.JointVelocities;
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.motion.ElevatorArmWristKinematics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.optimization.NumericalJacobian100;
@@ -28,7 +31,7 @@ public class JacobianTest {
 
     @Test
     void test0() {
-        final JoelsKinematics k = new JoelsKinematics(2, 1);
+        final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         Function<Vector<N3>, Vector<N3>> f = q ->  Jacobian.pose(k.forward(Jacobian.config(q)));
         
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
@@ -118,7 +121,7 @@ public class JacobianTest {
     void testDet() {
         // this prints a table of jacobian determinants ("scale") to show the
         // singularities at the edges.
-        final JoelsKinematics k = new JoelsKinematics(2, 1);
+        final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
 
         // forward jacobian goes from config to pose
         Function<Vector<N3>, Vector<N3>> f = q -> Jacobian.pose(k.forward(Jacobian.config(q)));
@@ -143,7 +146,7 @@ public class JacobianTest {
     void testPath() {
         // a very simple path showing pose, config, and velocities.
         //
-        final JoelsKinematics k = new JoelsKinematics(2, 1);
+        final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         Function<Vector<N3>, Vector<N3>> f = q -> Jacobian.pose(k.forward(Jacobian.config(q)));
 
         Pose2d start = new Pose2d(1, -1, Rotation2d.kZero);
@@ -177,7 +180,7 @@ public class JacobianTest {
 
     @Test
     void testTrajectory() {
-        final JoelsKinematics k = new JoelsKinematics(2, 1);
+        final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         Jacobian j = new Jacobian(k);
 
         TrajectoryPlanner planner = new TrajectoryPlanner(List.of(new ConstantConstraint(1, 1)));

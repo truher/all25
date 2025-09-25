@@ -1,7 +1,8 @@
-package org.team100;
+package org.team100.frc2025.CalgamesArm;
 
 import java.util.function.Function;
-
+import org.team100.lib.motion.Config;
+import org.team100.lib.motion.ElevatorArmWristKinematics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.optimization.NumericalJacobian100;
@@ -17,11 +18,11 @@ import edu.wpi.first.math.numbers.N3;
 
 /** The Jacobian describes how the kinematics affect velocities. */
 public class Jacobian {
-    private final JoelsKinematics m_k;
+    private final ElevatorArmWristKinematics m_k;
     /** Vector version of the forward kinematics */
     private final Function<Vector<N3>, Vector<N3>> m_f;
 
-    public Jacobian(JoelsKinematics k) {
+    public Jacobian(ElevatorArmWristKinematics k) {
         m_k = k;
         m_f = q -> pose(k.forward(config(q)));
     }
