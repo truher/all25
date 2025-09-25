@@ -24,8 +24,8 @@ The first link is just like the PR example:
 $$
 p_{c_1} =
 \begin{bmatrix}
-q_1 - l \\[4pt]
-0\\[4pt]
+q_1 - l \\
+0\\
 0
 \end{bmatrix}
 $$
@@ -35,8 +35,8 @@ The second link is also identical to the PR example (with different notation):
 $$
 p_{c_2} =
 \begin{bmatrix}
-q_1 + l_{c_2} c_2\\[4pt]
-l_{c_2} s_2\\[4pt]
+q_1 + l_{c_2} c_2\\
+l_{c_2} s_2\\
 0
 \end{bmatrix}
 $$
@@ -46,8 +46,8 @@ The third link is similar to the second link in the RR example:
 $$
 p_{c_3} =
 \begin{bmatrix}
-q_1  + l_2 c_2 + l_{c_3} c_{23} \\[4pt]
-l_2 s_2 + l_{c_3} s_{23} \\[4pt]
+q_1  + l_2 c_2 + l_{c_3} c_{23} \\
+l_2 s_2 + l_{c_3} s_{23} \\
 0
 \end{bmatrix}
 $$
@@ -59,8 +59,8 @@ The first link depends only on the first joint:
 $$
 J_{v_1} =
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+1 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 $$
@@ -71,8 +71,8 @@ and rotationally on the second joint:
 $$
 J_{v_2} =
 \begin{bmatrix}
-1 & -l_{c_2} s_2 & 0 \\[4pt]
-0 & l_{c_2} c_2 & 0 \\[4pt]
+1 & -l_{c_2} s_2 & 0 \\
+0 & l_{c_2} c_2 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 $$
@@ -82,8 +82,8 @@ And finally the third link:
 $$
 J_{v_3} =
 \begin{bmatrix}
-1 & -l_2 s_2 - l_{c_3} s_{23} & -l_{c_3}s_{23} \\[4pt]
-0 & l_2 c_2 + l_{c_3} c_{23}  & l_{c_3}c_{23} \\[4pt]
+1 & -l_2 s_2 - l_{c_3} s_{23} & -l_{c_3}s_{23} \\
+0 & l_2 c_2 + l_{c_3} c_{23}  & l_{c_3}c_{23} \\
 0 & 0 & 0
 \end{bmatrix}
 $$
@@ -96,8 +96,8 @@ The first rotational Jacobian is always zero since the first joint is prismatic.
 $$
 J_{\omega_1} =
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 $$
@@ -107,8 +107,8 @@ The second rotation Jacobian is identical to the second PR link:
 $$
 J_{\omega_2} =
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 1 & 0 
 \end{bmatrix}
 $$
@@ -118,8 +118,8 @@ The last rotation sums the two joints:
 $$
 J_{\omega_3} =
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 1 & 1
 \end{bmatrix}
 $$
@@ -147,86 +147,86 @@ $$
 M =
 m_1
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+1 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+1 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \\
 +
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 I_{c1}
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \\
 +
 m_2
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
--l_{c_2} s_2  & l_{c_2} c_2 & 0 \\[4pt]
+1 & 0 & 0 \\
+-l_{c_2} s_2  & l_{c_2} c_2 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \begin{bmatrix}
-1 & -l_{c_2} s_2 & 0 \\[4pt]
-0 & l_{c_2} c_2 & 0 \\[4pt]
+1 & -l_{c_2} s_2 & 0 \\
+0 & l_{c_2} c_2 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \\
 +
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 1 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 1 \\
 0 & 0 & 0 
 \end{bmatrix}
 \begin{bmatrix}
-I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\[4pt]
--I_{yx_2} & I_{yy_2} & -I_{yz_2} \\[4pt]
--I_{zx_2} & -I_{zy_2} & I_{zz_2} \\[4pt]
+I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\
+-I_{yx_2} & I_{yy_2} & -I_{yz_2} \\
+-I_{zx_2} & -I_{zy_2} & I_{zz_2} \\
 \end{bmatrix}
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 1 & 0 
 \end{bmatrix}
 \\
 +
 m_3
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
--l_2 s_2 - l_{c_3} s_{23} & l_2 c_2 + l_{c_3} c_{23}  & 0 \\[4pt]
+1 & 0 & 0 \\
+-l_2 s_2 - l_{c_3} s_{23} & l_2 c_2 + l_{c_3} c_{23}  & 0 \\
 -l_{c_3}s_{23} & l_{c_3}c_{23} & 0
 \end{bmatrix}
 \begin{bmatrix}
-1 & -l_2 s_2 - l_{c_3} s_{23} & -l_{c_3}s_{23} \\[4pt]
-0 & l_2 c_2 + l_{c_3} c_{23}  & l_{c_3}c_{23} \\[4pt]
+1 & -l_2 s_2 - l_{c_3} s_{23} & -l_{c_3}s_{23} \\
+0 & l_2 c_2 + l_{c_3} c_{23}  & l_{c_3}c_{23} \\
 0 & 0 & 0
 \end{bmatrix}
 \\
 +
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 1 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 1 \\
 0 & 0 & 1
 \end{bmatrix}
 \begin{bmatrix}
-I_{xx_3} & -I_{xy_3} & -I_{xz_3} \\[4pt]
--I_{yx_3} & I_{yy_3} & -I_{yz_3} \\[4pt]
--I_{zx_3} & -I_{zy_3} & I_{zz_3} \\[4pt]
+I_{xx_3} & -I_{xy_3} & -I_{xz_3} \\
+-I_{yx_3} & I_{yy_3} & -I_{yz_3} \\
+-I_{zx_3} & -I_{zy_3} & I_{zz_3} \\
 \end{bmatrix}
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 1 & 1
 \end{bmatrix}
 $$
@@ -237,42 +237,42 @@ $$
 M =
 m_1
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+1 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 +
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \\
 +
 m_2
 \begin{bmatrix}
-1 & -l_{c_2}s_2 & 0 \\[4pt]
--l_{c_2}s_2 & l_{c_2}^2 & 0 \\[4pt]
+1 & -l_{c_2}s_2 & 0 \\
+-l_{c_2}s_2 & l_{c_2}^2 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 +
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & I_{zz_2} & 0 \\[4pt]
+0 & 0 & 0 \\
+0 & I_{zz_2} & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \\
 +
 m_3
 \begin{bmatrix}
-1 & -l_2 s_2 - l_{c_3} s_{23}  & -l_{c_3}s_{23} \\[4pt]
--l_2 s_2 - l_{c_3} s_{23} & l_2^2 + 2l_2l_{c_3}c_3 + l_{c_3}^2 & l_{c_3}^2 + l_2l_{c_3}c_3 \\[4pt]
+1 & -l_2 s_2 - l_{c_3} s_{23}  & -l_{c_3}s_{23} \\
+-l_2 s_2 - l_{c_3} s_{23} & l_2^2 + 2l_2l_{c_3}c_3 + l_{c_3}^2 & l_{c_3}^2 + l_2l_{c_3}c_3 \\
 -l_{c_3}s_{23} & l_{c_3}^2 + l_2l_{c_3}c_3 & l_{c_3}^2
 \end{bmatrix}
 +
 \begin{bmatrix}
-0 & 0 & 0 \\[4pt]
-0 & I_{zz_3} & I_{zz_3} \\[4pt]
+0 & 0 & 0 \\
+0 & I_{zz_3} & I_{zz_3} \\
 0 & I_{zz_3} & I_{zz_3}
 \end{bmatrix}
 $$
@@ -292,21 +292,21 @@ Simplifying a bit further:
 $$
 M = 
 \begin{bmatrix}
-m_1 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+m_1 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 +
 \begin{bmatrix}
-m_2 & -m_2l_{c_2}s_2 & 0 \\[4pt]
--m_2l_{c_2}s_2 & m_2l_{c_2}^2 +  I_{zz_2} & 0 \\[4pt]
+m_2 & -m_2l_{c_2}s_2 & 0 \\
+-m_2l_{c_2}s_2 & m_2l_{c_2}^2 +  I_{zz_2} & 0 \\
 0 & 0 & 0
 \end{bmatrix}
-\\[15pt]
+\\
 +
 \begin{bmatrix}
-m_3 & -m_3l_2 s_2 - m_3l_{c_3} s_{23}  & -m_3l_{c_3}s_{23} \\[4pt]
--m_3l_2 s_2 - m_3l_{c_3} s_{23} & m_3l_2^2 + m_32l_2l_{c_3}c_3 + m_3l_{c_3}^2 + I_{zz_3}& m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3}\\[4pt]
+m_3 & -m_3l_2 s_2 - m_3l_{c_3} s_{23}  & -m_3l_{c_3}s_{23} \\
+-m_3l_2 s_2 - m_3l_{c_3} s_{23} & m_3l_2^2 + m_32l_2l_{c_3}c_3 + m_3l_{c_3}^2 + I_{zz_3}& m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3}\\
 -m_3l_{c_3}s_{23} & m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3} & m_3l_{c_3}^2 + I_{zz_3}
 \end{bmatrix}
 $$
@@ -687,8 +687,8 @@ could vary. But for now, leave it constant:
 $$
 g=
 \begin{bmatrix}
--g\\[4pt]
-0\\[4pt]
+-g\\
+0\\
 0
 \end{bmatrix}
 $$
@@ -701,39 +701,39 @@ G=
 -
 m_1
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
-0 & 0 & 0 \\[4pt]
+1 & 0 & 0 \\
+0 & 0 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \begin{bmatrix}
--g\\[4pt]
-0\\[4pt]
+-g\\
+0\\
 0
 \end{bmatrix}
 \\
 -
 m_2
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
--l_{c_2} s_2 & l_{c_2} c_2 & 0 \\[4pt]
+1 & 0 & 0 \\
+-l_{c_2} s_2 & l_{c_2} c_2 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
 \begin{bmatrix}
--g\\[4pt]
-0\\[4pt]
+-g\\
+0\\
 0
 \end{bmatrix}
 \\
 -
 m_3
 \begin{bmatrix}
-1 & 0 & 0 \\[4pt]
--l_2 s_2 - l_{c_3} s_{23} & l_2 c_2 + l_{c_3} c_{23}  & 0 \\[4pt]
+1 & 0 & 0 \\
+-l_2 s_2 - l_{c_3} s_{23} & l_2 c_2 + l_{c_3} c_{23}  & 0 \\
 -l_{c_3}s_{23} & l_{c_3}c_{23} & 0
 \end{bmatrix}
 \begin{bmatrix}
--g\\[4pt]
-0\\[4pt]
+-g\\
+0\\
 0
 \end{bmatrix}
 $$
@@ -743,20 +743,20 @@ Or:
 $$
 G = 
 \begin{bmatrix}
-m_1g\\[4pt]
-0\\[4pt]
+m_1g\\
+0\\
 0
 \end{bmatrix}
 +
 \begin{bmatrix}
-m_2g\\[4pt]
--l_{c_2} s_2m_2g\\[4pt]
+m_2g\\
+-l_{c_2} s_2m_2g\\
 0 
 \end{bmatrix}
 +
 \begin{bmatrix}
-m_3g\\[4pt]
--l_2 s_2m_3g - l_{c_3} s_{23}m_3g\\[4pt]
+m_3g\\
+-l_2 s_2m_3g - l_{c_3} s_{23}m_3g\\
 -l_{c_3}s_{23} m_3g
 \end{bmatrix}
 $$
@@ -766,8 +766,8 @@ Or finally:
 $$
 G = 
 \begin{bmatrix}
-(m_1 + m_2 + m_3)g \\[4pt]
--l_{c_2} s_2m_2g -l_2 s_2m_3g - l_{c_3} s_{23}m_3g  \\[4pt]
+(m_1 + m_2 + m_3)g \\
+-l_{c_2} s_2m_2g -l_2 s_2m_3g - l_{c_3} s_{23}m_3g  \\
 -l_{c_3}s_{23} m_3g
 \end{bmatrix}
 $$

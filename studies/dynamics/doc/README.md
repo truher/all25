@@ -49,8 +49,7 @@ $$
 that is, the cartesian COM Jacobian for the $i$'th link is:
 
 $$
-J_{v_i}
-=
+J_{v_i} =
 \begin{bmatrix}
 \partial p_{C_i} \over \partial q_1
 &
@@ -95,7 +94,7 @@ So, for example, for a 2-DOF system,
 $$
 M =
 \begin{bmatrix}
-m_{11} & m_{12}\\[4pt]
+m_{11} & m_{12}\\
 m_{21} & m_{22}
 \end{bmatrix}
 $$
@@ -114,6 +113,7 @@ c_{ij} =
 $$
 
 where $\Gamma$ is the Christoffel symbol of the first kind:
+
 $$
 \Gamma_{ijk}(q) = {1\over2}
 \left(
@@ -163,9 +163,9 @@ G = -
 m_1 g & m_2 g & \cdots & m_n g \\
 \end{bmatrix}
 \begin{bmatrix}
-J_{v_1}^T\\[4pt]
-J_{v_2}^T\\[4pt]
-\vdots\\[4pt]
+J_{v_1}^T\\
+J_{v_2}^T\\
+\vdots\\
 J_{v_n}^T
 \end{bmatrix}
 $$

@@ -28,8 +28,8 @@ So the center of mass of the first link is:
 $$
 p_{c_1} =
 \begin{bmatrix}
-q_1 - l \\[4pt]
-0\\[4pt]
+q_1 - l \\
+0\\
 0
 \end{bmatrix}
 $$
@@ -39,8 +39,8 @@ The center of mass of the second link is:
 $$
 p_{c_2} =
 \begin{bmatrix}
-q_1 + d c_2\\[4pt]
-d s_2\\[4pt]
+q_1 + d c_2\\
+d s_2\\
 0
 \end{bmatrix}
 $$
@@ -52,8 +52,8 @@ non-zero value:
 $$
 J_{v_1} =
 \begin{bmatrix}
-1 & 0 \\[4pt]
-0 & 0 \\[4pt]
+1 & 0 \\
+0 & 0 \\
 0 & 0
 \end{bmatrix}
 $$
@@ -64,8 +64,8 @@ translation in the first column (from $q_1$) and rotation in the second (from $q
 $$
 J_{v_2} =
 \begin{bmatrix}
-1 & -ds_2 \\[4pt]
-0 & dc_2 \\[4pt]
+1 & -ds_2 \\
+0 & dc_2 \\
 0 & 0
 \end{bmatrix}
 $$
@@ -76,8 +76,8 @@ the first joint is prismatic:
 $$
 J_{\omega_1} =
 \begin{bmatrix}
-0 & 0 \\[4pt]
-0 & 0 \\[4pt]
+0 & 0 \\
+0 & 0 \\
 0 & 0
 \end{bmatrix}
 $$
@@ -88,8 +88,8 @@ as the angular velocity of the joint itself:
 $$
 J_{\omega_2} =
 \begin{bmatrix}
-0 & 0 \\[4pt]
-0 & 0 \\[4pt]
+0 & 0 \\
+0 & 0 \\
 0 & 1
 \end{bmatrix}
 $$
@@ -113,56 +113,56 @@ $$
 M =
 m_1
 \begin{bmatrix}
-1 & 0 & 0\\[4pt]
-0 & 0 & 0\\[4pt]
+1 & 0 & 0\\
+0 & 0 & 0\\
 \end{bmatrix}
 \begin{bmatrix}
-1 & 0 \\[4pt]
-0 & 0 \\[4pt]
+1 & 0 \\
+0 & 0 \\
 0 & 0
 \end{bmatrix}
 \\
 +
 \begin{bmatrix}
-0 & 0 & 0\\[4pt]
-0 & 0 & 0\\[4pt]
+0 & 0 & 0\\
+0 & 0 & 0\\
 \end{bmatrix}
 \begin{bmatrix}
-I_{xx} & -I_{xy} & -I_{xz} \\[4pt]
--I_{yx} & I_{yy} & -I_{yz} \\[4pt]
--I_{zx} & -I_{zy} & I_{zz} \\[4pt]
+I_{xx} & -I_{xy} & -I_{xz} \\
+-I_{yx} & I_{yy} & -I_{yz} \\
+-I_{zx} & -I_{zy} & I_{zz} \\
 \end{bmatrix}
 \begin{bmatrix}
-0 & 0 \\[4pt]
-0 & 0 \\[4pt]
+0 & 0 \\
+0 & 0 \\
 0 & 0
 \end{bmatrix}
 \\
 +
 m_2
 \begin{bmatrix}
-1 & 0 & 0\\[4pt]
--ds_2 & dc_2 & 0\\[4pt]
+1 & 0 & 0\\
+-ds_2 & dc_2 & 0\\
 \end{bmatrix}
 \begin{bmatrix}
-1 & -ds_2 \\[4pt]
-0 & dc_2 \\[4pt]
+1 & -ds_2 \\
+0 & dc_2 \\
 0 & 0
 \end{bmatrix}
 \\
 +
 \begin{bmatrix}
-0 & 0 & 0\\[4pt]
-0 & 0 & 1\\[4pt]
+0 & 0 & 0\\
+0 & 0 & 1\\
 \end{bmatrix}
 \begin{bmatrix}
-I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\[4pt]
--I_{yx_2} & I_{yy_2} & -I_{yz_2} \\[4pt]
--I_{zx_2} & -I_{zy_2} & I_{zz_2} \\[4pt]
+I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\
+-I_{yx_2} & I_{yy_2} & -I_{yz_2} \\
+-I_{zx_2} & -I_{zy_2} & I_{zz_2} \\
 \end{bmatrix}
 \begin{bmatrix}
-0 & 0 \\[4pt]
-0 & 0 \\[4pt]
+0 & 0 \\
+0 & 0 \\
 0 & 1
 \end{bmatrix}
 $$
@@ -173,23 +173,23 @@ $$
 M =
 m_1
 \begin{bmatrix}
-1 & 0 \\[4pt]
+1 & 0 \\
 0 & 0
 \end{bmatrix}
 +
 \begin{bmatrix}
-0 & 0 \\[4pt]
+0 & 0 \\
 0 & 0
 \end{bmatrix}
 +
 m_2
 \begin{bmatrix}
-1 & - d s_2 \\[4pt]
+1 & - d s_2 \\
 - d s_2 & d^2
 \end{bmatrix}
 +
 \begin{bmatrix}
-0 & 0 \\[4pt]
+0 & 0 \\
 0 & I_{zz_2}
 \end{bmatrix}
 $$
@@ -199,7 +199,7 @@ Which gives us the mass matrix:
 $$
 M =
 \begin{bmatrix}
-m_1+m_2 & -m_2ds_2 \\[4pt]
+m_1+m_2 & -m_2ds_2 \\
 -m_2ds_2 & I_{zz2}+m_2d^2
 \end{bmatrix}
 $$
@@ -287,7 +287,7 @@ Then we can write the $C$ matrix:
 $$
 C = 
 \begin{bmatrix}
-0 & -m_2dc_2\dot{q_2}\\[4pt]
+0 & -m_2dc_2\dot{q_2}\\
 0 & 0
 \end{bmatrix}
 $$
@@ -305,7 +305,7 @@ The reference shows this as the gravity vector:
 $$
 G = 
 \begin{bmatrix}
-0 \\[4pt] 
+0 \\ 
 dc_2m_2g
 \end{bmatrix}
 $$
@@ -359,7 +359,7 @@ So
 $$
 G =
 \begin{bmatrix}
-(m_1+m_2)g \\[4pt]
+(m_1+m_2)g \\
 -ds_2m_2g
 \end{bmatrix}
 $$
@@ -385,19 +385,19 @@ and substituting the matrices we computed above:
 $$
 \tau = 
 \begin{bmatrix}
-m_1+m_2 & -m_2ds_2 \\[4pt]
+m_1+m_2 & -m_2ds_2 \\
 -m_2ds_2 & I_{zz2}+m_2d^2
 \end{bmatrix}
 \ddot{q}
 +
 \begin{bmatrix}
-0 & -m_2dc_2\dot{q_2}\\[4pt]
+0 & -m_2dc_2\dot{q_2}\\
 0 & 0
 \end{bmatrix}
 \dot{q}
 +
 \begin{bmatrix}
-(m_1+m_2)g \\[4pt]
+(m_1+m_2)g \\
 -ds_2m_2g
 \end{bmatrix}
 $$
