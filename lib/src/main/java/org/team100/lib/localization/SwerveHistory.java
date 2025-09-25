@@ -8,7 +8,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
-import org.team100.util.TimeInterpolatableBuffer100;
+import org.team100.lib.util.TimeInterpolatableBuffer100;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
