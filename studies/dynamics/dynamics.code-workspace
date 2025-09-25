@@ -44,6 +44,8 @@
 		"workbench.tree.enableStickyScroll": false,
 		"editor.stickyScroll.enabled": false,
 		"editor.minimap.enabled": false,
-		"editor.inlayHints.enabled": "off"
+		"editor.inlayHints.enabled": "off",
+		"markdown.preview.scrollEditorWithPreview": false,
+		"markdown.preview.scrollPreviewWithEditor": false
 	}
 }

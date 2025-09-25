@@ -28,14 +28,14 @@ l_{c_1} s_1\\[4pt]
 \end{bmatrix}
 $$
 
-The center of mass of the second link is a rotation on top
-of wherever the first link end is:
+The center of mass of the second link is a rotation added
+to wherever the end of the first link is:
 
 $$
 p_{c_2} =
 \begin{bmatrix}
-l_{c_2} c_{12} + l_1 c_1\\[4pt]
-l_{c_2} s_{12} + l_1 s_1\\[4pt]
+l_1 c_1 + l_{c_2} c_{12} \\[4pt]
+l_1 s_1 + l_{c_2} s_{12} \\[4pt]
 0
 \end{bmatrix}
 $$
@@ -57,8 +57,8 @@ And the same for the second link:
 $$
 J_{v_2} =
 \begin{bmatrix}
--l_{c_2} s_{12} - l_1 s_1 & -l_{c_2}s_{12} \\[4pt]
-l_{c_2} c_{12} + l_1 c_1 & l_{c_2}c_{12} \\[4pt]
+- l_1 s_1 - l_{c_2} s_{12}  & -l_{c_2}s_{12} \\[4pt]
+l_1 c_1 + l_{c_2} c_{12}  & l_{c_2}c_{12} \\[4pt]
 0 & 0
 \end{bmatrix}
 $$
@@ -116,6 +116,8 @@ l_{c_1} c_1 & 0 \\[4pt]
 \\
 +
 \begin{bmatrix}
+0 & 0 & 1 \\[4pt]
+0 & 0 & 0
 \end{bmatrix}
 \begin{bmatrix}
 I_{xx_1} & -I_{xy_1} & -I_{xz_1} \\[4pt]
@@ -123,6 +125,9 @@ I_{xx_1} & -I_{xy_1} & -I_{xz_1} \\[4pt]
 -I_{zx_1} & -I_{zy_1} & I_{zz_1} \\[4pt]
 \end{bmatrix}
 \begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0 \\[4pt]
+1 & 0
 \end{bmatrix}
 \\
 +
@@ -139,6 +144,8 @@ l_{c_2} c_{12} + l_1 c_1 & l_{c_2}c_{12} \\[4pt]
 \\
 +
 \begin{bmatrix}
+0 & 0 & 1 \\[4pt]
+0 & 0 & 1
 \end{bmatrix}
 \begin{bmatrix}
 I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\[4pt]
@@ -146,5 +153,252 @@ I_{xx_2} & -I_{xy_2} & -I_{xz_2} \\[4pt]
 -I_{zx_2} & -I_{zy_2} & I_{zz_2} \\[4pt]
 \end{bmatrix}
 \begin{bmatrix}
+0 & 0 \\[4pt]
+0 & 0 \\[4pt]
+1 & 1
 \end{bmatrix}
 $$
+
+Which is:
+
+$$
+M = 
+m_1
+\begin{bmatrix}
+l_{c_1}^2 & 0\\[4pt]
+0 & 0
+\end{bmatrix}
++
+\begin{bmatrix}
+I_{zz_1} & 0\\[4pt]
+0 & 0
+\end{bmatrix}
++
+m_2
+\begin{bmatrix}
+l_1^2 + 2l_1l_{c_2}c_2 + l_{c_2}^2 & l_1l_{c_2}c_2+l_{c_2}^2\\[4pt]
+l_1l_{c_2}c_2+l_{c_2}^2 & l_{c_2}^2
+\end{bmatrix}
++
+\begin{bmatrix}
+I_{zz_2} & I_{zz_2}\\[4pt]
+I_{zz_2} & I_{zz_2}
+\end{bmatrix}
+$$
+
+So altogether:
+
+$$
+M=
+\begin{bmatrix}
+m_1 l_{c_1}^2 
++ m_2l_1^2 + 2m_2l_1l_{c_2}c_2 + m_2l_{c_2}^2 
++ I_{zz_1}
++ I_{zz_2}
+& 
+m_2l_1l_{c_2}c_2+m_2l_{c_2}^2 + I_{zz_2}\\[4pt]
+m_2l_1l_{c_2}c_2+m_2l_{c_2}^2 + I_{zz_2}
+&
+m_2 l_{c_2}^2 + I_{zz_2}
+\end{bmatrix}
+$$
+
+Note that only $q_2$ is involved in $M$ (through $c_2$), so the
+derivatives below will be simple:
+
+## Centrifugal and Coriolis
+
+
+To derive the centrifugal/Coriolis term, start by writing out
+the Christoffel symbol permutations:
+
+$$
+\Gamma_{111} = {1\over2}
+\left( {\partial m_{11} \over \partial q_1}
++ {\partial m_{11} \over \partial q_1}
+- {\partial m_{11} \over \partial q_1} \right) = 0
+$$
+
+$$
+\Gamma_{112} = {1\over2}
+\left( {\partial m_{11} \over \partial q_2}
++ {\partial m_{12} \over \partial q_1}
+- {\partial m_{12} \over \partial q_1} \right) = -m_2l_1l_{c_2}s_2
+$$
+
+$$
+\Gamma_{121} = {1\over2}
+\left( {\partial m_{12} \over \partial q_1}
++ {\partial m_{11} \over \partial q_2}
+- {\partial m_{21} \over \partial q_1} \right) = -m_2l_1l_{c_2}s_2
+$$
+
+$$
+\Gamma_{122} = {1\over2}
+\left( {\partial m_{12} \over \partial q_2}
++ {\partial m_{12} \over \partial q_2}
+- {\partial m_{22} \over \partial q_1} \right) = -m_2l_1l_{c_2}s_2
+$$
+
+$$
+\Gamma_{211} = {1\over2}
+\left( {\partial m_{21} \over \partial q_1}
++ {\partial m_{21} \over \partial q_1}
+- {\partial m_{11} \over \partial q_2} \right) = m_2l_1l_{c_2}s_2
+$$
+
+$$
+\Gamma_{212} = {1\over2}
+\left( {\partial m_{21} \over \partial q_2}
++ {\partial m_{22} \over \partial q_1}
+- {\partial m_{12} \over \partial q_2} \right) = 0
+$$
+
+$$
+\Gamma_{221} = {1\over2}
+\left( {\partial m_{22} \over \partial q_1}
++ {\partial m_{21} \over \partial q_2}
+- {\partial m_{21} \over \partial q_2} \right) = 0
+$$
+
+$$
+\Gamma_{222} = {1\over2}
+\left( {\partial m_{22} \over \partial q_2}
++ {\partial m_{22} \over \partial q_2}
+- {\partial m_{22} \over \partial q_2} \right) = 0
+$$
+
+Then we can write the $C$ matrix:
+
+$$
+C = 
+\begin{bmatrix}
+-m_2l_1l_{c_2}s_2\dot{q_2} & -m_2l_1l_{c_2}s_2\dot{q_1} -m_2l_1l_{c_2}s_2\dot{q_2}  \\[4pt]
+m_2l_1l_{c_2}s_2\dot{q_1} & 0
+\end{bmatrix}
+$$
+
+## Gravity
+
+Start with the expression for gravity:
+
+$$
+G = -
+\begin{bmatrix}
+m_1 g & m_2 g & \cdots m_n g \\
+\end{bmatrix}
+\begin{bmatrix}
+J_{v_1}^T\\
+J_{v_2}^T\\
+\vdots\\
+J_{v_n}^T
+\end{bmatrix}
+$$
+
+So in our case:
+
+$$
+G = 
+-J_{v_1}^T m_1 g  
+- J_{v_2}^T m_2 g
+$$
+
+Our gravity acts along the x axis:
+
+$$
+g=
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+$$
+
+Thus our gravity vector is:
+
+$$
+G=
+-m_1
+\begin{bmatrix}
+-l_{c_1} s_1 & l_{c_1} c_1 & 0 \\[4pt]
+0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+
+-m_2
+\begin{bmatrix}
+-l_{c_2} s_{12} - l_1 s_1 & l_{c_2} c_{12} + l_1 c_1 & 0  \\[4pt]
+-l_{c_2}s_{12}  & l_{c_2}c_{12} & 0
+\end{bmatrix}
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+$$
+
+Or
+
+$$
+G = 
+\begin{bmatrix}
+-m_1gl_{c_1}s_1 - m_2g(l_{c_2}s_{12} + l_1s_1)\\[4pt]
+-m_2gl_{c_2}s_{12}
+\end{bmatrix}
+$$
+
+
+## Equation of Motion
+
+Finally (using our corrected gravity expression),
+we can write the equation of motion, starting with the definition:
+
+$$
+\tau = M(q)\ddot{q} + C(q,\dot{q})\dot{q} + G(q)
+$$
+
+and substituting the matrices we computed above:
+
+$$
+\tau = 
+\\[20pt]
+\begin{bmatrix}
+m_1 l_{c_1}^2 
++ m_2l_1^2 + 2m_2l_1l_{c_2}c_2 + m_2l_{c_2}^2 
++ I_{zz_1}
++ I_{zz_2}
+& 
+m_2l_1l_{c_2}c_2+m_2l_{c_2}^2 + I_{zz_2}\\[4pt]
+m_2l_1l_{c_2}c_2+m_2l_{c_2}^2 + I_{zz_2}
+&
+m_2 l_{c_2}^2 + I_{zz_2}
+\end{bmatrix}
+\ddot{q}
+\\[20pt]
++
+\begin{bmatrix}
+-m_2l_1l_{c_2}s_2\dot{q_2} & -m_2l_1l_{c_2}s_2\dot{q_1} -m_2l_1l_{c_2}s_2\dot{q_2}  \\[4pt]
+m_2l_1l_{c_2}s_2\dot{q_1} & 0
+\end{bmatrix}
+\dot{q}
+\\[20pt]
++
+\begin{bmatrix}
+-m_1gl_{c_1}s_1 - m_2g(l_{c_2}s_{12} + l_1s_1)\\[4pt]
+-m_2gl_{c_2}s_{12}
+\end{bmatrix}
+
+$$
+
+
+The mass term contains cosine of the second joint: the intuition
+is that the interaction between the axes is maximum when the arm
+is fully extended.
+
+The Coriolis term contains the sine, so the intuition is that the
+Coriolis and centrifugal effects are maximum when the links are
+perpendicular.

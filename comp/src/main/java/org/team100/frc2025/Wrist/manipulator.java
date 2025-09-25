@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Manipulator extends SubsystemBase {
+
     private final LinearMechanism m_leftMotor;
     private final LinearMechanism m_rightMotor;
     private final LinearMechanism m_algaeMotor;
@@ -26,7 +27,6 @@ public class Manipulator extends SubsystemBase {
     private final LaserCan m_coralLeftLaserCan;
 
     public Manipulator(LoggerFactory log) {
-
         switch (Identity.instance) {
             case COMP_BOT:
                 // Set specific parameters for the competition robot
@@ -110,7 +110,11 @@ public class Manipulator extends SubsystemBase {
     }
 
     public void intakeAlgae() {
-
+//         if (m_algaeMotor.getCurrent() > 80) {
+//             m_algaeMotor.setDutyCycle(0.5);
+//         } else {
+//             m_algaeMotor.setDutyCycle(1);
+//         }
         m_algaeMotor.setDutyCycle(1);
     }
 
