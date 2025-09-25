@@ -112,6 +112,7 @@ $$
 c_{ij} =
 \sum\limits_{k=1}^{n} \Gamma_{ijk}(q)\dot{q_k}
 $$
+
 where $\Gamma$ is the Christoffel symbol of the first kind:
 $$
 \Gamma_{ijk}(q) = {1\over2}

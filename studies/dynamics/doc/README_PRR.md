@@ -352,8 +352,10 @@ $
 
 ## Centrifugal and Coriolis
 
-There are 27 Christoffel symbols (!), but they are not all unique.  Also,
-the partial derivatives with respect to $q_1$ is always zero.
+To compute the Coriolis matrix, $C$, we start with the Christoffel symbols.
+There are 27 of them (!), but they are not all unique.  Also,
+the partial derivatives with respect to $q_1$ are always zero, as are
+partial derivatives of $m_{11}$ and $m_{33}$.
 
 $m_{11}$ is constant:
 $$
@@ -406,6 +408,7 @@ $$
 - {\partial m_{23} \over \partial q_1} \right)
 = {1\over2} \left( {\partial m_{12} \over \partial q_3}
 + {\partial m_{13} \over \partial q_2} \right)
+= -m_3l_{c_3}c_{23}
 $$
 
 $m_{13}$
@@ -426,6 +429,8 @@ $$
 = {1\over2}
 \left( {\partial m_{13} \over \partial q_2}
 + {\partial m_{12} \over \partial q_3} \right)
+= \Gamma_{123}
+= -m_3l_{c_3}c_{23}
 $$
 $$
 \Gamma_{133} = {1\over2}
@@ -434,6 +439,7 @@ $$
 - {\partial m_{33} \over \partial q_1} \right)
 = 
 {\partial m_{13} \over \partial q_3}
+= -m_3l_{c_3}c_{23}
 $$
 
 $m_{21}$
@@ -444,6 +450,7 @@ $$
 - {\partial m_{11} \over \partial q_2} \right)
 = 
 - {1\over2} {\partial m_{11} \over \partial q_2}
+= 0
 $$
 $$
 \Gamma_{212} = {1\over2}
@@ -459,6 +466,7 @@ $$
 - {\partial m_{13} \over \partial q_2} \right)
 = {1\over2} \left( {\partial m_{21} \over \partial q_3}
 - {\partial m_{13} \over \partial q_2} \right)
+= 0
 $$
 
 $m_{22}$
@@ -475,7 +483,7 @@ $$
 + {\partial m_{22} \over \partial q_2}
 - {\partial m_{22} \over \partial q_2} \right)
 = {1\over2} {\partial m_{22} \over \partial q_2}
-= 
+= 0
 $$
 $$
 \Gamma_{223} = {1\over2}
@@ -483,7 +491,7 @@ $$
 + {\partial m_{23} \over \partial q_2}
 - {\partial m_{23} \over \partial q_2} \right)
 = {1\over2} {\partial m_{22} \over \partial q_3}
-= 
+= -m_3l_2l_{c_3}s_3
 $$
 
 $m_{23}$
@@ -492,10 +500,12 @@ $$
 \left( {\partial m_{23} \over \partial q_1}
 + {\partial m_{21} \over \partial q_3}
 - {\partial m_{31} \over \partial q_2} \right)
-= 
+=
 {1\over2}
 \left( {\partial m_{21} \over \partial q_3}
 - {\partial m_{31} \over \partial q_2} \right)
+= \Gamma_{213}
+= 0
 $$
 $$
 \Gamma_{232} = {1\over2}
@@ -504,6 +514,7 @@ $$
 - {\partial m_{32} \over \partial q_2} \right)
 = {1\over2} {\partial m_{22} \over \partial q_3}
 = \Gamma_{223} 
+= -m_3l_2l_{c_3}s_3
 $$
 $$
 \Gamma_{233} = {1\over2}
@@ -512,7 +523,7 @@ $$
 - {\partial m_{33} \over \partial q_2} \right)
 = 
 {\partial m_{23} \over \partial q_3}
-- {1\over2}{\partial m_{33} \over \partial q_2}
+= -m_3l_2l_{c_3}s_3
 $$
 
 $m_{31}$
@@ -523,6 +534,7 @@ $$
 - {\partial m_{11} \over \partial q_3} \right)
 =
  - {1\over2} {\partial m_{11} \over \partial q_3}
+= 0
 $$
 $$
 \Gamma_{312} = {1\over2}
@@ -532,6 +544,7 @@ $$
 =
 {1\over2}\left( {\partial m_{31} \over \partial q_2}
 - {\partial m_{12} \over \partial q_3} \right)
+= 0
 $$
 $$
 \Gamma_{313} = {1\over2}
@@ -549,6 +562,7 @@ $$
 - {\partial m_{21} \over \partial q_3} \right)
 = {1\over2} \left( {\partial m_{31} \over \partial q_2}
 - {\partial m_{21} \over \partial q_3} \right)
+= 0
 $$
 $$
 \Gamma_{322} = {1\over2}
@@ -558,6 +572,7 @@ $$
 = 
 {\partial m_{32} \over \partial q_2}
 - {1\over2}{\partial m_{22} \over \partial q_3}
+= m_3l_2l_{c_3}s_3
 $$
 $$
 \Gamma_{323} = {1\over2}
@@ -565,7 +580,7 @@ $$
 + {\partial m_{33} \over \partial q_2}
 - {\partial m_{23} \over \partial q_3} \right)
 = {1\over2} {\partial m_{33} \over \partial q_2}
-= 
+= 0
 $$
 
 $m_{33}$
@@ -583,6 +598,7 @@ $$
 - {\partial m_{32} \over \partial q_3} \right)
 = {1\over2} {\partial m_{33} \over \partial q_2} 
 = \Gamma_{323}
+= 0
 $$
 $$
 \Gamma_{333} = {1\over2}
@@ -590,12 +606,249 @@ $$
 + {\partial m_{33} \over \partial q_3}
 - {\partial m_{33} \over \partial q_3} \right)
 = {1\over2} {\partial m_{33} \over \partial q_3}
-= 
+= 0
 $$
 
+So recalling the elements of the $C$ matrix are summed over $k$:
+
+$$
+c_{ij} =
+\sum\limits_{k=1}^{n} \Gamma_{ijk}(q)\dot{q_k}
+$$
+
+$
+c_{11} = 0
+$
+
+$
+c_{12} = -m_2l_{c_2}c_2\dot{q}_2 - m_3l_2c_2\dot{q}_2 - m_3l_{c_3}c_{23}\dot{q}_2  -m_3l_{c_3}c_{23} \dot{q}_3
+$
+
+$
+c_{13} = -m_3l_{c_3}c_{23} \dot{q}_2  -m_3l_{c_3}c_{23} \dot{q}_3
+$
+
+$
+c_{21} = 0
+$
+
+$
+c_{22} = -m_3l_2l_{c_3}s_3 \dot{q}_3
+$
+
+$
+c_{23} = -m_3l_2l_{c_3}s_3 \dot{q}_2 -m_3l_2l_{c_3}s_3 \dot{q}_3
+$
+
+$
+c_{31} = 0
+$
+
+$
+c_{32} = m_3l_2l_{c_3}s_3 \dot{q}_2
+$
+
+$
+c_{33} = 0 
+$
 
 
 ## Gravity
 
+Start with the expression for gravity:
+
+$$
+G = -
+\begin{bmatrix}
+m_1 g & m_2 g & \cdots m_n g \\
+\end{bmatrix}
+\begin{bmatrix}
+J_{v_1}^T\\
+J_{v_2}^T\\
+\vdots\\
+J_{v_n}^T
+\end{bmatrix}
+$$
+
+So in our case:
+
+$$
+G = 
+- J_{v_1}^T m_1 g  
+- J_{v_2}^T m_2 g
+- J_{v_3}^T m_3 g
+$$
+
+To keep things simple, let's say that gravity acts along
+the x axis.  In fact, it would be nice to couple the "gravity"
+with the acceleration of the robot base, so that gravity
+could vary. But for now, leave it constant:
+
+$$
+g=
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+$$
+
+Thus our gravity vector is:
+
+$$
+G=
+
+-
+m_1
+\begin{bmatrix}
+1 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\[4pt]
+0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+\\
+-
+m_2
+\begin{bmatrix}
+1 & 0 & 0 \\[4pt]
+-l_{c_2} s_2 & l_{c_2} c_2 & 0 \\[4pt]
+0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+\\
+-
+m_3
+\begin{bmatrix}
+1 & 0 & 0 \\[4pt]
+-l_2 s_2 - l_{c_3} s_{23} & l_2 c_2 + l_{c_3} c_{23}  & 0 \\[4pt]
+-l_{c_3}s_{23} & l_{c_3}c_{23} & 0
+\end{bmatrix}
+\begin{bmatrix}
+-g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
+$$
+
+Or:
+
+$$
+G = 
+\begin{bmatrix}
+m_1g\\[4pt]
+0\\[4pt]
+0
+\end{bmatrix}
++
+\begin{bmatrix}
+m_2g\\[4pt]
+-l_{c_2} s_2m_2g\\[4pt]
+0 
+\end{bmatrix}
++
+\begin{bmatrix}
+m_3g\\[4pt]
+-l_2 s_2m_3g - l_{c_3} s_{23}m_3g\\[4pt]
+-l_{c_3}s_{23} m_3g
+\end{bmatrix}
+$$
+
+Or finally:
+
+$$
+G = 
+\begin{bmatrix}
+(m_1 + m_2 + m_3)g \\[4pt]
+-l_{c_2} s_2m_2g -l_2 s_2m_3g - l_{c_3} s_{23}m_3g  \\[4pt]
+-l_{c_3}s_{23} m_3g
+\end{bmatrix}
+$$
+
 
 ## Equation of Motion
+
+
+Finally, we can write the equation of motion, starting with the definition:
+
+$$
+\tau = M(q)\ddot{q} + C(q,\dot{q})\dot{q} + G(q)
+$$
+
+P joint force, $f_1$:
+
+$$
+f_1 =
+ (m_1 + m_2 + m_3)\ddot{q}_1
+\\
++
+ (-m_2l_{c_2}s_2 -m_3l_2 s_2 - m_3l_{c_3} s_{23} )\ddot{q}_2
+\\
++
+-m_3l_{c_3}s_{23} \ddot{q}_3
+\\
++
+(-m_2l_{c_2}c_2\dot{q}_2 - m_3l_2c_2\dot{q}_2 - m_3l_{c_3}c_{23}\dot{q}_2  -m_3l_{c_3}c_{23} \dot{q}_3 )\dot{q}_2
+\\
++
+(-m_3l_{c_3}c_{23} \dot{q}_2  -m_3l_{c_3}c_{23} \dot{q}_3 )\dot{q}_3
+\\
++
+(m_1 + m_2 + m_3)g 
+
+
+
+$$
+
+First R joint torque, $\tau_2$:
+
+$$
+
+\tau_2 =
+(-m_2l_{c_2}s_2 -m_3l_2 s_2 - m_3l_{c_3} s_{23})\ddot{q}_1
+\\
++
+ (m_2l_{c_2}^2 +  I_{zz_2} + m_3l_2^2 + m_32l_2l_{c_3}c_3 + m_3l_{c_3}^2 + I_{zz_3}) \ddot{q}_2
+\\
++
+ (m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3})\ddot{q}_3
+\\
++
+(-m_3l_2l_{c_3}s_3 \dot{q}_3)\dot{q}_2
+\\
++
+(-m_3l_2l_{c_3}s_3 \dot{q}_2 -m_3l_2l_{c_3}s_3 \dot{q}_3)\dot{q}_3
+\\
++
+-l_{c_2} s_2m_2g -l_2 s_2m_3g - l_{c_3} s_{23}m_3g 
+
+$$
+
+Second R joint torque, $\tau_3$:
+
+$$
+\tau_3 =
+(-m_3l_{c_3}s_{23})\ddot{q}_1
+\\
++
+( m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3})\ddot{q}_2
+\\
++
+(m_3l_{c_3}^2 + I_{zz_3})\ddot{q}_3
+
+\\
++
+m_3l_2l_{c_3}s_3 \dot{q}_2\dot{q}_2
+\\
++
+-l_{c_3}s_{23} m_3g
+
+
+$$
