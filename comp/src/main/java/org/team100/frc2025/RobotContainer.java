@@ -10,6 +10,8 @@ import java.util.function.BooleanSupplier;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
+import org.team100.frc2025.CalgamesArm.CalgamesMech;
+import org.team100.frc2025.CalgamesArm.RealMech;
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.CommandGroups.GrabAlgaeL2Dumb;
@@ -49,6 +51,8 @@ import org.team100.lib.commands.drivetrain.manual.ManualWithFullStateHeading;
 import org.team100.lib.commands.drivetrain.manual.ManualWithProfiledHeading;
 import org.team100.lib.commands.drivetrain.manual.ManualWithTargetLock;
 import org.team100.lib.commands.drivetrain.manual.SimpleManualModuleStates;
+import org.team100.lib.commands.r3.FollowTrajectory;
+import org.team100.lib.commands.r3.SubsystemR3;
 import org.team100.lib.config.Camera;
 import org.team100.lib.config.Identity;
 import org.team100.lib.controller.drivetrain.FullStateSwerveController;
@@ -90,7 +94,9 @@ import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
+import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.Util;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -503,9 +509,21 @@ public class RobotContainer {
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
         
 
+        // calgames mech command?
+        SubsystemR3 CalgamesMech = new CalgamesMech(logger, 0.3, 0.1);
+        List<HolonomicPose2d> calgamesWaypoints = List.of(
+                new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
+                new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
+
+        TrajectoryPlanner p = new TrajectoryPlanner(List.of(
+                new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly something wrong - kym
+        Trajectory100 bar = p.restToRest(calgamesWaypoints);
+        whileTrue(buttons::red2,
+                new FollowTrajectory(CalgamesMech, bar));
+
         // this is for developing autopick.
         new FloorPickSetup(
-                fieldLog, driverControl, m_drive, m_targets, 
+                fieldLog, driverControl, m_drive, m_targets,
                 SwerveControllerFactory.pick(driveLog), autoProfile);
 
         m_initializer = Executors.newSingleThreadScheduledExecutor();

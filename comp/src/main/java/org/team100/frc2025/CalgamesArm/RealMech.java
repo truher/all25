@@ -1,7 +1,8 @@
-package org.team100;
+package org.team100.frc2025.CalgamesArm;
 
 import java.util.function.DoubleSupplier;
 
+import org.team100.lib.commands.r3.SubsystemR3;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
@@ -17,6 +18,9 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
+import org.team100.lib.motion.Config;
+import org.team100.lib.motion.ElevatorArmWristKinematics;
+import org.team100.lib.motion.MechInterface;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
@@ -32,10 +36,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** A version of the arm mechanism with real motors. */
-public class RealMech extends SubsystemBase implements MechInterface {
+public class RealMech extends SubsystemBase implements MechInterface, SubsystemR3 {
     private final double m_armLength;
     private final double m_handLength;
-    private final JoelsKinematics m_kinematics;
+    private final ElevatorArmWristKinematics m_kinematics;
     private final Jacobian m_jacobian;
 
     // TODO: real elevator has port and starboard motors.
@@ -57,7 +61,7 @@ public class RealMech extends SubsystemBase implements MechInterface {
         LoggerFactory parent = log.type(this);
         m_armLength = armLength;
         m_handLength = handLength;
-        m_kinematics = new JoelsKinematics(armLength, handLength);
+        m_kinematics = new ElevatorArmWristKinematics(armLength, handLength);
         m_jacobian = new Jacobian(m_kinematics);
         m_gravity = Gravity.from2025();
 
@@ -230,7 +234,7 @@ public class RealMech extends SubsystemBase implements MechInterface {
                 m_wrist.getVelocityRad_S().orElse(0));
     }
 
-    private SwerveModel getState() {
+    public SwerveModel getState() {
         Config c = getConfig();
         JointVelocities jv = getJointVelocity();
         Pose2d p = m_kinematics.forward(c);
@@ -239,6 +243,7 @@ public class RealMech extends SubsystemBase implements MechInterface {
     }
 
     /** There are no profiles here, so this control needs to be feasible. */
+    @Override
     public void set(SwerveControl control) {
         // control has three inputs:
         // position
@@ -288,7 +293,7 @@ public class RealMech extends SubsystemBase implements MechInterface {
     /////////////////////////////////
 
     /** This is not "hold position" this is "torque off" */
-    private void stop() {
+    public void stop() {
         m_elevator.stop();
         m_shoulder.stop();
         m_wrist.stop();
