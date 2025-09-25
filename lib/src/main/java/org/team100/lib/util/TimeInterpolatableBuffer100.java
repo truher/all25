@@ -1,4 +1,4 @@
-package org.team100.util;
+package org.team100.lib.util;
 
 import java.util.Map.Entry;
 import java.util.NavigableMap;
@@ -6,8 +6,6 @@ import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.interpolation.Interpolatable;
 
