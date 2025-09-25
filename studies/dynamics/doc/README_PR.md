@@ -11,9 +11,9 @@ The setup is:
 * a revolute joint parameterized by $q_2$, the angle measured from the x axis.
 * a link of mass $m_2$ centered at $d$ from the joint, with intertia $I_{c2}$.
 
-The important results are as follows (remember that
+The important results are as follows.  Remember that
 joint configurations are $q_1$ and $q_2$ and
-things like $s_2$ really mean $sin(q_2)$):
+things like $s_2$ really mean $sin(q_2)$.
 
 
 ## Mass

@@ -314,41 +314,41 @@ m_3 & -m_3l_2 s_2 - m_3l_{c_3} s_{23}  & -m_3l_{c_3}s_{23} \\
 And then finally, the terms of the mass matrix, written out individually so it's
 easier to read:
 
-$
+```math
 m_{11} = m_1 + m_2 + m_3
-$
+```
 
-$
+```math
 m_{12} = -m_2l_{c_2}s_2 -m_3l_2 s_2 - m_3l_{c_3} s_{23} 
-$
+```
 
-$
+```math
 m_{13} = -m_3l_{c_3}s_{23} 
-$
+```
 
-$
+```math
 m_{21} = -m_2l_{c_2}s_2 -m_3l_2 s_2 - m_3l_{c_3} s_{23} = m_{12}
-$
+```
 
-$
+```math
 m_{22} = m_2l_{c_2}^2 +  I_{zz_2} + m_3l_2^2 + m_32l_2l_{c_3}c_3 + m_3l_{c_3}^2 + I_{zz_3}
-$
+```
 
-$
+```math
 m_{23} = m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3}
-$
+```
 
-$
+```math
 m_{31} = -m_3l_{c_3}s_{23} = m_{13}
-$
+```
 
-$
+```math
 m_{32} = m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3} = m_{23}
-$
+```
 
-$
+```math
 m_{33} = m_3l_{c_3}^2 + I_{zz_3}
-$
+```
 
 ## Centrifugal and Coriolis
 
@@ -616,41 +616,41 @@ c_{ij} =
 \sum\limits_{k=1}^{n} \Gamma_{ijk}(q)\dot{q_k}
 ```
 
-$
+```math
 c_{11} = 0
-$
+```
 
-$
+```math
 c_{12} = -m_2l_{c_2}c_2\dot{q}_2 - m_3l_2c_2\dot{q}_2 - m_3l_{c_3}c_{23}\dot{q}_2  -m_3l_{c_3}c_{23} \dot{q}_3
-$
+```
 
-$
+```math
 c_{13} = -m_3l_{c_3}c_{23} \dot{q}_2  -m_3l_{c_3}c_{23} \dot{q}_3
-$
+```
 
-$
+```math
 c_{21} = 0
-$
+```
 
-$
+```math
 c_{22} = -m_3l_2l_{c_3}s_3 \dot{q}_3
-$
+```
 
-$
+```math
 c_{23} = -m_3l_2l_{c_3}s_3 \dot{q}_2 -m_3l_2l_{c_3}s_3 \dot{q}_3
-$
+```
 
-$
+```math
 c_{31} = 0
-$
+```
 
-$
+```math
 c_{32} = m_3l_2l_{c_3}s_3 \dot{q}_2
-$
+```
 
-$
+```math
 c_{33} = 0 
-$
+```
 
 
 ## Gravity
@@ -803,14 +803,11 @@ f_1 =
 +
 (m_1 + m_2 + m_3)g 
 
-
-
 ```
 
 First R joint torque, $\tau_2$:
 
 ```math
-
 \tau_2 =
 (-m_2l_{c_2}s_2 -m_3l_2 s_2 - m_3l_{c_3} s_{23})\ddot{q}_1
 \\
@@ -849,6 +846,4 @@ m_3l_2l_{c_3}s_3 \dot{q}_2\dot{q}_2
 \\
 +
 -l_{c_3}s_{23} m_3g
-
-
 ```
