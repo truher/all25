@@ -124,7 +124,7 @@ $$
 \right)
 $$
 
-More about [Christoffel symbols](https://en.wikipedia.org/wiki/Christoffel_symbols#Christoffel_symbols_of_the_first_kind).
+The derivation of Christoffel symbols is beyond the scope of this text.  For more about them, see [this reference](https://en.wikipedia.org/wiki/Christoffel_symbols#Christoffel_symbols_of_the_first_kind).
 
 
 

@@ -7,7 +7,7 @@ This covers a three-jointed, prismatic-revolute-revolute (PRR) mechanism.
 The setup is:
 
 * a prismatic joint at the origin, parameterized by $q_1$, the distance to the second joint.
-* a link of mass $m_1$ centered $l_{c_1}$ from the far end (so that $l_c1$ doesn't depend on $q_1$), with inertia $I_{c1}$.
+* a link of mass $m_1$ centered $l_{c_1}$ from the far end (so that $l_{c_1}$ doesn't depend on $q_1$), with inertia $I_{c_1}$.
 * a revolute joint parameterized by $q_2$, the angle measured from the x axis.
 * a link of mass $m_2$ centered at $l_{c_2}$ from the joint, with inertia $I_{c_2}$ and length $l_2$.
 * a revolute joint parameterized by $q_3$, the angle relative to the second link.
@@ -91,7 +91,7 @@ $$
 And the angular center-of-mass Jacobians: all rotations are around Z,
 so there are only values in the last row.
 
-The first Jacobian is always zero since the first joint is prismatic.
+The first rotational Jacobian is always zero since the first joint is prismatic.
 
 $$
 J_{\omega_1} =
@@ -102,7 +102,7 @@ J_{\omega_1} =
 \end{bmatrix}
 $$
 
-The second link Jacobian is identical to the second PR link:
+The second rotation Jacobian is identical to the second PR link:
 
 $$
 J_{\omega_2} =
@@ -113,7 +113,7 @@ J_{\omega_2} =
 \end{bmatrix}
 $$
 
-The last link sums the two rotations:
+The last rotation sums the two joints:
 
 $$
 J_{\omega_3} =
@@ -266,8 +266,8 @@ m_2
 m_3
 \begin{bmatrix}
 1 & -l_2 s_2 - l_{c_3} s_{23}  & -l_{c_3}s_{23} \\[4pt]
--l_2 s_2 - l_{c_3} s_{23} & l_2^2 + 2l_2l_{c_3}(s_2s_{23}+c_2c_{23}) + l_{c_3}^2 & l_{c_3}^2 + l_2l_{c_3}(s_2s_{23}) \\[4pt]
--l_{c_3}s_{23} & l_{c_3}^2 + l_2l_{c_3}(s_2s_{23}) & l_{c_3}^2
+-l_2 s_2 - l_{c_3} s_{23} & l_2^2 + 2l_2l_{c_3}c_3 + l_{c_3}^2 & l_{c_3}^2 + l_2l_{c_3}c_3 \\[4pt]
+-l_{c_3}s_{23} & l_{c_3}^2 + l_2l_{c_3}c_3 & l_{c_3}^2
 \end{bmatrix}
 +
 \begin{bmatrix}
@@ -275,188 +275,322 @@ m_3
 0 & I_{zz_3} & I_{zz_3} \\[4pt]
 0 & I_{zz_3} & I_{zz_3}
 \end{bmatrix}
+$$
 
+The $m_3$ component makes use of the identity,
+$$
+cos(a)cos(b)+sin(a)sin(b) = cos(a-b)
+$$
+ 
+to simplify
+$$
+c_2c_{23} + s_2s_{23} = c_3
+$$
+
+Simplifying a bit further:
 
 $$
+M = 
+\begin{bmatrix}
+m_1 & 0 & 0 \\[4pt]
+0 & 0 & 0 \\[4pt]
+0 & 0 & 0
+\end{bmatrix}
++
+\begin{bmatrix}
+m_2 & -m_2l_{c_2}s_2 & 0 \\[4pt]
+-m_2l_{c_2}s_2 & m_2l_{c_2}^2 +  I_{zz_2} & 0 \\[4pt]
+0 & 0 & 0
+\end{bmatrix}
+\\[15pt]
++
+\begin{bmatrix}
+m_3 & -m_3l_2 s_2 - m_3l_{c_3} s_{23}  & -m_3l_{c_3}s_{23} \\[4pt]
+-m_3l_2 s_2 - m_3l_{c_3} s_{23} & m_3l_2^2 + m_32l_2l_{c_3}c_3 + m_3l_{c_3}^2 + I_{zz_3}& m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3}\\[4pt]
+-m_3l_{c_3}s_{23} & m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3} & m_3l_{c_3}^2 + I_{zz_3}
+\end{bmatrix}
+$$
+
+And then finally, the terms of the mass matrix, written out individually so it's
+easier to read:
+
+$
+m_{11} = m_1 + m_2 + m_3
+$
+
+$
+m_{12} = -m_2l_{c_2}s_2 -m_3l_2 s_2 - m_3l_{c_3} s_{23} 
+$
+
+$
+m_{13} = -m_3l_{c_3}s_{23} 
+$
+
+$
+m_{21} = -m_2l_{c_2}s_2 -m_3l_2 s_2 - m_3l_{c_3} s_{23} = m_{12}
+$
+
+$
+m_{22} = m_2l_{c_2}^2 +  I_{zz_2} + m_3l_2^2 + m_32l_2l_{c_3}c_3 + m_3l_{c_3}^2 + I_{zz_3}
+$
+
+$
+m_{23} = m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3}
+$
+
+$
+m_{31} = -m_3l_{c_3}s_{23} = m_{13}
+$
+
+$
+m_{32} = m_3l_{c_3}^2 + m_3l_2l_{c_3}c_3 + I_{zz_3} = m_{23}
+$
+
+$
+m_{33} = m_3l_{c_3}^2 + I_{zz_3}
+$
 
 ## Centrifugal and Coriolis
 
-There are 27 Christoffel symbols:
-### 11
+There are 27 Christoffel symbols (!), but they are not all unique.  Also,
+the partial derivatives with respect to $q_1$ is always zero.
+
+$m_{11}$ is constant:
 $$
 \Gamma_{111} = {1\over2}
 \left( {\partial m_{11} \over \partial q_1}
 + {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+- {\partial m_{11} \over \partial q_1} \right)
+= {1\over2}  {\partial m_{11} \over \partial q_1}
+= 0
 $$
 $$
 \Gamma_{112} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\left( {\partial m_{11} \over \partial q_2}
++ {\partial m_{12} \over \partial q_1}
+- {\partial m_{12} \over \partial q_1} \right)
+= {1\over2}{\partial m_{11} \over \partial q_2} 
+= 0
 $$
 $$
 \Gamma_{113} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\left( {\partial m_{11} \over \partial q_3}
++ {\partial m_{13} \over \partial q_1}
+- {\partial m_{13} \over \partial q_1} \right) 
+= {1\over2} {\partial m_{11} \over \partial q_3}
+= 0
 $$
-### 12
+
+$m_{12}$
 $$
 \Gamma_{121} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\left( {\partial m_{12} \over \partial q_1}
++ {\partial m_{11} \over \partial q_2}
+- {\partial m_{21} \over \partial q_1} \right)
+= {1\over2}{\partial m_{11} \over \partial q_2}
+= \Gamma_{112} 
+= 0
 $$
 $$
 \Gamma_{122} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\left( {\partial m_{12} \over \partial q_2}
++ {\partial m_{12} \over \partial q_2}
+- {\partial m_{22} \over \partial q_1} \right)
+= {\partial m_{12} \over \partial q_2}
+= -m_2l_{c_2}c_2 - m_3l_2c_2 - m_3l_{c_3}c_{23}
 $$
 $$
 \Gamma_{123} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\left( {\partial m_{12} \over \partial q_3}
++ {\partial m_{13} \over \partial q_2}
+- {\partial m_{23} \over \partial q_1} \right)
+= {1\over2} \left( {\partial m_{12} \over \partial q_3}
++ {\partial m_{13} \over \partial q_2} \right)
 $$
-### 13
+
+$m_{13}$
 $$
 \Gamma_{131} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\left( {\partial m_{13} \over \partial q_1}
++ {\partial m_{11} \over \partial q_3}
+- {\partial m_{31} \over \partial q_1} \right)
+= {1\over2} {\partial m_{11} \over \partial q_3}
+= \Gamma_{113} 
+= 0
 $$
 $$
 \Gamma_{132} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\left( {\partial m_{13} \over \partial q_2}
++ {\partial m_{12} \over \partial q_3}
+- {\partial m_{32} \over \partial q_1} \right)
+= {1\over2}
+\left( {\partial m_{13} \over \partial q_2}
++ {\partial m_{12} \over \partial q_3} \right)
 $$
 $$
 \Gamma_{133} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\left( {\partial m_{13} \over \partial q_3}
++ {\partial m_{13} \over \partial q_3}
+- {\partial m_{33} \over \partial q_1} \right)
+= 
+{\partial m_{13} \over \partial q_3}
 $$
 
-
-### 21
+$m_{21}$
 $$
-\Gamma_{111} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-$$
-\Gamma_{112} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{211} = {1\over2}
+\left( {\partial m_{21} \over \partial q_1}
++ {\partial m_{21} \over \partial q_1}
+- {\partial m_{11} \over \partial q_2} \right)
+= 
+- {1\over2} {\partial m_{11} \over \partial q_2}
 $$
 $$
-\Gamma_{113} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-### 22
-$$
-\Gamma_{121} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{212} = {1\over2}
+\left( {\partial m_{21} \over \partial q_2}
++ {\partial m_{22} \over \partial q_1}
+- {\partial m_{12} \over \partial q_2} \right)
+= 0
 $$
 $$
-\Gamma_{122} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-$$
-\Gamma_{123} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-### 23
-$$
-\Gamma_{131} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-$$
-\Gamma_{132} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-$$
-\Gamma_{133} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{213} = {1\over2}
+\left( {\partial m_{21} \over \partial q_3}
++ {\partial m_{23} \over \partial q_1}
+- {\partial m_{13} \over \partial q_2} \right)
+= {1\over2} \left( {\partial m_{21} \over \partial q_3}
+- {\partial m_{13} \over \partial q_2} \right)
 $$
 
+$m_{22}$
+$$
+\Gamma_{221} = {1\over2}
+\left( {\partial m_{22} \over \partial q_1}
++ {\partial m_{21} \over \partial q_2}
+- {\partial m_{21} \over \partial q_2} \right)
+= 0
+$$
+$$
+\Gamma_{222} = {1\over2}
+\left( {\partial m_{22} \over \partial q_2}
++ {\partial m_{22} \over \partial q_2}
+- {\partial m_{22} \over \partial q_2} \right)
+= {1\over2} {\partial m_{22} \over \partial q_2}
+= 
+$$
+$$
+\Gamma_{223} = {1\over2}
+\left( {\partial m_{22} \over \partial q_3}
++ {\partial m_{23} \over \partial q_2}
+- {\partial m_{23} \over \partial q_2} \right)
+= {1\over2} {\partial m_{22} \over \partial q_3}
+= 
+$$
 
+$m_{23}$
+$$
+\Gamma_{231} = {1\over2}
+\left( {\partial m_{23} \over \partial q_1}
++ {\partial m_{21} \over \partial q_3}
+- {\partial m_{31} \over \partial q_2} \right)
+= 
+{1\over2}
+\left( {\partial m_{21} \over \partial q_3}
+- {\partial m_{31} \over \partial q_2} \right)
+$$
+$$
+\Gamma_{232} = {1\over2}
+\left( {\partial m_{23} \over \partial q_2}
++ {\partial m_{22} \over \partial q_3}
+- {\partial m_{32} \over \partial q_2} \right)
+= {1\over2} {\partial m_{22} \over \partial q_3}
+= \Gamma_{223} 
+$$
+$$
+\Gamma_{233} = {1\over2}
+\left( {\partial m_{23} \over \partial q_3}
++ {\partial m_{23} \over \partial q_3}
+- {\partial m_{33} \over \partial q_2} \right)
+= 
+{\partial m_{23} \over \partial q_3}
+- {1\over2}{\partial m_{33} \over \partial q_2}
+$$
 
-### 31
+$m_{31}$
 $$
-\Gamma_{111} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-$$
-\Gamma_{112} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{311} = {1\over2}
+\left( {\partial m_{31} \over \partial q_1}
++ {\partial m_{31} \over \partial q_1}
+- {\partial m_{11} \over \partial q_3} \right)
+=
+ - {1\over2} {\partial m_{11} \over \partial q_3}
 $$
 $$
-\Gamma_{113} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-### 32
-$$
-\Gamma_{121} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{312} = {1\over2}
+\left( {\partial m_{31} \over \partial q_2}
++ {\partial m_{32} \over \partial q_1}
+- {\partial m_{12} \over \partial q_3} \right)
+=
+{1\over2}\left( {\partial m_{31} \over \partial q_2}
+- {\partial m_{12} \over \partial q_3} \right)
 $$
 $$
-\Gamma_{122} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{313} = {1\over2}
+\left( {\partial m_{31} \over \partial q_3}
++ {\partial m_{33} \over \partial q_1}
+- {\partial m_{13} \over \partial q_3} \right)
+= 0
+$$
+
+$m_{32}$
+$$
+\Gamma_{321} = {1\over2}
+\left( {\partial m_{32} \over \partial q_1}
++ {\partial m_{31} \over \partial q_2}
+- {\partial m_{21} \over \partial q_3} \right)
+= {1\over2} \left( {\partial m_{31} \over \partial q_2}
+- {\partial m_{21} \over \partial q_3} \right)
 $$
 $$
-\Gamma_{123} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
-$$
-### 33
-$$
-\Gamma_{131} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{322} = {1\over2}
+\left( {\partial m_{32} \over \partial q_2}
++ {\partial m_{32} \over \partial q_2}
+- {\partial m_{22} \over \partial q_3} \right)
+= 
+{\partial m_{32} \over \partial q_2}
+- {1\over2}{\partial m_{22} \over \partial q_3}
 $$
 $$
-\Gamma_{132} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{323} = {1\over2}
+\left( {\partial m_{32} \over \partial q_3}
++ {\partial m_{33} \over \partial q_2}
+- {\partial m_{23} \over \partial q_3} \right)
+= {1\over2} {\partial m_{33} \over \partial q_2}
+= 
+$$
+
+$m_{33}$
+$$
+\Gamma_{331} = {1\over2}
+\left( {\partial m_{33} \over \partial q_1}
++ {\partial m_{31} \over \partial q_3}
+- {\partial m_{31} \over \partial q_3} \right)
+= 0
 $$
 $$
-\Gamma_{133} = {1\over2}
-\left( {\partial m_{11} \over \partial q_1}
-+ {\partial m_{11} \over \partial q_1}
-- {\partial m_{11} \over \partial q_1} \right) = 0
+\Gamma_{332} = {1\over2}
+\left( {\partial m_{33} \over \partial q_2}
++ {\partial m_{32} \over \partial q_3}
+- {\partial m_{32} \over \partial q_3} \right)
+= {1\over2} {\partial m_{33} \over \partial q_2} 
+= \Gamma_{323}
+$$
+$$
+\Gamma_{333} = {1\over2}
+\left( {\partial m_{33} \over \partial q_3}
++ {\partial m_{33} \over \partial q_3}
+- {\partial m_{33} \over \partial q_3} \right)
+= {1\over2} {\partial m_{33} \over \partial q_3}
+= 
 $$
 
 
