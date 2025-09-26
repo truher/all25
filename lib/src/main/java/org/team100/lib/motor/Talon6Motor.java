@@ -1,5 +1,7 @@
 package org.team100.lib.motor;
 
+import java.util.OptionalDouble;
+
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.DoubleCache;
 import org.team100.lib.coherence.Takt;
@@ -201,8 +203,10 @@ public abstract class Talon6Motor implements BareMotor {
         TalonFXConfigurator talonFXConfigurator = m_motor.getConfigurator();
         Phoenix100.currentConfig(talonFXConfigurator, m_supplyLimit, currentA);
     }
-    public double getCurrent(){
-return m_motor.getStatorCurrent().getValueAsDouble();
+
+    @Override
+    public double getCurrent() {
+        return m_motor.getStatorCurrent().getValueAsDouble();
     }
 
     /**
@@ -309,6 +313,12 @@ return m_motor.getStatorCurrent().getValueAsDouble();
     }
 
     @Override
+    public void reset() {
+        m_position.reset();
+        m_velocity.reset();
+    }
+
+    @Override
     public void close() {
         m_motor.close();
     }
@@ -363,6 +373,13 @@ return m_motor.getStatorCurrent().getValueAsDouble();
      */
     public double getPositionRev() {
         return m_position.getAsDouble();
+    }
+
+    @Override
+    public double getPositionRad() {
+        double motorPositionRev = getPositionRev();
+        double positionRad = motorPositionRev * 2 * Math.PI;
+        return positionRad;
     }
 
     /** ait a long time for a new value, do not use outside testing. */

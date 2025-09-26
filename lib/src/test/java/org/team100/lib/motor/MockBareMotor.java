@@ -75,6 +75,11 @@ public class MockBareMotor implements BareMotor {
     }
 
     @Override
+    public void reset() {
+        //
+    }
+
+    @Override
     public void close() {
         //
     }
@@ -82,6 +87,16 @@ public class MockBareMotor implements BareMotor {
     @Override
     public double getVelocityRad_S() {
         return this.velocity;
+    }
+
+    @Override
+    public double getPositionRad() {
+        return this.position;
+    }
+
+    @Override
+    public double getCurrent() {
+        return 0;
     }
 
     @Override

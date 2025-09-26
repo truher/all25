@@ -7,118 +7,194 @@ import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.Talon6Encoder;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.LinearMechanism;
+import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Kraken6Motor;
+import org.team100.lib.motor.LazySimulatedBareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import au.grapplerobotics.simulation.MockLaserCan;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Manipulator extends SubsystemBase {
 
-    private final LinearMechanism m_leftMotor;
-    private final LinearMechanism m_rightMotor;
-    private final LinearMechanism m_algaeMotor;
-    private final LaserCan m_coralRightLaserCan;
-    private final LaserCan m_coralCenterLaserCan;
-    private final LaserCan m_coralBackLaserCan;
-    private final LaserCan m_coralLeftLaserCan;
+    private static final int NEAR = 100;
+    private final BareMotor m_algaeMotor;
+    private final LinearMechanism m_leftMech;
+    private final LinearMechanism m_rightMech;
+    private final LinearMechanism m_algaeMech;
+    private final LaserCanInterface m_rightLaser;
+    private final LaserCanInterface m_frontLaser;
+    private final LaserCanInterface m_backLaser;
+    private final LaserCanInterface m_leftLaser;
 
     public Manipulator(LoggerFactory log) {
         switch (Identity.instance) {
-            case COMP_BOT:
+            case COMP_BOT -> {
                 // Set specific parameters for the competition robot
-                Kraken6Motor m_KrakenLeftMotor = new Kraken6Motor(log, 54, MotorPhase.FORWARD, 40, 40,
+                Kraken6Motor leftMotor = new Kraken6Motor(log, 54, MotorPhase.FORWARD, 40, 40,
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor m_KrakenRightMotor = new Kraken6Motor(log, 55, MotorPhase.REVERSE, 40, 40,
+                Kraken6Motor rightMotor = new Kraken6Motor(log, 55, MotorPhase.REVERSE, 40, 40,
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor m_KrakenAlgaeMotor = new Kraken6Motor(log, 56, MotorPhase.FORWARD, 120, 120,
+                Kraken6Motor algaeMotor = new Kraken6Motor(log, 56, MotorPhase.FORWARD, 120, 120,
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                m_coralRightLaserCan = new LaserCan(52);
-                m_coralCenterLaserCan = new LaserCan(51);
-                m_coralBackLaserCan = new LaserCan(53);
-                m_coralLeftLaserCan = new LaserCan(50);
-                m_leftMotor = new LinearMechanism(log, m_KrakenLeftMotor, new Talon6Encoder(log, m_KrakenLeftMotor), 16,
+                m_algaeMotor = algaeMotor;
+                m_rightLaser = new LaserCan(52);
+                m_frontLaser = new LaserCan(51);
+                m_backLaser = new LaserCan(53);
+                m_leftLaser = new LaserCan(50);
+                m_leftMech = new LinearMechanism(log, leftMotor, new Talon6Encoder(log, leftMotor), 16,
                         .1, -100000000, 1000000);
-                m_rightMotor = new LinearMechanism(log, m_KrakenRightMotor, new Talon6Encoder(log, m_KrakenRightMotor),
+                m_rightMech = new LinearMechanism(log, rightMotor, new Talon6Encoder(log, rightMotor),
                         16, .1, -100000000, 1000000);
-                m_algaeMotor = new LinearMechanism(log, m_KrakenAlgaeMotor, new Talon6Encoder(log, m_KrakenAlgaeMotor),
+                m_algaeMech = new LinearMechanism(log, algaeMotor, new Talon6Encoder(log, algaeMotor),
                         16, .1, -100000000, 1000000);
-
-                break;
-
-            default:
-                SimulatedBareMotor leftMotor = new SimulatedBareMotor(log, 100);
+            }
+            default -> {
+                BareMotor leftMotor = new SimulatedBareMotor(log, 100);
                 SimulatedBareEncoder leftEncoder = new SimulatedBareEncoder(log, leftMotor);
-                SimulatedBareMotor rightMotor = new SimulatedBareMotor(log, 100);
+                BareMotor rightMotor = new SimulatedBareMotor(log, 100);
                 SimulatedBareEncoder rightEncoder = new SimulatedBareEncoder(log, rightMotor);
-                SimulatedBareMotor algaeMotor = new SimulatedBareMotor(log, 100);
+                // simulated algae motor gets overloaded 2 sec after starting
+                BareMotor algaeMotor = new LazySimulatedBareMotor(
+                        new SimulatedBareMotor(log, 100), 2);
                 SimulatedBareEncoder algaeEncoder = new SimulatedBareEncoder(log, algaeMotor);
-                m_leftMotor = new LinearMechanism(
+                m_algaeMotor = algaeMotor;
+                m_leftMech = new LinearMechanism(
                         log, leftMotor, leftEncoder, 1, 1,
                         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_rightMotor = new LinearMechanism(
+                m_rightMech = new LinearMechanism(
                         log, rightMotor, rightEncoder, 1, 1,
                         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_algaeMotor = new LinearMechanism(
+                m_algaeMech = new LinearMechanism(
                         log, algaeMotor, algaeEncoder, 1, 1,
                         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_coralRightLaserCan = new LaserCan(52);
-                m_coralCenterLaserCan = new LaserCan(51);
-                m_coralBackLaserCan = new LaserCan(53);
-                m_coralLeftLaserCan = new LaserCan(50);
-                break;
-        }
-    }
-
-    public boolean isCoralClose(double distance) {
-        return distance < 100;
-    }
-
-    public void intakeCenter() {
-        if (isCoralClose(m_coralBackLaserCan.getMeasurement().distance_mm)) {
-            stopMotors();
-        } else {
-            m_algaeMotor.setDutyCycle(-0.5);
-            m_leftMotor.setDutyCycle(0.5);
-            m_rightMotor.setDutyCycle(0.5);
-        }
-    }
-
-    public void intakeSideways() {
-        if (isCoralClose(m_coralLeftLaserCan.getMeasurement().distance_mm)
-                && isCoralClose(m_coralRightLaserCan.getMeasurement().distance_mm)) {
-            stopMotors();
-        } else {
-            m_algaeMotor.setDutyCycle(-0.5);
-            if (isCoralClose(m_coralLeftLaserCan.getMeasurement().distance_mm)) {
-                m_leftMotor.setDutyCycle(0.5);
-                m_rightMotor.setDutyCycle(-0.5);
-            } else {
-                m_leftMotor.setDutyCycle(-0.5);
-                m_rightMotor.setDutyCycle(0.5);
+                m_rightLaser = new MockLaserCan();
+                m_frontLaser = new MockLaserCan();
+                m_backLaser = new MockLaserCan();
+                m_leftLaser = new MockLaserCan();
             }
         }
     }
 
+    public boolean isCoralClose(LaserCanInterface sensor) {
+        Measurement m = sensor.getMeasurement();
+        if (m == null)
+            return false;
+        return m.distance_mm < NEAR;
+    }
+
+    public void intakeCenter() {
+        if (hasCoral()) {
+            stopMotors();
+        } else {
+            m_algaeMech.setDutyCycle(-0.5);
+            m_leftMech.setDutyCycle(0.5);
+            m_rightMech.setDutyCycle(0.5);
+        }
+    }
+
+    public boolean hasCoral() {
+        return isCoralClose(m_backLaser);
+    }
+
+    public void ejectCenter() {
+        m_algaeMech.setDutyCycle(0.5);
+        m_leftMech.setDutyCycle(-0.5);
+        m_rightMech.setDutyCycle(-0.5);
+    }
+
+    public void intakeSideways() {
+        if (hasCoralSideways()) {
+            stopMotors();
+        } else {
+            m_algaeMech.setDutyCycle(-0.5);
+            if (isCoralClose(m_leftLaser)) {
+                m_leftMech.setDutyCycle(0.5);
+                m_rightMech.setDutyCycle(-0.5);
+            } else {
+                m_leftMech.setDutyCycle(-0.5);
+                m_rightMech.setDutyCycle(0.5);
+            }
+        }
+    }
+
+    public boolean hasCoralSideways() {
+        return isCoralClose(m_leftLaser) && isCoralClose(m_rightLaser);
+    }
+
     public void stopMotors() {
-        m_algaeMotor.setDutyCycle(0);
-        m_leftMotor.setDutyCycle(0);
-        m_rightMotor.setDutyCycle(0);
+        m_algaeMech.setDutyCycle(0);
+        m_leftMech.setDutyCycle(0);
+        m_rightMech.setDutyCycle(0);
     }
 
-    public void intakeAlgae() {
-        // if (m_algaeMotor.getCurrent() > 80) {
-        // m_algaeMotor.setDutyCycle(0.5);
-        // } else {
-        // m_algaeMotor.setDutyCycle(1);
-        // }
-        m_algaeMotor.setDutyCycle(1);
+    /**
+     * Current is high when the algae is in.
+     * (...and also at startup so include a delay.)
+     */
+    public boolean hasAlgae() {
+        return m_algaeMotor.getCurrent() > 80;
     }
 
+    /////////////////////////////////////////////////
+    //
+    // COMMANDS
+
+    /** This is not "hold position" it is "disable". */
     public Command stop() {
-        return run(this::stopMotors);
+        return startRun(this::lowAlgaeTorque, this::stopMotors);
     }
 
+    public Command algaeHold() {
+        return startRun(this::lowAlgaeTorque, this::intakeAlgae);
+    }
+
+    public Command algaeIntake() {
+        return startRun(this::highAlgaeTorque, this::intakeAlgae);
+    }
+
+    public Command algaeEject() {
+        return startRun(this::highAlgaeTorque, this::ejectAlgae);
+    }
+
+    public Command centerIntake() {
+        return run(this::intakeCenter);
+    }
+
+    public Command centerEject() {
+        return run(this::ejectCenter);
+    }
+
+    //////////////////////////////////////////////////
+
+    /**
+     * Set high current limits.
+     * Previous grip used 90A stator current, with a motor with kT of 0.018 Nm/amp,
+     * so 1.62 Nm.
+     */
+    private void highAlgaeTorque() {
+        m_algaeMotor.setTorqueLimit(1.65);
+    }
+
+    /**
+     * Set moderate current limits.
+     * Previous grip used 35A stator current, with a motor with kT of 0.018 Nm/amp,
+     * so 0.63 Nm.
+     */
+    private void lowAlgaeTorque() {
+        m_algaeMotor.setTorqueLimit(0.65);
+    }
+
+    private void intakeAlgae() {
+        m_algaeMech.setDutyCycle(1);
+    }
+
+    public void ejectAlgae() {
+        m_algaeMech.setDutyCycle(-0.1);
+    }
 }

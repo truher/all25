@@ -195,6 +195,11 @@ public abstract class CANSparkMotor implements BareMotor {
     }
 
     @Override
+    public double getCurrent() {
+        return m_current.getAsDouble();
+    }
+
+    @Override
     public void setEncoderPositionRad(double positionRad) {
         setEncoderPosition(positionRad / (2 * Math.PI));
     }
@@ -202,6 +207,12 @@ public abstract class CANSparkMotor implements BareMotor {
     @Override
     public void stop() {
         m_motor.stopMotor();
+    }
+
+    @Override
+    public void reset() {
+        m_encoder_position.reset();
+        m_encoder_velocity.reset();
     }
 
     @Override
@@ -225,6 +236,13 @@ public abstract class CANSparkMotor implements BareMotor {
      */
     public double getPositionRot() {
         return m_encoder_position.getAsDouble();
+    }
+
+    @Override
+    public double getPositionRad() {
+        double motorPositionRev = getPositionRot();
+        double positionRad = motorPositionRev * 2 * Math.PI;
+        return positionRad;
     }
 
     /**

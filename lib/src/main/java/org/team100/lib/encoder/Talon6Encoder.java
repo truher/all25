@@ -37,9 +37,7 @@ public class Talon6Encoder implements IncrementalBareEncoder {
      */
     @Override
     public OptionalDouble getPositionRad() {
-        double motorPositionRev = m_motor.getPositionRev();
-        double positionRad = motorPositionRev * 2 * Math.PI;
-        return OptionalDouble.of(positionRad);
+        return OptionalDouble.of(m_motor.getPositionRad());
     }
 
     @Override

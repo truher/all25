@@ -1,5 +1,6 @@
 package org.team100.frc2025;
 
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.print;
 
 import java.io.IOException;
@@ -11,25 +12,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
+import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
-import org.team100.frc2025.CommandGroups.GrabAlgaeL2Dumb;
-import org.team100.frc2025.CommandGroups.GrabAlgaeL3Dumb;
-import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
-import org.team100.frc2025.CommandGroups.ScoreBargeSmart;
+import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Elevator.ElevatorDefaultCommand;
 import org.team100.frc2025.Funnel.Funnel;
-import org.team100.frc2025.Funnel.FunnelDefault;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.Auton;
 import org.team100.frc2025.Wrist.AlgaeGrip;
-import org.team100.frc2025.Wrist.AlgaeGripDefaultCommand;
-import org.team100.frc2025.Wrist.AlgaeOuttakeGroup;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.frc2025.Wrist.WristDefaultCommand;
@@ -322,8 +318,7 @@ public class RobotContainer {
                 m_climberIntake.stop().withName("climber intake default"));
         m_elevator.setDefaultCommand(new ElevatorDefaultCommand(elevatorLog, m_elevator, m_wrist, m_grip, m_drive));
         m_wrist.setDefaultCommand(new WristDefaultCommand(elevatorLog, m_wrist, m_elevator, m_grip, m_drive));
-        m_grip.setDefaultCommand(new AlgaeGripDefaultCommand(m_grip));
-        m_funnel.setDefaultCommand(new FunnelDefault(m_funnel));
+
         m_manipulator.setDefaultCommand(
                 m_manipulator.stop().withName("manipulator default"));
 
@@ -335,18 +330,38 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        m_auton = new Auton(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
-                autoProfile, m_drive, localizer::setHeedRadiusM, m_swerveKinodynamics, viz).left();
+        /** fake arm to see what it needs to do. */
+        Placeholder placeholder = new Placeholder();
+
+        m_auton = new Auton(logger, placeholder, m_manipulator, m_wrist,
+                m_elevator, m_funnel, m_tunnel, m_grip,
+                autoController, autoProfile, m_drive,
+                localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
+                .left();
 
         whileTrue(driverControl::test,
-                new Auton(logger, m_wrist, m_elevator, m_funnel, m_tunnel, m_grip, autoController,
-                        autoProfile, m_drive, localizer::setHeedRadiusM, m_swerveKinodynamics, viz).right());
+                new Auton(logger, placeholder, m_manipulator, m_wrist,
+                        m_elevator, m_funnel, m_tunnel, m_grip,
+                        autoController, autoProfile, m_drive,
+                        localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
+                        .right());
 
         // Driver/Operator Buttons
         onTrue(driverControl::resetRotation0, new ResetPose(m_drive, new Pose2d()));
         onTrue(driverControl::resetRotation180, new SetRotation(m_drive, Rotation2d.kPi));
-        whileTrue(driverControl::feedFunnel,
-                RunFunnelHandoff.get(comLog, m_elevator, m_wrist, m_funnel, m_tunnel, m_grip));
+    
+        ////////////////////////////////////////////////////////////
+        // 
+        // PICK
+        //
+        whileTrue(driverControl::floorPick,
+                parallel(
+                        placeholder.pick(),
+                        m_manipulator.centerIntake()));
+        whileTrue(driverControl::stationPick,
+                parallel(
+                        placeholder.station(),
+                        m_manipulator.centerIntake()));
 
         ////////////////////////////////////////////////////////////
         //
@@ -377,26 +392,19 @@ public class RobotContainer {
                         holonomicController, profile, m_drive,
                         localizer::setHeedRadiusM, buttons::level, buttons::point));
 
-        whileTrue(buttons::ab,
-                GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::cd,
-                GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::ef,
-                GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::gh,
-                GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::ij,
-                GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::kl,
-                GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
+        // grab and hold algae, and then eject it when you let go of the button
+        whileTrue(buttons::algae,
+                GrabAndHoldAlgae.get(
+                        m_wrist, m_elevator, m_manipulator, buttons::algaeLevel))
+                .onFalse(m_manipulator.algaeEject().withTimeout(0.5));
 
-        whileTrue(buttons::red2,
-                AlgaeOuttakeGroup.get(m_grip, m_wrist, m_elevator));
-        whileTrue(buttons::red3,
-                new ScoreBargeSmart(m_elevator, m_wrist, m_grip, buttons::red4));
+        // these are all unbound
+        whileTrue(buttons::red2, print("red2"));
+        whileTrue(buttons::red3, print("red3"));
+        whileTrue(buttons::red4, print("red4"));
         whileTrue(buttons::barge, print("barge"));
 
-        whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeAlgae));
+        // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeAlgae));
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
 
@@ -460,18 +468,18 @@ public class RobotContainer {
         // TODO: remove
     }
 
-    private void whileTrue(BooleanSupplier condition, Command command) {
-        new Trigger(condition).whileTrue(command);
+    private Trigger whileTrue(BooleanSupplier condition, Command command) {
+        return new Trigger(condition).whileTrue(command);
     }
 
-    private void whileTrue(BooleanSupplier condition1, BooleanSupplier condition2, Command command) {
+    private Trigger whileTrue(BooleanSupplier condition1, BooleanSupplier condition2, Command command) {
         Trigger trigger1 = new Trigger(condition1);
         Trigger trigger2 = new Trigger(condition2);
-        trigger1.and(trigger2).whileTrue(command);
+        return trigger1.and(trigger2).whileTrue(command);
     }
 
-    private void onTrue(BooleanSupplier condition, Command command) {
-        new Trigger(condition).onTrue(command);
+    private Trigger onTrue(BooleanSupplier condition, Command command) {
+        return new Trigger(condition).onTrue(command);
     }
 
     public void scheduleAuton() {

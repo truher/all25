@@ -7,7 +7,6 @@ import static org.team100.lib.hid.ControlUtil.expo;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 
 /**
@@ -60,6 +59,18 @@ public class SimulatedJoystick implements DriverControl {
     @Override
     public boolean toReef() {
         return button(6);
+    }
+
+    @Override
+    public boolean stationPick() {
+        return button(9);
+
+    }
+
+    @Override
+    public boolean floorPick() {
+        return button(10);
+
     }
 
     @Override

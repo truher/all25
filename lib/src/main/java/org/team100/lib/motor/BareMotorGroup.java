@@ -32,6 +32,16 @@ public class BareMotorGroup implements BareMotor {
     }
 
     @Override
+    public double getPositionRad() {
+        return mean((m) -> m.getPositionRad());
+    }
+
+    @Override
+    public double getCurrent() {
+        return mean((m) -> m.getCurrent());
+    }
+
+    @Override
     public void setEncoderPositionRad(double positionRad) {
         apply((m) -> m.setEncoderPositionRad(positionRad));
     }
@@ -54,6 +64,11 @@ public class BareMotorGroup implements BareMotor {
     @Override
     public void stop() {
         apply((m) -> m.stop());
+    }
+
+    @Override
+    public void reset() {
+        apply((m) -> m.reset());
     }
 
     @Override

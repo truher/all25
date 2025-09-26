@@ -110,7 +110,11 @@ public interface DriverControl {
         return false;
     }
 
-    default boolean feedFunnel() {
+    default boolean floorPick() {
+        return false;
+    }
+
+    default boolean stationPick() {
         return false;
     }
 

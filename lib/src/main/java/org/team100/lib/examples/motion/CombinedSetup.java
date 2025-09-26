@@ -13,6 +13,6 @@ public class CombinedSetup {
         /**
          * Illustrates a short sequence: move, roll for 2 sec, move back.
          */
-        new Trigger(control::feedFunnel).whileTrue(SimpleSequence.get(log, rotary, openloop));
+        new Trigger(control::floorPick).whileTrue(SimpleSequence.get(log, rotary, openloop));
     }
 }

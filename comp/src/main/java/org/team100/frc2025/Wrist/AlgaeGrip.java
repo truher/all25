@@ -139,8 +139,16 @@ public class AlgaeGrip extends SubsystemBase  {
         m_motor.set(-dutyCycle);
     }
 
+    public void intakeAlgae() {
+        setDutyCycle(1.0);
+    }
+
+    public void ejectAlgae() {
+        setDutyCycle(-0.1);
+    }
+
     public void stop() {
-        // m_motor.setDutyCycle(0);
+        m_motor.set(0);
     }
 
     public void outtake() {
