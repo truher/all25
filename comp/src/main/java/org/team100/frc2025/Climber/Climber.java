@@ -1,10 +1,5 @@
 package org.team100.frc2025.Climber;
 
-import static edu.wpi.first.wpilibj2.command.Commands.parallel;
-import static org.team100.lib.hid.ControlUtil.deadband;
-
-import static edu.wpi.first.wpilibj2.command.Commands.*;
-
 import java.util.function.DoubleSupplier;
 
 import org.team100.lib.config.Feedforward100;
@@ -13,7 +8,6 @@ import org.team100.lib.config.PIDConstants;
 import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.encoder.AS5048RotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
-import org.team100.lib.encoder.IncrementalBareEncoder;
 import org.team100.lib.encoder.RotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
@@ -21,9 +15,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.OnboardAngularPositionServo;
-import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Falcon6Motor;
-import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
@@ -88,6 +80,10 @@ public class Climber extends SubsystemBase {
         return m_servo.atGoal();
     }
 
+    public double angle() {
+        return m_servo.getPosition().orElse(0);
+    }
+
     // COMMANDS
 
     public Command stop() {
@@ -101,11 +97,20 @@ public class Climber extends SubsystemBase {
                 () -> setDutyCycle(0));
     }
 
-    /** Use a profile to set position perpetually. */
-    public Command setPosition(double v) {
+    /** Push the climber out into the intake position. */
+    public Command goToIntakePosition() {
         return startRun(
+                // TODO: why do we need this reset?
                 () -> reset(),
-                () -> setAngle(v));
+                () -> setAngle(-Math.PI / 2));
+    }
+
+    /** Pull the climber in all the way to the climb position. */
+    public Command goToClimbPosition() {
+        return startRun(
+                // TODO: why do we need this reset?
+                () -> reset(),
+                () -> setAngle(0.53));
     }
 
     ////////////////////////////////

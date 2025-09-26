@@ -1,7 +1,6 @@
 package org.team100.lib.hid;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * Represents the HID used by the "driver" role, which typically focuses on
@@ -44,7 +43,6 @@ public interface DriverControl {
             double ratio = clamped / hyp;
             return new DriverControl.Velocity(ratio * x(), ratio * y(), theta());
         }
-
     }
 
     public enum Speed {
@@ -80,14 +78,6 @@ public interface DriverControl {
         return new Velocity(0, 0, 0);
     }
 
-    default Velocity verySlow() {
-        return new Velocity(0, 0, 0);
-    }
-
-    default double shooterPivot() {
-        return 0;
-    }
-
     /**
      * Absolute rotational input. This could be mapped to a turntable or a POV hat
      * or similar. Return null if the control should be ignored.
@@ -112,33 +102,43 @@ public interface DriverControl {
         return false;
     }
 
-    default boolean fullCycle() {
+    /**
+     * Drive to a scoring location at the reef. The specific location
+     * is chosen by the operator.
+     */
+    default boolean toReef() {
         return false;
     }
 
-    default Translation2d target() {
-        return null;
-    }
-
-    default boolean driveToObject() {
+    default boolean feedFunnel() {
         return false;
     }
 
-    default boolean driveToTag() {
+    /** Aim the front of the robot at the reef center. */
+    default boolean useReefLock() {
         return false;
     }
 
-    default boolean testTrajectory() {
+    /** Aim the back of the robot at the nearest station. */
+    default boolean driveWithBargeAssist() {
         return false;
     }
 
-    default boolean trigger() {
+    ////////////////////////////////////////////////////////////
+    //
+    // CLIMB
+    //
+    /**
+     * Pull climber in and drive forward.
+     */
+    default boolean climb() {
         return false;
     }
 
-    default boolean defense() {
-        return false;
-    }
+    ////////////////////////////////////////////////////////////
+    //
+    // These are for prototyping with Xbox controllers.
+    // Please don't use these for comp.
 
     default boolean test() {
         return false;
@@ -151,25 +151,6 @@ public interface DriverControl {
     default boolean button5() {
         return false;
     }
-
-    default boolean climb() {
-        return false;
-    }
-
-    default boolean feedFunnel() {
-        return false;
-    }
-
-    default boolean useReefLock() {
-        return false;
-    }
-
-    default boolean driveWithBargeAssist() {
-        return false;
-    }
-
-    // These are for prototyping with Xbox controllers.
-    // Please don't use these for comp.
 
     default boolean x() {
         return false;

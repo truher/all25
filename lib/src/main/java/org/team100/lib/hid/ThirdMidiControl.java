@@ -48,5 +48,4 @@ public class ThirdMidiControl implements ThirdControl {
     private boolean b(int b) {
         return m_controller.getRawButton(b);
     }
-
 }

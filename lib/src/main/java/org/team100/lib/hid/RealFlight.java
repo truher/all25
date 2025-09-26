@@ -83,11 +83,6 @@ public class RealFlight implements DriverControl {
     }
 
     @Override
-    public boolean fullCycle() {
-        return hid.getRawButton(4);
-    }
-
-    @Override
     public boolean resetRotation0() {
         return hid.getRawButton(1);
     }

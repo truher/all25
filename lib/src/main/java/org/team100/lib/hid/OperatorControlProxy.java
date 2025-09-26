@@ -45,20 +45,20 @@ public class OperatorControlProxy implements OperatorControl {
 
     private static OperatorControl getOperatorControl(String name) {
         if (name.contains("F310")) {
-            return new OperatorV2Control();
+            return new OperatorXboxControl();
         }
         if (name.contains("8Bit")) {
-            return new OperatorV2Control();
+            return new OperatorXboxControl();
         }
         if (name.contains("Xbox")) {
-            return new OperatorV2Control();
+            return new OperatorXboxControl();
         }
         if (name.startsWith("MSP430")) {
             // the old button board
             return new NoOperatorControl();
         }
         if (name.contains("Keyboard")) {
-            return new OperatorV2Control();
+            return new OperatorXboxControl();
         }
         return new NoOperatorControl();
     }
@@ -74,13 +74,13 @@ public class OperatorControlProxy implements OperatorControl {
     }
 
     @Override
-    public boolean elevate() {
-        return m_operatorControl.elevate();
+    public boolean activateManualClimb() {
+        return m_operatorControl.activateManualClimb();
     }
 
     @Override
-    public boolean activateManualClimb() {
-        return m_operatorControl.activateManualClimb();
+    public boolean climbIntake() {
+        return m_operatorControl.climbIntake();
     }
 
     @Override

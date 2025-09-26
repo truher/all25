@@ -2,6 +2,7 @@ package org.team100.lib.hid;
 
 import org.team100.lib.async.Async;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
+import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -83,8 +84,8 @@ public class ThirdControlProxy implements ThirdControl {
     }
 
     @Override
-    public ScoringLevel scoringPosition() {
-        return m_ThirdControl.scoringPosition();
+    public ScoringLevel level() {
+        return m_ThirdControl.level();
     }
 
     @Override
@@ -105,6 +106,11 @@ public class ThirdControlProxy implements ThirdControl {
     @Override
     public boolean l4() {
         return m_ThirdControl.l4();
+    }
+
+    @Override
+    public ReefPoint point() {
+        return m_ThirdControl.point();
     }
 
     @Override

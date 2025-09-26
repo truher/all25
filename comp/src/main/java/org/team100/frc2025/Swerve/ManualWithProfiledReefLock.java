@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
 import org.team100.lib.controller.simple.Feedback100;
+import org.team100.lib.field.FieldConstants;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.logging.Level;
@@ -41,6 +42,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
     private final SwerveKinodynamics m_swerveKinodynamics;
     private final SwerveDriveSubsystem m_drive;
 
+    /** lock rotation to reef center */
     private final Supplier<Boolean> m_lockToReef;
 
     private final Feedback100 m_thetaFeedback;
@@ -54,21 +56,13 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
     private final DoubleLogger m_log_theta_FF;
     private final DoubleLogger m_log_theta_FB;
     private final DoubleLogger m_log_output_omega;
+    /** lock rotation to nearest station */
     private final Supplier<Boolean> m_lockToFunnel;
     
     // package private for testing
     Rotation2d m_goal = null;
     Control100 m_thetaSetpoint = null;
 
-    /**
-     * 
-     * @param parent
-     * @param swerveKinodynamics
-     * @param desiredRotation    absolute input supplier, null if free. usually
-     *                           POV-derived.
-     * @param thetaController
-     * @param omegaController
-     */
     public ManualWithProfiledReefLock(
             LoggerFactory parent,
             SwerveKinodynamics swerveKinodynamics,

@@ -1,7 +1,7 @@
-package org.team100.frc2025.Swerve;
+package org.team100.lib.field;
 
 import org.junit.jupiter.api.Test;
-import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
+import org.team100.lib.field.FieldConstants.ReefPoint;
 
 public class SetpointsTest {
     @Test

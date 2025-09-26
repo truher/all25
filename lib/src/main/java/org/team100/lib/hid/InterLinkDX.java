@@ -89,11 +89,6 @@ public class InterLinkDX implements DriverControl {
     }
 
     @Override
-    public boolean fullCycle() {
-        return button(13);
-    }
-
-    @Override
     public boolean resetRotation0() {
         return button(14);
     }

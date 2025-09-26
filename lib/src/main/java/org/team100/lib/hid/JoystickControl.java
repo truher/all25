@@ -7,7 +7,6 @@ import static org.team100.lib.hid.ControlUtil.expo;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 
 /**
@@ -32,11 +31,6 @@ public abstract class JoystickControl implements DriverControl {
     @Override
     public String getHIDName() {
         return m_controller.getName();
-    }
-
-    @Override
-    public boolean fullCycle() {
-        return button(1);
     }
 
     @Override
@@ -89,32 +83,6 @@ public abstract class JoystickControl implements DriverControl {
             return null;
         }
         return Rotation2d.fromDegrees(-1.0 * desiredAngleDegrees);
-    }
-
-    /**
-     * For now, this knows the field-relative target.
-     */
-    @Override
-    public Translation2d target() {
-        if (m_controller.getRawButton(3)) {
-            // alternate target is closer to the left side
-            return new Translation2d(6, 4);
-        } else {
-            // default target is kinda mid-field
-            return new Translation2d(0.431985, 5.446929);
-        }
-
-        // return new Translation2d(0.431985, 5.446929);
-    }
-
-    @Override
-    public boolean trigger() {
-        return m_controller.getRawButton(4);
-    }
-
-    @Override
-    public boolean driveToObject() {
-        return m_controller.getRawButton(3);
     }
 
     private boolean button(int button) {

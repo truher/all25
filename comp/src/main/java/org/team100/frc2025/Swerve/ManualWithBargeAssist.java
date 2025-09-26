@@ -177,20 +177,25 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
         m_log_theta_FB.log(() -> thetaFB);
         m_log_output_omega.log(() -> omega);
 
-
         return twistWithSnapM_S;
     }
 
+    /**
+     * Slow down when driving toward the barge scoring location, so you don't hit
+     * it.
+     */
     public FieldRelativeVelocity clipAndScale(DriverControl.Velocity twist1_1) {
         // clip the input to the unit circle
         final DriverControl.Velocity clipped = twist1_1.clip(1.0);
-        
+
         double scale = 1;
 
-        if(clipped.x() > 0){
-            double distance = 7.2 - m_drive.getPose().getX();
-            scale = distance*scale;
-            
+        if (clipped.x() > 0) {
+            // x coordinate of the barge scoring location
+            double BARGE_X = 7.2;
+            double distance = BARGE_X - m_drive.getPose().getX();
+            scale = distance * scale;
+
             if (Math.abs(distance) < 0.01) {
                 scale = 0;
             } else {
@@ -200,15 +205,13 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
             scale = 1;
         }
 
-        if(scale >= 0.5){
+        if (scale >= 0.5) {
             scale = 0.5;
         }
 
-        
-       
         DriverControl.Velocity scaled;
 
-        if(clipped.x() > 0){
+        if (clipped.x() > 0) {
             scaled = new DriverControl.Velocity(scale, clipped.y(), clipped.theta());
         } else {
             scaled = new DriverControl.Velocity(clipped.x(), clipped.y(), clipped.theta());

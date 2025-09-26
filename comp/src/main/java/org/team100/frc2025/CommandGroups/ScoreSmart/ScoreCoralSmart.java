@@ -9,12 +9,12 @@ import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
 import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Swerve.FieldConstants;
-import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.field.FieldConstants;
+import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
@@ -31,29 +31,28 @@ public class ScoreCoralSmart {
             Wrist2 wrist,
             Elevator elevator,
             CoralTunnel tunnel,
-            Supplier<ScoringLevel> level,
             SwerveController controller,
             HolonomicProfile profile,
-            SwerveDriveSubsystem m_drive,
+            SwerveDriveSubsystem drive,
             DoubleConsumer heedRadiusM,
-            ReefPoint point) {
-        Supplier<Pose2d> goal = () -> FieldConstants.makeGoal(level.get(), point);
+            Supplier<ScoringLevel> level,
+            Supplier<ReefPoint> point) {
+        Supplier<Pose2d> goal = () -> FieldConstants.makeGoal(level.get(), point.get());
         return parallel(
                 runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
-                select(
-                        Map.ofEntries(
-                                Map.entry(
-                                        ScoringLevel.L4,
-                                        ScoreL4Smart.get(logger, wrist, elevator, tunnel,
-                                                controller, profile, m_drive, goal)),
-                                Map.entry(
-                                        ScoringLevel.L3,
-                                        ScoreL3Smart.get(logger, wrist, elevator, tunnel,
-                                                controller, profile, m_drive, goal)),
-                                Map.entry(
-                                        ScoringLevel.L2,
-                                        ScoreL2Smart.get(logger, wrist, elevator, tunnel,
-                                                controller, profile, m_drive, goal))),
+                select(Map.ofEntries(
+                        Map.entry(ScoringLevel.L4,
+                                ScoreL4Smart.get(logger, wrist, elevator,
+                                        tunnel, controller, profile,
+                                        drive, goal)),
+                        Map.entry(ScoringLevel.L3,
+                                ScoreL3Smart.get(logger, wrist, elevator,
+                                        tunnel, controller, profile,
+                                        drive, goal)),
+                        Map.entry(ScoringLevel.L2,
+                                ScoreL2Smart.get(logger, wrist, elevator,
+                                        tunnel, controller, profile,
+                                        drive, goal))),
                         level));
     }
 }
