@@ -148,8 +148,9 @@ public class LoggerFactory {
         public void log(Supplier<Double> vals) {
             if (!allow(m_level))
                 return;
-            double val = vals.get();
-            m_primitiveLogger.log(val);
+            Double val = vals.get();
+            if (val != null)
+                m_primitiveLogger.log(val.doubleValue());
         }
     }
 

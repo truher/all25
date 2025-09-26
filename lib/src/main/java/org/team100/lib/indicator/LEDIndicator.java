@@ -55,7 +55,8 @@ public class LEDIndicator {
      * Periodic does all the real work in this class.
      */
     public void periodic() {
-        if (m_timeSinceLastPose.get() < 1) {
+        Double v = m_timeSinceLastPose.get();
+        if (v != null && v < 1) {
             m_led.setData(m_greenBuffer);
         } else {
             m_led.setData(m_redBuffer);
