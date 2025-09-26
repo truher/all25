@@ -66,6 +66,11 @@ public class BareMotorController100 implements BareMotor {
     }
 
     @Override
+    public void reset() {
+        //
+    }
+
+    @Override
     public void close() {
         // m_motor.close();
     }
@@ -73,6 +78,16 @@ public class BareMotorController100 implements BareMotor {
     /** MotorControllers do not support velocity measurement. */
     @Override
     public double getVelocityRad_S() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double getPositionRad() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double getCurrent() {
         throw new UnsupportedOperationException();
     }
 

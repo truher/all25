@@ -6,7 +6,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Wrist.AlgaeGrip;
-import org.team100.frc2025.Wrist.CheckFunnelDanger;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.lib.logging.LoggerFactory;
@@ -23,7 +22,6 @@ public class RunFunnelHandoff {
             CoralTunnel tunnel,
             AlgaeGrip grip) {
         return sequence(
-                new CheckFunnelDanger(wrist, elevator),
                 parallel(
                         wrist.set(0.1).until(wrist::atGoal),
                         elevator.setNoGravity(0.1).until(elevator::atGoal)),

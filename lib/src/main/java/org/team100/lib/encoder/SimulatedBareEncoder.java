@@ -5,19 +5,19 @@ import java.util.OptionalDouble;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
-import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.motor.BareMotor;
 import org.team100.lib.util.Util;
 
 public class SimulatedBareEncoder implements IncrementalBareEncoder {
     private static final boolean DEBUG = false;
-    private final SimulatedBareMotor m_motor;
+    private final BareMotor m_motor;
 
     private OptionalDoubleLogger m_log_position;
     private OptionalDoubleLogger m_log_velocity;
 
     public SimulatedBareEncoder(
             LoggerFactory parent,
-            SimulatedBareMotor motor) {
+            BareMotor motor) {
         LoggerFactory child = parent.type(this);
         m_motor = motor;
         m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (rad)");

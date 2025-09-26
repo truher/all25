@@ -9,6 +9,9 @@ public interface BareMotor {
 
     /**
      * Some motors allow torque limiting through current limiting.
+     * 
+     * NOTE! Changing current limits can be a slow operation, so don't do this too
+     * often.
      */
     void setTorqueLimit(double torqueNm);
 
@@ -39,6 +42,16 @@ public interface BareMotor {
      * Motor shaft speed.
      */
     double getVelocityRad_S();
+
+    /**
+     * Value should be updated in Robot.robotPeriodic().
+     * 
+     * Motor shaft position.
+     */
+    double getPositionRad();
+
+    /** Motor stator current in amps. */
+    double getCurrent();
 
     void setEncoderPositionRad(double positionRad);
 
@@ -80,6 +93,9 @@ public interface BareMotor {
 
     /** This is not "hold position" this is "torque off". */
     void stop();
+
+    /** Reset the cache. */
+    void reset();
 
     /**
      * For test cleanup.

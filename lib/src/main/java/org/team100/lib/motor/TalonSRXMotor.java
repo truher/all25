@@ -65,6 +65,11 @@ public class TalonSRXMotor implements BareMotor {
     }
 
     @Override
+    public void reset() {
+        //
+    }
+
+    @Override
     public void close() {
         // SRX doesn't support close()
     }
@@ -74,6 +79,11 @@ public class TalonSRXMotor implements BareMotor {
         m_log_supply.log(m_motor::getSupplyCurrent);
         m_log_stator.log(m_motor::getStatorCurrent);
         m_log_duty.log(m_motor::getMotorOutputPercent);
+    }
+
+    @Override
+    public double getCurrent() {
+        return m_motor.getStatorCurrent();
     }
 
     // unsupported methods
@@ -86,6 +96,11 @@ public class TalonSRXMotor implements BareMotor {
     @Override
     public double getVelocityRad_S() {
         throw new UnsupportedOperationException("TalonSRX cannot report velocity.");
+    }
+
+    @Override
+    public double getPositionRad() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

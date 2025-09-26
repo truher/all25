@@ -129,6 +129,13 @@ public class SimulatedBareMotor implements BareMotor {
         return m_stateCache.get().v();
     }
 
+    @Override
+    public double getCurrent() {
+        // this is totally wrong
+        // TODO: some sort of torque model?
+        return getVelocityRad_S() / 10.0;
+    }
+
     public double getPositionRad() {
         double pos = m_stateCache.get().x();
         if (Double.isNaN(pos))

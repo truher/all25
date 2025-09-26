@@ -64,6 +64,20 @@ public class LazySimulatedBareMotor implements BareMotor {
     }
 
     @Override
+    public double getPositionRad() {
+        return m_delegate.getPositionRad();
+    }
+
+    @Override
+    public double getCurrent() {
+        // running means low current
+        if (m_running)
+            return 10;
+        // not running because the torque (thus current) required is higher
+        return 100;
+    }
+
+    @Override
     public void setEncoderPositionRad(double positionRad) {
         m_delegate.setEncoderPositionRad(positionRad);
     }
@@ -87,6 +101,11 @@ public class LazySimulatedBareMotor implements BareMotor {
     public void stop() {
         m_running = false;
         m_delegate.stop();
+    }
+
+    @Override
+    public void reset() {
+        m_delegate.reset();
     }
 
     @Override

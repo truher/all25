@@ -43,10 +43,7 @@ public class CANSparkEncoder implements IncrementalBareEncoder {
      */
     @Override
     public OptionalDouble getPositionRad() {
-        // raw position is in rotations
-        double motorPositionRev = m_motor.getPositionRot();
-        double positionRad = motorPositionRev * 2 * Math.PI;
-        return OptionalDouble.of(positionRad);
+        return OptionalDouble.of(m_motor.getPositionRad());
     }
 
     /**
