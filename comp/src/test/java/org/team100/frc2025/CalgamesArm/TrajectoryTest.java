@@ -2,7 +2,6 @@ package org.team100.frc2025.CalgamesArm;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -14,6 +13,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
+/**
+ * These pop up GUI windows, so leave them commented out when you check in.
+ */
 public class TrajectoryTest {
 
     /**
@@ -22,7 +24,7 @@ public class TrajectoryTest {
      * TrajectoryPlanner.restToRest() has several overloads: the one that takes
      * two non-holonomic poses draws a straight line between them.
      */
-    @Test
+    // @Test
     void testSimple() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(1, 0.1),
@@ -44,7 +46,7 @@ public class TrajectoryTest {
      * In this case, is facing +x, and moving +x, and it ends up moving +y but
      * facing the other way (i.e. backwards)
      */
-    @Test
+    // @Test
     void testCurved() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(2, 0.5),
@@ -64,7 +66,7 @@ public class TrajectoryTest {
      * specifying many such points will make the curve harder to calculate and
      * harder to make smooth.
      */
-    @Test
+    // @Test
     void testMultipleWaypoints() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(2, 0.5),
@@ -83,47 +85,52 @@ public class TrajectoryTest {
     }
 
     /** Example of using a trajectory library for 2025 scoring paths */
-    @Test
+    // @Test
     void testPickupToPlace() {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(2, 0.5),
                 new YawRateConstraint(1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
         List<HolonomicPose2d> waypoints = List.of(
+                // pickup
                 new HolonomicPose2d(
-                        new Translation2d(1, 0.1), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //pickup
+                        new Translation2d(1, 0.1), new Rotation2d(-Math.PI), new Rotation2d(Math.PI / 2)),
+                // place for gateway point?
                 new HolonomicPose2d(
-                        new Translation2d(3, 7), new Rotation2d(Math.PI/2), new Rotation2d()), //place for gateway point?
+                        new Translation2d(3, 7), new Rotation2d(Math.PI / 2), new Rotation2d()),
                 new HolonomicPose2d(
-                        new Translation2d(6, 9), new Rotation2d(-((7*Math.PI)/36)), new Rotation2d(Math.PI / 2)));
+                        new Translation2d(6, 9), new Rotation2d(-((7 * Math.PI) / 36)), new Rotation2d(Math.PI / 2)));
         Trajectory100 t = p.restToRest(waypoints);
-        // TrajectoryPlotter.plot(t, "simple");    
+        // TrajectoryPlotter.plot(t, "simple");
     }
 
-    @Test
+    // @Test
     void testSingularityDemo() {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(2, 0.5),
                 new YawRateConstraint(1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
         List<HolonomicPose2d> waypoints = List.of(
+                // pickup
                 new HolonomicPose2d(
-                        new Translation2d(1, 0.1), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //pickup
+                        new Translation2d(1, 0.1), new Rotation2d(-Math.PI), new Rotation2d(Math.PI / 2)),
+                // place for gateway point
                 new HolonomicPose2d(
-                        new Translation2d(0.75, 3), new Rotation2d(-Math.PI), new Rotation2d(Math.PI/2)), //place for gateway point
+                        new Translation2d(0.75, 3), new Rotation2d(-Math.PI), new Rotation2d(Math.PI / 2)),
+                // place for gateway point
                 new HolonomicPose2d(
-                        new Translation2d(3, 7), new Rotation2d(Math.PI/2), new Rotation2d()), //place for gateway point
+                        new Translation2d(3, 7), new Rotation2d(Math.PI / 2), new Rotation2d()),
                 new HolonomicPose2d(
-                        new Translation2d(6, 9), new Rotation2d(-((7*Math.PI)/36)), new Rotation2d(Math.PI / 2)));
+                        new Translation2d(6, 9), new Rotation2d(-((7 * Math.PI) / 36)), new Rotation2d(Math.PI / 2)));
         Trajectory100 t = p.restToRest(waypoints);
-        // TrajectoryPlotter.plot(t, "simple");    
+        // TrajectoryPlotter.plot(t, "simple");
     }
 
     /** Example of using a trajectory library. */
-    @Test
+    // @Test
     void testExample() throws InterruptedException {
         TrajectoryExample e = new TrajectoryExample();
-        // new TrajectoryPlotter(0.1).plot(e.pickToL4(), "pick to L4, X UP");
+        new TrajectoryPlotter(0.1).plot(e.pickToL4(), "pick to L4, X UP");
         new TrajectoryPlotter(0.1).plot(e.pickToL3(), "pick to L3, X UP");
         new TrajectoryPlotter(0.1).plot(e.pickToL2(), "pick to L2, X UP");
         new TrajectoryPlotter(0.1).plot(e.pickToL1(), "pick to L1, X UP");
