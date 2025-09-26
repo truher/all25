@@ -1,4 +1,4 @@
-package org.team100.trajectory_visualizer;
+package org.team100.frc2025.CalgamesArm;
 
 import org.jfree.data.xy.VectorSeries;
 import org.team100.lib.geometry.Pose2dWithMotion;

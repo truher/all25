@@ -1,4 +1,4 @@
-package org.team100.trajectory_visualizer;
+package org.team100.frc2025.CalgamesArm;
 
 import java.awt.Dimension;
 

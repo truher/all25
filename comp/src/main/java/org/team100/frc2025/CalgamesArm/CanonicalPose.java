@@ -1,4 +1,4 @@
-package org.team100.trajectory_visualizer;
+package org.team100.frc2025.CalgamesArm;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

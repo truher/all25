@@ -1,4 +1,4 @@
-package org.team100.frc2025.CalgamesArmTests;
+package org.team100.frc2025.CalgamesArm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
