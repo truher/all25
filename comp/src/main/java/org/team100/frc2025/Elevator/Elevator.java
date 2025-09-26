@@ -29,7 +29,6 @@ public class Elevator extends SubsystemBase {
      * Publish the elevator mechanism visualization to glass. This might be a little
      * bit slow, turn it off for comp.
      */
-    private static final boolean VISUALIZE = true;
     private static final double ELEVATOR_MAXIMUM_POSITION = 56.0;
     private static final double ELEVATOR_MINIMUM_POSITION = 0.0;
     private static final double ELEVATOR_REDUCTION = 2;
@@ -42,8 +41,6 @@ public class Elevator extends SubsystemBase {
 
     private final OutboardLinearPositionServo m_starboardServo;
     private final OutboardLinearPositionServo m_portServo;
-
-    private final Runnable m_viz;
 
     private boolean m_isSafe = false;
 
@@ -89,12 +86,7 @@ public class Elevator extends SubsystemBase {
         }
         m_starboardServo.reset();
         m_portServo.reset();
-        if (VISUALIZE) {
-            m_viz = new ElevatorVisualization(this);
-        } else {
-            m_viz = () -> {
-            };
-        }
+
     }
 
     private static OutboardLinearPositionServo makeServo(
@@ -189,7 +181,6 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         m_starboardServo.periodic();
         m_portServo.periodic();
-        m_viz.run();
     }
 
     // OBSERVERS

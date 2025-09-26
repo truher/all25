@@ -20,15 +20,11 @@ import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Elevator.ElevatorDefaultCommand;
-import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.Auton;
-import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
-import org.team100.frc2025.Wrist.WristDefaultCommand;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
@@ -125,11 +121,9 @@ public class RobotContainer {
     final Wrist2 m_wrist;
     final Climber m_climber;
     final ClimberIntake m_climberIntake;
-    final Funnel m_funnel;
     // final LEDIndicator m_leds;
 
     final CoralTunnel m_tunnel;
-    final AlgaeGrip m_grip;
     final SwerveKinodynamics m_swerveKinodynamics;
 
     private final ScheduledExecutorService m_initializer;
@@ -167,8 +161,6 @@ public class RobotContainer {
             m_elevator = new Elevator(elevatorLog, 11, 19);
             m_wrist = new Wrist2(elevatorLog, 9, m_elevator::getSetpointAcceleration);
             m_tunnel = new CoralTunnel(elevatorLog, 3, 25);
-            m_funnel = new Funnel(logger, 23, 14);
-            m_grip = new AlgaeGrip(logger, m_tunnel);
             m_climber = new Climber(logger, 15);
 
             // put in 0 as placeholder
@@ -178,10 +170,8 @@ public class RobotContainer {
         } else {
             m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
             m_tunnel = new CoralTunnel(elevatorLog, 3, 25);
-            m_grip = new AlgaeGrip(logger, m_tunnel);
             m_elevator = new Elevator(elevatorLog, 2, 19);
             m_wrist = new Wrist2(elevatorLog, 9, m_elevator::getSetpointAcceleration);
-            m_funnel = new Funnel(logger, 23, 14);
             m_climber = new Climber(logger, 18);
             m_manipulator = new Manipulator(logger);
 
@@ -316,8 +306,7 @@ public class RobotContainer {
                 m_climber.stop().withName("climber default"));
         m_climberIntake.setDefaultCommand(
                 m_climberIntake.stop().withName("climber intake default"));
-        m_elevator.setDefaultCommand(new ElevatorDefaultCommand(elevatorLog, m_elevator, m_wrist, m_grip, m_drive));
-        m_wrist.setDefaultCommand(new WristDefaultCommand(elevatorLog, m_wrist, m_elevator, m_grip, m_drive));
+            
 
         m_manipulator.setDefaultCommand(
                 m_manipulator.stop().withName("manipulator default"));
@@ -334,14 +323,14 @@ public class RobotContainer {
         Placeholder placeholder = new Placeholder();
 
         m_auton = new Auton(logger, placeholder, m_manipulator, m_wrist,
-                m_elevator, m_funnel, m_tunnel, m_grip,
+                m_elevator, m_tunnel,
                 autoController, autoProfile, m_drive,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                 .left();
 
         whileTrue(driverControl::test,
                 new Auton(logger, placeholder, m_manipulator, m_wrist,
-                        m_elevator, m_funnel, m_tunnel, m_grip,
+                        m_elevator, m_tunnel,
                         autoController, autoProfile, m_drive,
                         localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                         .right());
