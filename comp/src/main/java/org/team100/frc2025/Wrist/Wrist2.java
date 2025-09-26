@@ -60,7 +60,7 @@ public class Wrist2 extends SubsystemBase {
     private final RotaryMechanism m_wristMech;
     private final Torque m_gravityAndSpringTorque;
     private final BooleanLogger m_log_safe;
-    private final Runnable m_viz;
+
 
     private boolean m_isSafe = false;
 
@@ -132,19 +132,14 @@ public class Wrist2 extends SubsystemBase {
 
         }
         m_wristServo.reset();
-        if (VISUALIZE) {
-            m_viz = new WristVisualization(this);
-        } else {
-            m_viz = () -> {
-            };
-        }
+
     }
 
     @Override
     public void periodic() {
         m_wristServo.periodic();
         m_log_safe.log(() -> m_isSafe);
-        m_viz.run();
+
     }
 
     public void resetWristProfile() {

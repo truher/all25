@@ -18,8 +18,6 @@ import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
 import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Funnel.Funnel;
-import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.frc2025.grip.Manipulator;
@@ -41,8 +39,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 // it's a record to make it less verbose
 public record Auton(LoggerFactory logger, Placeholder placeholder,
         Manipulator manipulator, Wrist2 wrist,
-        Elevator elevator, Funnel funnel, CoralTunnel tunnel,
-        AlgaeGrip grip, SwerveController controller, HolonomicProfile profile,
+        Elevator elevator, CoralTunnel tunnel,
+        SwerveController controller, HolonomicProfile profile,
         SwerveDriveSubsystem drive,
         DoubleConsumer heedRadiusM, SwerveKinodynamics kinodynamics,
         TrajectoryVisualization viz) {

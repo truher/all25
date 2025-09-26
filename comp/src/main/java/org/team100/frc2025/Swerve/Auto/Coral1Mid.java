@@ -9,8 +9,6 @@ import java.util.function.DoubleConsumer;
 import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
 import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Funnel.Funnel;
-import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
@@ -34,9 +32,7 @@ public class Coral1Mid {
             LoggerFactory logger,
             Wrist2 wrist,
             Elevator elevator,
-            Funnel funnel,
             CoralTunnel tunnel,
-            AlgaeGrip grip,
             SwerveController controller,
             HolonomicProfile profile,
             SwerveDriveSubsystem drive,
