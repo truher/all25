@@ -1,4 +1,4 @@
-package org.team100.frc2025.Wrist;
+package org.team100.frc2025.grip;
 
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
@@ -7,13 +7,12 @@ import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.Talon6Encoder;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.LinearMechanism;
-import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import au.grapplerobotics.LaserCan;
-import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Manipulator extends SubsystemBase {
@@ -79,7 +78,7 @@ public class Manipulator extends SubsystemBase {
 
     public void intakeCenter() {
         if (isCoralClose(m_coralBackLaserCan.getMeasurement().distance_mm)) {
-            stop();
+            stopMotors();
         } else {
             m_algaeMotor.setDutyCycle(-0.5);
             m_leftMotor.setDutyCycle(0.5);
@@ -90,7 +89,7 @@ public class Manipulator extends SubsystemBase {
     public void intakeSideways() {
         if (isCoralClose(m_coralLeftLaserCan.getMeasurement().distance_mm)
                 && isCoralClose(m_coralRightLaserCan.getMeasurement().distance_mm)) {
-            stop();
+            stopMotors();
         } else {
             m_algaeMotor.setDutyCycle(-0.5);
             if (isCoralClose(m_coralLeftLaserCan.getMeasurement().distance_mm)) {
@@ -103,19 +102,23 @@ public class Manipulator extends SubsystemBase {
         }
     }
 
-    public void stop() {
+    public void stopMotors() {
         m_algaeMotor.setDutyCycle(0);
         m_leftMotor.setDutyCycle(0);
         m_rightMotor.setDutyCycle(0);
     }
 
     public void intakeAlgae() {
-//         if (m_algaeMotor.getCurrent() > 80) {
-//             m_algaeMotor.setDutyCycle(0.5);
-//         } else {
-//             m_algaeMotor.setDutyCycle(1);
-//         }
+        // if (m_algaeMotor.getCurrent() > 80) {
+        // m_algaeMotor.setDutyCycle(0.5);
+        // } else {
+        // m_algaeMotor.setDutyCycle(1);
+        // }
         m_algaeMotor.setDutyCycle(1);
+    }
+
+    public Command stop() {
+        return run(this::stopMotors);
     }
 
 }

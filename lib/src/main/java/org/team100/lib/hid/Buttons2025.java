@@ -1,7 +1,9 @@
 package org.team100.lib.hid;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
+import org.team100.lib.field.FieldConstants.ReefPoint;
+
+import edu.wpi.first.wpilibj.GenericHID;
 
 public class Buttons2025 implements ThirdControl {
     private final GenericHID m_controller;
@@ -41,14 +43,14 @@ public class Buttons2025 implements ThirdControl {
     }
 
     @Override
-    public ScoringLevel scoringPosition(){
-        if(l1()){
+    public ScoringLevel level() {
+        if (l1()) {
             return ScoringLevel.L1;
-        } else if(l2()){
+        } else if (l2()) {
             return ScoringLevel.L2;
-        } else if(l3()){
+        } else if (l3()) {
             return ScoringLevel.L3;
-        } else if(l4()){
+        } else if (l4()) {
             return ScoringLevel.L4;
         }
 
@@ -73,6 +75,47 @@ public class Buttons2025 implements ThirdControl {
     @Override
     public boolean l4() {
         return m_controller.getRawButton(4);
+    }
+
+    @Override
+    public ReefPoint point() {
+        if (a())
+            return ReefPoint.A;
+        if (b())
+            return ReefPoint.B;
+        if (c())
+            return ReefPoint.C;
+        if (d())
+            return ReefPoint.D;
+        if (e())
+            return ReefPoint.E;
+        if (f())
+            return ReefPoint.F;
+        if (g())
+            return ReefPoint.G;
+        if (h())
+            return ReefPoint.H;
+        if (i())
+            return ReefPoint.I;
+        if (j())
+            return ReefPoint.J;
+        if (k())
+            return ReefPoint.K;
+        if (l())
+            return ReefPoint.L;
+        if (ab())
+            return ReefPoint.AB;
+        if (cd())
+            return ReefPoint.CD;
+        if (ef())
+            return ReefPoint.EF;
+        if (gh())
+            return ReefPoint.GH;
+        if (ij())
+            return ReefPoint.IJ;
+        if (kl())
+            return ReefPoint.KL;
+        return ReefPoint.NONE;
     }
 
     @Override

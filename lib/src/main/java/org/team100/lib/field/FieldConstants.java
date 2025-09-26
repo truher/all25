@@ -1,4 +1,4 @@
-package org.team100.frc2025.Swerve;
+package org.team100.lib.field;
 
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 
@@ -35,7 +35,7 @@ public class FieldConstants {
      * between poles, for algae.
      */
     public enum ReefPoint {
-        A, B, C, D, E, F, G, H, I, J, K, L, AB, CD, EF, GH, IJ, KL;
+        A, B, C, D, E, F, G, H, I, J, K, L, AB, CD, EF, GH, IJ, KL, NONE;
 
         /** Direction away from each reef face. */
         Rotation2d angle() {
@@ -46,6 +46,7 @@ public class FieldConstants {
                 case G, H, GH -> Rotation2d.fromDegrees(0);
                 case I, J, IJ -> Rotation2d.fromDegrees(60);
                 case K, L, KL -> Rotation2d.fromDegrees(120);
+                case NONE -> Rotation2d.kZero;
                 default -> throw new IllegalArgumentException();
             };
         }
@@ -101,6 +102,7 @@ public class FieldConstants {
             case A, C, E, G, I, K -> center.minus(d);
             case B, D, F, H, J, L -> center.plus(d);
             case AB, CD, EF, GH, IJ, KL -> center;
+            case NONE -> center;
             default -> throw new IllegalArgumentException();
         };
     }
@@ -116,11 +118,13 @@ public class FieldConstants {
             case L1 -> switch (letter) {
                 case A, B, C, D, E, F, G, H, I, J, K, L -> 3;
                 case AB, CD, EF, GH, IJ, KL -> 1.2;
+                case NONE -> 3.0;
                 default -> throw new IllegalArgumentException("invalid point");
             };
             case L2 -> switch (letter) {
                 case A, B, C, D, E, F, G, H, I, J, K, L -> 1.295;
                 case AB, CD, EF, GH, IJ, KL -> 1.2;
+                case NONE -> 3.0;
                 default -> throw new IllegalArgumentException("invalid point");
             };
             case L3 -> switch (letter) {
@@ -147,6 +151,7 @@ public class FieldConstants {
                 case K -> 1.34;
                 case KL -> 1.2;
                 case L -> 1.34;
+                case NONE -> 3.0;
                 default -> throw new IllegalArgumentException("invalid point");
             };
             case L4 -> switch (letter) {
@@ -173,6 +178,7 @@ public class FieldConstants {
                 case K -> 1.43;
                 case KL -> 1.2;
                 case L -> 1.43;
+                case NONE -> 3.0;
                 default -> throw new IllegalArgumentException("invalid point");
             };
             case NONE -> 3.0;

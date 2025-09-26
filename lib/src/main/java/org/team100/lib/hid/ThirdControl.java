@@ -1,5 +1,7 @@
 package org.team100.lib.hid;
+
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
+import org.team100.lib.field.FieldConstants.ReefPoint;
 
 /**
  * Represents a third control beyond the driver and operator, for example, knobs
@@ -33,7 +35,7 @@ public interface ThirdControl {
 
     // Coral Scoring Levels
 
-    default ScoringLevel scoringPosition() {
+    default ScoringLevel level() {
         return ScoringLevel.NONE;
     }
 
@@ -54,6 +56,10 @@ public interface ThirdControl {
     }
 
     // Coral Scoring
+
+    default ReefPoint point() {
+        return ReefPoint.NONE;
+    }
 
     default boolean a() {
         return false;

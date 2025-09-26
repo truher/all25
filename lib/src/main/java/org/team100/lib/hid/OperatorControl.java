@@ -13,18 +13,37 @@ public interface OperatorControl {
         return "No HID Found!!";
     }
 
+    ////////////////////////////////////////////////////////////
+    //
+    // CLIMB
+    //
+
+    /**
+     * Activate manual control of winch duty cycle.
+     * For resetting the climber position.
+     */
     default boolean activateManualClimb() {
         return false;
     }
 
+    /**
+     * Set winch duty cycle directly.
+     * For resetting the climber position.
+     */
     default double manualClimbSpeed() {
         return 0.0;
     }
 
-    /** placeholder for elevator development */
-    default boolean elevate() {
+    /**
+     * Extend and spin climber for intake.
+     */
+    default boolean climbIntake() {
         return false;
     }
+
+    //
+    //
+    //
 
     default boolean intake() {
         return false;
@@ -33,9 +52,4 @@ public interface OperatorControl {
     default boolean outtake() {
         return false;
     }
-
-    default boolean setWrist() {
-        return false;
-    }
-
 }

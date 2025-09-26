@@ -1,9 +1,6 @@
 package org.team100.frc2025;
 
-import static edu.wpi.first.wpilibj2.command.Commands.parallel;
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
-import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
+import static edu.wpi.first.wpilibj2.command.Commands.print;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +12,9 @@ import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.Climber.Climber;
+import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
+import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.CommandGroups.GrabAlgaeL2Dumb;
 import org.team100.frc2025.CommandGroups.GrabAlgaeL3Dumb;
 import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
@@ -25,9 +24,6 @@ import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Elevator.ElevatorDefaultCommand;
 import org.team100.frc2025.Funnel.Funnel;
 import org.team100.frc2025.Funnel.FunnelDefault;
-import org.team100.frc2025.Funnel.ReleaseFunnel;
-import org.team100.frc2025.Swerve.FieldConstants;
-import org.team100.frc2025.Swerve.FieldConstants.ReefPoint;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.Auton;
@@ -35,23 +31,15 @@ import org.team100.frc2025.Wrist.AlgaeGrip;
 import org.team100.frc2025.Wrist.AlgaeGripDefaultCommand;
 import org.team100.frc2025.Wrist.AlgaeOuttakeGroup;
 import org.team100.frc2025.Wrist.CoralTunnel;
-import org.team100.frc2025.Wrist.Manipulator;
-import org.team100.frc2025.Wrist.ManipulatorDefault;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.frc2025.Wrist.WristDefaultCommand;
+import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.commands.drivetrain.ResetPose;
 import org.team100.lib.commands.drivetrain.SetRotation;
-import org.team100.lib.commands.drivetrain.manual.DriveManually;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
-import org.team100.lib.commands.drivetrain.manual.ManualChassisSpeeds;
-import org.team100.lib.commands.drivetrain.manual.ManualFieldRelativeSpeeds;
-import org.team100.lib.commands.drivetrain.manual.ManualWithFullStateHeading;
-import org.team100.lib.commands.drivetrain.manual.ManualWithProfiledHeading;
-import org.team100.lib.commands.drivetrain.manual.ManualWithTargetLock;
-import org.team100.lib.commands.drivetrain.manual.SimpleManualModuleStates;
 import org.team100.lib.commands.r3.FollowTrajectory;
 import org.team100.lib.commands.r3.SubsystemR3;
 import org.team100.lib.config.Camera;
@@ -62,6 +50,7 @@ import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.examples.semiauto.FloorPickSetup;
+import org.team100.lib.field.FieldConstants;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.gyro.Gyro;
@@ -152,6 +141,7 @@ public class RobotContainer {
     private final Runnable m_simulatedTagDetector;
     private final Runnable m_targetSimulator;
     private final Runnable m_combinedViz;
+    private final Runnable m_climberViz;
     private final Targets m_targets;
     private final Manipulator m_manipulator;
 
@@ -204,6 +194,7 @@ public class RobotContainer {
         }
 
         m_combinedViz = new CombinedVisualization(m_elevator, m_wrist);
+        m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
 
         m_test = new Coordinated(m_elevator, m_wrist);
 
@@ -301,89 +292,40 @@ public class RobotContainer {
         //
 
         final SwerveController holonomicController = SwerveControllerFactory.byIdentity(comLog);
-
-        final DriveManually driveManually = new DriveManually(
-                driverControl::velocity,
-                localizer::setHeedRadiusM,
-                m_drive);
-        final LoggerFactory manLog = comLog.type(driveManually);
-
         final Feedback100 thetaFeedback = new PIDFeedback(
-                manLog, 3.2, 0, 0, true, 0.05, 1);
+                comLog, 3.2, 0, 0, true, 0.05, 1);
 
-        driveManually.register("MODULE_STATE", false,
-                new SimpleManualModuleStates(manLog, m_swerveKinodynamics));
-
-        driveManually.register("ROBOT_RELATIVE_CHASSIS_SPEED", false,
-                new ManualChassisSpeeds(manLog, m_swerveKinodynamics));
-
-        driveManually.register("FIELD_RELATIVE_TWIST", false,
-                new ManualFieldRelativeSpeeds(manLog, m_swerveKinodynamics));
-
-        driveManually.register("SNAPS_PROFILED", true,
-                new ManualWithProfiledHeading(
-                        manLog,
-                        m_swerveKinodynamics,
-                        driverControl::desiredRotation,
-                        thetaFeedback));
-
-        driveManually.register("SNAPS_FULL_STATE", true,
-                new ManualWithFullStateHeading(
-                        manLog,
-                        m_swerveKinodynamics,
-                        driverControl::desiredRotation,
-                        new double[] {
-                                5,
-                                0.35
-                        }));
-
-        driveManually.register("LOCKED", false,
-                new ManualWithTargetLock(
-                        fieldLog,
-                        manLog,
-                        m_swerveKinodynamics,
-                        driverControl::target,
-                        thetaFeedback));
-
-        driveManually.register("BARGE ASSIST", false,
-                new ManualWithBargeAssist(
-                        manLog,
-                        m_swerveKinodynamics,
-                        driverControl::desiredRotation,
-                        thetaFeedback,
-                        m_drive));
-
-        driveManually.register("REEF LOCK", false,
-                new ManualWithProfiledReefLock(
-                        manLog,
-                        m_swerveKinodynamics,
-                        driverControl::useReefLock,
-                        thetaFeedback,
-                        m_drive,
-                        buttons::red1));
-
-        // DEFAULT COMMANDS
-
+        // There are 4 modes:
+        // * normal
+        // * lock rotation to reef center
+        // * lock rotation to nearest station
+        // * and barge-assist
+        // TODO: use a single selector in the control
         DriveManuallySimple driveDefault = new DriveManuallySimple(
                 driverControl::velocity,
                 localizer::setHeedRadiusM,
                 m_drive,
                 new ManualWithProfiledReefLock(
-                        manLog, m_swerveKinodynamics, driverControl::useReefLock, thetaFeedback,
-                        m_drive, buttons::red1),
+                        comLog, m_swerveKinodynamics, driverControl::useReefLock,
+                        thetaFeedback, m_drive, buttons::red1),
                 new ManualWithBargeAssist(
-                        manLog, m_swerveKinodynamics, driverControl::desiredRotation, thetaFeedback,
-                        m_drive),
+                        comLog, m_swerveKinodynamics, driverControl::desiredRotation,
+                        thetaFeedback, m_drive),
                 driverControl::driveWithBargeAssist);
 
+        // DEFAULT COMMANDS
+
         m_drive.setDefaultCommand(driveDefault);
-        m_climber.setDefaultCommand(m_climber.stop());
-        m_climberIntake.setDefaultCommand(m_climberIntake.stop());
+        m_climber.setDefaultCommand(
+                m_climber.stop().withName("climber default"));
+        m_climberIntake.setDefaultCommand(
+                m_climberIntake.stop().withName("climber intake default"));
         m_elevator.setDefaultCommand(new ElevatorDefaultCommand(elevatorLog, m_elevator, m_wrist, m_grip, m_drive));
         m_wrist.setDefaultCommand(new WristDefaultCommand(elevatorLog, m_wrist, m_elevator, m_grip, m_drive));
         m_grip.setDefaultCommand(new AlgaeGripDefaultCommand(m_grip));
         m_funnel.setDefaultCommand(new FunnelDefault(m_funnel));
-        m_manipulator.setDefaultCommand(new ManipulatorDefault(m_manipulator));
+        m_manipulator.setDefaultCommand(
+                m_manipulator.stop().withName("manipulator default"));
 
         // DRIVER BUTTONS
         final HolonomicProfile profile = HolonomicProfile.get(driveLog, m_swerveKinodynamics, 1, 0.5, 1, 0.2);
@@ -405,101 +347,55 @@ public class RobotContainer {
         onTrue(driverControl::resetRotation180, new SetRotation(m_drive, Rotation2d.kPi));
         whileTrue(driverControl::feedFunnel,
                 RunFunnelHandoff.get(comLog, m_elevator, m_wrist, m_funnel, m_tunnel, m_grip));
-        /*
-         * whileTrue(driverControl::climb,
-         * new ParallelCommandGroup(
-         * m_climber.setPosition(0.53), new DriveForwardSlowly(m_drive)));
-         */
-        // When climb pressed, set arm position, then start spinning; stop spinning when
-        // spin velocity slows;
+
+        ////////////////////////////////////////////////////////////
+        //
+        // CLIMB
+        //
+
+        // Step 1, operator: Extend and spin.
+        whileTrue(operatorControl::climbIntake,
+                ClimberCommands.intake(m_climber, m_climberIntake));
+
+        // Step 2, driver: Pull climber in and drive forward.
         whileTrue(driverControl::climb,
-                parallel(
-                        m_climber.setPosition(.53),
-                        m_climberIntake.intake()
-                                .withDeadline(
-                                        sequence(
-                                                waitSeconds(1),
-                                                waitUntil(() -> m_climberIntake.isSlow())))));
+                ClimberCommands.climb(m_climber, m_drive));
+
+        // Between matches, operator: Reset the climber position.
+        whileTrue(operatorControl::activateManualClimb,
+                m_climber.manual(operatorControl::manualClimbSpeed));
+
+        ////////////////////////////////////////////////////////////
         //
+        // SCORING
         //
-        //
 
-        whileTrue(driverControl::driveToTag, buttons::a,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.A));
+        // Driver controls "go to reef" mode, buttons supply level and point.
+        whileTrue(driverControl::toReef,
+                ScoreCoralSmart.get(
+                        coralSequence, m_wrist, m_elevator, m_tunnel,
+                        holonomicController, profile, m_drive,
+                        localizer::setHeedRadiusM, buttons::level, buttons::point));
 
-        whileTrue(driverControl::driveToTag, buttons::b,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.B));
-
-        whileTrue(driverControl::driveToTag, buttons::c,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.C));
-
-        whileTrue(driverControl::driveToTag, buttons::d,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.D));
-
-        whileTrue(driverControl::driveToTag, buttons::e,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.E));
-
-        whileTrue(driverControl::driveToTag, buttons::f,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.F));
-
-        whileTrue(driverControl::driveToTag, buttons::g,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.G));
-
-        whileTrue(driverControl::driveToTag, buttons::h,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.H));
-
-        whileTrue(driverControl::driveToTag, buttons::i,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.I));
-
-        whileTrue(driverControl::driveToTag, buttons::j,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.J));
-
-        whileTrue(driverControl::driveToTag, buttons::k,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.K));
-
-        whileTrue(driverControl::driveToTag, buttons::l,
-                ScoreCoralSmart.get(coralSequence, m_wrist, m_elevator, m_tunnel,
-                        buttons::scoringPosition, holonomicController, profile,
-                        m_drive, localizer::setHeedRadiusM, ReefPoint.L));
-
-        whileTrue(buttons::ab, GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::cd, GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::ef, GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::gh, GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::ij, GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
-        whileTrue(buttons::kl, GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
+        whileTrue(buttons::ab,
+                GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
+        whileTrue(buttons::cd,
+                GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
+        whileTrue(buttons::ef,
+                GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
+        whileTrue(buttons::gh,
+                GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
+        whileTrue(buttons::ij,
+                GrabAlgaeL3Dumb.get(m_wrist, m_elevator, m_grip));
+        whileTrue(buttons::kl,
+                GrabAlgaeL2Dumb.get(m_wrist, m_elevator, m_grip));
 
         whileTrue(buttons::red2,
                 AlgaeOuttakeGroup.get(m_grip, m_wrist, m_elevator));
         whileTrue(buttons::red3,
                 new ScoreBargeSmart(m_elevator, m_wrist, m_grip, buttons::red4));
-        whileTrue(buttons::barge,
-                ReleaseFunnel.get(logger, m_funnel, m_climber));
+        whileTrue(buttons::barge, print("barge"));
 
-        whileTrue(operatorControl::activateManualClimb,
-                m_climber.manual(operatorControl::manualClimbSpeed));
         whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeAlgae));
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
@@ -599,6 +495,7 @@ public class RobotContainer {
         m_targets.periodic();
         // m_leds.periodic();
         m_combinedViz.run();
+        m_climberViz.run();
     }
 
     public void cancelAuton() {

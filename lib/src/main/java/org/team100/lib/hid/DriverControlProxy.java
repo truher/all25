@@ -95,18 +95,8 @@ public class DriverControlProxy implements DriverControl {
     }
 
     @Override
-    public double shooterPivot() {
-        return m_driverControl.shooterPivot();
-    }
-
-    @Override
     public Velocity velocity() {
         return m_driverControl.velocity();
-    }
-
-    @Override
-    public Velocity verySlow() {
-        return m_driverControl.verySlow();
     }
 
     @Override
@@ -115,33 +105,8 @@ public class DriverControlProxy implements DriverControl {
     }
 
     @Override
-    public boolean fullCycle() {
-        return m_driverControl.fullCycle();
-    }
-
-    @Override
-    public boolean driveToObject() {
-        return m_driverControl.driveToObject();
-    }
-
-    @Override
-    public boolean testTrajectory() {
-        return m_driverControl.testTrajectory();
-    }
-
-    @Override
-    public Translation2d target() {
-        return m_driverControl.target();
-    }
-
-    @Override
-    public boolean driveToTag() {
-        return m_driverControl.driveToTag();
-    }
-
-    @Override
-    public boolean trigger() {
-        return m_driverControl.trigger();
+    public boolean toReef() {
+        return m_driverControl.toReef();
     }
 
     @Override
@@ -152,11 +117,6 @@ public class DriverControlProxy implements DriverControl {
     @Override
     public boolean resetRotation180() {
         return m_driverControl.resetRotation180();
-    }
-
-    @Override
-    public boolean defense() {
-        return m_driverControl.defense();
     }
 
     @Override

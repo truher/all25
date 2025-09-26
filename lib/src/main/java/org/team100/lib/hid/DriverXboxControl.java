@@ -18,23 +18,23 @@ import edu.wpi.first.wpilibj.XboxController;
  * Controls mapping (please keep this in sync with the code below):
  * 
  * <pre>
- * left trigger [0,1]     == medium speed
+ * left trigger [0,1]     == reef lock
  * left bumper button     == slow speed
  * left stick x [-1,1]    == omega
- * left stick y [-1,1]    ==
- * left stick button      == drive-to-amp
+ * left stick y [-1,1]    == **** unbound ****
+ * left stick button      == (don't use)
  * dpad/pov angle [0,360] == snaps
  * "back" button          == reset 0 rotation
  * "start" button         == reset 180 rotation
  * right stick x [-1,1]   == x velocity
  * right stick y [-1,1]   == y velocity
- * right stick button     == 
- * x button               == full cycle
- * y button               == drive to note
- * a button               == lock rotation to amp
- * b button               == aim and shoot
- * right trigger [0,1]    ==
- * right bumper button    ==
+ * right stick button     == (don't use)
+ * x button               ==
+ * y button               ==
+ * a button               == drive to score at reef
+ * b button               == **** unbound ****
+ * right trigger [0,1]    == medium speed
+ * right bumper button    == barge assist
  * </pre>
  * 
  * Do not use stick buttons, they are prone to stray clicks
@@ -63,11 +63,6 @@ public class DriverXboxControl implements DriverControl {
     @Override
     public String getHIDName() {
         return m_controller.getName();
-    }
-
-    @Override
-    public double shooterPivot() {
-        return -1.0 * m_controller.getLeftY();
     }
 
     /**
@@ -113,47 +108,6 @@ public class DriverXboxControl implements DriverControl {
         }
     }
 
-    @Override
-    public Velocity verySlow() {
-        final double rightY = m_controller.getRightY();
-        final double rightX = m_controller.getRightX();
-        final double leftX = m_controller.getLeftX();
-        m_log_right_y.log(() -> rightY);
-        m_log_right_x.log(() -> rightX);
-        m_log_left_x.log(() -> leftX);
-
-        double dx = 0;
-        double dy = 0;
-        double x = -1.0 * clamp(rightY, 1);
-        double y = -1.0 * clamp(rightX, 1);
-        double r = Math.hypot(x, y);
-        if (r > DEADBAND) {
-            double expoR = expo(r, EXPO);
-            double ratio = expoR / r;
-            dx = ratio * x;
-            dy = ratio * y;
-        } else {
-            dx = 0;
-            dy = 0;
-        }
-
-        double dtheta = expo(deadband(-1.0 * clamp(leftX, 1), DEADBAND, 1), EXPO);
-
-        Speed speed = speed();
-        m_log_speed.log(() -> speed);
-
-        return new Velocity(SLOW * dx, SLOW * dy, SLOW * dtheta);
-
-    }
-
-    public boolean shoot() {
-        return m_controller.getRightBumperButton();
-    }
-
-    /**
-     * This used to be public and affect everything; now it just affects the
-     * velocity() output above.
-     */
     private Speed speed() {
         if (m_controller.getLeftBumperButton())
             return Speed.SLOW;
@@ -183,23 +137,8 @@ public class DriverXboxControl implements DriverControl {
     }
 
     @Override
-    public boolean fullCycle() {
-        return m_controller.getYButton();
-    }
-
-    @Override
-    public boolean driveToObject() {
-        return m_controller.getYButton();
-    }
-
-    @Override
-    public boolean driveToTag() {
+    public boolean toReef() {
         return m_controller.getAButton();
-    }
-
-    @Override
-    public boolean testTrajectory() {
-        return m_controller.getBButton();
     }
 
     @Override

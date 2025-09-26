@@ -30,6 +30,18 @@
         "intellicodeApiExamples.typescript.enabled": false,
         "workbench.tree.enableStickyScroll": false,
         "editor.stickyScroll.scrollWithEditor": false,
-        "editor.stickyScroll.enabled": false
+        "editor.stickyScroll.enabled": false,
+        "java.completion.favoriteStaticMembers": [
+            "edu.wpi.first.wpilibj2.command.Commands.*",
+            "org.junit.Assert.*",
+            "org.junit.Assume.*",
+            "org.junit.jupiter.api.Assertions.*",
+            "org.junit.jupiter.api.Assumptions.*",
+            "org.junit.jupiter.api.DynamicContainer.*",
+            "org.junit.jupiter.api.DynamicTest.*",
+            "org.mockito.Mockito.*",
+            "org.mockito.ArgumentMatchers.*",
+            "org.mockito.Answers.*"
+        ]
     }
 }

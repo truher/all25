@@ -24,8 +24,10 @@ public class LazySimulatedBareMotor implements BareMotor {
     public void setDutyCycle(double output) {
         if (output < 1e-3) {
             m_running = false;
+            m_delegate.setDutyCycle(output);
         } else if (m_running) {
             if (m_timer.get() > m_timeout) {
+                m_running = false;
                 m_delegate.setDutyCycle(0);
             } else {
                 m_delegate.setDutyCycle(output);
@@ -41,8 +43,10 @@ public class LazySimulatedBareMotor implements BareMotor {
     public void setVelocity(double velocityRad_S, double accelRad_S2, double torqueNm) {
         if (velocityRad_S < 1e-3) {
             m_running = false;
+            m_delegate.setVelocity(velocityRad_S, accelRad_S2, torqueNm);
         } else if (m_running) {
             if (m_timer.get() > m_timeout) {
+                m_running = false;
                 m_delegate.setVelocity(0, 0, 0);
             } else {
                 m_delegate.setVelocity(velocityRad_S, accelRad_S2, torqueNm);

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.team100.frc2025.Swerve.FieldConstants;
-import org.team100.frc2025.Swerve.FieldConstants.CoralStation;
+import org.team100.lib.field.FieldConstants;
+import org.team100.lib.field.FieldConstants.CoralStation;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.Trajectory100;

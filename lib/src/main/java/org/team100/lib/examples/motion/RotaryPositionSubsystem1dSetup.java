@@ -32,6 +32,6 @@ public class RotaryPositionSubsystem1dSetup {
          * Note the use of "whileTrue" -- it cancels the command if you let go of the
          * button, which seems like a good idea.
          */
-        new Trigger(control::trigger).whileTrue(rotary.goToTheSpot().until(rotary::isDone));
+        new Trigger(control::x).whileTrue(rotary.goToTheSpot().until(rotary::isDone));
     }
 }

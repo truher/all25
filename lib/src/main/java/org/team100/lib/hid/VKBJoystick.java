@@ -33,12 +33,6 @@ public class VKBJoystick implements DriverControl {
     }
 
     @Override
-    public boolean fullCycle() {
-        // return button(1); // trigger halfway down
-        return false;
-    }
-
-    @Override
     public boolean useReefLock() {
         return button(0); // trigger halfway down
     }
@@ -86,35 +80,8 @@ public class VKBJoystick implements DriverControl {
         return Rotation2d.fromDegrees(-1.0 * desiredAngleDegrees);
     }
 
-    /**
-     * For now, this knows the field-relative target.
-     */
     @Override
-    public Translation2d target() {
-        if (m_hid.getRawButton(3)) {
-            // alternate target is closer to the left side
-            return new Translation2d(6, 4);
-        } else {
-            // default target is kinda mid-field
-            return new Translation2d(0.431985, 5.446929);
-        }
-
-        // return new Translation2d(0.431985, 5.446929);
-    }
-
-    @Override
-    public boolean trigger() {
-        // return button(1);
-        return false;
-    }
-
-    @Override
-    public boolean driveToObject() {
-        return button(7);
-    }
-
-    @Override
-    public boolean driveToTag() {
+    public boolean toReef() {
         return button(8);
     }
 

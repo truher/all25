@@ -97,11 +97,20 @@ public class Climber extends SubsystemBase {
                 () -> setDutyCycle(0));
     }
 
-    /** Use a profile to set position perpetually. */
-    public Command setPosition(double v) {
+    /** Push the climber out into the intake position. */
+    public Command goToIntakePosition() {
         return startRun(
+                // TODO: why do we need this reset?
                 () -> reset(),
-                () -> setAngle(v));
+                () -> setAngle(-Math.PI / 2));
+    }
+
+    /** Pull the climber in all the way to the climb position. */
+    public Command goToClimbPosition() {
+        return startRun(
+                // TODO: why do we need this reset?
+                () -> reset(),
+                () -> setAngle(0.53));
     }
 
     ////////////////////////////////

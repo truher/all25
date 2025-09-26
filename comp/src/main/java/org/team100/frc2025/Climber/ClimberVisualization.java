@@ -1,5 +1,8 @@
 package org.team100.frc2025.Climber;
 
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.Logging;
+
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -7,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
-public class ClimberVisualization {
+public class ClimberVisualization implements Runnable {
 
     private final Climber m_climber;
     private final ClimberIntake m_intake;
@@ -31,10 +34,13 @@ public class ClimberVisualization {
         SmartDashboard.putData("Climber", m_view);
     }
 
-    public void periodic() {
-        m_arm.setAngle(Math.toDegrees(m_climber.angle()));
-        m_wheels.setColor(m_intake.isSlow()
-                ? new Color8Bit(Color.kRed)
-                : new Color8Bit(Color.kGreen));
+    @Override
+    public void run() {
+        if (Logging.instance().getLevel().admit(Level.TRACE)) {
+            m_arm.setAngle(Math.toDegrees(m_climber.angle()));
+            m_wheels.setColor(m_intake.isSlow()
+                    ? new Color8Bit(Color.kRed)
+                    : new Color8Bit(Color.kGreen));
+        }
     }
 }

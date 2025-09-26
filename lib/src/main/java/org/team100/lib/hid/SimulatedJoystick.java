@@ -32,25 +32,8 @@ public class SimulatedJoystick implements DriverControl {
     }
 
     @Override
-    public boolean trigger() {
-        // return button(1);
-        return false;
-    }
-
-    @Override
-    public boolean fullCycle() {
-        // return button(1);
-        return false;
-    }
-
-    @Override
     public boolean useReefLock() {
         return button(1);
-    }
-
-    @Override
-    public boolean testTrajectory() {
-        return button(2);
     }
 
     @Override
@@ -64,18 +47,18 @@ public class SimulatedJoystick implements DriverControl {
     }
 
     @Override
-    public boolean driveToObject() {
-        return button(4);
-    }
-
-    @Override
     public boolean button5() {
         // return button(5);
         return false;
     }
 
     @Override
-    public boolean driveToTag() {
+    public boolean climb() {
+        return button(5);
+    }
+
+    @Override
+    public boolean toReef() {
         return button(6);
     }
 
@@ -112,22 +95,6 @@ public class SimulatedJoystick implements DriverControl {
             return null;
         }
         return Rotation2d.fromDegrees(-1.0 * desiredAngleDegrees);
-    }
-
-    /**
-     * For now, this knows the field-relative target.
-     */
-    @Override
-    public Translation2d target() {
-        if (m_hid.getRawButton(3)) {
-            // alternate target is closer to the left side
-            return new Translation2d(6, 4);
-        } else {
-            // default target is kinda mid-field
-            return new Translation2d(0.431985, 5.446929);
-        }
-
-        // return new Translation2d(0.431985, 5.446929);
     }
 
     //////////////////
