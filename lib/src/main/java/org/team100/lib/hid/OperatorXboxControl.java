@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj.XboxController;
  * left bumper button     ==
  * left stick x [-1,1]    == manual climb speed
  * left stick y [-1,1]    == 
- * left stick button      == 
+ * left stick button      == (don't use)
  * dpad/pov angle [0,360] == 
  * "back" button          == 
  * "start" button         == 
  * right stick x [-1,1]   == 
  * right stick y [-1,1]   == 
- * right stick button     == 
+ * right stick button     == (don't use)
  * x button               == extend and spin climber for intake
  * y button               == activate manual climb mode
  * a button               == 

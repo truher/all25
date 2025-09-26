@@ -7,7 +7,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import java.util.function.DoubleConsumer;
 
 import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
-import org.team100.frc2025.CommandGroups.RunFunnelHandoff;
 import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Funnel.Funnel;
@@ -54,17 +53,16 @@ public class Coral1Mid {
         return sequence(
                 parallel(
                         runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
-
                         toReef,
                         sequence(
-                                RunFunnelHandoff.get(logger, elevator, wrist, funnel, tunnel, grip).withTimeout(0.5),
                                 parallel(
                                         wrist.readyUp(),
-                                        elevator.set(1))
-                                        .until(() -> wrist.atGoal() && elevator.atGoal()),
-                                prePlace))
-                        .until(() -> (toReef.isDone() && prePlace.isDone())),
+                                        elevator.set(1) //
+                                ).until(() -> wrist.atGoal() && elevator.atGoal()),
+                                prePlace)//
+                ).until(() -> (toReef.isDone() && prePlace.isDone())),
                 new PostDropCoralL4(wrist, elevator, 10)
-                        .until(elevator::atGoal));
+                        .until(elevator::atGoal) //
+        );
     }
 }

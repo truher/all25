@@ -29,8 +29,8 @@ import edu.wpi.first.wpilibj.XboxController;
  * right stick x [-1,1]   == x velocity
  * right stick y [-1,1]   == y velocity
  * right stick button     == (don't use)
- * x button               ==
- * y button               ==
+ * x button               == floor intake
+ * y button               == station intake
  * a button               == drive to score at reef
  * b button               == **** unbound ****
  * right trigger [0,1]    == medium speed
@@ -142,8 +142,13 @@ public class DriverXboxControl implements DriverControl {
     }
 
     @Override
-    public boolean feedFunnel() {
+    public boolean floorPick() {
         return m_controller.getXButton();
+    }
+
+    @Override
+    public boolean stationPick() {
+        return m_controller.getYButton();
     }
 
     @Override

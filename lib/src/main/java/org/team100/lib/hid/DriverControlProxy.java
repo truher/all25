@@ -135,8 +135,13 @@ public class DriverControlProxy implements DriverControl {
     }
 
     @Override
-    public boolean feedFunnel() {
-        return m_driverControl.feedFunnel();
+    public boolean floorPick() {
+        return m_driverControl.floorPick();
+    }
+
+    @Override
+    public boolean stationPick() {
+        return m_driverControl.stationPick();
     }
 
     @Override
