@@ -152,6 +152,10 @@ public class Feedforward100 {
         // return new Feedforward100(0, 0, 0, 0, 0);
     }
 
+    public static Feedforward100 makeKrakenClimberIntake() {
+        return new Feedforward100(0.13, 0.022, 0.007, 0.26, 0.26, 0.06);
+    }
+
     public double velocityFFVolts(double motorRev_S) {
         return kV * motorRev_S;
     }

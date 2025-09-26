@@ -1,35 +1,14 @@
 package org.team100.frc2025.Climber;
 
-import static edu.wpi.first.wpilibj2.command.Commands.parallel;
-import static org.team100.lib.hid.ControlUtil.deadband;
-
-import static edu.wpi.first.wpilibj2.command.Commands.*;
-
-import java.util.function.DoubleSupplier;
-
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.controller.simple.PIDFeedback;
-import org.team100.lib.encoder.AS5048RotaryPositionSensor;
-import org.team100.lib.encoder.EncoderDrive;
-import org.team100.lib.encoder.IncrementalBareEncoder;
-import org.team100.lib.encoder.RotaryPositionSensor;
-import org.team100.lib.encoder.SimulatedBareEncoder;
-import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.mechanism.RotaryMechanism;
-import org.team100.lib.motion.servo.AngularPositionServo;
-import org.team100.lib.motion.servo.OnboardAngularPositionServo;
 import org.team100.lib.motor.BareMotor;
-import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.Kraken6Motor;
+import org.team100.lib.motor.LazySimulatedBareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.incremental.IncrementalProfile;
-import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
-import org.team100.lib.reference.ProfileReference1d;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,21 +18,17 @@ public class ClimberIntake extends SubsystemBase {
     private final BareMotor m_motor;
 
     public ClimberIntake(LoggerFactory parent, int canID) {
-        LoggerFactory log = parent.name("ClimberIntake");
+        LoggerFactory log = parent.type(this);
 
         switch (Identity.instance) {
             case COMP_BOT -> {
-                // add the X44 Kraken motor for the active intake
-                SimulatedBareMotor intakeMotor = new SimulatedBareMotor(log, 100);
-
-                m_motor = intakeMotor;
+                m_motor = new Kraken6Motor(
+                        log, canID, MotorPhase.FORWARD, 50, 50, new PIDConstants(),
+                        Feedforward100.makeKrakenClimberIntake());
             }
-
             default -> {
-                // add the X44 Kraken motor for the active intake
-                SimulatedBareMotor intakeMotor = new SimulatedBareMotor(log, 100);
-
-                m_motor = intakeMotor;
+                m_motor = new LazySimulatedBareMotor(
+                        new SimulatedBareMotor(log, 100), 1);
             }
         }
     }
@@ -61,21 +36,30 @@ public class ClimberIntake extends SubsystemBase {
     @Override
     public void periodic() {
         m_motor.periodic();
-    } 
+    }
 
-    public double getVelocityRad_S(){
-        return m_motor.getVelocityRad_S();
+    public boolean isSlow() {
+        return m_motor.getVelocityRad_S() < 10;
     }
 
     // COMMANDS
 
     public Command stop() {
-        return run(
-                () -> m_motor.setDutyCycle(0));
+        return run(this::stopMotor);
     }
 
-    public Command startIntake() {
-        return run(
-                () -> m_motor.setDutyCycle(1));
+    public Command intake() {
+        return run(this::fullSpeed);
     }
+
+    ////////////////
+
+    private void stopMotor() {
+        m_motor.setDutyCycle(0);
+    }
+
+    private void fullSpeed() {
+        m_motor.setDutyCycle(1);
+    }
+
 }
