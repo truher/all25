@@ -36,17 +36,17 @@ public class Manipulator extends SubsystemBase {
         switch (Identity.instance) {
             case COMP_BOT -> {
                 // Set specific parameters for the competition robot
-                Kraken6Motor leftMotor = new Kraken6Motor(log, 54, MotorPhase.FORWARD, 40, 40,
+                Kraken6Motor leftMotor = new Kraken6Motor(log, 19, MotorPhase.FORWARD, 40, 40, //can id done
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor rightMotor = new Kraken6Motor(log, 55, MotorPhase.REVERSE, 40, 40,
+                Kraken6Motor rightMotor = new Kraken6Motor(log, 20, MotorPhase.REVERSE, 40, 40, //can id done
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor algaeMotor = new Kraken6Motor(log, 56, MotorPhase.FORWARD, 120, 120,
+                Kraken6Motor algaeMotor = new Kraken6Motor(log, 21, MotorPhase.FORWARD, 120, 120, //can id done
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
                 m_algaeMotor = algaeMotor;
-                m_rightLaser = new LaserCan(52);
-                m_frontLaser = new LaserCan(51);
-                m_backLaser = new LaserCan(53);
-                m_leftLaser = new LaserCan(50);
+                m_rightLaser = new LaserCan(17); //can id done
+                m_frontLaser = new LaserCan(16); //can id done
+                m_backLaser = new LaserCan(18); //can id done
+                m_leftLaser = new LaserCan(15); //can id done
                 m_leftMech = new LinearMechanism(log, leftMotor, new Talon6Encoder(log, leftMotor), 16,
                         .1, -100000000, 1000000);
                 m_rightMech = new LinearMechanism(log, rightMotor, new Talon6Encoder(log, rightMotor),

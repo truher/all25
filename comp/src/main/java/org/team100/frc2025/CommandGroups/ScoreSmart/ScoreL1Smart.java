@@ -17,26 +17,24 @@ import org.team100.lib.profile.HolonomicProfile;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
-
-public class ScoreL4Smart {
+public class ScoreL1Smart {
     public static Command get(
             LoggerFactory logger,
             Placeholder placeholder,
             Manipulator manipulator,
             SwerveController controller,
             HolonomicProfile profile,
-            SwerveDriveSubsystem m_drive,
+            SwerveDriveSubsystem drive,
             Supplier<Pose2d> goal) {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
-                logger, m_drive, controller, profile, goal);
-        FollowTrajectory prePlace = placeholder.prePlaceL4(); //changed to follow trajectory
-        return sequence( //this is differnt so we can like make it know about is done
+                logger, drive, controller, profile, goal);
+        FollowTrajectory prePlace = placeholder.prePlaceL1();
+        return sequence(
                 parallel(
                         toReef,
                         prePlace //
                 ).until(() -> (toReef.isDone() && prePlace.isDone())),
-                manipulator.centerEject()
-                        .withTimeout(0.5),
+                manipulator.centerEject().withTimeout(0.5),
                 placeholder.stow());
     }
 }

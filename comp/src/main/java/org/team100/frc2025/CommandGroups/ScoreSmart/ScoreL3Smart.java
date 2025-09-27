@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
+import org.team100.lib.commands.r3.FollowTrajectory;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
@@ -27,12 +28,12 @@ public class ScoreL3Smart {
             Supplier<Pose2d> goal) {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, m_drive, controller, profile, goal);
-        Command prePlace = placeholder.prePlaceL3();
+        FollowTrajectory prePlace = placeholder.prePlaceL3();
         return sequence(
                 parallel(
                         toReef,
                         prePlace //
-                ).until(() -> (toReef.isDone() && placeholder.atL3())),
+                ).until(() -> (toReef.isDone() && prePlace.isDone())),
                 manipulator.centerEject().withTimeout(0.5),
                 placeholder.stow());
     }
