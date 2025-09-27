@@ -1,5 +1,6 @@
 package org.team100.lib.examples.tank;
 
+import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.BareMotorGroup;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -11,10 +12,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public class BareMotorTank extends SubsystemBase implements TankDrive {
 
-    private final BareMotorGroup m_left;
-    private final BareMotorGroup m_right;
+    private final BareMotor m_left;
+    private final BareMotor m_right;
 
-    public BareMotorTank(BareMotorGroup left, BareMotorGroup right) {
+    public BareMotorTank(BareMotor left, BareMotor right) {
         m_left = left;
         m_right = right;
     }
