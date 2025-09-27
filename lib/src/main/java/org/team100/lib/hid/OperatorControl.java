@@ -1,5 +1,7 @@
 package org.team100.lib.hid;
 
+import org.team100.lib.hid.DriverControl.Velocity;
+
 /**
  * Represents the HID used by the "operator" role, which typically controls
  * everything other than the drivetrain.
@@ -11,6 +13,15 @@ public interface OperatorControl {
 
     default String getHIDName() {
         return "No HID Found!!";
+    }
+
+    /** For "flying" the arm around manually. */
+    default Velocity velocity() {
+        return new Velocity(0, 0, 0);
+    }
+
+    default boolean manual() {
+        return false;
     }
 
     ////////////////////////////////////////////////////////////
