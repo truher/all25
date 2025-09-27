@@ -15,11 +15,6 @@ import static org.team100.lib.field.FieldConstants.ReefPoint.L;
 import java.util.function.DoubleConsumer;
 
 import org.team100.frc2025.CalgamesArm.Placeholder;
-import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
-import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
-import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Wrist.CoralTunnel;
-import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
@@ -38,8 +33,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 // it's a record to make it less verbose
 public record Auton(LoggerFactory logger, Placeholder placeholder,
-        Manipulator manipulator, Wrist2 wrist,
-        Elevator elevator, CoralTunnel tunnel,
+        Manipulator manipulator,
         SwerveController controller, HolonomicProfile profile,
         SwerveDriveSubsystem drive,
         DoubleConsumer heedRadiusM, SwerveKinodynamics kinodynamics,
@@ -54,8 +48,8 @@ public record Auton(LoggerFactory logger, Placeholder placeholder,
                 embarkAndPreplace(L4, K),
                 scoreAndReload(CoralStation.LEFT),
                 embarkAndPreplace(L4, L),
-                new PostDropCoralL4(wrist, elevator, 10)
-                        .until(elevator::atGoal));
+                manipulator.centerEject().withTimeout(0.5),
+                placeholder.stow());
     }
 
     public Command right() {
@@ -65,8 +59,8 @@ public record Auton(LoggerFactory logger, Placeholder placeholder,
                 embarkAndPreplace(L4, D),
                 scoreAndReload(CoralStation.RIGHT),
                 embarkAndPreplace(L4, C),
-                new PostDropCoralL4(wrist, elevator, 10)
-                        .until(elevator::atGoal));
+                manipulator.centerEject().withTimeout(0.5),
+                placeholder.stow());
     }
 
     /** Drive to the reef and go up. */
@@ -74,14 +68,12 @@ public record Auton(LoggerFactory logger, Placeholder placeholder,
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
                 () -> FieldConstants.makeGoal(position, point));
-        PrePlaceCoralL4 prePlace = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
+        Command prePlace = placeholder.prePlaceL4();
         return parallel(
                 runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
                 toReef,
-                sequence(
-                        wrist.readyUp().until(wrist::atGoal),
-                        prePlace))
-                .until(() -> (toReef.isDone() && prePlace.isDone()));
+                prePlace //
+        ).until(() -> (toReef.isDone() && placeholder.atL4()));
     }
 
     /** Score, drive to the station, and pause briefly. */

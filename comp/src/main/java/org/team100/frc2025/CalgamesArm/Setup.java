@@ -28,6 +28,6 @@ public class Setup implements Runnable {
     @Override
     public void run() {
         m_mech.periodic();
-        m_viz.periodic();
+        m_viz.run();
     }
 }

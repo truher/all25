@@ -8,9 +8,8 @@ import java.util.Map;
 import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
-import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Wrist.CoralTunnel;
-import org.team100.frc2025.Wrist.Wrist2;
+import org.team100.frc2025.CalgamesArm.Placeholder;
+import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.field.FieldConstants;
@@ -28,9 +27,8 @@ public class ScoreCoralSmart {
 
     public static Command get(
             LoggerFactory logger,
-            Wrist2 wrist,
-            Elevator elevator,
-            CoralTunnel tunnel,
+            Placeholder placeholder,
+            Manipulator manipulator,
             SwerveController controller,
             HolonomicProfile profile,
             SwerveDriveSubsystem drive,
@@ -42,17 +40,17 @@ public class ScoreCoralSmart {
                 runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
                 select(Map.ofEntries(
                         Map.entry(ScoringLevel.L4,
-                                ScoreL4Smart.get(logger, wrist, elevator,
-                                        tunnel, controller, profile,
-                                        drive, goal)),
+                                ScoreL4Smart.get(
+                                        logger, placeholder, manipulator,
+                                        controller, profile, drive, goal)),
                         Map.entry(ScoringLevel.L3,
-                                ScoreL3Smart.get(logger, wrist, elevator,
-                                        tunnel, controller, profile,
-                                        drive, goal)),
+                                ScoreL3Smart.get(
+                                        logger, placeholder, manipulator,
+                                        controller, profile, drive, goal)),
                         Map.entry(ScoringLevel.L2,
-                                ScoreL2Smart.get(logger, wrist, elevator,
-                                        tunnel, controller, profile,
-                                        drive, goal))),
+                                ScoreL2Smart.get(
+                                        logger, placeholder, manipulator,
+                                        controller, profile, drive, goal))),
                         level));
     }
 }

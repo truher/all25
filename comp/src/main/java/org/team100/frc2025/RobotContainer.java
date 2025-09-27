@@ -19,12 +19,9 @@ import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
-import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.Auton;
-import org.team100.frc2025.Wrist.CoralTunnel;
-import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
@@ -33,7 +30,6 @@ import org.team100.lib.commands.drivetrain.ResetPose;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
 import org.team100.lib.commands.r3.FollowTrajectory;
-import org.team100.lib.commands.r3.SubsystemR3;
 import org.team100.lib.config.Camera;
 import org.team100.lib.config.Identity;
 import org.team100.lib.controller.drivetrain.FullStateSwerveController;
@@ -65,6 +61,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
+import org.team100.lib.motion.Viz;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveLocal;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -108,22 +105,14 @@ public class RobotContainer {
 
     private final SwerveModuleCollection m_modules;
     private final Command m_auton;
-    /**
-     * This runs on enable for test, so i can run stuff in simulation without
-     * fiddling with buttons. But it will also run in real life, so be careful.
-     */
-    private final Command m_test;
 
     // SUBSYSTEMS
     final SwerveDriveSubsystem m_drive;
 
-    final Elevator m_elevator;
-    final Wrist2 m_wrist;
     final Climber m_climber;
     final ClimberIntake m_climberIntake;
     // final LEDIndicator m_leds;
 
-    final CoralTunnel m_tunnel;
     final SwerveKinodynamics m_swerveKinodynamics;
 
     private final ScheduledExecutorService m_initializer;
@@ -148,7 +137,6 @@ public class RobotContainer {
         final LoggerFactory logger = logging.rootLogger;
         final LoggerFactory driveLog = logger.name("Drive");
         final LoggerFactory comLog = logger.name("Commands");
-        final LoggerFactory elevatorLog = logger.name("Elevator");
         final LoggerFactory coralSequence = logger.name("Coral Sequence");
         final LoggerFactory autoSequence = logger.name("Auto Sequence");
 
@@ -157,32 +145,20 @@ public class RobotContainer {
         final OperatorControl operatorControl = new OperatorControlProxy(async);
         final ThirdControl buttons = new ThirdControlProxy(async);
 
+        m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         if (Identity.instance.equals(Identity.COMP_BOT)) {
-            m_elevator = new Elevator(elevatorLog, 11, 19);
-            m_wrist = new Wrist2(elevatorLog, 9, m_elevator::getSetpointAcceleration);
-            m_tunnel = new CoralTunnel(elevatorLog, 3, 25);
             m_climber = new Climber(logger, 15);
-
-            // put in 0 as placeholder
             m_climberIntake = new ClimberIntake(logger, 0);
-            m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
-            m_manipulator = new Manipulator(logger);
         } else {
-            m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
-            m_tunnel = new CoralTunnel(elevatorLog, 3, 25);
-            m_elevator = new Elevator(elevatorLog, 2, 19);
-            m_wrist = new Wrist2(elevatorLog, 9, m_elevator::getSetpointAcceleration);
             m_climber = new Climber(logger, 18);
-            m_manipulator = new Manipulator(logger);
-
-            // put in 0 as placeholder value
             m_climberIntake = new ClimberIntake(logger, 0);
         }
 
-        m_combinedViz = new CombinedVisualization(m_elevator, m_wrist);
-        m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
+        m_manipulator = new Manipulator(logger);
+        CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.3, 0.1);
 
-        m_test = new Coordinated(m_elevator, m_wrist);
+        m_combinedViz = new Viz(CalgamesMech);
+        m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
 
         m_modules = SwerveModuleCollection.get(
                 driveLog,
@@ -306,7 +282,6 @@ public class RobotContainer {
                 m_climber.stop().withName("climber default"));
         m_climberIntake.setDefaultCommand(
                 m_climberIntake.stop().withName("climber intake default"));
-            
 
         m_manipulator.setDefaultCommand(
                 m_manipulator.stop().withName("manipulator default"));
@@ -322,15 +297,13 @@ public class RobotContainer {
         /** fake arm to see what it needs to do. */
         Placeholder placeholder = new Placeholder();
 
-        m_auton = new Auton(logger, placeholder, m_manipulator, m_wrist,
-                m_elevator, m_tunnel,
+        m_auton = new Auton(logger, placeholder, m_manipulator,
                 autoController, autoProfile, m_drive,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                 .left();
 
         whileTrue(driverControl::test,
-                new Auton(logger, placeholder, m_manipulator, m_wrist,
-                        m_elevator, m_tunnel,
+                new Auton(logger, placeholder, m_manipulator,
                         autoController, autoProfile, m_drive,
                         localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                         .right());
@@ -338,9 +311,9 @@ public class RobotContainer {
         // Driver/Operator Buttons
         onTrue(driverControl::resetRotation0, new ResetPose(m_drive, new Pose2d()));
         onTrue(driverControl::resetRotation180, new SetRotation(m_drive, Rotation2d.kPi));
-    
+
         ////////////////////////////////////////////////////////////
-        // 
+        //
         // PICK
         //
         whileTrue(driverControl::floorPick,
@@ -377,14 +350,14 @@ public class RobotContainer {
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,
                 ScoreCoralSmart.get(
-                        coralSequence, m_wrist, m_elevator, m_tunnel,
+                        coralSequence, placeholder, m_manipulator,
                         holonomicController, profile, m_drive,
                         localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         // grab and hold algae, and then eject it when you let go of the button
         whileTrue(buttons::algae,
                 GrabAndHoldAlgae.get(
-                        m_wrist, m_elevator, m_manipulator, buttons::algaeLevel))
+                        m_manipulator, placeholder, buttons::algaeLevel))
                 .onFalse(m_manipulator.algaeEject().withTimeout(0.5));
 
         // these are all unbound
@@ -397,8 +370,6 @@ public class RobotContainer {
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
 
-        // calgames mech command?
-        SubsystemR3 CalgamesMech = new CalgamesMech(logger, 0.3, 0.1);
         List<HolonomicPose2d> calgamesWaypoints = List.of(
                 new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
@@ -477,12 +448,6 @@ public class RobotContainer {
         m_auton.schedule();
     }
 
-    public void scheduleTest() {
-        if (m_test == null)
-            return;
-        m_test.schedule();
-    }
-
     public void periodic() {
         // publish the simulated tag sightings.
         m_simulatedTagDetector.run();
@@ -503,6 +468,5 @@ public class RobotContainer {
     public void close() {
         m_modules.close();
         // m_leds.close();
-        m_elevator.close();
     }
 }

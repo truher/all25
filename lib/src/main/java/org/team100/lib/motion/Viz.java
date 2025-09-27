@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Viz {
+public class Viz implements Runnable {
     private static final double SCALE = 100;
     private static final Translation2d ORIGIN = new Translation2d(50, 0);
     private final MechInterface m_mech;
@@ -39,7 +39,8 @@ public class Viz {
         SmartDashboard.putData("View", m_view);
     }
 
-    public void periodic() {
+    @Override
+    public void run() {
         Config q = m_mech.getConfig();
         m_elevator.setLength(shoulderHeight(q));
         m_arm.setAngle(shoulderAngle(q));
