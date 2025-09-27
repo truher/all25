@@ -92,6 +92,7 @@ public class Climber extends SubsystemBase {
     }
 
     public Command manual(DoubleSupplier s) {
+        
         return runEnd(
                 () -> setDutyCycle(s.getAsDouble()),
                 () -> setDutyCycle(0));

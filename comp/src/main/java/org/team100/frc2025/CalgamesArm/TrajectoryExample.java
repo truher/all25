@@ -47,5 +47,5 @@ public class TrajectoryExample {
                 Waypoint.GOING_FORWARD.hPose,
                 Waypoint.TO_L1.hPose));
     }
-
+    
 }

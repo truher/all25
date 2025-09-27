@@ -1,14 +1,4 @@
 {
-  "FMS": {
-    "window": {
-      "visible": false
-    }
-  },
-  "System Joysticks": {
-    "window": {
-      "visible": false
-    }
-  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -18,9 +8,7 @@
         },
         {
           "decKey": 87,
-          "decayRate": 1.0,
-          "incKey": 83,
-          "keyRate": 1.0
+          "incKey": 83
         },
         {
           "decKey": 69,
@@ -30,16 +18,13 @@
         }
       ],
       "axisCount": 3,
-      "buttonCount": 8,
+      "buttonCount": 5,
       "buttonKeys": [
         90,
         88,
         67,
         86,
-        66,
-        78,
-        77,
-        44
+        66
       ],
       "povConfig": [
         {
@@ -69,10 +54,10 @@
       "axisCount": 2,
       "buttonCount": 4,
       "buttonKeys": [
-        49,
-        50,
-        51,
-        52
+        77,
+        44,
+        46,
+        47
       ],
       "povCount": 0
     },
@@ -88,40 +73,14 @@
         }
       ],
       "axisCount": 2,
-      "buttonCount": 31,
+      "buttonCount": 6,
       "buttonKeys": [
         260,
         268,
         266,
-        -1,
+        261,
         269,
-        267,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1
+        267
       ],
       "povCount": 0
     },
@@ -137,9 +96,6 @@
     },
     {
       "guid": "Keyboard1"
-    },
-    {
-      "guid": "Keyboard2"
     }
   ]
 }
