@@ -9,128 +9,116 @@ Throughout these docs we will sometimes tell you to run a Git command. It's bett
 
 Let's start by getting the `Team100/all25` Git repo checked out.
 
-## Setting Up the Team100/all25 Repository
+## Setting Up the Team100/all25 Repository with GitHub Desktop
 
 ### Prerequisites
 Before we start, make sure you have:
 - A computer with internet access
 - A GitHub account (if you don't have one, go to [github.com](https://github.com) and sign up)
-- Basic familiarity with using a computer (opening programs, typing commands, etc.)
+- Basic familiarity with using a computer (opening programs, clicking buttons, etc.)
 
-### Step 1: Install Git
-Git is a tool that helps us manage code versions and collaborate with others. You need to install it first.
+### Step 1: Install GitHub Desktop
+GitHub Desktop is a user-friendly way to work with Git repositories. It's much easier than using command line Git!
 
 **On Windows:**
-1. Go to [git-scm.com](https://git-scm.com/download/win)
-2. Download the installer
-3. Run the installer and follow the prompts (you can use all the default settings)
-4. Open Command Prompt or PowerShell to test: type `git --version` and press Enter
-5. You should see something like `git version 2.x.x`
+1. Go to [desktop.github.com](https://desktop.github.com)
+2. Click "Download for Windows"
+3. Run the installer and follow the prompts
+4. GitHub Desktop will open automatically after installation
 
 **On Mac:**
-1. Open Terminal (press Cmd+Space, type "Terminal", press Enter)
-2. Type `git --version` and press Enter
-3. If Git is not installed, you'll be prompted to install it. Follow the instructions.
-4. If Git is already installed, you'll see the version number
+1. Go to [desktop.github.com](https://desktop.github.com)
+2. Click "Download for Mac"
+3. Open the downloaded file and drag GitHub Desktop to your Applications folder
+4. Open GitHub Desktop from your Applications folder
 
-**On Linux:**
-1. Open Terminal
-2. Type `sudo apt install git` (Ubuntu/Debian) or `sudo yum install git` (CentOS/RHEL)
-3. Press Enter and follow the prompts
-4. Test with `git --version`
+### Step 2: Sign In to GitHub Desktop
+1. Open GitHub Desktop
+2. Click "Sign in to GitHub.com"
+3. Enter your GitHub username and password
+4. GitHub Desktop will ask for permission - click "Authorize desktop"
+5. You should now see the GitHub Desktop main screen
 
-### Step 2: Configure Git (First Time Only)
-You need to tell Git who you are. Replace "Your Name" and "your.email@example.com" with your actual information:
+### Step 3: Fork the Team100/all25 Repository
+A "fork" creates your own copy of the repository that you can modify without affecting the original.
 
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-```
+1. Open your web browser and go to [github.com/Team100/all25](https://github.com/Team100/all25)
+2. Click the "Fork" button in the top-right corner
+3. GitHub will ask where to fork it - choose your personal account
+4. Wait for the fork to complete (this might take a minute)
+5. You now have your own copy at `github.com/YourUsername/all25`
 
-### Step 3: Choose Where to Put Your Code
-Decide where you want to keep your robot code. We recommend creating a folder like `src` or `projects` in your home directory.
+### Step 4: Clone Your Fork to Your Computer
+Now we'll download your forked copy to your computer.
 
-**On Windows:**
-- Open File Explorer
-- Navigate to `C:\Users\YourUsername\`
-- Create a new folder called `src`
-
-**On Mac/Linux:**
-- Open Terminal
-- Type `mkdir ~/src` and press Enter (this creates a folder called "src" in your home directory)
-
-### Step 4: Clone the Repository
-Now we'll download the Team100/all25 code to your computer.
-
-1. Open Terminal/Command Prompt
-2. Navigate to your src folder:
-   - **Windows:** `cd C:\Users\YourUsername\src`
-   - **Mac/Linux:** `cd ~/src`
-3. Clone the repository:
-   ```bash
-   git clone https://github.com/Team100/all25.git
-   ```
-4. Wait for the download to complete (this might take a few minutes)
-5. Navigate into the new folder:
-   ```bash
-   cd all25
-   ```
+1. In GitHub Desktop, click "Clone a repository from the Internet"
+2. Click the "GitHub.com" tab
+3. Find "all25" in the list (it should show "YourUsername/all25")
+4. Click on it to select it
+5. Choose where to save it on your computer:
+   - **Recommended location:** `C:\Users\YourUsername\Documents\GitHub\` (Windows) or `/Users/YourUsername/Documents/GitHub/` (Mac)
+   - GitHub Desktop will create the folder automatically
+6. Click "Clone"
+7. Wait for the download to complete (this might take a few minutes)
 
 ### Step 5: Verify Everything Worked
 Let's make sure everything downloaded correctly:
 
-1. Go into your `src` or `project` folder where you have the code.
-1. List the contents of the folder:
-   ```bash
-   ls
-   ```
-   (On Windows, use `dir` instead of `ls`)
-
-2. You should see folders like `comp`, `lib`, `studies`, `console`, `raspberry_pi`, and `doc`
+1. In GitHub Desktop, you should see "all25" in your repository list
+2. Click on "all25" to open it
+3. You should see the repository contents
+4. Open File Explorer (Windows) or Finder (Mac) and navigate to where you saved the repository
+5. You should see folders like `comp`, `lib`, `studies`, `console`, `raspberry_pi`, and `doc`
 
 ### Step 6: Understanding What You Just Downloaded
-You now have a complete copy of Team100's 2025 robot code! Here's what each folder contains:
+You now have your own copy of Team100's 2025 robot code! Here's what each folder contains:
 
 - **`comp/`** - The main competition robot code
 - **`lib/`** - Shared library code used by all projects
-- **`studies/`** - Small experimental projects and learning exercises
+- **`studies/`** - Small experimental projects and learning exercises (this is where you'll work!)
 - **`console/`** - Operator console hardware and software
 - **`raspberry_pi/`** - Vision processing and other coprocessor tasks
 - **`doc/`** - Documentation (like this file!)
 
-### Step 7: Set Up Your Development Branch (Optional but Recommended)
+### Step 7: Set Up Your Development Branch
 Before you start making changes, it's good practice to create your own branch (a separate version of the code where you can make changes without affecting the main code):
 
-1. Create a new branch with your name:
-   ```bash
-   git checkout -b your-name-dev/your-project-name
-   ```
-   1. Replace "your-name-dev" with something like "alex-dev" or "sarah-dev"
-   2. Replace "your-project-name" with what you are trying to accomplish. E.g. for now it can be `learning`
+1. In GitHub Desktop, make sure you're on the "main" branch (you should see this at the top)
+2. Click "Current branch: main" and then "New branch"
+3. Name your branch something like "your-name-dev" (replace with your actual name)
+4. Click "Create branch"
+5. You should now see "Current branch: your-name-dev" at the top
 
-2. Verify you're on your new branch:
-   ```bash
-   git branch
-   ```
-   You should see an asterisk (*) next to your branch name
+### Step 8: Understanding the Fork Workflow
+Here's how you'll work with your code:
+
+1. **Make changes** in your local repository
+2. **Commit changes** using GitHub Desktop (we'll show you how later)
+3. **Push changes** to your fork on GitHub
+4. **Create a Pull Request** to contribute your changes back to Team100/all25
 
 ### Troubleshooting Common Issues
 
-**"git: command not found"**
-- Git isn't installed or isn't in your PATH. Reinstall Git and make sure to restart your terminal.
+**"Repository not found"**
+- Make sure you forked the repository first (Step 3)
+- Check that you're signed in to GitHub Desktop
+- Verify you're looking at the right repository
+
+**"Clone failed"**
+- Check your internet connection
+- Make sure you have permission to access the repository
+- Try closing and reopening GitHub Desktop
+
+**"Can't find the repository"**
+- Make sure you forked it to your personal account
+- Check that you're signed in with the correct GitHub account
 
 **"Permission denied"**
-- You might not have permission to write to that directory. Try using a different folder or ask for help.
-
-**"Repository not found"**
-- Check that you typed the URL correctly: `https://github.com/Team100/all25.git`
-- Make sure you have internet access
-
-**"Authentication failed"**
-- This usually happens when GitHub requires authentication. For now, you can work with the code locally. We'll cover authentication later.
+- Make sure you're signed in to GitHub Desktop
+- Verify you have write access to the folder where you're trying to save
 
 ### What's Next?
-Great job! You now have the Team100/all25 repository on your computer. The next step is to set up VSCode and WPILib so you can actually work with the code.
+Great job! You now have your own copy of the Team100/all25 repository on your computer. The next step is to set up VSCode and WPILib so you can actually work with the code.
 
 ## Get VSCode + WPILib Set Up
 TODO
@@ -139,16 +127,25 @@ TODO
 
 
 ## Getting VSCode Workspace Working
-In VSCode, go to `File > Open Folder` and select the `all25/comp` folder. 
+Now that you have the repository on your computer, let's set up VSCode to work with it.
+
+1. Open VSCode
+2. Go to `File > Open Folder`
+3. Navigate to where you saved your repository (probably `Documents/GitHub/all25/`)
+4. Select the `comp` folder inside your repository
+5. Click "Select Folder"
 
 When you open the comp project, VS Code should show a message in the bottom-right corner suggesting that you open the "workspace" instead, which includes lib:
 
 <img src="readme_img/openworkspace.png" width=350/>
 
+**Click "Open Workspace"** - this will give you access to both the competition code and the shared library code.
+
 When you have VS Code correctly set up, the Explorer view should contain two top-level folders: "comp" and "lib":
 
 <img src="readme_img/comp_workspace.png" width=350/>
-TODO.
+
+**Important:** You're now working in your own fork of the repository, so any changes you make won't affect the main Team100/all25 repository until you create a Pull Request.
 
 ## Building the RoboRIO Code
 Use the WPI extensions to run the `gradlew` build:
