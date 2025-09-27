@@ -19,7 +19,7 @@ public class TankFactory {
     public static TankDrive make(LoggerFactory parent, int supplyLimit) {
         LoggerFactory log = parent.name("Tank Drive");
 
-        NeoCANSparkMotor right = new NeoCANSparkMotor(log, 27, MotorPhase.REVERSE, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
+        NeoCANSparkMotor right = new NeoCANSparkMotor(log, 27, MotorPhase.FORWARD, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
 
         NeoCANSparkMotor left = new NeoCANSparkMotor(log, 3, MotorPhase.REVERSE, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
        
