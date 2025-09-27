@@ -300,7 +300,7 @@ public class RobotContainer {
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
         /** fake arm to see what it needs to do. */
-        Placeholder placeholder = new Placeholder();
+        Placeholder placeholder = new Placeholder(CalgamesMech);
 
         m_auton = new Auton(logger, placeholder, m_manipulator,
                 autoController, autoProfile, m_drive,
