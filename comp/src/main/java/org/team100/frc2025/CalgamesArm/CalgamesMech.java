@@ -111,8 +111,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 // the shoulder has a 5048 on the intermediate shaft
                 AS5048RotaryPositionSensor shoulderSensor = new AS5048RotaryPositionSensor(
                         shoulderLog,
-                        4, //  id done
-                        0.5, // TODO: verify offset
+                        4, // id done
+                        0.059573, // TODO: verify offset
                         EncoderDrive.DIRECT); // TODO: verify drive
                 GearedRotaryPositionSensor gearedSensor = new GearedRotaryPositionSensor(
                         shoulderSensor,
@@ -147,7 +147,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         wristLog, wristMotor);
                 ProxyRotaryPositionSensor wristProxySensor = new ProxyRotaryPositionSensor(
                         wristEncoder,
-                        58); // TODO: calibrate ratio
+                        2* (38/12)*(38/12)*(50/12));
+                wristProxySensor.setEncoderPosition(2); // 9/27/25 measured
                 m_wrist = new RotaryMechanism(
                         wristLog,
                         wristMotor,
@@ -284,6 +285,13 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
             DoubleSupplier y,
             DoubleSupplier r) {
         return run(() -> addCartesian(x.getAsDouble(), y.getAsDouble(), r.getAsDouble()));
+    }
+
+    @Override
+    public void periodic() {
+        m_shoulder.periodic();
+        m_elevator.periodic();
+        m_wrist.periodic();
     }
 
     /////////////////////////////////
