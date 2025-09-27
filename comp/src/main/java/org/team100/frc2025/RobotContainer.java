@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
+import org.team100.frc2025.CalgamesArm.HoldPosition;
+import org.team100.frc2025.CalgamesArm.ManualConfig;
 import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
@@ -275,9 +277,12 @@ public class RobotContainer {
                         thetaFeedback, m_drive),
                 driverControl::driveWithBargeAssist);
 
+        /////////////////////////////////////////////////
+        //
         // DEFAULT COMMANDS
 
         m_drive.setDefaultCommand(driveDefault);
+        CalgamesMech.setDefaultCommand(new HoldPosition(CalgamesMech));
         m_climber.setDefaultCommand(
                 m_climber.stop().withName("climber default"));
         m_climberIntake.setDefaultCommand(
@@ -379,6 +384,10 @@ public class RobotContainer {
         Trajectory100 bar = p.restToRest(calgamesWaypoints);
         whileTrue(buttons::red2,
                 new FollowTrajectory(CalgamesMech, bar));
+
+        // "fly" the joints manually
+        whileTrue(operatorControl::manual,
+                new ManualConfig(operatorControl::velocity, CalgamesMech));
 
         // this is for developing autopick.
         new FloorPickSetup(
