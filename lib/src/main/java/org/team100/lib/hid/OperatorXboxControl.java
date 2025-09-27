@@ -1,5 +1,11 @@
 package org.team100.lib.hid;
 
+import static org.team100.lib.hid.ControlUtil.clamp;
+import static org.team100.lib.hid.ControlUtil.deadband;
+import static org.team100.lib.hid.ControlUtil.expo;
+
+import org.team100.lib.hid.DriverControl.Velocity;
+
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -9,15 +15,15 @@ import edu.wpi.first.wpilibj.XboxController;
  * 
  * <pre>
  * left trigger [0,1]     == 
- * left bumper button     ==
- * left stick x [-1,1]    == manual climb speed
- * left stick y [-1,1]    == 
+ * left bumper button     == activate manual arm
+ * left stick x [-1,1]    == manual wrist rotation
+ * left stick y [-1,1]    == manual climb speed
  * left stick button      == (don't use)
  * dpad/pov angle [0,360] == 
  * "back" button          == 
  * "start" button         == 
- * right stick x [-1,1]   == 
- * right stick y [-1,1]   == 
+ * right stick x [-1,1]   == manual shoulder rotation
+ * right stick y [-1,1]   == manual elevator
  * right stick button     == (don't use)
  * x button               == extend and spin climber for intake
  * y button               == activate manual climb mode
@@ -30,6 +36,9 @@ import edu.wpi.first.wpilibj.XboxController;
  * Do not use stick buttons, they are prone to stray clicks
  */
 public class OperatorXboxControl implements OperatorControl {
+    private static final double DEADBAND = 0.1;
+    private static final double EXPO = 0.65;
+
     private final XboxController m_controller;
 
     public OperatorXboxControl() {
@@ -42,8 +51,37 @@ public class OperatorXboxControl implements OperatorControl {
     }
 
     @Override
+    public Velocity velocity() {
+        final double rightY = m_controller.getRightY();
+        final double rightX = m_controller.getRightX();
+        final double leftX = m_controller.getLeftX();
+        double dx = 0;
+        double dy = 0;
+        double x = -1.0 * clamp(rightY, 1);
+        double y = -1.0 * clamp(rightX, 1);
+        double r = Math.hypot(x, y);
+        if (r > DEADBAND) {
+            double expoR = expo(r, EXPO);
+            double ratio = expoR / r;
+            dx = ratio * x;
+            dy = ratio * y;
+        } else {
+            dx = 0;
+            dy = 0;
+        }
+        double dtheta = expo(deadband(-1.0 * clamp(leftX, 1), DEADBAND, 1), EXPO);
+
+        return new Velocity(dx, dy, dtheta);
+    }
+
+    @Override
+    public boolean manual() {
+        return m_controller.getLeftBumperButton();
+    }
+
+    @Override
     public double manualClimbSpeed() {
-        return m_controller.getLeftX();
+        return m_controller.getLeftY();
     }
 
     @Override
