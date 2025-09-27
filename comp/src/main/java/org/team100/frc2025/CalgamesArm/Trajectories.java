@@ -20,6 +20,14 @@ public class Trajectories {
         m_planner = new TrajectoryPlanner(c);
     }
 
+
+    //trajecotries for moving from wherever to home
+    public Trajectory100 whereverToBetween() {
+        return m_planner.restToRest(List.of( //pick from back go to home (aka going forward)
+                Waypoint.FROM_PICK .hPose,
+                Waypoint.GOING_FORWARD.hPose));
+    }
+
     //coral
     public Trajectory100 pickToBetween() {
         return m_planner.restToRest(List.of( //pick from back go to home (aka going forward)

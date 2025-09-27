@@ -7,6 +7,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * We often use an enum of canonical poses.
  */
 public enum CanonicalPose {
+    //wherever positions
+    // WHEREVER
+
     HOME(1, 0, 0), //the fully hidden position
     PICK(0.1, -0.6, Rotation2d.kCW_90deg.getRadians()),
     /** This is required to make rotation go the right way around */

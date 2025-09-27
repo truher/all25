@@ -17,7 +17,7 @@ import org.team100.lib.profile.HolonomicProfile;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ScoreL2Smart {
+public class ScoreL1Smart {
     public static Command get(
             LoggerFactory logger,
             Placeholder placeholder,
@@ -28,7 +28,7 @@ public class ScoreL2Smart {
             Supplier<Pose2d> goal) {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile, goal);
-        FollowTrajectory prePlace = placeholder.prePlaceL2();
+        FollowTrajectory prePlace = placeholder.prePlaceL1();
         return sequence(
                 parallel(
                         toReef,

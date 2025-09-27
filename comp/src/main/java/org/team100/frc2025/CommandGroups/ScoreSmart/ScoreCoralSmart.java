@@ -50,6 +50,10 @@ public class ScoreCoralSmart {
                         Map.entry(ScoringLevel.L2,
                                 ScoreL2Smart.get(
                                         logger, placeholder, manipulator,
+                                        controller, profile, drive, goal)),
+                        Map.entry(ScoringLevel.L1,
+                                ScoreL1Smart.get(
+                                        logger, placeholder, manipulator,
                                         controller, profile, drive, goal))),
                         level));
     }

@@ -147,8 +147,8 @@ public class RobotContainer {
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         if (Identity.instance.equals(Identity.COMP_BOT)) {
-            m_climber = new Climber(logger, 15);
-            m_climberIntake = new ClimberIntake(logger, 0);
+            m_climber = new Climber(logger, 13); //should be correct
+            m_climberIntake = new ClimberIntake(logger, 14); //should be correct
         } else {
             m_climber = new Climber(logger, 18);
             m_climberIntake = new ClimberIntake(logger, 0);
@@ -370,20 +370,23 @@ public class RobotContainer {
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
 
-        List<HolonomicPose2d> calgamesWaypoints = List.of(
-                new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
-                new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
 
-        TrajectoryPlanner trajectoryPlanner = new TrajectoryPlanner(List.of(
-                new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly something wrong - kym
-        Trajectory100 bar = trajectoryPlanner.restToRest(calgamesWaypoints);
-        whileTrue(buttons::red2,
-                new FollowTrajectory(CalgamesMech, bar));
+        //i think this is all obsolete now because we made the commands in placeholder
+        // List<HolonomicPose2d> calgamesWaypoints = List.of(
+        //         new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
+        //         new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
 
-        // this is for developing autopick.
-        new FloorPickSetup(
-                fieldLog, driverControl, m_drive, m_targets,
-                SwerveControllerFactory.pick(driveLog), autoProfile);
+        // TrajectoryPlanner trajectoryPlanner = new TrajectoryPlanner(List.of(
+        //         new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly something wrong - kym
+        // Trajectory100 bar = trajectoryPlanner.restToRest(calgamesWaypoints);
+        // whileTrue(buttons::red2,
+        //         new FollowTrajectory(CalgamesMech, bar));
+
+        // // this is for developing autopick.
+        // new FloorPickSetup(
+        //         fieldLog, driverControl, m_drive, m_targets,
+        //         SwerveControllerFactory.pick(driveLog), autoProfile);
+
 
         m_initializer = Executors.newSingleThreadScheduledExecutor();
         m_initializer.schedule(this::initStuff, 0, TimeUnit.SECONDS);

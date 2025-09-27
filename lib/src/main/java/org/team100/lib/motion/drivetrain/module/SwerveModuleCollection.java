@@ -62,44 +62,44 @@ public class SwerveModuleCollection {
                         WCPSwerveModule100.getKrakenDrive(frontLeftLogger,
                                 currentLimit,
                                 statorLimit,
-                                18,
+                                2, //can id done
                                 DriveRatio.MEDIUM, DutyCycleRotaryPositionSensor.class,
-                                55,
-                                0,
+                                1,  //can id done
+                                6, //can id done
                                 0.512104,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(frontRightLogger,
                                 currentLimit,
                                 statorLimit,
-                                56,
+                                4, //can id done
                                 DriveRatio.MEDIUM, DutyCycleRotaryPositionSensor.class,
-                                51,
-                                1,
+                                3, //can id done
+                                7, //can id done
                                 0.512468,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(rearLeftLogger,
                                 currentLimit,
                                 statorLimit,
-                                22,
+                                8, //can id done
                                 DriveRatio.MEDIUM, DutyCycleRotaryPositionSensor.class,
-                                52,
-                                2,
+                                7,//can id done
+                                9,//can id done
                                 0.184939,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(rearRightLogger,
                                 currentLimit,
                                 statorLimit,
-                                4,
+                                6,//can id done
                                 DriveRatio.MEDIUM, DutyCycleRotaryPositionSensor.class,
-                                21,
-                                7,
+                                5, //can id done
+                                8,//can id done
                                 0.954909,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, MotorPhase.REVERSE));
-            case SWERVE_ONE:
+            case SWERVE_ONE: 
                 Util.println("************** WCP MODULES w/Duty-Cycle Encoders **************");
                 return new SwerveModuleCollection(
                         WCPSwerveModule100.getFalconDrive(frontLeftLogger,

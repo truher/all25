@@ -81,7 +81,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
             case COMP_BOT -> {
                 Kraken6Motor elevatorMotor = new Kraken6Motor(
                         elevatorLog,
-                        1, // TODO: elevator CAN ID
+                        11, // TODO: elevator CAN ID (DID, now for starboard)
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -100,7 +100,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
 
                 Kraken6Motor shoulderMotor = new Kraken6Motor(
                         parent,
-                        2, // TODO: shoulder CAN ID
+                        24, // TODO: shoulder CAN ID (Done)
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -112,7 +112,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 // the shoulder has a 5048 on the intermediate shaft
                 AS5048RotaryPositionSensor shoulderSensor = new AS5048RotaryPositionSensor(
                         shoulderLog,
-                        1, // TODO: verify channel
+                        4, //  id done
                         0.5, // TODO: verify offset
                         EncoderDrive.DIRECT); // TODO: verify drive
                 GearedRotaryPositionSensor gearedSensor = new GearedRotaryPositionSensor(
@@ -136,7 +136,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
 
                 Kraken6Motor wristMotor = new Kraken6Motor(
                         parent,
-                        3, // TODO: wrist CAN ID
+                        22, // TODO: wrist CAN ID (Done)
                         MotorPhase.FORWARD,
                         60,
                         90,

@@ -7,6 +7,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public enum Waypoint {
     /** This is required to make rotation go the right way around */
 
+    //moving from wherever
+    // FROM_WHEREVER()
     //pick
     FROM_PICK(CanonicalPose.PICK, Rotation2d.kZero),
     TO_PICK(CanonicalPose.PICK, Rotation2d.k180deg),
