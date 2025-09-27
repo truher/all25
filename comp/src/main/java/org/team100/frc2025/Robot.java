@@ -146,15 +146,6 @@ public class Robot extends TimedRobot100 {
 
     //////////////////////////////////////////////////////////////////////
     //
-    // Exits are called first when mode changes
-    //
-    @Override
-    public void testExit() {
-        clearCommands();
-    }
-
-    //////////////////////////////////////////////////////////////////////
-    //
     // Inits are called on mode change, after exiting the previous mode.
     //
 
@@ -173,15 +164,6 @@ public class Robot extends TimedRobot100 {
         m_robotContainer.onTeleop();
     }
 
-    @Override
-    public void testInit() {
-        clearCommands();
-        for (Topic t : NetworkTableInstance.getDefault().getTopics()) {
-            if (DEBUG)
-                Util.printf("%s\n", t.getName());
-        }
-        m_robotContainer.scheduleTest();
-    }
 
     ///////////////////////////////////////////////////////////////////////
     //
@@ -203,9 +185,7 @@ public class Robot extends TimedRobot100 {
         m_log_voltage.log(RobotController::getBatteryVoltage);
     }
 
-    @Override
-    public void testPeriodic() {
-    }
+
 
     //////////////////////////////////////////////////////////////////////
     //

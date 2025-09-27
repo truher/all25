@@ -39,11 +39,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * affects "gravity".
  */
 public class Wrist2 extends SubsystemBase {
-    /**
-     * Publish the elevator mechanism visualization to glass. This might be a little
-     * bit slow, turn it off for comp.
-     */
-    private static final boolean VISUALIZE = true;
+
     private static final int GEAR_RATIO = 25;
 
     private static final double WRIST_MIN_POSITION = -0.5;

@@ -6,10 +6,9 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.function.DoubleConsumer;
 
-import org.team100.frc2025.CommandGroups.PrePlaceCoralL4;
+import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
 import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Wrist.CoralTunnel;
 import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
@@ -30,9 +29,9 @@ public class Coral1Mid {
 
     public static Command get(
             LoggerFactory logger,
+            Placeholder placeholder,
             Wrist2 wrist,
             Elevator elevator,
-            CoralTunnel tunnel,
             SwerveController controller,
             HolonomicProfile profile,
             SwerveDriveSubsystem drive,
@@ -44,8 +43,7 @@ public class Coral1Mid {
                 logger, drive, controller, profile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.H));
 
-        PrePlaceCoralL4 prePlace = new PrePlaceCoralL4(wrist, elevator, tunnel, 47);
-
+        Command prePlace = placeholder.prePlaceL4();
         return sequence(
                 parallel(
                         runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
@@ -56,7 +54,7 @@ public class Coral1Mid {
                                         elevator.set(1) //
                                 ).until(() -> wrist.atGoal() && elevator.atGoal()),
                                 prePlace)//
-                ).until(() -> (toReef.isDone() && prePlace.isDone())),
+                ).until(() -> (toReef.isDone() && placeholder.atL4())),
                 new PostDropCoralL4(wrist, elevator, 10)
                         .until(elevator::atGoal) //
         );
