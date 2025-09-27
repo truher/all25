@@ -1,6 +1,7 @@
 package org.team100.lib.hid;
 
 import org.team100.lib.async.Async;
+import org.team100.lib.hid.DriverControl.Velocity;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -66,6 +67,16 @@ public class OperatorControlProxy implements OperatorControl {
     @Override
     public String getHIDName() {
         return m_operatorControl.getHIDName();
+    }
+
+    @Override
+    public Velocity velocity() {
+        return m_operatorControl.velocity();
+    }
+
+    @Override
+    public boolean manual() {
+        return m_operatorControl.manual();
     }
 
     @Override

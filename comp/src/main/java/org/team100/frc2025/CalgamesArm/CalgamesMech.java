@@ -44,7 +44,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private Config m_config;
 
     private final Gravity m_gravity;
-    
+
     private final DoubleLogger m_log_elevator;
     private final DoubleLogger m_log_shoulder;
     private final DoubleLogger m_log_wrist;
@@ -54,13 +54,12 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private final LinearMechanism m_elevator;
     private final RotaryMechanism m_shoulder;
     private final RotaryMechanism m_wrist;
-    
 
     private static final double ARM_REDUCTION = 78; // number from om, from talon to output? (inspo from elevator code)
 
-    public CalgamesMech(LoggerFactory log, 
-    double armLength, 
-    double wristLength) {
+    public CalgamesMech(LoggerFactory log,
+            double armLength,
+            double wristLength) {
         LoggerFactory parent = log.type(this);
         m_armLengthM = armLength;
         m_wristLengthM = wristLength;
@@ -120,7 +119,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         10); // TODO: verify gear ratio
 
                 ProxyRotaryPositionSensor shoulderProxySensor = new ProxyRotaryPositionSensor(
-                        shoulderEncoder, //what is this - kym
+                        shoulderEncoder, // what is this - kym
                         100); // TODO: calibrate ratio
                 CombinedRotaryPositionSensor shoulderCombined = new CombinedRotaryPositionSensor(
                         shoulderLog,
@@ -128,7 +127,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         shoulderProxySensor);
                 m_shoulder = new RotaryMechanism(
                         shoulderLog,
-                        shoulderMotor,  //need to learn what these three things do and how rotatrymech works - kym
+                        shoulderMotor, // need to learn what these three things do and how rotatrymech works - kym
                         shoulderCombined,
                         100, // TODO: calibrate ratio
                         -3, // TODO: calibrate lower limit
@@ -157,8 +156,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         -3, // TODO: calibrate lower limit
                         3);// TODO: calibrate upper limit
 
-            } 
-             default -> {
+            }
+            default -> {
                 SimulatedBareMotor elevatorMotor = new SimulatedBareMotor(elevatorLog, 600);
                 SimulatedBareEncoder elevatorEncoder = new SimulatedBareEncoder(elevatorLog, elevatorMotor);
                 m_elevator = new LinearMechanism(
@@ -196,12 +195,13 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         wristSensor,
                         58, // TODO: calibrate gear ratio
                         -3, // TODO: calibrate lower limit
-                        3);}
-                    }// TODO: calibrate upper limit
+                        3);
             }
+        }// TODO: calibrate upper limit
+    }
 
     // simple methods grabbed from mech.java
-    public static Mech make2025(LoggerFactory parent){
+    public static Mech make2025(LoggerFactory parent) {
         return new Mech(0.3, 0.1); // these values are prolly wrong, needs to be measured IRL
     }
 
@@ -227,7 +227,6 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_log_wrist.log(() -> c.wristAngle());
     }
 
-
     private JointVelocities getJointVelocity() {
         // TODO: think about these defaults
         return new JointVelocities(
@@ -235,7 +234,6 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 m_shoulder.getVelocityRad_S().orElse(0),
                 m_wrist.getVelocityRad_S().orElse(0));
     }
-
 
     public SwerveModel getState() {
         Config c = getConfig();
@@ -291,21 +289,21 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     /////////////////////////////////
     /** This is not "hold position" this is "torque off" */
     public void stop() {
-            m_elevator.stop();
-            m_shoulder.stop();
-            m_wrist.stop();
+        m_elevator.stop();
+        m_shoulder.stop();
+        m_wrist.stop();
     }
 
-        /** Sets each mechanism, with zero velocity */
-    private void set(Config c) {
-            logConfig(c);
-            // this is the force *of* gravity
-            JointForce jf = m_gravity.get(c);
-            // force should *oppose* gravity.
-            m_elevator.setPosition(c.shoulderHeight(), 0, 0, -1.0 * jf.elevator());
-            m_shoulder.setPosition(c.shoulderAngle(), 0, 0, -1.0 * jf.shoulder());
+    /** Sets each mechanism, with zero velocity */
+    public void set(Config c) {
+        logConfig(c);
+        // this is the force *of* gravity
+        JointForce jf = m_gravity.get(c);
+        // force should *oppose* gravity.
+        m_elevator.setPosition(c.shoulderHeight(), 0, 0, -1.0 * jf.elevator());
+        m_shoulder.setPosition(c.shoulderAngle(), 0, 0, -1.0 * jf.shoulder());
         m_wrist.setPosition(c.wristAngle(), 0, 0, -1.0 * jf.wrist());
-        }
+    }
 
     private void addConfig(double height, double shoulder, double wrist) {
         Config c = getConfig();
@@ -324,7 +322,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         double y2 = p.getY() + y;
         Rotation2d r2 = p.getRotation().plus(new Rotation2d(r));
         Pose2d newP = new Pose2d(x2, y2, r2); // our new goal point
-        m_log_pose.log(() -> newP);  // solves for the config to reach new goal point
+        m_log_pose.log(() -> newP); // solves for the config to reach new goal point
         Config c = m_kinematics.inverse(newP);
         if (c.isNaN()) {
             System.out.println("skipping invalid config");
@@ -355,5 +353,4 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
      * 
      */
 
-    
 }
