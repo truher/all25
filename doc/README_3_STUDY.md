@@ -15,7 +15,7 @@ WPILib comes with a wizard to start a new project.
 
 
 ## Make Sure Build + Deploy Work
-Let's make sure the WPILib plugin can build your Study and deploy it to the RoboRIO. Follow the previous instructions (remember those?) on how to build + deploy, but select your Study instead of `swerve100` this time.
+Let's make sure the WPILib plugin can build your Study and deploy it to the RoboRIO. Follow the [instructions](README_DEPLOY_TO_ROBORIO.md) on how to build + deploy, but select your Study instead of `comp` this time.
 
 If your deploy is successful, you should see in the Driver Station that Communications is GREEN, Robot Code is GREEN, and there are no errors scrolling in the log:
 ![](readme_img/test_project_success.png)

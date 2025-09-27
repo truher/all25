@@ -162,10 +162,11 @@ Use the WPI extensions to run the `gradlew` build:
     6 actionable tasks: 1 executed, 5 up-to-date
     Watched directory hierarchies: [C:\Users\Engineering Student\src\all24\comp\swerve100]
     ```
+
 TODO: what if the build is not successful?
 
 # Next Steps
-You are done setting up your code! It builds successfully so you could start making changes now, if you'd like. But before you do, I recommend learning a bit more about how to work with the FIRST Robotics interfaces, WPILib. There are two paths you can take:
+You are done setting up your code! It builds successfully so you could start making changes now, if you'd like. If you have a RoboRIO handy, you might want to try to [deploy](README_DEPLOY_TO_ROBORIO.md) to it immediately. But before you do, I recommend learning a bit more about how to work with the FIRST Robotics interfaces, WPILib. There are two paths you can take:
 
 1. [Learn to control a single motor](README_2_MOTOR.md): recommended, this walks you step-by-step on how to get a single motor running through the RoboRIO.
 2. [Learn to use the Simulator](README_5_SIMULATOR.md): alternate path, learn to deploy the code to a simulator and do your testing that way.
