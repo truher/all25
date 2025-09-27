@@ -23,7 +23,7 @@ public class ClimberIntake extends SubsystemBase {
         switch (Identity.instance) {
             case COMP_BOT -> {
                 m_motor = new Kraken6Motor(
-                        log, canID, MotorPhase.FORWARD, 50, 50, new PIDConstants(),
+                        log, canID, MotorPhase.FORWARD, 50, 2, new PIDConstants(),
                         Feedforward100.makeKrakenClimberIntake());
             }
             default -> {

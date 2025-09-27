@@ -1,5 +1,5 @@
 {
-	"folders": [
+    "folders": [
         {
             "path": "."
         },
@@ -23,7 +23,7 @@
         "java.signatureHelp.enabled": false,
         "java.saveActions.organizeImports": false,
         "workbench.colorCustomizations": {
-            "debugConsole.infoForeground":"#000000"
+            "debugConsole.infoForeground": "#000000"
         },
         "debug.console.collapseIdenticalLines": false,
         "intellicodeApiExamples.python.enabled": false,
@@ -42,6 +42,7 @@
             "org.mockito.Mockito.*",
             "org.mockito.ArgumentMatchers.*",
             "org.mockito.Answers.*"
-        ]
+        ],
+        "chat.disableAIFeatures": true
     }
 }
