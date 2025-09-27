@@ -76,5 +76,13 @@ public class ElevatorArmWristKinematics {
                 shoulderToWrist.getAngle().getRadians(),
                 wristAngle);
     }
+
+    public double getArmLength() {
+        return m_armLength;
+    }
+
+    public double getManipulatorLength() {
+        return m_manipulatorLength;
+    }
 }
 

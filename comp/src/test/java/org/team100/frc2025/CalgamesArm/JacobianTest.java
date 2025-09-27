@@ -4,11 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.function.Function;
-import org.team100.lib.motion.Config;
+
 import org.junit.jupiter.api.Test;
-import org.team100.frc2025.CalgamesArm.Jacobian;
-import org.team100.frc2025.CalgamesArm.JointVelocities;
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.motion.Config;
 import org.team100.lib.motion.ElevatorArmWristKinematics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
@@ -32,8 +31,8 @@ public class JacobianTest {
     @Test
     void test0() {
         final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
-        Function<Vector<N3>, Vector<N3>> f = q ->  Jacobian.pose(k.forward(Jacobian.config(q)));
-        
+        Function<Vector<N3>, Vector<N3>> f = q -> Jacobian.pose(k.forward(Jacobian.config(q)));
+
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
                 Nat.N3(),
                 Nat.N3(),
@@ -115,6 +114,45 @@ public class JacobianTest {
         assertEquals(0, m.get(0), DELTA);
         assertEquals(-0.5, m.get(1), DELTA);
         assertEquals(1.5, m.get(2), DELTA);
+    }
+
+    @Test
+    void test05() {
+        final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
+        Jacobian j = new Jacobian(k);
+
+        Config c = new Config(1, 0, 0);
+        Pose2d p = k.forward(c);
+
+        // some example velocities
+        // zero velocity
+        SwerveModel v = new SwerveModel(p);
+
+        JointVelocities jv = j.inverse(v);
+        assertEquals(0, jv.elevator(), DELTA);
+        assertEquals(0, jv.shoulder(), DELTA);
+        assertEquals(0, jv.wrist(), DELTA);
+
+        // +x
+        v = new SwerveModel(p, new FieldRelativeVelocity(1, 0, 0));
+        jv = j.inverse(v);
+        assertEquals(1, jv.elevator(), DELTA);
+        assertEquals(0, jv.shoulder(), DELTA);
+        assertEquals(0, jv.wrist(), DELTA);
+
+        // +y
+        v = new SwerveModel(p, new FieldRelativeVelocity(0, 1, 0));
+        jv = j.inverse(v);
+        assertEquals(0, jv.elevator(), DELTA);
+        assertEquals(0.5, jv.shoulder(), DELTA);
+        assertEquals(-0.5, jv.wrist(), DELTA);
+
+        // +theta
+        v = new SwerveModel(p, new FieldRelativeVelocity(0, 0, 1));
+        jv = j.inverse(v);
+        assertEquals(0, jv.elevator(), DELTA);
+        assertEquals(-0.5, jv.shoulder(), DELTA);
+        assertEquals(1.5, jv.wrist(), DELTA);
     }
 
     @Test
