@@ -1,6 +1,6 @@
 # Team 100 Documentation Hub
 
-Welcome to Team 100's learning path! This is your starting point for learning robotics programming, from complete beginner to contributing team member.
+Welcome to [Team100](https://www.team100.org/)'s learning path! This is your starting point for learning robotics programming, from complete beginner to contributing team member.
 
 ## 🚀 Getting Started - Learning Path
 
@@ -63,11 +63,10 @@ Once you've mastered the basics, explore these advanced topics:
 - **[🆔 Robot Identity Setup](README_N_IDENTITY.md)** - Configure hardware for specific robots
 - **[📋 Coding Conventions](Conventions.md)** - Team coding standards and best practices
 
-
-
 ## 🎮 **2025 FRC Game Context**
 
 Our instructions are designed for the **2025 FRC game "Reefscape"**, which involves:
+
 - **🌊 Algae collection and manipulation** - Gathering game pieces
 - **🪸 Coral handling** - Precise placement and scoring  
 - **🧗 Climbing mechanisms** - Ascending structures
@@ -77,6 +76,7 @@ Our instructions are designed for the **2025 FRC game "Reefscape"**, which invol
 ## 📝 **Contributing to Documentation**
 
 This is an in-progress guide, so please add to it anytime you see gaps! If you:
+
 - Find unclear instructions
 - Discover better ways to do things
 - Want to add new topics
@@ -87,4 +87,3 @@ Please update the documentation or ask for help adding new content.
 ---
 
 **Ready to start?** Begin with [Setting up your development environment](README_1_STARTING.md)!
-
