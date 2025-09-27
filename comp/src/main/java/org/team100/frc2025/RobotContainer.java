@@ -19,11 +19,9 @@ import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
-import org.team100.frc2025.Elevator.Elevator;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.Auton;
-import org.team100.frc2025.Wrist.Wrist2;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
@@ -32,7 +30,6 @@ import org.team100.lib.commands.drivetrain.ResetPose;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
 import org.team100.lib.commands.r3.FollowTrajectory;
-import org.team100.lib.commands.r3.SubsystemR3;
 import org.team100.lib.config.Camera;
 import org.team100.lib.config.Identity;
 import org.team100.lib.controller.drivetrain.FullStateSwerveController;
@@ -112,8 +109,6 @@ public class RobotContainer {
     // SUBSYSTEMS
     final SwerveDriveSubsystem m_drive;
 
-    final Elevator m_elevator;
-    final Wrist2 m_wrist;
     final Climber m_climber;
     final ClimberIntake m_climberIntake;
     // final LEDIndicator m_leds;
@@ -142,7 +137,6 @@ public class RobotContainer {
         final LoggerFactory logger = logging.rootLogger;
         final LoggerFactory driveLog = logger.name("Drive");
         final LoggerFactory comLog = logger.name("Commands");
-        final LoggerFactory elevatorLog = logger.name("Elevator");
         final LoggerFactory coralSequence = logger.name("Coral Sequence");
         final LoggerFactory autoSequence = logger.name("Auto Sequence");
 
@@ -151,26 +145,16 @@ public class RobotContainer {
         final OperatorControl operatorControl = new OperatorControlProxy(async);
         final ThirdControl buttons = new ThirdControlProxy(async);
 
+        m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         if (Identity.instance.equals(Identity.COMP_BOT)) {
-            m_elevator = new Elevator(elevatorLog, 11, 19);
-            m_wrist = new Wrist2(elevatorLog, 9, m_elevator::getSetpointAcceleration);
             m_climber = new Climber(logger, 15);
-
-            // put in 0 as placeholder
             m_climberIntake = new ClimberIntake(logger, 0);
-            m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
-            m_manipulator = new Manipulator(logger);
         } else {
-            m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
-            m_elevator = new Elevator(elevatorLog, 2, 19);
-            m_wrist = new Wrist2(elevatorLog, 9, m_elevator::getSetpointAcceleration);
             m_climber = new Climber(logger, 18);
-            m_manipulator = new Manipulator(logger);
-
-            // put in 0 as placeholder value
             m_climberIntake = new ClimberIntake(logger, 0);
         }
 
+        m_manipulator = new Manipulator(logger);
         CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.3, 0.1);
 
         m_combinedViz = new Viz(CalgamesMech);
@@ -313,14 +297,14 @@ public class RobotContainer {
         /** fake arm to see what it needs to do. */
         Placeholder placeholder = new Placeholder();
 
-        m_auton = new Auton(logger, placeholder, m_manipulator, m_wrist,
-                m_elevator, autoController, autoProfile, m_drive,
+        m_auton = new Auton(logger, placeholder, m_manipulator,
+                autoController, autoProfile, m_drive,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                 .left();
 
         whileTrue(driverControl::test,
-                new Auton(logger, placeholder, m_manipulator, m_wrist,
-                        m_elevator, autoController, autoProfile, m_drive,
+                new Auton(logger, placeholder, m_manipulator,
+                        autoController, autoProfile, m_drive,
                         localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                         .right());
 
@@ -366,7 +350,7 @@ public class RobotContainer {
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,
                 ScoreCoralSmart.get(
-                        coralSequence, placeholder, m_wrist, m_elevator,
+                        coralSequence, placeholder, m_manipulator,
                         holonomicController, profile, m_drive,
                         localizer::setHeedRadiusM, buttons::level, buttons::point));
 
@@ -484,6 +468,5 @@ public class RobotContainer {
     public void close() {
         m_modules.close();
         // m_leds.close();
-        m_elevator.close();
     }
 }

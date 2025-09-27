@@ -10,9 +10,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 /** This exists to accumulate API for the arm. */
 public class Placeholder {
-    /** Move to central lower stowed position and hold it there forever. */
+    /**
+     * Move to central lower stowed position and hold it there forever.
+     * This should also be the default command.
+     */
     public Command stow() {
         return print("stow");
+    }
+
+    /**  */
+    public boolean stowed() {
+        return false;
     }
 
     /** True if the center of gravity is not too high. */

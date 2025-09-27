@@ -7,9 +7,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import java.util.function.DoubleConsumer;
 
 import org.team100.frc2025.CalgamesArm.Placeholder;
-import org.team100.frc2025.CommandGroups.ScoreSmart.PostDropCoralL4;
-import org.team100.frc2025.Elevator.Elevator;
-import org.team100.frc2025.Wrist.Wrist2;
+import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
@@ -30,8 +28,7 @@ public class Coral1Mid {
     public static Command get(
             LoggerFactory logger,
             Placeholder placeholder,
-            Wrist2 wrist,
-            Elevator elevator,
+            Manipulator manipulator,
             SwerveController controller,
             HolonomicProfile profile,
             SwerveDriveSubsystem drive,
@@ -48,15 +45,9 @@ public class Coral1Mid {
                 parallel(
                         runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
                         toReef,
-                        sequence(
-                                parallel(
-                                        wrist.readyUp(),
-                                        elevator.set(1) //
-                                ).until(() -> wrist.atGoal() && elevator.atGoal()),
-                                prePlace)//
+                        prePlace //
                 ).until(() -> (toReef.isDone() && placeholder.atL4())),
-                new PostDropCoralL4(wrist, elevator, 10)
-                        .until(elevator::atGoal) //
-        );
+                manipulator.centerEject().withTimeout(0.5),
+                placeholder.stow());
     }
 }
