@@ -172,4 +172,6 @@ With the controller plugged in, your code deployed, you should have all green li
 
 Makes sure you have `TeleOperated` enabled, and Enable the robot. Then you should be able to control it with your Left Stick up/down on the XBox Controller. Exciting!!
 
+# Next Steps
+Congrats, you know how to control a real motor! Now let's learn to [use the Simulator](README_5_SIMULATOR.md).
 

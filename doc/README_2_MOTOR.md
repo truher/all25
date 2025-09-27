@@ -29,5 +29,5 @@ You should be using a Spark Max controller per the picture above. It has a USB-C
     1. ![](readme_img/run_motor.png)
 1. Your motor should be running very slowly!
 
-## DONE!
-You are done with this chapter. Move to the next one!
+# Next Steps
+You are done with this chapter. If you want to learn how to control the motor through code, move to [README_3_STUDY](README_3_STUDY.md). That will teach how to start with a fresh codebase with the minimum you need.

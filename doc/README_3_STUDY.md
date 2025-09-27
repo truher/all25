@@ -93,4 +93,5 @@ Time to send your code in for review. If you are not familiar with Git, go read 
 
 You should end up with a big PR that looks like [this one](https://github.com/Team100/all24/pull/548). Don't worry about it too much; we want to get this committed without any of YOUR changes because there is no reason for anyone to review this boilplate code.
 
-# Move On to the Next Chapter!
+# Next Steps
+You are ready to control your first motor! Move on to [motor control](README_4_MOTOR_CONTROL.md).
