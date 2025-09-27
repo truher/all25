@@ -45,8 +45,9 @@ public class Jacobian {
     public JointVelocities inverse(SwerveModel swerveModel) {
         Pose2d p = swerveModel.pose();
         FieldRelativeVelocity v = swerveModel.velocity();
+        Config c = m_k.inverse(p);
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
-                Nat.N3(), Nat.N3(), m_f, config(m_k.inverse(p)));
+                Nat.N3(), Nat.N3(), m_f, config(c));
         if (Math.abs(j.det()) < 1e-3) {
             // Don't try to invert if it's not possible.
             // The safe thing is to stop.
