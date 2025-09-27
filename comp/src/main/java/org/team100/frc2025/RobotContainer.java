@@ -374,9 +374,9 @@ public class RobotContainer {
                 new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
 
-        TrajectoryPlanner p = new TrajectoryPlanner(List.of(
+        TrajectoryPlanner trajectoryPlanner = new TrajectoryPlanner(List.of(
                 new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly something wrong - kym
-        Trajectory100 bar = p.restToRest(calgamesWaypoints);
+        Trajectory100 bar = trajectoryPlanner.restToRest(calgamesWaypoints);
         whileTrue(buttons::red2,
                 new FollowTrajectory(CalgamesMech, bar));
 
