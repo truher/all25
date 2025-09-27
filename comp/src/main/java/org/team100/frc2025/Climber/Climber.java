@@ -43,7 +43,7 @@ public class Climber extends SubsystemBase {
                         PIDConstants.makePositionPID(1),
                         Feedforward100.makeArmPivot());
 
-                int channel = 3;
+                int channel = 5;
                 double inputOffset = 0.110602;
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
                         log, channel, inputOffset, EncoderDrive.DIRECT);
