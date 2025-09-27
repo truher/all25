@@ -163,13 +163,18 @@ Now we want to have the XBoxController drive the `setDutyCycle` values. Because 
 Build and deploy this to your robot.
 
 ### Attaching a Controller to the RoboRIO
-Just plug the XBoxController to your computer via USB :) Easy!
+Just plug the XBoxController to your computer via USB :) Easy! 
+
+If you see an "HID not found" and a message about the controller, it may not be supported. Some controllers have a switch you need to flip, so try that.
+
 
 ### Putting it all together
 With the controller plugged in, your code deployed, you should have all green lights in your Driver Station:
 
-![](readme_img/all_green_driver_station)
+<img src="readme_img/driver_station.png">
 
 Makes sure you have `TeleOperated` enabled, and Enable the robot. Then you should be able to control it with your Left Stick up/down on the XBox Controller. Exciting!!
 
+# Next Steps
+Congrats, you know how to control a real motor! Now let's learn to [use the Simulator](README_5_SIMULATOR.md).
 

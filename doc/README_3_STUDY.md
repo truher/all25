@@ -15,7 +15,7 @@ WPILib comes with a wizard to start a new project.
 
 
 ## Make Sure Build + Deploy Work
-Let's make sure the WPILib plugin can build your Study and deploy it to the RoboRIO. Follow the previous instructions (remember those?) on how to build + deploy, but select your Study instead of `swerve100` this time.
+Let's make sure the WPILib plugin can build your Study and deploy it to the RoboRIO. Follow the [instructions](README_DEPLOY_TO_ROBORIO.md) on how to build + deploy, but select your Study instead of `comp` this time.
 
 If your deploy is successful, you should see in the Driver Station that Communications is GREEN, Robot Code is GREEN, and there are no errors scrolling in the log:
 ![](readme_img/test_project_success.png)
@@ -93,4 +93,5 @@ Time to send your code in for review. If you are not familiar with Git, go read 
 
 You should end up with a big PR that looks like [this one](https://github.com/Team100/all24/pull/548). Don't worry about it too much; we want to get this committed without any of YOUR changes because there is no reason for anyone to review this boilplate code.
 
-# Move On to the Next Chapter!
+# Next Steps
+You are ready to control your first motor! Move on to [motor control](README_4_MOTOR_CONTROL.md).
