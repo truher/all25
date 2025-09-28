@@ -153,13 +153,13 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         wristLog, wristMotor);
                 ProxyRotaryPositionSensor wristProxySensor = new ProxyRotaryPositionSensor(
                         wristEncoder,
-                        2* (38/12)*(38/12)*(50/12));
+                        55.710);
                 wristProxySensor.setEncoderPosition(2); // 9/27/25 measured
                 m_wrist = new RotaryMechanism(
                         wristLog,
                         wristMotor,
                         wristProxySensor,
-                        58, // TODO: calibrate ratio
+                        55.710, // TODO: calibrate ratio
                         -3, // TODO: calibrate lower limit
                         3);// TODO: calibrate upper limit
 
