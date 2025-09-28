@@ -41,10 +41,11 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private final double m_armLengthM;
     private final double m_wristLengthM;
     private final ElevatorArmWristKinematics m_kinematics;
-    private final Jacobian m_jacobian;
+    private final AnalyticalJacobian m_jacobian;
     private Config m_config;
 
     private final Gravity m_gravity;
+    private final Dynamics m_dynamics;
 
     private final DoubleLogger m_log_elevator;
     private final DoubleLogger m_log_shoulder;
@@ -65,9 +66,10 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_armLengthM = armLength;
         m_wristLengthM = wristLength;
         m_kinematics = new ElevatorArmWristKinematics(armLength, wristLength);
-        m_jacobian = new Jacobian(m_kinematics);
+        m_jacobian = new AnalyticalJacobian(m_kinematics);
 
         m_gravity = Gravity.from2025();
+        m_dynamics = new Dynamics();
 
         m_log_elevator = parent.doubleLogger(Level.TRACE, "elevator");
         m_log_shoulder = parent.doubleLogger(Level.TRACE, "shoulder");

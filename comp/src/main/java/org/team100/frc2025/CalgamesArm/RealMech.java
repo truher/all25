@@ -41,7 +41,7 @@ public class RealMech extends SubsystemBase implements MechInterface, SubsystemR
     private final double m_armLength;
     private final double m_handLength;
     private final ElevatorArmWristKinematics m_kinematics;
-    private final Jacobian m_jacobian;
+    private final AnalyticalJacobian m_jacobian;
 
     // TODO: real elevator has port and starboard motors.
     private final LinearMechanism m_elevator;
@@ -63,7 +63,7 @@ public class RealMech extends SubsystemBase implements MechInterface, SubsystemR
         m_armLength = armLength;
         m_handLength = handLength;
         m_kinematics = new ElevatorArmWristKinematics(armLength, handLength);
-        m_jacobian = new Jacobian(m_kinematics);
+        m_jacobian = new AnalyticalJacobian(m_kinematics);
         m_gravity = Gravity.from2025();
 
         m_log_elevator = parent.doubleLogger(Level.TRACE, "elevator");
