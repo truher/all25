@@ -55,6 +55,7 @@ public abstract class CANSparkMotor implements BareMotor {
     protected CANSparkMotor(
             LoggerFactory parent,
             SparkBase motor,
+            NeutralMode neutral,
             MotorPhase motorPhase,
             int currentLimit,
             Feedforward100 ff,
@@ -65,7 +66,7 @@ public abstract class CANSparkMotor implements BareMotor {
         // make config synchronous so we can see the errors
         Rev100.crash(() -> m_motor.setCANTimeout(500));
         Rev100.baseConfig(m_motor);
-        Rev100.motorConfig(m_motor, IdleMode.kCoast, motorPhase, 20);
+        Rev100.motorConfig(m_motor, neutral, motorPhase, 20);
         Rev100.currentConfig(m_motor, currentLimit);
         m_encoder = m_motor.getEncoder();
         m_pidController = m_motor.getClosedLoopController();

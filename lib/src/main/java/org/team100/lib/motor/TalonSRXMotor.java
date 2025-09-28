@@ -17,10 +17,21 @@ public class TalonSRXMotor implements BareMotor {
     private final DoubleLogger m_log_duty;
 
     public TalonSRXMotor(
-            LoggerFactory parent, int canID, MotorPhase motorPhase, double supplyLimit) {
+            LoggerFactory parent,
+            int canID,
+            MotorPhase phase,
+            NeutralMode neutral,
+            double supplyLimit) {
         m_motor = new TalonSRX(canID);
-        if (motorPhase == MotorPhase.REVERSE) {
-            m_motor.setInverted(true);
+        switch (neutral) {
+            case COAST -> m_motor.setNeutralMode(
+                    com.ctre.phoenix.motorcontrol.NeutralMode.Coast);
+            case BRAKE -> m_motor.setNeutralMode(
+                    com.ctre.phoenix.motorcontrol.NeutralMode.Brake);
+        }
+        switch (phase) {
+            case FORWARD -> m_motor.setInverted(false);
+            case REVERSE -> m_motor.setInverted(true);
         }
         // don't use the "peak" current limit feature at all
         m_motor.configPeakCurrentLimit(0);

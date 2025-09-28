@@ -7,6 +7,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,7 +45,7 @@ public class OpenLoopSubsystem extends SubsystemBase  {
                 // you should make a case in the feedforward class for your constants
                 Feedforward100 FF = Feedforward100.makeSimple();
                 m_motor = new Falcon6Motor(
-                        log, canId, MotorPhase.FORWARD, supplyLimit, statorLimit, PID, FF);
+                        log, canId, NeutralMode.COAST, MotorPhase.FORWARD, supplyLimit, statorLimit, PID, FF);
             }
             default -> {
                 m_motor = new SimulatedBareMotor(log, 600);

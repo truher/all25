@@ -21,6 +21,7 @@ import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
@@ -79,6 +80,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double turningOffset,
             SwerveKinodynamics kinodynamics,
             EncoderDrive drive,
+            NeutralMode neutral,
             MotorPhase motorPhase) {
 
         LinearVelocityServo driveServo = driveKrakenServo(
@@ -96,6 +98,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 STEERING_RATIO,
                 kinodynamics,
                 drive,
+                neutral,
                 motorPhase);
         return new WCPSwerveModule100(driveServo, turningServo);
     }
@@ -115,6 +118,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double turningOffset,
             SwerveKinodynamics kinodynamics,
             EncoderDrive drive,
+            NeutralMode neutral,
             MotorPhase motorPhase) {
         LinearVelocityServo driveServo = driveFalconServo(
                 parent.name("Drive"),
@@ -131,6 +135,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 STEERING_RATIO,
                 kinodynamics,
                 drive,
+                neutral,
                 motorPhase);
         return new WCPSwerveModule100(driveServo, turningServo);
     }
@@ -147,6 +152,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
         Kraken6Motor driveMotor = new Kraken6Motor(
                 parent,
                 driveMotorCanId,
+                NeutralMode.COAST,
                 MotorPhase.FORWARD,
                 supplyLimit,
                 statorLimit,
@@ -174,6 +180,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
         Falcon6Motor driveMotor = new Falcon6Motor(
                 parent,
                 driveMotorCanId,
+                NeutralMode.COAST,
                 MotorPhase.FORWARD,
                 supplyLimit,
                 statorLimit,
@@ -197,6 +204,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double gearRatio,
             SwerveKinodynamics kinodynamics,
             EncoderDrive drive,
+            NeutralMode neutral,
             MotorPhase motorPhase) {
 
         // Talon outboard POSITION PID
@@ -210,6 +218,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
         Falcon6Motor turningMotor = new Falcon6Motor(
                 parent,
                 turningMotorCanId,
+                neutral,
                 motorPhase,
                 STEERING_SUPPLY_LIMIT,
                 STEERING_STATOR_LIMIT,

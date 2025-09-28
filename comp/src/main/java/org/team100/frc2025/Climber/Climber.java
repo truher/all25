@@ -17,6 +17,7 @@ import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.OnboardAngularPositionServo;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
@@ -39,7 +40,7 @@ public class Climber extends SubsystemBase {
 
         switch (Identity.instance) {
             case COMP_BOT -> {
-                Falcon6Motor motor = new Falcon6Motor(log, canID, MotorPhase.REVERSE, 50, 50,
+                Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.BRAKE, MotorPhase.REVERSE, 50, 50,
                         PIDConstants.makePositionPID(1),
                         Feedforward100.makeArmPivot());
 

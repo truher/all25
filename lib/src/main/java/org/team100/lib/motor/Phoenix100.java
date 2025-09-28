@@ -28,7 +28,7 @@ public class Phoenix100 {
         if (ACTUALLY_CRASH)
             Util.warn("***** Motor config fail will CRASH the robot, NOT FOR COMP! *****");
         // else
-            // Util.warn("***** Motor config fail will not be caught, NOT FOR DEV! *****");
+        // Util.warn("***** Motor config fail will not be caught, NOT FOR DEV! *****");
 
     }
 
@@ -37,8 +37,8 @@ public class Phoenix100 {
         if (statusCode.isError()) {
             if (ACTUALLY_CRASH)
                 throw new IllegalStateException(statusCode.toString());
-                Util.warn("******************************************************");
-                Util.warn("****** MOTOR CONFIG HAS FAILED MOTOR IS NOT SET CORRECTLY ******");
+            Util.warn("******************************************************");
+            Util.warn("****** MOTOR CONFIG HAS FAILED MOTOR IS NOT SET CORRECTLY ******");
             Util.warn(statusCode.toString());
         }
     }
@@ -55,15 +55,19 @@ public class Phoenix100 {
         crash(() -> conf.apply(base, TIMEOUT_SEC));
     }
 
-    public static void motorConfig(TalonFXConfigurator conf, MotorPhase phase) {
-        // System.out.println("motorConfig");
+    public static void motorConfig(
+            TalonFXConfigurator conf,
+            NeutralMode neutral,
+            MotorPhase phase) {
         MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
-        motorConfigs.NeutralMode = NeutralModeValue.Brake;
-        if (phase == MotorPhase.FORWARD) {
-            motorConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
-        } else {
-            motorConfigs.Inverted = InvertedValue.Clockwise_Positive;
-        }
+        motorConfigs.NeutralMode = switch (neutral) {
+            case COAST -> NeutralModeValue.Coast;
+            case BRAKE -> NeutralModeValue.Brake;
+        };
+        motorConfigs.Inverted = switch (phase) {
+            case FORWARD -> InvertedValue.CounterClockwise_Positive;
+            case REVERSE -> InvertedValue.Clockwise_Positive;
+        };
         crash(() -> conf.apply(motorConfigs, TIMEOUT_SEC));
     }
 
@@ -89,7 +93,7 @@ public class Phoenix100 {
         Slot0Configs slot0Configs = new Slot0Configs();
         Slot1Configs slot1Configs = new Slot1Configs();
         slot0Configs.kV = 0.0; // we use "arbitrary feedforward", not this.
-        slot1Configs.kV = 0.0; 
+        slot1Configs.kV = 0.0;
         slot0Configs.kP = pid.getPositionP();
         slot0Configs.kI = pid.getPositionI();
         slot0Configs.kD = pid.getPositionD();

@@ -11,6 +11,7 @@ import org.team100.lib.motion.drivetrain.module.WCPSwerveModule100.DriveRatio;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.util.Util;
 
 /**
@@ -68,7 +69,7 @@ public class SwerveModuleCollection {
                                 6, //can id done
                                 0.512104,
                                 kinodynamics,
-                                EncoderDrive.INVERSE, MotorPhase.REVERSE),
+                                EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(frontRightLogger,
                                 currentLimit,
                                 statorLimit,
@@ -78,7 +79,7 @@ public class SwerveModuleCollection {
                                 7, //can id done
                                 0.512468,
                                 kinodynamics,
-                                EncoderDrive.INVERSE, MotorPhase.REVERSE),
+                                EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(rearLeftLogger,
                                 currentLimit,
                                 statorLimit,
@@ -88,7 +89,7 @@ public class SwerveModuleCollection {
                                 9,//can id done
                                 0.184939,
                                 kinodynamics,
-                                EncoderDrive.INVERSE, MotorPhase.REVERSE),
+                                EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(rearRightLogger,
                                 currentLimit,
                                 statorLimit,
@@ -98,7 +99,7 @@ public class SwerveModuleCollection {
                                 8,//can id done
                                 0.954909,
                                 kinodynamics,
-                                EncoderDrive.INVERSE, MotorPhase.REVERSE));
+                                EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE));
             case SWERVE_ONE: 
                 Util.println("************** WCP MODULES w/Duty-Cycle Encoders **************");
                 return new SwerveModuleCollection(
@@ -111,7 +112,7 @@ public class SwerveModuleCollection {
                                 7,
                                 0.658,
                                 kinodynamics,
-                                EncoderDrive.INVERSE, MotorPhase.REVERSE),
+                                EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(frontRightLogger,
                                 currentLimit,
                                 statorLimit,
@@ -121,7 +122,7 @@ public class SwerveModuleCollection {
                                 8,
                                 0.379,
                                 kinodynamics,
-                                EncoderDrive.INVERSE, MotorPhase.REVERSE),
+                                EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(rearLeftLogger,
                                 currentLimit,
                                 statorLimit,
@@ -131,7 +132,7 @@ public class SwerveModuleCollection {
                                 6,
                                 0.41,
                                 kinodynamics,
-                                EncoderDrive.INVERSE, MotorPhase.REVERSE),
+                                EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(rearRightLogger,
                                 currentLimit,
                                 statorLimit,
@@ -141,7 +142,7 @@ public class SwerveModuleCollection {
                                 9,
                                 0.03,
                                 kinodynamics,
-                                EncoderDrive.INVERSE, MotorPhase.REVERSE));
+                                EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE));
             case BETA_BOT:
             case SWERVE_TWO:
             case BLANK:
