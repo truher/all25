@@ -43,6 +43,6 @@
             "org.mockito.ArgumentMatchers.*",
             "org.mockito.Answers.*"
         ],
-        "chat.disableAIFeatures": true
+        "chat.disableAIFeatures": false
     }
 }
