@@ -11,6 +11,7 @@ import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.LazySimulatedBareMotor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import au.grapplerobotics.LaserCan;
@@ -36,11 +37,11 @@ public class Manipulator extends SubsystemBase {
         switch (Identity.instance) {
             case COMP_BOT -> {
                 // Set specific parameters for the competition robot
-                Kraken6Motor leftMotor = new Kraken6Motor(log, 19, MotorPhase.FORWARD, 40, 40, //can id done
+                Kraken6Motor leftMotor = new Kraken6Motor(log, 19, NeutralMode.COAST, MotorPhase.FORWARD, 40, 40, //can id done
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor rightMotor = new Kraken6Motor(log, 20, MotorPhase.REVERSE, 40, 40, //can id done
+                Kraken6Motor rightMotor = new Kraken6Motor(log, 20, NeutralMode.COAST, MotorPhase.REVERSE, 40, 40, //can id done
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor algaeMotor = new Kraken6Motor(log, 21, MotorPhase.FORWARD, 120, 120, //can id done
+                Kraken6Motor algaeMotor = new Kraken6Motor(log, 21, NeutralMode.COAST, MotorPhase.FORWARD, 120, 120, //can id done
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
                 m_algaeMotor = algaeMotor;
                 m_rightLaser = new LaserCan(17); //can id done

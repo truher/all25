@@ -16,6 +16,7 @@ import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.OnboardAngularPositionServo;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.timed.JerkLimitedIncrementalProfile;
 import org.team100.lib.reference.ProfileReference1d;
@@ -96,7 +97,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase  {
                 // you should make a case in the feedforward class for your constants
                 Feedforward100 FF = Feedforward100.makeSimple();
                 Kraken6Motor motor = new Kraken6Motor(
-                        log, canID, MotorPhase.REVERSE, supplyLimit, statorLimit, PID, FF);
+                        log, canID, NeutralMode.COAST, MotorPhase.REVERSE, supplyLimit, statorLimit, PID, FF);
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
                         log, sensorChannel, inputOffset, EncoderDrive.DIRECT);
                 RotaryMechanism mech = new RotaryMechanism(

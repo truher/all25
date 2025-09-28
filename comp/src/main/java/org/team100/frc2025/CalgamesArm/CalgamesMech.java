@@ -29,6 +29,7 @@ import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,10 +41,11 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private final double m_armLengthM;
     private final double m_wristLengthM;
     private final ElevatorArmWristKinematics m_kinematics;
-    private final Jacobian m_jacobian;
+    private final AnalyticalJacobian m_jacobian;
     private Config m_config;
 
     private final Gravity m_gravity;
+    private final Dynamics m_dynamics;
 
     private final DoubleLogger m_log_elevator;
     private final DoubleLogger m_log_shoulder;
@@ -64,9 +66,10 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_armLengthM = armLength;
         m_wristLengthM = wristLength;
         m_kinematics = new ElevatorArmWristKinematics(armLength, wristLength);
-        m_jacobian = new Jacobian(m_kinematics);
+        m_jacobian = new AnalyticalJacobian(m_kinematics);
 
         m_gravity = Gravity.from2025();
+        m_dynamics = new Dynamics();
 
         m_log_elevator = parent.doubleLogger(Level.TRACE, "elevator");
         m_log_shoulder = parent.doubleLogger(Level.TRACE, "shoulder");
@@ -81,6 +84,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 Kraken6Motor elevatorMotor = new Kraken6Motor(
                         elevatorLog,
                         11, // TODO: elevator CAN ID (DID, now for starboard)
+                        NeutralMode.BRAKE,
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -100,6 +104,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 Kraken6Motor shoulderMotor = new Kraken6Motor(
                         parent,
                         24, // TODO: shoulder CAN ID (Done)
+                        NeutralMode.BRAKE,
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -136,6 +141,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 Kraken6Motor wristMotor = new Kraken6Motor(
                         parent,
                         22, // TODO: wrist CAN ID (Done)
+                        NeutralMode.COAST,
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -147,13 +153,13 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         wristLog, wristMotor);
                 ProxyRotaryPositionSensor wristProxySensor = new ProxyRotaryPositionSensor(
                         wristEncoder,
-                        2* (38/12)*(38/12)*(50/12));
+                        55.710);
                 wristProxySensor.setEncoderPosition(2); // 9/27/25 measured
                 m_wrist = new RotaryMechanism(
                         wristLog,
                         wristMotor,
                         wristProxySensor,
-                        58, // TODO: calibrate ratio
+                        55.710, // TODO: calibrate ratio
                         -3, // TODO: calibrate lower limit
                         3);// TODO: calibrate upper limit
 

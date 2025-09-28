@@ -16,12 +16,13 @@ public class Neo550CANSparkMotor extends CANSparkMotor {
     public Neo550CANSparkMotor(
             LoggerFactory parent,
             int canId,
+            NeutralMode neutral,
             MotorPhase motorPhase,
             int currentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
         super(parent, new SparkMax(canId, MotorType.kBrushless),
-                motorPhase, currentLimit, ff, pid);
+                neutral, motorPhase, currentLimit, ff, pid);
     }
 
     @Override

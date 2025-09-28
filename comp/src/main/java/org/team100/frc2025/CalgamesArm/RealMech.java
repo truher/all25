@@ -28,6 +28,7 @@ import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,7 +41,7 @@ public class RealMech extends SubsystemBase implements MechInterface, SubsystemR
     private final double m_armLength;
     private final double m_handLength;
     private final ElevatorArmWristKinematics m_kinematics;
-    private final Jacobian m_jacobian;
+    private final AnalyticalJacobian m_jacobian;
 
     // TODO: real elevator has port and starboard motors.
     private final LinearMechanism m_elevator;
@@ -62,7 +63,7 @@ public class RealMech extends SubsystemBase implements MechInterface, SubsystemR
         m_armLength = armLength;
         m_handLength = handLength;
         m_kinematics = new ElevatorArmWristKinematics(armLength, handLength);
-        m_jacobian = new Jacobian(m_kinematics);
+        m_jacobian = new AnalyticalJacobian(m_kinematics);
         m_gravity = Gravity.from2025();
 
         m_log_elevator = parent.doubleLogger(Level.TRACE, "elevator");
@@ -78,6 +79,7 @@ public class RealMech extends SubsystemBase implements MechInterface, SubsystemR
                 Kraken6Motor elevatorMotor = new Kraken6Motor(
                         elevatorLog,
                         1, // TODO: elevator CAN ID
+                        NeutralMode.BRAKE,
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -97,6 +99,7 @@ public class RealMech extends SubsystemBase implements MechInterface, SubsystemR
                 Kraken6Motor shoulderMotor = new Kraken6Motor(
                         parent,
                         2, // TODO: shoulder CAN ID
+                        NeutralMode.BRAKE,
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -133,6 +136,7 @@ public class RealMech extends SubsystemBase implements MechInterface, SubsystemR
                 Kraken6Motor wristMotor = new Kraken6Motor(
                         parent,
                         3, // TODO: wrist CAN ID
+                        NeutralMode.COAST,
                         MotorPhase.FORWARD,
                         60,
                         90,
