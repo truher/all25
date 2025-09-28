@@ -311,31 +311,36 @@ class RealCamera(Camera):
                     ]
                 )
             case Model.GS:
-                # if identity == Identity.DIST_TEST: # 3.2mm lens
-                    # this is for the 3.2 mm lens
-                return np.array(
-                [
-                    [990, 0, 728], # 728 = 1456/2, not actually in the center
-                    [0, 990, 544], # 544 = 1088/2, actually center :-)
-                    [0, 0, 1],
-                ]
-                )
-                    # this is for the 6 mm lens
-                #     return np.array(
-                #         [
-                #             [1780, 0, 728], # 728 = 1456/2, not actually in the center
-                #             [0, 1780, 544], # 544 = 1088/2, actually center :-)
-                #             [0, 0, 1],
-                #         ]
-                #     )
-                # else: # 6mm lens
-                #     return np.array(
-                #         [
-                #             [1780, 0, 728],
-                #             [0, 1780, 544],
-                #             [0, 0, 1],
-                #         ]
-                #     )
+                # Example: handle different identities for GS model
+                match identity:
+                    case Identity.CORAL_RIGHT:
+                        # this is for the 3.2 mm lens
+                        return np.array(
+                            [
+                                [944.3507484, 0, 693.7105365],  # 728 = 1456/2, not actually in the center
+                                [0, 943.8611003, 498.1103206],  # 544 = 1088/2, actually center :-)
+                                [0, 0, 1],
+                            ]
+                        )
+                    # Uncomment and adjust as needed for other identities/lenses
+                    # case Identity.DIST_TEST:
+                    #     # this is for the 6 mm lens
+                    #     return np.array(
+                    #         [
+                    #             [1780, 0, 728],  # 728 = 1456/2, not actually in the center
+                    #             [0, 1780, 544],  # 544 = 1088/2, actually center :-)
+                    #             [0, 0, 1],
+                    #         ]
+                    #     )
+                    case _:
+                        # Default GS model intrinsic matrix
+                        return np.array(
+                            [
+                                [1780, 0, 728],
+                                [0, 1780, 544],
+                                [0, 0, 1],
+                            ]
+                        )
             case _:
                 return np.array(
                     [
@@ -359,7 +364,7 @@ class RealCamera(Camera):
             case Model.GS:
                 # if identity == Identity.DIST_TEST:
 # this is for the 3.2 mm lens from 9/15/25 testing
-                return np.array([[-0.27, 0.1, 0, 0]])
+                return np.array([[-0.280215963, 0.1410181344, -0.0004975099487, -0.0003688145196, -0.008688430095, 0.03172761625, -0.001268540923, 0.04303604588]])
 # this is for the 6 mm lens from 2/1/25 testing
                 #     return np.array([[-0.510, 0.335, 0, 0]])
                 # else:
