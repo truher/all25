@@ -19,11 +19,13 @@ public class Neo550Factory {
             int currentLimit,
             int canID,
             double gearRatio,
+            NeutralMode neutral,
             MotorPhase motorPhase,
             double wheelDiameterM) {
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 log,
                 canID,
+                neutral,
                 motorPhase,
                 currentLimit,
                 Feedforward100.makeNeo550(),
@@ -39,10 +41,12 @@ public class Neo550Factory {
             int currentLimit,
             int canID,
             double gearRatio,
+            NeutralMode neutral,
             MotorPhase motorPhase) {
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 log,
                 canID,
+                neutral,
                 motorPhase,
                 currentLimit,
                 Feedforward100.makeNeo550(),
@@ -62,6 +66,7 @@ public class Neo550Factory {
             int currentLimit,
             int canID,
             double gearRatio,
+            NeutralMode neutral,
             MotorPhase motorPhase,
             double wheelDiameterM) {
         return new OutboardLinearVelocityServo(log,
@@ -70,6 +75,7 @@ public class Neo550Factory {
                         currentLimit,
                         canID,
                         gearRatio,
+                        neutral,
                         motorPhase,
                         wheelDiameterM));
     }

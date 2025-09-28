@@ -16,12 +16,13 @@ public class NeoVortexCANSparkMotor extends CANSparkMotor {
     public NeoVortexCANSparkMotor(
             LoggerFactory parent,
             int canId,
+            NeutralMode neutral,
             MotorPhase motorPhase,
             int currentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
         super(parent, new SparkFlex(canId, MotorType.kBrushless),
-                motorPhase, currentLimit, ff, pid);
+                neutral, motorPhase, currentLimit, ff, pid);
     }
 
     @Override

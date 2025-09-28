@@ -86,6 +86,7 @@ public abstract class Talon6Motor implements BareMotor {
     protected Talon6Motor(
             LoggerFactory parent,
             int canId,
+            NeutralMode neutral,
             MotorPhase motorPhase,
             double supplyLimit,
             double statorLimit,
@@ -109,7 +110,7 @@ public abstract class Talon6Motor implements BareMotor {
         TalonFXConfigurator talonFXConfigurator = m_motor.getConfigurator();
         Phoenix100.logCrashStatus();
         Phoenix100.baseConfig(talonFXConfigurator);
-        Phoenix100.motorConfig(talonFXConfigurator, motorPhase);
+        Phoenix100.motorConfig(talonFXConfigurator, neutral, motorPhase);
         Phoenix100.currentConfig(talonFXConfigurator, supplyLimit, statorLimit);
         Phoenix100.pidConfig(talonFXConfigurator, lowLevelPIDConstants);
 

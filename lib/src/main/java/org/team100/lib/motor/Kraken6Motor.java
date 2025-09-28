@@ -14,12 +14,13 @@ public class Kraken6Motor extends Talon6Motor {
     public Kraken6Motor(
             LoggerFactory parent,
             int canId,
+            NeutralMode neutral,
             MotorPhase motorPhase,
             double supplyLimit,
             double statorLimit,
             PIDConstants pid,
             Feedforward100 ff) {
-            super(parent, canId, motorPhase, supplyLimit, statorLimit, pid, ff);
+            super(parent, canId, neutral, motorPhase, supplyLimit, statorLimit, pid, ff);
         }
 
     @Override

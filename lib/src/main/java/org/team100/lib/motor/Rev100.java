@@ -39,16 +39,26 @@ public class Rev100 {
         crash(() -> motor.configure(conf, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
     }
 
-    public static void motorConfig(SparkBase motor, IdleMode idleMode, MotorPhase phase,
+    public static void motorConfig(
+            SparkBase motor,
+            NeutralMode neutral,
+            MotorPhase phase,
             int periodMs) {
-        setIdleMode(motor, idleMode);
         SparkMaxConfig conf = new SparkMaxConfig();
-        conf.inverted(phase == MotorPhase.REVERSE);
+        conf.idleMode(switch (neutral) {
+            case COAST -> IdleMode.kCoast;
+            case BRAKE -> IdleMode.kBrake;
+        });
+        conf.inverted(switch (phase) {
+            case FORWARD -> false;
+            case REVERSE -> true;
+        });
         conf.signals.primaryEncoderVelocityPeriodMs(periodMs);
         conf.signals.primaryEncoderVelocityAlwaysOn(true);
         conf.signals.primaryEncoderPositionPeriodMs(periodMs);
         conf.signals.primaryEncoderPositionAlwaysOn(true);
-        // slower than default of 10; also affects things like motor temperature and applied output.
+        // slower than default of 10; also affects things like motor temperature and
+        // applied output.
         conf.signals.limitsPeriodMs(20);
         crash(() -> motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
     }
@@ -56,12 +66,6 @@ public class Rev100 {
     public static void currentConfig(SparkBase motor, int currentLimit) {
         SparkMaxConfig conf = new SparkMaxConfig();
         conf.smartCurrentLimit(currentLimit);
-        crash(() -> motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
-    }
-
-    public static void setIdleMode(SparkBase motor, IdleMode idleMode) {
-        SparkMaxConfig conf = new SparkMaxConfig();
-        conf.idleMode(idleMode);
         crash(() -> motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
     }
 

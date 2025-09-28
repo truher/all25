@@ -29,6 +29,7 @@ import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -81,6 +82,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 Kraken6Motor elevatorMotor = new Kraken6Motor(
                         elevatorLog,
                         11, // TODO: elevator CAN ID (DID, now for starboard)
+                        NeutralMode.BRAKE,
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -100,6 +102,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 Kraken6Motor shoulderMotor = new Kraken6Motor(
                         parent,
                         24, // TODO: shoulder CAN ID (Done)
+                        NeutralMode.BRAKE,
                         MotorPhase.FORWARD,
                         60,
                         90,
@@ -136,6 +139,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 Kraken6Motor wristMotor = new Kraken6Motor(
                         parent,
                         22, // TODO: wrist CAN ID (Done)
+                        NeutralMode.COAST,
                         MotorPhase.FORWARD,
                         60,
                         90,
