@@ -53,7 +53,9 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
 
     private final Pose2dLogger m_log_pose;
 
-    private final LinearMechanism m_elevator;
+    private final LinearMechanism m_elevatorFront;
+    private final LinearMechanism m_elevatorBack;
+
     private final RotaryMechanism m_shoulder;
     private final RotaryMechanism m_wrist;
 
@@ -76,39 +78,60 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_log_wrist = parent.doubleLogger(Level.TRACE, "wrist");
         m_log_pose = parent.pose2dLogger(Level.TRACE, "pose");
 
-        LoggerFactory elevatorLog = parent.name("elevator");
+        LoggerFactory elevatorbackLog = parent.name("elevator");
+        LoggerFactory elevatorfrontLog = parent.name("elevator");
         LoggerFactory shoulderLog = parent.name("shoulder");
         LoggerFactory wristLog = parent.name("wrist");
         switch (Identity.instance) {
             case COMP_BOT -> {
-                Kraken6Motor elevatorMotor = new Kraken6Motor(
-                        elevatorLog,
+                Kraken6Motor elevatorFrontMotor = new Kraken6Motor(
+                        elevatorfrontLog,
                         11, // TODO: elevator CAN ID (DID, now for starboard)
                         NeutralMode.BRAKE,
                         MotorPhase.FORWARD,
-                        60,
-                        90,
-                        PIDConstants.makePositionPID(10),
+                        20,
+                        20,
+                        PIDConstants.makePositionPID(0.5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
-                Talon6Encoder elevatorEncoder = new Talon6Encoder(
-                        elevatorLog, elevatorMotor);
-                m_elevator = new LinearMechanism(
-                        elevatorLog,
-                        elevatorMotor,
-                        elevatorEncoder,
-                        2, // TODO: calibrate ratio
-                        0.05, // TODO: calibrate pulley size
+                Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
+                        elevatorfrontLog, elevatorFrontMotor);
+                m_elevatorFront = new LinearMechanism(
+                        elevatorfrontLog,
+                        elevatorFrontMotor,
+                        elevatorFrontEncoder,
+                        2.182, // TODO: calibrate ratio
+                        0.03844, // TODO: calibrate pulley size
                         0, // TODO: calibrate lower limit
-                        2); // TODO: calibrate upper limit
+                        1.7); // TODO: calibrate upper limit 228-45
+
+                Kraken6Motor elevatorBackMotor = new Kraken6Motor(
+                        elevatorbackLog,
+                        12, // TODO: elevator CAN ID (DID, now for port)
+                        NeutralMode.BRAKE,
+                        MotorPhase.REVERSE,
+                        20, // orginally 60
+                        20, // originally 90
+                        PIDConstants.makePositionPID(0.5),
+                        Feedforward100.makeWCPSwerveTurningFalcon6());
+                Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
+                        elevatorbackLog, elevatorBackMotor);
+                m_elevatorBack = new LinearMechanism(
+                        elevatorbackLog,
+                        elevatorBackMotor,
+                        elevatorBackEncoder,
+                        2.182, // done 9/28
+                        0.03844, // done 9/28
+                        0, // just 0
+                        1.7); // done 9/28, raised to barge and subtracted og carriage top hight
 
                 Kraken6Motor shoulderMotor = new Kraken6Motor(
-                        parent,
+                        shoulderLog,
                         24, // TODO: shoulder CAN ID (Done)
                         NeutralMode.BRAKE,
-                        MotorPhase.FORWARD,
-                        60,
-                        90,
-                        PIDConstants.makePositionPID(10),
+                        MotorPhase.REVERSE,
+                        20, // og 60
+                        20, // og 90
+                        PIDConstants.makePositionPID(0.5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder shoulderEncoder = new Talon6Encoder(
                         shoulderLog,
@@ -118,14 +141,14 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         shoulderLog,
                         4, // id done
                         0.059573, // TODO: verify offset
-                        EncoderDrive.DIRECT); // TODO: verify drive
+                        EncoderDrive.INVERSE); // verified drive - 9/28
                 GearedRotaryPositionSensor gearedSensor = new GearedRotaryPositionSensor(
                         shoulderSensor,
-                        10); // TODO: verify gear ratio
+                        8); // verified gear ratio - 9/28/25
 
                 ProxyRotaryPositionSensor shoulderProxySensor = new ProxyRotaryPositionSensor(
                         shoulderEncoder, // what is this - kym
-                        100); // TODO: calibrate ratio
+                        78); // TODO: calibrate ratio - 9/28/25
                 CombinedRotaryPositionSensor shoulderCombined = new CombinedRotaryPositionSensor(
                         shoulderLog,
                         gearedSensor,
@@ -134,43 +157,58 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         shoulderLog,
                         shoulderMotor, // need to learn what these three things do and how rotatrymech works - kym
                         shoulderCombined,
-                        100, // TODO: calibrate ratio
-                        -3, // TODO: calibrate lower limit
-                        3);// TODO: calibrate upper limit
+                        78, // TODO: calibrate ratio - 9/28
+                        -1, // TODO: calibrate lower limit (DO IT FOR REAL)
+                        1);// TODO: calibrate upper limit (DO IT FOR REAL)
 
                 Kraken6Motor wristMotor = new Kraken6Motor(
-                        parent,
+                        wristLog,
                         22, // TODO: wrist CAN ID (Done)
                         NeutralMode.COAST,
                         MotorPhase.FORWARD,
-                        60,
-                        90,
-                        PIDConstants.makePositionPID(10),
+                        20, //og 60
+                        20, //og 90
+                        PIDConstants.makePositionPID(0.5), //og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 // the wrist has no angle sensor, so it needs to start in the "zero" position,
                 // or we need to add a homing
                 Talon6Encoder wristEncoder = new Talon6Encoder(
                         wristLog, wristMotor);
+                double gearRatio = 55.710;
                 ProxyRotaryPositionSensor wristProxySensor = new ProxyRotaryPositionSensor(
                         wristEncoder,
-                        55.710);
-                wristProxySensor.setEncoderPosition(2); // 9/27/25 measured
+                        gearRatio);
+                double wristEncoderOffset = 2.06818; // 2+0.06818
+                wristProxySensor.setEncoderPosition(wristEncoderOffset); // 9/27/25 measured
+
                 m_wrist = new RotaryMechanism(
                         wristLog,
                         wristMotor,
                         wristProxySensor,
-                        55.710, // TODO: calibrate ratio
-                        -3, // TODO: calibrate lower limit
-                        3);// TODO: calibrate upper limit
+                        gearRatio, // - 9/28
+                        -1.5, // - 9/28
+                        2.1);// -9/28, decided around starting position
 
             }
             default -> {
-                SimulatedBareMotor elevatorMotor = new SimulatedBareMotor(elevatorLog, 600);
-                SimulatedBareEncoder elevatorEncoder = new SimulatedBareEncoder(elevatorLog, elevatorMotor);
-                m_elevator = new LinearMechanism(
-                        elevatorLog,
-                        elevatorMotor,
-                        elevatorEncoder,
+                SimulatedBareMotor elevatorMotorFront = new SimulatedBareMotor(elevatorfrontLog, 600);
+                SimulatedBareEncoder elevatorEncoderFront = new SimulatedBareEncoder(elevatorfrontLog,
+                        elevatorMotorFront);
+                m_elevatorFront = new LinearMechanism(
+                        elevatorfrontLog,
+                        elevatorMotorFront,
+                        elevatorEncoderFront,
+                        2, // TODO: calibrate ratio
+                        0.05, // TODO: calibrate pulley size
+                        0, // TODO: calibrate lower limit
+                        2); // TODO: calibrate upper limit
+
+                SimulatedBareMotor elevatorMotorBack = new SimulatedBareMotor(elevatorbackLog, 600);
+                SimulatedBareEncoder elevatorEncoderBack = new SimulatedBareEncoder(elevatorbackLog, elevatorMotorBack);
+                m_elevatorBack = new LinearMechanism(
+                        elevatorbackLog,
+                        elevatorMotorBack,
+                        elevatorEncoderBack,
                         2, // TODO: calibrate ratio
                         0.05, // TODO: calibrate pulley size
                         0, // TODO: calibrate lower limit
@@ -223,7 +261,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     public Config getConfig() {
         // TODO: remove these defaults
         return new Config(
-                m_elevator.getPositionM().orElse(0),
+                m_elevatorFront.getPositionM().orElse(0), // only one included beacuse geared together
                 m_shoulder.getPositionRad().orElse(0),
                 m_wrist.getPositionRad().orElse(0));
     }
@@ -237,7 +275,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private JointVelocities getJointVelocity() {
         // TODO: think about these defaults
         return new JointVelocities(
-                m_elevator.getVelocityM_S().orElse(0),
+                m_elevatorFront.getVelocityM_S().orElse(0),
                 m_shoulder.getVelocityRad_S().orElse(0),
                 m_wrist.getVelocityRad_S().orElse(0));
     }
@@ -268,7 +306,12 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         JointForce jf = m_gravity.get(c);
         // set each mechanism
         // force should *oppose* gravity.
-        m_elevator.setPosition(c.shoulderHeight(), jv.elevator(), 0, -1.0 * jf.elevator());
+        m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, -1.0 * jf.elevator()); // TODO: Make one
+                                                                                                 // elevavtor thing go
+                                                                                                 // other way
+        m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, -1.0 * jf.elevator()); // TODO: Make one
+                                                                                                // elevavtor thing go
+                                                                                                // other way
         m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, -1.0 * jf.shoulder());
         m_wrist.setPosition(c.wristAngle(), jv.wrist(), 0, -1.0 * jf.wrist());
     }
@@ -296,14 +339,16 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     @Override
     public void periodic() {
         m_shoulder.periodic();
-        m_elevator.periodic();
+        m_elevatorFront.periodic();
+        m_elevatorBack.periodic();
         m_wrist.periodic();
     }
 
     /////////////////////////////////
     /** This is not "hold position" this is "torque off" */
     public void stop() {
-        m_elevator.stop();
+        m_elevatorFront.stop();
+        m_elevatorBack.stop();
         m_shoulder.stop();
         m_wrist.stop();
     }
@@ -314,7 +359,10 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         // this is the force *of* gravity
         JointForce jf = m_gravity.get(c);
         // force should *oppose* gravity.
-        m_elevator.setPosition(c.shoulderHeight(), 0, 0, -1.0 * jf.elevator());
+        m_elevatorFront.setPosition(c.shoulderHeight(), 0, 0, -1.0 * jf.elevator()); // TODO: make the other one and
+                                                                                     // make it go other way?
+        m_elevatorBack.setPosition(c.shoulderHeight(), 0, 0, -1.0 * jf.elevator()); // TODO: make the other one and make
+                                                                                    // it go other way?
         m_shoulder.setPosition(c.shoulderAngle(), 0, 0, -1.0 * jf.shoulder());
         m_wrist.setPosition(c.wristAngle(), 0, 0, -1.0 * jf.wrist());
     }

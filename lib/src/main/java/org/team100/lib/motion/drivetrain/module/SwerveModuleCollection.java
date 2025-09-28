@@ -67,7 +67,7 @@ public class SwerveModuleCollection {
                                 DriveRatio.MEDIUM, DutyCycleRotaryPositionSensor.class,
                                 1,  //can id done
                                 6, //can id done
-                                0.512104,
+                                0.893686,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(frontRightLogger,
@@ -77,7 +77,7 @@ public class SwerveModuleCollection {
                                 DriveRatio.MEDIUM, DutyCycleRotaryPositionSensor.class,
                                 3, //can id done
                                 7, //can id done
-                                0.512468,
+                                0.976568,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(rearLeftLogger,
@@ -87,7 +87,7 @@ public class SwerveModuleCollection {
                                 DriveRatio.MEDIUM, DutyCycleRotaryPositionSensor.class,
                                 7,//can id done
                                 9,//can id done
-                                0.184939,
+                                0.312068,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getKrakenDrive(rearRightLogger,
@@ -97,7 +97,7 @@ public class SwerveModuleCollection {
                                 DriveRatio.MEDIUM, DutyCycleRotaryPositionSensor.class,
                                 5, //can id done
                                 8,//can id done
-                                0.954909,
+                                0.842786,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE));
             case SWERVE_ONE: 

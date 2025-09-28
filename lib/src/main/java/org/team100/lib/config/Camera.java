@@ -89,20 +89,20 @@ public enum Camera {
      */
     CORAL_LEFT("8ddb2ed6c49a9bce",
             new Transform3d(
-                    new Translation3d(0.198, 0.284, 0.811),
+                    new Translation3d(.29, .19, -.638),
                     // new Rotation3d(-0.16, Math.toRadians(40), Math.toRadians(-18)))),
-                    new Rotation3d(-0.043, -0.705, 0.254).unaryMinus())),
+                    new Rotation3d(-2.99, -.66, -.22).unaryMinus())),
     // new Rotation3d(0, 0, 0))),
 
     /**
      * Coral reef right
      */
-    CORAL_RIGHT("364f07fb090a3bf7",
+    CORAL_RIGHT("82c4c3fe4f941e96",
             new Transform3d(
                     new Translation3d(0.215, -0.305, 0.79),
                     // new Rotation3d(0.01, -0.83, -0.199).unaryMinus())),
                     // new Rotation3d(0.020, -0.84, -0.195).unaryMinus())),
-                    new Rotation3d(0.015, -0.915, -0.170).unaryMinus())),
+                    new Rotation3d(0, 0,0).unaryMinus())),
 
     TEST4("test4",
             new Transform3d(
