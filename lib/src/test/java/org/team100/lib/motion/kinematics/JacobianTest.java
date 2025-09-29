@@ -10,9 +10,6 @@ import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
-import org.team100.lib.motion.kinematics.Jacobian;
-import org.team100.lib.motion.kinematics.JointVelocities;
 import org.team100.lib.optimization.NumericalJacobian100;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -28,6 +25,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N3;
 
 public class JacobianTest {
+    private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
 
     @Test
@@ -236,13 +234,14 @@ public class JacobianTest {
             FieldRelativeVelocity v = sm.velocity();
             Config c = k.inverse(p);
             JointVelocities jv = j.inverse(sm);
-            System.out.printf(
-                    "s (%5.2f) pose(%5.2f %5.2f %5.2f) conf(%5.2f %5.2f %5.2f) tv(%5.2f %5.2f %5.2f) jv(%5.2f %5.2f %5.2f)\n",
-                    time,
-                    p.getX(), p.getY(), p.getRotation().getRadians(),
-                    c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
-                    v.x(), v.y(), v.theta(),
-                    jv.elevator(), jv.shoulder(), jv.wrist());
+            if (DEBUG)
+                System.out.printf(
+                        "s (%5.2f) pose(%5.2f %5.2f %5.2f) conf(%5.2f %5.2f %5.2f) tv(%5.2f %5.2f %5.2f) jv(%5.2f %5.2f %5.2f)\n",
+                        time,
+                        p.getX(), p.getY(), p.getRotation().getRadians(),
+                        c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
+                        v.x(), v.y(), v.theta(),
+                        jv.elevator(), jv.shoulder(), jv.wrist());
         }
     }
 

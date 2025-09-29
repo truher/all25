@@ -1,6 +1,11 @@
 package org.team100.lib.motion.drivetrain.state;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 /** Meters, radians, and seconds. */
 public record FieldRelativeAcceleration(double x, double y, double theta) {
@@ -48,6 +53,14 @@ public record FieldRelativeAcceleration(double x, double y, double theta) {
             ratio = maxAccel / norm;
         }
         return new FieldRelativeAcceleration(ratio * x, ratio * y, MathUtil.clamp(theta, -maxAlpha, maxAlpha));
+    }
+
+    public static FieldRelativeAcceleration fromVector(Matrix<N3,N1> v) {
+        return new FieldRelativeAcceleration(v.get(0,0), v.get(1,0), v.get(2,0));
+    }
+
+    public Vector<N3> toVector() {
+        return VecBuilder.fill(x, y, theta);
     }
 
     @Override

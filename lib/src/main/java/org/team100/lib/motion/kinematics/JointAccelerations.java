@@ -1,5 +1,17 @@
 package org.team100.lib.motion.kinematics;
 
-public record JointAccelerations(double elevator, double shoulder, double wrist) {
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
+public record JointAccelerations(double elevator, double shoulder, double wrist) {
+    public Vector<N3> toVector() {
+        return VecBuilder.fill(elevator, shoulder, wrist);
+    }
+
+    public static JointAccelerations fromVector(Matrix<N3, N1> a) {
+        return new JointAccelerations(a.get(0, 0), a.get(1, 0), a.get(2, 0));
+    }
 }
