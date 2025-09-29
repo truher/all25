@@ -79,8 +79,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_log_wrist = parent.doubleLogger(Level.TRACE, "wrist");
         m_log_pose = parent.pose2dLogger(Level.TRACE, "pose");
 
-        LoggerFactory elevatorbackLog = parent.name("elevator");
-        LoggerFactory elevatorfrontLog = parent.name("elevator");
+        LoggerFactory elevatorbackLog = parent.name("elevatorBack");
+        LoggerFactory elevatorfrontLog = parent.name("elevatorFront");
         LoggerFactory shoulderLog = parent.name("shoulder");
         LoggerFactory wristLog = parent.name("wrist");
         switch (Identity.instance) {
@@ -89,10 +89,10 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         elevatorfrontLog,
                         11, // TODO: elevator CAN ID (DID, now for starboard)
                         NeutralMode.BRAKE,
-                        MotorPhase.FORWARD,
-                        20,
-                        20,
-                        PIDConstants.makePositionPID(2),
+                        MotorPhase.REVERSE,
+                        100,
+                        100,
+                        PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
                         elevatorfrontLog, elevatorFrontMotor);
@@ -109,10 +109,10 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         elevatorbackLog,
                         12, // TODO: elevator CAN ID (DID, now for port)
                         NeutralMode.BRAKE,
-                        MotorPhase.REVERSE,
-                        20, // orginally 60
-                        20, // originally 90
-                        PIDConstants.makePositionPID(2),
+                        MotorPhase.FORWARD,
+                        100, // orginally 60
+                        100, // originally 90
+                        PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
                         elevatorbackLog, elevatorBackMotor);
@@ -130,9 +130,9 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         24, // TODO: shoulder CAN ID (Done)
                         NeutralMode.BRAKE,
                         MotorPhase.REVERSE,
-                        20, // og 60
-                        20, // og 90
-                        PIDConstants.makePositionPID(0.5),
+                        40, // og 60
+                        40, // og 90
+                        PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder shoulderEncoder = new Talon6Encoder(
                         shoulderLog,
@@ -167,9 +167,9 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         22, // TODO: wrist CAN ID (Done)
                         NeutralMode.COAST,
                         MotorPhase.FORWARD,
-                        20, // og 60
-                        20, // og 90
-                        PIDConstants.makePositionPID(2), // og 10
+                        40, // og 60
+                        40, // og 90
+                        PIDConstants.makePositionPID(5), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 // the wrist has no angle sensor, so it needs to start in the "zero" position,
                 // or we need to add a homing
@@ -262,7 +262,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     public Config getConfig() {
         // TODO: remove these defaults
         return new Config(
-                m_elevatorFront.getPositionM().orElse(0), // only one included beacuse geared together
+                m_elevatorBack.getPositionM().orElse(0), // only one included beacuse geared together
                 m_shoulder.getPositionRad().orElse(0),
                 m_wrist.getPositionRad().orElse(0));
     }
@@ -276,7 +276,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private JointVelocities getJointVelocity() {
         // TODO: think about these defaults
         return new JointVelocities(
-                m_elevatorFront.getVelocityM_S().orElse(0),
+                m_elevatorBack.getVelocityM_S().orElse(0),
                 m_shoulder.getVelocityRad_S().orElse(0),
                 m_wrist.getVelocityRad_S().orElse(0));
     }

@@ -27,7 +27,8 @@ public class HoldPosition extends Command {
 
     @Override
     public void execute() {
-        m_subsystem.set(m_state.control());
+        //m_subsystem.set(m_state.control());
+        m_subsystem.stop();
     }
 
 }

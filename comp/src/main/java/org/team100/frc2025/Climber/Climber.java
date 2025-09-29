@@ -34,7 +34,7 @@ public class Climber extends SubsystemBase {
     public Climber(LoggerFactory parent, int canID) {
         LoggerFactory log = parent.name("Climber");
 
-        IncrementalProfile profile100 = new TrapezoidIncrementalProfile(0.5, 0.5, 0.05);
+        IncrementalProfile profile100 = new TrapezoidIncrementalProfile(1, 2, 0.05);
         ProfileReference1d ref = new IncrementalProfileReference1d(profile100, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 10, 0, 0, false, 0.05, 0.1);
 

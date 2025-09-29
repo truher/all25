@@ -38,16 +38,16 @@ public class Manipulator extends SubsystemBase {
             case COMP_BOT -> {
                 // Set specific parameters for the competition robot               //can id done
                 Kraken6Motor leftMotor = new Kraken6Motor(log, 19, NeutralMode.COAST, MotorPhase.FORWARD, 
-                1, //og 40
-                1, //og 40
+                10, //og 40
+                10, //og 40
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
                 Kraken6Motor rightMotor = new Kraken6Motor(log, 20, NeutralMode.COAST, MotorPhase.REVERSE,  //can id done
-                1, //og 40
-                1, //og 40
+                10, //og 40
+                10, //og 40
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
                 Kraken6Motor algaeMotor = new Kraken6Motor(log, 21, NeutralMode.COAST, MotorPhase.FORWARD,  //can id done
-                1, //og 120
-                1, //og 120
+                10, //og 120
+                10, //og 120
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
                 m_algaeMotor = algaeMotor;
                 m_rightLaser = new LaserCan(17); //can id done

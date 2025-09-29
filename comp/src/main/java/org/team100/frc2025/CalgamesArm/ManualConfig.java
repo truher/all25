@@ -5,13 +5,13 @@ import java.util.function.Supplier;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.kinematics.JointAccelerations;
+import org.team100.lib.motion.kinematics.JointForce;
 import org.team100.lib.motion.kinematics.JointVelocities;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** Use the operator control to "fly" the arm around in config space. */
 public class ManualConfig extends Command {
-    private static final double SCALE = 0.5;
 
     private final Supplier<DriverControl.Velocity> m_input;
     private final CalgamesMech m_subsystem;
@@ -42,9 +42,9 @@ public class ManualConfig extends Command {
         // velocity in m/s and rad/s
         // we want full scale to be about 0.5 m/s and 0.5 rad/s
         JointVelocities jv = new JointVelocities(
-                input.x() * SCALE,
-                input.y() * SCALE,
-                input.theta() * SCALE);
+                input.x() * 1.5,
+                input.y() * 3,
+                input.theta() * 3);
         Config newC = m_config.integrate(jv, dt);
 
         // impose limits; see CalgamesMech for more limits.
@@ -62,7 +62,9 @@ public class ManualConfig extends Command {
         JointVelocities newJv = newC.diff(m_config, dt);
         JointAccelerations ja = newJv.diff(m_prev, dt);
 
-        m_subsystem.set(newC, newJv, ja);
+        // m_subsystem.set(newC, newJv, ja);
+        m_subsystem.set(newC,
+                new JointVelocities(0,0,0), new JointAccelerations(0,0,0), new JointForce(0,0,0));
         m_config = newC;
         m_prev = newJv;
     }

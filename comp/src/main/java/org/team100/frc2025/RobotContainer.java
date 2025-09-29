@@ -371,9 +371,11 @@ public class RobotContainer {
         whileTrue(buttons::red4, print("red4"));
         whileTrue(buttons::barge, print("barge"));
 
-        // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeAlgae));
+        whileTrue(driverControl::a, m_manipulator.run(m_manipulator::ejectCenter));
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
+        
+
 
 
         //i think this is all obsolete now because we made the commands in placeholder
