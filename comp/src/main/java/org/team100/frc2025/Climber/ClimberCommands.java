@@ -24,7 +24,7 @@ public class ClimberCommands {
                         sequence(
                                 waitSeconds(1),
                                 waitUntil(
-                                        () -> intake.isSlow()
+                                        () -> intake.isSlow() //TODO: Wont work needs to be calibrated
                                                 && climber.atGoal())))
                 .withName("climb intake");
     }

@@ -336,15 +336,15 @@ public class RobotContainer {
         //
 
         // Step 1, operator: Extend and spin.
-        whileTrue(operatorControl::climbIntake,
+        whileTrue(operatorControl::climbIntake, //mapped to operator x button
                 ClimberCommands.intake(m_climber, m_climberIntake));
 
         // Step 2, driver: Pull climber in and drive forward.
-        whileTrue(driverControl::climb,
+        whileTrue(driverControl::climb, //mapped to driver y buttonTODO: Make sure this isnt double mapped
                 ClimberCommands.climb(m_climber, m_drive));
 
         // Between matches, operator: Reset the climber position.
-        whileTrue(operatorControl::activateManualClimb,
+        whileTrue(operatorControl::activateManualClimb, //speed is operator get left Y, activated with op y button
                 m_climber.manual(operatorControl::manualClimbSpeed));
 
         ////////////////////////////////////////////////////////////
@@ -394,7 +394,7 @@ public class RobotContainer {
 
 
         // "fly" the joints manually
-        whileTrue(operatorControl::manual,
+        whileTrue(operatorControl::manual, //to go to manual, left bumper operator
                 new ManualConfig(operatorControl::velocity, CalgamesMech));
 
         // this is for developing autopick.

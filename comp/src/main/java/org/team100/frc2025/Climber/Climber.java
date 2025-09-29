@@ -39,20 +39,21 @@ public class Climber extends SubsystemBase {
         PIDFeedback feedback = new PIDFeedback(log, 10, 0, 0, false, 0.05, 0.1);
 
         switch (Identity.instance) {
-            case COMP_BOT -> {
-                Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.BRAKE, MotorPhase.REVERSE, 50, 50,
-                        PIDConstants.makePositionPID(1),
+            case COMP_BOT -> { //TODO: MAKE SURE TO CHANGE THIS BACK TO BRAKE MODE FOR NEUTRAL REALLY IMPORTANT!
+                Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.COAST, MotorPhase.REVERSE, 
+                5, 5, //og 50, TODO: FIX THIS
+                        PIDConstants.makePositionPID(1), 
                         Feedforward100.makeArmPivot());
 
-                int channel = 3;
-                double inputOffset = 0.110602;
+                int channel = 5;
+                double inputOffset = 0.110602+(0.32); //9/28
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
                         log, channel, inputOffset, EncoderDrive.DIRECT);
+                double gearRatio = 5 * 5 * 4 * 20; // - 9/28
 
-                double gearRatio = 25 * 3 * 4;
                 RotaryMechanism rotaryMechanism = new RotaryMechanism(
                         log, motor, sensor, gearRatio,
-                        Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                        0, Math.PI/2);
 
                 m_servo = new OnboardAngularPositionServo(log, rotaryMechanism, ref, feedback);
             }
@@ -104,7 +105,7 @@ public class Climber extends SubsystemBase {
         return startRun(
                 // TODO: why do we need this reset?
                 () -> reset(),
-                () -> setAngle(-Math.PI / 2));
+                () -> setAngle(Math.PI / 2));
     }
 
     /** Pull the climber in all the way to the climb position. */
@@ -112,7 +113,7 @@ public class Climber extends SubsystemBase {
         return startRun(
                 // TODO: why do we need this reset?
                 () -> reset(),
-                () -> setAngle(0.53));
+                () -> setAngle(0));
     }
 
     ////////////////////////////////

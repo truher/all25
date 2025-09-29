@@ -33,7 +33,7 @@ public class GearedRotaryPositionSensor implements RotaryPositionSensor {
     public OptionalDouble getPositionRad() {
         OptionalDouble opt = m_delegate.getPositionRad();
         return opt.isPresent()
-                ? OptionalDouble.of(MathUtil.angleModulus(m_ratio * opt.getAsDouble()))
+                ? OptionalDouble.of(MathUtil.angleModulus(opt.getAsDouble() / m_ratio))
                 : OptionalDouble.empty();
     }
 
@@ -41,7 +41,7 @@ public class GearedRotaryPositionSensor implements RotaryPositionSensor {
     public OptionalDouble getVelocityRad_S() {
         OptionalDouble opt = m_delegate.getVelocityRad_S();
         return opt.isPresent()
-                ? OptionalDouble.of(m_ratio * opt.getAsDouble())
+                ? OptionalDouble.of(opt.getAsDouble() / m_ratio)
                 : OptionalDouble.empty();
     }
 
