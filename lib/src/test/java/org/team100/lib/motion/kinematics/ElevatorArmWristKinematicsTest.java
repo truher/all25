@@ -1,10 +1,9 @@
-package org.team100.lib.motion;
+package org.team100.lib.motion.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.ElevatorArmWristKinematics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

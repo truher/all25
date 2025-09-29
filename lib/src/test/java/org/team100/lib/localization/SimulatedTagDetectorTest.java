@@ -170,7 +170,7 @@ public class SimulatedTagDetectorTest {
 
     @Test
     void testTag6() throws IOException {
-        Camera camera = Camera.CORAL_LEFT;
+        Camera camera = Camera.TEST6;
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         // right in front of tag 7
         Pose2d robotPose = new Pose2d(2.6576, 4.0259, Rotation2d.kZero);

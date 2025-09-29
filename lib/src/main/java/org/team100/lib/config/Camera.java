@@ -102,7 +102,7 @@ public enum Camera {
                     new Translation3d(0.215, -0.305, 0.79),
                     // new Rotation3d(0.01, -0.83, -0.199).unaryMinus())),
                     // new Rotation3d(0.020, -0.84, -0.195).unaryMinus())),
-                    new Rotation3d(0, 0,0).unaryMinus())),
+                    new Rotation3d(0, 0, 0).unaryMinus())),
 
     TEST4("test4",
             new Transform3d(
@@ -112,6 +112,13 @@ public enum Camera {
             new Transform3d(
                     new Translation3d(0, 0.1, 1),
                     new Rotation3d(0, 0, 0))),
+
+    TEST6("test6",
+            new Transform3d(
+                    new Translation3d(0.198, 0.284, 0.811),
+                    // new Rotation3d(-0.16, Math.toRadians(40), Math.toRadians(-18)))),
+                    new Rotation3d(-0.043, -0.705, 0.254).unaryMinus())),
+                    
 
     UNKNOWN(null, new Transform3d());
 

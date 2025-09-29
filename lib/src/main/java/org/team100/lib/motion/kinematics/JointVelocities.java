@@ -1,4 +1,4 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.motion.kinematics;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -6,7 +6,11 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
-/** use the jacobian to find these from a cartesian velocity. */
+/**
+ * These are PRR velocities.
+ * 
+ * Use the jacobian to find these from a cartesian velocity.
+ */
 public record JointVelocities(double elevator, double shoulder, double wrist) {
     public static JointVelocities fromVector(Vector<N3> v) {
         return new JointVelocities(v.get(0), v.get(1), v.get(2));

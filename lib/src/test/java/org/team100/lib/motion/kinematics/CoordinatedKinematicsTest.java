@@ -1,10 +1,10 @@
-package org.team100.lib.motion;
+package org.team100.lib.motion.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.CoordinatedKinematics.Joints;
+import org.team100.lib.motion.kinematics.CoordinatedKinematics.Joints;
 
 import edu.wpi.first.math.geometry.Translation2d;
 
