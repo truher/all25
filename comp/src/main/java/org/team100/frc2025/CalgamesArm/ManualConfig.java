@@ -4,17 +4,20 @@ import java.util.function.Supplier;
 
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.motion.Config;
+import org.team100.lib.motion.kinematics.JointAccelerations;
+import org.team100.lib.motion.kinematics.JointVelocities;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** Use the operator control to "fly" the arm around in config space. */
 public class ManualConfig extends Command {
-    // TODO: some reasonable scale here
-    private static final double SCALE = 0.01;
+    private static final double SCALE = 0.5;
+
     private final Supplier<DriverControl.Velocity> m_input;
     private final CalgamesMech m_subsystem;
 
     private Config m_config;
+    private JointVelocities m_prev;
 
     public ManualConfig(
             Supplier<DriverControl.Velocity> input,
@@ -27,15 +30,40 @@ public class ManualConfig extends Command {
     @Override
     public void initialize() {
         m_config = m_subsystem.getConfig();
+        m_prev = new JointVelocities(0, 0, 0);
     }
 
     @Override
     public void execute() {
+        // input is [-1, 1]
         DriverControl.Velocity input = m_input.get();
-        m_config = new Config(
-                m_config.shoulderHeight() + input.x() * SCALE,
-                m_config.shoulderAngle() + input.y() * SCALE,
-                m_config.wristAngle() + input.theta() * SCALE);
-        m_subsystem.set(m_config);
+        final double dt = 0.02;
+        // control is velocity.
+        // velocity in m/s and rad/s
+        // we want full scale to be about 0.5 m/s and 0.5 rad/s
+        JointVelocities jv = new JointVelocities(
+                input.x() * SCALE,
+                input.y() * SCALE,
+                input.theta() * SCALE);
+        Config newC = m_config.integrate(jv, dt);
+
+        // impose limits; see CalgamesMech for more limits.
+        if (newC.shoulderHeight() < 0 || newC.shoulderHeight() > 1.7) {
+            newC = new Config(m_config.shoulderHeight(), newC.shoulderAngle(), newC.wristAngle());
+        }
+        if (newC.shoulderAngle() < -1 || newC.shoulderAngle() > 1) {
+            newC = new Config(newC.shoulderHeight(), m_config.shoulderAngle(), newC.wristAngle());
+        }
+        if (newC.wristAngle() < -1.5 || newC.wristAngle() > 2.1) {
+            newC = new Config(newC.shoulderHeight(), newC.shoulderAngle(), m_config.wristAngle());
+        }
+
+        // recompute velocity and accel
+        JointVelocities newJv = newC.diff(m_config, dt);
+        JointAccelerations ja = newJv.diff(m_prev, dt);
+
+        m_subsystem.set(newC, newJv, ja);
+        m_config = newC;
+        m_prev = newJv;
     }
 }

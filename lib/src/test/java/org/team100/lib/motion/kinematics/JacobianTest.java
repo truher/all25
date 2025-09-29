@@ -38,7 +38,8 @@ public class JacobianTest {
                 Nat.N3(),
                 f,
                 Jacobian.config(new Config(1, 0, 0)));
-        System.out.println(j);
+        if (DEBUG)
+            System.out.println(j);
 
         // dx/dh should be 1 in all positions
         assertEquals(1, j.get(0, 0), DELTA);
@@ -174,9 +175,11 @@ public class JacobianTest {
                         f,
                         Jacobian.config(k.inverse(p)));
                 double det = j.det();
-                System.out.printf("%8.2f", det);
+                if (DEBUG)
+                    System.out.printf("%8.2f", det);
             }
-            System.out.println();
+            if (DEBUG)
+                System.out.println();
         }
     }
 
@@ -205,7 +208,7 @@ public class JacobianTest {
                     Jacobian.config(c));
             Matrix<N3, N3> jinv = j.inv();
             Vector<N3> cv = new Vector<>(jinv.times(tv));
-            System.out.printf(
+            if (DEBUG) System.out.printf(
                     "s (%5.2f) pose(%5.2f %5.2f %5.2f) conf(%5.2f %5.2f %5.2f) tv(%5.2f %5.2f %5.2f) cv(%5.2f %5.2f %5.2f)\n",
                     s,
                     p.getX(), p.getY(), p.getRotation().getRadians(),

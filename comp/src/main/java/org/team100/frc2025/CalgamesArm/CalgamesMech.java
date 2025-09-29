@@ -26,6 +26,7 @@ import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
 import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
+import org.team100.lib.motion.kinematics.JointAccelerations;
 import org.team100.lib.motion.kinematics.JointForce;
 import org.team100.lib.motion.kinematics.JointVelocities;
 import org.team100.lib.motion.mechanism.LinearMechanism;
@@ -45,7 +46,6 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private final double m_wristLengthM;
     private final ElevatorArmWristKinematics m_kinematics;
     private final AnalyticalJacobian m_jacobian;
-    private Config m_config;
 
     private final Gravity m_gravity;
     private final Dynamics m_dynamics;
@@ -61,8 +61,6 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
 
     private final RotaryMechanism m_shoulder;
     private final RotaryMechanism m_wrist;
-
-    private static final double ARM_REDUCTION = 78; // number from om, from talon to output? (inspo from elevator code)
 
     public CalgamesMech(LoggerFactory log,
             double armLength,
@@ -169,9 +167,9 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         22, // TODO: wrist CAN ID (Done)
                         NeutralMode.COAST,
                         MotorPhase.FORWARD,
-                        20, //og 60
-                        20, //og 90
-                        PIDConstants.makePositionPID(0.5), //og 10
+                        20, // og 60
+                        20, // og 90
+                        PIDConstants.makePositionPID(0.5), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 // the wrist has no angle sensor, so it needs to start in the "zero" position,
                 // or we need to add a homing
@@ -297,7 +295,6 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         // position
         Pose2d p = control.pose();
         Config c = m_kinematics.inverse(p);
-        logConfig(c);
         if (c.isNaN()) {
             System.out.println("skipping invalid config");
             stop();
@@ -305,22 +302,16 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         }
         // velocity
         JointVelocities jv = m_jacobian.inverse(control.model());
-        // this is the force *of* gravity
-        JointForce jf = m_gravity.get(c);
-        // set each mechanism
-        // force should *oppose* gravity.
-        m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, -1.0 * jf.elevator()); // TODO: Make one
-                                                                                                 // elevavtor thing go
-                                                                                                 // other way
-        m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, -1.0 * jf.elevator()); // TODO: Make one
-                                                                                                // elevavtor thing go
-                                                                                                // other way
-        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, -1.0 * jf.shoulder());
-        m_wrist.setPosition(c.wristAngle(), jv.wrist(), 0, -1.0 * jf.wrist());
-    }
+        // this is the force *of* gravity, so multiply by -1 in actuation
+        // JointForce jf = m_gravity.get(c);
 
-    private void setConfig(Config config) {
-        m_config = config;
+        JointAccelerations ja = m_jacobian.inverseA(control);
+
+        // this is the force *required* so pass it directly.
+        JointForce jf = m_dynamics.forward(c, jv, ja);
+
+        // set each mechanism
+        set(c, jv, ja, jf);
     }
 
     public Command config(
@@ -356,18 +347,30 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_wrist.stop();
     }
 
+    public void set(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
+        logConfig(c);
+        m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), ja.elevator(), jf.elevator());
+        m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), ja.elevator(), jf.elevator());
+        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), ja.shoulder(), jf.shoulder());
+        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), ja.shoulder(), jf.wrist());
+    }
+
     /** Sets each mechanism, with zero velocity */
     public void set(Config c) {
-        logConfig(c);
         // this is the force *of* gravity
-        JointForce jf = m_gravity.get(c);
+        // JointForce jf = m_gravity.get(c);
         // force should *oppose* gravity.
-        m_elevatorFront.setPosition(c.shoulderHeight(), 0, 0, -1.0 * jf.elevator()); // TODO: make the other one and
-                                                                                     // make it go other way?
-        m_elevatorBack.setPosition(c.shoulderHeight(), 0, 0, -1.0 * jf.elevator()); // TODO: make the other one and make
-                                                                                    // it go other way?
-        m_shoulder.setPosition(c.shoulderAngle(), 0, 0, -1.0 * jf.shoulder());
-        m_wrist.setPosition(c.wristAngle(), 0, 0, -1.0 * jf.wrist());
+
+        JointVelocities jv = new JointVelocities(0, 0, 0);
+        JointAccelerations ja = new JointAccelerations(0, 0, 0);
+        m_jacobian.forwardA(c, jv, ja);
+        JointForce jf = m_dynamics.forward(c, jv, ja);
+        set(c, jv, ja, jf);
+    }
+
+    public void set(Config c, JointVelocities jv, JointAccelerations ja) {
+        JointForce jf = m_dynamics.forward(c, jv, ja);
+        set(c, jv, ja, jf);
     }
 
     private void addConfig(double height, double shoulder, double wrist) {
@@ -378,7 +381,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 c.wristAngle() + wrist));
     }
 
-    private void addCartesian(double x, double y, double r) { // how much we want to change our goal point by (eg
+    private void addCartesian(double x, double y, double r) {
+        // how much we want to change our goal point by (eg
         // move up by 5, left by 3, rotate 20 degrees)
         Pose2d p = m_kinematics.forward(getConfig());
         // Pose2d.add() method uses the pose frame so we don't use it.
