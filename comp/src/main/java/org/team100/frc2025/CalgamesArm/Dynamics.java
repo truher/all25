@@ -16,8 +16,8 @@ import org.team100.lib.motion.kinematics.JointVelocities;
  */
 public class Dynamics {
     private static final double HAND_MASS = 6;
-    private static final double ARM_MASS = 0.5;
-    private static final double CARRIAGE_MASS = 2;
+    private static final double ARM_MASS = 1;
+    private static final double CARRIAGE_MASS = 13;
 
     /** From shoulder to arm center of mass */
     private static final double ARM_COM_LENGTH = 0.25;
@@ -25,8 +25,8 @@ public class Dynamics {
     private static final double ARM_INERTIA = ARM_MASS * ARM_LENGTH * ARM_LENGTH / 3;
 
     /** From wrist to hand center of mass */
-    private static final double HAND_COM_LENGTH = 0.1;
-    private static final double HAND_LENGTH = 0.05;
+    private static final double HAND_COM_LENGTH = 0.14;
+    private static final double HAND_LENGTH = 0.343;
     private static final double HAND_INERTIA = HAND_MASS * HAND_LENGTH * HAND_LENGTH / 3;
 
     private final PRRDynamics m_dynamics;

@@ -157,7 +157,7 @@ public class RobotContainer {
         }
 
         m_manipulator = new Manipulator(logger);
-        CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.3, 0.1);
+        CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.5, 0.343);
 
         m_combinedViz = new Viz(CalgamesMech);
         m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);

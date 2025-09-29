@@ -92,7 +92,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         MotorPhase.FORWARD,
                         20,
                         20,
-                        PIDConstants.makePositionPID(0.5),
+                        PIDConstants.makePositionPID(2),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
                         elevatorfrontLog, elevatorFrontMotor);
@@ -101,7 +101,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         elevatorFrontMotor,
                         elevatorFrontEncoder,
                         2.182, // TODO: calibrate ratio
-                        0.03844, // TODO: calibrate pulley size
+                        0.03844, // TODO: calibrate pulley size- done
                         0, // TODO: calibrate lower limit
                         1.7); // TODO: calibrate upper limit 228-45
 
@@ -112,7 +112,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         MotorPhase.REVERSE,
                         20, // orginally 60
                         20, // originally 90
-                        PIDConstants.makePositionPID(0.5),
+                        PIDConstants.makePositionPID(2),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
                         elevatorbackLog, elevatorBackMotor);
@@ -141,7 +141,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 AS5048RotaryPositionSensor shoulderSensor = new AS5048RotaryPositionSensor(
                         shoulderLog,
                         4, // id done
-                        0.059573, // TODO: verify offset
+                        0.565, // TODO: verify offset
                         EncoderDrive.INVERSE); // verified drive - 9/28
                 GearedRotaryPositionSensor gearedSensor = new GearedRotaryPositionSensor(
                         shoulderSensor,
@@ -169,7 +169,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         MotorPhase.FORWARD,
                         20, // og 60
                         20, // og 90
-                        PIDConstants.makePositionPID(0.5), // og 10
+                        PIDConstants.makePositionPID(2), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 // the wrist has no angle sensor, so it needs to start in the "zero" position,
                 // or we need to add a homing
