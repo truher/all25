@@ -1,7 +1,7 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.motion.kinematics;
 
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.ElevatorArmWristKinematics;
+import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
@@ -30,6 +30,10 @@ public class AnalyticalJacobian {
     public FieldRelativeVelocity forward(Config c, JointVelocities v) {
         Matrix<N3, N3> j = getJ(c);
         return FieldRelativeVelocity.fromVector(j.times(v.toVector()));
+    }
+
+    public FieldRelativeAcceleration forwardA(Config c, JointVelocities v, JointAccelerations a) {
+        return null;
     }
 
     private Matrix<N3, N3> getJ(Config c) {
@@ -61,6 +65,10 @@ public class AnalyticalJacobian {
             return new JointVelocities(0, 0, 0);
         }
         return JointVelocities.fromVector(j.inv().times(v.toVector()));
+    }
+
+    public JointAccelerations inverseA(SwerveModel swerveModel) {
+        return null;
     }
 
 }

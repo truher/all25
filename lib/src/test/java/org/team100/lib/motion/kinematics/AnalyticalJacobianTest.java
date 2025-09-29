@@ -1,12 +1,12 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.motion.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.ElevatorArmWristKinematics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.trajectory.Trajectory100;
@@ -86,6 +86,23 @@ public class AnalyticalJacobianTest {
                     v.x(), v.y(), v.theta(),
                     jv.elevator(), jv.shoulder(), jv.wrist());
         }
+    }
+
+    @Test
+    void testInverseA() {
+        final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
+        AnalyticalJacobian j = new AnalyticalJacobian(k);
+        assertNotNull(j.inverseA(new SwerveModel()));
+    }
+
+    @Test
+    void testForwardA() {
+        final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
+        AnalyticalJacobian j = new AnalyticalJacobian(k);
+        assertNotNull(j.forwardA(
+                new Config(0, 0, 0),
+                new JointVelocities(0, 0, 0),
+                new JointAccelerations(0, 0, 0)));
     }
 
 }

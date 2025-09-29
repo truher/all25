@@ -1,4 +1,6 @@
-package org.team100.lib.motion;
+package org.team100.lib.motion.kinematics;
+
+import org.team100.lib.motion.Config;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,7 +39,6 @@ public class ElevatorArmWristKinematics {
                 + m_manipulatorLength * Math.sin(config.shoulderAngle() + config.wristAngle());
         double r = config.shoulderAngle() + config.wristAngle();
         return new Pose2d(x, y, new Rotation2d(r));
-
     }
     
     

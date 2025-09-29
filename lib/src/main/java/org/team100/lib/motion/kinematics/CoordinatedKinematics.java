@@ -1,4 +1,4 @@
-package org.team100.lib.motion;
+package org.team100.lib.motion.kinematics;
 
 import edu.wpi.first.math.geometry.Translation2d;
 

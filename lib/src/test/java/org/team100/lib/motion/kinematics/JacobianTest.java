@@ -1,4 +1,4 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.motion.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -8,9 +8,11 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.ElevatorArmWristKinematics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
+import org.team100.lib.motion.kinematics.Jacobian;
+import org.team100.lib.motion.kinematics.JointVelocities;
 import org.team100.lib.optimization.NumericalJacobian100;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
