@@ -313,12 +313,31 @@ class RealCamera(Camera):
             case Model.GS:
                 # Example: handle different identities for GS model
                 match identity:
-                    case Identity.CORAL_RIGHT:
+                    case Identity.DEV:
                         # this is for the 3.2 mm lens
                         return np.array(
                             [
                                 [944.3507484, 0, 693.7105365],  # 728 = 1456/2, not actually in the center
                                 [0, 943.8611003, 498.1103206],  # 544 = 1088/2, actually center :-)
+                                [0, 0, 1],
+                            ]
+                        )
+                    case Identity.CORAL_LEFT:
+                        return np.array(
+                            [
+                                [935.4403554, 0, 676.3779953],  # 728 = 1456/2, not actually in the center
+                                [0, 934.6111779, 537.0691437],  # 544 = 1088/2, actually center :-)
+                                [0, 0, 1],
+                                
+                            ]
+
+
+                        )
+                    case Identity.CORAL_RIGHT:
+                        return np.array(
+                            [
+                                [938.0364397, 0, 674.7133631],  # 728 = 1456/2, not actually in the center
+                                [0, 937.4685798, 548.7346201],  # 544 = 1088/2, actually center :-)
                                 [0, 0, 1],
                             ]
                         )
@@ -357,18 +376,30 @@ class RealCamera(Camera):
         see https://docs.google.com/spreadsheets/d/1x2_58wyVb5e9HJW8WgakgYcOXgPaJe0yTIHew206M-M
         """
         match model:
+
             case Model.V3_WIDE:
                 return np.array([[0.01, -0.0365, 0, 0]])
             case Model.V2:
                 return np.array([[-0.003, 0.04, 0, 0]])
+            
             case Model.GS:
+                match identity:
+                    case Identity.CORAL_LEFT:
+                        # this is for the 3.2 mm lens from 9/15/25 testing
+                        return np.array([[-0.2883685917, 0.08640059653, -0.0003167335742, 0.0004112607248 ]])
+                    case Identity.CORAL_RIGHT:
+                        return np.array([[-0.3057497651, 0.1211648432, 0.0003595528879, -0.0002945429981]])
+                    case _:
+                        # this is for the 3.2 mm lens from 9/15/25 testing
+                        return np.array([[-0.280215963, 0.1410181344, -0.0004975099487, -0.0003688145196, -0.008688430095, 0.03172761625, -0.001268540923, 0.04303604588]])
                 # if identity == Identity.DIST_TEST:
-# this is for the 3.2 mm lens from 9/15/25 testing
-                return np.array([[-0.280215963, 0.1410181344, -0.0004975099487, -0.0003688145196, -0.008688430095, 0.03172761625, -0.001268540923, 0.04303604588]])
-# this is for the 6 mm lens from 2/1/25 testing
+                #     # this is for the 3.2 mm lens from 9/15/25 testing
+                #     return np.array([[-0.280215963, 0.1410181344, -0.0004975099487, -0.0003688145196, -0.008688430095, 0.03172761625, -0.001268540923, 0.04303604588]])
+                # # this is for the 6 mm lens from 2/1/25 testing
                 #     return np.array([[-0.510, 0.335, 0, 0]])
                 # else:
                 #     return np.array([[-0.2, -0.4, 0, 0]])
+
             case _:
                 return np.array([[0, 0, 0, 0]])
 
