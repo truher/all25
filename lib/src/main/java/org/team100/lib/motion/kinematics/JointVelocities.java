@@ -23,4 +23,11 @@ public record JointVelocities(double elevator, double shoulder, double wrist) {
     public Vector<N3> toVector() {
         return VecBuilder.fill(elevator, shoulder, wrist);
     }
+
+    public JointAccelerations diff(JointVelocities jv, double dt) {
+        return new JointAccelerations(
+                (jv.elevator - elevator) / dt,
+                (jv.shoulder - shoulder) / dt,
+                (jv.wrist - wrist) / dt);
+    }
 }

@@ -10,20 +10,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class ElevatorArmWristKinematicsTest {
+    private static final boolean DEBUG = false;
     // one micrometer tolerance since all the math here is exact
     private static final double DELTA = 0.000001;
 
     @Test
-    void testArmHeightComp(){
+    void testArmHeightComp() {
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(5, 1);
         Translation2d wristPosition = new Translation2d(3, 3);
         double h = new ElevatorArmWristKinematics(5, 1).armX(wristPosition);
-        System.out.println(wristPosition.getY());
+        if (DEBUG)
+            System.out.println(wristPosition.getY());
         assertEquals(4, h);
 
     }
-
-
 
     @Test
     void testForward0() {
@@ -67,8 +67,8 @@ public class ElevatorArmWristKinematicsTest {
 
     @Test
     void testInverseDownArm45Triangle() {
-        //built for a 45 45 90 triangle for
-        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics((2*Math.sqrt(2)), 1);
+        // built for a 45 45 90 triangle for
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics((2 * Math.sqrt(2)), 1);
         Pose2d p = new Pose2d(0.1, 3, Rotation2d.kCCW_90deg);
         Config c = k.inverse(p);
 
@@ -83,7 +83,7 @@ public class ElevatorArmWristKinematicsTest {
         Pose2d p = new Pose2d(0.1, 2, Rotation2d.kCCW_90deg);
         Config c = k.inverse(p);
 
-        assertEquals(Math.sqrt(3)+0.1, c.shoulderHeight(), 0.001);
+        assertEquals(Math.sqrt(3) + 0.1, c.shoulderHeight(), 0.001);
         assertEquals(Math.toRadians(150), c.shoulderAngle(), 0.001);
         assertEquals(Math.toRadians(-60), c.wristAngle(), 0.001);
     }
