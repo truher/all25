@@ -13,9 +13,7 @@ import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.CalgamesViz;
-import org.team100.frc2025.CalgamesArm.FollowTrajectory;
 import org.team100.frc2025.CalgamesArm.HoldPosition;
-import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.CalgamesArm.ManualConfig;
 import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.Climber.Climber;
@@ -23,6 +21,7 @@ import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
+import org.team100.frc2025.CommandGroups.ManualIntake;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
@@ -75,9 +74,7 @@ import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
-import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
-import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.Util;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -150,8 +147,8 @@ public class RobotContainer {
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         if (Identity.instance.equals(Identity.COMP_BOT)) {
-            m_climber = new Climber(logger, 13); //should be correct
-            m_climberIntake = new ClimberIntake(logger, 14); //should be correct
+            m_climber = new Climber(logger, 13); // should be correct
+            m_climberIntake = new ClimberIntake(logger, 14); // should be correct
         } else {
             m_climber = new Climber(logger, 18);
             m_climberIntake = new ClimberIntake(logger, 0);
@@ -322,14 +319,11 @@ public class RobotContainer {
         //
         // PICK
         //
+
         whileTrue(driverControl::floorPick,
-                parallel(
-                        placeholder.pick(),
-                        m_manipulator.centerIntake()));
+                ManualIntake.floor(placeholder, m_manipulator));
         whileTrue(driverControl::stationPick,
-                parallel(
-                        placeholder.station(),
-                        m_manipulator.centerIntake()));
+                ManualIntake.station(placeholder, m_manipulator));
 
         ////////////////////////////////////////////////////////////
         //
@@ -337,15 +331,15 @@ public class RobotContainer {
         //
 
         // Step 1, operator: Extend and spin.
-        whileTrue(operatorControl::climbIntake, //mapped to operator x button
+        whileTrue(operatorControl::climbIntake, // mapped to operator x button
                 ClimberCommands.intake(m_climber, m_climberIntake));
 
         // Step 2, driver: Pull climber in and drive forward.
-        whileTrue(driverControl::climb, //mapped to driver y buttonTODO: Make sure this isnt double mapped
+        whileTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
                 ClimberCommands.climb(m_climber, m_drive));
 
         // Between matches, operator: Reset the climber position.
-        whileTrue(operatorControl::activateManualClimb, //speed is operator get left Y, activated with op y button
+        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op y button
                 m_climber.manual(operatorControl::manualClimbSpeed));
 
         ////////////////////////////////////////////////////////////
@@ -375,31 +369,29 @@ public class RobotContainer {
         whileTrue(driverControl::a, m_manipulator.run(m_manipulator::ejectCenter));
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
-        
 
-
-
-        //i think this is all obsolete now because we made the commands in placeholder
+        // i think this is all obsolete now because we made the commands in placeholder
         // List<HolonomicPose2d> calgamesWaypoints = List.of(
-        //         new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
-        //         new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
+        // new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
+        // new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero,
+        // Rotation2d.kZero));
 
         // TrajectoryPlanner trajectoryPlanner = new TrajectoryPlanner(List.of(
-        //         new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly something wrong - kym
+        // new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly
+        // something wrong - kym
         // Trajectory100 bar = trajectoryPlanner.restToRest(calgamesWaypoints);
         // whileTrue(buttons::red2,
-        //         new FollowTrajectory(CalgamesMech, bar));
+        // new FollowTrajectory(CalgamesMech, bar));
 
         // // this is for developing autopick.
         // new FloorPickSetup(
-        //         fieldLog, driverControl, m_drive, m_targets,
-        //         SwerveControllerFactory.pick(driveLog), autoProfile);
-
+        // fieldLog, driverControl, m_drive, m_targets,
+        // SwerveControllerFactory.pick(driveLog), autoProfile);
 
         // "fly" the joints manually
-        whileTrue(operatorControl::manual, //to go to manual, left bumper operator
-                //new ManualCartesian(operatorControl::velocity, CalgamesMech));
-                 new ManualConfig(operatorControl::velocity, CalgamesMech));
+        whileTrue(operatorControl::manual, // to go to manual, left bumper operator
+                // new ManualCartesian(operatorControl::velocity, CalgamesMech));
+                new ManualConfig(operatorControl::velocity, CalgamesMech));
 
         // this is for developing autopick.
         new FloorPickSetup(

@@ -11,19 +11,20 @@ public class ManualIntake {
 
     /**
      * At the same time, move the arm to the floor and spin the intake,
-     * endlessly.
+     * endlessly. Uses a profile since this is a "reaching down" pose.
      */
-    public Command floor(Placeholder placeholder, Manipulator manipulator) {
+    public static Command floor(Placeholder placeholder, Manipulator manipulator) {
         return parallel(
-                placeholder.pick(),
+                // placeholder.pick(),
+                placeholder.pickWithProfile(),
                 manipulator.centerIntake());
     }
 
     /**
      * At the same time, move the arm to the station and spin the intake,
-     * endlessly.
+     * endlessly. Uses a trajectory since this is a "reaching up" pose.
      */
-    public Command station(Placeholder placeholder, Manipulator manipulator) {
+    public static Command station(Placeholder placeholder, Manipulator manipulator) {
         return parallel(
                 placeholder.station(),
                 manipulator.centerIntake());

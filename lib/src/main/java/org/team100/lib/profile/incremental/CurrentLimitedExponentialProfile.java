@@ -26,6 +26,7 @@ public class CurrentLimitedExponentialProfile implements IncrementalProfile {
     /** Speed where the torque curves cross */
     private final double m_limit;
 
+    /** Typically the stall accel is double the limited accel. */
     public CurrentLimitedExponentialProfile(
             double maxVel,
             double limitedAccel,

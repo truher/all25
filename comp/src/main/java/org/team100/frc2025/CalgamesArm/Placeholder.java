@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
+import org.team100.lib.motion.Config;
 import org.team100.lib.trajectory.Trajectory100;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,7 +17,8 @@ public class Placeholder {
 
     // the trajecotry planner object to use for eveyrthing. This assumes same
     // constraints for all moving
-    Trajectories trajectories = new Trajectories(); // i addded some constraints. prolly something wrong - kym
+    Trajectories trajectories = new Trajectories();
+    // i addded some constraints. prolly something wrong - kym
     private final CalgamesMech m_CalgamesMech;
 
     public Placeholder(CalgamesMech cMech) {
@@ -67,6 +69,12 @@ public class Placeholder {
         return new FollowTrajectory(m_CalgamesMech, pick);
     }
 
+    /** Use a profile to move from anywhere to the floor, and stay there forever. */
+    public Command pickWithProfile() {
+        Config goal = new Config(0, -3 * Math.PI / 4, Math.PI / 4);
+        return new FollowJointProfiles(m_CalgamesMech, goal);
+    }
+
     /**
      * Move to the supplied point for algae pick from the reef, and hold there
      * forever.
@@ -93,7 +101,6 @@ public class Placeholder {
         Trajectory100 ppL1 = trajectories.betweenToL1();
         return new FollowTrajectory(m_CalgamesMech, ppL1);
     }
-
 
     /**
      * Move to the L2 scoring position and hold there forever
@@ -137,14 +144,13 @@ public class Placeholder {
         return new FollowTrajectory(m_CalgamesMech, ppL4); // TODO: Check this code kai made it
     }
 
-        /**
+    /**
      * Move to the barge scoring position and hold there forever
      */
     public FollowTrajectory prePlaceBarge() {
         Trajectory100 ppBarge = trajectories.betweenToBarge();
         return new FollowTrajectory(m_CalgamesMech, ppBarge); // TODO: Check this code kai made it
     }
-
 
     /**
      * Move to the proccessor scoring position and hold there forever
@@ -159,7 +165,8 @@ public class Placeholder {
      * This should be done by the trajectory follower, not actually by the
      * placeholder class.
      */
-    //9/27 kai - this whole atL4 thing should be useless now, we are using the follow trajecotry object
+    // 9/27 kai - this whole atL4 thing should be useless now, we are using the
+    // follow trajecotry object
     public boolean atL4() {
         return false;
     }

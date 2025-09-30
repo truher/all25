@@ -123,7 +123,56 @@ public class ProfiledTest {
                     i1.v(), i2.v(), i3.v(),
                     i1.a(), i2.a(), i3.a());
         }
+    }
 
+    /**
+    * Profile down is also not safe.
+    */
+    @Test
+    void l4ToHome() {
+
+        ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(0.5, 0.343);
+        Pose2d pL4 = CanonicalPose.L4.pose;
+
+        // home position
+        Config start = k.inverse(pL4);
+
+        // floor pick position
+        Config goal = new Config(0, 0, 0);
+
+        Model100 g1 = new Model100(goal.shoulderHeight(), 0);
+        Model100 g2 = new Model100(goal.shoulderAngle(), 0);
+        Model100 g3 = new Model100(goal.wristAngle(), 0);
+        IncrementalProfile p1 = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        IncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        IncrementalProfile p3 = new TrapezoidIncrementalProfile(1, 1, 0.05);
+
+        Control100 i1 = new Control100(start.shoulderHeight(), 0);
+        Control100 i2 = new Control100(start.shoulderAngle(), 0);
+        Control100 i3 = new Control100(start.wristAngle(), 0);
+
+        double eta1 = p1.simulateForETA(DT, i1, g1);
+        double eta2 = p1.simulateForETA(DT, i2, g2);
+        double eta3 = p1.simulateForETA(DT, i3, g3);
+
+        double eta = Math.max(eta1, Math.max(eta2, eta3));
+
+        System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+        for (double tt = 0; tt < eta; tt += DT) {
+            i1 = p1.calculate(DT, i1, g1);
+            i2 = p2.calculate(DT, i2, g2);
+            i3 = p3.calculate(DT, i3, g3);
+            Config c = new Config(i1.x(), i2.x(), i3.x());
+            Pose2d p = k.forward(c);
+
+            System.out.printf(
+                    "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                    tt,
+                    p.getX(), p.getY(), p.getRotation().getRadians(),
+                    c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
+                    i1.v(), i2.v(), i3.v(),
+                    i1.a(), i2.a(), i3.a());
+        }
     }
 
 }

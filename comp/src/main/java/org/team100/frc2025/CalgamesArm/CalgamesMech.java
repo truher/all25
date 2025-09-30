@@ -301,7 +301,7 @@ public class CalgamesMech extends SubsystemBase {
 
     }
 
-    private JointVelocities getJointVelocity() {
+    public JointVelocities getJointVelocity() {
         // TODO: think about these defaults
         return new JointVelocities(
                 m_elevatorBack.getVelocityM_S().orElse(0),
