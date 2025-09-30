@@ -1,4 +1,4 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.frc2025.parkinglot;
 
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.kinematics.JointForce;

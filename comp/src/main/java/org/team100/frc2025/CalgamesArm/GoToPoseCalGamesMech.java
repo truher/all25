@@ -1,46 +1,45 @@
-package org.team100.lib.commands.r3;
+package org.team100.frc2025.CalgamesArm;
 
 import java.util.List;
 
-import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.reference.TrajectoryReference;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** Analogous to DriveWithTrajectory, but for R3 positional control. */
+/** Starting pose is current pose, with the fixed starting course. */
 public class GoToPoseCalGamesMech extends Command {
 
-    private final SubsystemR3 m_subsystem;
-    private final HolonomicPose2d m_holonomicPose2d;
-    private final HolonomicPose2d m_currentPose;
+    private final CalgamesMech m_subsystem;
+    private final HolonomicPose2d m_goal;
+    private final Rotation2d m_course;
     private final TrajectoryPlanner m_trajectoryPlanner;
 
-
-    private ReferenceControllerR3 m_referenceController;
+    private CalgamesReferenceController m_referenceController;
 
     public GoToPoseCalGamesMech(
-            SubsystemR3 subsystem,
-            HolonomicPose2d holonomicPose2d,
-            HolonomicPose2d currentPose,
+            CalgamesMech subsystem,
+            Rotation2d course,
+            HolonomicPose2d goal,
             TrajectoryPlanner trajectoryPlanner) {
         m_subsystem = subsystem;
-        m_holonomicPose2d = holonomicPose2d;
-        m_currentPose = currentPose;
+        m_goal = goal;
+        m_course = course;
         m_trajectoryPlanner = trajectoryPlanner;
         addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
-        Trajectory100 m_trajectory = m_trajectoryPlanner.restToRest(List.of(
-                m_currentPose,
-                m_holonomicPose2d));
-        m_referenceController = new ReferenceControllerR3(
-                m_subsystem,
-                new TrajectoryReference(m_trajectory));
+        HolonomicPose2d m_currentPose = HolonomicPose2d.fromPose(
+                m_subsystem.getState().pose(), m_course);
+        Trajectory100 m_trajectory = m_trajectoryPlanner.restToRest(
+                List.of(m_currentPose, m_goal));
+        m_referenceController = new CalgamesReferenceController(
+                m_subsystem, new TrajectoryReference(m_trajectory));
     }
 
     @Override

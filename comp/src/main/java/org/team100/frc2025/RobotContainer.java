@@ -12,10 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
+import org.team100.frc2025.CalgamesArm.CalgamesViz;
 import org.team100.frc2025.CalgamesArm.HoldPosition;
-import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.CalgamesArm.ManualConfig;
-import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
@@ -32,7 +31,6 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.commands.drivetrain.ResetPose;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
-import org.team100.lib.commands.r3.FollowTrajectory;
 import org.team100.lib.config.Camera;
 import org.team100.lib.config.Identity;
 import org.team100.lib.controller.drivetrain.FullStateSwerveController;
@@ -64,7 +62,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.motion.Viz;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveLocal;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -75,9 +72,7 @@ import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
-import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
-import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.Util;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -150,17 +145,17 @@ public class RobotContainer {
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         if (Identity.instance.equals(Identity.COMP_BOT)) {
-            m_climber = new Climber(logger, 13); //should be correct
-            m_climberIntake = new ClimberIntake(logger, 14); //should be correct
+            m_climber = new Climber(logger, 13); // should be correct
+            m_climberIntake = new ClimberIntake(logger, 14); // should be correct
         } else {
             m_climber = new Climber(logger, 18);
             m_climberIntake = new ClimberIntake(logger, 0);
         }
 
         m_manipulator = new Manipulator(logger);
-        CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.5, 0.343);
+        CalgamesMech mech = new CalgamesMech(logger, 0.5, 0.343);
 
-        m_combinedViz = new Viz(CalgamesMech);
+        m_combinedViz = new CalgamesViz(mech);
         m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
 
         m_modules = SwerveModuleCollection.get(
@@ -283,7 +278,11 @@ public class RobotContainer {
         // DEFAULT COMMANDS
 
         m_drive.setDefaultCommand(driveDefault);
-        CalgamesMech.setDefaultCommand(new HoldPosition(CalgamesMech));
+
+        mech.setDefaultCommand(new HoldPosition(mech));
+        // NOTE: this default command *MOVES IMMEDIATELY WHEN ENABLED*. WATCH OUT!
+        // CalgamesMech.setDefaultCommand(CalgamesMech.profileHome());
+
         m_climber.setDefaultCommand(
                 m_climber.stop().withName("climber default"));
         m_climberIntake.setDefaultCommand(
@@ -300,16 +299,13 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        /** fake arm to see what it needs to do. */
-        Placeholder placeholder = new Placeholder(CalgamesMech);
-
-        m_auton = new Auton(logger, placeholder, m_manipulator,
+        m_auton = new Auton(logger, mech, m_manipulator,
                 autoController, autoProfile, m_drive,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                 .left();
 
         whileTrue(driverControl::test,
-                new Auton(logger, placeholder, m_manipulator,
+                new Auton(logger, mech, m_manipulator,
                         autoController, autoProfile, m_drive,
                         localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                         .right());
@@ -322,13 +318,20 @@ public class RobotContainer {
         //
         // PICK
         //
+
+        /**
+         * At the same time, move the arm to the floor and spin the intake,
+         * and go back home when the button is released, ending when complete.
+         */
         whileTrue(driverControl::floorPick,
                 parallel(
-                        placeholder.pick(),
-                        m_manipulator.centerIntake()));
+                        mech.pickWithProfile(),
+                        m_manipulator.centerIntake()))
+                .onFalse(mech.profileHome());
+
         whileTrue(driverControl::stationPick,
                 parallel(
-                        placeholder.station(),
+                        mech.stationWithProfile(),
                         m_manipulator.centerIntake()));
 
         ////////////////////////////////////////////////////////////
@@ -337,15 +340,15 @@ public class RobotContainer {
         //
 
         // Step 1, operator: Extend and spin.
-        whileTrue(operatorControl::climbIntake, //mapped to operator x button
+        whileTrue(operatorControl::climbIntake, // mapped to operator x button
                 ClimberCommands.intake(m_climber, m_climberIntake));
 
         // Step 2, driver: Pull climber in and drive forward.
-        whileTrue(driverControl::climb, //mapped to driver y buttonTODO: Make sure this isnt double mapped
+        whileTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
                 ClimberCommands.climb(m_climber, m_drive));
 
         // Between matches, operator: Reset the climber position.
-        whileTrue(operatorControl::activateManualClimb, //speed is operator get left Y, activated with op y button
+        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op y button
                 m_climber.manual(operatorControl::manualClimbSpeed));
 
         ////////////////////////////////////////////////////////////
@@ -356,14 +359,14 @@ public class RobotContainer {
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,
                 ScoreCoralSmart.get(
-                        coralSequence, placeholder, m_manipulator,
+                        coralSequence, mech, m_manipulator,
                         holonomicController, profile, m_drive,
                         localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         // grab and hold algae, and then eject it when you let go of the button
         whileTrue(buttons::algae,
                 GrabAndHoldAlgae.get(
-                        m_manipulator, placeholder, buttons::algaeLevel))
+                        m_manipulator, mech, buttons::algaeLevel))
                 .onFalse(m_manipulator.algaeEject().withTimeout(0.5));
 
         // these are all unbound
@@ -375,31 +378,29 @@ public class RobotContainer {
         whileTrue(driverControl::a, m_manipulator.run(m_manipulator::ejectCenter));
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
-        
 
-
-
-        //i think this is all obsolete now because we made the commands in placeholder
+        // i think this is all obsolete now because we made the commands in placeholder
         // List<HolonomicPose2d> calgamesWaypoints = List.of(
-        //         new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
-        //         new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
+        // new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
+        // new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero,
+        // Rotation2d.kZero));
 
         // TrajectoryPlanner trajectoryPlanner = new TrajectoryPlanner(List.of(
-        //         new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly something wrong - kym
+        // new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly
+        // something wrong - kym
         // Trajectory100 bar = trajectoryPlanner.restToRest(calgamesWaypoints);
         // whileTrue(buttons::red2,
-        //         new FollowTrajectory(CalgamesMech, bar));
+        // new FollowTrajectory(CalgamesMech, bar));
 
         // // this is for developing autopick.
         // new FloorPickSetup(
-        //         fieldLog, driverControl, m_drive, m_targets,
-        //         SwerveControllerFactory.pick(driveLog), autoProfile);
-
+        // fieldLog, driverControl, m_drive, m_targets,
+        // SwerveControllerFactory.pick(driveLog), autoProfile);
 
         // "fly" the joints manually
-        whileTrue(operatorControl::manual, //to go to manual, left bumper operator
-                //new ManualCartesian(operatorControl::velocity, CalgamesMech));
-                 new ManualConfig(operatorControl::velocity, CalgamesMech));
+        whileTrue(operatorControl::manual, // to go to manual, left bumper operator
+                // new ManualCartesian(operatorControl::velocity, CalgamesMech));
+                new ManualConfig(operatorControl::velocity, mech));
 
         // this is for developing autopick.
         new FloorPickSetup(

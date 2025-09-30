@@ -126,15 +126,4 @@ public class TrajectoryTest {
         // TrajectoryPlotter.plot(t, "simple");
     }
 
-    /** Example of using a trajectory library. */
-    // @Test
-    void testExample() throws InterruptedException {
-        TrajectoryExample e = new TrajectoryExample();
-        new TrajectoryPlotter(0.1).plot(e.pickToL4(), "pick to L4, X UP");
-        new TrajectoryPlotter(0.1).plot(e.pickToL3(), "pick to L3, X UP");
-        new TrajectoryPlotter(0.1).plot(e.pickToL2(), "pick to L2, X UP");
-        new TrajectoryPlotter(0.1).plot(e.pickToL1(), "pick to L1, X UP");
-        Thread.sleep(100000);
-    }
-
 }

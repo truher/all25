@@ -6,7 +6,8 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.function.DoubleConsumer;
 
-import org.team100.frc2025.CalgamesArm.Placeholder;
+import org.team100.frc2025.CalgamesArm.CalgamesMech;
+import org.team100.frc2025.CalgamesArm.FollowTrajectory;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
@@ -27,7 +28,7 @@ public class Coral1Mid {
 
     public static Command get(
             LoggerFactory logger,
-            Placeholder placeholder,
+            CalgamesMech mech,
             Manipulator manipulator,
             SwerveController controller,
             HolonomicProfile profile,
@@ -40,14 +41,14 @@ public class Coral1Mid {
                 logger, drive, controller, profile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.H));
 
-        Command prePlace = placeholder.prePlaceL4();
+        FollowTrajectory prePlace = mech.homeToL4();
         return sequence(
                 parallel(
                         runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
                         toReef,
                         prePlace //
-                ).until(() -> (toReef.isDone() && placeholder.atL4())),
+                ).until(() -> (toReef.isDone() && prePlace.isDone())),
                 manipulator.centerEject().withTimeout(0.5),
-                placeholder.stow());
+                mech.l4ToHome());
     }
 }
