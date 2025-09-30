@@ -11,12 +11,16 @@ import java.util.function.Supplier;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.primitive.PrimitiveLogger;
+import org.team100.lib.motion.Config;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
+import org.team100.lib.motion.kinematics.JointAccelerations;
+import org.team100.lib.motion.kinematics.JointForce;
+import org.team100.lib.motion.kinematics.JointVelocities;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.trajectory.timing.TimedPose;
@@ -860,4 +864,113 @@ public class LoggerFactory {
     public Blip24Logger logBlip24(Level level, String leaf) {
         return new Blip24Logger(level, leaf);
     }
+
+    public class ConfigLogger {
+        private final Level m_level;
+        private final DoubleLogger m_elevator;
+        private final DoubleLogger m_shoulder;
+        private final DoubleLogger m_wrist;
+
+        ConfigLogger(Level level, String leaf) {
+            m_level = level;
+            m_elevator = doubleLogger(level, join(leaf, "elevator"));
+            m_shoulder = doubleLogger(level, join(leaf, "shoulder"));
+            m_wrist = doubleLogger(level, join(leaf, "wrist"));
+        }
+
+        public void log(Supplier<Config> vals) {
+            if (!allow(m_level))
+                return;
+            Config val = vals.get();
+            m_elevator.log(val::shoulderHeight);
+            m_shoulder.log(val::shoulderAngle);
+            m_wrist.log(val::wristAngle);
+        }
+    }
+
+    public ConfigLogger logConfig(Level level, String leaf) {
+        return new ConfigLogger(level, leaf);
+    }
+
+    public class JointVelocitiesLogger {
+        private final Level m_level;
+        private final DoubleLogger m_elevator;
+        private final DoubleLogger m_shoulder;
+        private final DoubleLogger m_wrist;
+
+        JointVelocitiesLogger(Level level, String leaf) {
+            m_level = level;
+            m_elevator = doubleLogger(level, join(leaf, "elevator"));
+            m_shoulder = doubleLogger(level, join(leaf, "shoulder"));
+            m_wrist = doubleLogger(level, join(leaf, "wrist"));
+        }
+
+        public void log(Supplier<JointVelocities> vals) {
+            if (!allow(m_level))
+                return;
+            JointVelocities val = vals.get();
+            m_elevator.log(val::elevator);
+            m_shoulder.log(val::shoulder);
+            m_wrist.log(val::wrist);
+        }
+    }
+
+    public JointVelocitiesLogger logJointVelocities(Level level, String leaf) {
+        return new JointVelocitiesLogger(level, leaf);
+    }
+
+    public class JointAccelerationsLogger {
+        private final Level m_level;
+        private final DoubleLogger m_elevator;
+        private final DoubleLogger m_shoulder;
+        private final DoubleLogger m_wrist;
+
+        JointAccelerationsLogger(Level level, String leaf) {
+            m_level = level;
+            m_elevator = doubleLogger(level, join(leaf, "elevator"));
+            m_shoulder = doubleLogger(level, join(leaf, "shoulder"));
+            m_wrist = doubleLogger(level, join(leaf, "wrist"));
+        }
+
+        public void log(Supplier<JointAccelerations> vals) {
+            if (!allow(m_level))
+                return;
+            JointAccelerations val = vals.get();
+            m_elevator.log(val::elevator);
+            m_shoulder.log(val::shoulder);
+            m_wrist.log(val::wrist);
+        }
+    }
+
+    public JointAccelerationsLogger logJointAccelerations(Level level, String leaf) {
+        return new JointAccelerationsLogger(level, leaf);
+    }
+
+    public class JointForceLogger {
+        private final Level m_level;
+        private final DoubleLogger m_elevator;
+        private final DoubleLogger m_shoulder;
+        private final DoubleLogger m_wrist;
+
+        JointForceLogger(Level level, String leaf) {
+            m_level = level;
+            m_elevator = doubleLogger(level, join(leaf, "elevator"));
+            m_shoulder = doubleLogger(level, join(leaf, "shoulder"));
+            m_wrist = doubleLogger(level, join(leaf, "wrist"));
+        }
+
+        public void log(Supplier<JointForce> vals) {
+            if (!allow(m_level))
+                return;
+            JointForce val = vals.get();
+            m_elevator.log(val::elevator);
+            m_shoulder.log(val::shoulder);
+            m_wrist.log(val::wrist);
+        }
+    }
+
+    public JointForceLogger logJointForce(Level level, String leaf) {
+        return new JointForceLogger(level, leaf);
+    }
+
 }

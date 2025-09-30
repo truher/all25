@@ -38,9 +38,10 @@ public class FollowJointProfiles extends Command {
         m_g2 = new Model100(goal.shoulderAngle(), 0);
         m_g3 = new Model100(goal.wristAngle(), 0);
         // TODO: turn these limits up by a factor of 4 or so
-        m_p1 = new CurrentLimitedExponentialProfile(0.25, 0.5, 1);
-        m_p2 = new CurrentLimitedExponentialProfile(0.25, 0.5, 1);
-        m_p3 = new CurrentLimitedExponentialProfile(0.25, 0.5, 1);
+        m_p1 = new CurrentLimitedExponentialProfile(0.5, 1, 2);
+        m_p2 = new CurrentLimitedExponentialProfile(0.5, 1, 2);
+        m_p3 = new CurrentLimitedExponentialProfile(0.5, 1, 2);
+        addRequirements(subsystem);
     }
 
     @Override

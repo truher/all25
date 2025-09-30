@@ -13,7 +13,6 @@ import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.CalgamesViz;
-import org.team100.frc2025.CalgamesArm.HoldPosition;
 import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
@@ -50,6 +49,7 @@ import org.team100.lib.hid.OperatorControl;
 import org.team100.lib.hid.OperatorControlProxy;
 import org.team100.lib.hid.ThirdControl;
 import org.team100.lib.hid.ThirdControlProxy;
+import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.FreshSwerveEstimate;
@@ -109,7 +109,7 @@ public class RobotContainer {
 
     final Climber m_climber;
     final ClimberIntake m_climberIntake;
-    // final LEDIndicator m_leds;
+    final LEDIndicator m_leds;
 
     final SwerveKinodynamics m_swerveKinodynamics;
 
@@ -211,7 +211,7 @@ public class RobotContainer {
                 swerveLocal,
                 limiter);
 
-        // m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
+        m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -279,9 +279,9 @@ public class RobotContainer {
 
         m_drive.setDefaultCommand(driveDefault);
 
-        mech.setDefaultCommand(new HoldPosition(mech));
+        // mech.setDefaultCommand(new HoldPosition(mech));
         // NOTE: this default command *MOVES IMMEDIATELY WHEN ENABLED*. WATCH OUT!
-        // CalgamesMech.setDefaultCommand(CalgamesMech.profileHome());
+        mech.setDefaultCommand(mech.profileHomeEndless());
 
         m_climber.setDefaultCommand(
                 m_climber.stop().withName("climber default"));
@@ -304,7 +304,7 @@ public class RobotContainer {
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                 .left();
 
-        whileTrue(driverControl::test,
+        whileTrue(() -> false, // driverControl::test),
                 new Auton(logger, mech, m_manipulator,
                         autoController, autoProfile, m_drive,
                         localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
@@ -327,7 +327,7 @@ public class RobotContainer {
                 parallel(
                         mech.pickWithProfile(),
                         m_manipulator.centerIntake()))
-                .onFalse(mech.profileHome());
+                .onFalse(mech.profileHomeTerminal());
 
         whileTrue(driverControl::stationPick,
                 parallel(
@@ -360,7 +360,7 @@ public class RobotContainer {
         whileTrue(buttons::l1, mech.homeToL1()).onFalse(mech.l1ToHome());
         whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
         whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
-        whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
+        whileTrue(driverControl::test, mech.homeToL4()).onFalse(mech.l4ToHome());
 
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,
@@ -465,7 +465,7 @@ public class RobotContainer {
         m_targetSimulator.run();
         // show the closest target on field2d
         m_targets.periodic();
-        // m_leds.periodic();
+        m_leds.periodic();
         m_combinedViz.run();
         m_climberViz.run();
     }
@@ -477,6 +477,6 @@ public class RobotContainer {
     // this keeps the tests from conflicting via the use of simulated HAL ports.
     public void close() {
         m_modules.close();
-        // m_leds.close();
+        m_leds.close();
     }
 }

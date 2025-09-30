@@ -1,12 +1,11 @@
 package org.team100.frc2025.CalgamesArm;
 
+import org.team100.lib.commands.Done;
 import org.team100.lib.reference.TrajectoryReference;
 import org.team100.lib.trajectory.Trajectory100;
 
-import edu.wpi.first.wpilibj2.command.Command;
-
 /** Analogous to DriveWithTrajectory, but for R3 positional control. */
-public class FollowTrajectory extends Command {
+public class FollowTrajectory extends Done {
 
     private final CalgamesMech m_subsystem;
     private final Trajectory100 m_trajectory;
