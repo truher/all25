@@ -22,7 +22,6 @@ public class ElevatorArmWristKinematicsTest {
         if (DEBUG)
             System.out.println(wristPosition.getY());
         assertEquals(4, h);
-
     }
 
     @Test
@@ -72,9 +71,9 @@ public class ElevatorArmWristKinematicsTest {
         Pose2d p = new Pose2d(0.1, 3, Rotation2d.kCCW_90deg);
         Config c = k.inverse(p);
 
-        assertEquals(2.1, c.shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(135), c.shoulderAngle(), 0.001);
-        assertEquals(Math.toRadians(-45), c.wristAngle(), 0.001);
+        assertEquals(-1.9, c.shoulderHeight(), 0.001);
+        assertEquals(Math.toRadians(45), c.shoulderAngle(), 0.001);
+        assertEquals(Math.toRadians(45), c.wristAngle(), 0.001);
     }
 
     @Test
@@ -83,9 +82,9 @@ public class ElevatorArmWristKinematicsTest {
         Pose2d p = new Pose2d(0.1, 2, Rotation2d.kCCW_90deg);
         Config c = k.inverse(p);
 
-        assertEquals(Math.sqrt(3) + 0.1, c.shoulderHeight(), 0.001);
-        assertEquals(Math.toRadians(150), c.shoulderAngle(), 0.001);
-        assertEquals(Math.toRadians(-60), c.wristAngle(), 0.001);
+        assertEquals(0.1 - Math.sqrt(3), c.shoulderHeight(), 0.001);
+        assertEquals(Math.toRadians(30), c.shoulderAngle(), 0.001);
+        assertEquals(Math.toRadians(60), c.wristAngle(), 0.001);
     }
 
     @Test

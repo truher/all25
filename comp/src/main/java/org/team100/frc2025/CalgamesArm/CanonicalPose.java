@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * We often use an enum of canonical poses.
+ * 
+ * TODO: are these in mechanism coordinates or robot coordinates?
  */
 public enum CanonicalPose {
     //wherever positions

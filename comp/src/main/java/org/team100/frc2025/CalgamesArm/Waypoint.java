@@ -33,6 +33,9 @@ public enum Waypoint {
     GOING_FORWARD(CanonicalPose.BETWEEN, Rotation2d.kCCW_90deg), //is there a going backward? what exatcly is this for?
     GOING_BACKWARD(CanonicalPose.BETWEEN, Rotation2d.kCW_90deg),
 
+    /** from the home position, go up to score.  */
+    HOME_TO_SCORE(CanonicalPose.HOME, Rotation2d.kZero),
+
     //L4
     TO_L4(CanonicalPose.L4, new Rotation2d(Math.toRadians(125))),
     FROM_L4(CanonicalPose.L4, new Rotation2d(Math.toRadians(-50))), //just opposite of to

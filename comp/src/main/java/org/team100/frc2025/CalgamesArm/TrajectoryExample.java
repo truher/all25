@@ -27,6 +27,12 @@ public class TrajectoryExample {
                 Waypoint.TO_L4.hPose));
     }
 
+    public Trajectory100 homeToL4() {
+        return m_planner.restToRest(List.of(
+                Waypoint.HOME_TO_SCORE.hPose,
+                Waypoint.TO_L4.hPose));
+    }
+
     public Trajectory100 pickToL3() {
         return m_planner.restToRest(List.of(
                 Waypoint.FROM_PICK.hPose,
