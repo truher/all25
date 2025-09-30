@@ -18,17 +18,24 @@ public class CalgamesReferenceController {
     public CalgamesReferenceController(CalgamesMech subsystem, SwerveReference reference) {
         m_subsystem = subsystem;
         m_reference = reference;
+        m_reference.initialize(m_subsystem.getState());
     }
 
     public void execute() {
-        SwerveModel measurement = m_subsystem.getState();
-        SwerveModel current = m_reference.current();
-        SwerveModel error = current.minus(measurement);
-        if (DEBUG)
-            Util.printf("error %s\n", error);
+        try {
+            SwerveModel measurement = m_subsystem.getState();
+            SwerveModel current = m_reference.current();
+            SwerveModel error = current.minus(measurement);
+            if (DEBUG)
+                Util.printf("error %s\n", error);
 
-        SwerveControl next = m_reference.next();
-        m_subsystem.set(next);
+            SwerveControl next = m_reference.next();
+            m_subsystem.set(next);
+        } catch (IllegalStateException ex) {
+            // System.out.println(ex);
+            // This happens when the trajectory generator produces an empty trajectory.
+            // Ignore it for now.
+        }
     }
 
     /**

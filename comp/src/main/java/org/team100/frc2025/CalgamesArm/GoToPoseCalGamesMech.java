@@ -2,16 +2,16 @@ package org.team100.frc2025.CalgamesArm;
 
 import java.util.List;
 
+import org.team100.lib.commands.Done;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.reference.TrajectoryReference;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /** Starting pose is current pose, with the fixed starting course. */
-public class GoToPoseCalGamesMech extends Command {
+public class GoToPoseCalGamesMech extends Done {
 
     private final CalgamesMech m_subsystem;
     private final HolonomicPose2d m_goal;
@@ -39,7 +39,8 @@ public class GoToPoseCalGamesMech extends Command {
         Trajectory100 m_trajectory = m_trajectoryPlanner.restToRest(
                 List.of(m_currentPose, m_goal));
         m_referenceController = new CalgamesReferenceController(
-                m_subsystem, new TrajectoryReference(m_trajectory));
+                m_subsystem,
+                new TrajectoryReference(m_trajectory));
     }
 
     @Override

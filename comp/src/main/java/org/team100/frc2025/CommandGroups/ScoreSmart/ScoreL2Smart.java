@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.FollowTrajectory;
 import org.team100.frc2025.grip.Manipulator;
+import org.team100.lib.commands.Done;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.LoggerFactory;
@@ -28,7 +29,7 @@ public class ScoreL2Smart {
             Supplier<Pose2d> goal) {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile, goal);
-        FollowTrajectory toL2 = mech.homeToL2();
+        Done toL2 = mech.homeToL2();
         return sequence(
                 parallel(
                         toReef,
