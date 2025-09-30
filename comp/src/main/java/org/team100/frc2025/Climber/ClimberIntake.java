@@ -25,8 +25,8 @@ public class ClimberIntake extends SubsystemBase {
             case COMP_BOT -> {
                 m_motor = new Kraken6Motor(
                         log, canID, NeutralMode.COAST, MotorPhase.REVERSE, 
-                        5, //og 50
-                        5, //og 2
+                        20, //og 50
+                        20, //og 2
                         new PIDConstants(),
                         Feedforward100.makeKrakenClimberIntake());
             }
@@ -43,7 +43,7 @@ public class ClimberIntake extends SubsystemBase {
     }
 
     public boolean isSlow() {
-        return m_motor.getVelocityRad_S() < 10;
+        return m_motor.getVelocityRad_S() < 1;
     }
 
     // COMMANDS

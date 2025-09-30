@@ -54,6 +54,18 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private final DoubleLogger m_log_shoulder;
     private final DoubleLogger m_log_wrist;
 
+    private final DoubleLogger m_log_elevatorV;
+    private final DoubleLogger m_log_shoulderV;
+    private final DoubleLogger m_log_wristV;
+
+    private final DoubleLogger m_log_elevatorA;
+    private final DoubleLogger m_log_shoulderA;
+    private final DoubleLogger m_log_wristA;
+
+    private final DoubleLogger m_log_elevatorF;
+    private final DoubleLogger m_log_shoulderF;
+    private final DoubleLogger m_log_wristF;
+
     private final Pose2dLogger m_log_pose;
 
     private final LinearMechanism m_elevatorFront;
@@ -74,13 +86,26 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_gravity = Gravity.from2025();
         m_dynamics = new Dynamics();
 
-        m_log_elevator = parent.doubleLogger(Level.TRACE, "elevator");
-        m_log_shoulder = parent.doubleLogger(Level.TRACE, "shoulder");
-        m_log_wrist = parent.doubleLogger(Level.TRACE, "wrist");
+        m_log_elevator = parent.doubleLogger(Level.TRACE, "elevatorP");
+        m_log_shoulder = parent.doubleLogger(Level.TRACE, "shoulderP");
+        m_log_wrist = parent.doubleLogger(Level.TRACE, "wristP");
+
+        m_log_elevatorV = parent.doubleLogger(Level.TRACE, "elevatorV");
+        m_log_shoulderV = parent.doubleLogger(Level.TRACE, "shoulderV");
+        m_log_wristV = parent.doubleLogger(Level.TRACE, "wristV");
+
+        m_log_elevatorA = parent.doubleLogger(Level.TRACE, "elevatorA");
+        m_log_shoulderA = parent.doubleLogger(Level.TRACE, "shoulderA");
+        m_log_wristA = parent.doubleLogger(Level.TRACE, "wristA");
+
+        m_log_elevatorF = parent.doubleLogger(Level.TRACE, "elevatorF");
+        m_log_shoulderF = parent.doubleLogger(Level.TRACE, "shoulderF");
+        m_log_wristF = parent.doubleLogger(Level.TRACE, "wristF");
+
         m_log_pose = parent.pose2dLogger(Level.TRACE, "pose");
 
-        LoggerFactory elevatorbackLog = parent.name("elevator");
-        LoggerFactory elevatorfrontLog = parent.name("elevator");
+        LoggerFactory elevatorbackLog = parent.name("elevatorBack");
+        LoggerFactory elevatorfrontLog = parent.name("elevatorFront");
         LoggerFactory shoulderLog = parent.name("shoulder");
         LoggerFactory wristLog = parent.name("wrist");
         switch (Identity.instance) {
@@ -89,10 +114,10 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         elevatorfrontLog,
                         11, // TODO: elevator CAN ID (DID, now for starboard)
                         NeutralMode.BRAKE,
-                        MotorPhase.FORWARD,
-                        20,
-                        20,
-                        PIDConstants.makePositionPID(0.5),
+                        MotorPhase.REVERSE,
+                        100,
+                        100,
+                        PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
                         elevatorfrontLog, elevatorFrontMotor);
@@ -101,7 +126,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         elevatorFrontMotor,
                         elevatorFrontEncoder,
                         2.182, // TODO: calibrate ratio
-                        0.03844, // TODO: calibrate pulley size
+                        0.03844, // TODO: calibrate pulley size- done
                         0, // TODO: calibrate lower limit
                         1.7); // TODO: calibrate upper limit 228-45
 
@@ -109,10 +134,10 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         elevatorbackLog,
                         12, // TODO: elevator CAN ID (DID, now for port)
                         NeutralMode.BRAKE,
-                        MotorPhase.REVERSE,
-                        20, // orginally 60
-                        20, // originally 90
-                        PIDConstants.makePositionPID(0.5),
+                        MotorPhase.FORWARD,
+                        100, // orginally 60
+                        100, // originally 90
+                        PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
                         elevatorbackLog, elevatorBackMotor);
@@ -130,9 +155,9 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         24, // TODO: shoulder CAN ID (Done)
                         NeutralMode.BRAKE,
                         MotorPhase.REVERSE,
-                        20, // og 60
-                        20, // og 90
-                        PIDConstants.makePositionPID(0.5),
+                        40, // og 60
+                        40, // og 90
+                        PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder shoulderEncoder = new Talon6Encoder(
                         shoulderLog,
@@ -141,7 +166,7 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 AS5048RotaryPositionSensor shoulderSensor = new AS5048RotaryPositionSensor(
                         shoulderLog,
                         4, // id done
-                        0.059573, // TODO: verify offset
+                        0.565, // TODO: verify offset
                         EncoderDrive.INVERSE); // verified drive - 9/28
                 GearedRotaryPositionSensor gearedSensor = new GearedRotaryPositionSensor(
                         shoulderSensor,
@@ -159,17 +184,17 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         shoulderMotor, // need to learn what these three things do and how rotatrymech works - kym
                         shoulderCombined,
                         78, // TODO: calibrate ratio - 9/28
-                        -1, // TODO: calibrate lower limit (DO IT FOR REAL)
-                        1);// TODO: calibrate upper limit (DO IT FOR REAL)
+                        -2, // TODO: calibrate lower limit (DO IT FOR REAL)
+                        2);// TODO: calibrate upper limit (DO IT FOR REAL)
 
                 Kraken6Motor wristMotor = new Kraken6Motor(
                         wristLog,
                         22, // TODO: wrist CAN ID (Done)
                         NeutralMode.COAST,
                         MotorPhase.FORWARD,
-                        20, // og 60
-                        20, // og 90
-                        PIDConstants.makePositionPID(0.5), // og 10
+                        40, // og 60
+                        40, // og 90
+                        PIDConstants.makePositionPID(5), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 // the wrist has no angle sensor, so it needs to start in the "zero" position,
                 // or we need to add a homing
@@ -262,21 +287,34 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     public Config getConfig() {
         // TODO: remove these defaults
         return new Config(
-                m_elevatorFront.getPositionM().orElse(0), // only one included beacuse geared together
+                m_elevatorBack.getPositionM().orElse(0), // only one included beacuse geared together
                 m_shoulder.getPositionRad().orElse(0),
                 m_wrist.getPositionRad().orElse(0));
     }
 
-    private void logConfig(Config c) {
+    private void logConfig(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
         m_log_elevator.log(() -> c.shoulderHeight());
         m_log_shoulder.log(() -> c.shoulderAngle());
         m_log_wrist.log(() -> c.wristAngle());
+
+        m_log_elevatorV.log(() -> jv.elevator());
+        m_log_shoulderV.log(() -> jv.shoulder());
+        m_log_wristV.log(() -> jv.wrist());
+
+        m_log_elevatorA.log(() -> ja.elevator());
+        m_log_shoulderA.log(() -> ja.shoulder());
+        m_log_wristA.log(() -> ja.wrist());
+
+        m_log_elevatorF.log(() -> jf.elevator());
+        m_log_shoulderF.log(() -> jf.shoulder());
+        m_log_wristF.log(() -> jf.wrist());
+
     }
 
     private JointVelocities getJointVelocity() {
         // TODO: think about these defaults
         return new JointVelocities(
-                m_elevatorFront.getVelocityM_S().orElse(0),
+                m_elevatorBack.getVelocityM_S().orElse(0),
                 m_shoulder.getVelocityRad_S().orElse(0),
                 m_wrist.getVelocityRad_S().orElse(0));
     }
@@ -312,6 +350,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
 
         // set each mechanism
         set(c, jv, ja, jf);
+        //System.out.println(c);
+        //set(c);
     }
 
     public Command config(
@@ -348,11 +388,11 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     }
 
     public void set(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
-        logConfig(c);
-        m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), ja.elevator(), jf.elevator());
-        m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), ja.elevator(), jf.elevator());
-        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), ja.shoulder(), jf.shoulder());
-        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), ja.shoulder(), jf.wrist());
+        logConfig(c, jv, ja, jf);
+        m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
+        m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
+        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
+        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
     }
 
     /** Sets each mechanism, with zero velocity */

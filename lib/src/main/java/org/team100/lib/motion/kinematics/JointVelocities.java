@@ -26,8 +26,8 @@ public record JointVelocities(double elevator, double shoulder, double wrist) {
 
     public JointAccelerations diff(JointVelocities jv, double dt) {
         return new JointAccelerations(
-                (jv.elevator - elevator) / dt,
-                (jv.shoulder - shoulder) / dt,
-                (jv.wrist - wrist) / dt);
+                (elevator - jv.elevator) / dt,
+                (shoulder - jv.shoulder) / dt,
+                (wrist - jv.wrist) / dt);
     }
 }

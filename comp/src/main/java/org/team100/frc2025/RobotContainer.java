@@ -13,6 +13,7 @@ import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.HoldPosition;
+import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.CalgamesArm.ManualConfig;
 import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.Climber.Climber;
@@ -157,7 +158,7 @@ public class RobotContainer {
         }
 
         m_manipulator = new Manipulator(logger);
-        CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.3, 0.1);
+        CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.5, 0.343);
 
         m_combinedViz = new Viz(CalgamesMech);
         m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
@@ -371,9 +372,11 @@ public class RobotContainer {
         whileTrue(buttons::red4, print("red4"));
         whileTrue(buttons::barge, print("barge"));
 
-        // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeAlgae));
+        whileTrue(driverControl::a, m_manipulator.run(m_manipulator::ejectCenter));
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
+        
+
 
 
         //i think this is all obsolete now because we made the commands in placeholder
@@ -395,7 +398,8 @@ public class RobotContainer {
 
         // "fly" the joints manually
         whileTrue(operatorControl::manual, //to go to manual, left bumper operator
-                new ManualConfig(operatorControl::velocity, CalgamesMech));
+                //new ManualCartesian(operatorControl::velocity, CalgamesMech));
+                 new ManualConfig(operatorControl::velocity, CalgamesMech));
 
         // this is for developing autopick.
         new FloorPickSetup(

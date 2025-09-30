@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Manipulator extends SubsystemBase {
 
-    private static final int NEAR = 100;
+    private static final int NEAR = 50;
     private final BareMotor m_algaeMotor;
     private final LinearMechanism m_leftMech;
     private final LinearMechanism m_rightMech;
@@ -33,32 +33,37 @@ public class Manipulator extends SubsystemBase {
     private final LaserCanInterface m_backLaser;
     private final LaserCanInterface m_leftLaser;
 
-    public Manipulator(LoggerFactory log) {
+    public Manipulator(LoggerFactory parent) {
+        LoggerFactory log = parent.name("Manipulator");
+
+        LoggerFactory algaeMotorLog = log.name("Algae");
+        LoggerFactory leftMotorLog = log.name("leftMotor");
+        LoggerFactory rightMotorLog = log.name("rightMotor");
         switch (Identity.instance) {
             case COMP_BOT -> {
                 // Set specific parameters for the competition robot               //can id done
-                Kraken6Motor leftMotor = new Kraken6Motor(log, 19, NeutralMode.COAST, MotorPhase.FORWARD, 
-                1, //og 40
-                1, //og 40
+                Kraken6Motor leftMotor = new Kraken6Motor(leftMotorLog, 19, NeutralMode.COAST, MotorPhase.FORWARD, 
+                40, //og 40
+                40, //og 40
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor rightMotor = new Kraken6Motor(log, 20, NeutralMode.COAST, MotorPhase.REVERSE,  //can id done
-                1, //og 40
-                1, //og 40
+                Kraken6Motor rightMotor = new Kraken6Motor(rightMotorLog, 20, NeutralMode.COAST, MotorPhase.REVERSE,  //can id done
+                40, //og 40
+                40, //og 40
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor algaeMotor = new Kraken6Motor(log, 21, NeutralMode.COAST, MotorPhase.FORWARD,  //can id done
-                1, //og 120
-                1, //og 120
+                Kraken6Motor algaeMotor = new Kraken6Motor(algaeMotorLog, 21, NeutralMode.COAST, MotorPhase.FORWARD,  //can id done
+                120, //og 120
+                120, //og 120
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
                 m_algaeMotor = algaeMotor;
                 m_rightLaser = new LaserCan(17); //can id done
                 m_frontLaser = new LaserCan(16); //can id done
                 m_backLaser = new LaserCan(18); //can id done
                 m_leftLaser = new LaserCan(15); //can id done
-                m_leftMech = new LinearMechanism(log, leftMotor, new Talon6Encoder(log, leftMotor), 16,
+                m_leftMech = new LinearMechanism(leftMotorLog, leftMotor, new Talon6Encoder(log, leftMotor), 16,
                         .1, -100000000, 1000000);
-                m_rightMech = new LinearMechanism(log, rightMotor, new Talon6Encoder(log, rightMotor),
+                m_rightMech = new LinearMechanism(rightMotorLog, rightMotor, new Talon6Encoder(log, rightMotor),
                         16, .1, -100000000, 1000000);
-                m_algaeMech = new LinearMechanism(log, algaeMotor, new Talon6Encoder(log, algaeMotor),
+                m_algaeMech = new LinearMechanism(algaeMotorLog, algaeMotor, new Talon6Encoder(log, algaeMotor),
                         16, .1, -100000000, 1000000);
             }
             default -> {
@@ -110,9 +115,9 @@ public class Manipulator extends SubsystemBase {
     }
 
     public void ejectCenter() {
-        m_algaeMech.setDutyCycle(0.5);
-        m_leftMech.setDutyCycle(-0.5);
-        m_rightMech.setDutyCycle(-0.5);
+        m_algaeMech.setDutyCycle(1);
+        m_leftMech.setDutyCycle(1);
+        m_rightMech.setDutyCycle(1);
     }
 
     public void intakeSideways() {
