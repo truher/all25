@@ -1,7 +1,13 @@
 package org.team100.frc2025.CalgamesArm;
 
-import java.util.function.DoubleSupplier;
+import static edu.wpi.first.wpilibj2.command.Commands.select;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
@@ -13,6 +19,7 @@ import org.team100.lib.encoder.ProxyRotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
 import org.team100.lib.encoder.Talon6Encoder;
+import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -32,6 +39,10 @@ import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,6 +52,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class CalgamesMech extends SubsystemBase {
     private final double m_armLengthM;
     private final double m_wristLengthM;
+    private final TrajectoryPlanner m_planner;
+
     private final ElevatorArmWristKinematics m_kinematics;
     private final AnalyticalJacobian m_jacobian;
 
@@ -76,6 +89,12 @@ public class CalgamesMech extends SubsystemBase {
         LoggerFactory parent = log.type(this);
         m_armLengthM = armLength;
         m_wristLengthM = wristLength;
+
+        List<TimingConstraint> c = List.of(
+                new ConstantConstraint(1, 1),
+                new YawRateConstraint(1, 1));
+        m_planner = new TrajectoryPlanner(c);
+
         m_kinematics = new ElevatorArmWristKinematics(armLength, wristLength);
         m_jacobian = new AnalyticalJacobian(m_kinematics);
 
@@ -410,6 +429,172 @@ public class CalgamesMech extends SubsystemBase {
                 c.shoulderAngle() + shoulder,
                 c.wristAngle() + wrist));
     }
+
+    /////////////////////////////////////////////////////////
+    ///
+    /// COMMANDS
+    ///
+
+    /**
+     * Use a profile to move from the current position and velocity to the "home"
+     * position (origin) at rest, and end when done.
+     */
+    public Command profileHome() {
+        FollowJointProfiles f = new FollowJointProfiles(this, new Config(0, 0, 0));
+        return f.until(f::isDone);
+    }
+
+    /**
+     * Use a profile to move from the current position and velocity to the floor at
+     * rest, and stay there forever.
+     */
+    public Command pickWithProfile() {
+        return new FollowJointProfiles(this, new Config(0, -3 * Math.PI / 4, Math.PI / 4));
+    }
+
+    /**
+     * Use a profile to move from the current position and velocity to the
+     * station-pick location at rest, and stay there forever.
+     */
+    public Command stationWithProfile() {
+        return new FollowJointProfiles(this, new Config(0, -1, 0));
+    }
+
+    /**
+     * Use a profile to move from the current position and velocity to the
+     * processor location at rest, and stay there forever.
+     */
+    public Command processorWithProfile() {
+        return new FollowJointProfiles(this, new Config(0, 1, 0));
+    }
+
+    /**
+     * Use a trajectory to move from home to the L1 scoring position and hold there
+     * forever
+     */
+    public FollowTrajectory homeToL1() {
+        return new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(1, 0, 0, 0),
+                        Waypoint.TO_L1.hPose)));
+    }
+
+    /**
+     * Use a trajectory to move to the L2 scoring position and hold there forever
+     */
+    public FollowTrajectory homeToL2() {
+        return new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(1, 0, 0, 0),
+                        Waypoint.TO_L2.hPose)));
+    }
+
+    /**
+     * Use a trajectory to move to the L3 scoring position and hold there forever
+     */
+    public FollowTrajectory homeToL3() {
+        return new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(1, 0, 0, 0),
+                        Waypoint.TO_L3.hPose)));
+    }
+
+    /**
+     * Move to the L4 scoring position and hold there forever
+     */
+    public FollowTrajectory homeToL4() {
+        return new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(1, 0, 0, 0),
+                        Waypoint.TO_L4.hPose)));
+    }
+
+    /** ends when done */
+    public Command l4ToHome() {
+        FollowTrajectory f = new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        Waypoint.FROM_L4.hPose,
+                        HolonomicPose2d.make(1, 0, 0, Math.PI))));
+        return f.until(f::isDone);
+    }
+
+    /** ends when done */
+    public Command l3ToHome() {
+        FollowTrajectory f = new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        Waypoint.FROM_L3.hPose,
+                        HolonomicPose2d.make(1, 0, 0, Math.PI))));
+        return f.until(f::isDone);
+    }
+
+    /** ends when done */
+    public Command l2ToHome() {
+        FollowTrajectory f = new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        Waypoint.FROM_L2.hPose,
+                        HolonomicPose2d.make(1, 0, 0, Math.PI))));
+        return f.until(f::isDone);
+    }
+
+    /** ends when done */
+    public Command l1ToHome() {
+        FollowTrajectory f = new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        Waypoint.FROM_L1.hPose,
+                        HolonomicPose2d.make(1, 0, 0, Math.PI))));
+        return f.until(f::isDone);
+    }
+
+    public Command homeToAlgaeL2() {
+        return new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(1, 0, 0, 0),
+                        Waypoint.TO_A2.hPose)));
+    }
+
+    public Command homeToAlgaeL3() {
+        return new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(1, 0, 0, 0),
+                        Waypoint.TO_A1.hPose)));
+    }
+
+    /**
+     * Move to the supplied point for algae pick from the reef, and hold there
+     * forever.
+     */
+    public Command algaeReefPick(Supplier<ScoringLevel> level) {
+        Command l3 = homeToAlgaeL3();
+        Command l2 = homeToAlgaeL2();
+        return select(
+                Map.ofEntries(
+                        Map.entry(
+                                ScoringLevel.L3,
+                                l3),
+                        Map.entry(
+                                ScoringLevel.L2,
+                                l2)),
+                level);
+    }
+
+    /**
+     * Move to the barge scoring position and hold there forever
+     */
+    public FollowTrajectory prePlaceBarge() {
+        return new FollowTrajectory(this,
+                m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(1, 0, 0, 0),
+                        Waypoint.TO_BARGE.hPose)));
+    }
+
+    /** Not too far extended in any direction. */
+    public boolean isSafeToDrive() {
+        double x = m_elevatorBack.getPositionM().orElse(0);
+        double y = m_shoulder.getPositionRad().orElse(0);
+        return x < 1 && Math.abs(y) < 1;
+    }
+
+    ////////////////////
 
     private void addCartesian(double x, double y, double r) {
         // how much we want to change our goal point by (eg

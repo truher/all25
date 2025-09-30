@@ -14,7 +14,8 @@ import static org.team100.lib.field.FieldConstants.ReefPoint.L;
 
 import java.util.function.DoubleConsumer;
 
-import org.team100.frc2025.CalgamesArm.Placeholder;
+import org.team100.frc2025.CalgamesArm.CalgamesMech;
+import org.team100.frc2025.CalgamesArm.FollowTrajectory;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
@@ -32,7 +33,7 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 import edu.wpi.first.wpilibj2.command.Command;
 
 // it's a record to make it less verbose
-public record Auton(LoggerFactory logger, Placeholder placeholder,
+public record Auton(LoggerFactory logger, CalgamesMech mech,
         Manipulator manipulator,
         SwerveController controller, HolonomicProfile profile,
         SwerveDriveSubsystem drive,
@@ -49,7 +50,7 @@ public record Auton(LoggerFactory logger, Placeholder placeholder,
                 scoreAndReload(CoralStation.LEFT),
                 embarkAndPreplace(L4, L),
                 manipulator.centerEject().withTimeout(0.5),
-                placeholder.stow());
+                mech.l4ToHome());
     }
 
     public Command right() {
@@ -60,7 +61,7 @@ public record Auton(LoggerFactory logger, Placeholder placeholder,
                 scoreAndReload(CoralStation.RIGHT),
                 embarkAndPreplace(L4, C),
                 manipulator.centerEject().withTimeout(0.5),
-                placeholder.stow());
+                mech.l4ToHome());
     }
 
     /** Drive to the reef and go up. */
@@ -68,12 +69,12 @@ public record Auton(LoggerFactory logger, Placeholder placeholder,
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
                 () -> FieldConstants.makeGoal(position, point));
-        Command prePlace = placeholder.prePlaceL4();
+        FollowTrajectory prePlace = mech.homeToL4();
         return parallel(
                 runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
                 toReef,
                 prePlace //
-        ).until(() -> (toReef.isDone() && placeholder.atL4()));
+        ).until(() -> (toReef.isDone() && prePlace.isDone()));
     }
 
     /** Score, drive to the station, and pause briefly. */
@@ -87,17 +88,17 @@ public record Auton(LoggerFactory logger, Placeholder placeholder,
                         .withTimeout(0.5),
                 parallel(
                         // then stow the arm
-                        placeholder.stow(),
+                        mech.l4ToHome(),
                         sequence(
                                 // while the arm is still in motion
                                 // wait for it to be low enough
-                                waitUntil(placeholder::isSafeToDrive),
+                                waitUntil(mech::isSafeToDrive),
                                 // and then drive to pick
                                 navigator) //
                 ).until(navigator::isDone),
                 // then move the arm into the station and run the intake.
                 parallel(
-                        placeholder.station(),
+                        mech.stationWithProfile(),
                         manipulator.centerIntake() //
                 ).until(manipulator::hasCoral) //
         );

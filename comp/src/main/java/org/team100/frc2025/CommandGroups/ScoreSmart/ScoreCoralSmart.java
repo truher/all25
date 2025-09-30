@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
-import org.team100.frc2025.CalgamesArm.Placeholder;
+import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
@@ -27,7 +27,7 @@ public class ScoreCoralSmart {
 
     public static Command get(
             LoggerFactory logger,
-            Placeholder placeholder,
+            CalgamesMech mech,
             Manipulator manipulator,
             SwerveController controller,
             HolonomicProfile profile,
@@ -41,19 +41,19 @@ public class ScoreCoralSmart {
                 select(Map.ofEntries(
                         Map.entry(ScoringLevel.L4,
                                 ScoreL4Smart.get(
-                                        logger, placeholder, manipulator,
+                                        logger, mech, manipulator,
                                         controller, profile, drive, goal)),
                         Map.entry(ScoringLevel.L3,
                                 ScoreL3Smart.get(
-                                        logger, placeholder, manipulator,
+                                        logger, mech, manipulator,
                                         controller, profile, drive, goal)),
                         Map.entry(ScoringLevel.L2,
                                 ScoreL2Smart.get(
-                                        logger, placeholder, manipulator,
+                                        logger, mech, manipulator,
                                         controller, profile, drive, goal)),
                         Map.entry(ScoringLevel.L1,
                                 ScoreL1Smart.get(
-                                        logger, placeholder, manipulator,
+                                        logger, mech, manipulator,
                                         controller, profile, drive, goal))),
                         level));
     }

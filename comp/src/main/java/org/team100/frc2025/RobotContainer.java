@@ -15,13 +15,11 @@ import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.CalgamesViz;
 import org.team100.frc2025.CalgamesArm.HoldPosition;
 import org.team100.frc2025.CalgamesArm.ManualConfig;
-import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
-import org.team100.frc2025.CommandGroups.ManualIntake;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
@@ -155,9 +153,9 @@ public class RobotContainer {
         }
 
         m_manipulator = new Manipulator(logger);
-        CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.5, 0.343);
+        CalgamesMech mech = new CalgamesMech(logger, 0.5, 0.343);
 
-        m_combinedViz = new CalgamesViz(CalgamesMech);
+        m_combinedViz = new CalgamesViz(mech);
         m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
 
         m_modules = SwerveModuleCollection.get(
@@ -280,7 +278,11 @@ public class RobotContainer {
         // DEFAULT COMMANDS
 
         m_drive.setDefaultCommand(driveDefault);
-        CalgamesMech.setDefaultCommand(new HoldPosition(CalgamesMech));
+
+        mech.setDefaultCommand(new HoldPosition(mech));
+        // NOTE: this default command *MOVES IMMEDIATELY WHEN ENABLED*. WATCH OUT!
+        // CalgamesMech.setDefaultCommand(CalgamesMech.profileHome());
+
         m_climber.setDefaultCommand(
                 m_climber.stop().withName("climber default"));
         m_climberIntake.setDefaultCommand(
@@ -297,16 +299,13 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        /** fake arm to see what it needs to do. */
-        Placeholder placeholder = new Placeholder(CalgamesMech);
-
-        m_auton = new Auton(logger, placeholder, m_manipulator,
+        m_auton = new Auton(logger, mech, m_manipulator,
                 autoController, autoProfile, m_drive,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                 .left();
 
         whileTrue(driverControl::test,
-                new Auton(logger, placeholder, m_manipulator,
+                new Auton(logger, mech, m_manipulator,
                         autoController, autoProfile, m_drive,
                         localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                         .right());
@@ -320,10 +319,20 @@ public class RobotContainer {
         // PICK
         //
 
+        /**
+         * At the same time, move the arm to the floor and spin the intake,
+         * and go back home when the button is released, ending when complete.
+         */
         whileTrue(driverControl::floorPick,
-                ManualIntake.floor(placeholder, m_manipulator));
+                parallel(
+                        mech.pickWithProfile(),
+                        m_manipulator.centerIntake()))
+                .onFalse(mech.profileHome());
+
         whileTrue(driverControl::stationPick,
-                ManualIntake.station(placeholder, m_manipulator));
+                parallel(
+                        mech.stationWithProfile(),
+                        m_manipulator.centerIntake()));
 
         ////////////////////////////////////////////////////////////
         //
@@ -350,14 +359,14 @@ public class RobotContainer {
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,
                 ScoreCoralSmart.get(
-                        coralSequence, placeholder, m_manipulator,
+                        coralSequence, mech, m_manipulator,
                         holonomicController, profile, m_drive,
                         localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         // grab and hold algae, and then eject it when you let go of the button
         whileTrue(buttons::algae,
                 GrabAndHoldAlgae.get(
-                        m_manipulator, placeholder, buttons::algaeLevel))
+                        m_manipulator, mech, buttons::algaeLevel))
                 .onFalse(m_manipulator.algaeEject().withTimeout(0.5));
 
         // these are all unbound
@@ -391,7 +400,7 @@ public class RobotContainer {
         // "fly" the joints manually
         whileTrue(operatorControl::manual, // to go to manual, left bumper operator
                 // new ManualCartesian(operatorControl::velocity, CalgamesMech));
-                new ManualConfig(operatorControl::velocity, CalgamesMech));
+                new ManualConfig(operatorControl::velocity, mech));
 
         // this is for developing autopick.
         new FloorPickSetup(

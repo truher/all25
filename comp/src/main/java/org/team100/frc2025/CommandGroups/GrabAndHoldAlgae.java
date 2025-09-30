@@ -5,8 +5,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.function.Supplier;
 
-import org.team100.frc2025.CalgamesArm.FollowTrajectory;
-import org.team100.frc2025.CalgamesArm.Placeholder;
+import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 
@@ -16,10 +15,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class GrabAndHoldAlgae {
     public static Command get(
             Manipulator grip,
-            Placeholder placeholder,
+            CalgamesMech mech,
             Supplier<ScoringLevel> level) {
+
+        Command pick = mech.algaeReefPick(level);
         return parallel(
-                placeholder.algaeReefPick(level),
+                pick,
                 sequence(
                         grip.algaeIntake()
                                 .until(grip::hasAlgae),

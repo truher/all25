@@ -12,7 +12,10 @@ import org.team100.lib.state.Model100;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** Follow three uncoordinated profiles in configuration space. */
+/**
+ * Follow three uncoordinated profiles in configuration space.
+ * Starting point and velocity are current measurements.
+ */
 public class FollowJointProfiles extends Command {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
 
@@ -42,7 +45,9 @@ public class FollowJointProfiles extends Command {
 
     @Override
     public void initialize() {
+        // initial position is current position
         Config c = m_subsystem.getConfig();
+        // initial velocity is current velocity
         JointVelocities jv = m_subsystem.getJointVelocity();
         m_c1 = new Control100(c.shoulderHeight(), jv.elevator());
         m_c2 = new Control100(c.shoulderAngle(), jv.shoulder());

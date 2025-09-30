@@ -5,8 +5,8 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.function.Supplier;
 
+import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.FollowTrajectory;
-import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.controller.drivetrain.SwerveController;
@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class ScoreL2Smart {
     public static Command get(
             LoggerFactory logger,
-            Placeholder placeholder,
+            CalgamesMech mech,
             Manipulator manipulator,
             SwerveController controller,
             HolonomicProfile profile,
@@ -28,13 +28,13 @@ public class ScoreL2Smart {
             Supplier<Pose2d> goal) {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile, goal);
-        FollowTrajectory prePlace = placeholder.prePlaceL2();
+        FollowTrajectory toL2 = mech.homeToL2();
         return sequence(
                 parallel(
                         toReef,
-                        prePlace //
-                ).until(() -> (toReef.isDone() && prePlace.isDone())),
+                        toL2 //
+                ).until(() -> (toReef.isDone() && toL2.isDone())),
                 manipulator.centerEject().withTimeout(0.5),
-                placeholder.stow());
+                mech.l2ToHome());
     }
 }
