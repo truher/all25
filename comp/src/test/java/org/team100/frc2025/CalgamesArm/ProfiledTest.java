@@ -9,6 +9,7 @@ import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public class ProfiledTest {
     private static final double DT = 0.02;
@@ -86,7 +87,7 @@ public class ProfiledTest {
         // home position
         Config start = new Config(0, 0, 0);
 
-        Pose2d pL4 = CanonicalPose.L4.pose;
+        Pose2d pL4 = new Pose2d(1.9, 0.5, new Rotation2d(150));
         // floor pick position
         Config goal = k.inverse(pL4);
 
@@ -126,13 +127,13 @@ public class ProfiledTest {
     }
 
     /**
-    * Profile down is also not safe.
-    */
+     * Profile down is also not safe.
+     */
     @Test
     void l4ToHome() {
 
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(0.5, 0.343);
-        Pose2d pL4 = CanonicalPose.L4.pose;
+        Pose2d pL4 = new Pose2d(1.9, 0.5, new Rotation2d(150));
 
         // home position
         Config start = k.inverse(pL4);

@@ -476,7 +476,7 @@ public class CalgamesMech extends SubsystemBase {
         return new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
                         HolonomicPose2d.make(1, 0, 0, 0),
-                        Waypoint.TO_L1.hPose)));
+                        HolonomicPose2d.make(0.5, 0.5, 1.5, 1.7))));
     }
 
     /**
@@ -486,7 +486,7 @@ public class CalgamesMech extends SubsystemBase {
         return new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
                         HolonomicPose2d.make(1, 0, 0, 0),
-                        Waypoint.TO_L2.hPose)));
+                        HolonomicPose2d.make(0.85, 0.5, 2, 2))));
     }
 
     /**
@@ -496,7 +496,7 @@ public class CalgamesMech extends SubsystemBase {
         return new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
                         HolonomicPose2d.make(1, 0, 0, 0),
-                        Waypoint.TO_L3.hPose)));
+                        HolonomicPose2d.make(1.2, 0.5, 2, 2))));
     }
 
     /**
@@ -506,14 +506,14 @@ public class CalgamesMech extends SubsystemBase {
         return new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
                         HolonomicPose2d.make(1, 0, 0, 0),
-                        Waypoint.TO_L4.hPose)));
+                        HolonomicPose2d.make(1.9, 0.5, 2.5, 2))));
     }
 
     /** ends when done */
     public Command l4ToHome() {
         FollowTrajectory f = new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
-                        Waypoint.FROM_L4.hPose,
+                        HolonomicPose2d.make(1.9, 0.5, 2.5, -1),
                         HolonomicPose2d.make(1, 0, 0, Math.PI))));
         return f.until(f::isDone);
     }
@@ -522,7 +522,7 @@ public class CalgamesMech extends SubsystemBase {
     public Command l3ToHome() {
         FollowTrajectory f = new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
-                        Waypoint.FROM_L3.hPose,
+                        HolonomicPose2d.make(1.2, 0.5, 2, -1),
                         HolonomicPose2d.make(1, 0, 0, Math.PI))));
         return f.until(f::isDone);
     }
@@ -531,7 +531,7 @@ public class CalgamesMech extends SubsystemBase {
     public Command l2ToHome() {
         FollowTrajectory f = new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
-                        Waypoint.FROM_L2.hPose,
+                        HolonomicPose2d.make(0.85, 0.5, 2, -1),
                         HolonomicPose2d.make(1, 0, 0, Math.PI))));
         return f.until(f::isDone);
     }
@@ -540,7 +540,7 @@ public class CalgamesMech extends SubsystemBase {
     public Command l1ToHome() {
         FollowTrajectory f = new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
-                        Waypoint.FROM_L1.hPose,
+                        HolonomicPose2d.make(0.5, 0.5, 1.5, -1.0),
                         HolonomicPose2d.make(1, 0, 0, Math.PI))));
         return f.until(f::isDone);
     }
@@ -549,14 +549,14 @@ public class CalgamesMech extends SubsystemBase {
         return new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
                         HolonomicPose2d.make(1, 0, 0, 0),
-                        Waypoint.TO_A2.hPose)));
+                        HolonomicPose2d.make(0.85, 0.5, 1.5, 1.5))));
     }
 
     public Command homeToAlgaeL3() {
         return new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
                         HolonomicPose2d.make(1, 0, 0, 0),
-                        Waypoint.TO_A1.hPose)));
+                        HolonomicPose2d.make(1.2, 0.5, 1.5, 1.5))));
     }
 
     /**
@@ -580,11 +580,11 @@ public class CalgamesMech extends SubsystemBase {
     /**
      * Move to the barge scoring position and hold there forever
      */
-    public FollowTrajectory prePlaceBarge() {
+    public FollowTrajectory homeToBarge() {
         return new FollowTrajectory(this,
                 m_planner.restToRest(List.of(
                         HolonomicPose2d.make(1, 0, 0, 0),
-                        Waypoint.TO_BARGE.hPose)));
+                        HolonomicPose2d.make(2.0, 0, 1.5, 1.5))));
     }
 
     /** Not too far extended in any direction. */
