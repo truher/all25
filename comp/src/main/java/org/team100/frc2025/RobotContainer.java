@@ -13,6 +13,7 @@ import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.HoldPosition;
+import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.CalgamesArm.ManualConfig;
 import org.team100.frc2025.CalgamesArm.Placeholder;
 import org.team100.frc2025.Climber.Climber;
@@ -397,7 +398,8 @@ public class RobotContainer {
 
         // "fly" the joints manually
         whileTrue(operatorControl::manual, //to go to manual, left bumper operator
-                new ManualConfig(operatorControl::velocity, CalgamesMech));
+                //new ManualCartesian(operatorControl::velocity, CalgamesMech));
+                 new ManualConfig(operatorControl::velocity, CalgamesMech));
 
         // this is for developing autopick.
         new FloorPickSetup(

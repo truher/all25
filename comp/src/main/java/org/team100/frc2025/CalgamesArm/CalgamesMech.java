@@ -350,6 +350,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
 
         // set each mechanism
         set(c, jv, ja, jf);
+        //System.out.println(c);
+        //set(c);
     }
 
     public Command config(
