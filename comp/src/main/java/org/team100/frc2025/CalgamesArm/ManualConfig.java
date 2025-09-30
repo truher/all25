@@ -51,7 +51,7 @@ public class ManualConfig extends Command {
         if (newC.shoulderHeight() < 0 || newC.shoulderHeight() > 1.7) {
             newC = new Config(m_config.shoulderHeight(), newC.shoulderAngle(), newC.wristAngle());
         }
-        if (newC.shoulderAngle() < -1 || newC.shoulderAngle() > 1) {
+        if (newC.shoulderAngle() < -2 || newC.shoulderAngle() > 2) {
             newC = new Config(newC.shoulderHeight(), m_config.shoulderAngle(), newC.wristAngle());
         }
         if (newC.wristAngle() < -1.5 || newC.wristAngle() > 2.1) {
@@ -63,8 +63,7 @@ public class ManualConfig extends Command {
         JointAccelerations ja = newJv.diff(m_prev, dt);
 
         // m_subsystem.set(newC, newJv, ja);
-        m_subsystem.set(newC,
-                new JointVelocities(0,0,0), new JointAccelerations(0,0,0), new JointForce(0,0,0));
+        m_subsystem.set(newC, newJv, ja);
         m_config = newC;
         m_prev = newJv;
     }

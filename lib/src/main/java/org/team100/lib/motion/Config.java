@@ -29,9 +29,9 @@ public record Config(double shoulderHeight, double shoulderAngle, double wristAn
      */
     public JointVelocities diff(Config c, double dt) {
         return new JointVelocities(
-                (c.shoulderHeight - shoulderHeight) / dt,
-                (c.shoulderAngle - shoulderAngle) / dt,
-                (c.wristAngle - wristAngle) / dt);
+                (shoulderHeight - c.shoulderHeight) / dt,
+                (shoulderAngle - c.shoulderAngle) / dt,
+                (wristAngle - c.wristAngle) / dt);
     }
 
     public boolean isNaN() {

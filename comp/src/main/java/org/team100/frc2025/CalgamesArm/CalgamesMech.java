@@ -54,6 +54,18 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     private final DoubleLogger m_log_shoulder;
     private final DoubleLogger m_log_wrist;
 
+    private final DoubleLogger m_log_elevatorV;
+    private final DoubleLogger m_log_shoulderV;
+    private final DoubleLogger m_log_wristV;
+
+    private final DoubleLogger m_log_elevatorA;
+    private final DoubleLogger m_log_shoulderA;
+    private final DoubleLogger m_log_wristA;
+
+    private final DoubleLogger m_log_elevatorF;
+    private final DoubleLogger m_log_shoulderF;
+    private final DoubleLogger m_log_wristF;
+
     private final Pose2dLogger m_log_pose;
 
     private final LinearMechanism m_elevatorFront;
@@ -74,9 +86,22 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_gravity = Gravity.from2025();
         m_dynamics = new Dynamics();
 
-        m_log_elevator = parent.doubleLogger(Level.TRACE, "elevator");
-        m_log_shoulder = parent.doubleLogger(Level.TRACE, "shoulder");
-        m_log_wrist = parent.doubleLogger(Level.TRACE, "wrist");
+        m_log_elevator = parent.doubleLogger(Level.TRACE, "elevatorP");
+        m_log_shoulder = parent.doubleLogger(Level.TRACE, "shoulderP");
+        m_log_wrist = parent.doubleLogger(Level.TRACE, "wristP");
+
+        m_log_elevatorV = parent.doubleLogger(Level.TRACE, "elevatorV");
+        m_log_shoulderV = parent.doubleLogger(Level.TRACE, "shoulderV");
+        m_log_wristV = parent.doubleLogger(Level.TRACE, "wristV");
+
+        m_log_elevatorA = parent.doubleLogger(Level.TRACE, "elevatorA");
+        m_log_shoulderA = parent.doubleLogger(Level.TRACE, "shoulderA");
+        m_log_wristA = parent.doubleLogger(Level.TRACE, "wristA");
+
+        m_log_elevatorF = parent.doubleLogger(Level.TRACE, "elevatorF");
+        m_log_shoulderF = parent.doubleLogger(Level.TRACE, "shoulderF");
+        m_log_wristF = parent.doubleLogger(Level.TRACE, "wristF");
+
         m_log_pose = parent.pose2dLogger(Level.TRACE, "pose");
 
         LoggerFactory elevatorbackLog = parent.name("elevatorBack");
@@ -159,8 +184,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                         shoulderMotor, // need to learn what these three things do and how rotatrymech works - kym
                         shoulderCombined,
                         78, // TODO: calibrate ratio - 9/28
-                        -1, // TODO: calibrate lower limit (DO IT FOR REAL)
-                        1);// TODO: calibrate upper limit (DO IT FOR REAL)
+                        -2, // TODO: calibrate lower limit (DO IT FOR REAL)
+                        2);// TODO: calibrate upper limit (DO IT FOR REAL)
 
                 Kraken6Motor wristMotor = new Kraken6Motor(
                         wristLog,
@@ -267,10 +292,23 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
                 m_wrist.getPositionRad().orElse(0));
     }
 
-    private void logConfig(Config c) {
+    private void logConfig(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
         m_log_elevator.log(() -> c.shoulderHeight());
         m_log_shoulder.log(() -> c.shoulderAngle());
         m_log_wrist.log(() -> c.wristAngle());
+
+        m_log_elevatorV.log(() -> jv.elevator());
+        m_log_shoulderV.log(() -> jv.shoulder());
+        m_log_wristV.log(() -> jv.wrist());
+
+        m_log_elevatorA.log(() -> ja.elevator());
+        m_log_shoulderA.log(() -> ja.shoulder());
+        m_log_wristA.log(() -> ja.wrist());
+
+        m_log_elevatorF.log(() -> jf.elevator());
+        m_log_shoulderF.log(() -> jf.shoulder());
+        m_log_wristF.log(() -> jf.wrist());
+
     }
 
     private JointVelocities getJointVelocity() {
@@ -348,11 +386,11 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
     }
 
     public void set(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
-        logConfig(c);
-        m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), ja.elevator(), jf.elevator());
-        m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), ja.elevator(), jf.elevator());
-        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), ja.shoulder(), jf.shoulder());
-        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), ja.shoulder(), jf.wrist());
+        logConfig(c, jv, ja, jf);
+        m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
+        m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
+        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
+        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
     }
 
     /** Sets each mechanism, with zero velocity */
