@@ -50,6 +50,11 @@ public class OperatorXboxControl implements OperatorControl {
         return m_controller.getName();
     }
 
+    /**
+     * dx = right y = axis 5
+     * dy = right x = axis 4
+     * dr = left x = axis 0
+     */
     @Override
     public Velocity velocity() {
         final double rightY = m_controller.getRightY();

@@ -3,6 +3,7 @@ package org.team100.lib.util;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -39,6 +40,11 @@ public class Util {
             System.out.printf("%6.3f ", v.get(i));
         }
         System.out.println();
+    }
+
+    public static String pose2Str(Pose2d p) {
+        return String.format("%6.3f, %6.3f, %6.3f",
+                p.getX(), p.getY(), p.getRotation().getRadians());
     }
 
     public static String poseStr(Pose3d p) {

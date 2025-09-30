@@ -15,7 +15,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLimitSwitch;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 /**
  * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in

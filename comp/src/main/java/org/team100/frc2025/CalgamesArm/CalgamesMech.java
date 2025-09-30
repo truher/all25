@@ -43,6 +43,7 @@ import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,6 +51,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CalgamesMech extends SubsystemBase {
+    private static final boolean DEBUG = false;
+
     private final double m_armLengthM;
     private final double m_wristLengthM;
     private final TrajectoryPlanner m_planner;
@@ -342,8 +345,11 @@ public class CalgamesMech extends SubsystemBase {
         // position
         Pose2d p = control.pose();
         Config c = m_kinematics.inverse(p);
+        if (DEBUG)
+            System.out.printf("pose %s config %s\n", Util.pose2Str(p), c);
         if (c.isNaN()) {
-            System.out.println("skipping invalid config");
+            if (DEBUG)
+                System.out.println("skipping invalid config");
             stop();
             return;
         }
@@ -609,7 +615,8 @@ public class CalgamesMech extends SubsystemBase {
         m_log_pose.log(() -> newP); // solves for the config to reach new goal point
         Config c = m_kinematics.inverse(newP);
         if (c.isNaN()) {
-            System.out.println("skipping invalid config");
+            if (DEBUG)
+                System.out.println("skipping invalid config");
             stop(); // if the config fails, we quit
             return;
         }

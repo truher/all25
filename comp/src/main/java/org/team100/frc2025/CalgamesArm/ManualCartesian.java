@@ -3,11 +3,8 @@ package org.team100.frc2025.CalgamesArm;
 import java.util.function.Supplier;
 
 import org.team100.lib.hid.DriverControl;
-import org.team100.lib.motion.Config;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.kinematics.JointAccelerations;
-import org.team100.lib.motion.kinematics.JointForce;
 import org.team100.lib.motion.kinematics.JointVelocities;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,11 +13,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 /** Use the operator control to "fly" the arm around in config space. */
 public class ManualCartesian extends Command {
+    private static final boolean DEBUG = false;
 
     private final Supplier<DriverControl.Velocity> m_input;
     private final CalgamesMech m_subsystem;
 
-    private Pose2d m_config;
+    private Pose2d m_pose;
     private JointVelocities m_prev;
 
     public ManualCartesian(
@@ -33,12 +31,13 @@ public class ManualCartesian extends Command {
 
     @Override
     public void initialize() {
-        m_config = m_subsystem.getState().pose();
+        m_pose = m_subsystem.getState().pose();
         m_prev = new JointVelocities(0, 0, 0);
     }
 
     @Override
     public void execute() {
+
         // input is [-1, 1]
         DriverControl.Velocity input = m_input.get();
         final double dt = 0.02;
@@ -50,26 +49,27 @@ public class ManualCartesian extends Command {
                 input.y() * 1.5,
                 input.theta() * 3);
 
+        double x2 = m_pose.getX() + jv.x() * dt;
+        double y2 = m_pose.getY() + jv.y() * dt;
+        Rotation2d r2 = m_pose.getRotation().plus(new Rotation2d(jv.theta() * dt));
+        m_pose = new Pose2d(x2, y2, r2); // our new goal point
 
-  
-        double x2 = m_config.getX() + jv.x() * dt;
-        double y2 = m_config.getY() + jv.y() * dt;
-        Rotation2d r2 = m_config.getRotation().plus(new Rotation2d(jv.theta() * dt));
-        m_config = new Pose2d(x2, y2, r2); // our new goal point
-
-   // m_subsystem.set(new SwerveControl(m_config));
-    //System.out.println(m_config);
-
+        m_subsystem.set(new SwerveControl(m_pose));
+        if (DEBUG)
+            System.out.printf("pose %s\n", m_pose);
 
         // // impose limits; see CalgamesMech for more limits.
         // if (newC.shoulderHeight() < 0 || newC.shoulderHeight() > 1.7) {
-        //     newC = new Config(m_config.shoulderHeight(), newC.shoulderAngle(), newC.wristAngle());
+        // newC = new Config(m_config.shoulderHeight(), newC.shoulderAngle(),
+        // newC.wristAngle());
         // }
         // if (newC.shoulderAngle() < -2 || newC.shoulderAngle() > 2) {
-        //     newC = new Config(newC.shoulderHeight(), m_config.shoulderAngle(), newC.wristAngle());
+        // newC = new Config(newC.shoulderHeight(), m_config.shoulderAngle(),
+        // newC.wristAngle());
         // }
         // if (newC.wristAngle() < -1.5 || newC.wristAngle() > 2.1) {
-        //     newC = new Config(newC.shoulderHeight(), newC.shoulderAngle(), m_config.wristAngle());
+        // newC = new Config(newC.shoulderHeight(), newC.shoulderAngle(),
+        // m_config.wristAngle());
         // }
 
         // recompute velocity and accel

@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import org.team100.lib.hid.DriverControl;
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.kinematics.JointAccelerations;
-import org.team100.lib.motion.kinematics.JointForce;
 import org.team100.lib.motion.kinematics.JointVelocities;
 
 import edu.wpi.first.wpilibj2.command.Command;

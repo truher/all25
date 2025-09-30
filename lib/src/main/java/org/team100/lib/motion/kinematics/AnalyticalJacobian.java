@@ -20,7 +20,7 @@ import edu.wpi.first.math.numbers.N3;
  * See doc/README.md
  */
 public class AnalyticalJacobian {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private final ElevatorArmWristKinematics m_k;
     // notation from PRRDynamics.
     private final double l2;
