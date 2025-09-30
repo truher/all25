@@ -1,7 +1,6 @@
 package org.team100.lib.examples.tank;
 
 import org.team100.lib.motor.BareMotor;
-import org.team100.lib.motor.BareMotorGroup;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;

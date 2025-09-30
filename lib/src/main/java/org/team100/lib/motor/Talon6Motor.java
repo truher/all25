@@ -1,7 +1,5 @@
 package org.team100.lib.motor;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.DoubleCache;
 import org.team100.lib.coherence.Takt;

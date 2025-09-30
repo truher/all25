@@ -39,4 +39,9 @@ public record Config(double shoulderHeight, double shoulderAngle, double wristAn
                 || Double.isNaN(shoulderAngle())
                 || Double.isNaN(wristAngle());
     }
+
+    @Override
+    public String toString() {
+        return String.format("%6.3f %6.3f %6.3f", shoulderHeight, shoulderAngle, wristAngle);
+    }
 };
