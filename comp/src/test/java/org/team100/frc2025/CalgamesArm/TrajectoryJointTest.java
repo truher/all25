@@ -22,6 +22,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 /** How do the joints respond to trajectories? */
 public class TrajectoryJointTest {
+    private static final boolean DEBUG = false;
+
     /**
      * How does the smooth cartesian trajectory work in configuration space?
      * 
@@ -49,8 +51,10 @@ public class TrajectoryJointTest {
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(
                 0.5, 0.3);
         AnalyticalJacobian J = new AnalyticalJacobian(k);
-        System.out
-                .println("t, x, y, r, vx, vy, vr, ax, ay, ar, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+        if (DEBUG)
+            System.out
+                    .println(
+                            "t, x, y, r, vx, vy, vr, ax, ay, ar, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < t.duration(); tt += 0.02) {
             SwerveControl m = SwerveControl.fromTimedPose(t.sample(tt));
             Pose2d p = m.pose();
@@ -59,15 +63,16 @@ public class TrajectoryJointTest {
             Config q = k.inverse(p);
             JointVelocities jv = J.inverse(m.model());
             JointAccelerations ja = J.inverseA(m);
-            System.out.printf(
-                    "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
-                    tt,
-                    p.getX(), p.getY(), p.getRotation().getRadians(),
-                    v.x(), v.y(), v.theta(),
-                    a.x(), a.y(), a.theta(),
-                    q.shoulderHeight(), q.shoulderAngle(), q.wristAngle(),
-                    jv.elevator(), jv.shoulder(), jv.wrist(),
-                    ja.elevator(), ja.shoulder(), ja.wrist());
+            if (DEBUG)
+                System.out.printf(
+                        "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt,
+                        p.getX(), p.getY(), p.getRotation().getRadians(),
+                        v.x(), v.y(), v.theta(),
+                        a.x(), a.y(), a.theta(),
+                        q.shoulderHeight(), q.shoulderAngle(), q.wristAngle(),
+                        jv.elevator(), jv.shoulder(), jv.wrist(),
+                        ja.elevator(), ja.shoulder(), ja.wrist());
         }
     }
 

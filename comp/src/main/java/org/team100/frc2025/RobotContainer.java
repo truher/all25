@@ -356,6 +356,12 @@ public class RobotContainer {
         // SCORING
         //
 
+        // Manual movement of arm, for testing.
+        whileTrue(buttons::l1, mech.homeToL1()).onFalse(mech.l1ToHome());
+        whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
+        whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
+        whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
+
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,
                 ScoreCoralSmart.get(
@@ -379,28 +385,10 @@ public class RobotContainer {
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
         whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
 
-        // i think this is all obsolete now because we made the commands in placeholder
-        // List<HolonomicPose2d> calgamesWaypoints = List.of(
-        // new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
-        // new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero,
-        // Rotation2d.kZero));
-
-        // TrajectoryPlanner trajectoryPlanner = new TrajectoryPlanner(List.of(
-        // new ConstantConstraint(0.1, 0.1))); // i addded some constraints. prolly
-        // something wrong - kym
-        // Trajectory100 bar = trajectoryPlanner.restToRest(calgamesWaypoints);
-        // whileTrue(buttons::red2,
-        // new FollowTrajectory(CalgamesMech, bar));
-
-        // // this is for developing autopick.
-        // new FloorPickSetup(
-        // fieldLog, driverControl, m_drive, m_targets,
-        // SwerveControllerFactory.pick(driveLog), autoProfile);
-
         // "fly" the joints manually
         whileTrue(operatorControl::manual, // to go to manual, left bumper operator
                 new ManualCartesian(operatorControl::velocity, mech));
-                // new ManualConfig(operatorControl::velocity, mech));
+        // new ManualConfig(operatorControl::velocity, mech));
 
         // this is for developing autopick.
         new FloorPickSetup(

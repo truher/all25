@@ -23,11 +23,6 @@ public class FieldConstants {
         }
     }
 
-    /**
-     * Half the distance between the poles, i.e. offset from the center, in meters.
-     */
-    private static final double REEF_OFFSET = 0.1645; // 0.1524
-
     private static final Translation2d REEF_CENTER = new Translation2d(4.489, 4.026);
 
     /**
@@ -97,11 +92,21 @@ public class FieldConstants {
         // center of the face of the reef
         Translation2d center = REEF_CENTER.plus(spoke);
         Rotation2d newRotation = sectorAngle.rotateBy(Rotation2d.kCCW_90deg);
-        Translation2d d = new Translation2d(REEF_OFFSET, newRotation);
+
+        // end-effector is not in the center of robot y, it's offset a little.
+        double endEffectorOffset = 0.1;
+        // Half the distance between the poles, i.e. offset from the center, in meters.
+        double reefOffset = 0.1645; // 0.1524
+        Translation2d offsetLeft = new Translation2d(endEffectorOffset - reefOffset, newRotation);
+        Translation2d offsetRight = new Translation2d(endEffectorOffset + reefOffset, newRotation);
+        Translation2d offsetCenter = new Translation2d(endEffectorOffset, newRotation);
+
         return switch (point) {
-            case A, C, E, G, I, K -> center.minus(d);
-            case B, D, F, H, J, L -> center.plus(d);
-            case AB, CD, EF, GH, IJ, KL -> center;
+            // left side
+            case A, C, E, G, I, K -> center.plus(offsetLeft);
+            // right side
+            case B, D, F, H, J, L -> center.plus(offsetRight);
+            case AB, CD, EF, GH, IJ, KL -> center.plus(offsetCenter);
             case NONE -> center;
             default -> throw new IllegalArgumentException();
         };

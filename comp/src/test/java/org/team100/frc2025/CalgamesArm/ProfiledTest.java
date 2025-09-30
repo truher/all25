@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class ProfiledTest {
+    private static final boolean DEBUG = false;
     private static final double DT = 0.02;
 
     /**
@@ -51,7 +52,8 @@ public class ProfiledTest {
 
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
-        System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+        if (DEBUG)
+            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
@@ -59,13 +61,14 @@ public class ProfiledTest {
             Config c = new Config(i1.x(), i2.x(), i3.x());
             Pose2d p = k.forward(c);
 
-            System.out.printf(
-                    "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
-                    tt,
-                    p.getX(), p.getY(), p.getRotation().getRadians(),
-                    c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
-                    i1.v(), i2.v(), i3.v(),
-                    i1.a(), i2.a(), i3.a());
+            if (DEBUG)
+                System.out.printf(
+                        "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt,
+                        p.getX(), p.getY(), p.getRotation().getRadians(),
+                        c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
+                        i1.v(), i2.v(), i3.v(),
+                        i1.a(), i2.a(), i3.a());
         }
 
     }
@@ -108,7 +111,8 @@ public class ProfiledTest {
 
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
-        System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+        if (DEBUG)
+            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
@@ -116,13 +120,14 @@ public class ProfiledTest {
             Config c = new Config(i1.x(), i2.x(), i3.x());
             Pose2d p = k.forward(c);
 
-            System.out.printf(
-                    "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
-                    tt,
-                    p.getX(), p.getY(), p.getRotation().getRadians(),
-                    c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
-                    i1.v(), i2.v(), i3.v(),
-                    i1.a(), i2.a(), i3.a());
+            if (DEBUG)
+                System.out.printf(
+                        "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt,
+                        p.getX(), p.getY(), p.getRotation().getRadians(),
+                        c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
+                        i1.v(), i2.v(), i3.v(),
+                        i1.a(), i2.a(), i3.a());
         }
     }
 
@@ -158,7 +163,8 @@ public class ProfiledTest {
 
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
-        System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+        if (DEBUG)
+            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
@@ -166,13 +172,14 @@ public class ProfiledTest {
             Config c = new Config(i1.x(), i2.x(), i3.x());
             Pose2d p = k.forward(c);
 
-            System.out.printf(
-                    "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
-                    tt,
-                    p.getX(), p.getY(), p.getRotation().getRadians(),
-                    c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
-                    i1.v(), i2.v(), i3.v(),
-                    i1.a(), i2.a(), i3.a());
+            if (DEBUG)
+                System.out.printf(
+                        "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt,
+                        p.getX(), p.getY(), p.getRotation().getRadians(),
+                        c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
+                        i1.v(), i2.v(), i3.v(),
+                        i1.a(), i2.a(), i3.a());
         }
     }
 
