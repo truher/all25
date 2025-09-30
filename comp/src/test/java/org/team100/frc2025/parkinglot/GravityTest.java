@@ -1,10 +1,9 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.frc2025.parkinglot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.kinematics.JointForce;
 import org.junit.jupiter.api.Test;
-import org.team100.frc2025.CalgamesArm.Gravity;
 
 public class GravityTest {
     private static final double DELTA = 0.001;

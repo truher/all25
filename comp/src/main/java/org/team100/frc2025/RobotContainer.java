@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
+import org.team100.frc2025.CalgamesArm.CalgamesViz;
+import org.team100.frc2025.CalgamesArm.FollowTrajectory;
 import org.team100.frc2025.CalgamesArm.HoldPosition;
 import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.CalgamesArm.ManualConfig;
@@ -32,7 +34,6 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.commands.drivetrain.ResetPose;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
-import org.team100.lib.commands.r3.FollowTrajectory;
 import org.team100.lib.config.Camera;
 import org.team100.lib.config.Identity;
 import org.team100.lib.controller.drivetrain.FullStateSwerveController;
@@ -64,7 +65,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.motion.Viz;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveLocal;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -160,7 +160,7 @@ public class RobotContainer {
         m_manipulator = new Manipulator(logger);
         CalgamesMech CalgamesMech = new CalgamesMech(logger, 0.5, 0.343);
 
-        m_combinedViz = new Viz(CalgamesMech);
+        m_combinedViz = new CalgamesViz(CalgamesMech);
         m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
 
         m_modules = SwerveModuleCollection.get(

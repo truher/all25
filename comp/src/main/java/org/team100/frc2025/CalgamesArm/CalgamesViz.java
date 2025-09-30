@@ -1,4 +1,7 @@
-package org.team100.lib.motion;
+package org.team100.frc2025.CalgamesArm;
+
+import org.team100.lib.motion.Config;
+
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -6,17 +9,17 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Viz implements Runnable {
+public class CalgamesViz implements Runnable {
     private static final double SCALE = 100;
     private static final Translation2d ORIGIN = new Translation2d(50, 0);
-    private final MechInterface m_mech;
+    private final CalgamesMech m_mech;
     private final Mechanism2d m_view;
     private final MechanismRoot2d m_root;
     private final MechanismLigament2d m_elevator;
     private final MechanismLigament2d m_arm;
     private final MechanismLigament2d m_hand;
 
-    public Viz(MechInterface mech) {
+    public CalgamesViz(CalgamesMech mech) {
         m_mech = mech;
         m_view = new Mechanism2d(SCALE, SCALE);
         m_root = m_view.getRoot("root", ORIGIN.getX(), ORIGIN.getY());

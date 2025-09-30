@@ -6,7 +6,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.select;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.team100.lib.commands.r3.FollowTrajectory;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.trajectory.Trajectory100;
 

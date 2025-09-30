@@ -2,7 +2,6 @@ package org.team100.frc2025.CalgamesArm;
 
 import java.util.function.DoubleSupplier;
 
-import org.team100.lib.commands.r3.SubsystemR3;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
@@ -19,8 +18,6 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.Mech;
-import org.team100.lib.motion.MechInterface;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
@@ -41,13 +38,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CalgamesMech extends SubsystemBase implements MechInterface, SubsystemR3 {
+public class CalgamesMech extends SubsystemBase {
     private final double m_armLengthM;
     private final double m_wristLengthM;
     private final ElevatorArmWristKinematics m_kinematics;
     private final AnalyticalJacobian m_jacobian;
 
-    private final Gravity m_gravity;
     private final Dynamics m_dynamics;
 
     private final DoubleLogger m_log_elevator;
@@ -83,7 +79,6 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         m_kinematics = new ElevatorArmWristKinematics(armLength, wristLength);
         m_jacobian = new AnalyticalJacobian(m_kinematics);
 
-        m_gravity = Gravity.from2025();
         m_dynamics = new Dynamics();
 
         m_log_elevator = parent.doubleLogger(Level.TRACE, "elevatorP");
@@ -271,11 +266,6 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
         }// TODO: calibrate upper limit
     }
 
-    // simple methods grabbed from mech.java
-    public static Mech make2025(LoggerFactory parent) {
-        return new Mech(0.3, 0.1); // these values are prolly wrong, needs to be measured IRL
-    }
-
     public double getArmLength() {
         return m_armLengthM;
     }
@@ -350,8 +340,8 @@ public class CalgamesMech extends SubsystemBase implements MechInterface, Subsys
 
         // set each mechanism
         set(c, jv, ja, jf);
-        //System.out.println(c);
-        //set(c);
+        // System.out.println(c);
+        // set(c);
     }
 
     public Command config(
