@@ -361,6 +361,7 @@ public class RobotContainer {
         whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
         whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
         whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
+        whileTrue(driverControl::test, mech.homeToL4()).onFalse(mech.l4ToHome());
 
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,

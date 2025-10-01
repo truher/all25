@@ -30,4 +30,11 @@ public record JointVelocities(double elevator, double shoulder, double wrist) {
                 (shoulder - jv.shoulder) / dt,
                 (wrist - jv.wrist) / dt);
     }
+
+    public Vector<N3> div(JointVelocities jv) {
+        return VecBuilder.fill(
+                elevator / jv.elevator,
+                shoulder / jv.shoulder,
+                wrist / jv.wrist);
+    }
 }

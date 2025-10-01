@@ -79,7 +79,7 @@ public class AnalyticalJacobian {
      * 
      * \ddot{q} = J^{-1}(\ddot{x} - \dot{J}J^{-1}\dot{x})
      * 
-     * See README.md equation 9
+     * See doc/README.md equation 9
      */
     public JointAccelerations inverseA(SwerveControl m) {
         Pose2d x = m.pose();

@@ -76,8 +76,7 @@ public class CalgamesMech extends SubsystemBase {
 
     private final RotaryMechanism m_shoulder;
     private final RotaryMechanism m_wrist;
-    double m_homeHeight = 0.843; //sum of the lengths of the arms
-
+    double m_homeHeight = 0.843; // sum of the lengths of the arms
 
     public CalgamesMech(LoggerFactory log,
             double armLength,
@@ -86,13 +85,11 @@ public class CalgamesMech extends SubsystemBase {
         m_armLengthM = armLength;
         m_wristLengthM = wristLength;
 
-        m_transit = new MechTrajectories(this);
-
         m_kinematics = new ElevatorArmWristKinematics(armLength, wristLength);
         m_jacobian = new AnalyticalJacobian(m_kinematics);
-
         m_dynamics = new Dynamics();
 
+        m_transit = new MechTrajectories(this, m_kinematics, m_jacobian);
 
         LoggerFactory jointLog = parent.name("joints");
         m_log_config = jointLog.logConfig(Level.TRACE, "config");
@@ -342,12 +339,21 @@ public class CalgamesMech extends SubsystemBase {
      * position (origin) at rest, and end when done.
      */
     public Command profileHomeTerminal() {
-        FollowJointProfiles f = new FollowJointProfiles(this, new Config(0, 0, 0));
-        return f.until(f::isDone);
+        // FollowJointProfiles f =
+        // FollowJointProfiles.WithCurrentLimitedExponentialProfile(
+        // this, new Config(0, 0, 0));
+        FollowJointProfiles f = FollowJointProfiles.slowFast(
+                this, new Config(0, 0, 0));
+        return f.until(f::isDone)
+                .withName("profileHomeTerminal");
     }
 
     public Command profileHomeEndless() {
-        return new FollowJointProfiles(this, new Config(0, 0, 0));
+        // return FollowJointProfiles.WithCurrentLimitedExponentialProfile(
+        // this, new Config(0, 0, 0));
+        return FollowJointProfiles.slowFast(
+                this, new Config(0, 0, 0))
+                .withName("profileHomeEndless");
     }
 
     /**
@@ -355,7 +361,11 @@ public class CalgamesMech extends SubsystemBase {
      * rest, and stay there forever.
      */
     public Command pickWithProfile() {
-        return new FollowJointProfiles(this, new Config(0,  -1.83, -0.12));
+        // return FollowJointProfiles.WithCurrentLimitedExponentialProfile(
+        // this, new Config(0, -1.83, -0.12));
+        return FollowJointProfiles.fastSlow(
+                this, new Config(0, -1.83, -0.12))
+                .withName("pickWithProfile");
     }
 
     /**
@@ -363,7 +373,11 @@ public class CalgamesMech extends SubsystemBase {
      * station-pick location at rest, and stay there forever.
      */
     public Command stationWithProfile() {
-        return new FollowJointProfiles(this, new Config(0, -1, 0));
+        // return FollowJointProfiles.WithCurrentLimitedExponentialProfile(
+        // this, new Config(0, -1, 0));
+        return FollowJointProfiles.fastSlow(
+                this, new Config(0, -1, 0))
+                .withName("stationWithProfile");
     }
 
     /**
@@ -371,65 +385,69 @@ public class CalgamesMech extends SubsystemBase {
      * processor location at rest, and stay there forever.
      */
     public Command processorWithProfile() {
-        return new FollowJointProfiles(this, new Config(0, 1, 0));
+        // return FollowJointProfiles.WithCurrentLimitedExponentialProfile(
+        // this, new Config(0, 1, 0));
+        return FollowJointProfiles.fastSlow(
+                this, new Config(0, 1, 0))
+                .withName("processorWithProfile");
     }
 
     public Done homeToL1() {
-        return m_transit.endless(
+        return m_transit.endless("homeToL1",
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(0.5, 0.5, 1.5, 1.7));
     }
 
     public Done homeToL2() {
-        return m_transit.endless(
+        return m_transit.endless("homeToL2",
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(0.85, 0.5, 2, 2));
     }
 
     public Done homeToL3() {
-        return m_transit.endless(
+        return m_transit.endless("homeToL3",
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(1.2, 0.5, 2, 2));
     }
 
     public Done homeToL4() {
-        return m_transit.endless(
+        return m_transit.endless("homeToL4",
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(1.6, 0.5,2, 1.57));
+                HolonomicPose2d.make(1.6, 0.5, 2, 1.57));
     }
 
     public Command l4ToHome() {
-        return m_transit.terminal(
+        return m_transit.terminal("l4ToHome",
                 HolonomicPose2d.make(1.9, 0.5, 2.5, -1),
                 HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command l3ToHome() {
-        return m_transit.terminal(
+        return m_transit.terminal("l3ToHome",
                 HolonomicPose2d.make(1.2, 0.5, 2, -1),
                 HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command l2ToHome() {
-        return m_transit.terminal(
+        return m_transit.terminal("l2ToHome",
                 HolonomicPose2d.make(0.85, 0.5, 2, -1),
                 HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command l1ToHome() {
-        return m_transit.terminal(
+        return m_transit.terminal("l1ToHome",
                 HolonomicPose2d.make(0.5, 0.5, 1.5, -1.0),
                 HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command homeToAlgaeL2() {
-        return m_transit.endless(
+        return m_transit.endless("homeToAlgaeL2",
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(0.85, 0.5, 1.5, 1.5));
     }
 
     public Command homeToAlgaeL3() {
-        return m_transit.endless(
+        return m_transit.endless("homeToAlgaeL3",
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(1.2, 0.5, 1.5, 1.5));
     }
@@ -442,14 +460,15 @@ public class CalgamesMech extends SubsystemBase {
         return select(Map.ofEntries(
                 Map.entry(ScoringLevel.L3, homeToAlgaeL3()),
                 Map.entry(ScoringLevel.L2, homeToAlgaeL2()) //
-        ), level);
+        ), level)
+                .withName("algaeReefPick");
     }
 
     /**
      * Move to the barge scoring position and hold there forever
      */
     public Done homeToBarge() {
-        return m_transit.endless(
+        return m_transit.endless("homeToBarge",
                 HolonomicPose2d.make(1, 0, 0, 0),
                 HolonomicPose2d.make(2.0, 0, 1.5, 1.5));
     }
@@ -462,6 +481,14 @@ public class CalgamesMech extends SubsystemBase {
     }
 
     /////////////////////////////////////////////////////////////
+
+    public ElevatorArmWristKinematics getKinematics() {
+        return m_kinematics;
+    }
+
+    public AnalyticalJacobian getJacobian() {
+        return m_jacobian;
+    }
 
     @Override
     public void periodic() {
