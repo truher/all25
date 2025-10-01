@@ -156,8 +156,8 @@ public class CalgamesMech extends SubsystemBase {
                         24, // TODO: shoulder CAN ID (Done)
                         NeutralMode.BRAKE,
                         MotorPhase.REVERSE,
-                        40, // og 60
-                        40, // og 90
+                        100, // og 60
+                        100, // og 90
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder shoulderEncoder = new Talon6Encoder(
@@ -194,8 +194,8 @@ public class CalgamesMech extends SubsystemBase {
                         NeutralMode.COAST,
                         MotorPhase.FORWARD,
                         40, // og 60
-                        40, // og 90
-                        PIDConstants.makePositionPID(5), // og 10
+                        60, // og 90
+                        PIDConstants.makePositionPID(8), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 // the wrist has no angle sensor, so it needs to start in the "zero" position,
                 // or we need to add a homing
@@ -355,7 +355,7 @@ public class CalgamesMech extends SubsystemBase {
      * rest, and stay there forever.
      */
     public Command pickWithProfile() {
-        return new FollowJointProfiles(this, new Config(0,  -1.85, 0));
+        return new FollowJointProfiles(this, new Config(0,  -1.83, -0.12));
     }
 
     /**
@@ -395,7 +395,7 @@ public class CalgamesMech extends SubsystemBase {
     public Done homeToL4() {
         return m_transit.endless(
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(1.9, 0.5, 2.5, 2));
+                HolonomicPose2d.make(1.6, 0.5,2, 1.57));
     }
 
     public Command l4ToHome() {

@@ -19,8 +19,8 @@ public class MechTrajectories extends Command {
     public MechTrajectories(CalgamesMech mech) {
         m_subsystem = mech;
         List<TimingConstraint> c = List.of(
-                new ConstantConstraint(0.5, 1),
-                new YawRateConstraint(0.5, 1));
+                new ConstantConstraint(5, 10),
+                new YawRateConstraint(5, 5));
         m_planner = new TrajectoryPlanner(c);
     }
 

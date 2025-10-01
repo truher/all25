@@ -104,9 +104,9 @@ public class Manipulator extends SubsystemBase {
         if (hasCoral()) {
             stopMotors();
         } else {
-            m_algaeMech.setDutyCycle(-0.5);
-            m_leftMech.setDutyCycle(0.1);
-            m_rightMech.setDutyCycle(0.1);
+            m_algaeMech.setDutyCycle(-1);
+            m_leftMech.setDutyCycle(0.5);
+            m_rightMech.setDutyCycle(0.5);
         }
     }
 
@@ -116,8 +116,8 @@ public class Manipulator extends SubsystemBase {
 
     public void ejectCenter() {
         m_algaeMech.setDutyCycle(1);
-        m_leftMech.setDutyCycle(1);
-        m_rightMech.setDutyCycle(1);
+        m_leftMech.setDutyCycle(-1);
+        m_rightMech.setDutyCycle(-1);
     }
 
     public void intakeSideways() {
