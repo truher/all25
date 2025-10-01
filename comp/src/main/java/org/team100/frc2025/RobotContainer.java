@@ -323,7 +323,7 @@ public class RobotContainer {
          * At the same time, move the arm to the floor and spin the intake,
          * and go back home when the button is released, ending when complete.
          */
-        whileTrue(driverControl::floorPick,
+        whileTrue(driverControl::floorPick, //driver x
                 parallel(
                         mech.pickWithProfile(),
                         m_manipulator.centerIntake()))
@@ -360,7 +360,7 @@ public class RobotContainer {
         whileTrue(buttons::l1, mech.homeToL1()).onFalse(mech.l1ToHome());
         whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
         whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
-        whileTrue(driverControl::test, mech.homeToL4()).onFalse(mech.l4ToHome());
+        whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
 
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,
@@ -381,9 +381,9 @@ public class RobotContainer {
         whileTrue(buttons::red4, print("red4"));
         whileTrue(buttons::barge, print("barge"));
 
-        whileTrue(driverControl::a, m_manipulator.run(m_manipulator::ejectCenter));
+        whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
-        whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
+        // whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
 
         // "fly" the joints manually
         whileTrue(operatorControl::manual, // to go to manual, left bumper operator

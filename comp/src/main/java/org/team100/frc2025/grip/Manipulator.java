@@ -105,8 +105,8 @@ public class Manipulator extends SubsystemBase {
             stopMotors();
         } else {
             m_algaeMech.setDutyCycle(-0.5);
-            m_leftMech.setDutyCycle(0.5);
-            m_rightMech.setDutyCycle(0.5);
+            m_leftMech.setDutyCycle(0.1);
+            m_rightMech.setDutyCycle(0.1);
         }
     }
 
