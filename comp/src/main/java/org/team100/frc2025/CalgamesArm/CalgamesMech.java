@@ -76,6 +76,8 @@ public class CalgamesMech extends SubsystemBase {
 
     private final RotaryMechanism m_shoulder;
     private final RotaryMechanism m_wrist;
+    double m_homeHeight = 0.843; //sum of the lengths of the arms
+
 
     public CalgamesMech(LoggerFactory log,
             double armLength,
@@ -90,6 +92,7 @@ public class CalgamesMech extends SubsystemBase {
         m_jacobian = new AnalyticalJacobian(m_kinematics);
 
         m_dynamics = new Dynamics();
+
 
         LoggerFactory jointLog = parent.name("joints");
         m_log_config = jointLog.logConfig(Level.TRACE, "config");
@@ -126,7 +129,7 @@ public class CalgamesMech extends SubsystemBase {
                         2.182, // TODO: calibrate ratio
                         0.03844, // TODO: calibrate pulley size- done
                         0, // TODO: calibrate lower limit
-                        1.7); // TODO: calibrate upper limit 228-45
+                        1.8); // TODO: calibrate upper limit 228-45
 
                 Kraken6Motor elevatorBackMotor = new Kraken6Motor(
                         elevatorbackLog,
@@ -146,7 +149,7 @@ public class CalgamesMech extends SubsystemBase {
                         2.182, // done 9/28
                         0.03844, // done 9/28
                         0, // just 0
-                        1.7); // done 9/28, raised to barge and subtracted og carriage top hight
+                        1.8); // done 9/28, raised to barge and subtracted og carriage top hight
 
                 Kraken6Motor shoulderMotor = new Kraken6Motor(
                         shoulderLog,
@@ -352,7 +355,7 @@ public class CalgamesMech extends SubsystemBase {
      * rest, and stay there forever.
      */
     public Command pickWithProfile() {
-        return new FollowJointProfiles(this, new Config(0, -3 * Math.PI / 4, Math.PI / 4));
+        return new FollowJointProfiles(this, new Config(0,  -1.85, 0));
     }
 
     /**
@@ -373,61 +376,61 @@ public class CalgamesMech extends SubsystemBase {
 
     public Done homeToL1() {
         return m_transit.endless(
-                HolonomicPose2d.make(1, 0, 0, 0),
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(0.5, 0.5, 1.5, 1.7));
     }
 
     public Done homeToL2() {
         return m_transit.endless(
-                HolonomicPose2d.make(1, 0, 0, 0),
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(0.85, 0.5, 2, 2));
     }
 
     public Done homeToL3() {
         return m_transit.endless(
-                HolonomicPose2d.make(1, 0, 0, 0),
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(1.2, 0.5, 2, 2));
     }
 
     public Done homeToL4() {
         return m_transit.endless(
-                HolonomicPose2d.make(1, 0, 0, 0),
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(1.9, 0.5, 2.5, 2));
     }
 
     public Command l4ToHome() {
         return m_transit.terminal(
                 HolonomicPose2d.make(1.9, 0.5, 2.5, -1),
-                HolonomicPose2d.make(1, 0, 0, Math.PI));
+                HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command l3ToHome() {
         return m_transit.terminal(
                 HolonomicPose2d.make(1.2, 0.5, 2, -1),
-                HolonomicPose2d.make(1, 0, 0, Math.PI));
+                HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command l2ToHome() {
         return m_transit.terminal(
                 HolonomicPose2d.make(0.85, 0.5, 2, -1),
-                HolonomicPose2d.make(1, 0, 0, Math.PI));
+                HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command l1ToHome() {
         return m_transit.terminal(
                 HolonomicPose2d.make(0.5, 0.5, 1.5, -1.0),
-                HolonomicPose2d.make(1, 0, 0, Math.PI));
+                HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command homeToAlgaeL2() {
         return m_transit.endless(
-                HolonomicPose2d.make(1, 0, 0, 0),
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(0.85, 0.5, 1.5, 1.5));
     }
 
     public Command homeToAlgaeL3() {
         return m_transit.endless(
-                HolonomicPose2d.make(1, 0, 0, 0),
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
                 HolonomicPose2d.make(1.2, 0.5, 1.5, 1.5));
     }
 
