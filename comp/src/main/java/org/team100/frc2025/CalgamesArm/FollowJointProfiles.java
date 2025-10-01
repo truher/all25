@@ -4,6 +4,7 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.kinematics.JointAccelerations;
 import org.team100.lib.motion.kinematics.JointVelocities;
+import org.team100.lib.profile.incremental.CompleteProfile;
 import org.team100.lib.profile.incremental.CurrentLimitedExponentialProfile;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.state.Control100;
@@ -31,17 +32,61 @@ public class FollowJointProfiles extends Command {
     private Control100 m_c2;
     private Control100 m_c3;
 
-    public FollowJointProfiles(CalgamesMech subsystem, Config goal) {
+    public static FollowJointProfiles WithCurrentLimitedExponentialProfile(
+            CalgamesMech subsystem, Config goal) {
+        return new FollowJointProfiles(
+                subsystem,
+                goal,
+                new CurrentLimitedExponentialProfile(2, 4, 5), // elevator
+                new CurrentLimitedExponentialProfile(8, 8, 16), // arm
+                new CurrentLimitedExponentialProfile(8, 8, 16)); // wrist
+    }
+
+    /**
+     * Accelerate gently but decelerate firmly.
+     * 
+     * This is for paths that start with lots of gravity torque and end
+     * without very much gravity torque, e.g. from "pick" to "home".
+     */
+    public static FollowJointProfiles slowFast(CalgamesMech subsystem, Config goal) {
+        return new FollowJointProfiles(
+                subsystem,
+                goal,
+                new CompleteProfile(2, 4, 6, 5, 50, 50, 0.001), // elevator
+                new CompleteProfile(8, 4, 12, 16, 50, 50, 0.001), // arm
+                new CompleteProfile(8, 4, 12, 16, 50, 50, 0.001)); // wrist
+    }
+
+    /**
+     * Accelerate firmly but decelerate gently.
+     * 
+     * This is for paths that start without gravity torque but end with a lot of
+     * gravity torque, e.g. from "home" to "pick".
+     */
+
+    public static FollowJointProfiles fastSlow(CalgamesMech subsystem, Config goal) {
+        return new FollowJointProfiles(
+                subsystem,
+                goal,
+                new CompleteProfile(2, 6, 4, 5, 50, 50, 0.001), // elevator
+                new CompleteProfile(8, 12, 4, 16, 50, 50, 0.001), // arm
+                new CompleteProfile(8, 12, 4, 16, 50, 50, 0.001)); // wrist
+    }
+
+    FollowJointProfiles(
+            CalgamesMech subsystem,
+            Config goal,
+            IncrementalProfile p1,
+            IncrementalProfile p2,
+            IncrementalProfile p3) {
         m_subsystem = subsystem;
         // Joint goals are motionless
         m_g1 = new Model100(goal.shoulderHeight(), 0);
         m_g2 = new Model100(goal.shoulderAngle(), 0);
         m_g3 = new Model100(goal.wristAngle(), 0);
-        // TODO: turn these limits up by a factor of 4 or so
-        //speeds
-        m_p1 = new CurrentLimitedExponentialProfile(2, 4, 5); //elevator
-        m_p2 = new CurrentLimitedExponentialProfile(8, 8, 16); //arm
-        m_p3 = new CurrentLimitedExponentialProfile(8, 8, 16); //wrist
+        m_p1 = p1;
+        m_p2 = p2;
+        m_p3 = p3;
         addRequirements(subsystem);
     }
 

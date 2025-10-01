@@ -14,4 +14,11 @@ public record JointAccelerations(double elevator, double shoulder, double wrist)
     public static JointAccelerations fromVector(Matrix<N3, N1> a) {
         return new JointAccelerations(a.get(0, 0), a.get(1, 0), a.get(2, 0));
     }
+
+    public Vector<N3> div(JointAccelerations ja) {
+        return VecBuilder.fill(
+                elevator / ja.elevator,
+                shoulder / ja.shoulder,
+                wrist / ja.wrist);
+    }
 }

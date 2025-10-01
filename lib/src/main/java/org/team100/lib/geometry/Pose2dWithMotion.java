@@ -66,6 +66,21 @@ public class Pose2dWithMotion {
                     MathUtil.interpolate(m_dtheta, other.m_dtheta, x));
         }
 
+        /** You probably don't want this. */
+        public double dx() {
+            return m_dx;
+        }
+
+        /** You probably don't want this. */
+        public double dy() {
+            return m_dy;
+        }
+
+        /** You probably don't want this. */
+        public double dtheta() {
+            return m_dtheta;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj)
@@ -140,6 +155,11 @@ public class Pose2dWithMotion {
 
     public Pose2d getPose() {
         return m_pose;
+    }
+
+    /** You probably don't want this. */
+    public MotionDirection getMotionDirection() {
+        return m_fieldRelativeMotionDirection;
     }
 
     /** Radians per meter, which is the reciprocal of the radius. */

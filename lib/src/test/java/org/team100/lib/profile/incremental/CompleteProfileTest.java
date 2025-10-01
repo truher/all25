@@ -46,14 +46,32 @@ public class CompleteProfileTest {
     }
 
     @Test
-    void testSimple() {
-        CompleteProfile p = new CompleteProfile(3, 8, 12, 15, 50, 50, 0.001);
+    void testFastAccelSlowDecel() {
+        CompleteProfile p = new CompleteProfile(5, 12, 5, 50, 50, 50, 0.001);
         final Model100 goal = new Model100(2, 0);
         Control100 c = new Control100();
         double t = 0;
-        for (int i = 0; i < 200; ++i) {
+        if (DEBUG) System.out.println("t, x, v, a");
+        for (int i = 0; i < 100; ++i) {
             if (DEBUG)
-                Util.printf("%12.4f %12.4f %12.4f %12.4f\n", t, c.x(), c.v(), c.a());
+                Util.printf("%.3f, %.3f, %.3f, %.3f\n", 
+                t, c.x(), c.v(), c.a());
+            c = p.calculate(DT, c, goal);
+            t += DT;
+        }
+    }
+
+    @Test
+    void testSlowAccelFastDecel() {
+        CompleteProfile p = new CompleteProfile(5, 5, 12, 50, 50, 50, 0.001);
+        final Model100 goal = new Model100(2, 0);
+        Control100 c = new Control100();
+        double t = 0;
+        if (DEBUG) System.out.println("t, x, v, a");
+        for (int i = 0; i < 100; ++i) {
+            if (DEBUG)
+                Util.printf("%.3f, %.3f, %.3f, %.3f\n", 
+                t, c.x(), c.v(), c.a());
             c = p.calculate(DT, c, goal);
             t += DT;
         }
