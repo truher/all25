@@ -40,8 +40,8 @@ public class FollowJointProfiles extends Command {
         // TODO: turn these limits up by a factor of 4 or so
         //speeds
         m_p1 = new CurrentLimitedExponentialProfile(2, 4, 5); //elevator
-        m_p2 = new CurrentLimitedExponentialProfile(2, 4, 5); //arm
-        m_p3 = new CurrentLimitedExponentialProfile(2, 4, 5); //wrist
+        m_p2 = new CurrentLimitedExponentialProfile(8, 8, 16); //arm
+        m_p3 = new CurrentLimitedExponentialProfile(8, 8, 16); //wrist
         addRequirements(subsystem);
     }
 

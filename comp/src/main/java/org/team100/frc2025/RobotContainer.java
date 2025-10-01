@@ -382,7 +382,7 @@ public class RobotContainer {
         whileTrue(buttons::barge, print("barge"));
 
         whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
-        whileTrue(driverControl::b, m_manipulator.run(m_manipulator::intakeSideways));
+        whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
         // whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
 
         // "fly" the joints manually
