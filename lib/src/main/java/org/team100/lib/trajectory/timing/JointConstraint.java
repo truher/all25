@@ -3,20 +3,17 @@ package org.team100.lib.trajectory.timing;
 import java.util.Optional;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
+import org.team100.lib.motion.Config;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
 import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
 import org.team100.lib.motion.kinematics.JointAccelerations;
 import org.team100.lib.motion.kinematics.JointVelocities;
 
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.numbers.N3;
 
 /**
  * For cartesian trajectories executed by non-cartesian mechanisms: each joint
@@ -30,9 +27,6 @@ import edu.wpi.first.math.numbers.N3;
  * constraint per se.
  */
 public class JointConstraint implements TimingConstraint {
-    /** don't barf if the max velocity seems to be zero; return this instead. */
-    private static final double MIN_MAX_V = 1.0;
-    private static final double MIN_MAX_A = 1.0;
     private final ElevatorArmWristKinematics m_k;
     private final AnalyticalJacobian m_j;
     private final JointVelocities m_maxJv;
@@ -52,24 +46,23 @@ public class JointConstraint implements TimingConstraint {
     @Override
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
         Pose2d pose = state.getPose();
-        MotionDirection motion = state.getMotionDirection();
-        // THIS IS NOT VELOCITY! It's kind of "spatial velocity".
-        // you could also think of it as 1 m/s along the path
-        FieldRelativeVelocity v = new FieldRelativeVelocity(
-                motion.dx(), motion.dy(), motion.dtheta());
-        SwerveModel m = new SwerveModel(pose, v);
-        // required joint velocities to achieve 1 m/s
-        JointVelocities jv = m_j.inverse(m);
-        // required joint velocities as a fraction of maximum.
-        Vector<N3> ratio = jv.div(m_maxJv);
-        // maximum fraction
-        double max = ratio.maxAbs();
-        if (max < 1e-3) {
-            return new NonNegativeDouble(MIN_MAX_V);
-        }
-        // the available max velocity is the inverse, e.g. if 1 m/s drives
-        // a joint at 50% of its maximum, then the max v is 2.
-        return new NonNegativeDouble(1.0 / max);
+        Optional<Rotation2d> course2 = state.getCourse();
+
+        double c = course2.map(Rotation2d::getCos).orElse(0.0);
+        double s = course2.map(Rotation2d::getSin).orElse(0.0);
+
+        Config q = m_k.inverse(pose);
+
+        // find the cartesian velocity for the max joint velocity
+        // TODO: this is wrong, it uses *one* joint velocity;
+        // what we want is to find the ellipsoid in cartesian
+        // space corresponding to the sphere in joint space.
+        FieldRelativeVelocity v = m_j.forward(q, m_maxJv);
+
+        // find the component in the direction of motion
+        double vel = v.x() * c + v.y() * s;
+
+        return new NonNegativeDouble(Math.abs(vel));
     }
 
     @Override
@@ -85,21 +78,20 @@ public class JointConstraint implements TimingConstraint {
         double vy = velocityM_S * c;
         double omega = velocityM_S * r;
         FieldRelativeVelocity v = new FieldRelativeVelocity(vx, vy, omega);
-        // the acceleration constraint here is *along* the path, so
-        // make a "unit" acceleration which does that.
-        FieldRelativeAcceleration a = new FieldRelativeAcceleration(
-                c, s, r);
-        SwerveControl m = new SwerveControl(pose, v, a);
-        // joint accel to achieve 1 m/s etc
-        JointAccelerations ja = m_j.inverseA(m);
-        // joint accel as a fraction of max
-        Vector<N3> ratio = ja.div(m_maxJa);
-        // max fraction
-        double max = ratio.maxAbs();
-        if (max < 1e-3) {
-            max = MIN_MAX_A;
-        }
-        return new MinMaxAcceleration(-1.0 / max, 1.0 / max);
+
+        Config q = m_k.inverse(pose);
+        JointVelocities qdot = m_j.inverse(new SwerveModel(pose, v));
+
+        // find the cartesian accel for the max joint accel
+        // TODO: this is wrong, it uses *one* joint velocity;
+        // what we want is to find the ellipsoid in cartesian
+        // space corresponding to the sphere in joint space.
+        FieldRelativeAcceleration fa = m_j.forwardA(q, qdot, m_maxJa);
+
+        // find the component in the direction of motion
+        double acc = fa.x() * c + fa.y() * s;
+
+        return new MinMaxAcceleration(-1.0 * Math.abs(acc), 1.0 * Math.abs(acc));
     }
 
 }
