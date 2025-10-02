@@ -6,7 +6,9 @@ import org.team100.lib.util.RoboRioChannel;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
+import org.team100.lib.coherence.Takt;
 
 /**
  * An LED strip used as a signal light.
@@ -28,26 +30,50 @@ import edu.wpi.first.wpilibj.util.Color;
  * from green to red as you drive around.
  */
 public class LEDIndicator {
-    private static final int LENGTH = 40;
+    private static final int LENGTH = 10;
     private final AddressableLED m_led;
     // buffer flipping is a little quicker than setting the pixels one at a time
     private final AddressableLEDBuffer m_greenBuffer;
     private final AddressableLEDBuffer m_redBuffer;
+    private final AddressableLEDBuffer m_tealBuffer;
+    private final AddressableLEDBuffer m_orangeBuffer;
+    private final AddressableLEDBuffer m_whiteBuffer;
     private final Supplier<Double> m_timeSinceLastPose;
+    private final Supplier<Boolean> m_hasCoral;
+    private final Supplier<Boolean> m_hasAlgae;
+    private final Supplier<Boolean> m_intakingCoral;
+    private final Supplier<Boolean> m_intakingAlgae;
+    
+    private double m_lastBlinkTime = 0;
+    private boolean m_blinkState = false;
+    private final double BLINK_INTERVAL_S = 0.5; 
 
-    public LEDIndicator(RoboRioChannel port, Supplier<Double> timeSinceLastPose) {
+    public LEDIndicator(
+            RoboRioChannel port, 
+            Supplier<Double> timeSinceLastPose,
+            Supplier<Boolean> hasCoral, 
+            Supplier<Boolean> hasAlgae, 
+            Supplier<Boolean> intakingCoral, 
+            Supplier<Boolean> intakingAlgae) {
         m_led = new AddressableLED(port.channel);
         m_led.setLength(LENGTH);
         m_greenBuffer = fill(Color.kGreen);
+        m_tealBuffer = fill(Color.kTeal);
+        m_whiteBuffer = fill(Color.kWhiteSmoke);
+        m_orangeBuffer = fill(Color.kOrange);
         m_redBuffer = fill(Color.kRed);
         m_led.setData(m_redBuffer);
         m_led.start();
         m_timeSinceLastPose = timeSinceLastPose;
+        m_hasCoral = hasCoral;
+        m_hasAlgae = hasAlgae;
+        m_intakingCoral = intakingCoral;
+        m_intakingAlgae = intakingAlgae;
     }
 
     private static AddressableLEDBuffer fill(Color color) {
         AddressableLEDBuffer buf = new AddressableLEDBuffer(LENGTH);
-        for (int i = 0; i < 40; ++i) {
+        for (int i = 0; i < LENGTH; ++i) {
             buf.setLED(i, color);
         }
         return buf;
@@ -56,13 +82,55 @@ public class LEDIndicator {
     /**
      * Periodic does all the real work in this class.
      */
-    public void periodic() {
+    public void disabledPeriodic() {
         Double v = m_timeSinceLastPose.get();
         if (v != null && v < 1) {
             m_led.setData(m_greenBuffer);
         } else {
             m_led.setData(m_redBuffer);
         }
+    }
+
+    public void enabledPeriodic() {
+        boolean hasCoral = m_hasCoral.get();
+        boolean hasAlgae = m_hasAlgae.get();
+        boolean intakingCoral = m_intakingCoral.get();
+        boolean intakingAlgae = m_intakingAlgae.get();
+        
+        if (hasCoral) {
+            if (hasAlgae) {
+                if (shouldBlink()) {
+                    m_led.setData(m_blinkState ? m_tealBuffer : m_whiteBuffer);
+                }
+            } else {
+                m_led.setData(m_whiteBuffer);
+            }
+        } else if (hasAlgae) {
+            m_led.setData(m_tealBuffer);
+        } else if (intakingAlgae) {
+            if (shouldBlink()) {
+                m_led.setData(m_blinkState ? m_tealBuffer : m_orangeBuffer);
+            }
+        } else if (intakingCoral) {
+            if (shouldBlink()) {
+                m_led.setData(m_blinkState ? m_whiteBuffer : m_orangeBuffer);
+            }
+        } else {
+            m_led.setData(m_orangeBuffer);
+        }
+    }
+
+    /**
+     * Handles blink timing and returns true if blink state changed
+     */
+    private boolean shouldBlink() {
+        double currentTime = Takt.actual();
+        if (currentTime - m_lastBlinkTime > BLINK_INTERVAL_S) {
+            m_blinkState = !m_blinkState;
+            m_lastBlinkTime = currentTime;
+            return true;
+        }
+        return false;
     }
 
     public void close() {

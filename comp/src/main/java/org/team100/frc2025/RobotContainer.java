@@ -213,7 +213,7 @@ public class RobotContainer {
                 swerveLocal,
                 limiter);
 
-        m_leds = new LEDIndicator(new RoboRioChannel(0), localizer::getPoseAgeSec);
+        m_leds = new LEDIndicator(new RoboRioChannel(0), localizer::getPoseAgeSec, m_manipulator::hasCoral, m_manipulator::hasAlgae, () -> (driverControl.floorPick() || driverControl.stationPick()) , buttons::algae);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -345,9 +345,9 @@ public class RobotContainer {
         // CLIMB
         //
 
-        // Step 1, operator: Extend and spin.
-        whileTrue(operatorControl::climbIntake, // mapped to operator x button
-                ClimberCommands.intake(m_climber, m_climberIntake));
+        // Extend, spin, wait for intake, and pull climber in and drive forward.
+        whileTrue(operatorControl::climbIntake, // 
+                ClimberCommands.climbAuto(m_climber, m_climberIntake, m_drive));
 
         // Step 2, driver: Pull climber in and drive forward.
         whileTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
@@ -379,8 +379,7 @@ public class RobotContainer {
         // grab and hold algae, and then eject it when you let go of the button
         whileTrue(buttons::algae,
                 GrabAndHoldAlgae.get(
-                        m_manipulator, mech, buttons::algaeLevel))
-                .onFalse(m_manipulator.algaeEject().withTimeout(0.5));
+                        m_manipulator, mech, buttons::algaeLevel));
 
         // these are all unbound
         whileTrue(buttons::red2, print("red2"));
@@ -465,6 +464,16 @@ public class RobotContainer {
         m_auton.schedule();
     }
 
+    public void disabledPeriodic() 
+    {
+        m_leds.disabledPeriodic();   
+    }
+
+    public void enabledPeriodic() 
+    {
+        m_leds.enabledPeriodic();   
+    }
+
     public void periodic() {
         // publish the simulated tag sightings.
         m_simulatedTagDetector.run();
@@ -472,7 +481,6 @@ public class RobotContainer {
         m_targetSimulator.run();
         // show the closest target on field2d
         m_targets.periodic();
-        m_leds.periodic();
         m_combinedViz.run();
         m_climberViz.run();
     }
