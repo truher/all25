@@ -19,22 +19,23 @@ import edu.wpi.first.wpilibj.XboxController;
  * 
  * <pre>
  * left trigger [0,1]     == reef lock
- * left bumper button     == slow speed
+ * left bumper button     == barge assist
  * left stick x [-1,1]    == omega
- * left stick y [-1,1]    == **** unbound ****
+ * left stick y [-1,1]    ==
  * left stick button      == (don't use)
  * dpad/pov angle [0,360] == snaps
  * "back" button          == reset 0 rotation
  * "start" button         == reset 180 rotation
  * right stick x [-1,1]   == x velocity
  * right stick y [-1,1]   == y velocity
- * right stick button     == (don't use)
- * x button               == floor intake
- * y button               == station intake
+ * right stick button     == (don't use) 
+ * x button               == 
+ * y button               == Climb
  * a button               == drive to score at reef
- * b button               == **** unbound ****
- * right trigger [0,1]    == medium speed
- * right bumper button    == barge assist
+ * b button               == COMMAND ISN'T MADE YET (Algae Ground)
+ * right trigger [0,1]    == floor intake
+ * right bumper button    == COMMAND ISN'T MADE YET (L1 Coral)
+ * right bumper b&trigger == station pick
  * </pre>
  * 
  * Do not use stick buttons, they are prone to stray clicks
@@ -109,10 +110,10 @@ public class DriverXboxControl implements DriverControl {
     }
 
     private Speed speed() {
-        if (m_controller.getLeftBumperButton())
-            return Speed.SLOW;
-        if (m_controller.getRightTriggerAxis() > .9)
-            return Speed.MEDIUM;
+        // if (m_controller.getLeftBumperButton())
+        // return Speed.SLOW;
+        // if (m_controller.getRightTriggerAxis() > .9)
+        // return Speed.MEDIUM;
         return Speed.NORMAL;
     }
 
@@ -143,12 +144,19 @@ public class DriverXboxControl implements DriverControl {
 
     @Override
     public boolean floorPick() {
-        return m_controller.getXButton();
+        if (m_controller.getRightTriggerAxis() > .9) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean stationPick() {
         // return m_controller.getYButton();
+        // return false;
+        if (m_controller.getRightTriggerAxis() > .9 && m_controller.getRightBumperButton()) {
+            return true;
+        }
         return false;
     }
 
@@ -167,7 +175,7 @@ public class DriverXboxControl implements DriverControl {
 
     @Override
     public boolean driveWithBargeAssist() {
-        return m_controller.getRightBumperButton();
+        return m_controller.getLeftBumperButton();
     }
 
     @Override

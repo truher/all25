@@ -354,7 +354,7 @@ public class RobotContainer {
                 ClimberCommands.climb(m_climber, m_drive));
 
         // Between matches, operator: Reset the climber position.
-        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op y button
+        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op right bumper button
                 m_climber.manual(operatorControl::manualClimbSpeed));
 
         ////////////////////////////////////////////////////////////

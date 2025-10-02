@@ -25,12 +25,12 @@ import edu.wpi.first.wpilibj.XboxController;
  * right stick x [-1,1]   == manual shoulder rotation
  * right stick y [-1,1]   == manual elevator
  * right stick button     == (don't use)
- * x button               == extend and spin climber for intake
- * y button               == activate manual climb mode
- * a button               == 
- * b button               == 
- * right trigger [0,1]    ==
- * right bumper button    ==
+ * x button               == COMMAND ISN'T MADE YET ()
+ * y button               == manual intake coral (mapped to "intake")
+ * a button               == COMMAND ISN'T MADE YET
+ * b button               == manual puke coral (mapped to "outake")
+ * right trigger [0,1]    == 
+ * right bumper button    == activate manual climb
  * </pre>
  * 
  * Do not use stick buttons, they are prone to stray clicks
@@ -91,19 +91,24 @@ public class OperatorXboxControl implements OperatorControl {
 
     @Override
     public boolean activateManualClimb() {
-        return m_controller.getYButton();
+        return m_controller.getRightBumperButton();
     }
 
     @Override
     public boolean climbIntake() {
-        return m_controller.getXButton();
+        if (m_controller.getRightTriggerAxis() > .9) {
+            return true;
+        }
+        return false;
     }
 
+    // TODO: Make work
     @Override
     public boolean intake() {
         return m_controller.getAButton();
     }
 
+    // TODO: Make work
     @Override
     public boolean outtake() {
         return m_controller.getBButton();
