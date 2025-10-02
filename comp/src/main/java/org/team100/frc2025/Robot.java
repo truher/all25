@@ -172,16 +172,19 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void disabledPeriodic() {
+        m_robotContainer.disabledPeriodic();
         int keyListSize = NetworkTableInstance.getDefault().getTable("Vision").getKeys().size();
         m_log_key_list_size.log(() -> keyListSize);
     }
 
     @Override
     public void autonomousPeriodic() {
+        m_robotContainer.enabledPeriodic();
     }
 
     @Override
     public void teleopPeriodic() {
+        m_robotContainer.enabledPeriodic();
         m_log_voltage.log(RobotController::getBatteryVoltage);
     }
 
