@@ -1,6 +1,5 @@
 package org.team100.frc2025.Swerve;
 
-import java.util.ArrayList;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
@@ -23,7 +22,6 @@ import org.team100.lib.state.Model100;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
@@ -56,11 +54,9 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
     private final DoubleLogger m_log_theta_FF;
     private final DoubleLogger m_log_theta_FB;
     private final DoubleLogger m_log_output_omega;
-    /** lock rotation to nearest station */
-    private final Supplier<Boolean> m_lockToFunnel;
-    
+
     // package private for testing
-    Rotation2d m_goal = null;
+
     Control100 m_thetaSetpoint = null;
 
     public ManualWithProfiledReefLock(
@@ -68,8 +64,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
             SwerveKinodynamics swerveKinodynamics,
             Supplier<Boolean> lockToReef,
             Feedback100 thetaController,
-            SwerveDriveSubsystem drive,
-            Supplier<Boolean> lockToFunnel) {
+            SwerveDriveSubsystem drive) {
         LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_lockToReef = lockToReef;
@@ -83,13 +78,11 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
         m_log_theta_FF = child.doubleLogger(Level.TRACE, "thetaFF");
         m_log_theta_FB = child.doubleLogger(Level.TRACE, "thetaFB");
         m_log_output_omega = child.doubleLogger(Level.TRACE, "output/omega");
-        m_lockToFunnel  = lockToFunnel;
     }
 
     @Override
     public void reset(SwerveModel state) {
         m_thetaSetpoint = state.theta().control();
-        m_goal = null;
         m_thetaFeedback.reset();
     }
 
@@ -112,39 +105,9 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
             final SwerveModel state,
             final DriverControl.Velocity twist1_1) {
         final FieldRelativeVelocity control = clipAndScale(twist1_1);
-        final double currentVelocity = state.velocity().norm();
 
-        final TrapezoidIncrementalProfile m_profile = makeProfile(currentVelocity);
-
-        if(!m_lockToReef.get() && !m_lockToFunnel.get()){
-            m_goal = null;
-        } else{
-            if(m_lockToReef.get()) {
-                Rotation2d rotationToReef = FieldConstants.angleToReefCenter(m_drive.getPose().getTranslation());
-                // m_goal = FieldConstants.getSectorAngle(currentFieldSector).rotateBy(Rotation2d.k180deg);
-                m_goal = rotationToReef;
-                // System.out.println(currentFieldSector);
-            }
-
-            if(m_lockToFunnel.get()){
-                Pose2d goalTranslationLeft = new Pose2d(1.2, 7.00, Rotation2d.fromDegrees(-54));
-                Pose2d goalTranslationRight = new Pose2d(1.2, 1.05, Rotation2d.fromDegrees(54));
-    
-                ArrayList<Pose2d> poses = new ArrayList<>();
-    
-                poses.add(goalTranslationLeft);
-                poses.add(goalTranslationRight);
-    
-                m_goal = m_drive.getPose().nearest(poses).getRotation();
-            }
-        }
-
-         
-        // m_goal = Rotation2d.fromDegrees(90);
-
-        if (m_goal == null) {
-            // we're not in snap mode, so it's pure manual
-            // in this case there is no setpoint
+        if (!m_lockToReef.get()) {
+            // not locked, just return the input.
             m_thetaSetpoint = null;
             m_log_snap_mode.log(() -> false);
             return control;
@@ -156,34 +119,31 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
             m_thetaSetpoint = state.theta().control();
         }
 
+        // feedback uses the current setpoint, which was set previously
         final double thetaFB = m_thetaFeedback.calculate(state.theta(), m_thetaSetpoint.model());
-
-        //
-        // feedforward uses the new setpoint
-        //
 
         final double yawMeasurement = state.theta().x();
         // take the short path
-        m_goal = new Rotation2d(
-                Math100.getMinDistance(yawMeasurement, m_goal.getRadians()));
-        // in snap mode we take dx and dy from the user, and use the profile for dtheta.
-        // the omega goal in snap mode is always zero.
-        final Model100 goalState = new Model100(m_goal.getRadians(), 0);
+        Rotation2d m_goal = Math100.getMinDistance(
+                yawMeasurement,
+                FieldConstants.angleToReefCenter(m_drive.getPose().getTranslation()));
 
         // use the modulus closest to the measurement
         m_thetaSetpoint = new Control100(
                 Math100.getMinDistance(yawMeasurement, m_thetaSetpoint.x()),
                 m_thetaSetpoint.v());
-        m_thetaSetpoint = m_profile.calculate(TimedRobot100.LOOP_PERIOD_S, m_thetaSetpoint, goalState);
 
-        // the snap overrides the user input for omega.
+        final TrapezoidIncrementalProfile profile = makeProfile(state.velocity().norm());
+        m_thetaSetpoint = profile.calculate(
+                TimedRobot100.LOOP_PERIOD_S, m_thetaSetpoint, new Model100(m_goal.getRadians(), 0));
+
         final double thetaFF = m_thetaSetpoint.v();
 
         final double omega = MathUtil.clamp(
                 thetaFF + thetaFB,
                 -m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
-                
+
         FieldRelativeVelocity twistWithSnapM_S = new FieldRelativeVelocity(control.x(), control.y(), omega);
 
         m_log_snap_mode.log(() -> true);
@@ -193,15 +153,12 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
         m_log_theta_FB.log(() -> thetaFB);
         m_log_output_omega.log(() -> omega);
 
-
         return twistWithSnapM_S;
     }
 
     public FieldRelativeVelocity clipAndScale(DriverControl.Velocity twist1_1) {
         // clip the input to the unit circle
         final DriverControl.Velocity clipped = twist1_1.clip(1.0);
-
- 
 
         // scale to max in both translation and rotation
         return FieldRelativeDriver.scale(

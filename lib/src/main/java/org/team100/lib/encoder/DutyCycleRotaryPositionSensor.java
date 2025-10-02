@@ -9,6 +9,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
+import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -43,19 +44,19 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
 
     protected DutyCycleRotaryPositionSensor(
             LoggerFactory parent,
-            int channel,
+            RoboRioChannel channel,
             double inputOffset,
             EncoderDrive drive) {
         super(parent, inputOffset, drive);
         LoggerFactory child = parent.type(this);
-        m_channel = channel;
-        m_digitalInput = new DigitalInput(channel);
+        m_channel = channel.channel;
+        m_digitalInput = new DigitalInput(channel.channel);
         m_dutyCycle = new DutyCycle(m_digitalInput);
         m_duty = Cache.ofDouble(m_dutyCycle::getOutput);
         m_log_duty = child.doubleLogger(Level.COMP, "duty cycle");
         m_log_frequency = child.intLogger(Level.TRACE, "frequency");
         m_log_connected = child.booleanLogger(Level.TRACE, "connected");
-        child.intLogger(Level.COMP, "channel").log(() -> channel);
+        child.intLogger(Level.COMP, "channel").log(() -> channel.channel);
     }
 
     @Override

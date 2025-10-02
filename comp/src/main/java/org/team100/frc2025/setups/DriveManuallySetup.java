@@ -94,7 +94,6 @@ public class DriveManuallySetup {
                         m_swerveKinodynamics,
                         driverControl::useReefLock,
                         thetaFeedback,
-                        m_drive,
-                        buttons::red1));
+                        m_drive));
     }
 }

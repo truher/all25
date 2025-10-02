@@ -8,6 +8,7 @@ import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
+import org.team100.lib.util.CanId;
 import org.team100.lib.util.Util;
 
 import com.ctre.phoenix6.StatusSignal;
@@ -83,7 +84,7 @@ public abstract class Talon6Motor implements BareMotor {
 
     protected Talon6Motor(
             LoggerFactory parent,
-            int canId,
+            CanId canId,
             NeutralMode neutral,
             MotorPhase motorPhase,
             double supplyLimit,
@@ -101,7 +102,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_positionVoltage.UpdateFreqHz = 0;
 
         LoggerFactory child = parent.type(this);
-        m_motor = new TalonFX(canId);
+        m_motor = new TalonFX(canId.id);
         m_ff = ff;
         m_supplyLimit = supplyLimit;
 
@@ -184,7 +185,7 @@ public abstract class Talon6Motor implements BareMotor {
         // m_log_torque = child.doubleLogger(Level.TRACE, "torque (Nm)");
         // m_log_temp = child.doubleLogger(Level.TRACE, "temperature (C)");
 
-        child.intLogger(Level.TRACE, "Device ID").log(() -> canId);
+        child.intLogger(Level.TRACE, "Device ID").log(() -> canId.id);
     }
 
     /** Set duty cycle immediately. */

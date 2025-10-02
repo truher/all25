@@ -1,6 +1,7 @@
 package org.team100.lib.encoder;
 
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.util.RoboRioChannel;
 
 /**
  * Implements max and min duty cycle to address the PWM output's "init" and
@@ -29,7 +30,7 @@ public class AS5048RotaryPositionSensor extends DutyCycleRotaryPositionSensor {
 
     public AS5048RotaryPositionSensor(
             LoggerFactory parent,
-            int channel,
+            RoboRioChannel channel,
             double inputOffset,
             EncoderDrive drive) {
         super(parent, channel, inputOffset, drive);

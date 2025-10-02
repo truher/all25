@@ -3,6 +3,7 @@ package org.team100.lib.motor;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.util.CanId;
 
 /**
  * Kraken using Phoenix 6.
@@ -13,7 +14,7 @@ public class Kraken6Motor extends Talon6Motor {
 
     public Kraken6Motor(
             LoggerFactory parent,
-            int canId,
+            CanId canId,
             NeutralMode neutral,
             MotorPhase motorPhase,
             double supplyLimit,

@@ -13,11 +13,10 @@ import org.team100.lib.motor.LazySimulatedBareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.sensor.LaserCan100;
+import org.team100.lib.util.CanId;
 
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
-import au.grapplerobotics.simulation.MockLaserCan;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -28,10 +27,10 @@ public class Manipulator extends SubsystemBase {
     private final LinearMechanism m_leftMech;
     private final LinearMechanism m_rightMech;
     private final LinearMechanism m_algaeMech;
-    private final LaserCanInterface m_rightLaser;
-    private final LaserCanInterface m_frontLaser;
-    private final LaserCanInterface m_backLaser;
-    private final LaserCanInterface m_leftLaser;
+    private final LaserCan100 m_rightLaser;
+    private final LaserCan100 m_frontLaser;
+    private final LaserCan100 m_backLaser;
+    private final LaserCan100 m_leftLaser;
 
     public Manipulator(LoggerFactory parent) {
         LoggerFactory log = parent.name("Manipulator");
@@ -41,31 +40,34 @@ public class Manipulator extends SubsystemBase {
         LoggerFactory rightMotorLog = log.name("rightMotor");
         switch (Identity.instance) {
             case COMP_BOT -> {
-                // Set specific parameters for the competition robot               //can id done
-                Kraken6Motor leftMotor = new Kraken6Motor(leftMotorLog, 19, NeutralMode.COAST, MotorPhase.FORWARD, 
-                40, //og 40
-                40, //og 40
+                // Set specific parameters for the competition robot
+                Kraken6Motor leftMotor = new Kraken6Motor(leftMotorLog, new CanId(19), NeutralMode.COAST,
+                        MotorPhase.FORWARD,
+                        40, // og 40
+                        40, // og 40
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor rightMotor = new Kraken6Motor(rightMotorLog, 20, NeutralMode.COAST, MotorPhase.REVERSE,  //can id done
-                40, //og 40
-                40, //og 40
+                Kraken6Motor rightMotor = new Kraken6Motor(rightMotorLog, new CanId(20), NeutralMode.COAST,
+                        MotorPhase.REVERSE,
+                        40, // og 40
+                        40, // og 40
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                Kraken6Motor algaeMotor = new Kraken6Motor(algaeMotorLog, 21, NeutralMode.COAST, MotorPhase.FORWARD,  //can id done
-                120, //og 120
-                120, //og 120
+                Kraken6Motor algaeMotor = new Kraken6Motor(algaeMotorLog, new CanId(21), NeutralMode.COAST,
+                        MotorPhase.FORWARD,
+                        120, // og 120
+                        120, // og 120
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
                 algaeMotor.setTorqueLimit(5);
                 m_algaeMotor = algaeMotor;
-                m_rightLaser = new LaserCan(17); //can id done
-                m_frontLaser = new LaserCan(16); //can id done
-                m_backLaser = new LaserCan(18); //can id done
-                m_leftLaser = new LaserCan(15); //can id done
-                m_leftMech = new LinearMechanism(leftMotorLog, leftMotor, new Talon6Encoder(log, leftMotor), 16,
-                        .1, -100000000, 1000000);
+                m_rightLaser = new LaserCan100(new CanId(17));
+                m_frontLaser = new LaserCan100(new CanId(16));
+                m_backLaser = new LaserCan100(new CanId(18));
+                m_leftLaser = new LaserCan100(new CanId(15));
+                m_leftMech = new LinearMechanism(leftMotorLog, leftMotor, new Talon6Encoder(log, leftMotor),
+                        16, 0.1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 m_rightMech = new LinearMechanism(rightMotorLog, rightMotor, new Talon6Encoder(log, rightMotor),
-                        16, .1, -100000000, 1000000);
+                        16, 0.1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 m_algaeMech = new LinearMechanism(algaeMotorLog, algaeMotor, new Talon6Encoder(log, algaeMotor),
-                        16, .1, -100000000, 1000000);
+                        16, 0.1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
             }
             default -> {
                 BareMotor leftMotor = new SimulatedBareMotor(log, 100);
@@ -77,28 +79,18 @@ public class Manipulator extends SubsystemBase {
                         new SimulatedBareMotor(log, 100), 2);
                 SimulatedBareEncoder algaeEncoder = new SimulatedBareEncoder(log, algaeMotor);
                 m_algaeMotor = algaeMotor;
-                m_leftMech = new LinearMechanism(
-                        log, leftMotor, leftEncoder, 1, 1,
-                        Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_rightMech = new LinearMechanism(
-                        log, rightMotor, rightEncoder, 1, 1,
-                        Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_algaeMech = new LinearMechanism(
-                        log, algaeMotor, algaeEncoder, 1, 1,
-                        Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_rightLaser = new MockLaserCan();
-                m_frontLaser = new MockLaserCan();
-                m_backLaser = new MockLaserCan();
-                m_leftLaser = new MockLaserCan();
+                m_leftMech = new LinearMechanism(log, leftMotor, leftEncoder,
+                        1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                m_rightMech = new LinearMechanism(log, rightMotor, rightEncoder,
+                        1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                m_algaeMech = new LinearMechanism(log, algaeMotor, algaeEncoder,
+                        1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                m_rightLaser = new LaserCan100();
+                m_frontLaser = new LaserCan100();
+                m_backLaser = new LaserCan100();
+                m_leftLaser = new LaserCan100();
             }
         }
-    }
-
-    public boolean isCoralClose(LaserCanInterface sensor) {
-        Measurement m = sensor.getMeasurement();
-        if (m == null)
-            return false;
-        return m.distance_mm < NEAR;
     }
 
     public void intakeCenter() {
@@ -112,7 +104,7 @@ public class Manipulator extends SubsystemBase {
     }
 
     public boolean hasCoral() {
-        return isCoralClose(m_backLaser);
+        return coralIsClose(m_backLaser);
     }
 
     public void ejectCenter() {
@@ -126,7 +118,7 @@ public class Manipulator extends SubsystemBase {
             stopMotors();
         } else {
             m_algaeMech.setDutyCycle(-0.5);
-            if (isCoralClose(m_leftLaser)) {
+            if (coralIsClose(m_leftLaser)) {
                 m_leftMech.setDutyCycle(0.5);
                 m_rightMech.setDutyCycle(-0.5);
             } else {
@@ -137,7 +129,7 @@ public class Manipulator extends SubsystemBase {
     }
 
     public boolean hasCoralSideways() {
-        return isCoralClose(m_leftLaser) && isCoralClose(m_rightLaser);
+        return coralIsClose(m_leftLaser) && coralIsClose(m_rightLaser);
     }
 
     public void stopMotors() {
@@ -191,7 +183,7 @@ public class Manipulator extends SubsystemBase {
      * so 1.62 Nm.
      */
     private void highAlgaeTorque() {
-        //m_algaeMotor.setTorqueLimit(1.65);
+        // m_algaeMotor.setTorqueLimit(1.65);
     }
 
     /**
@@ -200,7 +192,7 @@ public class Manipulator extends SubsystemBase {
      * so 0.63 Nm.
      */
     private void lowAlgaeTorque() {
-        //m_algaeMotor.setTorqueLimit(0.65);
+        // m_algaeMotor.setTorqueLimit(0.65);
     }
 
     private void intakeAlgae() {
@@ -209,5 +201,14 @@ public class Manipulator extends SubsystemBase {
 
     public void ejectAlgae() {
         m_algaeMech.setDutyCycle(-0.1);
+    }
+
+    ///////////////////////////////////////////////
+
+    private static boolean coralIsClose(LaserCan100 sensor) {
+        Measurement m = sensor.getMeasurement();
+        if (m == null)
+            return false;
+        return m.distance_mm < NEAR;
     }
 }

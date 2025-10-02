@@ -11,13 +11,14 @@ import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
+import org.team100.lib.util.CanId;
 
 public class Neo550Factory {
 
     public static LinearMechanism getNEO550LinearMechanism(
             LoggerFactory log,
             int currentLimit,
-            int canID,
+            CanId canID,
             double gearRatio,
             NeutralMode neutral,
             MotorPhase motorPhase,
@@ -39,7 +40,7 @@ public class Neo550Factory {
     public static RotaryMechanism getNEO550RotaryMechanism(
             LoggerFactory log,
             int currentLimit,
-            int canID,
+            CanId canID,
             double gearRatio,
             NeutralMode neutral,
             MotorPhase motorPhase) {
@@ -64,7 +65,7 @@ public class Neo550Factory {
     public static LinearVelocityServo getNEO550VelocityServo(
             LoggerFactory log,
             int currentLimit,
-            int canID,
+            CanId canID,
             double gearRatio,
             NeutralMode neutral,
             MotorPhase motorPhase,

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * Various math utilities.
@@ -11,7 +12,6 @@ import edu.wpi.first.math.MathUtil;
 public class Math100 {
     public static final boolean DEBUG = false;
     private static final double EPSILON = 1e-6;
-
 
     /**
      * Returns the real solutions to the quadratic ax^2 + bx + c.
@@ -74,5 +74,8 @@ public class Math100 {
         return MathUtil.angleModulus(x - measurement) + measurement;
     }
 
-   
+    public static Rotation2d getMinDistance(double measurement, Rotation2d x) {
+        return new Rotation2d(MathUtil.angleModulus(x.getRadians() - measurement) + measurement);
+    }
+
 }

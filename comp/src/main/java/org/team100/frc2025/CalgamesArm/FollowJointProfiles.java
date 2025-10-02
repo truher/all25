@@ -1,5 +1,6 @@
 package org.team100.frc2025.CalgamesArm;
 
+import org.team100.lib.commands.Done;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.kinematics.JointAccelerations;
@@ -11,13 +12,12 @@ import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Follow three uncoordinated profiles in configuration space.
  * Starting point and velocity are current measurements.
  */
-public class FollowJointProfiles extends Command {
+public class FollowJointProfiles extends Done {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
 
     private final CalgamesMech m_subsystem;
@@ -112,6 +112,7 @@ public class FollowJointProfiles extends Command {
         m_subsystem.set(c, jv, ja);
     }
 
+    @Override
     public boolean isDone() {
         return profileDone() && atReference();
     }

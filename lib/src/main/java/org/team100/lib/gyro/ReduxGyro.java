@@ -5,6 +5,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.Rotation2dLogger;
+import org.team100.lib.util.CanId;
 import org.team100.lib.util.Util;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
@@ -32,9 +33,9 @@ public class ReduxGyro implements Gyro {
     private final Rotation2dLogger m_log_pitch;
     private final Rotation2dLogger m_log_roll;
 
-    public ReduxGyro(LoggerFactory parent, int canID) {
+    public ReduxGyro(LoggerFactory parent, CanId canID) {
         LoggerFactory child = parent.type(this);
-        m_gyro = new Canandgyro(canID);
+        m_gyro = new Canandgyro(canID.id);
         m_gyro.clearStickyFaults();
 
         // Both position and velocity should be reasonably fresh.

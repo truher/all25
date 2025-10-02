@@ -9,6 +9,7 @@ import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.util.CanId;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * This class extends SubsystemBase, to be compatible with the scheduler, and
  * the logger will use the class name.
  */
-public class OpenLoopSubsystem extends SubsystemBase  {
+public class OpenLoopSubsystem extends SubsystemBase {
     private final BareMotor m_motor;
 
     public OpenLoopSubsystem(LoggerFactory parent) {
@@ -38,7 +39,7 @@ public class OpenLoopSubsystem extends SubsystemBase  {
          */
         switch (Identity.instance) {
             case COMP_BOT -> {
-                int canId = 1;
+                CanId canId = new CanId(1);
                 int supplyLimit = 60;
                 int statorLimit = 90;
                 PIDConstants PID = PIDConstants.makeVelocityPID(0.3);

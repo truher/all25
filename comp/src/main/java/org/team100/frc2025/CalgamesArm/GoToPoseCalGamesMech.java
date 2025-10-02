@@ -34,7 +34,7 @@ public class GoToPoseCalGamesMech extends Done {
 
     @Override
     public void initialize() {
-        HolonomicPose2d m_currentPose = HolonomicPose2d.fromPose(
+        HolonomicPose2d m_currentPose = HolonomicPose2d.make(
                 m_subsystem.getState().pose(), m_course);
         Trajectory100 m_trajectory = m_trajectoryPlanner.restToRest(
                 List.of(m_currentPose, m_goal));

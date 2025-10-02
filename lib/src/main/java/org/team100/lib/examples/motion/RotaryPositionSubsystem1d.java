@@ -22,6 +22,8 @@ import org.team100.lib.profile.timed.JerkLimitedIncrementalProfile;
 import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.reference.TimedProfileReference1d;
+import org.team100.lib.util.CanId;
+import org.team100.lib.util.RoboRioChannel;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,7 +42,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * This class extends SubsystemBase, to be compatible with the scheduler, and it
  * , so that the logger will use the class name.
  */
-public class RotaryPositionSubsystem1d extends SubsystemBase  {
+public class RotaryPositionSubsystem1d extends SubsystemBase {
     /**
      * It's useful for a subsystem to know about positional settings, so that all
      * the knowledge about the subsystem itself is contained here.
@@ -88,18 +90,16 @@ public class RotaryPositionSubsystem1d extends SubsystemBase  {
                 // these constants only apply to the COMP_BOT case.
                 // note the pattern here: using a variable is a way to label the thing
                 // without needing to write a comment.
-                int canID = 1;
                 int supplyLimit = 60;
                 int statorLimit = 90;
-                int sensorChannel = 5;
                 double inputOffset = 0.135541;
                 PIDConstants PID = PIDConstants.makeVelocityPID(0.3);
                 // you should make a case in the feedforward class for your constants
                 Feedforward100 FF = Feedforward100.makeSimple();
                 Kraken6Motor motor = new Kraken6Motor(
-                        log, canID, NeutralMode.COAST, MotorPhase.REVERSE, supplyLimit, statorLimit, PID, FF);
+                        log, new CanId(1), NeutralMode.COAST, MotorPhase.REVERSE, supplyLimit, statorLimit, PID, FF);
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
-                        log, sensorChannel, inputOffset, EncoderDrive.DIRECT);
+                        log, new RoboRioChannel(5), inputOffset, EncoderDrive.DIRECT);
                 RotaryMechanism mech = new RotaryMechanism(
                         log, motor, sensor, GEAR_RATIO, MIN_POSITION, MAX_POSITION);
                 m_servo = new OnboardAngularPositionServo(
