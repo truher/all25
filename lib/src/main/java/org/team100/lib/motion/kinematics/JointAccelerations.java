@@ -21,4 +21,12 @@ public record JointAccelerations(double elevator, double shoulder, double wrist)
                 shoulder / ja.shoulder,
                 wrist / ja.wrist);
     }
+
+    public double norm() {
+        return Math.sqrt(elevator * elevator + shoulder * shoulder + wrist * wrist);
+    }
+
+    public JointAccelerations times(double s) {
+        return new JointAccelerations(s * elevator, s * shoulder, s * wrist);
+    }
 }

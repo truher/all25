@@ -3,9 +3,11 @@ package org.team100.lib.trajectory.timing;
 import java.util.Optional;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
 import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
@@ -46,23 +48,32 @@ public class JointConstraint implements TimingConstraint {
     @Override
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
         Pose2d pose = state.getPose();
-        Optional<Rotation2d> course2 = state.getCourse();
+        MotionDirection motion = state.getMotionDirection();
+        // unit vector in cartesian space
+        FieldRelativeVelocity v = new FieldRelativeVelocity(
+                motion.dx(), motion.dy(), motion.dtheta());
+        SwerveModel m = new SwerveModel(pose, v);
 
-        double c = course2.map(Rotation2d::getCos).orElse(0.0);
-        double s = course2.map(Rotation2d::getSin).orElse(0.0);
+        // corresponding vector in joint space
+        JointVelocities qdot = m_j.inverse(m);
+
+        // as a fraction of maxima
+        double elevatorScale = Math.abs(qdot.elevator() / m_maxJv.elevator());
+        double shoulderScale = Math.abs(qdot.shoulder() / m_maxJv.shoulder());
+        double wristScale = Math.abs(qdot.wrist() / m_maxJv.wrist());
+
+        double maxScale = Math.max(elevatorScale, Math.max(shoulderScale, wristScale));
+
+        // scale qdot to the nearest maximum
+        JointVelocities maxQdotInMotionDirection = qdot.times(1 / maxScale);
 
         Config q = m_k.inverse(pose);
 
-        // find the cartesian velocity for the max joint velocity
-        // TODO: this is wrong, it uses *one* joint velocity;
-        // what we want is to find the ellipsoid in cartesian
-        // space corresponding to the sphere in joint space.
-        FieldRelativeVelocity v = m_j.forward(q, m_maxJv);
-
-        // find the component in the direction of motion
-        double vel = v.x() * c + v.y() * s;
-
-        return new NonNegativeDouble(Math.abs(vel));
+        FieldRelativeVelocity maxV = m_j.forward(q, maxQdotInMotionDirection);
+        double norm = maxV.norm();
+        if (Double.isNaN(norm))
+            return new NonNegativeDouble(0);
+        return new NonNegativeDouble(norm);
     }
 
     @Override
@@ -77,21 +88,36 @@ public class JointConstraint implements TimingConstraint {
         double vx = velocityM_S * s;
         double vy = velocityM_S * c;
         double omega = velocityM_S * r;
+
+        // actual cartesian velocity
         FieldRelativeVelocity v = new FieldRelativeVelocity(vx, vy, omega);
 
         Config q = m_k.inverse(pose);
+        // actual qdot
         JointVelocities qdot = m_j.inverse(new SwerveModel(pose, v));
 
-        // find the cartesian accel for the max joint accel
-        // TODO: this is wrong, it uses *one* joint velocity;
-        // what we want is to find the ellipsoid in cartesian
-        // space corresponding to the sphere in joint space.
-        FieldRelativeAcceleration fa = m_j.forwardA(q, qdot, m_maxJa);
+        // find accel in motion
+        FieldRelativeAcceleration unitA = new FieldRelativeAcceleration(c, s, r);
+        SwerveControl sc = new SwerveControl(pose, v, unitA);
+        // corresponding a vector in joint space
+        JointAccelerations qddot = m_j.inverseA(sc);
 
-        // find the component in the direction of motion
-        double acc = fa.x() * c + fa.y() * s;
+        // as a fraction of maxima
+        double elevatorScale = Math.abs(qddot.elevator() / m_maxJa.elevator());
+        double shoulderScale = Math.abs(qddot.shoulder() / m_maxJa.shoulder());
+        double wristScale = Math.abs(qddot.wrist() / m_maxJa.wrist());
 
-        return new MinMaxAcceleration(-1.0 * Math.abs(acc), 1.0 * Math.abs(acc));
+        double maxScale = Math.max(elevatorScale, Math.max(shoulderScale, wristScale));
+
+        // scale qddot to the nearest maximum
+        JointAccelerations maxQddotInMotionDirection = qddot.times(1 / maxScale);
+
+        FieldRelativeAcceleration fa = m_j.forwardA(q, qdot, maxQddotInMotionDirection);
+
+        double norm = fa.norm();
+        if (Double.isNaN(norm))
+            return new MinMaxAcceleration(0, 0);
+        return new MinMaxAcceleration(-1.0 * norm, 1.0 * norm);
     }
 
 }

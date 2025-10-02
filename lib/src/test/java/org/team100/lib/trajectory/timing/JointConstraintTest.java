@@ -57,9 +57,9 @@ public class JointConstraintTest {
         // motion +y, shoulder and wrist have same constraint
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(3, 0, Rotation2d.kZero), new MotionDirection(0, 1, 0), 0, 0);
-        assertEquals(4, jc.getMaxVelocity(state).getValue(), DELTA);
-        assertEquals(-4, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
-        assertEquals(4, jc.getMinMaxAcceleration(state, 0).getMaxAccel(), DELTA);
+        assertEquals(2, jc.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(-2, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
+        assertEquals(2, jc.getMinMaxAcceleration(state, 0).getMaxAccel(), DELTA);
     }
 
     @Test
@@ -102,9 +102,9 @@ public class JointConstraintTest {
         // bent wrist and shoulder, arm at 45, motion +y,
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(2, 1 + Math.sqrt(2), Rotation2d.kCCW_90deg), new MotionDirection(0, 1, 0), 0, 0);
-        assertEquals(1.414, jc.getMaxVelocity(state).getValue(), DELTA);
-        assertEquals(-1.414, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
-        assertEquals(1.414, jc.getMinMaxAcceleration(state, 0).getMaxAccel(), DELTA);
+        assertEquals(1, jc.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(-1, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
+        assertEquals(1, jc.getMinMaxAcceleration(state, 0).getMaxAccel(), DELTA);
     }
 
 }
