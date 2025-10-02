@@ -1,5 +1,6 @@
 package org.team100.frc2025.CalgamesArm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.commands.Done;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 /** Make a trajectory from the start to the end and follow it. */
 public class MechTrajectories extends Command {
+    private static final boolean USE_JOINT_CONSTRAINT = false;
     private final CalgamesMech m_subsystem;
     private final TrajectoryPlanner m_planner;
 
@@ -26,17 +28,21 @@ public class MechTrajectories extends Command {
             ElevatorArmWristKinematics k,
             AnalyticalJacobian j) {
         m_subsystem = mech;
-        List<TimingConstraint> c = List.of(
-                // NOTE! the JointConstraint is new; you might want to play with it, or remove
-                // it and use the ConstantConstraint instead.
-                 new ConstantConstraint(10, 5),
-                 new YawRateConstraint(10, 5)
-                // new JointConstraint(
-                //         k,
-                //         j,
-                //         new JointVelocities(8, 10, 10),
-                //         new JointAccelerations(16, 16, 16))
-                        );
+        List<TimingConstraint> c = new ArrayList<>();
+        if (USE_JOINT_CONSTRAINT) {
+            // This is experimental, don't use it.
+            c.add(new JointConstraint(
+                k,
+                j,
+                new JointVelocities(10, 10, 10),
+                new JointAccelerations(10, 10, 10)));
+
+        } else {
+            // These are known to work, but suboptimal.
+            c.add(new ConstantConstraint(10, 5));
+            c.add(new YawRateConstraint(10, 5));
+        }
+
         m_planner = new TrajectoryPlanner(c);
     }
 

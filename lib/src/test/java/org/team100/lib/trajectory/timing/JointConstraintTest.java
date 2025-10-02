@@ -26,9 +26,10 @@ public class JointConstraintTest {
         // motionless, this just returns the minimum maxima.
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(3, 0, Rotation2d.kZero), new MotionDirection(0, 0, 0), 0, 0);
-        assertEquals(1, jc.getMaxVelocity(state).getValue(), DELTA);
-        assertEquals(-1, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
-        assertEquals(1, jc.getMinMaxAcceleration(state, 0).getMaxAccel(), DELTA);
+        // this is a singularity
+        assertEquals(0, jc.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(0, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
+        assertEquals(0, jc.getMinMaxAcceleration(state, 0).getMaxAccel(), DELTA);
     }
 
     @Test

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
+import org.team100.lib.motion.Config;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
@@ -13,10 +14,8 @@ import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
 import org.team100.lib.motion.kinematics.JointAccelerations;
 import org.team100.lib.motion.kinematics.JointVelocities;
 
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.numbers.N3;
 
 /**
  * For cartesian trajectories executed by non-cartesian mechanisms: each joint
@@ -30,9 +29,6 @@ import edu.wpi.first.math.numbers.N3;
  * constraint per se.
  */
 public class JointConstraint implements TimingConstraint {
-    /** don't barf if the max velocity seems to be zero; return this instead. */
-    private static final double MIN_MAX_V = 1.0;
-    private static final double MIN_MAX_A = 1.0;
     private final ElevatorArmWristKinematics m_k;
     private final AnalyticalJacobian m_j;
     private final JointVelocities m_maxJv;
@@ -53,23 +49,31 @@ public class JointConstraint implements TimingConstraint {
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
         Pose2d pose = state.getPose();
         MotionDirection motion = state.getMotionDirection();
-        // THIS IS NOT VELOCITY! It's kind of "spatial velocity".
-        // you could also think of it as 1 m/s along the path
+        // unit vector in cartesian space
         FieldRelativeVelocity v = new FieldRelativeVelocity(
                 motion.dx(), motion.dy(), motion.dtheta());
         SwerveModel m = new SwerveModel(pose, v);
-        // required joint velocities to achieve 1 m/s
-        JointVelocities jv = m_j.inverse(m);
-        // required joint velocities as a fraction of maximum.
-        Vector<N3> ratio = jv.div(m_maxJv);
-        // maximum fraction
-        double max = ratio.maxAbs();
-        if (max < 1e-3) {
-            return new NonNegativeDouble(MIN_MAX_V);
-        }
-        // the available max velocity is the inverse, e.g. if 1 m/s drives
-        // a joint at 50% of its maximum, then the max v is 2.
-        return new NonNegativeDouble(1.0 / max);
+
+        // corresponding vector in joint space
+        JointVelocities qdot = m_j.inverse(m);
+
+        // as a fraction of maxima
+        double elevatorScale = Math.abs(qdot.elevator() / m_maxJv.elevator());
+        double shoulderScale = Math.abs(qdot.shoulder() / m_maxJv.shoulder());
+        double wristScale = Math.abs(qdot.wrist() / m_maxJv.wrist());
+
+        double maxScale = Math.max(elevatorScale, Math.max(shoulderScale, wristScale));
+
+        // scale qdot to the nearest maximum
+        JointVelocities maxQdotInMotionDirection = qdot.times(1 / maxScale);
+
+        Config q = m_k.inverse(pose);
+
+        FieldRelativeVelocity maxV = m_j.forward(q, maxQdotInMotionDirection);
+        double norm = maxV.norm();
+        if (Double.isNaN(norm))
+            return new NonNegativeDouble(0);
+        return new NonNegativeDouble(norm);
     }
 
     @Override
@@ -84,22 +88,36 @@ public class JointConstraint implements TimingConstraint {
         double vx = velocityM_S * s;
         double vy = velocityM_S * c;
         double omega = velocityM_S * r;
+
+        // actual cartesian velocity
         FieldRelativeVelocity v = new FieldRelativeVelocity(vx, vy, omega);
-        // the acceleration constraint here is *along* the path, so
-        // make a "unit" acceleration which does that.
-        FieldRelativeAcceleration a = new FieldRelativeAcceleration(
-                c, s, r);
-        SwerveControl m = new SwerveControl(pose, v, a);
-        // joint accel to achieve 1 m/s etc
-        JointAccelerations ja = m_j.inverseA(m);
-        // joint accel as a fraction of max
-        Vector<N3> ratio = ja.div(m_maxJa);
-        // max fraction
-        double max = ratio.maxAbs();
-        if (max < 1e-3) {
-            max = MIN_MAX_A;
-        }
-        return new MinMaxAcceleration(-1.0 / max, 1.0 / max);
+
+        Config q = m_k.inverse(pose);
+        // actual qdot
+        JointVelocities qdot = m_j.inverse(new SwerveModel(pose, v));
+
+        // find accel in motion
+        FieldRelativeAcceleration unitA = new FieldRelativeAcceleration(c, s, r);
+        SwerveControl sc = new SwerveControl(pose, v, unitA);
+        // corresponding a vector in joint space
+        JointAccelerations qddot = m_j.inverseA(sc);
+
+        // as a fraction of maxima
+        double elevatorScale = Math.abs(qddot.elevator() / m_maxJa.elevator());
+        double shoulderScale = Math.abs(qddot.shoulder() / m_maxJa.shoulder());
+        double wristScale = Math.abs(qddot.wrist() / m_maxJa.wrist());
+
+        double maxScale = Math.max(elevatorScale, Math.max(shoulderScale, wristScale));
+
+        // scale qddot to the nearest maximum
+        JointAccelerations maxQddotInMotionDirection = qddot.times(1 / maxScale);
+
+        FieldRelativeAcceleration fa = m_j.forwardA(q, qdot, maxQddotInMotionDirection);
+
+        double norm = fa.norm();
+        if (Double.isNaN(norm))
+            return new MinMaxAcceleration(0, 0);
+        return new MinMaxAcceleration(-1.0 * norm, 1.0 * norm);
     }
 
 }
