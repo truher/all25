@@ -346,15 +346,15 @@ public class RobotContainer {
         //
 
         // Step 1, operator: Extend and spin.
-        whileTrue(operatorControl::climbIntake, // mapped to operator x button
+        whileTrue(operatorControl::climbIntake, // mapped to operator right trigger
                 ClimberCommands.intake(m_climber, m_climberIntake));
 
         // Step 2, driver: Pull climber in and drive forward.
-        whileTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
+        whileTrue(driverControl::climb, // mapped to driver y button
                 ClimberCommands.climb(m_climber, m_drive));
 
         // Between matches, operator: Reset the climber position.
-        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op y button
+        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op right bumper button
                 m_climber.manual(operatorControl::manualClimbSpeed));
 
         ////////////////////////////////////////////////////////////
