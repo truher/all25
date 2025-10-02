@@ -53,7 +53,7 @@ public class FollowJointProfiles extends Command {
                 subsystem,
                 goal,
                 new CompleteProfile(2, 4, 6, 5, 50, 50, 0.001), // elevator
-                new CompleteProfile(8, 4, 12, 16, 50, 50, 0.001), // arm
+                new CompleteProfile(12, 8, 16, 16, 50, 50, 0.001), // arm
                 new CompleteProfile(8, 4, 12, 16, 50, 50, 0.001)); // wrist
     }
 
@@ -69,7 +69,7 @@ public class FollowJointProfiles extends Command {
                 subsystem,
                 goal,
                 new CompleteProfile(2, 6, 4, 5, 50, 50, 0.001), // elevator
-                new CompleteProfile(8, 12, 4, 16, 50, 50, 0.001), // arm
+                new CompleteProfile(12, 20, 8, 16, 100, 100, 0.001), // arm
                 new CompleteProfile(8, 12, 4, 16, 50, 50, 0.001)); // wrist
     }
 

@@ -126,7 +126,7 @@ public class CalgamesMech extends SubsystemBase {
                         2.182, // TODO: calibrate ratio
                         0.03844, // TODO: calibrate pulley size- done
                         0, // TODO: calibrate lower limit
-                        1.8); // TODO: calibrate upper limit 228-45
+                        1.9); // TODO: calibrate upper limit 228-45
 
                 Kraken6Motor elevatorBackMotor = new Kraken6Motor(
                         elevatorbackLog,
@@ -146,7 +146,7 @@ public class CalgamesMech extends SubsystemBase {
                         2.182, // done 9/28
                         0.03844, // done 9/28
                         0, // just 0
-                        1.8); // done 9/28, raised to barge and subtracted og carriage top hight
+                        1.9); // done 9/28, raised to barge and subtracted og carriage top hight
 
                 Kraken6Motor shoulderMotor = new Kraken6Motor(
                         shoulderLog,
@@ -164,7 +164,7 @@ public class CalgamesMech extends SubsystemBase {
                 AS5048RotaryPositionSensor shoulderSensor = new AS5048RotaryPositionSensor(
                         shoulderLog,
                         4, // id done
-                        0.565, // TODO: verify offset
+                        0.684, // TODO: verify offset
                         EncoderDrive.INVERSE); // verified drive - 9/28
                 GearedRotaryPositionSensor gearedSensor = new GearedRotaryPositionSensor(
                         shoulderSensor,
@@ -225,7 +225,7 @@ public class CalgamesMech extends SubsystemBase {
                         2, // TODO: calibrate ratio
                         0.05, // TODO: calibrate pulley size
                         0, // TODO: calibrate lower limit
-                        2); // TODO: calibrate upper limit
+                        2.2); // TODO: calibrate upper limit
 
                 SimulatedBareMotor elevatorMotorBack = new SimulatedBareMotor(elevatorbackLog, 600);
                 SimulatedBareEncoder elevatorEncoderBack = new SimulatedBareEncoder(elevatorbackLog, elevatorMotorBack);
@@ -236,7 +236,7 @@ public class CalgamesMech extends SubsystemBase {
                         2, // TODO: calibrate ratio
                         0.05, // TODO: calibrate pulley size
                         0, // TODO: calibrate lower limit
-                        2); // TODO: calibrate upper limit
+                        2.2); // TODO: calibrate upper limit
 
                 SimulatedBareMotor shoulderMotor = new SimulatedBareMotor(shoulderLog, 600);
                 SimulatedBareEncoder shoulderEncoder = new SimulatedBareEncoder(shoulderLog, shoulderMotor);
@@ -400,38 +400,38 @@ public class CalgamesMech extends SubsystemBase {
 
     public Done homeToL2() {
         return m_transit.endless("homeToL2",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(0.85, 0.5, 2, 2));
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 1.5),
+                HolonomicPose2d.make(0.52, 0.54, 2, 1.5));
     }
 
     public Done homeToL3() {
         return m_transit.endless("homeToL3",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(1.2, 0.5, 2, 2));
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 0.8),
+                HolonomicPose2d.make(0.92, 0.56, 1.7, 1.5));
     }
 
     public Done homeToL4() {
         return m_transit.endless("homeToL4",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(1.6, 0.5, 2, 1.57));
+                HolonomicPose2d.make(m_homeHeight, 0, 0, 0.1),
+                HolonomicPose2d.make(1.57, 0.54, 2, 1.57));
     }
 
     public Command l4ToHome() {
         return m_transit.terminal("l4ToHome",
-                HolonomicPose2d.make(1.9, 0.5, 2.5, -1),
+                HolonomicPose2d.make(1.57, 0.54, 2.5, -1),
                 HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
     }
 
     public Command l3ToHome() {
         return m_transit.terminal("l3ToHome",
-                HolonomicPose2d.make(1.2, 0.5, 2, -1),
-                HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
+                HolonomicPose2d.make(0.92, 0.56, 1.7, -1.5),
+                HolonomicPose2d.make(m_homeHeight, 0, 0,-2.3 ));
     }
 
     public Command l2ToHome() {
         return m_transit.terminal("l2ToHome",
-                HolonomicPose2d.make(0.85, 0.5, 2, -1),
-                HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
+                HolonomicPose2d.make(0.52, 0.54``, 2, -1.5),
+                HolonomicPose2d.make(m_homeHeight, 0, 0, -1.5));
     }
 
     public Command l1ToHome() {
@@ -443,13 +443,13 @@ public class CalgamesMech extends SubsystemBase {
     public Command homeToAlgaeL2() {
         return m_transit.endless("homeToAlgaeL2",
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(0.85, 0.5, 1.5, 1.5));
+                HolonomicPose2d.make(0.85, 0.7, 1.5, 1.5));
     }
 
     public Command homeToAlgaeL3() {
         return m_transit.endless("homeToAlgaeL3",
                 HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(1.2, 0.5, 1.5, 1.5));
+                HolonomicPose2d.make(1.2, 0.7, 1.5, 1.5));
     }
 
     /**
@@ -470,7 +470,13 @@ public class CalgamesMech extends SubsystemBase {
     public Done homeToBarge() {
         return m_transit.endless("homeToBarge",
                 HolonomicPose2d.make(1, 0, 0, 0),
-                HolonomicPose2d.make(2.0, 0, 1.5, 1.5));
+                HolonomicPose2d.make(1.7, -0.5, -1.5, 1.5));
+    }
+    public Done bargeToHome() {
+        return m_transit.endless("bargeToHome",
+                HolonomicPose2d.make(1.7, -0.5, -1.5, -1.5),     
+                HolonomicPose2d.make(1, 0, 0, 0));
+                
     }
 
     /** Not too far extended in any direction. */

@@ -9,8 +9,10 @@ import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
 import org.team100.lib.motion.kinematics.JointAccelerations;
 import org.team100.lib.motion.kinematics.JointVelocities;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.JointConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -27,13 +29,14 @@ public class MechTrajectories extends Command {
         List<TimingConstraint> c = List.of(
                 // NOTE! the JointConstraint is new; you might want to play with it, or remove
                 // it and use the ConstantConstraint instead.
-                // new ConstantConstraint(5, 10),
-                // new YawRateConstraint(5, 5),
-                new JointConstraint(
-                        k,
-                        j,
-                        new JointVelocities(2, 5, 5),
-                        new JointAccelerations(4, 8, 8)));
+                 new ConstantConstraint(10, 5),
+                 new YawRateConstraint(10, 5)
+                // new JointConstraint(
+                //         k,
+                //         j,
+                //         new JointVelocities(8, 10, 10),
+                //         new JointAccelerations(16, 16, 16))
+                        );
         m_planner = new TrajectoryPlanner(c);
     }
 
