@@ -2,6 +2,8 @@ package org.team100.lib.indicator;
 
 import java.util.function.Supplier;
 
+import org.team100.lib.util.RoboRioChannel;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
@@ -33,8 +35,8 @@ public class LEDIndicator {
     private final AddressableLEDBuffer m_redBuffer;
     private final Supplier<Double> m_timeSinceLastPose;
 
-    public LEDIndicator(int port, Supplier<Double> timeSinceLastPose) {
-        m_led = new AddressableLED(port);
+    public LEDIndicator(RoboRioChannel port, Supplier<Double> timeSinceLastPose) {
+        m_led = new AddressableLED(port.channel);
         m_led.setLength(LENGTH);
         m_greenBuffer = fill(Color.kGreen);
         m_redBuffer = fill(Color.kRed);

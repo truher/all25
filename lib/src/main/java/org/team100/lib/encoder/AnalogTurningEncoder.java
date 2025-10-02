@@ -7,6 +7,7 @@ import org.team100.lib.coherence.Cache;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
+import org.team100.lib.util.RoboRioChannel;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
@@ -31,12 +32,12 @@ public class AnalogTurningEncoder extends RoboRioRotaryPositionSensor {
 
     public AnalogTurningEncoder(
             LoggerFactory parent,
-            int channel,
+            RoboRioChannel channel,
             double inputOffset,
             EncoderDrive drive) {
         super(parent, inputOffset, drive);
         LoggerFactory child = parent.type(this);
-        m_input = new AnalogInput(channel);
+        m_input = new AnalogInput(channel.channel);
         m_voltage = Cache.ofDouble(m_input::getVoltage);
         m_rail = Cache.ofDouble(RobotController::getVoltage5V);
         m_log_voltage = child.doubleLogger(Level.TRACE, "voltage");

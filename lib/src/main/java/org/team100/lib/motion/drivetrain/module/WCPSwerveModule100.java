@@ -25,6 +25,8 @@ import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
+import org.team100.lib.util.CanId;
+import org.team100.lib.util.RoboRioChannel;
 
 public class WCPSwerveModule100 extends SwerveModule100 {
     private static final double STEERING_POSITION_TOLERANCE_RAD = 0.05;
@@ -72,11 +74,11 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             LoggerFactory parent,
             double supplyLimitAmps,
             double statorLimitAmps,
-            int driveMotorCanId,
+            CanId driveMotorCanId,
             DriveRatio ratio,
             Class<? extends RotaryPositionSensor> encoderClass,
-            int turningMotorCanId,
-            int turningEncoderChannel,
+            CanId turningMotorCanId,
+            RoboRioChannel turningEncoderChannel,
             double turningOffset,
             SwerveKinodynamics kinodynamics,
             EncoderDrive drive,
@@ -110,11 +112,11 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             LoggerFactory parent,
             double supplyLimitAmps,
             double statorLimitAmps,
-            int driveMotorCanId,
+            CanId driveMotorCanId,
             DriveRatio ratio,
             Class<? extends RotaryPositionSensor> encoderClass,
-            int turningMotorCanId,
-            int turningEncoderChannel,
+            CanId turningMotorCanId,
+            RoboRioChannel turningEncoderChannel,
             double turningOffset,
             SwerveKinodynamics kinodynamics,
             EncoderDrive drive,
@@ -144,7 +146,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             LoggerFactory parent,
             double supplyLimit,
             double statorLimit,
-            int driveMotorCanId,
+            CanId driveMotorCanId,
             DriveRatio ratio) {
         Feedforward100 ff = Feedforward100.makeWCPSwerveDriveKraken6();
         // note (10/2/24) 0.4 produces oscillation, on carpet.
@@ -173,7 +175,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             LoggerFactory parent,
             double supplyLimit,
             double statorLimit,
-            int driveMotorCanId,
+            CanId driveMotorCanId,
             DriveRatio ratio) {
         Feedforward100 ff = Feedforward100.makeWCPSwerveDriveFalcon6();
         PIDConstants pid = PIDConstants.makeVelocityPID(0.3);
@@ -198,8 +200,8 @@ public class WCPSwerveModule100 extends SwerveModule100 {
     private static AngularPositionServo turningServo(
             LoggerFactory parent,
             Class<? extends RotaryPositionSensor> encoderClass,
-            int turningMotorCanId,
-            int turningEncoderChannel,
+            CanId turningMotorCanId,
+            RoboRioChannel turningEncoderChannel,
             double turningOffset,
             double gearRatio,
             SwerveKinodynamics kinodynamics,
@@ -259,7 +261,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
     private static RotaryPositionSensor turningSensor(
             Class<? extends RotaryPositionSensor> encoderClass,
             LoggerFactory parent,
-            int channel,
+            RoboRioChannel channel,
             double inputOffset,
             EncoderDrive drive) {
         if (encoderClass == AnalogTurningEncoder.class) {

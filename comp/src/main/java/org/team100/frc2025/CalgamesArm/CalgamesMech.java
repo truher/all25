@@ -1,6 +1,7 @@
 package org.team100.frc2025.CalgamesArm;
 
 import static edu.wpi.first.wpilibj2.command.Commands.select;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -15,6 +16,7 @@ import org.team100.lib.encoder.CombinedRotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
 import org.team100.lib.encoder.GearedRotaryPositionSensor;
 import org.team100.lib.encoder.ProxyRotaryPositionSensor;
+import org.team100.lib.encoder.RotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
 import org.team100.lib.encoder.Talon6Encoder;
@@ -44,14 +46,39 @@ import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.util.CanId;
+import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CalgamesMech extends SubsystemBase {
     private static final boolean DEBUG = false;
+    ////////////////////////////////////////////////////////
+    ///
+    /// CANONICAL CONFIGS
+    /// These are used with profiles.
+    ///
+    private static final Config HOME = new Config(0, 0, 0);
+    private static final Config CORAL_GROUND_PICK = new Config(0, -1.83, -0.12);
+    private static final Config STATION = new Config(0, -1, 0);
+    private static final Config PROCESSOR = new Config(0, 1, 0);
+
+    ////////////////////////////////////////////////////////
+    ///
+    /// CANONICAL POSES
+    /// These are used with trajectories.
+    ///
+    private static final Pose2d L1 = new Pose2d(0.50, 0.50, rad(1.5));
+    private static final Pose2d L2 = new Pose2d(0.52, 0.54, rad(2.0));
+    private static final Pose2d L3 = new Pose2d(0.92, 0.56, rad(1.7));
+    private static final Pose2d L4 = new Pose2d(1.57, 0.54, rad(2.0));
+    private static final Pose2d ALGAE_L2 = new Pose2d(0.85, 0.7, rad(1.5));
+    private static final Pose2d ALGAE_L3 = new Pose2d(1.2, 0.7, rad(1.5));
+    private static final Pose2d BARGE = new Pose2d(1.7, -0.5, rad(-1.5));
 
     private final double m_armLengthM;
     private final double m_wristLengthM;
@@ -76,7 +103,9 @@ public class CalgamesMech extends SubsystemBase {
 
     private final RotaryMechanism m_shoulder;
     private final RotaryMechanism m_wrist;
-    double m_homeHeight = 0.843; // sum of the lengths of the arms
+
+    /** Home pose is Config(0,0,0), from forward kinematics. */
+    private final Pose2d m_home;
 
     public CalgamesMech(LoggerFactory log,
             double armLength,
@@ -88,6 +117,8 @@ public class CalgamesMech extends SubsystemBase {
         m_kinematics = new ElevatorArmWristKinematics(armLength, wristLength);
         m_jacobian = new AnalyticalJacobian(m_kinematics);
         m_dynamics = new Dynamics();
+
+        m_home = m_kinematics.forward(HOME);
 
         m_transit = new MechTrajectories(this, m_kinematics, m_jacobian);
 
@@ -108,31 +139,32 @@ public class CalgamesMech extends SubsystemBase {
         LoggerFactory wristLog = parent.name("wrist");
         switch (Identity.instance) {
             case COMP_BOT -> {
+
+                final double elevatorGearRatio = 2.182;
+                final double elevatorDrivePulleyDiameterM = 0.03844;
+                final double elevatorLowerLimit = 0;
+                final double elevatorUpperLimit = 1.9;
+
                 Kraken6Motor elevatorFrontMotor = new Kraken6Motor(
                         elevatorfrontLog,
-                        11, // TODO: elevator CAN ID (DID, now for starboard)
-                        NeutralMode.BRAKE,
-                        MotorPhase.REVERSE,
+                        new CanId(11),
+                        NeutralMode.BRAKE, MotorPhase.REVERSE,
                         100,
                         100,
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
                         elevatorfrontLog, elevatorFrontMotor);
+
                 m_elevatorFront = new LinearMechanism(
-                        elevatorfrontLog,
-                        elevatorFrontMotor,
-                        elevatorFrontEncoder,
-                        2.182, // TODO: calibrate ratio
-                        0.03844, // TODO: calibrate pulley size- done
-                        0, // TODO: calibrate lower limit
-                        1.9); // TODO: calibrate upper limit 228-45
+                        elevatorfrontLog, elevatorFrontMotor, elevatorFrontEncoder,
+                        elevatorGearRatio, elevatorDrivePulleyDiameterM,
+                        elevatorLowerLimit, elevatorUpperLimit);
 
                 Kraken6Motor elevatorBackMotor = new Kraken6Motor(
                         elevatorbackLog,
-                        12, // TODO: elevator CAN ID (DID, now for port)
-                        NeutralMode.BRAKE,
-                        MotorPhase.FORWARD,
+                        new CanId(12),
+                        NeutralMode.BRAKE, MotorPhase.FORWARD,
                         100, // orginally 60
                         100, // originally 90
                         PIDConstants.makePositionPID(5),
@@ -140,17 +172,13 @@ public class CalgamesMech extends SubsystemBase {
                 Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
                         elevatorbackLog, elevatorBackMotor);
                 m_elevatorBack = new LinearMechanism(
-                        elevatorbackLog,
-                        elevatorBackMotor,
-                        elevatorBackEncoder,
-                        2.182, // done 9/28
-                        0.03844, // done 9/28
-                        0, // just 0
-                        1.9); // done 9/28, raised to barge and subtracted og carriage top hight
+                        elevatorbackLog, elevatorBackMotor, elevatorBackEncoder,
+                        elevatorGearRatio, elevatorDrivePulleyDiameterM,
+                        elevatorLowerLimit, elevatorUpperLimit);
 
                 Kraken6Motor shoulderMotor = new Kraken6Motor(
                         shoulderLog,
-                        24, // TODO: shoulder CAN ID (Done)
+                        new CanId(24),
                         NeutralMode.BRAKE,
                         MotorPhase.REVERSE,
                         100, // og 60
@@ -158,113 +186,86 @@ public class CalgamesMech extends SubsystemBase {
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
                 Talon6Encoder shoulderEncoder = new Talon6Encoder(
-                        shoulderLog,
-                        shoulderMotor);
-                // the shoulder has a 5048 on the intermediate shaft
+                        shoulderLog, shoulderMotor);
+                // The shoulder has a 5048 on the intermediate shaft
                 AS5048RotaryPositionSensor shoulderSensor = new AS5048RotaryPositionSensor(
                         shoulderLog,
-                        4, // id done
-                        0.684, // TODO: verify offset
-                        EncoderDrive.INVERSE); // verified drive - 9/28
+                        new RoboRioChannel(4),
+                        0.684, // <<< This is the input offset (in TURNS) to adjust when zeroing
+                        EncoderDrive.INVERSE);
                 GearedRotaryPositionSensor gearedSensor = new GearedRotaryPositionSensor(
                         shoulderSensor,
-                        8); // verified gear ratio - 9/28/25
+                        8);
 
                 ProxyRotaryPositionSensor shoulderProxySensor = new ProxyRotaryPositionSensor(
-                        shoulderEncoder, // what is this - kym
-                        78); // TODO: calibrate ratio - 9/28/25
+                        shoulderEncoder,
+                        78);
                 CombinedRotaryPositionSensor shoulderCombined = new CombinedRotaryPositionSensor(
-                        shoulderLog,
-                        gearedSensor,
-                        shoulderProxySensor);
+                        shoulderLog, gearedSensor, shoulderProxySensor);
                 m_shoulder = new RotaryMechanism(
-                        shoulderLog,
-                        shoulderMotor, // need to learn what these three things do and how rotatrymech works - kym
-                        shoulderCombined,
-                        78, // TODO: calibrate ratio - 9/28
-                        -2, // TODO: calibrate lower limit (DO IT FOR REAL)
-                        2);// TODO: calibrate upper limit (DO IT FOR REAL)
+                        shoulderLog, shoulderMotor, shoulderCombined,
+                        78,
+                        -2,
+                        2);
 
                 Kraken6Motor wristMotor = new Kraken6Motor(
                         wristLog,
-                        22, // TODO: wrist CAN ID (Done)
-                        NeutralMode.COAST,
-                        MotorPhase.FORWARD,
+                        new CanId(22),
+                        NeutralMode.COAST, MotorPhase.FORWARD,
                         40, // og 60
                         60, // og 90
                         PIDConstants.makePositionPID(8), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
-                // the wrist has no angle sensor, so it needs to start in the "zero" position,
-                // or we need to add a homing
+                // the wrist has no angle sensor, so it needs to start in the "zero" position.
                 Talon6Encoder wristEncoder = new Talon6Encoder(
                         wristLog, wristMotor);
-                double gearRatio = 55.710;
+                final double wristGearRatio = 55.710;
                 ProxyRotaryPositionSensor wristProxySensor = new ProxyRotaryPositionSensor(
                         wristEncoder,
-                        gearRatio);
+                        wristGearRatio);
                 double wristEncoderOffset = 2.06818; // 2+0.06818
-                wristProxySensor.setEncoderPosition(wristEncoderOffset); // 9/27/25 measured
-
+                wristProxySensor.setEncoderPosition(wristEncoderOffset);
                 m_wrist = new RotaryMechanism(
-                        wristLog,
-                        wristMotor,
-                        wristProxySensor,
-                        gearRatio, // - 9/28
-                        -1.5, // - 9/28
-                        2.1);// -9/28, decided around starting position
+                        wristLog, wristMotor, wristProxySensor, wristGearRatio,
+                        -1.5, // min
+                        2.1); // max
 
             }
             default -> {
-                SimulatedBareMotor elevatorMotorFront = new SimulatedBareMotor(elevatorfrontLog, 600);
-                SimulatedBareEncoder elevatorEncoderFront = new SimulatedBareEncoder(elevatorfrontLog,
+                SimulatedBareMotor elevatorMotorFront = new SimulatedBareMotor(
+                        elevatorfrontLog, 600);
+                SimulatedBareEncoder elevatorEncoderFront = new SimulatedBareEncoder(
+                        elevatorfrontLog,
                         elevatorMotorFront);
                 m_elevatorFront = new LinearMechanism(
-                        elevatorfrontLog,
-                        elevatorMotorFront,
-                        elevatorEncoderFront,
-                        2, // TODO: calibrate ratio
-                        0.05, // TODO: calibrate pulley size
-                        0, // TODO: calibrate lower limit
-                        2.2); // TODO: calibrate upper limit
+                        elevatorfrontLog, elevatorMotorFront, elevatorEncoderFront,
+                        2, 0.05, 0, 2.2);
 
-                SimulatedBareMotor elevatorMotorBack = new SimulatedBareMotor(elevatorbackLog, 600);
-                SimulatedBareEncoder elevatorEncoderBack = new SimulatedBareEncoder(elevatorbackLog, elevatorMotorBack);
+                SimulatedBareMotor elevatorMotorBack = new SimulatedBareMotor(
+                        elevatorbackLog, 600);
+                SimulatedBareEncoder elevatorEncoderBack = new SimulatedBareEncoder(
+                        elevatorbackLog, elevatorMotorBack);
                 m_elevatorBack = new LinearMechanism(
-                        elevatorbackLog,
-                        elevatorMotorBack,
-                        elevatorEncoderBack,
-                        2, // TODO: calibrate ratio
-                        0.05, // TODO: calibrate pulley size
-                        0, // TODO: calibrate lower limit
-                        2.2); // TODO: calibrate upper limit
+                        elevatorbackLog, elevatorMotorBack, elevatorEncoderBack,
+                        2, 0.05, 0, 2.2);
 
-                SimulatedBareMotor shoulderMotor = new SimulatedBareMotor(shoulderLog, 600);
-                SimulatedBareEncoder shoulderEncoder = new SimulatedBareEncoder(shoulderLog, shoulderMotor);
-                SimulatedRotaryPositionSensor shoulderSensor = new SimulatedRotaryPositionSensor(
-                        shoulderLog,
-                        shoulderEncoder,
-                        100); // TODO: calibrate gear ratio
+                SimulatedBareMotor shoulderMotor = new SimulatedBareMotor(
+                        shoulderLog, 600);
+                SimulatedBareEncoder shoulderEncoder = new SimulatedBareEncoder(
+                        shoulderLog, shoulderMotor);
+                RotaryPositionSensor shoulderSensor = new SimulatedRotaryPositionSensor(
+                        shoulderLog, shoulderEncoder, 100);
                 m_shoulder = new RotaryMechanism(
-                        shoulderLog,
-                        shoulderMotor,
-                        shoulderSensor,
-                        100, // TODO: calibrate gear ratio
-                        -3, // TODO: calibrate lower limit
-                        3); // TODO: calibrate upper limit
+                        shoulderLog, shoulderMotor, shoulderSensor, 100, -3, 3);
 
-                SimulatedBareMotor wristMotor = new SimulatedBareMotor(wristLog, 600);
-                SimulatedBareEncoder wristEncoder = new SimulatedBareEncoder(wristLog, wristMotor);
-                SimulatedRotaryPositionSensor wristSensor = new SimulatedRotaryPositionSensor(
-                        wristLog,
-                        wristEncoder,
-                        58); // TODO: calibrate gear ratio
+                SimulatedBareMotor wristMotor = new SimulatedBareMotor(
+                        wristLog, 600);
+                SimulatedBareEncoder wristEncoder = new SimulatedBareEncoder(
+                        wristLog, wristMotor);
+                RotaryPositionSensor wristSensor = new SimulatedRotaryPositionSensor(
+                        wristLog, wristEncoder, 58);
                 m_wrist = new RotaryMechanism(
-                        wristLog,
-                        wristMotor,
-                        wristSensor,
-                        58, // TODO: calibrate gear ratio
-                        -3, // TODO: calibrate lower limit
-                        3);
+                        wristLog, wristMotor, wristSensor, 58, -3, 3);
             }
         }
     }
@@ -321,7 +322,7 @@ public class CalgamesMech extends SubsystemBase {
         set(c, jv, ja, jf);
     }
 
-    /** This is not "hold position" this is "torque off" */
+    /** This is not "hold position" this is "torque off". */
     public void stop() {
         m_elevatorFront.stop();
         m_elevatorBack.stop();
@@ -331,7 +332,7 @@ public class CalgamesMech extends SubsystemBase {
 
     /////////////////////////////////////////////////////////
     ///
-    /// COMMANDS
+    /// PROFILE COMMANDS
     ///
 
     /**
@@ -339,21 +340,39 @@ public class CalgamesMech extends SubsystemBase {
      * position (origin) at rest, and end when done.
      */
     public Command profileHomeTerminal() {
-        // FollowJointProfiles f =
-        // FollowJointProfiles.WithCurrentLimitedExponentialProfile(
-        // this, new Config(0, 0, 0));
         FollowJointProfiles f = FollowJointProfiles.slowFast(
-                this, new Config(0, 0, 0));
+                this, HOME);
         return f.until(f::isDone)
                 .withName("profileHomeTerminal");
     }
 
+    /**
+     * Use a profile to move from the current position and velocity to the "home"
+     * position (origin) at rest, and hold there forever.
+     */
     public Command profileHomeEndless() {
-        // return FollowJointProfiles.WithCurrentLimitedExponentialProfile(
-        // this, new Config(0, 0, 0));
         return FollowJointProfiles.slowFast(
-                this, new Config(0, 0, 0))
+                this, HOME)
                 .withName("profileHomeEndless");
+    }
+
+    /**
+     * Use a profile to move from the current position and velocity to the "home"
+     * position at rest, and then turn off the elevator motors so they stop trying
+     * to push against gravity (making that squealing noise).
+     */
+    public Command profileHomeAndThenRest() {
+        Done f = FollowJointProfiles.slowFast(this, HOME);
+        return sequence(
+                f.until(f::isDone),
+                restAtHome() //
+        ).withName("profileHomeAndThenRest");
+
+    }
+
+    /** Turn off the elevator motor. */
+    public Command restAtHome() {
+        return run(this::rest);
     }
 
     /**
@@ -361,10 +380,8 @@ public class CalgamesMech extends SubsystemBase {
      * rest, and stay there forever.
      */
     public Command pickWithProfile() {
-        // return FollowJointProfiles.WithCurrentLimitedExponentialProfile(
-        // this, new Config(0, -1.83, -0.12));
         return FollowJointProfiles.fastSlow(
-                this, new Config(0, -1.83, -0.12))
+                this, CORAL_GROUND_PICK)
                 .withName("pickWithProfile");
     }
 
@@ -373,10 +390,8 @@ public class CalgamesMech extends SubsystemBase {
      * station-pick location at rest, and stay there forever.
      */
     public Command stationWithProfile() {
-        // return FollowJointProfiles.WithCurrentLimitedExponentialProfile(
-        // this, new Config(0, -1, 0));
         return FollowJointProfiles.fastSlow(
-                this, new Config(0, -1, 0))
+                this, STATION)
                 .withName("stationWithProfile");
     }
 
@@ -385,71 +400,74 @@ public class CalgamesMech extends SubsystemBase {
      * processor location at rest, and stay there forever.
      */
     public Command processorWithProfile() {
-        // return FollowJointProfiles.WithCurrentLimitedExponentialProfile(
-        // this, new Config(0, 1, 0));
         return FollowJointProfiles.fastSlow(
-                this, new Config(0, 1, 0))
+                this, PROCESSOR)
                 .withName("processorWithProfile");
     }
 
+    //////////////////////////////////////////////////////////////////
+    ///
+    /// TRAJECTORY COMMANDS
+    ///
+
     public Done homeToL1() {
         return m_transit.endless("homeToL1",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(0.5, 0.5, 1.5, 1.7));
-    }
-
-    public Done homeToL2() {
-        return m_transit.endless("homeToL2",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 1.5),
-                HolonomicPose2d.make(0.52, 0.54, 2, 1.5));
-    }
-
-    public Done homeToL3() {
-        return m_transit.endless("homeToL3",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 0.8),
-                HolonomicPose2d.make(0.92, 0.56, 1.7, 1.5));
-    }
-
-    public Done homeToL4() {
-        return m_transit.endless("homeToL4",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 0.1),
-                HolonomicPose2d.make(1.57, 0.54, 2, 1.57));
-    }
-
-    public Command l4ToHome() {
-        return m_transit.terminal("l4ToHome",
-                HolonomicPose2d.make(1.57, 0.54, 2.5, -1),
-                HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
-    }
-
-    public Command l3ToHome() {
-        return m_transit.terminal("l3ToHome",
-                HolonomicPose2d.make(0.92, 0.56, 1.7, -1.5),
-                HolonomicPose2d.make(m_homeHeight, 0, 0,-2.3 ));
-    }
-
-    public Command l2ToHome() {
-        return m_transit.terminal("l2ToHome",
-                HolonomicPose2d.make(0.52, 0.54``, 2, -1.5),
-                HolonomicPose2d.make(m_homeHeight, 0, 0, -1.5));
+                HolonomicPose2d.make(m_home, 1.5),
+                HolonomicPose2d.make(L1, 1.7));
     }
 
     public Command l1ToHome() {
         return m_transit.terminal("l1ToHome",
-                HolonomicPose2d.make(0.5, 0.5, 1.5, -1.0),
-                HolonomicPose2d.make(m_homeHeight, 0, 0, Math.PI));
+                HolonomicPose2d.make(L1, -1.0),
+                HolonomicPose2d.make(m_home, -1.5));
+    }
+
+    public Done homeToL2() {
+        return m_transit.endless("homeToL2",
+                HolonomicPose2d.make(m_home, 1.5),
+                HolonomicPose2d.make(L2, 1.5));
+    }
+
+    public Command l2ToHome() {
+        return m_transit.terminal("l2ToHome",
+                HolonomicPose2d.make(L2, -1.5),
+                HolonomicPose2d.make(m_home, -1.5));
+    }
+
+    public Done homeToL3() {
+        return m_transit.endless("homeToL3",
+                HolonomicPose2d.make(m_home, 0.8),
+                HolonomicPose2d.make(L3, 1.5));
+    }
+
+    public Command l3ToHome() {
+        return m_transit.terminal("l3ToHome",
+                HolonomicPose2d.make(L3, -1.5),
+                HolonomicPose2d.make(m_home, -2.3));
+    }
+
+    public Done homeToL4() {
+        return m_transit.endless("homeToL4",
+                HolonomicPose2d.make(m_home, 0.1),
+                HolonomicPose2d.make(L4, 1.5));
+    }
+
+    public Command l4ToHome() {
+        return m_transit.terminal("l4ToHome",
+                HolonomicPose2d.make(L4, -1.5),
+                HolonomicPose2d.make(m_home, -3));
     }
 
     public Command homeToAlgaeL2() {
         return m_transit.endless("homeToAlgaeL2",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(0.85, 0.7, 1.5, 1.5));
+                HolonomicPose2d.make(m_home, 1.5),
+                HolonomicPose2d.make(ALGAE_L2, 1.5));
     }
 
     public Command homeToAlgaeL3() {
         return m_transit.endless("homeToAlgaeL3",
-                HolonomicPose2d.make(m_homeHeight, 0, 0, 0),
-                HolonomicPose2d.make(1.2, 0.7, 1.5, 1.5));
+                HolonomicPose2d.make(m_home, 0),
+                HolonomicPose2d.make(ALGAE_L3, 1.5));
     }
 
     /**
@@ -469,14 +487,15 @@ public class CalgamesMech extends SubsystemBase {
      */
     public Done homeToBarge() {
         return m_transit.endless("homeToBarge",
-                HolonomicPose2d.make(1, 0, 0, 0),
-                HolonomicPose2d.make(1.7, -0.5, -1.5, 1.5));
+                HolonomicPose2d.make(m_home, 0),
+                HolonomicPose2d.make(BARGE, 1.5));
     }
+
     public Done bargeToHome() {
         return m_transit.endless("bargeToHome",
-                HolonomicPose2d.make(1.7, -0.5, -1.5, -1.5),     
-                HolonomicPose2d.make(1, 0, 0, 0));
-                
+                HolonomicPose2d.make(BARGE, -1.5),
+                HolonomicPose2d.make(m_home, 0));
+
     }
 
     /** Not too far extended in any direction. */
@@ -506,6 +525,14 @@ public class CalgamesMech extends SubsystemBase {
 
     /////////////////////////////////////////////////////////////
 
+    /** Elevator torque off, shoulder and wrist hold position at zero. */
+    private void rest() {
+        m_elevatorFront.stop();
+        m_elevatorBack.stop();
+        m_shoulder.setPosition(0, 0, 0, 0);
+        m_wrist.setPosition(0, 0, 0, 0);
+    }
+
     private void set(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
         logConfig(c, jv, ja, jf);
         m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
@@ -527,20 +554,8 @@ public class CalgamesMech extends SubsystemBase {
         m_log_cartesianA.log(() -> a);
     }
 
-    /*
-     * notes:
-     * calgamesarm class should be dumb, basically just figuring out how much to
-     * move things and moving them
-     * 
-     * should make a seperate class for the needed trajecotries and figuring them
-     * out
-     * as part of that, we should make a thing to graph the changes in wrist,
-     * shoulder, elevator position (derive the trajectory)
-     * and make sure there are no discontiuites, those mean singulairty (i think)
-     * 
-     * will make a seperate class that translates the points along the trajectory
-     * into simple poses accepatable by the dumb class
-     * 
-     */
-
+    /** to make the constants above easier to read */
+    private static Rotation2d rad(double r) {
+        return Rotation2d.fromRadians(r);
+    };
 }

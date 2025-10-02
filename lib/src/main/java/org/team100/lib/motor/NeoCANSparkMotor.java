@@ -3,6 +3,7 @@ package org.team100.lib.motor;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.util.CanId;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -19,13 +20,13 @@ public class NeoCANSparkMotor extends CANSparkMotor {
      */
     public NeoCANSparkMotor(
             LoggerFactory parent,
-            int canId,
+            CanId canId,
             NeutralMode neutral,
             MotorPhase motorPhase,
             int currentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
-        super(parent, new SparkMax(canId, MotorType.kBrushless),
+        super(parent, new SparkMax(canId.id, MotorType.kBrushless),
                 neutral, motorPhase, currentLimit, ff, pid);
     }
 

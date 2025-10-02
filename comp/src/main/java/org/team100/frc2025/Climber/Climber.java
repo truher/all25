@@ -23,6 +23,8 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
+import org.team100.lib.util.CanId;
+import org.team100.lib.util.RoboRioChannel;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,7 +33,7 @@ public class Climber extends SubsystemBase {
 
     private final AngularPositionServo m_servo;
 
-    public Climber(LoggerFactory parent, int canID) {
+    public Climber(LoggerFactory parent, CanId canID) {
         LoggerFactory log = parent.name("Climber");
 
         IncrementalProfile profile100 = new TrapezoidIncrementalProfile(1, 2, 0.05);
@@ -39,21 +41,21 @@ public class Climber extends SubsystemBase {
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
 
         switch (Identity.instance) {
-            case COMP_BOT -> { //TODO: MAKE SURE TO CHANGE THIS BACK TO BRAKE MODE FOR NEUTRAL REALLY IMPORTANT!
-                Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.COAST, MotorPhase.REVERSE, 
-                5, 5, //og 50, TODO: FIX THIS
-                        PIDConstants.makePositionPID(1), 
+            case COMP_BOT -> { // TODO: MAKE SURE TO CHANGE THIS BACK TO BRAKE MODE FOR NEUTRAL REALLY
+                               // IMPORTANT!
+                Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.COAST, MotorPhase.REVERSE,
+                        5, 5, // og 50, TODO: FIX THIS
+                        PIDConstants.makePositionPID(1),
                         Feedforward100.makeArmPivot());
 
-                int channel = 5;
-                double inputOffset = 0.110602+(0.32); //9/28
+                double inputOffset = 0.110602 + (0.32); // 9/28
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
-                        log, channel, inputOffset, EncoderDrive.DIRECT);
+                        log, new RoboRioChannel(5), inputOffset, EncoderDrive.DIRECT);
                 double gearRatio = 5 * 5 * 4 * 20; // - 9/28
 
                 RotaryMechanism rotaryMechanism = new RotaryMechanism(
                         log, motor, sensor, gearRatio,
-                        0, Math.PI/2);
+                        0, Math.PI / 2);
 
                 m_servo = new OnboardAngularPositionServo(log, rotaryMechanism, ref, feedback);
             }
@@ -94,7 +96,7 @@ public class Climber extends SubsystemBase {
     }
 
     public Command manual(DoubleSupplier s) {
-        
+
         return runEnd(
                 () -> setDutyCycle(s.getAsDouble()),
                 () -> setDutyCycle(0));

@@ -74,6 +74,8 @@ import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
+import org.team100.lib.util.CanId;
+import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.Util;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -145,11 +147,11 @@ public class RobotContainer {
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         if (Identity.instance.equals(Identity.COMP_BOT)) {
-            m_climber = new Climber(logger, 13); // should be correct
-            m_climberIntake = new ClimberIntake(logger, 14); // should be correct
+            m_climber = new Climber(logger, new CanId(13));
+            m_climberIntake = new ClimberIntake(logger, new CanId(14));
         } else {
-            m_climber = new Climber(logger, 18);
-            m_climberIntake = new ClimberIntake(logger, 0);
+            m_climber = new Climber(logger, new CanId(18));
+            m_climberIntake = new ClimberIntake(logger, new CanId(0));
         }
 
         m_manipulator = new Manipulator(logger);
@@ -211,7 +213,7 @@ public class RobotContainer {
                 swerveLocal,
                 limiter);
 
-        m_leds = new LEDIndicator(0, localizer::getPoseAgeSec);
+        m_leds = new LEDIndicator(new RoboRioChannel(0), localizer::getPoseAgeSec);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -267,7 +269,7 @@ public class RobotContainer {
                 m_drive,
                 new ManualWithProfiledReefLock(
                         comLog, m_swerveKinodynamics, driverControl::useReefLock,
-                        thetaFeedback, m_drive, ()->false),
+                        thetaFeedback, m_drive),
                 new ManualWithBargeAssist(
                         comLog, m_swerveKinodynamics, driverControl::desiredRotation,
                         thetaFeedback, m_drive),
@@ -280,8 +282,12 @@ public class RobotContainer {
         m_drive.setDefaultCommand(driveDefault);
 
         // mech.setDefaultCommand(new HoldPosition(mech));
-        // NOTE: this default command *MOVES IMMEDIATELY WHEN ENABLED*. WATCH OUT!
-        mech.setDefaultCommand(mech.profileHomeEndless());
+        //
+        // WARNING!
+        // This default command *MOVES IMMEDIATELY WHEN ENABLED*!
+        // WATCH OUT!
+        //
+        mech.setDefaultCommand(mech.profileHomeAndThenRest());
 
         m_climber.setDefaultCommand(
                 m_climber.stop().withName("climber default"));
@@ -323,7 +329,7 @@ public class RobotContainer {
          * At the same time, move the arm to the floor and spin the intake,
          * and go back home when the button is released, ending when complete.
          */
-        whileTrue(driverControl::floorPick, //driver x
+        whileTrue(driverControl::floorPick, // driver x
                 parallel(
                         mech.pickWithProfile(),
                         m_manipulator.centerIntake()))

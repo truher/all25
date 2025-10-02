@@ -10,6 +10,7 @@ import org.team100.lib.motor.LazySimulatedBareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.util.CanId;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,15 +19,15 @@ public class ClimberIntake extends SubsystemBase {
 
     private final BareMotor m_motor;
 
-    public ClimberIntake(LoggerFactory parent, int canID) {
+    public ClimberIntake(LoggerFactory parent, CanId canID) {
         LoggerFactory log = parent.type(this);
 
         switch (Identity.instance) {
             case COMP_BOT -> {
                 m_motor = new Kraken6Motor(
-                        log, canID, NeutralMode.COAST, MotorPhase.REVERSE, 
-                        20, //og 50
-                        20, //og 2
+                        log, canID, NeutralMode.COAST, MotorPhase.REVERSE,
+                        20, // og 50
+                        20, // og 2
                         new PIDConstants(),
                         Feedforward100.makeKrakenClimberIntake());
             }

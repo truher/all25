@@ -3,6 +3,7 @@ package org.team100.lib.motor;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
+import org.team100.lib.util.CanId;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -18,11 +19,11 @@ public class TalonSRXMotor implements BareMotor {
 
     public TalonSRXMotor(
             LoggerFactory parent,
-            int canID,
+            CanId canID,
             MotorPhase phase,
             NeutralMode neutral,
             double supplyLimit) {
-        m_motor = new TalonSRX(canID);
+        m_motor = new TalonSRX(canID.id);
         switch (neutral) {
             case COAST -> m_motor.setNeutralMode(
                     com.ctre.phoenix.motorcontrol.NeutralMode.Coast);
