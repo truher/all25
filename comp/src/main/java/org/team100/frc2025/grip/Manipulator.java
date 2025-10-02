@@ -56,7 +56,7 @@ public class Manipulator extends SubsystemBase {
                         120, // og 120
                         120, // og 120
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
-                algaeMotor.setTorqueLimit(5);
+                algaeMotor.setTorqueLimit(4);
                 m_algaeMotor = algaeMotor;
                 m_rightLaser = new LaserCan100(new CanId(17));
                 m_frontLaser = new LaserCan100(new CanId(16));

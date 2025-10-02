@@ -23,8 +23,7 @@ public class GrabAndHoldAlgae {
                 pick,
                 sequence(
                         grip.algaeIntake()
-                                .until(grip::hasAlgae),
-                        grip.algaeHold()))
-                .withName("grab and hold algae");
+                                .until(grip::hasAlgae))
+                .withName("grab and hold algae").handleInterrupt(grip::ejectAlgae));
     }
 }

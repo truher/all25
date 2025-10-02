@@ -39,4 +39,13 @@ public class ClimberCommands {
                 .withName("climb while driving");
 
     }
+
+    /**
+     * Pull the climber in while driving slowly forward.
+     */
+    public static Command climbAuto(Climber climber, ClimberIntake intake, SwerveDriveSubsystem drive) {
+        return sequence(
+            intake(climber, intake), climb(climber, drive));
+
+    }
 }
