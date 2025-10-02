@@ -54,6 +54,7 @@ public class Manipulator extends SubsystemBase {
                 120, //og 120
                 120, //og 120
                         new PIDConstants(), Feedforward100.makeShooterFalcon6());
+                algaeMotor.setTorqueLimit(5);
                 m_algaeMotor = algaeMotor;
                 m_rightLaser = new LaserCan(17); //can id done
                 m_frontLaser = new LaserCan(16); //can id done
@@ -116,8 +117,8 @@ public class Manipulator extends SubsystemBase {
 
     public void ejectCenter() {
         m_algaeMech.setDutyCycle(1);
-        m_leftMech.setDutyCycle(-1);
-        m_rightMech.setDutyCycle(-1);
+        m_leftMech.setDutyCycle(-0.75);
+        m_rightMech.setDutyCycle(-0.75);
     }
 
     public void intakeSideways() {
@@ -190,7 +191,7 @@ public class Manipulator extends SubsystemBase {
      * so 1.62 Nm.
      */
     private void highAlgaeTorque() {
-        m_algaeMotor.setTorqueLimit(1.65);
+        //m_algaeMotor.setTorqueLimit(1.65);
     }
 
     /**
@@ -199,7 +200,7 @@ public class Manipulator extends SubsystemBase {
      * so 0.63 Nm.
      */
     private void lowAlgaeTorque() {
-        m_algaeMotor.setTorqueLimit(0.65);
+        //m_algaeMotor.setTorqueLimit(0.65);
     }
 
     private void intakeAlgae() {

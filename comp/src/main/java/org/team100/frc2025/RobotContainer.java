@@ -267,7 +267,7 @@ public class RobotContainer {
                 m_drive,
                 new ManualWithProfiledReefLock(
                         comLog, m_swerveKinodynamics, driverControl::useReefLock,
-                        thetaFeedback, m_drive, buttons::red1),
+                        thetaFeedback, m_drive, ()->false),
                 new ManualWithBargeAssist(
                         comLog, m_swerveKinodynamics, driverControl::desiredRotation,
                         thetaFeedback, m_drive),
@@ -380,7 +380,7 @@ public class RobotContainer {
         whileTrue(buttons::red2, print("red2"));
         whileTrue(buttons::red3, print("red3"));
         whileTrue(buttons::red4, print("red4"));
-        whileTrue(buttons::barge, print("barge"));
+        whileTrue(buttons::barge, mech.homeToBarge()).onFalse(mech.bargeToHome());
 
         whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
         whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
