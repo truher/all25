@@ -84,6 +84,11 @@ public class ProfileReference implements SwerveReference {
         return m_done;
     }
 
+    @Override
+    public SwerveModel goal() {
+        return m_goal;
+    }
+
     /**
      * Stop updating the references. There's no way to restart the updates, so you
      * should discard this object once you call end().

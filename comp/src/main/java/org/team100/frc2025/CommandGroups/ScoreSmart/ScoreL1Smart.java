@@ -7,7 +7,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import java.util.function.Supplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
-import org.team100.frc2025.CalgamesArm.FollowTrajectory;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.Done;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
@@ -31,14 +30,16 @@ public class ScoreL1Smart {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile, goal);
         Done toL1 = mech.homeToL1();
-                Command eject = manipulator.centerEject().withTimeout(0.5);
+        Command eject = manipulator.centerEject().withTimeout(0.5);
         return sequence(
                 parallel(
                         toReef,
-                        toL1,
+                        waitUntil(() -> toReef.toGo() < 1)
+                                .andThen(toL1),
                         waitUntil(() -> (toReef.isDone() && toL1.isDone()))
-                                .andThen(eject))
-                        .until(() -> (toReef.isDone() && toL1.isDone() && eject.isFinished())),
-                mech.l1ToHome());
+                                .andThen(eject)//
+                ).until(() -> (toReef.isDone() && toL1.isDone() && eject.isFinished())),
+                mech.l1ToHome()//
+        );
     }
 }

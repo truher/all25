@@ -44,10 +44,16 @@ public class CalgamesReferenceController {
      * Since positional feedback is outboard, the "at reference" thing is unknown.
      * 
      * TODO: make it known.
-     * 
      */
     public boolean isDone() {
         return m_reference.done();// && m_controller.atReference();
+    }
+
+    /** Distance between the measurement and the goal. */
+    public double toGo() {
+        SwerveModel goal = m_reference.goal();
+        SwerveModel measurement = m_subsystem.getState();
+        return goal.minus(measurement).translation().getNorm();
     }
 
 }

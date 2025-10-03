@@ -24,5 +24,14 @@ public interface SwerveReference {
      */
     SwerveControl next();
 
+    /**
+     * The reference series has reached the end, and will keep returning the same
+     * (goal) reference.
+     */
     boolean done();
+
+    /**
+     * For reference sources that have endpoints, what is the endpoint?
+     */
+    SwerveModel goal();
 }

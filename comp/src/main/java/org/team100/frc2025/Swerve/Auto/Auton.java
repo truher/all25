@@ -1,6 +1,7 @@
 package org.team100.frc2025.Swerve.Auto;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.print;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
@@ -40,9 +41,28 @@ public record Auton(LoggerFactory logger, CalgamesMech mech,
         DoubleConsumer heedRadiusM, SwerveKinodynamics kinodynamics,
         TrajectoryVisualization viz) {
 
+    static final boolean AUTON_FIXED = false;
+
     /** While driving to scoring tag, pay attention only to very close tags. */
     private static final double HEED_RADIUS_M = 3;
+
+    public Command leftPreloadOnly() {
+        return sequence(
+                embarkAndPreplace(L4, I),
+                manipulator.centerEject().withTimeout(0.5),
+                mech.l4ToHome());
+    }
+
+    public Command rightPreloadOnly() {
+        return sequence(
+                embarkAndPreplace(L4, F),
+                manipulator.centerEject().withTimeout(0.5),
+                mech.l4ToHome());
+    }
+
     public Command left() {
+        if (!AUTON_FIXED)
+            return print("LEFT AUTON: do not use until it is adjusted for the new pick location\n");
         return sequence(
                 embarkAndPreplace(L4, I),
                 scoreAndReload(CoralStation.LEFT),
@@ -54,6 +74,8 @@ public record Auton(LoggerFactory logger, CalgamesMech mech,
     }
 
     public Command right() {
+        if (!AUTON_FIXED)
+            return print("RIGHT AUTON: do not use until it is adjusted for the new pick location\n");
         return sequence(
                 embarkAndPreplace(L4, F),
                 scoreAndReload(CoralStation.RIGHT),
@@ -65,21 +87,21 @@ public record Auton(LoggerFactory logger, CalgamesMech mech,
     }
 
     /** Drive to the reef and go up. */
-    public Command embarkAndPreplace(ScoringLevel position, ReefPoint point) {
+    private Command embarkAndPreplace(ScoringLevel position, ReefPoint point) {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
                 () -> FieldConstants.makeGoal(position, point));
-        Done prePlace = mech.homeToL4();
+        Done toL4 = mech.homeToL4();
         return parallel(
                 runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
                 toReef,
-                prePlace //
-        ).until(() -> (toReef.isDone() && prePlace.isDone()));
+                waitUntil(() -> toReef.toGo() < 1)
+                        .andThen(toL4) //
+        ).until(() -> (toReef.isDone() && toL4.isDone()));
     }
 
     /** Score, drive to the station, and pause briefly. */
-    public Command scoreAndReload(CoralStation station) {
-
+    private Command scoreAndReload(CoralStation station) {
         GoToCoralStation toStation = new GoToCoralStation(kinodynamics, station, 0.5);
         DriveWithTrajectoryFunction navigator = new DriveWithTrajectoryFunction(drive, controller, viz, toStation);
         return sequence(
