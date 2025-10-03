@@ -127,35 +127,35 @@ public class FieldConstants {
                 default -> throw new IllegalArgumentException("invalid point");
             };
             case L2 -> switch (letter) {
-                case A, B, C, D, E, F, G, H, I, J, K, L -> 1.295;
+                case A, B, C, D, E, F, G, H, I, J, K, L -> 1.4;
                 case AB, CD, EF, GH, IJ, KL -> 1.2;
                 case NONE -> 3.0;
                 default -> throw new IllegalArgumentException("invalid point");
             };
             case L3 -> switch (letter) {
-                case A -> 1.34;
+                case A -> 1.4;
                 case AB -> 1.2;
-                case B -> 1.34;
+                case B -> 1.4;
 
-                case C -> 1.34;
+                case C -> 1.4;
                 case CD -> 1.2;
-                case D -> 1.34;
+                case D -> 1.4;
 
-                case E -> 1.34;
+                case E -> 1.4;
                 case EF -> 1.2;
-                case F -> 1.34;
+                case F -> 1.4;
 
-                case G -> 1.34;
+                case G -> 1.4;
                 case GH -> 1.2;
-                case H -> 1.34;
+                case H -> 1.4;
 
-                case I -> 1.34;
+                case I -> 1.4;
                 case IJ -> 1.2;
-                case J -> 1.34;
+                case J -> 1.4;
 
-                case K -> 1.34;
+                case K -> 1.4;
                 case KL -> 1.2;
-                case L -> 1.34;
+                case L -> 1.4;
                 case NONE -> 3.0;
                 default -> throw new IllegalArgumentException("invalid point");
             };

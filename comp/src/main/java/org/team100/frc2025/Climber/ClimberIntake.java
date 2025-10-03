@@ -18,10 +18,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ClimberIntake extends SubsystemBase {
 
     private final BareMotor m_motor;
+    private double desiredSpeed = 0;
+    private int timer;
+    private boolean climbReady;
 
     public ClimberIntake(LoggerFactory parent, CanId canID) {
         LoggerFactory log = parent.type(this);
-
+        climbReady = false;
+        timer = 0;
         switch (Identity.instance) {
             case COMP_BOT -> {
                 m_motor = new Kraken6Motor(
@@ -44,7 +48,15 @@ public class ClimberIntake extends SubsystemBase {
     }
 
     public boolean isSlow() {
+        timer++;
+        if (desiredSpeed == 1 && m_motor.getVelocityRad_S() < 1 && timer > 50) {
+            climbReady = true;
+        }
         return m_motor.getVelocityRad_S() < 1;
+    }
+
+    public boolean isClimbReady() {
+        return climbReady;
     }
 
     // COMMANDS
@@ -60,10 +72,12 @@ public class ClimberIntake extends SubsystemBase {
     ////////////////
 
     private void stopMotor() {
+        desiredSpeed = 0;
         m_motor.setDutyCycle(0);
     }
 
     private void fullSpeed() {
+        desiredSpeed = 1;
         m_motor.setDutyCycle(1);
     }
 

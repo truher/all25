@@ -43,8 +43,8 @@ public class Climber extends SubsystemBase {
         switch (Identity.instance) {
             case COMP_BOT -> { // TODO: MAKE SURE TO CHANGE THIS BACK TO BRAKE MODE FOR NEUTRAL REALLY
                                // IMPORTANT!
-                Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.COAST, MotorPhase.REVERSE,
-                        5, 5, // og 50, TODO: FIX THIS
+                Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.BRAKE, MotorPhase.REVERSE,
+                        20, 20, // og 50, TODO: FIX THIS
                         PIDConstants.makePositionPID(1),
                         Feedforward100.makeArmPivot());
 

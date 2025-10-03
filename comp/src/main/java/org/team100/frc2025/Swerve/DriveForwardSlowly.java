@@ -15,6 +15,6 @@ public class DriveForwardSlowly extends Command {
 
     @Override
     public void execute() {
-        m_drive.setChassisSpeeds(new ChassisSpeeds(-0.1, 0, 0));
+        m_drive.setChassisSpeeds(new ChassisSpeeds(0, 0.1, 0));
     }
 }
