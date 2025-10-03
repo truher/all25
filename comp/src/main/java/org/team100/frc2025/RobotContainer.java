@@ -335,6 +335,11 @@ public class RobotContainer {
                         m_manipulator.centerIntake()))
                 .onFalse(mech.profileHomeTerminal());
 
+        
+        new FloorPickSetup(
+                fieldLog, driverControl, m_drive, m_targets,
+                SwerveControllerFactory.pick(driveLog), autoProfile);
+
         whileTrue(driverControl::stationPick,
                 parallel(
                         mech.stationWithProfile(),
@@ -363,10 +368,10 @@ public class RobotContainer {
         //
 
         // Manual movement of arm, for testing.
-        whileTrue(buttons::l1, mech.homeToL1()).onFalse(mech.l1ToHome());
-        whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
-        whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
-        whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
+        // whileTrue(buttons::l1, mech.homeToL1()).onFalse(mech.l1ToHome());
+        // whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
+        // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
+        // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
         whileTrue(driverControl::test, mech.homeToL4()).onFalse(mech.l4ToHome());
 
         // Driver controls "go to reef" mode, buttons supply level and point.
@@ -387,19 +392,14 @@ public class RobotContainer {
         whileTrue(buttons::red4, print("red4"));
         whileTrue(buttons::barge, mech.homeToBarge()).onFalse(mech.bargeToHome());
 
-        whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
-        whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
+        // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
+        // whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
         // whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
 
         // "fly" the joints manually
         whileTrue(operatorControl::manual, // to go to manual, left bumper operator
                 new ManualCartesian(operatorControl::velocity, mech));
         // new ManualConfig(operatorControl::velocity, mech));
-
-        // this is for developing autopick.
-        new FloorPickSetup(
-                fieldLog, driverControl, m_drive, m_targets,
-                SwerveControllerFactory.pick(driveLog), autoProfile);
 
         m_initializer = Executors.newSingleThreadScheduledExecutor();
         m_initializer.schedule(this::initStuff, 0, TimeUnit.SECONDS);

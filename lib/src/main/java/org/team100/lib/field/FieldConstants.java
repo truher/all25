@@ -94,7 +94,7 @@ public class FieldConstants {
         Rotation2d newRotation = sectorAngle.rotateBy(Rotation2d.kCCW_90deg);
 
         // end-effector is not in the center of robot y, it's offset a little.
-        double endEffectorOffset = 0.1;
+        double endEffectorOffset = 0.193;
         // Half the distance between the poles, i.e. offset from the center, in meters.
         double reefOffset = 0.1645; // 0.1524
         Translation2d offsetLeft = new Translation2d(endEffectorOffset - reefOffset, newRotation);
