@@ -213,7 +213,13 @@ public class RobotContainer {
                 swerveLocal,
                 limiter);
 
-        m_leds = new LEDIndicator(new RoboRioChannel(0), localizer::getPoseAgeSec, m_manipulator::hasCoral, m_manipulator::hasAlgae, () -> (driverControl.floorPick() || driverControl.stationPick()) , buttons::algae, m_climberIntake::isClimbReady);
+        m_leds = new LEDIndicator(
+                new RoboRioChannel(0),
+                localizer::getPoseAgeSec,
+                m_manipulator::hasCoral,
+                m_manipulator::hasAlgae,
+                () -> (driverControl.floorPick() || driverControl.stationPick()),
+                buttons::algae);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -335,7 +341,6 @@ public class RobotContainer {
                         m_manipulator.centerIntake()))
                 .onFalse(mech.profileHomeTerminal());
 
-        
         new FloorPickSetup(
                 fieldLog, driverControl, m_drive, m_targets,
                 SwerveControllerFactory.pick(driveLog), autoProfile);
@@ -356,10 +361,11 @@ public class RobotContainer {
 
         // Step 2, driver: Pull climber in and drive forward.
         onTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
-                ClimberCommands.climb(m_climber, m_drive,mech));
+                ClimberCommands.climb(m_climber, m_drive, mech));
 
         // Between matches, operator: Reset the climber position.
-        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op right bumper button
+        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op right bumper
+                                                        // button
                 m_climber.manual(operatorControl::manualClimbSpeed));
 
         ////////////////////////////////////////////////////////////
@@ -464,14 +470,12 @@ public class RobotContainer {
         m_auton.schedule();
     }
 
-    public void disabledPeriodic() 
-    {
-        m_leds.disabledPeriodic();   
+    public void disabledPeriodic() {
+        m_leds.disabledPeriodic();
     }
 
-    public void enabledPeriodic() 
-    {
-        m_leds.enabledPeriodic();   
+    public void enabledPeriodic() {
+        m_leds.enabledPeriodic();
     }
 
     public void periodic() {
