@@ -22,6 +22,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 /**
@@ -51,7 +52,7 @@ public abstract class Talon6Motor implements BareMotor {
     protected final DoubleCache m_supply;
     protected final DoubleCache m_supplyVoltage;
     protected final DoubleCache m_stator;
-    // protected final DoubleCache m_temp;
+    protected final DoubleCache m_temp;
     // protected final DoubleCache m_torque;
 
     // caching the control requests saves allocation
@@ -80,7 +81,7 @@ public abstract class Talon6Motor implements BareMotor {
     private final DoubleLogger m_log_supplyVoltage;
     private final DoubleLogger m_log_stator;
     // private final DoubleLogger m_log_torque;
-    // private final DoubleLogger m_log_temp;
+    private final DoubleLogger m_log_temp;
 
     protected Talon6Motor(
             LoggerFactory parent,
@@ -128,7 +129,7 @@ public abstract class Talon6Motor implements BareMotor {
         final StatusSignal<Current> motorSupplyCurrent = m_motor.getSupplyCurrent();
         final StatusSignal<Voltage> motorSupplyVoltage = m_motor.getSupplyVoltage();
         final StatusSignal<Current> motorStatorCurrent = m_motor.getStatorCurrent();
-        // final StatusSignal<Temperature> motorDeviceTemp = m_motor.getDeviceTemp();
+        final StatusSignal<Temperature> motorDeviceTemp = m_motor.getDeviceTemp();
         // final StatusSignal<Current> motorTorqueCurrent = m_motor.getTorqueCurrent();
 
         // The memoizer refreshes all the signals at once.
@@ -140,7 +141,7 @@ public abstract class Talon6Motor implements BareMotor {
         Cache.registerSignal(motorSupplyCurrent);
         Cache.registerSignal(motorSupplyVoltage);
         Cache.registerSignal(motorStatorCurrent);
-        // Memo.registerSignal(motorDeviceTemp);
+        Cache.registerSignal(motorDeviceTemp);
         // Memo.registerSignal(motorTorqueCurrent);
 
         // None of these need to refresh.
@@ -161,7 +162,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_supply = Cache.ofDouble(() -> motorSupplyCurrent.getValueAsDouble());
         m_supplyVoltage = Cache.ofDouble(() -> motorSupplyVoltage.getValueAsDouble());
         m_stator = Cache.ofDouble(() -> motorStatorCurrent.getValueAsDouble());
-        // m_temp = Memo.ofDouble(() -> motorDeviceTemp.getValueAsDouble());
+        m_temp = Cache.ofDouble(() -> motorDeviceTemp.getValueAsDouble());
         // m_torque = Memo.ofDouble(() -> motorTorqueCurrent.getValueAsDouble());
 
         m_log_desired_duty = child.doubleLogger(Level.TRACE, "desired duty cycle [-1,1]");
@@ -183,7 +184,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_log_supplyVoltage = child.doubleLogger(Level.DEBUG, "supply voltage (V)");
         m_log_stator = child.doubleLogger(Level.TRACE, "stator current (A)");
         // m_log_torque = child.doubleLogger(Level.TRACE, "torque (Nm)");
-        // m_log_temp = child.doubleLogger(Level.TRACE, "temperature (C)");
+        m_log_temp = child.doubleLogger(Level.TRACE, "temperature (C)");
 
         child.intLogger(Level.TRACE, "Device ID").log(() -> canId.id);
     }
@@ -397,7 +398,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_log_supplyVoltage.log(m_supplyVoltage);
         m_log_stator.log(m_stator);
         // m_log_torque.log(this::getMotorTorque);
-        // m_log_temp.log(m_temp);
+        m_log_temp.log(m_temp);
     }
 
     // private double getMotorTorque() {

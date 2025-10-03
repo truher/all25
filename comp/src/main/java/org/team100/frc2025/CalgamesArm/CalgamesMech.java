@@ -57,6 +57,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CalgamesMech extends SubsystemBase {
     private static final boolean DEBUG = false;
+    private boolean DISABLED = false;
     ////////////////////////////////////////////////////////
     ///
     /// CANONICAL CONFIGS
@@ -64,6 +65,7 @@ public class CalgamesMech extends SubsystemBase {
     ///
     private static final Config HOME = new Config(0, 0, 0);
     private static final Config CORAL_GROUND_PICK = new Config(0, -1.83, -0.12);
+    private static final Config CLIMB = new Config(0, -1.83, 1.7);
     private static final Config STATION = new Config(0, -1, 0);
     private static final Config PROCESSOR = new Config(0, 1, 0);
 
@@ -78,7 +80,7 @@ public class CalgamesMech extends SubsystemBase {
     private static final Pose2d L4 = new Pose2d(1.57, 0.54, rad(2.0));
     private static final Pose2d ALGAE_L2 = new Pose2d(0.85, 0.7, rad(1.5));
     private static final Pose2d ALGAE_L3 = new Pose2d(1.2, 0.7, rad(1.5));
-    private static final Pose2d BARGE = new Pose2d(1.7, -0.5, rad(-1.5));
+    private static final Pose2d BARGE = new Pose2d(2.1, -0.5, rad(-1.5));
 
     private final double m_armLengthM;
     private final double m_wristLengthM;
@@ -364,7 +366,8 @@ public class CalgamesMech extends SubsystemBase {
     public Command profileHomeAndThenRest() {
         Done f = FollowJointProfiles.slowFast(this, HOME);
         return sequence(
-                f.until(f::isDone),
+                // f.until(f::isDone),
+                f.withTimeout(2),
                 restAtHome() //
         ).withName("profileHomeAndThenRest");
 
@@ -383,6 +386,12 @@ public class CalgamesMech extends SubsystemBase {
         return FollowJointProfiles.fastSlow(
                 this, CORAL_GROUND_PICK)
                 .withName("pickWithProfile");
+    }
+
+    public Command climbWithProfile() {
+        return FollowJointProfiles.gentleForClimb(
+                this, CLIMB)
+                .withName("climbWithProfile");
     }
 
     /**
@@ -488,13 +497,13 @@ public class CalgamesMech extends SubsystemBase {
     public Done homeToBarge() {
         return m_transit.endless("homeToBarge",
                 HolonomicPose2d.make(m_home, 0),
-                HolonomicPose2d.make(BARGE, 1.5));
+                HolonomicPose2d.make(BARGE, -1));
     }
 
     public Done bargeToHome() {
         return m_transit.endless("bargeToHome",
-                HolonomicPose2d.make(BARGE, -1.5),
-                HolonomicPose2d.make(m_home, 0));
+                HolonomicPose2d.make(BARGE, 2.5),
+                HolonomicPose2d.make(m_home, Math.PI));
 
     }
 
@@ -529,16 +538,28 @@ public class CalgamesMech extends SubsystemBase {
     private void rest() {
         m_elevatorFront.stop();
         m_elevatorBack.stop();
-        m_shoulder.setPosition(0, 0, 0, 0);
-        m_wrist.setPosition(0, 0, 0, 0);
+                    m_wrist.setPosition(0, 0, 0, 0);
+        if (!DISABLED) {
+            m_shoulder.setPosition(0, 0, 0, 0);
+        }
     }
 
     private void set(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
         logConfig(c, jv, ja, jf);
+
         m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
         m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
-        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
-        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
+                m_wrist.setPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
+        if (DISABLED) {
+            return;
+        }
+                m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
+    }
+
+    public Command setDisabled(boolean disabled) {
+        return run(() -> {
+            DISABLED = disabled;
+        });
     }
 
     private void logConfig(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {

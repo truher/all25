@@ -213,7 +213,7 @@ public class RobotContainer {
                 swerveLocal,
                 limiter);
 
-        m_leds = new LEDIndicator(new RoboRioChannel(0), localizer::getPoseAgeSec, m_manipulator::hasCoral, m_manipulator::hasAlgae, () -> (driverControl.floorPick() || driverControl.stationPick()) , buttons::algae);
+        m_leds = new LEDIndicator(new RoboRioChannel(0), localizer::getPoseAgeSec, m_manipulator::hasCoral, m_manipulator::hasAlgae, () -> (driverControl.floorPick() || driverControl.stationPick()) , buttons::algae, m_climberIntake::isClimbReady);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -351,12 +351,12 @@ public class RobotContainer {
         //
 
         // Extend, spin, wait for intake, and pull climber in and drive forward.
-        whileTrue(operatorControl::climbIntake, // 
-                ClimberCommands.climbAuto(m_climber, m_climberIntake, m_drive));
+        whileTrue(buttons::red1,
+                ClimberCommands.climbIntake(m_climber, m_climberIntake, mech));
 
         // Step 2, driver: Pull climber in and drive forward.
-        whileTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
-                ClimberCommands.climb(m_climber, m_drive));
+        onTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
+                ClimberCommands.climb(m_climber, m_drive,mech));
 
         // Between matches, operator: Reset the climber position.
         whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op right bumper button
@@ -387,7 +387,7 @@ public class RobotContainer {
                         m_manipulator, mech, buttons::algaeLevel));
 
         // these are all unbound
-        whileTrue(buttons::red2, print("red2"));
+        whileTrue(buttons::red2, m_manipulator.run(m_manipulator::ejectAlgae));
         whileTrue(buttons::red3, print("red3"));
         whileTrue(buttons::red4, print("red4"));
         whileTrue(buttons::barge, mech.homeToBarge()).onFalse(mech.bargeToHome());

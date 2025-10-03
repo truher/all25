@@ -5,6 +5,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
+import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.Swerve.DriveForwardSlowly;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 
@@ -16,36 +17,39 @@ public class ClimberCommands {
      * Wait a second.
      * Command ends when spin velocity slows and the climber is in position
      */
-    public static Command intake(Climber climber, ClimberIntake intake) {
+    public static Command climbIntake(Climber climber, ClimberIntake intake, CalgamesMech mech) {
         return parallel(
                 climber.goToIntakePosition(),
-                intake.intake())
-                .withDeadline(
-                        sequence(
-                                waitSeconds(1),
-                                waitUntil(
-                                        () -> intake.isSlow() //TODO: Wont work needs to be calibrated
-                                                && climber.atGoal())))
+                intake.intake()
+                        .withDeadline(
+                                sequence(
+                                        waitSeconds(1),
+                                        waitUntil(
+                                                () -> intake.isSlow() 
+                                                        && climber.atGoal()))),
+                mech.climbWithProfile())
                 .withName("climb intake");
     }
 
     /**
      * Pull the climber in while driving slowly forward.
      */
-    public static Command climb(Climber climber, SwerveDriveSubsystem drive) {
+    public static Command climb(Climber climber, SwerveDriveSubsystem drive, CalgamesMech mech) {
         return parallel(
                 climber.goToClimbPosition(),
-                new DriveForwardSlowly(drive))
-                .withName("climb while driving");
+                new DriveForwardSlowly(drive),
+                mech.setDisabled(true)
+                .withName("climb while driving").until(() -> false));
 
     }
 
     /**
      * Pull the climber in while driving slowly forward.
      */
-    public static Command climbAuto(Climber climber, ClimberIntake intake, SwerveDriveSubsystem drive) {
+    public static Command climbAuto(Climber climber, ClimberIntake intake, SwerveDriveSubsystem drive,
+            CalgamesMech shoulder) {
         return sequence(
-            intake(climber, intake), climb(climber, drive));
+                climbIntake(climber, intake, shoulder), climb(climber, drive,shoulder));
 
     }
 }

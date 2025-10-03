@@ -2,6 +2,7 @@ package org.team100.frc2025.CommandGroups.ScoreSmart;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import java.util.function.Supplier;
 
@@ -30,12 +31,14 @@ public class ScoreL2Smart {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile, goal);
         Done toL2 = mech.homeToL2();
+                Command eject = manipulator.centerEject().withTimeout(0.5);
         return sequence(
                 parallel(
                         toReef,
-                        toL2 //
-                ).until(() -> (toReef.isDone() && toL2.isDone())),
-                manipulator.centerEject().withTimeout(0.5),
+                        toL2,
+                        waitUntil(() -> (toReef.isDone() && toL2.isDone()))
+                                .andThen(eject))
+                        .until(() -> (toReef.isDone() && toL2.isDone() && eject.isFinished())),
                 mech.l2ToHome());
     }
 }
