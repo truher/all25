@@ -58,7 +58,7 @@ public class ClimberIntake extends SubsystemBase {
 
     ////////////////
 
-    private void stopMotor() {
+    public void stopMotor() {
         m_motor.setDutyCycle(0);
     }
 

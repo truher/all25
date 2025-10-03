@@ -88,6 +88,10 @@ public class Climber extends SubsystemBase {
         return m_servo.getPosition().orElse(0);
     }
 
+    public void stopMotor() {
+        m_servo.stop();
+    }
+
     // COMMANDS
 
     public Command stop() {
