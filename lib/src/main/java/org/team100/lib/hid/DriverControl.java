@@ -171,5 +171,10 @@ public interface DriverControl {
     default boolean b() {
         return false;
     }
+    
+    default boolean l1pick() {
+        return false;
+    }
+
 
 }

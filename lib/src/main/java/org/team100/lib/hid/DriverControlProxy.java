@@ -180,4 +180,9 @@ public class DriverControlProxy implements DriverControl {
         return m_driverControl.b();
     }
 
+    @Override
+    public boolean l1pick() {
+        return m_driverControl.l1pick();
+    }
+
 }
