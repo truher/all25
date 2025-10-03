@@ -2,6 +2,7 @@ package org.team100.frc2025;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.print;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
+import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
@@ -348,6 +350,10 @@ public class RobotContainer {
                         m_manipulator.centerIntake()))
                 .onFalse(m_mech.profileHomeTerminal());
 
+        whileTrue(driverControl::l1pick, 
+                        m_mech.pickWithProfile())
+                .onFalse(m_mech.profileHomeTerminal());
+
         new FloorPickSetup(
                 fieldLog, driverControl, m_drive, m_targets,
                 SwerveControllerFactory.pick(driveLog), autoProfile);
@@ -381,7 +387,7 @@ public class RobotContainer {
         //
 
         // Manual movement of arm, for testing.
-        // whileTrue(buttons::l1, mech.homeToL1()).onFalse(mech.l1ToHome());
+        whileTrue(buttons::l1, m_mech.profileHomeToL1());
         // whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
         // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
         // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
@@ -396,13 +402,25 @@ public class RobotContainer {
 
         // grab and hold algae, and then eject it when you let go of the button
         whileTrue(buttons::algae,
-                GrabAndHoldAlgae.get(
-                        m_manipulator, m_mech, buttons::algaeLevel));
+                MoveToAlgaePosition.get(
+                        m_mech, buttons::algaeLevel));
 
         // these are all unbound
-        whileTrue(buttons::red2, m_manipulator.run(m_manipulator::ejectAlgae));
-        whileTrue(buttons::red3, print("red3"));
-        whileTrue(buttons::red4, print("red4"));
+        whileTrue(driverControl::b, m_mech.algaePickGround());
+        whileTrue(buttons::red2, 
+                sequence(
+                        m_manipulator.sidewaysIntake()
+                                .until(m_manipulator::hasCoralSideways),
+                        m_manipulator.sidewaysHold()));
+        whileTrue(buttons::red3,
+                sequence(
+                        m_manipulator.algaeIntake()
+                                .until(m_manipulator::hasAlgae),
+                        m_manipulator.algaeHold())//
+        ).onFalse(
+                m_manipulator.algaeEject()
+                        .withTimeout(0.5));
+        whileTrue(buttons::red4, m_mech.processorWithProfile());
         whileTrue(buttons::barge, m_mech.homeToBarge()).onFalse(m_mech.bargeToHome());
 
         // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));

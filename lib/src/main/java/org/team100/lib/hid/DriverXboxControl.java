@@ -159,6 +159,13 @@ public class DriverXboxControl implements DriverControl {
         }
         return false;
     }
+    
+    @Override
+    public boolean l1pick() {
+        // return m_controller.getYButton();
+        // return false;
+        return m_controller.getRightBumperButton();
+    }
 
     @Override
     public boolean test() {

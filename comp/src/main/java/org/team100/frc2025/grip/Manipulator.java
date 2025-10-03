@@ -116,8 +116,9 @@ public class Manipulator extends SubsystemBase {
     public void intakeSideways() {
         if (hasCoralSideways()) {
             stopMotors();
+            m_algaeMech.setDutyCycle(-1);
         } else {
-            m_algaeMech.setDutyCycle(-0.5);
+            m_algaeMech.setDutyCycle(-1);
             if (coralIsClose(m_leftLaser)) {
                 m_leftMech.setDutyCycle(0.5);
                 m_rightMech.setDutyCycle(-0.5);
@@ -143,7 +144,7 @@ public class Manipulator extends SubsystemBase {
      * (...and also at startup so include a delay.)
      */
     public boolean hasAlgae() {
-        return m_algaeMotor.getCurrent() > 80;
+        return m_algaeMotor.getCurrent() > 50;
     }
 
     /////////////////////////////////////////////////
@@ -168,7 +169,15 @@ public class Manipulator extends SubsystemBase {
     }
 
     public Command centerIntake() {
-        return run(this::intakeCenter);
+        return startRun(this::highAlgaeTorque, this::intakeCenter);
+    }
+
+     public Command sidewaysIntake() {
+        return startRun(this::highAlgaeTorque, this::intakeSideways);
+    }
+
+    public Command sidewaysHold() {
+        return startRun(this::lowCoralTorque, this::intakeSideways);
     }
 
     public Command centerEject() {
@@ -183,7 +192,7 @@ public class Manipulator extends SubsystemBase {
      * so 1.62 Nm.
      */
     private void highAlgaeTorque() {
-        // m_algaeMotor.setTorqueLimit(1.65);
+        m_algaeMotor.setTorqueLimit(3);
     }
 
     /**
@@ -192,7 +201,11 @@ public class Manipulator extends SubsystemBase {
      * so 0.63 Nm.
      */
     private void lowAlgaeTorque() {
-        // m_algaeMotor.setTorqueLimit(0.65);
+        m_algaeMotor.setTorqueLimit(2.5);
+    }
+
+    private void lowCoralTorque() {
+        m_algaeMotor.setTorqueLimit(.5);
     }
 
     private void intakeAlgae() {
@@ -200,7 +213,7 @@ public class Manipulator extends SubsystemBase {
     }
 
     public void ejectAlgae() {
-        m_algaeMech.setDutyCycle(-0.1);
+        m_algaeMech.setDutyCycle(-0.5);
     }
 
     ///////////////////////////////////////////////

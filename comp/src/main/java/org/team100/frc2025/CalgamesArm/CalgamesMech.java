@@ -67,20 +67,21 @@ public class CalgamesMech extends SubsystemBase {
     private static final Config CORAL_GROUND_PICK = new Config(0, -1.83, -0.12);
     private static final Config CLIMB = new Config(0, -1.83, 1.7);
     private static final Config STATION = new Config(0, -1, 0);
-    private static final Config PROCESSOR = new Config(0, 1, 0);
+    private static final Config PROCESSOR = new Config(0, 1.2, 0);
+    private static final Config ALGAE_GROUND = new Config(0, 1.43, 0);
+    private static final Config L1 = new Config(0, -.95, -.5);
 
     ////////////////////////////////////////////////////////
     ///
     /// CANONICAL POSES
     /// These are used with trajectories.
     ///
-    private static final Pose2d L1 = new Pose2d(0.50, 0.50, rad(1.5));
     private static final Pose2d L2 = new Pose2d(0.52, 0.54, rad(2.0));
     private static final Pose2d L3 = new Pose2d(0.92, 0.56, rad(1.7));
     private static final Pose2d L4 = new Pose2d(1.57, 0.54, rad(2.0));
     private static final Pose2d ALGAE_L2 = new Pose2d(0.85, 0.7, rad(1.5));
     private static final Pose2d ALGAE_L3 = new Pose2d(1.2, 0.7, rad(1.5));
-    private static final Pose2d BARGE = new Pose2d(2.1, -0.5, rad(-1.5));
+    private static final Pose2d BARGE = new Pose2d(2.3, -0.5, rad(-1.5));
 
     private final double m_armLengthM;
     private final double m_wristLengthM;
@@ -145,7 +146,7 @@ public class CalgamesMech extends SubsystemBase {
                 final double elevatorGearRatio = 2.182;
                 final double elevatorDrivePulleyDiameterM = 0.03844;
                 final double elevatorLowerLimit = 0;
-                final double elevatorUpperLimit = 1.9;
+                final double elevatorUpperLimit = 2.1;
 
                 Kraken6Motor elevatorFrontMotor = new Kraken6Motor(
                         elevatorfrontLog,
@@ -348,6 +349,13 @@ public class CalgamesMech extends SubsystemBase {
                 .withName("profileHomeTerminal");
     }
 
+    public Command profileHomeToL1() {
+        FollowJointProfiles f = FollowJointProfiles.fastSlow(
+                this, L1);
+        return f.until(f::isDone)
+                .withName("profileHomeTerminal");
+    }
+
     /**
      * Use a profile to move from the current position and velocity to the "home"
      * position (origin) at rest, and hold there forever.
@@ -388,6 +396,16 @@ public class CalgamesMech extends SubsystemBase {
                 .withName("pickWithProfile");
     }
 
+    /**
+     * Use a profile to move from the current position and velocity to the floor at
+     * rest, and stay there forever.
+     */
+    public Command algaePickGround() {
+        return FollowJointProfiles.algae(
+                this, ALGAE_GROUND)
+                .withName("pickWithProfile");
+    }
+
     public Command climbWithProfile() {
         return FollowJointProfiles.gentleForClimb(
                 this, CLIMB)
@@ -409,7 +427,7 @@ public class CalgamesMech extends SubsystemBase {
      * processor location at rest, and stay there forever.
      */
     public Command processorWithProfile() {
-        return FollowJointProfiles.fastSlow(
+        return FollowJointProfiles.algae(
                 this, PROCESSOR)
                 .withName("processorWithProfile");
     }
@@ -421,14 +439,15 @@ public class CalgamesMech extends SubsystemBase {
 
     public Done homeToL1() {
         return m_transit.endless("homeToL1",
-                HolonomicPose2d.make(m_home, 1.5),
-                HolonomicPose2d.make(L1, 1.7));
+                HolonomicPose2d.make(m_home, -1.5),
+                HolonomicPose2d.make(L2, -1.7));
     }
 
+    //NEVER CALL
     public Command l1ToHome() {
         return m_transit.terminal("l1ToHome",
-                HolonomicPose2d.make(L1, -1.0),
-                HolonomicPose2d.make(m_home, -1.5));
+                HolonomicPose2d.make(L2, 1.3),
+                HolonomicPose2d.make(m_home, 1.5));
     }
 
     public Done homeToL2() {
