@@ -115,7 +115,7 @@ public class RobotContainer {
 
     final SwerveKinodynamics m_swerveKinodynamics;
 
-    private final ScheduledExecutorService m_initializer;
+    // private final ScheduledExecutorService m_initializer;
 
     private final Runnable m_simulatedTagDetector;
     private final Runnable m_targetSimulator;
@@ -123,6 +123,7 @@ public class RobotContainer {
     private final Runnable m_climberViz;
     private final Targets m_targets;
     private final Manipulator m_manipulator;
+    private final CalgamesMech m_mech;
 
     public RobotContainer(TimedRobot100 robot) throws IOException {
         final AsyncFactory asyncFactory = new AsyncFactory(robot);
@@ -155,9 +156,9 @@ public class RobotContainer {
         }
 
         m_manipulator = new Manipulator(logger);
-        CalgamesMech mech = new CalgamesMech(logger, 0.5, 0.343);
+        m_mech = new CalgamesMech(logger, 0.5, 0.343);
 
-        m_combinedViz = new CalgamesViz(mech);
+        m_combinedViz = new CalgamesViz(m_mech);
         m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
 
         m_modules = SwerveModuleCollection.get(
@@ -213,7 +214,13 @@ public class RobotContainer {
                 swerveLocal,
                 limiter);
 
-        m_leds = new LEDIndicator(new RoboRioChannel(0), localizer::getPoseAgeSec, m_manipulator::hasCoral, m_manipulator::hasAlgae, () -> (driverControl.floorPick() || driverControl.stationPick()) , buttons::algae, m_climberIntake::isClimbReady);
+        m_leds = new LEDIndicator(
+                new RoboRioChannel(0),
+                localizer::getPoseAgeSec,
+                m_manipulator::hasCoral,
+                m_manipulator::hasAlgae,
+                () -> (driverControl.floorPick() || driverControl.stationPick()),
+                buttons::algae);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -287,7 +294,7 @@ public class RobotContainer {
         // This default command *MOVES IMMEDIATELY WHEN ENABLED*!
         // WATCH OUT!
         //
-        mech.setDefaultCommand(mech.profileHomeAndThenRest());
+        m_mech.setDefaultCommand(m_mech.profileHomeAndThenRest());
 
         m_climber.setDefaultCommand(
                 m_climber.stop().withName("climber default"));
@@ -305,13 +312,13 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        m_auton = new Auton(logger, mech, m_manipulator,
+        m_auton = new Auton(logger, m_mech, m_manipulator,
                 autoController, autoProfile, m_drive,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                 .left();
 
         whileTrue(() -> false, // driverControl::test),
-                new Auton(logger, mech, m_manipulator,
+                new Auton(logger, m_mech, m_manipulator,
                         autoController, autoProfile, m_drive,
                         localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
                         .right());
@@ -331,18 +338,17 @@ public class RobotContainer {
          */
         whileTrue(driverControl::floorPick, // driver x
                 parallel(
-                        mech.pickWithProfile(),
+                        m_mech.pickWithProfile(),
                         m_manipulator.centerIntake()))
-                .onFalse(mech.profileHomeTerminal());
+                .onFalse(m_mech.profileHomeTerminal());
 
-        
         new FloorPickSetup(
                 fieldLog, driverControl, m_drive, m_targets,
                 SwerveControllerFactory.pick(driveLog), autoProfile);
 
         whileTrue(driverControl::stationPick,
                 parallel(
-                        mech.stationWithProfile(),
+                        m_mech.stationWithProfile(),
                         m_manipulator.centerIntake()));
 
         ////////////////////////////////////////////////////////////
@@ -352,14 +358,15 @@ public class RobotContainer {
 
         // Extend, spin, wait for intake, and pull climber in and drive forward.
         whileTrue(buttons::red1,
-                ClimberCommands.climbIntake(m_climber, m_climberIntake, mech));
+                ClimberCommands.climbIntake(m_climber, m_climberIntake, m_mech));
 
         // Step 2, driver: Pull climber in and drive forward.
         onTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
-                ClimberCommands.climb(m_climber, m_drive,mech));
+                ClimberCommands.climb(m_climber, m_drive, m_mech));
 
         // Between matches, operator: Reset the climber position.
-        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op right bumper button
+        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op right bumper
+                                                        // button
                 m_climber.manual(operatorControl::manualClimbSpeed));
 
         ////////////////////////////////////////////////////////////
@@ -372,25 +379,25 @@ public class RobotContainer {
         // whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
         // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
         // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
-        whileTrue(driverControl::test, mech.homeToL4()).onFalse(mech.l4ToHome());
+        whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
 
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,
                 ScoreCoralSmart.get(
-                        coralSequence, mech, m_manipulator,
+                        coralSequence, m_mech, m_manipulator,
                         holonomicController, profile, m_drive,
                         localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         // grab and hold algae, and then eject it when you let go of the button
         whileTrue(buttons::algae,
                 GrabAndHoldAlgae.get(
-                        m_manipulator, mech, buttons::algaeLevel));
+                        m_manipulator, m_mech, buttons::algaeLevel));
 
         // these are all unbound
         whileTrue(buttons::red2, m_manipulator.run(m_manipulator::ejectAlgae));
         whileTrue(buttons::red3, print("red3"));
         whileTrue(buttons::red4, print("red4"));
-        whileTrue(buttons::barge, mech.homeToBarge()).onFalse(mech.bargeToHome());
+        whileTrue(buttons::barge, m_mech.homeToBarge()).onFalse(m_mech.bargeToHome());
 
         // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
         // whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
@@ -398,21 +405,25 @@ public class RobotContainer {
 
         // "fly" the joints manually
         whileTrue(operatorControl::manual, // to go to manual, left bumper operator
-                new ManualCartesian(operatorControl::velocity, mech));
+                new ManualCartesian(operatorControl::velocity, m_mech));
         // new ManualConfig(operatorControl::velocity, mech));
 
-        m_initializer = Executors.newSingleThreadScheduledExecutor();
-        m_initializer.schedule(this::initStuff, 0, TimeUnit.SECONDS);
+        // why did this use an async?
+        initStuff();
 
-        // This really only does anything when we're sitting idle; when actually
-        // running, the gc runs frequently without prodding.
-        m_initializer.schedule(System::gc, 3, TimeUnit.SECONDS);
+        // m_initializer = Executors.newSingleThreadScheduledExecutor();
+        // m_initializer.schedule(this::initStuff, 0, TimeUnit.SECONDS);
+
+        // // This really only does anything when we're sitting idle; when actually
+        // // running, the gc runs frequently without prodding.
+        // m_initializer.schedule(System::gc, 3, TimeUnit.SECONDS);
     }
 
     public void initStuff() {
-        Util.println("\n******** Pre-initializing some expensive things ... ");
+        Util.println("\n*** PREWARM START");
         double startS = Takt.actual();
 
+        // Exercise the trajectory planner.
         List<HolonomicPose2d> waypoints = new ArrayList<>();
         waypoints.add(new HolonomicPose2d(
                 new Translation2d(),
@@ -425,11 +436,44 @@ public class RobotContainer {
         TrajectoryPlanner m_planner = new TrajectoryPlanner(
                 new TimingConstraintFactory(m_swerveKinodynamics).medium());
         m_planner.restToRest(waypoints);
+
+        // Exercise the drive motors.
         m_drive.driveInFieldCoords(new FieldRelativeVelocity(0, 0, 0));
+
+        // Exercise some mechanism commands.
+        Command c = m_mech.homeToL4();
+        c.initialize();
+        c.execute();
+
+        c = m_mech.pickWithProfile();
+        c.initialize();
+        c.execute();
+
+        m_mech.stop();
+
+        c = m_manipulator.centerIntake();
+        c.initialize();
+        c.execute();
+
+        m_manipulator.stopMotors();
+
+        c = m_climber.goToIntakePosition();
+        c.initialize();
+        c.execute();
+
+        m_climber.stopMotor();
+
+        c = m_climberIntake.intake();
+        c.initialize();
+        c.execute();
+
+        m_climberIntake.stopMotor();
+
+        // Force full garbage collection.
         System.gc();
 
         double endS = Takt.actual();
-        Util.printf("\n... Initialization ET: %f\n", endS - startS);
+        Util.printf("\n*** PREWARM END ET: %f\n", endS - startS);
     }
 
     public void onTeleop() {
@@ -464,14 +508,12 @@ public class RobotContainer {
         m_auton.schedule();
     }
 
-    public void disabledPeriodic() 
-    {
-        m_leds.disabledPeriodic();   
+    public void disabledPeriodic() {
+        m_leds.disabledPeriodic();
     }
 
-    public void enabledPeriodic() 
-    {
-        m_leds.enabledPeriodic();   
+    public void enabledPeriodic() {
+        m_leds.enabledPeriodic();
     }
 
     public void periodic() {

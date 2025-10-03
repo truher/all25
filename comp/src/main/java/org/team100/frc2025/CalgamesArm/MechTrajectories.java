@@ -13,6 +13,7 @@ import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.JointConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.TorqueConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,18 +33,26 @@ public class MechTrajectories extends Command {
         if (USE_JOINT_CONSTRAINT) {
             // This is experimental, don't use it.
             c.add(new JointConstraint(
-                k,
-                j,
-                new JointVelocities(10, 10, 10),
-                new JointAccelerations(10, 10, 10)));
+                    k,
+                    j,
+                    new JointVelocities(10, 10, 10),
+                    new JointAccelerations(10, 10, 10)));
 
         } else {
             // These are known to work, but suboptimal.
             c.add(new ConstantConstraint(10, 5));
             c.add(new YawRateConstraint(10, 5));
+            // This is new
+            c.add(new TorqueConstraint(20));
         }
 
-        m_planner = new TrajectoryPlanner(c);
+        // ALERT!
+        // The parameters here used to be double these values;
+        // These finer grains make smoother paths and schedules but
+        // take longer to compute, so if it takes too long, make these
+        // numbers bigger!
+        m_planner = new TrajectoryPlanner(0.01, 0.1, 0.05, c);
+        // m_planner = new TrajectoryPlanner(0.02, 0.2, 0.1, c);
     }
 
     /** A command that goes from the start to the end and then finishes. */
@@ -63,7 +72,8 @@ public class MechTrajectories extends Command {
     public Done endless(String name, HolonomicPose2d start, HolonomicPose2d end) {
 
         /** Use the start course and ignore the start pose for now */
-        GoToPoseCalGamesMech c = new GoToPoseCalGamesMech(m_subsystem, start.course(), end, m_planner);
+        GoToPoseCalGamesMech c = new GoToPoseCalGamesMech(
+                m_subsystem, start.course(), end, m_planner);
         c.setName(name);
         return c;
         // return new FollowTrajectory(m_subsystem, m_planner.restToRest(List.of(start,

@@ -50,7 +50,8 @@ public class GravityCompensatedProfileTest {
         GravityCompensatedProfile p = new GravityCompensatedProfile(0.5, 5, 10);
         Control100 i = new Control100(0, 0);
         Model100 g = new Model100(Math.PI / 2, 0);
-        System.out.println("t, x, v, a");
+        if (DEBUG)
+            System.out.println("t, x, v, a");
         for (double t = 0; t < 1; t += 0.02) {
             i = p.calculate(0.02, i, g);
             if (DEBUG)
@@ -64,7 +65,8 @@ public class GravityCompensatedProfileTest {
         GravityCompensatedProfile p = new GravityCompensatedProfile(0.5, 5, 10);
         Control100 i = new Control100(Math.PI / 2, 0);
         Model100 g = new Model100(0, 0);
-        System.out.println("t, x, v, a");
+        if (DEBUG)
+            System.out.println("t, x, v, a");
         for (double t = 0; t < 1; t += 0.02) {
             i = p.calculate(0.02, i, g);
             if (DEBUG)

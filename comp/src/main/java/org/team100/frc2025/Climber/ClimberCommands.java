@@ -25,7 +25,7 @@ public class ClimberCommands {
                                 sequence(
                                         waitSeconds(1),
                                         waitUntil(
-                                                () -> intake.isSlow() 
+                                                () -> intake.isSlow()
                                                         && climber.atGoal()))),
                 mech.climbWithProfile())
                 .withName("climb intake");
@@ -38,8 +38,8 @@ public class ClimberCommands {
         return parallel(
                 climber.goToClimbPosition(),
                 new DriveForwardSlowly(drive),
-                mech.setDisabled(true)
-                .withName("climb while driving").until(() -> false));
+                mech.setDisabled(true) //
+        ).withName("climb while driving");
 
     }
 
@@ -49,7 +49,7 @@ public class ClimberCommands {
     public static Command climbAuto(Climber climber, ClimberIntake intake, SwerveDriveSubsystem drive,
             CalgamesMech shoulder) {
         return sequence(
-                climbIntake(climber, intake, shoulder), climb(climber, drive,shoulder));
+                climbIntake(climber, intake, shoulder), climb(climber, drive, shoulder));
 
     }
 }
