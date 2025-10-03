@@ -37,12 +37,15 @@ public class LEDIndicator {
     private final AddressableLEDBuffer m_redBuffer;
     private final AddressableLEDBuffer m_tealBuffer;
     private final AddressableLEDBuffer m_orangeBuffer;
+    private final AddressableLEDBuffer m_blackBuffer;
     private final AddressableLEDBuffer m_whiteBuffer;
     private final Supplier<Double> m_timeSinceLastPose;
     private final Supplier<Boolean> m_hasCoral;
     private final Supplier<Boolean> m_hasAlgae;
     private final Supplier<Boolean> m_intakingCoral;
     private final Supplier<Boolean> m_intakingAlgae;
+    private final Supplier<Boolean> m_climbing;
+    private final Supplier<Boolean> m_climbed;
     
     private double m_lastBlinkTime = 0;
     private boolean m_blinkState = false;
@@ -54,7 +57,9 @@ public class LEDIndicator {
             Supplier<Boolean> hasCoral, 
             Supplier<Boolean> hasAlgae, 
             Supplier<Boolean> intakingCoral, 
-            Supplier<Boolean> intakingAlgae) {
+            Supplier<Boolean> intakingAlgae,
+            Supplier<Boolean> climbing,
+            Supplier<Boolean> climbed) {
         m_led = new AddressableLED(port.channel);
         m_led.setLength(LENGTH);
         m_greenBuffer = fill(Color.kGreen);
@@ -62,6 +67,7 @@ public class LEDIndicator {
         m_whiteBuffer = fill(Color.kWhiteSmoke);
         m_orangeBuffer = fill(Color.kOrangeRed);
         m_redBuffer = fill(Color.kRed);
+        m_blackBuffer = fill(Color.kBlack);
         m_led.setData(m_redBuffer);
         m_led.start();
         m_timeSinceLastPose = timeSinceLastPose;
@@ -69,6 +75,8 @@ public class LEDIndicator {
         m_hasAlgae = hasAlgae;
         m_intakingCoral = intakingCoral;
         m_intakingAlgae = intakingAlgae;
+        m_climbed = climbed;
+        m_climbing = climbing;
     }
 
     private static AddressableLEDBuffer fill(Color color) {
@@ -96,7 +104,14 @@ public class LEDIndicator {
         boolean hasAlgae = m_hasAlgae.get();
         boolean intakingCoral = m_intakingCoral.get();
         boolean intakingAlgae = m_intakingAlgae.get();
-        if (hasCoral) {
+        boolean climbing = m_climbing.get();
+        boolean climbed = m_climbed.get();
+        
+        if (climbing && climbed) {
+            if (shouldBlink()) {
+                m_led.setData(m_blinkState ? m_greenBuffer : m_blackBuffer);
+            }
+        } else if (hasCoral) {
             if (hasAlgae) {
                 if (shouldBlink()) {
                     m_led.setData(m_blinkState ? m_tealBuffer : m_whiteBuffer);
