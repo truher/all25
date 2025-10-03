@@ -538,20 +538,23 @@ public class CalgamesMech extends SubsystemBase {
     private void rest() {
         m_elevatorFront.stop();
         m_elevatorBack.stop();
-        m_wrist.setPosition(0, 0, 0, 0);
-        if (!DISABLED) {
-            m_shoulder.setPosition(0, 0, 0, 0);
+        if (DISABLED) { 
+            m_wrist.setPosition(1.7, 0, 0, 0);
+            return;
         }
+        m_wrist.setPosition(0, 0, 0, 0);
+        m_shoulder.setPosition(0, 0, 0, 0);
     }
 
     private void set(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
         logConfig(c, jv, ja, jf);
         m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
         m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
-        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
         if (DISABLED) {
+            m_wrist.setPosition(1.7, 0, 0, 0);
             return;
         }
+        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
         m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
     }
 

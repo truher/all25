@@ -220,7 +220,9 @@ public class RobotContainer {
                 m_manipulator::hasCoral,
                 m_manipulator::hasAlgae,
                 () -> (driverControl.floorPick() || driverControl.stationPick()),
-                buttons::algae);
+                buttons::algae,
+                buttons::red1,
+                m_climberIntake::isSlow);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
