@@ -46,7 +46,7 @@ public class LEDIndicator {
     
     private double m_lastBlinkTime = 0;
     private boolean m_blinkState = false;
-    private final double BLINK_INTERVAL_S = 0.5; 
+    private final double BLINK_INTERVAL_S = 0.05; 
 
     public LEDIndicator(
             RoboRioChannel port, 
@@ -60,7 +60,7 @@ public class LEDIndicator {
         m_greenBuffer = fill(Color.kGreen);
         m_tealBuffer = fill(Color.kTeal);
         m_whiteBuffer = fill(Color.kWhiteSmoke);
-        m_orangeBuffer = fill(Color.kOrange);
+        m_orangeBuffer = fill(Color.kOrangeRed);
         m_redBuffer = fill(Color.kRed);
         m_led.setData(m_redBuffer);
         m_led.start();

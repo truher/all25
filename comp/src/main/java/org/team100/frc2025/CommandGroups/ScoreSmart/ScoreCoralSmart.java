@@ -2,6 +2,7 @@ package org.team100.frc2025.CommandGroups.ScoreSmart;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static edu.wpi.first.wpilibj2.command.Commands.print;
 import static edu.wpi.first.wpilibj2.command.Commands.select;
 
 import java.util.Map;
@@ -54,7 +55,9 @@ public class ScoreCoralSmart {
                         Map.entry(ScoringLevel.L1,
                                 ScoreL1Smart.get(
                                         logger, mech, manipulator,
-                                        controller, profile, drive, goal))),
-                        level));
+                                        controller, profile, drive, goal)),
+                        Map.entry(ScoringLevel.NONE, print("No button pressed"))),
+                        level))
+                .withName("ScoreCoralSmart");
     }
 }
