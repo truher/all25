@@ -36,6 +36,13 @@ public class TrajectoryReference implements SwerveReference {
         return m_trajectory.isDone(progress());
     }
 
+    @Override
+    public SwerveModel goal() {
+        return SwerveControl.fromTimedPose(m_trajectory.getLastPoint()).model();
+    }
+
+    ////////////////////////////////////////////////////
+
     private double progress() {
         return Takt.get() - m_startTimeS;
     }
@@ -43,5 +50,4 @@ public class TrajectoryReference implements SwerveReference {
     private SwerveControl sample(double t) {
         return SwerveControl.fromTimedPose(m_trajectory.sample(t));
     }
-
 }

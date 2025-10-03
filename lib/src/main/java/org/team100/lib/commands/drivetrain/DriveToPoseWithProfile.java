@@ -72,4 +72,8 @@ public class DriveToPoseWithProfile extends Command {
     public boolean isDone() {
         return m_referenceController != null && m_referenceController.isDone();
     }
+
+    public double toGo() {
+        return m_referenceController.toGo();
+    }
 }

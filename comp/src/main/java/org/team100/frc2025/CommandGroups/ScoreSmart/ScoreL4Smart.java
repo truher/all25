@@ -34,10 +34,12 @@ public class ScoreL4Smart {
         return sequence(
                 parallel(
                         toReef,
-                        toL4,
+                        waitUntil(() -> toReef.toGo() < 1)
+                                .andThen(toL4),
                         waitUntil(() -> (toReef.isDone() && toL4.isDone()))
-                                .andThen(eject))
-                        .until(() -> (toReef.isDone() && toL4.isDone() && eject.isFinished())),
-                mech.l4ToHome());
+                                .andThen(eject)//
+                ).until(() -> (toReef.isDone() && toL4.isDone() && eject.isFinished())),
+                mech.l4ToHome() //
+        );
     }
 }

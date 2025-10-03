@@ -315,13 +315,17 @@ public class RobotContainer {
         m_auton = new Auton(logger, m_mech, m_manipulator,
                 autoController, autoProfile, m_drive,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
-                .left();
+                .leftPreloadOnly();
+        // .left();
 
-        whileTrue(() -> false, // driverControl::test),
+        whileTrue(
+                // () -> false,
+                driverControl::test,
                 new Auton(logger, m_mech, m_manipulator,
                         autoController, autoProfile, m_drive,
                         localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
-                        .right());
+                        .rightPreloadOnly());
+        // .right());
 
         // Driver/Operator Buttons
         onTrue(driverControl::resetRotation0, new ResetPose(m_drive, new Pose2d()));
@@ -379,7 +383,7 @@ public class RobotContainer {
         // whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
         // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
         // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
-        whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
+        // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
 
         // Driver controls "go to reef" mode, buttons supply level and point.
         whileTrue(driverControl::toReef,

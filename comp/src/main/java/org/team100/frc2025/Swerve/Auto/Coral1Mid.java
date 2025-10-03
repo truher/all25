@@ -3,6 +3,7 @@ package org.team100.frc2025.Swerve.Auto;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import java.util.function.DoubleConsumer;
 
@@ -21,6 +22,7 @@ import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 
 public class Coral1Mid {
     /** While driving to scoring tag, pay attention only to very close tags. */
@@ -41,14 +43,18 @@ public class Coral1Mid {
                 logger, drive, controller, profile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.H));
 
-        Done prePlace = mech.homeToL4();
+        Done toL4 = mech.homeToL4();
+        ParallelRaceGroup eject = manipulator.centerEject().withTimeout(0.5);
         return sequence(
                 parallel(
                         runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
                         toReef,
-                        prePlace //
-                ).until(() -> (toReef.isDone() && prePlace.isDone())),
-                manipulator.centerEject().withTimeout(0.5),
-                mech.l4ToHome());
+                        waitUntil(() -> toReef.toGo() < 1)
+                                .andThen(toL4),
+                        waitUntil(() -> toReef.isDone() && toL4.isDone())
+                                .andThen(eject) //
+                ).until(() -> (toReef.isDone() && toL4.isDone() && eject.isFinished())),
+                mech.l4ToHome() //
+        );
     }
 }

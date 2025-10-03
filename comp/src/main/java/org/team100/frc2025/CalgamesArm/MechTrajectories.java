@@ -58,9 +58,6 @@ public class MechTrajectories extends Command {
     /** A command that goes from the start to the end and then finishes. */
     public Command terminal(String name, HolonomicPose2d start, HolonomicPose2d end) {
 
-        // FollowTrajectory f = new FollowTrajectory(
-        // m_subsystem, m_planner.restToRest(List.of(start, end)));
-
         /** Use the start course and ignore the start pose for now */
         Done f = new GoToPoseCalGamesMech(m_subsystem, start.course(), end, m_planner);
         return f
@@ -76,8 +73,7 @@ public class MechTrajectories extends Command {
                 m_subsystem, start.course(), end, m_planner);
         c.setName(name);
         return c;
-        // return new FollowTrajectory(m_subsystem, m_planner.restToRest(List.of(start,
-        // end)));
+
     }
 
 }

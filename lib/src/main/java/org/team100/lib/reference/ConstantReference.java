@@ -31,4 +31,9 @@ public class ConstantReference implements SwerveReference {
         return false;
     }
 
+    @Override
+    public SwerveModel goal() {
+        return m_goal;
+    }
+
 }
