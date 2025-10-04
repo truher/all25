@@ -76,8 +76,8 @@ public class CalgamesMech extends SubsystemBase {
     /// CANONICAL POSES
     /// These are used with trajectories.
     ///
-    private static final Pose2d L2 = new Pose2d(0.52, 0.54, rad(2.0));
-    private static final Pose2d L3 = new Pose2d(0.92, 0.56, rad(1.7));
+    private static final Pose2d L2 = new Pose2d(0.56, 0.54, rad(2.0));
+    private static final Pose2d L3 = new Pose2d(0.94, 0.56, rad(1.7));
     private static final Pose2d L4 = new Pose2d(1.57, 0.54, rad(2.0));
     private static final Pose2d ALGAE_L2 = new Pose2d(0.85, 0.7, rad(1.5));
     private static final Pose2d ALGAE_L3 = new Pose2d(1.2, 0.7, rad(1.5));

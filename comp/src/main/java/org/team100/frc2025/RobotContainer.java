@@ -311,10 +311,11 @@ public class RobotContainer {
         // DRIVER BUTTONS
         final HolonomicProfile profile = HolonomicProfile.get(driveLog, m_swerveKinodynamics, 1, 0.5, 1, 0.2);
 
-        final HolonomicProfile autoProfile = HolonomicProfile.currentLimitedExponential(3.5, 7, 20,
-                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 20);
+        final HolonomicProfile autoProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
+                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
+
 
         m_auton = new Auton(logger, m_mech, m_manipulator,
                 autoController, autoProfile, m_drive,

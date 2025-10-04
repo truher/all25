@@ -48,7 +48,7 @@ public class Climber extends SubsystemBase {
                         PIDConstants.makePositionPID(1),
                         Feedforward100.makeArmPivot());
 
-                double inputOffset = 0.110602 + (0.32); // 9/28
+                double inputOffset = 0.110602 + (0.33); // 9/28
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
                         log, new RoboRioChannel(5), inputOffset, EncoderDrive.DIRECT);
                 double gearRatio = 5 * 5 * 4 * 20; // - 9/28
