@@ -324,7 +324,7 @@ public class RobotContainer {
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
         m_auton = LolipopAuto.get(logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive, m_planner, 
+                autoController, autoProfile, m_drive, m_planner,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
 
         whileTrue(
@@ -408,7 +408,8 @@ public class RobotContainer {
         // grab and hold algae, and then eject it when you let go of the button
         whileTrue(buttons::algae,
                 MoveToAlgaePosition.get(
-                        m_mech, buttons::algaeLevel));
+                        m_mech, buttons::algaeLevel))
+                .onFalse(m_mech.algaeToHome());
 
         // these are all unbound
         FollowJointProfiles homeGentle = m_mech.homeAlgae();

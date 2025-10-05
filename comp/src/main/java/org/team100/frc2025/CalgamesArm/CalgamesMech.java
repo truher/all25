@@ -410,6 +410,7 @@ public class CalgamesMech extends SubsystemBase {
         return FollowJointProfiles.gentle(
                 this, HOME);
     }
+
     public FollowJointProfiles homeAlgae() {
         return FollowJointProfiles.algaeUp(
                 this, HOME);
@@ -452,7 +453,7 @@ public class CalgamesMech extends SubsystemBase {
                 HolonomicPose2d.make(L2, -1.7));
     }
 
-    //NEVER CALL
+    // NEVER CALL
     public Command l1ToHome() {
         return m_transit.terminal("l1ToHome",
                 HolonomicPose2d.make(L2, 1.3),
@@ -505,6 +506,12 @@ public class CalgamesMech extends SubsystemBase {
         return m_transit.endless("homeToAlgaeL3",
                 HolonomicPose2d.make(m_home, 0),
                 HolonomicPose2d.make(ALGAE_L3, 1.5));
+    }
+
+    public Command algaeToHome() {
+        return m_transit.endless("homeToAlgaeL3",
+                HolonomicPose2d.make(ALGAE_L3, -1.0),
+                HolonomicPose2d.make(m_home, Math.PI));
     }
 
     /**
@@ -566,7 +573,7 @@ public class CalgamesMech extends SubsystemBase {
     private void rest() {
         m_elevatorFront.stop();
         m_elevatorBack.stop();
-        if (DISABLED) { 
+        if (DISABLED) {
             m_wrist.setPosition(2, 0, 0, 0);
             return;
         }
