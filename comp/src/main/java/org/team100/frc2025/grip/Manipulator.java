@@ -103,6 +103,7 @@ public class Manipulator extends SubsystemBase {
         if (hasCoral()) {
             stopMotors();
         } else if (hasCoralSideways()) {
+            m_algaeMech.setDutyCycle(-1);
             m_leftMech.setDutyCycle(0.5);
             m_rightMech.setDutyCycle(-0.5);
         } else {
