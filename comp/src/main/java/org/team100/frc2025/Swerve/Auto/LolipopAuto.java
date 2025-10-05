@@ -5,6 +5,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.DoubleConsumer;
 
@@ -14,10 +15,12 @@ import org.team100.lib.commands.Done;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithTrajectory;
 import org.team100.lib.commands.drivetrain.DriveToTranslationFacingWithProfile;
+import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.ReefPoint;
+import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -48,28 +51,41 @@ public class LolipopAuto {
             DoubleConsumer heedRadiusM,
             SwerveKinodynamics kinodynamics,
             TrajectoryVisualization viz) {
-        DriveToPoseWithTrajectory toReefTrajectory = new DriveToPoseWithTrajectory(
-                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A).plus(new Transform2d(-.5,.5,new Rotation2d())), drive,
-                generateTrajectory(planner),
-                controller, viz);
+
+        // this one uses some curvature
+        DriveWithTrajectoryFunction toReefTrajectory = new DriveWithTrajectoryFunction(
+                drive, controller, viz,
+                (p) -> planner.restToRest(List.of(
+                        HolonomicPose2d.make(drive.getPose(), Math.PI),
+                        HolonomicPose2d.make(3, 5, 0, -2))));
+
+        // this appears to be a straight line
+        // DriveToPoseWithTrajectory toReefTrajectory = new DriveToPoseWithTrajectory(
+        //         () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A)
+        //                 .plus(new Transform2d(-.5, .5, new Rotation2d())),
+        //         drive,
+        //         generateTrajectory(planner),
+        //         controller, viz);
 
         DriveToPoseWithProfile toReefA = new DriveToPoseWithProfile(
-            logger, drive, controller, profile,
-            () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A));
+                logger, drive, controller, profile,
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A));
 
-    DriveToTranslationFacingWithProfile toCenterCoral = new DriveToTranslationFacingWithProfile(
+        DriveToTranslationFacingWithProfile toCenterCoral = new DriveToTranslationFacingWithProfile(
                 logger, drive, controller, profile,
                 () -> FieldConstants.CoralMark.CENTER.value
-                        .plus(new Translation2d(0.7, 0)), new Rotation2d(Math.PI));
+                        .plus(new Translation2d(0.7, 0)),
+                new Rotation2d(Math.PI));
 
         DriveToPoseWithProfile toReefB = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.B));
 
-    DriveToTranslationFacingWithProfile toCoralRight = new DriveToTranslationFacingWithProfile(
+        DriveToTranslationFacingWithProfile toCoralRight = new DriveToTranslationFacingWithProfile(
                 logger, drive, controller, profile,
                 () -> FieldConstants.CoralMark.RIGHT.value
-                        .plus(new Translation2d(0.7, 0).rotateBy(new Rotation2d(Math.PI/4))), new Rotation2d(Math.PI));
+                        .plus(new Translation2d(0.7, 0).rotateBy(new Rotation2d(Math.PI / 4))),
+                new Rotation2d(Math.PI));
 
         DriveToPoseWithProfile toReefC = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
@@ -93,7 +109,8 @@ public class LolipopAuto {
                 parallel(
                         toCenterCoral,
                         mech.pickWithProfile(),
-                        manipulator.centerIntake()).until(manipulator::hasCoral).withTimeout(3).andThen(manipulator::stop),
+                        manipulator.centerIntake()).until(manipulator::hasCoral).withTimeout(3)
+                        .andThen(manipulator::stop),
                 parallel(
                         toReefB,
                         mech.profileHomeAndThenRest().until(toReefB::isDone).andThen(toL4second),
@@ -103,7 +120,8 @@ public class LolipopAuto {
                 parallel(
                         toCoralRight,
                         mech.pickWithProfile(),
-                        manipulator.centerIntake()).until(manipulator::hasCoral).withTimeout(3).andThen(manipulator::stop),
+                        manipulator.centerIntake()).until(manipulator::hasCoral).withTimeout(3)
+                        .andThen(manipulator::stop),
                 parallel(
                         toReefC,
                         mech.profileHomeAndThenRest().until(toReefC::isDone).andThen(toL4third),
