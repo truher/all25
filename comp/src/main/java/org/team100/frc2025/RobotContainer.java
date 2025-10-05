@@ -14,6 +14,7 @@ import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.CalgamesViz;
+import org.team100.frc2025.CalgamesArm.FollowJointProfiles;
 import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
@@ -25,6 +26,8 @@ import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.Auton;
+import org.team100.frc2025.Swerve.Auto.Coral1Left;
+import org.team100.frc2025.Swerve.Auto.Coral1Mid;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
@@ -224,7 +227,7 @@ public class RobotContainer {
                 () -> (driverControl.floorPick() || driverControl.stationPick()),
                 buttons::algae,
                 buttons::red1,
-                m_climberIntake::isSlow);
+                m_climberIntake::isIn);
 
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated tag detector.
@@ -316,11 +319,9 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-
-        m_auton = new Auton(logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive,
-                localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
-                .leftPreloadOnly();
+        m_auton = Coral1Mid.get(logger, m_mech, m_manipulator,
+        autoController, autoProfile, m_drive,
+        localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
         // .left();
 
         whileTrue(
@@ -351,8 +352,8 @@ public class RobotContainer {
                         m_manipulator.centerIntake()))
                 .onFalse(m_mech.profileHomeTerminal());
 
-        whileTrue(driverControl::l1pick, 
-                        m_mech.pickWithProfile())
+        whileTrue(driverControl::l1pick,
+                m_mech.pickWithProfile())
                 .onFalse(m_mech.profileHomeTerminal());
 
         new FloorPickSetup(
@@ -407,13 +408,14 @@ public class RobotContainer {
                         m_mech, buttons::algaeLevel));
 
         // these are all unbound
-        whileTrue(driverControl::b, m_mech.algaePickGround());
-        whileTrue(buttons::red2, 
+        FollowJointProfiles homeGentle = m_mech.homeAlgae();
+        whileTrue(driverControl::b, m_mech.algaePickGround()).onFalse(homeGentle.until(homeGentle::isDone));
+        whileTrue(buttons::red2,
                 sequence(
                         m_manipulator.sidewaysIntake()
                                 .until(m_manipulator::hasCoralSideways),
                         m_manipulator.sidewaysHold()));
-        whileTrue(buttons::red3,
+        whileTrue(buttons::barge,
                 sequence(
                         m_manipulator.algaeIntake()
                                 .until(m_manipulator::hasAlgae),
@@ -422,7 +424,7 @@ public class RobotContainer {
                 m_manipulator.algaeEject()
                         .withTimeout(0.5));
         whileTrue(buttons::red4, m_mech.processorWithProfile());
-        whileTrue(buttons::barge, m_mech.homeToBarge()).onFalse(m_mech.bargeToHome());
+        whileTrue(buttons::red3, m_mech.homeToBarge()).onFalse(m_mech.bargeToHome());
 
         // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
         // whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));

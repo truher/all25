@@ -49,7 +49,8 @@ public class GoToPoseCalGamesMech extends Done {
     }
 
     public boolean isDone() {
-        return m_referenceController.isDone();
+        if (m_referenceController == null) return false;
+        return  m_referenceController.isDone();
     }
 
     @Override

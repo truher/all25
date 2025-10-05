@@ -213,7 +213,7 @@ public class Manipulator extends SubsystemBase {
     }
 
     public void ejectAlgae() {
-        m_algaeMech.setDutyCycle(-0.5);
+        m_algaeMech.setDutyCycle(-1);
     }
 
     ///////////////////////////////////////////////

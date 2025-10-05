@@ -165,7 +165,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_temp = Cache.ofDouble(() -> motorDeviceTemp.getValueAsDouble());
         // m_torque = Memo.ofDouble(() -> motorTorqueCurrent.getValueAsDouble());
 
-        m_log_desired_duty = child.doubleLogger(Level.TRACE, "desired duty cycle [-1,1]");
+        m_log_desired_duty = child.doubleLogger(Level.DEBUG, "desired duty cycle [-1,1]");
         m_log_desired_position = child.doubleLogger(Level.DEBUG, "desired position (rev)");
         m_log_desired_speed = child.doubleLogger(Level.DEBUG, "desired speed (rev_s)");
         m_log_desired_accel = child.doubleLogger(Level.TRACE, "desired accel (rev_s2)");
@@ -182,9 +182,9 @@ public abstract class Talon6Motor implements BareMotor {
         m_log_error = child.doubleLogger(Level.TRACE, "error (rev_s)");
         m_log_supply = child.doubleLogger(Level.DEBUG, "supply current (A)");
         m_log_supplyVoltage = child.doubleLogger(Level.DEBUG, "supply voltage (V)");
-        m_log_stator = child.doubleLogger(Level.TRACE, "stator current (A)");
+        m_log_stator = child.doubleLogger(Level.DEBUG, "stator current (A)");
         // m_log_torque = child.doubleLogger(Level.TRACE, "torque (Nm)");
-        m_log_temp = child.doubleLogger(Level.TRACE, "temperature (C)");
+        m_log_temp = child.doubleLogger(Level.DEBUG, "temperature (C)");
 
         child.intLogger(Level.TRACE, "Device ID").log(() -> canId.id);
     }
