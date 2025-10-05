@@ -73,7 +73,7 @@ public class LolipopAuto {
 
         DriveToPoseWithProfile toReefC = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
-                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.B));
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.C));
 
         Done toL4 = mech.homeToL4();
         Done toL4second = mech.homeToL4();
