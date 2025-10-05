@@ -28,6 +28,7 @@ import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.Auton;
 import org.team100.frc2025.Swerve.Auto.Coral1Left;
 import org.team100.frc2025.Swerve.Auto.Coral1Mid;
+import org.team100.frc2025.Swerve.Auto.LolipopAuto;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
@@ -210,6 +211,9 @@ public class RobotContainer {
 
         SwerveLimiter limiter = new SwerveLimiter(driveLog, m_swerveKinodynamics, RobotController::getBatteryVoltage);
 
+        TrajectoryPlanner m_planner = new TrajectoryPlanner(
+                new TimingConstraintFactory(m_swerveKinodynamics).auto());
+
         m_drive = new SwerveDriveSubsystem(
                 fieldLogger,
                 driveLog,
@@ -222,9 +226,9 @@ public class RobotContainer {
         m_leds = new LEDIndicator(
                 new RoboRioChannel(0),
                 localizer::getPoseAgeSec,
-                m_manipulator::hasCoral,
+                () -> (m_manipulator.hasCoral() || (m_manipulator.hasCoralSideways() && buttons.red2())),
                 m_manipulator::hasAlgae,
-                () -> (driverControl.floorPick() || driverControl.stationPick()),
+                () -> (driverControl.floorPick() || driverControl.stationPick() || buttons.red2()),
                 buttons::algae,
                 buttons::red1,
                 m_climberIntake::isIn);
@@ -319,10 +323,9 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        m_auton = Coral1Mid.get(logger, m_mech, m_manipulator,
-        autoController, autoProfile, m_drive,
-        localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
-        // .left();
+        m_auton = LolipopAuto.get(logger, m_mech, m_manipulator,
+                autoController, autoProfile, m_drive, m_planner, 
+                localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
 
         whileTrue(
                 // () -> false,
@@ -508,7 +511,7 @@ public class RobotContainer {
     }
 
     public void onInit() {
-        m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(Math.PI)));
+        m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(0)));
     }
 
     public void onAuto() {

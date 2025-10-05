@@ -155,6 +155,49 @@ public class TrajectoryPlanner {
         }
     }
 
+    public Trajectory100 movingToMoving(SwerveModel startState, Rotation2d startCourse, double splineEntranceVelocity, SwerveModel endState, Rotation2d endCourse, double splineExitVelocity) {
+        Translation2d startTranslation = startState.translation();
+        FieldRelativeVelocity startVelocity = startState.velocity();
+
+        Translation2d endTranslation = endState.translation();
+        FieldRelativeVelocity endVelocity = endState.velocity();
+
+        // should work with out this.
+        if (startVelocity.norm() < VELOCITY_EPSILON && endVelocity.norm() < VELOCITY_EPSILON) {
+            return restToRest(startState.pose(), endState.pose());
+        }
+
+        Translation2d full = endTranslation.minus(startTranslation);
+
+        // use the start velocity to adjust the first magic number.
+        // divide by the distance because the spline multiplies by it
+        double e1 = 2.0 * startVelocity.norm() / full.getNorm();
+        List<Double> magicNumbers = List.of(e1, 1.2);
+
+        try {
+            return generateTrajectory(
+                    List.of(
+                            new HolonomicPose2d(
+                                    startTranslation,
+                                    startState.rotation(),
+                                    startCourse),
+                            new HolonomicPose2d(
+                                    endTranslation,
+                                    endState.rotation(),
+                                    endCourse)),
+                    splineEntranceVelocity,
+                    splineExitVelocity,
+                    magicNumbers);
+        } catch (TrajectoryGenerationException e) {
+            Util.warn("Trajectory Generation Exception");
+            return new Trajectory100();
+        }
+    }
+
+    public Trajectory100 movingToRest(SwerveModel startState, Rotation2d startCourse, double splineEntranceVelocity, Pose2d end, Rotation2d endCourse, double splineExitVelocity) {
+        return movingToMoving(startState, startCourse,splineEntranceVelocity, new SwerveModel(end), endCourse,splineExitVelocity);
+    }
+
     /**
      * Produces straight lines from start to end.
      */
