@@ -226,7 +226,7 @@ public class RobotContainer {
         m_leds = new LEDIndicator(
                 new RoboRioChannel(0),
                 localizer::getPoseAgeSec,
-                () -> (m_manipulator.hasCoral() || m_manipulator.hasCoralSideways()),
+                () -> (m_manipulator.hasCoral() || (m_manipulator.hasCoralSideways() && buttons.red2())),
                 m_manipulator::hasAlgae,
                 () -> (driverControl.floorPick() || driverControl.stationPick() || buttons.red2()),
                 buttons::algae,
