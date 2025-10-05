@@ -508,8 +508,13 @@ public class CalgamesMech extends SubsystemBase {
                 HolonomicPose2d.make(ALGAE_L3, 1.5));
     }
 
-    public Command algaeToHome() {
-        return m_transit.endless("homeToAlgaeL3",
+    public Command algaeL2ToHome() {
+        return m_transit.terminal("homeToAlgaeL2",
+                HolonomicPose2d.make(ALGAE_L2, -1.0),
+                HolonomicPose2d.make(m_home, Math.PI));
+    }
+    public Command algaeL3ToHome() {
+        return m_transit.terminal("homeToAlgaeL3",
                 HolonomicPose2d.make(ALGAE_L3, -1.0),
                 HolonomicPose2d.make(m_home, Math.PI));
     }
@@ -524,6 +529,14 @@ public class CalgamesMech extends SubsystemBase {
                 Map.entry(ScoringLevel.L2, homeToAlgaeL2()) //
         ), level)
                 .withName("algaeReefPick");
+    }
+
+    public Command algaeReefExit(Supplier<ScoringLevel> level) {
+        return select(Map.ofEntries(
+                Map.entry(ScoringLevel.L3, algaeL3ToHome()),
+                Map.entry(ScoringLevel.L2, algaeL2ToHome()) //
+        ), level)
+                .withName("algaeReefExit");
     }
 
     /**

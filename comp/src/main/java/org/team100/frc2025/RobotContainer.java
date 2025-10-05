@@ -20,7 +20,7 @@ import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
-import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
+import org.team100.frc2025.CommandGroups.AlgaeExit;
 import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
@@ -406,10 +406,10 @@ public class RobotContainer {
                         localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         // grab and hold algae, and then eject it when you let go of the button
-        whileTrue(buttons::algae,
+        onTrue(buttons::algae,
                 MoveToAlgaePosition.get(
-                        m_mech, buttons::algaeLevel))
-                .onFalse(m_mech.algaeToHome());
+                        m_mech, buttons::algaeLevel,buttons::algae))
+               ;
 
         // these are all unbound
         FollowJointProfiles homeGentle = m_mech.homeAlgae();

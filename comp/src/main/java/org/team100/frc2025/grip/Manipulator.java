@@ -104,8 +104,8 @@ public class Manipulator extends SubsystemBase {
             stopMotors();
         } else if (hasCoralSideways()) {
             m_algaeMech.setDutyCycle(-1);
-            m_leftMech.setDutyCycle(0.5);
-            m_rightMech.setDutyCycle(-0.5);
+            m_leftMech.setDutyCycle(0.3);
+            m_rightMech.setDutyCycle(-0.3);
         } else {
             m_algaeMech.setDutyCycle(-1);
             m_leftMech.setDutyCycle(1);
@@ -216,7 +216,7 @@ public class Manipulator extends SubsystemBase {
     }
 
     private void lowCoralTorque() {
-        m_algaeMotor.setTorqueLimit(.5);
+        m_algaeMotor.setTorqueLimit(.6);
     }
 
     private void intakeAlgae() {

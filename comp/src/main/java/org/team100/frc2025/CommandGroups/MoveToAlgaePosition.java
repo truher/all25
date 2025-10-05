@@ -15,12 +15,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class MoveToAlgaePosition {
     public static Command get(
             CalgamesMech mech,
-            Supplier<ScoringLevel> level) {
-
-        Command pick = mech.algaeReefPick(level);
-        FollowJointProfiles homeGentle = mech.homeAlgae();
-        return sequence(
-                pick,
-                homeGentle.until(homeGentle::isDone));
+            Supplier<ScoringLevel> level,
+            Supplier<Boolean> buttons) {
+                Command pick = mech.algaeReefPick(level);
+                Command exit = mech.algaeReefExit(level);
+                return sequence(
+                pick.until(() -> !buttons.get()), exit);
     }
 }
