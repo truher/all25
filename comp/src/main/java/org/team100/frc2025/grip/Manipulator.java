@@ -5,7 +5,9 @@ import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.Talon6Encoder;
+import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Kraken6Motor;
@@ -17,10 +19,13 @@ import org.team100.lib.sensor.LaserCan100;
 import org.team100.lib.util.CanId;
 
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Manipulator extends SubsystemBase {
+
+    private final BooleanLogger coralLogger;
 
     private static final int NEAR = 50;
     private final BareMotor m_algaeMotor;
@@ -38,6 +43,7 @@ public class Manipulator extends SubsystemBase {
         LoggerFactory algaeMotorLog = log.name("Algae");
         LoggerFactory leftMotorLog = log.name("leftMotor");
         LoggerFactory rightMotorLog = log.name("rightMotor");
+        coralLogger = log.booleanLogger(Level.TRACE, "Coral Detection");
         switch (Identity.instance) {
             case COMP_BOT -> {
                 // Set specific parameters for the competition robot
@@ -96,6 +102,9 @@ public class Manipulator extends SubsystemBase {
     public void intakeCenter() {
         if (hasCoral()) {
             stopMotors();
+        } else if (hasCoralSideways()) {
+            m_leftMech.setDutyCycle(0.5);
+            m_rightMech.setDutyCycle(-0.5);
         } else {
             m_algaeMech.setDutyCycle(-1);
             m_leftMech.setDutyCycle(1);
@@ -104,6 +113,7 @@ public class Manipulator extends SubsystemBase {
     }
 
     public boolean hasCoral() {
+        if (Identity.instance.equals(Identity.BLANK)) return false; 
         return coralIsClose(m_backLaser);
     }
 
@@ -216,6 +226,15 @@ public class Manipulator extends SubsystemBase {
         m_algaeMech.setDutyCycle(-1);
     }
 
+
+    @Override
+    public void periodic() {
+        m_rightMech.periodic();
+        m_leftMech.periodic();
+        m_algaeMech.periodic();
+        m_algaeMotor.periodic();
+        coralLogger.log(this::hasCoral);
+    }
     ///////////////////////////////////////////////
 
     private static boolean coralIsClose(LaserCan100 sensor) {
