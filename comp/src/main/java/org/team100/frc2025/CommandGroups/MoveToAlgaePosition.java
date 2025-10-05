@@ -6,6 +6,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import java.util.function.Supplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
+import org.team100.frc2025.CalgamesArm.FollowJointProfiles;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,8 +18,9 @@ public class MoveToAlgaePosition {
             Supplier<ScoringLevel> level) {
 
         Command pick = mech.algaeReefPick(level);
+        FollowJointProfiles homeGentle = mech.homeAlgae();
         return sequence(
                 pick,
-                mech.profileHomeAndThenRest());
+                homeGentle.until(homeGentle::isDone));
     }
 }

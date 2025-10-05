@@ -65,7 +65,7 @@ public class CalgamesMech extends SubsystemBase {
     ///
     private static final Config HOME = new Config(0, 0, 0);
     private static final Config CORAL_GROUND_PICK = new Config(0, -1.83, -0.12);
-    private static final Config CLIMB = new Config(0, -1.83, 1.7);
+    private static final Config CLIMB = new Config(0, -1.83, 2);
     private static final Config STATION = new Config(0, -1, 0);
     private static final Config PROCESSOR = new Config(0, 1.2, 0);
     private static final Config ALGAE_GROUND = new Config(0, 1.43, 0);
@@ -80,7 +80,7 @@ public class CalgamesMech extends SubsystemBase {
     private static final Pose2d L3 = new Pose2d(0.94, 0.56, rad(1.7));
     private static final Pose2d L4 = new Pose2d(1.57, 0.54, rad(2.0));
     private static final Pose2d ALGAE_L2 = new Pose2d(0.85, 0.7, rad(1.5));
-    private static final Pose2d ALGAE_L3 = new Pose2d(1.2, 0.7, rad(1.5));
+    private static final Pose2d ALGAE_L3 = new Pose2d(1.15, 0.7, rad(1.5));
     private static final Pose2d BARGE = new Pose2d(2.3, -0.5, rad(-1.5));
 
     private final double m_armLengthM;
@@ -126,15 +126,15 @@ public class CalgamesMech extends SubsystemBase {
         m_transit = new MechTrajectories(this, m_kinematics, m_jacobian);
 
         LoggerFactory jointLog = parent.name("joints");
-        m_log_config = jointLog.logConfig(Level.TRACE, "config");
-        m_log_jointV = jointLog.logJointVelocities(Level.TRACE, "velocity");
-        m_log_jointA = jointLog.logJointAccelerations(Level.TRACE, "accel");
-        m_log_jointF = jointLog.logJointForce(Level.TRACE, "force");
+        m_log_config = jointLog.logConfig(Level.DEBUG, "config");
+        m_log_jointV = jointLog.logJointVelocities(Level.DEBUG, "velocity");
+        m_log_jointA = jointLog.logJointAccelerations(Level.DEBUG, "accel");
+        m_log_jointF = jointLog.logJointForce(Level.DEBUG, "force");
 
         LoggerFactory cartesianLog = parent.name("cartesian");
-        m_log_pose = cartesianLog.pose2dLogger(Level.TRACE, "pose");
-        m_log_cartesianV = cartesianLog.fieldRelativeVelocityLogger(Level.TRACE, "velocity");
-        m_log_cartesianA = cartesianLog.fieldRelativeAccelerationLogger(Level.TRACE, "accel");
+        m_log_pose = cartesianLog.pose2dLogger(Level.DEBUG, "pose");
+        m_log_cartesianV = cartesianLog.fieldRelativeVelocityLogger(Level.DEBUG, "velocity");
+        m_log_cartesianA = cartesianLog.fieldRelativeAccelerationLogger(Level.DEBUG, "accel");
 
         LoggerFactory elevatorbackLog = parent.name("elevatorBack");
         LoggerFactory elevatorfrontLog = parent.name("elevatorFront");
@@ -214,7 +214,7 @@ public class CalgamesMech extends SubsystemBase {
                 Kraken6Motor wristMotor = new Kraken6Motor(
                         wristLog,
                         new CanId(22),
-                        NeutralMode.COAST, MotorPhase.FORWARD,
+                        NeutralMode.BRAKE, MotorPhase.FORWARD,
                         40, // og 60
                         60, // og 90
                         PIDConstants.makePositionPID(8), // og 10
@@ -406,8 +406,17 @@ public class CalgamesMech extends SubsystemBase {
                 .withName("pickWithProfile");
     }
 
+    public FollowJointProfiles homeGentle() {
+        return FollowJointProfiles.gentle(
+                this, HOME);
+    }
+    public FollowJointProfiles homeAlgae() {
+        return FollowJointProfiles.algaeUp(
+                this, HOME);
+    }
+
     public Command climbWithProfile() {
-        return FollowJointProfiles.gentleForClimb(
+        return FollowJointProfiles.gentle(
                 this, CLIMB)
                 .withName("climbWithProfile");
     }
@@ -558,7 +567,7 @@ public class CalgamesMech extends SubsystemBase {
         m_elevatorFront.stop();
         m_elevatorBack.stop();
         if (DISABLED) { 
-            m_wrist.setPosition(1.7, 0, 0, 0);
+            m_wrist.setPosition(2, 0, 0, 0);
             return;
         }
         m_wrist.setPosition(0, 0, 0, 0);
@@ -570,7 +579,7 @@ public class CalgamesMech extends SubsystemBase {
         m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
         m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
         if (DISABLED) {
-            m_wrist.setPosition(1.7, 0, 0, 0);
+            m_wrist.setPosition(2, 0, 0, 0);
             return;
         }
         m_wrist.setPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());

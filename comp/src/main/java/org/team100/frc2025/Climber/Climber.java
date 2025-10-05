@@ -50,10 +50,10 @@ public class Climber extends SubsystemBase {
 
                 double inputOffset = 0.110602 + (0.33); // 9/28
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
-                        log, new RoboRioChannel(5), inputOffset, EncoderDrive.DIRECT);
+                        log, new RoboRioChannel(0), inputOffset, EncoderDrive.DIRECT);
                 double gearRatio = 5 * 5 * 4 * 20; // - 9/28
 
-                RotaryMechanism rotaryMechanism = new RotaryMechanism(
+                RotaryMechanism rotaryMechanism = new RotaryMechanism( 
                         log, motor, sensor, gearRatio,
                         0, Math.PI / 2);
 

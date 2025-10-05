@@ -192,7 +192,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
 
         if (clipped.x() > 0) {
             // x coordinate of the barge scoring location
-            double BARGE_X = 7.2;
+            double BARGE_X = 7.4;
             double distance = BARGE_X - m_drive.getPose().getX();
             scale = distance * scale;
 

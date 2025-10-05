@@ -46,8 +46,8 @@ public class RotaryMechanism {
         m_gearRatio = gearRatio;
         m_minPositionRad = minPositionRad;
         m_maxPositionRad = maxPositionRad;
-        m_log_velocity = child.doubleLogger(Level.TRACE, "velocity (rad_s)");
-        m_log_position = child.doubleLogger(Level.TRACE, "position (rad)");
+        m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");
+        m_log_position = child.doubleLogger(Level.DEBUG, "position (rad)");
     }
 
     /** Use for homing. */

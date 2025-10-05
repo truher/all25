@@ -24,7 +24,7 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 
-public class Coral1Mid {
+public class Coral1Left {
     /** While driving to scoring tag, pay attention only to very close tags. */
     private static final double HEED_RADIUS_M = 3;
 
@@ -41,7 +41,7 @@ public class Coral1Mid {
 
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
-                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.H));
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.I));
 
 
         Done toL4 = mech.homeToL4();

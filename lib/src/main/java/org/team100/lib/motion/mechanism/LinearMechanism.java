@@ -40,8 +40,8 @@ public class LinearMechanism {
         m_minPositionM = minPositionM;
         m_maxPositionM = maxPositionM;
         LoggerFactory child = parent.type(this);
-        m_log_velocity = child.optionalDoubleLogger(Level.TRACE, "velocity (m_s)");
-        m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (m)");
+        m_log_velocity = child.optionalDoubleLogger(Level.DEBUG, "velocity (m_s)");
+        m_log_position = child.optionalDoubleLogger(Level.DEBUG, "position (m)");
     }
 
     /** Should actuate immediately. Use for homing. */

@@ -20,13 +20,7 @@ public class ClimberCommands {
     public static Command climbIntake(Climber climber, ClimberIntake intake, CalgamesMech mech) {
         return parallel(
                 climber.goToIntakePosition(),
-                intake.intake()
-                        .withDeadline(
-                                sequence(
-                                        waitSeconds(1),
-                                        waitUntil(
-                                                () -> intake.isSlow()
-                                                        && climber.atGoal()))),
+                intake.intake(),
                 mech.climbWithProfile())
                 .withName("climb intake");
     }

@@ -10,6 +10,7 @@ import static org.team100.lib.field.FieldConstants.ReefPoint.C;
 import static org.team100.lib.field.FieldConstants.ReefPoint.D;
 import static org.team100.lib.field.FieldConstants.ReefPoint.F;
 import static org.team100.lib.field.FieldConstants.ReefPoint.I;
+import static org.team100.lib.field.FieldConstants.ReefPoint.H;
 import static org.team100.lib.field.FieldConstants.ReefPoint.K;
 import static org.team100.lib.field.FieldConstants.ReefPoint.L;
 
@@ -49,6 +50,13 @@ public record Auton(LoggerFactory logger, CalgamesMech mech,
     public Command leftPreloadOnly() {
         return sequence(
                 embarkAndPreplace(L4, I),
+                manipulator.centerEject().withTimeout(0.5),
+                mech.l4ToHome());
+    }
+
+    public Command centerPreloadOnly() {
+        return sequence(
+                embarkAndPreplace(L4, H),
                 manipulator.centerEject().withTimeout(0.5),
                 mech.l4ToHome());
     }
