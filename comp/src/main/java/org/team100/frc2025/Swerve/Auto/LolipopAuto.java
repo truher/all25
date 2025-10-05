@@ -13,6 +13,7 @@ import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.Done;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithTrajectory;
+import org.team100.lib.commands.drivetrain.DriveToTranslationFacingWithProfile;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.field.FieldConstants;
@@ -56,19 +57,30 @@ public class LolipopAuto {
             logger, drive, controller, profile,
             () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A));
 
-        DriveToPoseWithProfile toCenterCoral = new DriveToPoseWithProfile(
+    DriveToTranslationFacingWithProfile toCenterCoral = new DriveToTranslationFacingWithProfile(
                 logger, drive, controller, profile,
-                () -> new Pose2d(FieldConstants.CoralMark.CENTER.value, new Rotation2d())
-                        .plus(new Transform2d(new Translation2d(0.7, 0), new Rotation2d())));
+                () -> FieldConstants.CoralMark.CENTER.value
+                        .plus(new Translation2d(0.7, 0)), new Rotation2d(Math.PI));
 
         DriveToPoseWithProfile toReefB = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.B));
 
+    DriveToTranslationFacingWithProfile toCoralRight = new DriveToTranslationFacingWithProfile(
+                logger, drive, controller, profile,
+                () -> FieldConstants.CoralMark.RIGHT.value
+                        .plus(new Translation2d(0.7, 0).rotateBy(new Rotation2d(Math.PI/4))), new Rotation2d(Math.PI));
+
+        DriveToPoseWithProfile toReefC = new DriveToPoseWithProfile(
+                logger, drive, controller, profile,
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.B));
+
         Done toL4 = mech.homeToL4();
         Done toL4second = mech.homeToL4();
-        ParallelRaceGroup eject = manipulator.centerEject().withTimeout(0.5);
-        ParallelRaceGroup ejectsecond = manipulator.centerEject().withTimeout(0.5);
+        Done toL4third = mech.homeToL4();
+        ParallelRaceGroup eject = manipulator.centerEject().withTimeout(0.3);
+        ParallelRaceGroup ejectsecond = manipulator.centerEject().withTimeout(0.3);
+        ParallelRaceGroup ejectthird = manipulator.centerEject().withTimeout(0.3);
         return sequence(
                 toReefTrajectory.until(toReefTrajectory::isDone),
                 parallel(
@@ -88,6 +100,16 @@ public class LolipopAuto {
                         waitUntil(() -> toReefB.isDone() && toL4second.isDone())
                                 .andThen(ejectsecond))
                         .until(() -> (toReefB.isDone() && toL4second.isDone() && ejectsecond.isFinished())),
+                parallel(
+                        toCoralRight,
+                        mech.pickWithProfile(),
+                        manipulator.centerIntake()).until(manipulator::hasCoral).withTimeout(3).andThen(manipulator::stop),
+                parallel(
+                        toReefC,
+                        mech.profileHomeAndThenRest().until(toReefC::isDone).andThen(toL4third),
+                        waitUntil(() -> toReefC.isDone() && toL4third.isDone())
+                                .andThen(ejectthird))
+                        .until(() -> (toReefC.isDone() && toL4third.isDone() && ejectthird.isFinished())),
                 mech.l4ToHome());
     }
 
