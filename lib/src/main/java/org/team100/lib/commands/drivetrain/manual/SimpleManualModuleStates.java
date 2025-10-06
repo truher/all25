@@ -2,7 +2,7 @@ package org.team100.lib.commands.drivetrain.manual;
 
 import java.util.Optional;
 
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -38,7 +38,7 @@ public class SimpleManualModuleStates implements ModuleStateDriver {
      * There's no conflict between translation and rotation velocities in this mode.
      */
     @Override
-    public SwerveModuleStates apply(DriverControl.Velocity input) {
+    public SwerveModuleStates apply(Velocity input) {
         // dtheta is from [-1, 1], so angle is [-pi, pi]
         Optional<Rotation2d> angle = Optional.of(Rotation2d.fromRadians(Math.PI * input.theta()));
         double speedM_S = m_swerveKinodynamics.getMaxDriveVelocityM_S() * input.x();

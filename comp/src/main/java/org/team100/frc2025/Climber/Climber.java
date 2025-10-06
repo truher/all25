@@ -53,7 +53,7 @@ public class Climber extends SubsystemBase {
                         log, new RoboRioChannel(0), inputOffset, EncoderDrive.DIRECT);
                 double gearRatio = 5 * 5 * 4 * 20; // - 9/28
 
-                RotaryMechanism rotaryMechanism = new RotaryMechanism( 
+                RotaryMechanism rotaryMechanism = new RotaryMechanism(
                         log, motor, sensor, gearRatio,
                         0, Math.PI / 2);
 
@@ -100,7 +100,6 @@ public class Climber extends SubsystemBase {
     }
 
     public Command manual(DoubleSupplier s) {
-
         return runEnd(
                 () -> setDutyCycle(s.getAsDouble()),
                 () -> setDutyCycle(0));

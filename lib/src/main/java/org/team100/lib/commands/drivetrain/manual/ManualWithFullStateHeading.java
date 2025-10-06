@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
@@ -112,13 +112,13 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
     @Override
     public FieldRelativeVelocity apply(
             final SwerveModel state,
-            final DriverControl.Velocity twist1_1) {
+            final Velocity twist1_1) {
         final Model100 thetaState = state.theta();
         final double yawMeasurement = thetaState.x();
         final double yawRate = thetaState.v();
 
         // clip the input to the unit circle
-        final DriverControl.Velocity clipped = twist1_1.clip(1.0);
+        final Velocity clipped = twist1_1.clip(1.0);
         // scale to max in both translation and rotation
         final FieldRelativeVelocity scaled = FieldRelativeDriver.scale(
                 clipped,

@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.util.NamedChooser;
@@ -41,7 +41,7 @@ public class DriveManually extends Command {
      * Velocity control in control units, [-1,1] on all axes. This needs to be
      * mapped to a feasible velocity control as early as possible.
      */
-    private final Supplier<DriverControl.Velocity> m_twistSupplier;
+    private final Supplier<Velocity> m_twistSupplier;
     private final DoubleConsumer m_heedRadiusM;
     private final SwerveDriveSubsystem m_drive;
     private final Map<String, DriverAdapter> m_drivers;
@@ -49,7 +49,7 @@ public class DriveManually extends Command {
     String currentManualMode = null;
 
     public DriveManually(
-            Supplier<DriverControl.Velocity> twistSupplier,
+            Supplier<Velocity> twistSupplier,
             DoubleConsumer heedRadiusM,
             SwerveDriveSubsystem drive) {
         m_mode = m_manualModeChooser::getSelected;
@@ -89,7 +89,7 @@ public class DriveManually extends Command {
         }
 
         // input in [-1,1] control units
-        DriverControl.Velocity input = m_twistSupplier.get();
+        Velocity input = m_twistSupplier.get();
         SwerveModel state = m_drive.getState();
         DriverAdapter d = m_drivers.getOrDefault(manualMode, m_defaultDriver);
         d.apply(state, input);

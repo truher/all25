@@ -1,6 +1,6 @@
 package org.team100.lib.commands.drivetrain.manual;
 
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ChassisSpeedsLogger;
@@ -32,9 +32,9 @@ public class ManualChassisSpeeds implements ChassisSpeedDriver {
      * feasible) speeds.
      */
     @Override
-    public ChassisSpeeds apply(SwerveModel state, DriverControl.Velocity input) {
+    public ChassisSpeeds apply(SwerveModel state, Velocity input) {
         // clip the input to the unit circle
-        final DriverControl.Velocity clipped = input.clip(1.0);
+        final Velocity clipped = input.clip(1.0);
         // scale to max in both translation and rotation
 
         final ChassisSpeeds scaled = scaleChassisSpeeds(
@@ -56,7 +56,7 @@ public class ManualChassisSpeeds implements ChassisSpeedDriver {
      * @param maxRot   radians per second
      * @return meters and rad per second as specified by speed limits
      */
-    public static ChassisSpeeds scaleChassisSpeeds(DriverControl.Velocity twist, double maxSpeed, double maxRot) {
+    public static ChassisSpeeds scaleChassisSpeeds(Velocity twist, double maxSpeed, double maxRot) {
         return new ChassisSpeeds(
                 maxSpeed * MathUtil.clamp(twist.x(), -1, 1),
                 maxSpeed * MathUtil.clamp(twist.y(), -1, 1),

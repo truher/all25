@@ -2,7 +2,7 @@ package org.team100.lib.examples.tank;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -14,11 +14,11 @@ public class DriveTank extends Command {
     private static final double SCALE = 1;
     private static final double ROT_SCALE = 1;
 
-    private final Supplier<DriverControl.Velocity> m_twistSupplier;
+    private final Supplier<Velocity> m_twistSupplier;
     private final TankDrive m_drive;
 
     public DriveTank(
-            Supplier<DriverControl.Velocity> twistSupplier,
+            Supplier<Velocity> twistSupplier,
             TankDrive robotDrive) {
         m_twistSupplier = twistSupplier;
         m_drive = robotDrive;
@@ -27,7 +27,7 @@ public class DriveTank extends Command {
 
     @Override
     public void execute() {
-        DriverControl.Velocity input = m_twistSupplier.get();
+        Velocity input = m_twistSupplier.get();
         double rotscale = 1 - Math.abs(input.x());
         m_drive.set(input.x() * SCALE, input.y() * rotscale);
     }

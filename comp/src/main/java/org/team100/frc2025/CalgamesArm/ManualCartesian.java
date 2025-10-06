@@ -2,7 +2,7 @@ package org.team100.frc2025.CalgamesArm;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.kinematics.JointVelocities;
@@ -15,14 +15,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class ManualCartesian extends Command {
     private static final boolean DEBUG = false;
 
-    private final Supplier<DriverControl.Velocity> m_input;
+    private final Supplier<Velocity> m_input;
     private final CalgamesMech m_subsystem;
 
     private Pose2d m_pose;
     private JointVelocities m_prev;
 
     public ManualCartesian(
-            Supplier<DriverControl.Velocity> input,
+            Supplier<Velocity> input,
             CalgamesMech subsystem) {
         m_input = input;
         m_subsystem = subsystem;
@@ -39,7 +39,7 @@ public class ManualCartesian extends Command {
     public void execute() {
 
         // input is [-1, 1]
-        DriverControl.Velocity input = m_input.get();
+        Velocity input = m_input.get();
         final double dt = 0.02;
         // control is velocity.
         // velocity in m/s and rad/s

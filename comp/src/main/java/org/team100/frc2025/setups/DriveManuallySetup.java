@@ -10,8 +10,8 @@ import org.team100.lib.commands.drivetrain.manual.ManualWithProfiledHeading;
 import org.team100.lib.commands.drivetrain.manual.ManualWithTargetLock;
 import org.team100.lib.commands.drivetrain.manual.SimpleManualModuleStates;
 import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.hid.DriverControl;
-import org.team100.lib.hid.ThirdControl;
+import org.team100.lib.hid.Buttons2025;
+import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.LoggerFactory;
@@ -29,12 +29,12 @@ public class DriveManuallySetup {
     public static void setup(
             LoggerFactory comLog,
             FieldLogger.Log fieldLog,
-            DriverControl driverControl,
+            DriverXboxControl driverControl,
             AprilTagRobotLocalizer localizer,
             SwerveDriveSubsystem m_drive,
             SwerveKinodynamics m_swerveKinodynamics,
             Feedback100 thetaFeedback,
-            ThirdControl buttons) {
+            Buttons2025 buttons) {
 
         final DriveManually driveManually = new DriveManually(
                 driverControl::velocity,
@@ -55,14 +55,14 @@ public class DriveManuallySetup {
                 new ManualWithProfiledHeading(
                         manLog,
                         m_swerveKinodynamics,
-                        driverControl::desiredRotation,
+                        driverControl::pov,
                         thetaFeedback));
 
         driveManually.register("SNAPS_FULL_STATE", true,
                 new ManualWithFullStateHeading(
                         manLog,
                         m_swerveKinodynamics,
-                        driverControl::desiredRotation,
+                        driverControl::pov,
                         new double[] {
                                 5,
                                 0.35
@@ -84,7 +84,7 @@ public class DriveManuallySetup {
                 new ManualWithBargeAssist(
                         manLog,
                         m_swerveKinodynamics,
-                        driverControl::desiredRotation,
+                        driverControl::pov,
                         thetaFeedback,
                         m_drive));
 
@@ -92,7 +92,7 @@ public class DriveManuallySetup {
                 new ManualWithProfiledReefLock(
                         manLog,
                         m_swerveKinodynamics,
-                        driverControl::useReefLock,
+                        driverControl::leftTrigger,
                         thetaFeedback,
                         m_drive));
     }
