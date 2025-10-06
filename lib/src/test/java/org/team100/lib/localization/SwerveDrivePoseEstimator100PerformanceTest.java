@@ -6,9 +6,6 @@ import java.util.Optional;
 
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.MockGyro;
-import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.TestLoggerFactory;
-import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
@@ -21,7 +18,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class SwerveDrivePoseEstimator100PerformanceTest {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
-    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     private final Pose2d visionRobotPoseMeters = new Pose2d(1, 0, Rotation2d.kZero);
 

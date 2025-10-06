@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.kinematics.JointVelocities;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,7 +18,6 @@ public class ManualCartesian extends Command {
     private final CalgamesMech m_subsystem;
 
     private Pose2d m_pose;
-    private JointVelocities m_prev;
 
     public ManualCartesian(
             Supplier<Velocity> input,
@@ -32,12 +30,10 @@ public class ManualCartesian extends Command {
     @Override
     public void initialize() {
         m_pose = m_subsystem.getState().pose();
-        m_prev = new JointVelocities(0, 0, 0);
     }
 
     @Override
     public void execute() {
-
         // input is [-1, 1]
         Velocity input = m_input.get();
         final double dt = 0.02;
@@ -57,28 +53,5 @@ public class ManualCartesian extends Command {
         m_subsystem.set(new SwerveControl(m_pose));
         if (DEBUG)
             System.out.printf("pose %s\n", m_pose);
-
-        // // impose limits; see CalgamesMech for more limits.
-        // if (newC.shoulderHeight() < 0 || newC.shoulderHeight() > 1.7) {
-        // newC = new Config(m_config.shoulderHeight(), newC.shoulderAngle(),
-        // newC.wristAngle());
-        // }
-        // if (newC.shoulderAngle() < -2 || newC.shoulderAngle() > 2) {
-        // newC = new Config(newC.shoulderHeight(), m_config.shoulderAngle(),
-        // newC.wristAngle());
-        // }
-        // if (newC.wristAngle() < -1.5 || newC.wristAngle() > 2.1) {
-        // newC = new Config(newC.shoulderHeight(), newC.shoulderAngle(),
-        // m_config.wristAngle());
-        // }
-
-        // recompute velocity and accel
-        // JointVelocities newJv = newC.diff(m_config, dt);
-        // JointAccelerations ja = newJv.diff(m_prev, dt);
-
-        // m_subsystem.set(newC, newJv, ja);
-        // m_subsystem.set(newC, newJv, ja);
-        // m_config = newC;
-        // m_prev = newJv;
     }
 }

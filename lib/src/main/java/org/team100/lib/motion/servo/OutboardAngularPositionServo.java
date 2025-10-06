@@ -33,7 +33,6 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     private final DoubleLogger m_log_ff_torque;
     private final DoubleLogger m_log_measurement;
     private final Control100Logger m_log_setpoint;
-    // private final OptionalDoubleLogger m_log_position;
 
     /**
      * Goal "winds up" i.e. it's it's [-inf, inf], not [-pi,pi]
@@ -55,7 +54,6 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
         m_log_ff_torque = child.doubleLogger(Level.TRACE, "Feedforward Torque (Nm)");
         m_log_measurement = child.doubleLogger(Level.TRACE, "measurement (rad)");
         m_log_setpoint = child.control100Logger(Level.TRACE, "setpoint (rad)");
-        // m_log_position = child.optionalDoubleLogger(Level.TRACE, "Position");
     }
 
     @Override
@@ -65,14 +63,8 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
             return;
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
-        // OptionalDouble velocity = getVelocity();
-        // if (velocity.isEmpty())
-        // return;
         Control100 measurement = new Control100(position.getAsDouble(), 0);
         m_setpoint = measurement;
-        // TODO: do i need this somewhere else?
-        // m_controller.init(new Model100(position.getAsDouble(), 0));
-        // measurement is used for initialization only here.
         m_ref.setGoal(measurement.model());
         m_ref.init(measurement.model());
     }
@@ -211,6 +203,5 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     @Override
     public void periodic() {
         m_mechanism.periodic();
-        // m_sensor.periodic();
     }
 }

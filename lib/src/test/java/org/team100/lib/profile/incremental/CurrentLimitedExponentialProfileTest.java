@@ -31,6 +31,7 @@ public class CurrentLimitedExponentialProfileTest {
         double eta = profile.simulateForETA(0.2, sample, end);
         // approximate
         assertEquals(1.8, eta, 0.001);
+        @SuppressWarnings("unused")
         double tt = 0;
         for (int i = 0; i < 150; ++i) {
             tt += 0.02;

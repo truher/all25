@@ -38,9 +38,6 @@ public class OdometryUpdater {
     private final SwerveHistory m_history;
     private final Supplier<SwerveModulePositions> m_positions;
 
-    /**
-     * maintained in reset(). TODO: use a proxy gyro, not this class.
-     */
     private Rotation2d m_gyroOffset;
 
     public OdometryUpdater(
@@ -96,9 +93,8 @@ public class OdometryUpdater {
 
     /**
      * For testing.
-     * TODO: remove this one
      */
-    public void reset(
+    void reset(
             Rotation2d gyroAngle,
             Pose2d pose,
             double timestampSeconds) {

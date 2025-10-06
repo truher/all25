@@ -31,7 +31,6 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     private final Vector<X> m_xMin;
     private final Vector<X> m_xMax;
     private final double m_tolerance;
-    private final double m_toleranceSq;
     private final int m_iterations;
     /**
      * Max change in estimate per iteration, to avoid overreacting.
@@ -70,7 +69,6 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         m_xMin = xMin;
         m_xMax = xMax;
         m_tolerance = tolerance;
-        m_toleranceSq = tolerance * tolerance;
         m_iterations = iterations;
         m_dxLimit = dxLimit;
     }
@@ -196,15 +194,9 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         return dx;
     }
 
-    /**
-     * Using dot instead of norm saves the sqrt.
-     */
+
     private boolean within(Vector<Y> error) {
         return error.maxAbs() < m_tolerance;
-        // double sqErr = error.dot(error);
-        // if (DEBUG)
-        // System.out.printf("sqErr %f tolSq %f\n", sqErr, m_toleranceSq);
-        // return sqErr < m_toleranceSq;
     }
 
     /**

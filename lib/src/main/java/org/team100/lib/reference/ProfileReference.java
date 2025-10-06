@@ -18,8 +18,6 @@ import org.team100.lib.profile.HolonomicProfile;
  * One of the implications of this choice is that the cache updates will
  * continue forever unless we explicitly stop them, so if you use this class,
  * you need to remember to do that.
- * 
- * TODO: maybe implement this without the central Cache?
  */
 public class ProfileReference implements SwerveReference {
     private static final boolean DEBUG = false;

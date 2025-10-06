@@ -88,13 +88,6 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
             return;
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
-        // OptionalDouble velocity = getVelocity();
-        // if (velocity.isEmpty())
-        // return;
-        // TODO: do i need this somewhere else?
-        // m_controller.init(new Model100(position.getAsDouble(), 0));
-        // System.out.println("IM BEING RESET TO" + position.getAsDouble() +
-        // "***********************************************************");
         Control100 measurement = new Control100(position.getAsDouble(), 0);
         m_setpoint = measurement;
         // measurement is used for initialization only here.

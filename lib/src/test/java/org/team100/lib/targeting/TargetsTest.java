@@ -24,7 +24,6 @@ import edu.wpi.first.networktables.StructArrayTopic;
 
 /**
  * Timeless because the clock is used to decide to ignore (stale) input.
- * TODO: this is now intermittently failing due to timestamps.
  */
 public class TargetsTest implements Timeless {
     private static final double DELTA = 0.001;

@@ -389,8 +389,6 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
              * NEW (3/12/25), 2 cm std dev seems kinda realistic for 1 m.
              * 
              * If it still jitters, try 0.03 or 0.05, but watch out for slow convergence.
-             * 
-             * TODO: gather some actual data.
              */
             final double K = 0.03;
             return new double[] {

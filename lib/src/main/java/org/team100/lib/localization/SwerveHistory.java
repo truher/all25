@@ -59,8 +59,6 @@ public class SwerveHistory implements DoubleFunction<SwerveModel> {
 
     /**
      * Sample the state estimate buffer.
-     * 
-     * TODO: this should be behind the orchestrator, not used publicly.
      */
     @Override
     public SwerveModel apply(double timestampSeconds) {

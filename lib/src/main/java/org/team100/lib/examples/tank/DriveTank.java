@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class DriveTank extends Command {
     private static final double SCALE = 1;
+    @SuppressWarnings("unused")
     private static final double ROT_SCALE = 1;
 
     private final Supplier<Velocity> m_twistSupplier;

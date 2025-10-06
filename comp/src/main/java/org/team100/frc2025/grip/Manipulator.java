@@ -19,7 +19,6 @@ import org.team100.lib.sensor.LaserCan100;
 import org.team100.lib.util.CanId;
 
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -33,6 +32,7 @@ public class Manipulator extends SubsystemBase {
     private final LinearMechanism m_rightMech;
     private final LinearMechanism m_algaeMech;
     private final LaserCan100 m_rightLaser;
+    @SuppressWarnings("unused")
     private final LaserCan100 m_frontLaser;
     private final LaserCan100 m_backLaser;
     private final LaserCan100 m_leftLaser;

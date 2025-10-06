@@ -2,13 +2,12 @@ package org.team100.lib.indicator;
 
 import java.util.function.Supplier;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.util.RoboRioChannel;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import org.team100.lib.coherence.Takt;
 
 /**
  * An LED strip used as a signal light.

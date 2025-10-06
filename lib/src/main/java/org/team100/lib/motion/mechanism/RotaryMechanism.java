@@ -19,7 +19,6 @@ import org.team100.lib.util.Util;
  * seems simpler that way.
  */
 public class RotaryMechanism {
-    private static final boolean DEBUG = false;
     private final BareMotor m_motor;
     private final RotaryPositionSensor m_sensor;
     private final double m_gearRatio;

@@ -18,7 +18,7 @@ public class ElevatorArmWristKinematicsTest {
     void testArmHeightComp() {
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(5, 1);
         Translation2d wristPosition = new Translation2d(3, 3);
-        double h = new ElevatorArmWristKinematics(5, 1).armX(wristPosition);
+        double h = k.armX(wristPosition);
         if (DEBUG)
             System.out.println(wristPosition.getY());
         assertEquals(4, h);

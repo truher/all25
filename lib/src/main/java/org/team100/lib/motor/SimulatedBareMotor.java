@@ -132,7 +132,6 @@ public class SimulatedBareMotor implements BareMotor {
     @Override
     public double getCurrent() {
         // this is totally wrong
-        // TODO: some sort of torque model?
         return getVelocityRad_S() / 10.0;
     }
 
