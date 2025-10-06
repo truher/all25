@@ -174,7 +174,7 @@ public class FieldConstants {
 
                 case G -> 1.415;
                 case GH -> 1.2;
-                case H -> 1.415;
+                case H -> 1.465;
 
                 case I -> 1.415;
                 case IJ -> 1.2;

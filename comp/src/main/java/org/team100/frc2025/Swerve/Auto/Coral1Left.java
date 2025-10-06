@@ -41,7 +41,7 @@ public class Coral1Left {
 
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
-                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.I));
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.J));
 
 
         Done toL4 = mech.homeToL4();

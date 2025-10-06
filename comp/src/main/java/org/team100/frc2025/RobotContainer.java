@@ -20,7 +20,7 @@ import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
-import org.team100.frc2025.CommandGroups.GrabAndHoldAlgae;
+import org.team100.frc2025.CommandGroups.AlgaeExit;
 import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
@@ -323,8 +323,8 @@ public class RobotContainer {
 
         FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        m_auton = LolipopAuto.get(logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive, m_planner,
+        m_auton = Coral1Left.get(logger, m_mech, m_manipulator,
+                autoController, autoProfile, m_drive, 
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
 
         whileTrue(
@@ -406,10 +406,10 @@ public class RobotContainer {
                         localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         // grab and hold algae, and then eject it when you let go of the button
-        whileTrue(buttons::algae,
+        onTrue(buttons::algae,
                 MoveToAlgaePosition.get(
-                        m_mech, buttons::algaeLevel))
-                .onFalse(m_mech.algaeToHome());
+                        m_mech, buttons::algaeLevel,buttons::algae))
+               ;
 
         // these are all unbound
         FollowJointProfiles homeGentle = m_mech.homeAlgae();
@@ -512,7 +512,7 @@ public class RobotContainer {
     }
 
     public void onInit() {
-        m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(0)));
+        m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(Math.PI)));
     }
 
     public void onAuto() {
