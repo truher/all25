@@ -24,7 +24,7 @@ public class Blip24Struct implements Struct<Blip24> {
 
     @Override
     public String getSchema() {
-        return "int id;Transform3d pose";
+        return "int32 id;Transform3d pose";
     }
 
     @Override
