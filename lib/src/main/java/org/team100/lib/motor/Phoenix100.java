@@ -6,6 +6,7 @@ import org.team100.lib.config.PIDConstants;
 import org.team100.lib.util.Util;
 
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -102,6 +103,13 @@ public class Phoenix100 {
         slot1Configs.kD = pid.getVelocityD();
         crash(() -> conf.apply(slot0Configs, TIMEOUT_SEC));
         crash(() -> conf.apply(slot1Configs, TIMEOUT_SEC));
+    }
+
+    /** Allow music during disable: this is for warning sounds. */
+    public static void audioConfig(TalonFXConfigurator conf) {
+        AudioConfigs audioConfigs = new AudioConfigs();
+        audioConfigs.AllowMusicDurDisable = true;
+        crash(() -> conf.apply(audioConfigs, TIMEOUT_SEC));
     }
 
     private Phoenix100() {

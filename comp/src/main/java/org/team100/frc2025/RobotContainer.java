@@ -79,6 +79,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -354,6 +355,13 @@ public class RobotContainer {
                         m_mech.stationWithProfile(),
                         m_manipulator.centerIntake()));
 
+        // Sideways intake for L1
+        whileTrue(buttons::red2,
+                sequence(
+                        m_manipulator.sidewaysIntake()
+                                .until(m_manipulator::hasCoralSideways),
+                        m_manipulator.sidewaysHold()));
+
         ////////////////////////////////////////////////////////////
         //
         // CORAL SCORING
@@ -380,6 +388,8 @@ public class RobotContainer {
         //
         // ALGAE
         //
+        // Algae commands have two components: one button for manipulator,
+        // one button for arm mechanism.
 
         // grab and hold algae, and then eject it when you let go of the button
         onTrue(buttons::algae,
@@ -388,21 +398,22 @@ public class RobotContainer {
 
         FollowJointProfiles homeGentle = m_mech.homeAlgae();
         whileTrue(driver::b, m_mech.algaePickGround()).onFalse(homeGentle.until(homeGentle::isDone));
-        whileTrue(buttons::red2,
-                sequence(
-                        m_manipulator.sidewaysIntake()
-                                .until(m_manipulator::hasCoralSideways),
-                        m_manipulator.sidewaysHold()));
+
+        // Intake algae and puke it when you let go.
         whileTrue(buttons::barge,
                 sequence(
                         m_manipulator.algaeIntake()
                                 .until(m_manipulator::hasAlgae),
-                        m_manipulator.algaeHold())//
+                        m_manipulator.algaeHold()) //
         ).onFalse(
                 m_manipulator.algaeEject()
                         .withTimeout(0.5));
+
+        // Move mech to processor
         whileTrue(buttons::red4,
                 m_mech.processorWithProfile());
+
+        // Move mech to barge
         whileTrue(buttons::red3,
                 m_mech.homeToBarge()).onFalse(m_mech.bargeToHome());
 
@@ -426,6 +437,32 @@ public class RobotContainer {
         // Between matches, operator: Reset the climber position.
         whileTrue(operator::rightBumper,
                 m_climber.manual(operator::leftY));
+
+        ////////////////////////////////////////////////////////////
+        //
+        // TEST ALL MOVEMENTS
+        //
+        // For pre- and post-match testing.
+        //
+        // Enable "test" mode and press operator left bumper and driver right bumper.
+        //
+        // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
+        //
+        // THIS WILL MOVE THE ROBOT VERY FAST!
+        //
+        // DO NOT RUN with the wheels on the floor!
+        //
+        // DO NOT RUN without tiedown clamps.
+        //
+        // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
+        //
+        whileTrue(() -> (RobotState.isTest() && operator.leftBumper() && driver.rightBumper()),
+                // for now, it just beeps and does one thing.
+                sequence(
+                        startingBeeps(),
+                        m_manipulator.centerIntake().withTimeout(1) //
+                ).withName("test all movements") //
+        );
 
         initStuff();
     }
@@ -485,6 +522,25 @@ public class RobotContainer {
 
         double endS = Takt.actual();
         Util.printf("\n*** PREWARM END ET: %f\n", endS - startS);
+    }
+
+    public Command play(double freq) {
+        return parallel(
+                m_mech.play(freq),
+                m_manipulator.play(freq));
+    }
+
+    /** Three beeps and one long beep. */
+    public Command startingBeeps() {
+        return sequence(
+                play(880).withTimeout(0.5),
+                play(0).withTimeout(0.5),
+                play(880).withTimeout(0.5),
+                play(0).withTimeout(0.5),
+                play(880).withTimeout(0.5),
+                play(0).withTimeout(0.5),
+                play(1760).withTimeout(1.0),
+                play(0).withTimeout(0.1));
     }
 
     public void onTeleop() {

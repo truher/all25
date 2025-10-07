@@ -3,6 +3,8 @@ package org.team100.frc2025.CalgamesArm;
 import static edu.wpi.first.wpilibj2.command.Commands.select;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -46,6 +48,8 @@ import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.motor.Talon6Motor;
+import org.team100.lib.music.Music;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.Util;
@@ -55,7 +59,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CalgamesMech extends SubsystemBase {
+public class CalgamesMech extends SubsystemBase implements Music {
     private static final boolean DEBUG = false;
     private boolean DISABLED = false;
     ////////////////////////////////////////////////////////
@@ -110,7 +114,10 @@ public class CalgamesMech extends SubsystemBase {
     /** Home pose is Config(0,0,0), from forward kinematics. */
     private final Pose2d m_home;
 
-    public CalgamesMech(LoggerFactory log,
+    private final List<Talon6Motor> m_players;
+
+    public CalgamesMech(
+            LoggerFactory log,
             double armLength,
             double wristLength) {
         LoggerFactory parent = log.type(this);
@@ -140,6 +147,9 @@ public class CalgamesMech extends SubsystemBase {
         LoggerFactory elevatorfrontLog = parent.name("elevatorFront");
         LoggerFactory shoulderLog = parent.name("shoulder");
         LoggerFactory wristLog = parent.name("wrist");
+
+        m_players = new ArrayList<>();
+
         switch (Identity.instance) {
             case COMP_BOT -> {
 
@@ -156,6 +166,7 @@ public class CalgamesMech extends SubsystemBase {
                         100,
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
+                m_players.add(elevatorFrontMotor);
                 Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
                         elevatorfrontLog, elevatorFrontMotor);
 
@@ -172,6 +183,7 @@ public class CalgamesMech extends SubsystemBase {
                         100, // originally 90
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
+                m_players.add(elevatorBackMotor);
                 Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
                         elevatorbackLog, elevatorBackMotor);
                 m_elevatorBack = new LinearMechanism(
@@ -188,6 +200,7 @@ public class CalgamesMech extends SubsystemBase {
                         100, // og 90
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
+                m_players.add(shoulderMotor);
                 Talon6Encoder shoulderEncoder = new Talon6Encoder(
                         shoulderLog, shoulderMotor);
                 // The shoulder has a 5048 on the intermediate shaft
@@ -219,6 +232,7 @@ public class CalgamesMech extends SubsystemBase {
                         60, // og 90
                         PIDConstants.makePositionPID(8), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
+                m_players.add(wristMotor);
                 // the wrist has no angle sensor, so it needs to start in the "zero" position.
                 Talon6Encoder wristEncoder = new Talon6Encoder(
                         wristLog, wristMotor);
@@ -232,7 +246,6 @@ public class CalgamesMech extends SubsystemBase {
                         wristLog, wristMotor, wristProxySensor, wristGearRatio,
                         -1.5, // min
                         2.1); // max
-
             }
             default -> {
                 SimulatedBareMotor elevatorMotorFront = new SimulatedBareMotor(
@@ -271,6 +284,15 @@ public class CalgamesMech extends SubsystemBase {
                         wristLog, wristMotor, wristSensor, 58, -3, 3);
             }
         }
+    }
+
+    @Override
+    public Command play(double freq) {
+        return run(() -> {
+            for (Talon6Motor m : m_players) {
+                m.play(freq);
+            }
+        });
     }
 
     public double getArmLength() {
@@ -513,6 +535,7 @@ public class CalgamesMech extends SubsystemBase {
                 HolonomicPose2d.make(ALGAE_L2, -1.0),
                 HolonomicPose2d.make(m_home, Math.PI));
     }
+
     public Command algaeL3ToHome() {
         return m_transit.terminal("homeToAlgaeL3",
                 HolonomicPose2d.make(ALGAE_L3, -1.0),
