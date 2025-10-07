@@ -100,6 +100,7 @@ public class TrajectoryTest {
                         new Translation2d(3, 7), new Rotation2d(Math.PI / 2), new Rotation2d()),
                 new HolonomicPose2d(
                         new Translation2d(6, 9), new Rotation2d(-((7 * Math.PI) / 36)), new Rotation2d(Math.PI / 2)));
+        @SuppressWarnings("unused")
         Trajectory100 t = p.restToRest(waypoints);
         // TrajectoryPlotter.plot(t, "simple");
     }
@@ -122,6 +123,7 @@ public class TrajectoryTest {
                         new Translation2d(3, 7), new Rotation2d(Math.PI / 2), new Rotation2d()),
                 new HolonomicPose2d(
                         new Translation2d(6, 9), new Rotation2d(-((7 * Math.PI) / 36)), new Rotation2d(Math.PI / 2)));
+        @SuppressWarnings("unused")
         Trajectory100 t = p.restToRest(waypoints);
         // TrajectoryPlotter.plot(t, "simple");
     }

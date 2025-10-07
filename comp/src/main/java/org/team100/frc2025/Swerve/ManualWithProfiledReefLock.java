@@ -6,7 +6,7 @@ import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
@@ -103,7 +103,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
     @Override
     public FieldRelativeVelocity apply(
             final SwerveModel state,
-            final DriverControl.Velocity twist1_1) {
+            final Velocity twist1_1) {
         final FieldRelativeVelocity control = clipAndScale(twist1_1);
 
         if (!m_lockToReef.get()) {
@@ -156,9 +156,9 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
         return twistWithSnapM_S;
     }
 
-    public FieldRelativeVelocity clipAndScale(DriverControl.Velocity twist1_1) {
+    public FieldRelativeVelocity clipAndScale(Velocity twist1_1) {
         // clip the input to the unit circle
-        final DriverControl.Velocity clipped = twist1_1.clip(1.0);
+        final Velocity clipped = twist1_1.clip(1.0);
 
         // scale to max in both translation and rotation
         return FieldRelativeDriver.scale(

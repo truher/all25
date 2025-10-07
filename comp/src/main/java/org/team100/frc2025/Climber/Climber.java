@@ -41,19 +41,18 @@ public class Climber extends SubsystemBase {
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
 
         switch (Identity.instance) {
-            case COMP_BOT -> { // TODO: MAKE SURE TO CHANGE THIS BACK TO BRAKE MODE FOR NEUTRAL REALLY
-                               // IMPORTANT!
+            case COMP_BOT -> {
                 Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.BRAKE, MotorPhase.REVERSE,
-                        20, 20, // og 50, TODO: FIX THIS
+                        20, 20,
                         PIDConstants.makePositionPID(1),
                         Feedforward100.makeArmPivot());
 
-                double inputOffset = 0.110602 + (0.33); // 9/28
+                double inputOffset = 0.440602;
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
                         log, new RoboRioChannel(0), inputOffset, EncoderDrive.DIRECT);
-                double gearRatio = 5 * 5 * 4 * 20; // - 9/28
+                double gearRatio = 5 * 5 * 4 * 20;
 
-                RotaryMechanism rotaryMechanism = new RotaryMechanism( 
+                RotaryMechanism rotaryMechanism = new RotaryMechanism(
                         log, motor, sensor, gearRatio,
                         0, Math.PI / 2);
 
@@ -100,7 +99,6 @@ public class Climber extends SubsystemBase {
     }
 
     public Command manual(DoubleSupplier s) {
-
         return runEnd(
                 () -> setDutyCycle(s.getAsDouble()),
                 () -> setDutyCycle(0));
@@ -109,7 +107,6 @@ public class Climber extends SubsystemBase {
     /** Push the climber out into the intake position. */
     public Command goToIntakePosition() {
         return startRun(
-                // TODO: why do we need this reset?
                 () -> reset(),
                 () -> setAngle(Math.PI / 2));
     }
@@ -117,7 +114,6 @@ public class Climber extends SubsystemBase {
     /** Pull the climber in all the way to the climb position. */
     public Command goToClimbPosition() {
         return startRun(
-                // TODO: why do we need this reset?
                 () -> reset(),
                 () -> setAngle(0));
     }

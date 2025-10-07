@@ -13,6 +13,7 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
+import org.team100.lib.logging.LoggerFactory.Transform3dLogger;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.TrailingHistory;
@@ -102,6 +103,9 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     private final BooleanLogger m_log_using_gyro;
     private final DoubleLogger m_log_tag_error;
     private final Pose2dLogger m_log_pose;
+    /** For calibration. */
+    private final Transform3dLogger m_log_tag_in_camera;
+
     /**
      * The difference between the current instant and the instant of the blip,
      * including our magic correction, i.e. this is the time we look up in the pose
@@ -157,6 +161,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         m_log_using_gyro = child.booleanLogger(Level.TRACE, "rotation source");
         m_log_tag_error = child.doubleLogger(Level.TRACE, "tag error");
         m_log_pose = child.pose2dLogger(Level.TRACE, "pose");
+        m_log_tag_in_camera = child.transform3dLogger(Level.TRACE, "tag in camera");
         m_log_lag = child.doubleLogger(Level.TRACE, "lag");
     }
 
@@ -261,7 +266,10 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             final Pose3d tagInField = tagInFieldCoordsOptional.get();
 
             // Camera-to-tag, as it appears in the camera frame.
-            Transform3d tagInCamera = blip.blipToTransform();
+            Transform3d blipTransform = blip.blipToTransform();
+            m_log_tag_in_camera.log(() -> blipTransform);
+
+            Transform3d tagInCamera = blipTransform;
 
             if (DEBUG) {
                 // This is used for camera offset calibration. Place a tag at a known position,
@@ -319,7 +327,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 continue;
             }
 
-            if (blip.blipToTransform().getTranslation().getNorm() > m_heedRadiusM) {
+            if (blipTransform.getTranslation().getNorm() > m_heedRadiusM) {
                 if (DEBUG)
                     Util.println("tag is too far");
                 // Skip too-far tags.
@@ -389,8 +397,6 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
              * NEW (3/12/25), 2 cm std dev seems kinda realistic for 1 m.
              * 
              * If it still jitters, try 0.03 or 0.05, but watch out for slow convergence.
-             * 
-             * TODO: gather some actual data.
              */
             final double K = 0.03;
             return new double[] {

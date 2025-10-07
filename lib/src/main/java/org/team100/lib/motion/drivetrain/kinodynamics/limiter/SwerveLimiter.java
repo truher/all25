@@ -47,7 +47,6 @@ public class SwerveLimiter  {
         final double cartesianScale = 1.0;
         // Use much less than the maximum rotational acceleration.
         // Rotating fast can be upsetting.
-        // TODO: find the right alpha scale.
         final double alphaScale = 0.2;
         m_accelerationLimiter = new FieldRelativeAccelerationLimiter(child, dynamics, cartesianScale, alphaScale);
 
@@ -76,12 +75,12 @@ public class SwerveLimiter  {
         if (DEBUG)
             Util.printf("capsize limited %s\n", result);
 
-        // finally limit acceleration further, using motor physics
+        // Finally, limit acceleration further, using motor physics.
         result = m_accelerationLimiter.apply(m_current, result);
         if (DEBUG)
             Util.printf("accel limited %s\n", result);
 
-        // NEW! Ignore very small inputs.
+        // Ignore very small inputs.
         if (Experiments.instance.enabled(Experiment.SwerveDeadband)) {
             result = m_deadband.apply(result);
         }

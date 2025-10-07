@@ -26,8 +26,6 @@ import edu.wpi.first.wpilibj.util.WPILibVersion;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot100 {
-    private static final boolean DEBUG = false;
-
     private final DoubleLogger m_log_ds_MatchTime;
     private final BooleanLogger m_log_ds_AutonomousEnabled;
     private final BooleanLogger m_log_ds_TeleopEnabled;
@@ -47,11 +45,9 @@ public class Robot extends TimedRobot100 {
         m_log_ds_TeleopEnabled = dsLog.booleanLogger(Level.TRACE, "TeleopEnabled");
         m_log_ds_FMSAttached = dsLog.booleanLogger(Level.TRACE, "FMSAttached");
         m_log_key_list_size = m_robotLogger.intLogger(Level.TRACE, "key list size");
-        m_log_voltage = m_robotLogger.doubleLogger(Level.TRACE, "voltage");
+        m_log_voltage = m_robotLogger.doubleLogger(Level.COMP, "voltage");
         m_jvmLogger = new JvmLogger(m_robotLogger);
         m_log_update = m_robotLogger.doubleLogger(Level.COMP, "update time (s)");
-        // 4/2/25 Joel added this to try to avoid doing extra work
-        // setNetworkTablesFlushEnabled(false);
         // CanBridge.runTCP();
     }
 
@@ -217,11 +213,6 @@ public class Robot extends TimedRobot100 {
     }
 
     ///////////////////////////////////////////////////////////////////////
-
-    private void clearCommands() {
-        CommandScheduler.getInstance().cancelAll();
-        CommandScheduler.getInstance().clearComposedCommands();
-    }
 
     private void banner() {
         StringBuilder b = new StringBuilder();

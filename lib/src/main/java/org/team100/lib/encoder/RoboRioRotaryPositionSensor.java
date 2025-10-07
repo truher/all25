@@ -21,14 +21,8 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
     private final EncoderDrive m_drive;
     // LOGGERS
     private final OptionalDoubleLogger m_log_position;
-
     private final DoubleLogger m_log_position_turns;
     private final DoubleLogger m_log_position_turns_offset;
-    // private final DoubleLogger m_log_rate;
-
-    // private Double m_prevAngleRad = null;
-    // private Double m_prevTimeS = null;
-
 
     protected RoboRioRotaryPositionSensor(
             LoggerFactory parent,
@@ -40,7 +34,6 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
         m_log_position = log.optionalDoubleLogger(Level.COMP, "position (rad)");
         m_log_position_turns = log.doubleLogger(Level.COMP, "position (turns)");
         m_log_position_turns_offset = log.doubleLogger(Level.TRACE, "position (turns-offset)");
-        // m_log_rate = log.doubleLogger(Level.TRACE, "rate (rad)s)");
     }
 
     /** Implementations should cache this. */
@@ -95,49 +88,16 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
             default:
                 throw new IllegalArgumentException();
         }
-
     }
 
     /**
-     * NOTE (3/14/25): this seems to return garbage? I'm not sure, so I'll
-     * comment it out for now.
-     * TODO (3/14/25): test this in reality.
-     * 
-     * Nearly cached.
-     * 
-     * Current rate in rad/s.
-     * 
-     * This is simply the backward finite difference over one time step.
-     * 
-     * As such, it is likely to be very noisy.
-     * 
-     * Use a simple filter if you want a lagged, smoother measurement.
-     * 
-     * Use a Kalman filter if you can, to reduce the lag.
+     * Always returns zero.
+     *  
+     * Extracting velocity from the absolute position sensor does not work.
      */
     @Override
     public OptionalDouble getVelocityRad_S() {
         return OptionalDouble.of(0);
-
-        // OptionalDouble angleRad = getRad();
-        // if (angleRad.isEmpty())
-        // return OptionalDouble.empty();
-        // double timeS = Takt.get();
-        // if (m_prevAngleRad == null) {
-        // m_prevAngleRad = angleRad.getAsDouble();
-        // m_prevTimeS = timeS;
-        // return OptionalDouble.of(0);
-        // }
-        // double dxRad = MathUtil.angleModulus(angleRad.getAsDouble() -
-        // m_prevAngleRad);
-        // double dtS = timeS - m_prevTimeS;
-
-        // m_prevAngleRad = angleRad.getAsDouble();
-        // m_prevTimeS = timeS;
-
-        // double rateRad_S = dxRad / dtS;
-        // m_log_rate.log(() -> rateRad_S);
-        // return OptionalDouble.of(rateRad_S);
     }
 
 }

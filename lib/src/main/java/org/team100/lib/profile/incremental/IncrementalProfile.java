@@ -11,6 +11,7 @@ import org.team100.lib.util.Util;
  * Use the ETA to coordinate multiple dimensions.
  */
 public interface IncrementalProfile {
+    public static final int MAX_ETA = 10;
     static final boolean DEBUG = false;
 
     /**
@@ -35,8 +36,7 @@ public interface IncrementalProfile {
             Control100 c = calculate(dt, sample.control(), goal);
             sample = c.model();
             t += dt;
-            // TODO: configurable longest-ETA
-            if (t > 10)
+            if (t > MAX_ETA)
                 return Double.POSITIVE_INFINITY;
         }
         return t;

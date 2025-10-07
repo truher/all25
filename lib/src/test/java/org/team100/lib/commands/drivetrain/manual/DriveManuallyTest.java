@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -23,11 +23,11 @@ class DriveManuallyTest extends Fixtured implements Timeless {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     String desiredMode = null;
-    DriverControl.Velocity desiredTwist = new DriverControl.Velocity(1, 0, 0);
+    Velocity desiredTwist = new Velocity(1, 0, 0);
 
     @Test
     void testSimple() {
-        Supplier<DriverControl.Velocity> twistSupplier = () -> desiredTwist;
+        Supplier<Velocity> twistSupplier = () -> desiredTwist;
         SwerveDriveSubsystem drive = fixture.drive;
         fixture.collection.reset();
         stepTime();

@@ -20,14 +20,11 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 /**
  * Write simulated targets to Network Tables, so the Targets receiver can pick
  * them up.
- * 
- * TODO: simulate multiple cameras to see if the reader combines them
  */
 public class SimulatedTargetWriter {
     private static final boolean DEBUG = false;
 
     // camera frame is from 85 ms ago
-    // TODO: make this jitter a little
     private static final double DELAY = 0.085;
 
     private final Map<Camera, StructArrayPublisher<Rotation3d>> m_publishers;

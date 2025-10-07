@@ -6,7 +6,7 @@ import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
 import org.team100.lib.commands.drivetrain.manual.HeadingLatch;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
@@ -113,7 +113,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
     @Override
     public FieldRelativeVelocity apply(
             final SwerveModel state,
-            final DriverControl.Velocity twist1_1) {
+            final Velocity twist1_1) {
         final FieldRelativeVelocity control = clipAndScale(twist1_1);
 
         final double currentVelocity = state.velocity().norm();
@@ -184,9 +184,9 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
      * Slow down when driving toward the barge scoring location, so you don't hit
      * it.
      */
-    public FieldRelativeVelocity clipAndScale(DriverControl.Velocity twist1_1) {
+    public FieldRelativeVelocity clipAndScale(Velocity twist1_1) {
         // clip the input to the unit circle
-        final DriverControl.Velocity clipped = twist1_1.clip(1.0);
+        final Velocity clipped = twist1_1.clip(1.0);
 
         double scale = 1;
 
@@ -209,12 +209,12 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
             scale = 0.5;
         }
 
-        DriverControl.Velocity scaled;
+        Velocity scaled;
 
         if (clipped.x() > 0) {
-            scaled = new DriverControl.Velocity(scale, clipped.y(), clipped.theta());
+            scaled = new Velocity(scale, clipped.y(), clipped.theta());
         } else {
-            scaled = new DriverControl.Velocity(clipped.x(), clipped.y(), clipped.theta());
+            scaled = new Velocity(clipped.x(), clipped.y(), clipped.theta());
 
         }
 

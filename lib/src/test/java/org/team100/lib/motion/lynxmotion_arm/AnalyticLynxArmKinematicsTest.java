@@ -101,6 +101,7 @@ public class AnalyticLynxArmKinematicsTest {
         LynxArmConfig q0 = new LynxArmConfig(0, 0, 0, 0, 0);
 
         // this does indeed produce an error
+        @SuppressWarnings("unused")
         LynxArmConfig q = k.inverse(q0, p);
 
         Translation2d translation = p.toPose2d().getTranslation();

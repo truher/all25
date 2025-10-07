@@ -6,14 +6,12 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.DoubleConsumer;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.Done;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
-import org.team100.lib.commands.drivetrain.DriveToPoseWithTrajectory;
 import org.team100.lib.commands.drivetrain.DriveToTranslationFacingWithProfile;
 import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
@@ -24,15 +22,11 @@ import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -58,14 +52,6 @@ public class LolipopAuto {
                 (p) -> planner.restToRest(List.of(
                         HolonomicPose2d.make(drive.getPose(), Math.PI),
                         HolonomicPose2d.make(3, 5, 0, -2))));
-
-        // this appears to be a straight line
-        // DriveToPoseWithTrajectory toReefTrajectory = new DriveToPoseWithTrajectory(
-        //         () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A)
-        //                 .plus(new Transform2d(-.5, .5, new Rotation2d())),
-        //         drive,
-        //         generateTrajectory(planner),
-        //         controller, viz);
 
         DriveToPoseWithProfile toReefA = new DriveToPoseWithProfile(
                 logger, drive, controller, profile,
@@ -129,10 +115,5 @@ public class LolipopAuto {
                                 .andThen(ejectthird))
                         .until(() -> (toReefC.isDone() && toL4third.isDone() && ejectthird.isFinished())),
                 mech.l4ToHome());
-    }
-
-    private static BiFunction<SwerveModel, Pose2d, Trajectory100> generateTrajectory(TrajectoryPlanner planner) {
-        return (start, end) -> planner.movingToRest(start, new Rotation2d(Math.PI), 10, end,
-                new Rotation2d(-Math.PI / 2), 10);
     }
 }

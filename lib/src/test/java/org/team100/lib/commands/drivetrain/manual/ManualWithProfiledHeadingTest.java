@@ -12,7 +12,7 @@ import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.gyro.MockGyro;
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -48,7 +48,7 @@ class ManualWithProfiledHeadingTest {
                 thetaFeedback);
         m_manualWithHeading.reset(new SwerveModel());
 
-        DriverControl.Velocity twist1_1 = new DriverControl.Velocity(0, 0, 0);
+        Velocity twist1_1 = new Velocity(0, 0, 0);
 
         FieldRelativeVelocity twistM_S = m_manualWithHeading.apply(new SwerveModel(), twist1_1);
         verify(0, 0, 0, twistM_S);
@@ -57,7 +57,7 @@ class ManualWithProfiledHeadingTest {
         assertNotNull(m_manualWithHeading.m_goal);
         desiredRotation = null;
 
-        twist1_1 = new DriverControl.Velocity(0, 0, 1);
+        twist1_1 = new Velocity(0, 0, 1);
         twistM_S = m_manualWithHeading.apply(new SwerveModel(), twist1_1);
         // with a nonzero desired twist, we're out of snap mode
         assertNull(m_manualWithHeading.m_goal);
@@ -82,7 +82,7 @@ class ManualWithProfiledHeadingTest {
         // no desired rotation
         desiredRotation = null;
 
-        DriverControl.Velocity twist1_1 = new DriverControl.Velocity(0, 0, 1);
+        Velocity twist1_1 = new Velocity(0, 0, 1);
 
         FieldRelativeVelocity twistM_S = m_manualWithHeading.apply(
                 new SwerveModel(),
@@ -92,7 +92,7 @@ class ManualWithProfiledHeadingTest {
         assertNull(m_manualWithHeading.m_goal);
         verify(0, 0, 2.828, twistM_S);
 
-        twist1_1 = new DriverControl.Velocity(1, 0, 0);
+        twist1_1 = new Velocity(1, 0, 0);
 
         twistM_S = m_manualWithHeading.apply(new SwerveModel(Pose2d.kZero, twistM_S), twist1_1);
         assertNull(m_manualWithHeading.m_goal);
@@ -120,7 +120,7 @@ class ManualWithProfiledHeadingTest {
         // face towards +y
         desiredRotation = Rotation2d.kCCW_Pi_2;
         // no user input
-        final DriverControl.Velocity twist1_1 = new DriverControl.Velocity(0, 0, 0);
+        final Velocity twist1_1 = new Velocity(0, 0, 0);
 
         // initial state is motionless
         FieldRelativeVelocity twistM_S = m_manualWithHeading.apply(
@@ -200,7 +200,7 @@ class ManualWithProfiledHeadingTest {
         // no dtheta
 
         // no stick input
-        final DriverControl.Velocity twist1_1 = new DriverControl.Velocity(0, 0, 0);
+        final Velocity twist1_1 = new Velocity(0, 0, 0);
         FieldRelativeVelocity v = m_manualWithHeading.apply(
                 new SwerveModel(),
                 twist1_1);
@@ -265,7 +265,7 @@ class ManualWithProfiledHeadingTest {
                 thetaFeedback);
 
         // driver rotates a bit
-        DriverControl.Velocity control = new DriverControl.Velocity(0, 0, 1);
+        Velocity control = new Velocity(0, 0, 1);
 
         SwerveModel currentState = new SwerveModel(
                 Pose2d.kZero,
@@ -291,7 +291,7 @@ class ManualWithProfiledHeadingTest {
         verify(0, 0, 2.828, v);
 
         // let go of the stick
-        control = new DriverControl.Velocity(0, 0, 0);
+        control = new Velocity(0, 0, 0);
         currentState = new SwerveModel(
                 Pose2d.kZero,
                 new FieldRelativeVelocity(0, 0, 2.828));
@@ -336,7 +336,7 @@ class ManualWithProfiledHeadingTest {
                 thetaFeedback);
 
         // driver rotates a bit
-        DriverControl.Velocity twist1_1 = new DriverControl.Velocity(0, 0, 1);
+        Velocity twist1_1 = new Velocity(0, 0, 1);
 
         SwerveModel currentState = new SwerveModel(
                 Pose2d.kZero,
@@ -362,7 +362,7 @@ class ManualWithProfiledHeadingTest {
         verify(0, 0, 2.828, v);
 
         // let go of the stick
-        twist1_1 = new DriverControl.Velocity(0, 0, 0);
+        twist1_1 = new Velocity(0, 0, 0);
         currentState = new SwerveModel(
                 Pose2d.kZero,
                 new FieldRelativeVelocity(0, 0, 2.828));

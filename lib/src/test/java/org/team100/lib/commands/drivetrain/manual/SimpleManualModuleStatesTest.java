@@ -2,7 +2,7 @@ package org.team100.lib.commands.drivetrain.manual;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -19,7 +19,7 @@ class SimpleManualModuleStatesTest {
     void testZero() {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
         SimpleManualModuleStates s = new SimpleManualModuleStates(logger, limits);
-        DriverControl.Velocity input = new DriverControl.Velocity(0, 0, 0);
+        Velocity input = new Velocity(0, 0, 0);
         SwerveModuleStates ms = s.apply(input);
         assertEquals(0, ms.frontLeft().angle().get().getRadians(), DELTA);
         assertEquals(0, ms.frontRight().angle().get().getRadians(), DELTA);
@@ -36,7 +36,7 @@ class SimpleManualModuleStatesTest {
     void testAngle() {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
         SimpleManualModuleStates s = new SimpleManualModuleStates(logger, limits);
-        DriverControl.Velocity input = new DriverControl.Velocity(0, 0, 0.5);
+        Velocity input = new Velocity(0, 0, 0.5);
         SwerveModuleStates ms = s.apply(input);
         assertEquals(Math.PI / 2, ms.frontLeft().angle().get().getRadians(), DELTA);
         assertEquals(Math.PI / 2, ms.frontRight().angle().get().getRadians(), DELTA);
@@ -53,7 +53,7 @@ class SimpleManualModuleStatesTest {
     void testDrive() {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
         SimpleManualModuleStates s = new SimpleManualModuleStates(logger, limits);
-        DriverControl.Velocity input = new DriverControl.Velocity(0.5, 0, 0);
+        Velocity input = new Velocity(0.5, 0, 0);
         SwerveModuleStates ms = s.apply(input);
         assertEquals(0, ms.frontLeft().angle().get().getRadians(), DELTA);
         assertEquals(0, ms.frontRight().angle().get().getRadians(), DELTA);

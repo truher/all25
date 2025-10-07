@@ -16,12 +16,11 @@ import edu.wpi.first.math.Vector;
 public class GradientDescent<R extends Num> {
     private final Nat<R> m_rows;
     private final Function<Vector<R>, Double> m_f;
+    /** Return the current solution if a step doesn't improve it more than this. */
     private final double m_tolerance;
     private final int m_iterations;
 
     /**
-     * TODO: the tolerance is the *improvement* rather than the error itself.
-     * 
      * Since we're actually optimizing the scalar error instead of an arbitrary
      * function, and we know the error is positive-definite, maybe this should just
      * say that.
@@ -59,7 +58,6 @@ public class GradientDescent<R extends Num> {
             }
             double step = Math.abs(fNext - fCurrent);
             if (step < m_tolerance) {
-                // System.out.println(i);
                 return next;
             }
             current = next;

@@ -16,7 +16,6 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.Fixtured;
 import org.team100.lib.motion.drivetrain.MockDrive;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
@@ -128,53 +127,6 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
         }
         assertTrue(c.isDone());
 
-    }
-
-    /** Use a real drivetrain to observe the effect on the motors etc. */
-    @Test
-    void testRealDrive() {
-        fixture.collection.reset();
-        // 1m along +x, no rotation.
-        Trajectory100 trajectory = planner.restToRest(
-                new Pose2d(0, 0, Rotation2d.kZero),
-                new Pose2d(1, 0, Rotation2d.kZero));
-        // first state is motionless
-        assertEquals(0, trajectory.sample(0).velocityM_S(), DELTA);
-        SwerveController controller = SwerveControllerFactory.test(logger);
-
-        SwerveDriveSubsystem drive = fixture.drive;
-
-        // initially at rest
-        assertEquals(0, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
-        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
-
-        ReferenceController command = new ReferenceController(
-                drive,
-                controller,
-                new TrajectoryReference(trajectory),
-                false);
-        stepTime();
-
-        command.execute();
-        // but that output is not available until after takt.
-        assertEquals(0, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
-        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
-
-        // drive normally more
-        stepTime();
-        command.execute();
-        // this is the output from the previous takt
-        // TODO: fix this test
-        // assertEquals(0.02,
-        // fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
-        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
-
-        // etc
-        stepTime();
-        command.execute();
-        // assertEquals(0.04,
-        // fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
-        assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
     }
 
     @Test

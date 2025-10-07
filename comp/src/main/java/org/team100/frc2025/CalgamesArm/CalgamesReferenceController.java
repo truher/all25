@@ -42,11 +42,9 @@ public class CalgamesReferenceController {
      * Trajectory is complete and controller error is within tolerance.
      * 
      * Since positional feedback is outboard, the "at reference" thing is unknown.
-     * 
-     * TODO: make it known.
      */
     public boolean isDone() {
-        return m_reference.done();// && m_controller.atReference();
+        return m_reference.done();
     }
 
     /** Distance between the measurement and the goal. */

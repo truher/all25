@@ -30,11 +30,7 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
 
     /** Null if there's no current profile. */
     private Model100 m_goal;
-    // TODO: should this be both? which one should we retain?
     private Control100 m_nextSetpoint;
-
-    // for calculating acceleration
-    // private double previousSetpoint = 0;
 
     public OutboardLinearPositionServo(
             LoggerFactory parent,
@@ -61,9 +57,6 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
             return;
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
-        // OptionalDouble velocity = getVelocity();
-        // if (velocity.isEmpty())
-        // return;
         Control100 measurement = new Control100(position.getAsDouble(), 0);
         m_nextSetpoint = measurement;
         // reference is initalized with measurement only here.
@@ -177,19 +170,4 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
         m_log_position.log(() -> getPosition().orElse(Double.NaN));
         m_log_velocity.log(() -> getVelocity().orElse(Double.NaN));
     }
-
-    /**
-     * Acceleration from trailing difference in velocity.
-     * 
-     * To avoid injecting clock noise into the acceleration signal, this uses
-     * a constant dt, TimedRobot100.LOOP_PERIOD_S, so you'd better be calling this
-     * at about that rate.
-     * 
-     * @param setpoint desired velocity
-     */
-    // private double accel(double setpoint) {
-    // double accel = (setpoint - previousSetpoint) / TimedRobot100.LOOP_PERIOD_S;
-    // previousSetpoint = setpoint;
-    // return accel;
-    // }
 }

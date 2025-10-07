@@ -1,6 +1,6 @@
 package org.team100.lib.commands.drivetrain.manual;
 
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
@@ -13,7 +13,7 @@ public interface FieldRelativeDriver {
      * @param input control units [-1,1]
      * @return feasible field-relative velocity in m/s and rad/s
      */
-    FieldRelativeVelocity apply(SwerveModel state, DriverControl.Velocity input);
+    FieldRelativeVelocity apply(SwerveModel state, Velocity input);
 
     void reset(SwerveModel state);
 
@@ -27,7 +27,7 @@ public interface FieldRelativeDriver {
      * @param maxRot   radians per second
      * @return meters and rad per second as specified by speed limits
      */
-    public static FieldRelativeVelocity scale(DriverControl.Velocity twist, double maxSpeed, double maxRot) {
+    public static FieldRelativeVelocity scale(Velocity twist, double maxSpeed, double maxRot) {
         return new FieldRelativeVelocity(
                 maxSpeed * MathUtil.clamp(twist.x(), -1, 1),
                 maxSpeed * MathUtil.clamp(twist.y(), -1, 1),

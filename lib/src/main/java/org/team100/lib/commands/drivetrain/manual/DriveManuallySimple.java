@@ -3,7 +3,7 @@ package org.team100.lib.commands.drivetrain.manual;
 import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
@@ -22,7 +22,7 @@ public class DriveManuallySimple extends Command {
      * Velocity control in control units, [-1,1] on all axes. This needs to be
      * mapped to a feasible velocity control as early as possible.
      */
-    private final Supplier<DriverControl.Velocity> m_twistSupplier;
+    private final Supplier<Velocity> m_twistSupplier;
     private final DoubleConsumer m_heedRadiusM;
     private final SwerveDriveSubsystem m_drive;
     private final FieldRelativeDriver m_defaultDriver;
@@ -33,7 +33,7 @@ public class DriveManuallySimple extends Command {
     boolean wasUsingDefault = true;
 
     public DriveManuallySimple(
-            Supplier<DriverControl.Velocity> twistSupplier,
+            Supplier<Velocity> twistSupplier,
             DoubleConsumer heedRadiusM,
             SwerveDriveSubsystem drive,
             FieldRelativeDriver driver,
@@ -59,7 +59,7 @@ public class DriveManuallySimple extends Command {
     @Override
     public void execute() {
 
-        DriverControl.Velocity input = m_twistSupplier.get();
+        Velocity input = m_twistSupplier.get();
         SwerveModel state = m_drive.getState();
 
         if (m_useAlternative.get() == wasUsingDefault) { // we need to reset the driver because we switched modes from

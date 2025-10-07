@@ -3,7 +3,7 @@ package org.team100.lib.commands.drivetrain.manual;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -21,7 +21,7 @@ class ManualChassisSpeedsTest {
     void testChassisSpeedsZero() {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
         ManualChassisSpeeds manual = new ManualChassisSpeeds(logger, limits);
-        DriverControl.Velocity input = new DriverControl.Velocity(0, 0, 0);
+        Velocity input = new Velocity(0, 0, 0);
         ChassisSpeeds speeds = manual.apply(new SwerveModel(), input);
         assertEquals(0, speeds.vxMetersPerSecond, DELTA);
         assertEquals(0, speeds.vyMetersPerSecond, DELTA);
@@ -35,7 +35,7 @@ class ManualChassisSpeedsTest {
         assertEquals(2.828, limits.getMaxAngleSpeedRad_S(), DELTA);
         ManualChassisSpeeds manual = new ManualChassisSpeeds(logger, limits);
         // clipping to the unit circle
-        DriverControl.Velocity input = new DriverControl.Velocity(1, 2, 3);
+        Velocity input = new Velocity(1, 2, 3);
         ChassisSpeeds speeds = manual.apply(new SwerveModel(), input);
         assertEquals(0.447, speeds.vxMetersPerSecond, DELTA);
         assertEquals(0.894, speeds.vyMetersPerSecond, DELTA);

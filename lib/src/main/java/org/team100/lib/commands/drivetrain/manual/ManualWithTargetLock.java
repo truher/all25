@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.TargetUtil;
-import org.team100.lib.hid.DriverControl;
+import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -90,7 +90,7 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
     @Override
     public FieldRelativeVelocity apply(
             final SwerveModel state,
-            final DriverControl.Velocity input) {
+            final Velocity input) {
 
         //
         // feedback is based on the previous setpoint.
@@ -143,9 +143,9 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
         return twistWithLockM_S;
     }
 
-    private FieldRelativeVelocity getScaledInput(DriverControl.Velocity input) {
+    private FieldRelativeVelocity getScaledInput(Velocity input) {
         // clip the input to the unit circle
-        DriverControl.Velocity clipped = input.clip(1.0);
+        Velocity clipped = input.clip(1.0);
         // this is user input scaled to m/s and rad/s
         FieldRelativeVelocity scaledInput = FieldRelativeDriver.scale(
                 clipped,

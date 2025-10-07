@@ -15,6 +15,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -55,10 +56,15 @@ public abstract class Talon6Motor implements BareMotor {
     protected final DoubleCache m_temp;
     // protected final DoubleCache m_torque;
 
+    /////////////////////////////////////
+    // CONTROL REQUESTS
+    //
     // caching the control requests saves allocation
+    //
     private final VelocityVoltage m_velocityVoltage;
     private final DutyCycleOut m_dutyCycleOut;
     private final PositionVoltage m_positionVoltage;
+    private final MusicTone m_music;
 
     private final double m_supplyLimit;
 
@@ -92,11 +98,18 @@ public abstract class Talon6Motor implements BareMotor {
             double statorLimit,
             PIDConstants lowLevelPIDConstants,
             Feedforward100 ff) {
+        //////////////////////////////////////
+        //
+        // CONTROL REQUESTS
+        //
         m_velocityVoltage = new VelocityVoltage(0);
         m_dutyCycleOut = new DutyCycleOut(0);
         m_positionVoltage = new PositionVoltage(0);
-        // make control synchronous, i.e. "actuate immediately."
-        // see
+        m_music = new MusicTone(0);
+
+        //////////////////////////////////////
+        // Update frequencies.
+        // make control synchronous, i.e. "actuate immediately." See
         // https://github.com/Team254/FRC-2024-Public/blob/040f653744c9b18182be5f6bc51a7e505e346e59/src/main/java/com/team254/lib/ctre/swerve/SwerveModule.java#L210
         m_velocityVoltage.UpdateFreqHz = 0;
         m_dutyCycleOut.UpdateFreqHz = 0;
@@ -113,6 +126,7 @@ public abstract class Talon6Motor implements BareMotor {
         Phoenix100.motorConfig(talonFXConfigurator, neutral, motorPhase);
         Phoenix100.currentConfig(talonFXConfigurator, supplyLimit, statorLimit);
         Phoenix100.pidConfig(talonFXConfigurator, lowLevelPIDConstants);
+        Phoenix100.audioConfig(talonFXConfigurator);
 
         Phoenix100.crash(() -> m_motor.getPosition().setUpdateFrequency(SIGNAL_UPDATE_FREQ_HZ));
         Phoenix100.crash(() -> m_motor.getVelocity().setUpdateFrequency(SIGNAL_UPDATE_FREQ_HZ));
@@ -255,6 +269,10 @@ public abstract class Talon6Motor implements BareMotor {
         m_totalFeedForward.log(() -> FFVolts);
 
         log();
+    }
+
+    public void play(double freq) {
+        m_motor.setControl(m_music.withAudioFrequency(freq));
     }
 
     /**

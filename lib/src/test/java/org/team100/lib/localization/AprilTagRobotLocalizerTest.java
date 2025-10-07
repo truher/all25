@@ -30,9 +30,7 @@ import edu.wpi.first.networktables.StructArrayTopic;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 
-/**
- * TODO: clean up these cases for 2025.
- */
+
 class AprilTagRobotLocalizerTest implements Timeless {
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());

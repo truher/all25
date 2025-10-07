@@ -1,15 +1,11 @@
 package org.team100.frc2025;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
-import static edu.wpi.first.wpilibj2.command.Commands.print;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
@@ -20,15 +16,11 @@ import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
-import org.team100.frc2025.CommandGroups.AlgaeExit;
 import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
-import org.team100.frc2025.Swerve.Auto.Auton;
 import org.team100.frc2025.Swerve.Auto.Coral1Left;
-import org.team100.frc2025.Swerve.Auto.Coral1Mid;
-import org.team100.frc2025.Swerve.Auto.LolipopAuto;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
@@ -43,18 +35,15 @@ import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
-import org.team100.lib.examples.semiauto.FloorPickSetup;
+import org.team100.lib.examples.semiauto.FloorPickSequence;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.GyroFactory;
-import org.team100.lib.hid.DriverControl;
-import org.team100.lib.hid.DriverControlProxy;
-import org.team100.lib.hid.OperatorControl;
-import org.team100.lib.hid.OperatorControlProxy;
-import org.team100.lib.hid.ThirdControl;
-import org.team100.lib.hid.ThirdControlProxy;
+import org.team100.lib.hid.Buttons2025;
+import org.team100.lib.hid.DriverXboxControl;
+import org.team100.lib.hid.OperatorXboxControl;
 import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
@@ -90,6 +79,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -114,14 +104,11 @@ public class RobotContainer {
 
     // SUBSYSTEMS
     final SwerveDriveSubsystem m_drive;
-
     final Climber m_climber;
     final ClimberIntake m_climberIntake;
     final LEDIndicator m_leds;
 
     final SwerveKinodynamics m_swerveKinodynamics;
-
-    // private final ScheduledExecutorService m_initializer;
 
     private final Runnable m_simulatedTagDetector;
     private final Runnable m_targetSimulator;
@@ -148,9 +135,11 @@ public class RobotContainer {
         final LoggerFactory autoSequence = logger.name("Auto Sequence");
 
         final TrajectoryVisualization viz = new TrajectoryVisualization(fieldLogger);
-        final DriverControl driverControl = new DriverControlProxy(logger, async);
-        final OperatorControl operatorControl = new OperatorControlProxy(async);
-        final ThirdControl buttons = new ThirdControlProxy(async);
+
+        // CONTROLS
+        final DriverXboxControl driver = new DriverXboxControl(0);
+        final OperatorXboxControl operator = new OperatorXboxControl(1);
+        final Buttons2025 buttons = new Buttons2025(2);
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         if (Identity.instance.equals(Identity.COMP_BOT)) {
@@ -178,7 +167,7 @@ public class RobotContainer {
                 m_swerveKinodynamics,
                 m_modules);
 
-        // ignores the rotation derived from vision.
+        // Ignores the rotation derived from vision.
         final SwerveHistory history = new SwerveHistory(
                 m_swerveKinodynamics,
                 gyro.getYawNWU(),
@@ -209,10 +198,8 @@ public class RobotContainer {
                 m_swerveKinodynamics,
                 m_modules);
 
-        SwerveLimiter limiter = new SwerveLimiter(driveLog, m_swerveKinodynamics, RobotController::getBatteryVoltage);
-
-        TrajectoryPlanner m_planner = new TrajectoryPlanner(
-                new TimingConstraintFactory(m_swerveKinodynamics).auto());
+        final SwerveLimiter limiter = new SwerveLimiter(driveLog, m_swerveKinodynamics,
+                RobotController::getBatteryVoltage);
 
         m_drive = new SwerveDriveSubsystem(
                 fieldLogger,
@@ -226,9 +213,14 @@ public class RobotContainer {
         m_leds = new LEDIndicator(
                 new RoboRioChannel(0),
                 localizer::getPoseAgeSec,
-                () -> (m_manipulator.hasCoral() || (m_manipulator.hasCoralSideways() && buttons.red2())),
+                () -> (m_manipulator.hasCoral()
+                        || (m_manipulator.hasCoralSideways()
+                                && buttons.red2())),
                 m_manipulator::hasAlgae,
-                () -> (driverControl.floorPick() || driverControl.stationPick() || buttons.red2()),
+                () -> (driver.rightTrigger()
+                        || (driver.rightTrigger()
+                                && driver.rightBumper())
+                        || buttons.red2()),
                 buttons::algae,
                 buttons::red1,
                 m_climberIntake::isIn);
@@ -266,107 +258,168 @@ public class RobotContainer {
             m_targetSimulator = tsim::update;
         }
 
-        ///////////////////////////
+        ////////////////////////////////////////////////////////////
         //
-        // DRIVE CONTROLLERS
+        // MECHANISM
         //
 
-        final SwerveController holonomicController = SwerveControllerFactory.byIdentity(comLog);
+        // "fly" the joints manually
+        whileTrue(operator::leftBumper,
+                new ManualCartesian(operator::velocity, m_mech));
+        // new ManualConfig(operatorControl::velocity, mech));
+
+        ///////////////////////////
+        //
+        // DRIVETRAIN
+        //
+
+        // Reset pose estimator so the current gyro rotation corresponds to zero.
+        onTrue(driver::back,
+                new ResetPose(m_drive, new Pose2d()));
+
+        // Reset pose estimator so the current gyro rotation corresponds to 180.
+        onTrue(driver::start,
+                new SetRotation(m_drive, Rotation2d.kPi));
+
         final Feedback100 thetaFeedback = new PIDFeedback(
                 comLog, 3.2, 0, 0, true, 0.05, 1);
 
-        // There are 4 modes:
+        // There are 3 modes:
         // * normal
         // * lock rotation to reef center
-        // * lock rotation to nearest station
-        // * and barge-assist
-        // TODO: use a single selector in the control
-        DriveManuallySimple driveDefault = new DriveManuallySimple(
-                driverControl::velocity,
+        // * barge-assist (slow when near barge)
+        final Command driveDefault = new DriveManuallySimple(
+                driver::velocity,
                 localizer::setHeedRadiusM,
                 m_drive,
                 new ManualWithProfiledReefLock(
-                        comLog, m_swerveKinodynamics, driverControl::useReefLock,
+                        comLog, m_swerveKinodynamics, driver::leftTrigger,
                         thetaFeedback, m_drive),
                 new ManualWithBargeAssist(
-                        comLog, m_swerveKinodynamics, driverControl::desiredRotation,
+                        comLog, m_swerveKinodynamics, driver::pov,
                         thetaFeedback, m_drive),
-                driverControl::driveWithBargeAssist);
+                driver::leftBumper);
 
         /////////////////////////////////////////////////
         //
         // DEFAULT COMMANDS
-
-        m_drive.setDefaultCommand(driveDefault);
-
-        // mech.setDefaultCommand(new HoldPosition(mech));
         //
-        // WARNING!
-        // This default command *MOVES IMMEDIATELY WHEN ENABLED*!
-        // WATCH OUT!
+
+        m_drive.setDefaultCommand(driveDefault.withName("drive default"));
+        // WARNING! This default command *MOVES IMMEDIATELY WHEN ENABLED*!
+        m_mech.setDefaultCommand(m_mech.profileHomeAndThenRest().withName("mech default"));
+        m_climber.setDefaultCommand(m_climber.stop().withName("climber default"));
+        m_climberIntake.setDefaultCommand(m_climberIntake.stop().withName("climber intake default"));
+        m_manipulator.setDefaultCommand(m_manipulator.stop().withName("manipulator default"));
+
+        /////////////////////////////////////////////////
         //
-        m_mech.setDefaultCommand(m_mech.profileHomeAndThenRest());
-
-        m_climber.setDefaultCommand(
-                m_climber.stop().withName("climber default"));
-        m_climberIntake.setDefaultCommand(
-                m_climberIntake.stop().withName("climber intake default"));
-
-        m_manipulator.setDefaultCommand(
-                m_manipulator.stop().withName("manipulator default"));
-
-        // DRIVER BUTTONS
-        final HolonomicProfile profile = HolonomicProfile.get(driveLog, m_swerveKinodynamics, 1, 0.5, 1, 0.2);
+        // AUTONOMOUS
+        //
 
         final HolonomicProfile autoProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
-
-        FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
+        final FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
         m_auton = Coral1Left.get(logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive, 
+                autoController, autoProfile, m_drive,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
-
-        whileTrue(
-                // () -> false,
-                driverControl::test,
-                new Auton(logger, m_mech, m_manipulator,
-                        autoController, autoProfile, m_drive,
-                        localizer::setHeedRadiusM, m_swerveKinodynamics, viz)
-                        .rightPreloadOnly());
-        // .right());
-
-        // Driver/Operator Buttons
-        onTrue(driverControl::resetRotation0, new ResetPose(m_drive, new Pose2d()));
-        onTrue(driverControl::resetRotation180, new SetRotation(m_drive, Rotation2d.kPi));
 
         ////////////////////////////////////////////////////////////
         //
-        // PICK
+        // CORAL PICK
         //
 
-        /**
-         * At the same time, move the arm to the floor and spin the intake,
-         * and go back home when the button is released, ending when complete.
-         */
-        whileTrue(driverControl::floorPick, // driver x
+        // At the same time, move the arm to the floor and spin the intake,
+        // and go back home when the button is released, ending when complete.
+        whileTrue(driver::rightTrigger,
                 parallel(
                         m_mech.pickWithProfile(),
                         m_manipulator.centerIntake()))
                 .onFalse(m_mech.profileHomeTerminal());
 
-        whileTrue(driverControl::l1pick,
+        // Move to coral ground pick location.
+        whileTrue(driver::rightBumper,
                 m_mech.pickWithProfile())
                 .onFalse(m_mech.profileHomeTerminal());
 
-        new FloorPickSetup(
-                fieldLog, driverControl, m_drive, m_targets,
-                SwerveControllerFactory.pick(driveLog), autoProfile);
+        // Pick a game piece from the floor, based on camera input.
+        whileTrue(() -> false,
+                FloorPickSequence.get(
+                        fieldLog, m_drive, m_targets,
+                        SwerveControllerFactory.pick(driveLog), autoProfile)
+                        .withName("Floor Pick"));
 
-        whileTrue(driverControl::stationPick,
+        whileTrue(() -> (driver.rightTrigger() && driver.rightBumper()),
                 parallel(
                         m_mech.stationWithProfile(),
                         m_manipulator.centerIntake()));
+
+        // Sideways intake for L1
+        whileTrue(buttons::red2,
+                sequence(
+                        m_manipulator.sidewaysIntake()
+                                .until(m_manipulator::hasCoralSideways),
+                        m_manipulator.sidewaysHold()));
+
+        ////////////////////////////////////////////////////////////
+        //
+        // CORAL SCORING
+        //
+
+        // Manual movement of arm, for testing.
+        whileTrue(buttons::l1, m_mech.profileHomeToL1());
+        // whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
+        // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
+        // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
+        // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
+
+        final HolonomicProfile profile = HolonomicProfile.get(driveLog, m_swerveKinodynamics, 1, 0.5, 1, 0.2);
+        final SwerveController holonomicController = SwerveControllerFactory.byIdentity(comLog);
+
+        // Drive to a scoring location at the reef and score.
+        whileTrue(driver::a,
+                ScoreCoralSmart.get(
+                        coralSequence, m_mech, m_manipulator,
+                        holonomicController, profile, m_drive,
+                        localizer::setHeedRadiusM, buttons::level, buttons::point));
+
+        ////////////////////////////////////////////////////////////
+        //
+        // ALGAE
+        //
+        // Algae commands have two components: one button for manipulator,
+        // one button for arm mechanism.
+
+        // grab and hold algae, and then eject it when you let go of the button
+        onTrue(buttons::algae,
+                MoveToAlgaePosition.get(
+                        m_mech, buttons::algaeLevel, buttons::algae));
+
+        FollowJointProfiles homeGentle = m_mech.homeAlgae();
+        whileTrue(driver::b, m_mech.algaePickGround()).onFalse(homeGentle.until(homeGentle::isDone));
+
+        // Intake algae and puke it when you let go.
+        whileTrue(buttons::barge,
+                sequence(
+                        m_manipulator.algaeIntake()
+                                .until(m_manipulator::hasAlgae),
+                        m_manipulator.algaeHold()) //
+        ).onFalse(
+                m_manipulator.algaeEject()
+                        .withTimeout(0.5));
+
+        // Move mech to processor
+        whileTrue(buttons::red4,
+                m_mech.processorWithProfile());
+
+        // Move mech to barge
+        whileTrue(buttons::red3,
+                m_mech.homeToBarge()).onFalse(m_mech.bargeToHome());
+
+        // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
+        // whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
+        // whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
 
         ////////////////////////////////////////////////////////////
         //
@@ -378,76 +431,40 @@ public class RobotContainer {
                 ClimberCommands.climbIntake(m_climber, m_climberIntake, m_mech));
 
         // Step 2, driver: Pull climber in and drive forward.
-        onTrue(driverControl::climb, // mapped to driver y buttonTODO: Make sure this isnt double mapped
+        onTrue(driver::y,
                 ClimberCommands.climb(m_climber, m_drive, m_mech));
 
         // Between matches, operator: Reset the climber position.
-        whileTrue(operatorControl::activateManualClimb, // speed is operator get left Y, activated with op right bumper
-                                                        // button
-                m_climber.manual(operatorControl::manualClimbSpeed));
+        whileTrue(operator::rightBumper,
+                m_climber.manual(operator::leftY));
 
         ////////////////////////////////////////////////////////////
         //
-        // SCORING
+        // TEST ALL MOVEMENTS
         //
-
-        // Manual movement of arm, for testing.
-        whileTrue(buttons::l1, m_mech.profileHomeToL1());
-        // whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
-        // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
-        // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
-        // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
-
-        // Driver controls "go to reef" mode, buttons supply level and point.
-        whileTrue(driverControl::toReef,
-                ScoreCoralSmart.get(
-                        coralSequence, m_mech, m_manipulator,
-                        holonomicController, profile, m_drive,
-                        localizer::setHeedRadiusM, buttons::level, buttons::point));
-
-        // grab and hold algae, and then eject it when you let go of the button
-        onTrue(buttons::algae,
-                MoveToAlgaePosition.get(
-                        m_mech, buttons::algaeLevel,buttons::algae))
-               ;
-
-        // these are all unbound
-        FollowJointProfiles homeGentle = m_mech.homeAlgae();
-        whileTrue(driverControl::b, m_mech.algaePickGround()).onFalse(homeGentle.until(homeGentle::isDone));
-        whileTrue(buttons::red2,
+        // For pre- and post-match testing.
+        //
+        // Enable "test" mode and press operator left bumper and driver right bumper.
+        //
+        // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
+        //
+        // THIS WILL MOVE THE ROBOT VERY FAST!
+        //
+        // DO NOT RUN with the wheels on the floor!
+        //
+        // DO NOT RUN without tiedown clamps.
+        //
+        // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
+        //
+        whileTrue(() -> (RobotState.isTest() && operator.leftBumper() && driver.rightBumper()),
+                // for now, it just beeps and does one thing.
                 sequence(
-                        m_manipulator.sidewaysIntake()
-                                .until(m_manipulator::hasCoralSideways),
-                        m_manipulator.sidewaysHold()));
-        whileTrue(buttons::barge,
-                sequence(
-                        m_manipulator.algaeIntake()
-                                .until(m_manipulator::hasAlgae),
-                        m_manipulator.algaeHold())//
-        ).onFalse(
-                m_manipulator.algaeEject()
-                        .withTimeout(0.5));
-        whileTrue(buttons::red4, m_mech.processorWithProfile());
-        whileTrue(buttons::red3, m_mech.homeToBarge()).onFalse(m_mech.bargeToHome());
+                        startingBeeps(),
+                        m_manipulator.centerIntake().withTimeout(1) //
+                ).withName("test all movements") //
+        );
 
-        // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
-        // whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
-        // whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
-
-        // "fly" the joints manually
-        whileTrue(operatorControl::manual, // to go to manual, left bumper operator
-                new ManualCartesian(operatorControl::velocity, m_mech));
-        // new ManualConfig(operatorControl::velocity, mech));
-
-        // why did this use an async?
         initStuff();
-
-        // m_initializer = Executors.newSingleThreadScheduledExecutor();
-        // m_initializer.schedule(this::initStuff, 0, TimeUnit.SECONDS);
-
-        // // This really only does anything when we're sitting idle; when actually
-        // // running, the gc runs frequently without prodding.
-        // m_initializer.schedule(System::gc, 3, TimeUnit.SECONDS);
     }
 
     public void initStuff() {
@@ -464,9 +481,9 @@ public class RobotContainer {
                 new Translation2d(1, 0),
                 Rotation2d.kZero,
                 Rotation2d.kZero));
-        TrajectoryPlanner m_planner = new TrajectoryPlanner(
+        TrajectoryPlanner planner = new TrajectoryPlanner(
                 new TimingConstraintFactory(m_swerveKinodynamics).medium());
-        m_planner.restToRest(waypoints);
+        planner.restToRest(waypoints);
 
         // Exercise the drive motors.
         m_drive.driveInFieldCoords(new FieldRelativeVelocity(0, 0, 0));
@@ -507,6 +524,25 @@ public class RobotContainer {
         Util.printf("\n*** PREWARM END ET: %f\n", endS - startS);
     }
 
+    public Command play(double freq) {
+        return parallel(
+                m_mech.play(freq),
+                m_manipulator.play(freq));
+    }
+
+    /** Three beeps and one long beep. */
+    public Command startingBeeps() {
+        return sequence(
+                play(880).withTimeout(0.5),
+                play(0).withTimeout(0.5),
+                play(880).withTimeout(0.5),
+                play(0).withTimeout(0.5),
+                play(880).withTimeout(0.5),
+                play(0).withTimeout(0.5),
+                play(1760).withTimeout(1.0),
+                play(0).withTimeout(0.1));
+    }
+
     public void onTeleop() {
         // TODO: remove
     }
@@ -521,12 +557,6 @@ public class RobotContainer {
 
     private Trigger whileTrue(BooleanSupplier condition, Command command) {
         return new Trigger(condition).whileTrue(command);
-    }
-
-    private Trigger whileTrue(BooleanSupplier condition1, BooleanSupplier condition2, Command command) {
-        Trigger trigger1 = new Trigger(condition1);
-        Trigger trigger2 = new Trigger(condition2);
-        return trigger1.and(trigger2).whileTrue(command);
     }
 
     private Trigger onTrue(BooleanSupplier condition, Command command) {
