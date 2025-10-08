@@ -1,12 +1,14 @@
 package org.team100.lib.indicator;
 
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.util.RoboRioChannel;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.util.Color;
 
 /**
@@ -30,6 +32,8 @@ import edu.wpi.first.wpilibj.util.Color;
  */
 public class LEDIndicator {
     private static final int LENGTH = 40;
+    private static final double BLINK_INTERVAL_S = 0.05;
+
     private final AddressableLED m_led;
     // buffer flipping is a little quicker than setting the pixels one at a time
     private final AddressableLEDBuffer m_greenBuffer;
@@ -38,27 +42,27 @@ public class LEDIndicator {
     private final AddressableLEDBuffer m_orangeBuffer;
     private final AddressableLEDBuffer m_blackBuffer;
     private final AddressableLEDBuffer m_whiteBuffer;
-    private final Supplier<Double> m_timeSinceLastPose;
-    private final Supplier<Boolean> m_hasCoral;
-    private final Supplier<Boolean> m_hasAlgae;
-    private final Supplier<Boolean> m_intakingCoral;
-    private final Supplier<Boolean> m_intakingAlgae;
-    private final Supplier<Boolean> m_climbing;
-    private final Supplier<Boolean> m_climbed;
     
+    private final DoubleSupplier m_timeSinceLastPose;
+    private final BooleanSupplier m_hasCoral;
+    private final BooleanSupplier m_hasAlgae;
+    private final BooleanSupplier m_intakingCoral;
+    private final BooleanSupplier m_intakingAlgae;
+    private final BooleanSupplier m_climbing;
+    private final BooleanSupplier m_climbed;
+
     private double m_lastBlinkTime = 0;
     private boolean m_blinkState = false;
-    private final double BLINK_INTERVAL_S = 0.05; 
 
     public LEDIndicator(
-            RoboRioChannel port, 
-            Supplier<Double> timeSinceLastPose,
-            Supplier<Boolean> hasCoral, 
-            Supplier<Boolean> hasAlgae, 
-            Supplier<Boolean> intakingCoral, 
-            Supplier<Boolean> intakingAlgae,
-            Supplier<Boolean> climbing,
-            Supplier<Boolean> climbed) {
+            RoboRioChannel port,
+            DoubleSupplier timeSinceLastPose,
+            BooleanSupplier hasCoral,
+            BooleanSupplier hasAlgae,
+            BooleanSupplier intakingCoral,
+            BooleanSupplier intakingAlgae,
+            BooleanSupplier climbing,
+            BooleanSupplier climbed) {
         m_led = new AddressableLED(port.channel);
         m_led.setLength(LENGTH);
         m_greenBuffer = fill(Color.kGreen);
@@ -78,35 +82,25 @@ public class LEDIndicator {
         m_climbing = climbing;
     }
 
-    private static AddressableLEDBuffer fill(Color color) {
-        AddressableLEDBuffer buf = new AddressableLEDBuffer(LENGTH);
-        for (int i = 0; i < LENGTH; ++i) {
-            buf.setLED(i, color);
-        }
-        return buf;
-    }
-
     /**
      * Periodic does all the real work in this class.
      */
-    public void disabledPeriodic() {
-        Double v = m_timeSinceLastPose.get();
-        if (v != null && v < 1) {
-            m_led.setData(m_greenBuffer);
-        } else {
-            m_led.setData(m_redBuffer);
-        }
-    }
+    public void periodic() {
+        boolean hasCoral = m_hasCoral.getAsBoolean();
+        boolean hasAlgae = m_hasAlgae.getAsBoolean();
+        boolean intakingCoral = m_intakingCoral.getAsBoolean();
+        boolean intakingAlgae = m_intakingAlgae.getAsBoolean();
+        boolean climbing = m_climbing.getAsBoolean();
+        boolean climbed = m_climbed.getAsBoolean();
 
-    public void enabledPeriodic() {
-        boolean hasCoral = m_hasCoral.get();
-        boolean hasAlgae = m_hasAlgae.get();
-        boolean intakingCoral = m_intakingCoral.get();
-        boolean intakingAlgae = m_intakingAlgae.get();
-        boolean climbing = m_climbing.get();
-        boolean climbed = m_climbed.get();
-        
-        if (climbing && climbed) {
+        if (RobotState.isDisabled()) {
+            double poseAge = m_timeSinceLastPose.getAsDouble();
+            if (poseAge < 1) {
+                m_led.setData(m_greenBuffer);
+            } else {
+                m_led.setData(m_redBuffer);
+            }
+        } else if (climbing && climbed) {
             if (shouldBlink()) {
                 m_led.setData(m_blinkState ? m_greenBuffer : m_blackBuffer);
             }
@@ -133,6 +127,12 @@ public class LEDIndicator {
         }
     }
 
+    public void close() {
+        m_led.close();
+    }
+
+    ///////////////////////////////////////////////////////////
+
     /**
      * Handles blink timing and returns true if blink state changed
      */
@@ -146,7 +146,11 @@ public class LEDIndicator {
         return false;
     }
 
-    public void close() {
-        m_led.close();
+    private static AddressableLEDBuffer fill(Color color) {
+        AddressableLEDBuffer buf = new AddressableLEDBuffer(LENGTH);
+        for (int i = 0; i < LENGTH; ++i) {
+            buf.setLED(i, color);
+        }
+        return buf;
     }
 }

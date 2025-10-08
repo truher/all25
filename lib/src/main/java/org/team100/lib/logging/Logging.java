@@ -47,9 +47,6 @@ public class Logging {
         return 0;
     }
 
-    public void periodic() {
-    }
-
     public void setLevel(Level level) {
         m_level = level;
     }
