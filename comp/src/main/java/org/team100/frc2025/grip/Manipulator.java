@@ -2,7 +2,6 @@ package org.team100.frc2025.grip;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.DoubleConsumer;
 
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
