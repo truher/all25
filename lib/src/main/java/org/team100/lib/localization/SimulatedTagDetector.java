@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
@@ -37,7 +38,6 @@ public class SimulatedTagDetector {
     // our real cameras can see horizontally to about
     // 0.8 on each side. we didn't measure the vertical
     // extent, but it's probably something like 0.6.
-    // TODO: make these parameters, to accommodate different sensors and lenses.
     //
     // see
     // https://docs.google.com/spreadsheets/d/1x2_58wyVb5e9HJW8WgakgYcOXgPaJe0yTIHew206M-M
@@ -46,9 +46,9 @@ public class SimulatedTagDetector {
     private static final int TAG_COUNT = 22;
     // past about 80 degrees, you can't see the tag.
     private static final double OBLIQUE_LIMIT_RAD = 1.4;
-    // camera frame is from 85 ms ago
-    // TODO: make this jitter a little
-    private static final double DELAY = 0.085;
+    // camera frame is from 85 ms ago, more or less
+    private static final double MEAN_DELAY = 0.085;
+    private static final double STDEV_DELAY = 0.02;
 
     private final List<Camera> m_cameras;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
@@ -57,6 +57,7 @@ public class SimulatedTagDetector {
     private final Map<Camera, StructArrayPublisher<Blip24>> m_publishers;
     /** client instance, not the default */
     private final NetworkTableInstance m_inst;
+    private final Random m_rand;
 
     /**
      * 
@@ -76,6 +77,7 @@ public class SimulatedTagDetector {
         // this is a client just like the camera is a client.
         m_inst.startClient4("SimulatedTagDetector");
         m_inst.setServer("localhost");
+        m_rand = new Random();
         for (Camera camera : m_cameras) {
             // see tag_detector.py
             String name = "vision/" + camera.getSerial() + "/0/blips";
@@ -94,7 +96,8 @@ public class SimulatedTagDetector {
             return;
 
         // fetch the pose from a little while ago
-        double timestampS = Takt.get() - DELAY;
+        double actualDelay = MEAN_DELAY + m_rand.nextGaussian() * STDEV_DELAY;
+        double timestampS = Takt.get() - actualDelay;
         Pose2d pose = m_history.apply(timestampS).pose();
 
         Pose3d robotPose3d = new Pose3d(pose);
@@ -167,12 +170,8 @@ public class SimulatedTagDetector {
             }
 
             // publish whatever we saw
-            // TODO: pose should be from the past, using publisher "set" from the past.
-            // use a microsecond timestamp as specified here
-            // https://docs.wpilib.org/en/stable/docs/software/networktables/publish-and-subscribe.html
-
-            // provide timestamp matching the pose above
-            long delayUs = (long) DELAY * 1000000;
+            // with a timestamp matching the pose above
+            long delayUs = (long) actualDelay * 1000000;
             long timestampUs = NetworkTablesJNI.now();
             publisher.set(
                     blips.toArray(new Blip24[0]), timestampUs - delayUs);
