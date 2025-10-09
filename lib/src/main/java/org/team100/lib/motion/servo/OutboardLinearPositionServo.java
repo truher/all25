@@ -1,7 +1,5 @@
 package org.team100.lib.motion.servo;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
@@ -52,12 +50,9 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
 
     @Override
     public void reset() {
-        OptionalDouble position = getPosition();
-        if (position.isEmpty())
-            return;
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
-        Control100 measurement = new Control100(position.getAsDouble(), 0);
+        Control100 measurement = new Control100(getPosition(), 0);
         m_nextSetpoint = measurement;
         // reference is initalized with measurement only here.
         m_ref.setGoal(measurement.model());
@@ -75,10 +70,7 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
             m_ref.setGoal(goal);
             if (m_nextSetpoint == null) {
                 // erased by dutycycle control
-                OptionalDouble position = getPosition();
-                if (position.isEmpty())
-                    return;
-                m_nextSetpoint = new Control100(position.getAsDouble(), 0);
+                m_nextSetpoint = new Control100(getPosition(), 0);
             }
             // initialize with the setpoint, not the measurement, to avoid noise.
             m_ref.init(m_nextSetpoint.model());
@@ -106,7 +98,7 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
     }
 
     @Override
-    public OptionalDouble getPosition() {
+    public double getPosition() {
         return m_mechanism.getPositionM();
     }
 
@@ -122,20 +114,14 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
     }
 
     @Override
-    public OptionalDouble getVelocity() {
+    public double getVelocity() {
         return m_mechanism.getVelocityM_S();
     }
 
     @Override
     public boolean atSetpoint() {
-        OptionalDouble pos = m_mechanism.getPositionM();
-        if (pos.isEmpty())
-            return false;
-        OptionalDouble vel = m_mechanism.getVelocityM_S();
-        if (vel.isEmpty())
-            return false;
-        double pErr = m_nextSetpoint.x() - pos.getAsDouble();
-        double vErr = m_nextSetpoint.v() - vel.getAsDouble();
+        double pErr = m_nextSetpoint.x() - m_mechanism.getPositionM();
+        double vErr = m_nextSetpoint.v() - m_mechanism.getVelocityM_S();
         return Math.abs(pErr) < m_positionTolerance
                 && Math.abs(vErr) < m_velocityTolerance;
     }
@@ -167,7 +153,7 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
     @Override
     public void periodic() {
         m_mechanism.periodic();
-        m_log_position.log(() -> getPosition().orElse(Double.NaN));
-        m_log_velocity.log(() -> getVelocity().orElse(Double.NaN));
+        m_log_position.log(() -> getPosition());
+        m_log_velocity.log(() -> getVelocity());
     }
 }

@@ -1,7 +1,5 @@
 package org.team100.lib.motion.servo;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -83,12 +81,9 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
         if (DEBUG) {
             Util.println("OnboardAngularPositionServo reset");
         }
-        OptionalDouble position = getPosition();
-        if (position.isEmpty())
-            return;
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
-        Control100 measurement = new Control100(position.getAsDouble(), 0);
+        Control100 measurement = new Control100(getPosition(), 0);
         m_setpoint = measurement;
         // measurement is used for initialization only here.
         m_ref.setGoal(measurement.model());
@@ -117,12 +112,7 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
             m_goal = goal;
             m_ref.setGoal(goal);
             if (m_setpoint == null) {
-                final OptionalDouble position = m_mechanism.getPositionRad();
-                if (position.isEmpty()) {
-                    Util.warn("Broken sensor!");
-                    return;
-                }
-                double measurement = position.getAsDouble();
+                double measurement = m_mechanism.getPositionRad();
                 // avoid velocity noise here
                 m_setpoint = new Control100(measurement, 0);
             } else {
@@ -147,13 +137,10 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
     private void actuate(Setpoints1d setpoints, double feedForwardTorqueNm) {
         m_setpoint = setpoints.next();
 
-        final OptionalDouble position = m_mechanism.getPositionRad();
-        final OptionalDouble velocity = m_mechanism.getVelocityRad_S();
-        if (position.isEmpty() || velocity.isEmpty()) {
-            Util.warn("Broken sensor!");
-            return;
-        }
-        final Model100 measurement = new Model100(position.getAsDouble(), velocity.getAsDouble());
+        final double position = m_mechanism.getPositionRad();
+        final double velocity = m_mechanism.getVelocityRad_S();
+
+        final Model100 measurement = new Model100(position, velocity);
 
         final double u_FB = m_feedback.calculate(
                 measurement,
@@ -169,16 +156,13 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
         m_log_u_FB.log(() -> u_FB);
         m_log_u_FF.log(() -> u_FF);
         m_log_u_TOTAL.log(() -> u_TOTAL);
-        m_log_error.log(() -> setpoints.current().x() - position.getAsDouble());
-        m_log_velocity_error.log(() -> setpoints.current().v() - velocity.getAsDouble());
+        m_log_error.log(() -> setpoints.current().x() - position);
+        m_log_velocity_error.log(() -> setpoints.current().v() - velocity);
     }
 
     /** Return an angle near the measurement */
     private double mod(double x) {
-        OptionalDouble posOpt = m_mechanism.getPositionRad();
-        if (posOpt.isEmpty())
-            return x;
-        double measurement = posOpt.getAsDouble();
+        double measurement = m_mechanism.getPositionRad();
         return MathUtil.angleModulus(x - measurement) + measurement;
     }
 
@@ -186,7 +170,7 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
      * @return the absolute 1:1 position of the mechanism in [-pi, pi]
      */
     @Override
-    public OptionalDouble getPosition() {
+    public double getPosition() {
         return m_mechanism.getPositionRad();
     }
 
@@ -224,6 +208,6 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
     @Override
     public void periodic() {
         m_mechanism.periodic();
-        m_encoderValue.log(() -> getPosition().getAsDouble());
+        m_encoderValue.log(() -> getPosition());
     }
 }

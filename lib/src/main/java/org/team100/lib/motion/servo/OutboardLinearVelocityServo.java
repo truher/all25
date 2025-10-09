@@ -1,7 +1,5 @@
 package org.team100.lib.motion.servo;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -56,18 +54,13 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
      *         it.
      */
     @Override
-    public OptionalDouble getVelocity() {
-        final OptionalDouble velocityM_S = m_mechanism.getVelocityM_S();
-        return velocityM_S;
+    public double getVelocity() {
+        return m_mechanism.getVelocityM_S();
     }
 
     @Override
     public boolean atGoal() {
-        OptionalDouble optV = m_mechanism.getVelocityM_S();
-        if (optV.isEmpty())
-            return false;
-        double err = m_goal - optV.getAsDouble();
-        return Math.abs(err) < VELOCITY_TOLERANCE;
+        return Math.abs(m_goal - m_mechanism.getVelocityM_S()) < VELOCITY_TOLERANCE;
     }
 
     @Override
@@ -76,9 +69,8 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     }
 
     @Override
-    public OptionalDouble getDistance() {
-        final OptionalDouble positionM = m_mechanism.getPositionM();
-        return positionM;
+    public double getDistance() {
+        return m_mechanism.getPositionM();
     }
 
     @Override

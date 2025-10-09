@@ -1,7 +1,5 @@
 package org.team100.lib.motion.servo;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.reference.Setpoints1d;
 
 /**
@@ -30,8 +28,8 @@ public class MockAngularPositionServo implements AngularPositionServo {
     }
 
     @Override
-    public OptionalDouble getPosition() {
-        return null;
+    public double getPosition() {
+        return 0;
     }
 
     @Override

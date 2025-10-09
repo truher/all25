@@ -1,7 +1,5 @@
 package org.team100.lib.motion.servo;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
@@ -58,12 +56,10 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
 
     @Override
     public void reset() {
-        OptionalDouble position = getPosition();
-        if (position.isEmpty())
-            return;
+        double position = getPosition();
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
-        Control100 measurement = new Control100(position.getAsDouble(), 0);
+        Control100 measurement = new Control100(position, 0);
         m_setpoint = measurement;
         m_ref.setGoal(measurement.model());
         m_ref.init(measurement.model());
@@ -93,11 +89,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
             // make sure the setpoint is near the measurement
             if (m_setpoint == null) {
                 // erased by dutycycle control
-                OptionalDouble posOpt = m_mechanism.getPositionRad();
-                if (posOpt.isEmpty())
-                    return;
-                double measurement = posOpt.getAsDouble();
-                m_setpoint = new Control100(measurement, 0);
+                m_setpoint = new Control100(m_mechanism.getPositionRad(), 0);
             } else {
                 m_setpoint = new Control100(mod(m_setpoint.x()), m_setpoint.v());
             }
@@ -133,10 +125,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
 
     /** Return an angle near the measurement */
     private double mod(double x) {
-        OptionalDouble posOpt = m_mechanism.getPositionRad();
-        if (posOpt.isEmpty())
-            return x;
-        double measurement = posOpt.getAsDouble();
+        double measurement = m_mechanism.getPositionRad();
         m_log_measurement.log(() -> measurement);
         return MathUtil.angleModulus(x - measurement) + measurement;
     }
@@ -145,7 +134,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      * @return the absolute 1:1 position of the mechanism in [-pi, pi]
      */
     @Override
-    public OptionalDouble getPosition() {
+    public double getPosition() {
         return m_mechanism.getPositionRad();
     }
 
@@ -156,14 +145,8 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      */
     @Override
     public boolean atSetpoint() {
-        OptionalDouble positionRad = m_mechanism.getPositionRad();
-        if (positionRad.isEmpty())
-            return false;
-        OptionalDouble velocityRad_S = m_mechanism.getVelocityRad_S();
-        if (velocityRad_S.isEmpty())
-            return false;
-        double positionError = MathUtil.angleModulus(m_setpoint.x() - positionRad.getAsDouble());
-        double velocityError = m_setpoint.v() - velocityRad_S.getAsDouble();
+        double positionError = MathUtil.angleModulus(m_setpoint.x() - m_mechanism.getPositionRad());
+        double velocityError = m_setpoint.v() - m_mechanism.getVelocityRad_S();
         return Math.abs(positionError) < POSITION_TOLERANCE
                 && Math.abs(velocityError) < VELOCITY_TOLERANCE;
     }
@@ -176,7 +159,6 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
         }
         return m_ref.profileDone();
     }
-
 
     /**
      * Note this is affected by the setpoint update.

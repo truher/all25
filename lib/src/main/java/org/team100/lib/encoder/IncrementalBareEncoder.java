@@ -1,31 +1,23 @@
 package org.team100.lib.encoder;
 
-import java.util.OptionalDouble;
-
 /** Represents motor-shaft encoder, probably some kind of built-in. */
-public interface IncrementalBareEncoder  {
+public interface IncrementalBareEncoder {
+
+    /**
+     * Value should be updated in Robot.robotPeriodic().
+     * 
+     * @return rad
+     */
+    double getPositionRad();
 
     /**
      * Value should be updated in Robot.robotPeriodic().
      * 
      * Note some rate implementations can be noisy.
      * 
-     * If the encoder can't return a valid measurement (e.g. because hardware is not
-     * connected), return empty.
-     * 
      * @return rad/s
      */
-    OptionalDouble getVelocityRad_S();
-
-    /**
-     * Value should be updated in Robot.robotPeriodic().
-     * 
-     * If the encoder can't return a valid measurement (e.g. because hardware is not
-     * connected), return empty.
-     * 
-     * @return rad
-     */
-    OptionalDouble getPositionRad();
+    double getVelocityRad_S();
 
     /**
      * Resets position to zero.

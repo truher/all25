@@ -1,7 +1,6 @@
 package org.team100.lib.motion.drivetrain.module;
 
 import java.util.Optional;
-import java.util.OptionalDouble;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Identity;
@@ -13,7 +12,6 @@ import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,7 +39,7 @@ public abstract class SwerveModule100 {
         m_turningServo = turningServo;
         // note this will be wrong at instantiation.
         // TODO: make previous desired angle null instead.
-        double measurement = m_turningServo.getPosition().orElse(0);
+        double measurement = m_turningServo.getPosition();
         // the default previous angle is the measurement.
         m_previousDesiredAngle = new Rotation2d(measurement);
         m_previousTime = Takt.get();
@@ -84,11 +82,9 @@ public abstract class SwerveModule100 {
             speed = correctSpeedForSteering(speed, desiredAngle);
         }
         if (Experiments.instance.enabled(Experiment.ReduceCrossTrackError)) {
-            OptionalDouble optMeasurement = m_turningServo.getPosition();
-            if (optMeasurement.isPresent()) {
-                double measuredAngleRad = optMeasurement.getAsDouble();
-                speed = reduceCrossTrackError(measuredAngleRad, speed, desiredAngle);
-            }
+            double measuredAngleRad = m_turningServo.getPosition();
+            speed = reduceCrossTrackError(measuredAngleRad, speed, desiredAngle);
+
         }
         m_driveServo.setVelocity(speed);
         if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
@@ -141,15 +137,9 @@ public abstract class SwerveModule100 {
      * Use the current turning servo position to optimize the desired state.
      */
     private SwerveModuleState100 optimize(SwerveModuleState100 desired) {
-        OptionalDouble position = m_turningServo.getPosition();
-        if (position.isEmpty()) {
-            // This should never happen.
-            Util.warn("Empty steering angle measurement!");
-            return desired;
-        }
         return SwerveModuleState100.optimize(
                 desired,
-                new Rotation2d(position.getAsDouble()));
+                new Rotation2d(m_turningServo.getPosition()));
     }
 
     /**
@@ -181,35 +171,18 @@ public abstract class SwerveModule100 {
 
     /** FOR TEST ONLY */
     public SwerveModuleState100 getState() {
-        OptionalDouble driveVelocity = m_driveServo.getVelocity();
-        OptionalDouble turningPosition = m_turningServo.getPosition();
-        if (driveVelocity.isEmpty()) {
-            Util.warn("no drive velocity measurement!");
-            return null;
-        }
-        if (turningPosition.isEmpty()) {
-            Util.warn("no turning position measurement!");
-            return null;
-        }
+        double driveVelocity = m_driveServo.getVelocity();
+        double turningPosition = m_turningServo.getPosition();
+
         return new SwerveModuleState100(
-                driveVelocity.getAsDouble(),
-                Optional.of(new Rotation2d(turningPosition.getAsDouble())));
+                driveVelocity,
+                Optional.of(new Rotation2d(turningPosition)));
     }
 
     /** Uses Cache so the position is fresh and coherent. */
     public SwerveModulePosition100 getPosition() {
-        OptionalDouble driveDistance = m_driveServo.getDistance();
-        OptionalDouble turningPosition = m_turningServo.getPosition();
-        if (driveDistance.isEmpty()) {
-            Util.warn("no drive distance measurement!");
-            return null;
-        }
-        if (turningPosition.isEmpty()) {
-            Util.warn("no turning position measurement!");
-            return null;
-        }
-        double drive_M = driveDistance.getAsDouble();
-        double steerRad = turningPosition.getAsDouble();
+        double drive_M = m_driveServo.getDistance();
+        double steerRad = m_turningServo.getPosition();
         switch (Identity.instance) {
             case SWERVE_ONE:
             case SWERVE_TWO:
@@ -227,10 +200,8 @@ public abstract class SwerveModule100 {
                 Optional.of(new Rotation2d(steerRad)));
     }
 
-    public OptionalDouble turningPosition() {
-        OptionalDouble position = m_turningServo.getPosition();
-        // Util.printf("position %s\n", position);
-        return position;
+    public double turningPosition() {
+        return m_turningServo.getPosition();
     }
 
     boolean atSetpoint() {

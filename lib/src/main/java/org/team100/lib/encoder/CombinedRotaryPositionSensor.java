@@ -1,6 +1,5 @@
 package org.team100.lib.encoder;
 
-import java.util.OptionalDouble;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -8,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -34,10 +32,10 @@ import edu.wpi.first.math.MathUtil;
 public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
     private final RotaryPositionSensor m_absolute;
     private final ProxyRotaryPositionSensor m_incremental;
-    private final OptionalDoubleLogger m_log_absolute;
-    private final OptionalDoubleLogger m_log_incremental;
+    private final DoubleLogger m_log_absolute;
+    private final DoubleLogger m_log_incremental;
     private final DoubleLogger m_log_incremental_wrapped;
-    private final OptionalDoubleLogger m_log_combined;
+    private final DoubleLogger m_log_combined;
     // for synchronization one-shot delayed task
     private final ScheduledExecutorService m_synchronizer;
 
@@ -56,10 +54,10 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
         LoggerFactory child = parent.type(this);
         m_absolute = absolute;
         m_incremental = incremental;
-        m_log_absolute = child.optionalDoubleLogger(Level.DEBUG, "absolute (rad))");
-        m_log_incremental = child.optionalDoubleLogger(Level.TRACE, "incremental (rad)");
+        m_log_absolute = child.doubleLogger(Level.DEBUG, "absolute (rad))");
+        m_log_incremental = child.doubleLogger(Level.TRACE, "incremental (rad)");
         m_log_incremental_wrapped = child.doubleLogger(Level.TRACE, "incremental wrapped (rad)");
-        m_log_combined = child.optionalDoubleLogger(Level.DEBUG, "combined (rad)");
+        m_log_combined = child.doubleLogger(Level.DEBUG, "combined (rad)");
         // the duty cycle encoder seems to produce slightly-wrong values immediately
         // upon startup, so wait a bit before doing the synchronization
         m_synchronized = false;
@@ -86,7 +84,7 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
 
         final int N = 10;
         for (int i = 0; i < N; ++i) {
-            double pos = m_absolute.getPositionRad().getAsDouble();
+            double pos = m_absolute.getPositionRad();
             cos += Math.cos(pos);
             sin += Math.sin(pos);
 
@@ -110,7 +108,7 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
      * The secondary (incremental motor-integrated) measurement.
      */
     @Override
-    public OptionalDouble getPositionRad() {
+    public double getPositionRad() {
         return m_incremental.getPositionRad();
     }
 
@@ -120,7 +118,7 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
      * The secondary (incremental motor-integrated) measurement
      */
     @Override
-    public OptionalDouble getVelocityRad_S() {
+    public double getVelocityRad_S() {
         return m_incremental.getVelocityRad_S();
     }
 
@@ -135,7 +133,7 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
         m_incremental.periodic();
         m_log_absolute.log(m_absolute::getPositionRad);
         m_log_incremental.log(m_incremental::getPositionRad);
-        m_log_incremental_wrapped.log(() -> MathUtil.angleModulus(m_incremental.getPositionRad().getAsDouble()));
+        m_log_incremental_wrapped.log(() -> MathUtil.angleModulus(m_incremental.getPositionRad()));
         m_log_combined.log(this::getPositionRad);
     }
 
@@ -143,7 +141,7 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
      * The position as read by the absolute sensor. This is useful for debugging and
      * for the lash observer. Don't use this unless you know what you're doing.
      */
-    OptionalDouble getAbsolutePositionRad() {
+    double getAbsolutePositionRad() {
         return m_absolute.getPositionRad();
     }
 }

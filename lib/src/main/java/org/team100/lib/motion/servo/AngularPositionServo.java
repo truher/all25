@@ -1,7 +1,5 @@
 package org.team100.lib.motion.servo;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.reference.Setpoints1d;
 
 /**
@@ -25,7 +23,7 @@ public interface AngularPositionServo  {
     /**
      * Invalidates the current profile.
      */
-    public void setDutyCycle(double dutyCycle);
+    void setDutyCycle(double dutyCycle);
 
     void setTorqueLimit(double torqueNm);
 
@@ -54,7 +52,7 @@ public interface AngularPositionServo  {
      * 
      * @return Current position measurement, radians.
      */
-    OptionalDouble getPosition();
+    double getPosition();
 
     /** Mechanism is following the desired setpoint. */
     boolean atSetpoint();

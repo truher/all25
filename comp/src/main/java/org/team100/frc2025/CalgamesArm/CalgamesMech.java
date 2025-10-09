@@ -305,16 +305,16 @@ public class CalgamesMech extends SubsystemBase implements Music {
 
     public Config getConfig() {
         return new Config(
-                m_elevatorBack.getPositionM().orElse(0),
-                m_shoulder.getPositionRad().orElse(0),
-                m_wrist.getPositionRad().orElse(0));
+                m_elevatorBack.getPositionM(),
+                m_shoulder.getPositionRad(),
+                m_wrist.getPositionRad());
     }
 
     public JointVelocities getJointVelocity() {
         return new JointVelocities(
-                m_elevatorBack.getVelocityM_S().orElse(0),
-                m_shoulder.getVelocityRad_S().orElse(0),
-                m_wrist.getVelocityRad_S().orElse(0));
+                m_elevatorBack.getVelocityM_S(),
+                m_shoulder.getVelocityRad_S(),
+                m_wrist.getVelocityRad_S());
     }
 
     public SwerveModel getState() {
@@ -580,8 +580,8 @@ public class CalgamesMech extends SubsystemBase implements Music {
 
     /** Not too far extended in any direction. */
     public boolean isSafeToDrive() {
-        double x = m_elevatorBack.getPositionM().orElse(0);
-        double y = m_shoulder.getPositionRad().orElse(0);
+        double x = m_elevatorBack.getPositionM();
+        double y = m_shoulder.getPositionRad();
         return x < 1 && Math.abs(y) < 1;
     }
 

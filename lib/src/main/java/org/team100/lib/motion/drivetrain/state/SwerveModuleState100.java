@@ -7,7 +7,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.struct.SwerveModuleStateStruct;
 import edu.wpi.first.util.struct.StructSerializable;
 
-/** The state of one swerve module. */
+/**
+ * The state of one swerve module.
+ * 
+ * This class is used both for measurement and for control; in the control case,
+ * the angle can be empty, in case the velocity is ~zero: in that case, there's
+ * no requirement on the angle.
+ */
 public class SwerveModuleState100 implements Comparable<SwerveModuleState100>, StructSerializable {
     private final double m_speedM_S;
     private final Optional<Rotation2d> m_angle;

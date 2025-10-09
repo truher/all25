@@ -1,6 +1,5 @@
 package org.team100.lib.encoder;
 
-import java.util.OptionalDouble;
 import java.util.function.DoubleSupplier;
 
 import org.team100.lib.coherence.Cache;
@@ -66,11 +65,11 @@ public class AnalogTurningEncoder extends RoboRioRotaryPositionSensor {
 
     /** Cached, almost. */
     @Override
-    protected OptionalDouble getRatio() {
+    protected double getRatio() {
         double voltage = m_voltage.getAsDouble();
         double ratio = voltage / m_rail.getAsDouble();
         m_log_voltage.log(() -> voltage);
         m_log_ratio.log(() -> ratio);
-        return OptionalDouble.of(ratio);
+        return ratio;
     }
 }

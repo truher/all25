@@ -1,22 +1,20 @@
 package org.team100.lib.encoder;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.Talon6Motor;
 
 public class Talon6Encoder implements IncrementalBareEncoder {
     private final Talon6Motor m_motor;
-    private final OptionalDoubleLogger m_log_position;
-    private final OptionalDoubleLogger m_log_velocity;
+    private final DoubleLogger m_log_position;
+    private final DoubleLogger m_log_velocity;
 
     public Talon6Encoder(LoggerFactory parent, Talon6Motor motor) {
         LoggerFactory child = parent.type(this);
         m_motor = motor;
-        m_log_position = child.optionalDoubleLogger(Level.TRACE, "position (rad)");
-        m_log_velocity = child.optionalDoubleLogger(Level.TRACE, "velocity (rad_s)");
+        m_log_position = child.doubleLogger(Level.TRACE, "position (rad)");
+        m_log_velocity = child.doubleLogger(Level.TRACE, "velocity (rad_s)");
         reset();
     }
 
@@ -25,10 +23,8 @@ public class Talon6Encoder implements IncrementalBareEncoder {
      * Value is updated in Robot.robotPeriodic().
      */
     @Override
-    public OptionalDouble getVelocityRad_S() {
-        double motorVelocityRev_S = m_motor.getVelocityRev_S();
-        double velocityRad_S = motorVelocityRev_S * 2 * Math.PI;
-        return OptionalDouble.of(velocityRad_S);
+    public double getVelocityRad_S() {
+        return m_motor.getVelocityRev_S() * 2.0 * Math.PI;
     }
 
     /**
@@ -36,8 +32,8 @@ public class Talon6Encoder implements IncrementalBareEncoder {
      * Value is updated in Robot.robotPeriodic().
      */
     @Override
-    public OptionalDouble getPositionRad() {
-        return OptionalDouble.of(m_motor.getPositionRad());
+    public double getPositionRad() {
+        return m_motor.getPositionRad();
     }
 
     @Override

@@ -1,11 +1,9 @@
 package org.team100.lib.motion.mechanism;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.encoder.IncrementalBareEncoder;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
 
 /**
@@ -22,8 +20,8 @@ public class LinearMechanism {
     private final double m_wheelRadiusM;
     private final double m_minPositionM;
     private final double m_maxPositionM;
-    private final OptionalDoubleLogger m_log_velocity;
-    private final OptionalDoubleLogger m_log_position;
+    private final DoubleLogger m_log_velocity;
+    private final DoubleLogger m_log_position;
 
     public LinearMechanism(
             LoggerFactory parent,
@@ -40,8 +38,8 @@ public class LinearMechanism {
         m_minPositionM = minPositionM;
         m_maxPositionM = maxPositionM;
         LoggerFactory child = parent.type(this);
-        m_log_velocity = child.optionalDoubleLogger(Level.DEBUG, "velocity (m_s)");
-        m_log_position = child.optionalDoubleLogger(Level.DEBUG, "position (m)");
+        m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (m_s)");
+        m_log_position = child.doubleLogger(Level.DEBUG, "position (m)");
     }
 
     /** Should actuate immediately. Use for homing. */
@@ -51,12 +49,7 @@ public class LinearMechanism {
 
     /** Should actuate immediately. Limits position using the encoder. */
     public void setDutyCycle(double output) {
-        OptionalDouble posOpt = getPositionM();
-        if (posOpt.isEmpty()) {
-            m_motor.stop();
-            return;
-        }
-        double posM = posOpt.getAsDouble();
+        double posM = getPositionM();
         if (output < 0 && posM < m_minPositionM) {
             m_motor.stop();
             return;
@@ -85,12 +78,7 @@ public class LinearMechanism {
             double outputVelocityM_S,
             double outputAccelM_S2,
             double outputForceN) {
-        OptionalDouble posOpt = getPositionM();
-        if (posOpt.isEmpty()) {
-            m_motor.stop();
-            return;
-        }
-        double posM = posOpt.getAsDouble();
+        double posM = getPositionM();
         if (outputVelocityM_S < 0 && posM < m_minPositionM) {
             m_motor.stop();
             return;
@@ -130,19 +118,16 @@ public class LinearMechanism {
     }
 
     /** Nearly cached. */
-    public OptionalDouble getVelocityM_S() {
-        OptionalDouble velocityRad_S = m_encoder.getVelocityRad_S();
-        if (velocityRad_S.isEmpty())
-            return OptionalDouble.empty();
-        return OptionalDouble.of(velocityRad_S.getAsDouble() * m_wheelRadiusM / m_gearRatio);
+    public double getVelocityM_S() {
+        double velocityRad_S = m_encoder.getVelocityRad_S();
+        return velocityRad_S * m_wheelRadiusM / m_gearRatio;
     }
 
     /** Nearly cached. */
-    public OptionalDouble getPositionM() {
-        OptionalDouble positionRad = m_encoder.getPositionRad();
-        if (positionRad.isEmpty())
-            return OptionalDouble.empty();
-        return OptionalDouble.of(positionRad.getAsDouble() * m_wheelRadiusM / m_gearRatio);
+    public double getPositionM() {
+        double positionRad = m_encoder.getPositionRad();
+
+        return positionRad * m_wheelRadiusM / m_gearRatio;
     }
 
     /** This is not "hold position" this is "torque off". */

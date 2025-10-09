@@ -1,7 +1,5 @@
 package org.team100.lib.encoder;
 
-import java.util.OptionalDouble;
-
 /**
  * Absolute rotational measurement, as used in, for example, swerve steering,
  * arm angles, shooter angles, etc. This does not "wind up", it only returns
@@ -11,19 +9,19 @@ import java.util.OptionalDouble;
  * In 2025 these position sensors always sense the absolute position of a
  * mechanism, not through any sort of gearing.
  */
-public interface RotaryPositionSensor  {
+public interface RotaryPositionSensor {
 
     /**
-     * @return Counterclockwise-positive rad in [-pi,pi], empty if disconnected.
+     * @return Counterclockwise-positive rad in [-pi,pi]
      */
-    OptionalDouble getPositionRad();
+    double getPositionRad();
 
     /**
      * Note some velocity implementations can be noisy.
      * 
-     * @return Counterclockwise positive rad/s, empty if disconnected.
+     * @return Counterclockwise positive rad/s
      */
-    OptionalDouble getVelocityRad_S();
+    double getVelocityRad_S();
 
     /**
      * For logging.

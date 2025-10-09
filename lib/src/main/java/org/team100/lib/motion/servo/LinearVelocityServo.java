@@ -1,7 +1,5 @@
 package org.team100.lib.motion.servo;
 
-import java.util.OptionalDouble;
-
 /**
  * Represents a servo whose output is measured in linear units -- this is
  * usually relevant for wheeled mechanisms, where the surface speed of the wheel
@@ -16,7 +14,7 @@ public interface LinearVelocityServo {
     void reset();
 
     /**
-     * 's no profile here, it just sets the mechanism velocity.
+     * There's no profile here, it just sets the mechanism velocity.
      * 
      * Set velocity and compute implied acceleration based on the previous call,
      * using TimedRobot100.LOOP_PERIOD_S. If you call this more often, you'll
@@ -33,15 +31,15 @@ public interface LinearVelocityServo {
     void setVelocity(double setpointM_S, double setpointM_S2);
 
     /** meters/sec. Note this can be noisy, maybe filter it. */
-    OptionalDouble getVelocity();
+    double getVelocity();
 
-    /** we're within some tolerance of the desired  */
+    /** we're within some tolerance of the desired */
     boolean atGoal();
 
     void stop();
 
-    /** Implementations should use the Cache mechanism. */
-    OptionalDouble getDistance();
+    /** meters. Implementations should use the Cache mechanism. */
+    double getDistance();
 
     /** For logging */
     void periodic();

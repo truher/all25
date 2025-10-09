@@ -1,7 +1,5 @@
 package org.team100.lib.motion.mechanism;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.encoder.RotaryPositionSensor;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -56,12 +54,7 @@ public class RotaryMechanism {
 
     /** Should actuate immediately. Enforces position limit using the encoder. */
     public void setDutyCycle(double output) {
-        OptionalDouble posOpt = getPositionRad();
-        if (posOpt.isEmpty()) {
-            m_motor.stop();
-            return;
-        }
-        double posRad = posOpt.getAsDouble();
+        double posRad = getPositionRad();
         if (output < 0 && posRad < m_minPositionRad) {
             m_motor.stop();
             return;
@@ -93,12 +86,7 @@ public class RotaryMechanism {
             double outputRad_S,
             double outputAccelRad_S2,
             double outputTorqueNm) {
-        OptionalDouble posOpt = getPositionRad();
-        if (posOpt.isEmpty()) {
-            m_motor.stop();
-            return;
-        }
-        double posRad = posOpt.getAsDouble();
+        double posRad = getPositionRad();
         if (outputRad_S < 0 && posRad < m_minPositionRad) {
             m_motor.stop();
             return;
@@ -139,15 +127,19 @@ public class RotaryMechanism {
                 outputTorqueNm / m_gearRatio);
     }
 
-    /** Value is updated in Robot.robotPeriodic(). */
-    public OptionalDouble getVelocityRad_S() {
+    /**
+     * Value is updated in Robot.robotPeriodic().
+     * 
+     * @return velocity in rad/s
+     */
+    public double getVelocityRad_S() {
         return m_sensor.getVelocityRad_S();
     }
 
     /**
-     * @return the absolute 1:1 position of the mechanism in [-pi, pi]
+     * @return the absolute 1:1 position of the mechanism in rad [-pi, pi]
      */
-    public OptionalDouble getPositionRad() {
+    public double getPositionRad() {
         return m_sensor.getPositionRad();
     }
 
@@ -162,8 +154,8 @@ public class RotaryMechanism {
     public void periodic() {
         m_motor.periodic();
         m_sensor.periodic();
-        m_log_velocity.log(() -> getVelocityRad_S().getAsDouble());
-        m_log_position.log(() -> getPositionRad().getAsDouble());
+        m_log_velocity.log(() -> getVelocityRad_S());
+        m_log_position.log(() -> getPositionRad());
     }
 
 }

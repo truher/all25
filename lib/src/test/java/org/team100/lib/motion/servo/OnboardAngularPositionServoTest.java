@@ -51,7 +51,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         assertEquals(0, turningMotor.output, 0.001);
         assertEquals(0.5, servo.m_setpoint.x(), DELTA);
         assertEquals(1.0, servo.m_setpoint.v(), DELTA);
-        assertEquals(0.5, positionSensor.getPositionRad().getAsDouble(), DELTA);
+        assertEquals(0.5, positionSensor.getPositionRad(), DELTA);
         assertEquals(1.000, turningMotor.velocity, DELTA);
     }
 

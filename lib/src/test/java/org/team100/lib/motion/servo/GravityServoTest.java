@@ -48,21 +48,21 @@ class GravityServoTest implements Timeless {
         AngularPositionServo servo = new OnboardAngularPositionServo(
                 logger, simMech, ref, pivotFeedback);
         servo.reset();
-        ref.init(new Model100(servo.getPosition().getAsDouble(), 0));
+        ref.init(new Model100(servo.getPosition(), 0));
 
         Gravity gravity = new Gravity(logger, 5, 0);
         Spring spring = new Spring(logger);
         DoubleUnaryOperator torquefn = (x) -> gravity.applyAsDouble(x) + spring.applyAsDouble(x);
         Torque tt = new Torque(torquefn);
         // start at zero
-        assertEquals(0, servo.getPosition().getAsDouble(), DELTA);
+        assertEquals(0, servo.getPosition(), DELTA);
         // one second
         for (int i = 0; i < 70; ++i) {
             double torque = tt.torque(servo.getPosition());
             servo.setPositionProfiled(1, torque);
             stepTime();
         }
-        assertEquals(1, servo.getPosition().getAsDouble(), 1e-5);
+        assertEquals(1, servo.getPosition(), 1e-5);
     }
 
     /** For refactoring the gravity servo */
