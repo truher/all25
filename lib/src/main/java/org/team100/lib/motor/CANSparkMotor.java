@@ -133,11 +133,10 @@ public abstract class CANSparkMotor implements BareMotor {
     public void setVelocity(double motorRad_S, double motorAccelRad_S2, double motorTorqueNm) {
         final double motorRev_S = motorRad_S / (2 * Math.PI);
         final double motorRev_S2 = motorAccelRad_S2 / (2 * Math.PI);
-        final double currentMotorRev_S = m_encoder_velocity.getAsDouble() / 60;
 
-        final double frictionFFVolts = m_ff.frictionFFVolts(currentMotorRev_S, motorRev_S);
+        final double frictionFFVolts = m_ff.frictionFFVolts(motorRev_S);
         final double velocityFFVolts = m_ff.velocityFFVolts(motorRev_S);
-        final double accelFFVolts = m_ff.accelFFVolts(currentMotorRev_S, motorRev_S2);
+        final double accelFFVolts = m_ff.accelFFVolts(motorRev_S, motorRev_S2);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 
         final double FF = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
@@ -169,9 +168,8 @@ public abstract class CANSparkMotor implements BareMotor {
             double motorTorqueNm) {
         final double motorRev = motorPositionRad / (2 * Math.PI);
         final double motorRev_S = motorVelocityRad_S / (2 * Math.PI);
-        final double currentMotorRev_S = m_encoder_velocity.getAsDouble() / 60;
 
-        final double frictionFFVolts = m_ff.frictionFFVolts(currentMotorRev_S, motorRev_S);
+        final double frictionFFVolts = m_ff.frictionFFVolts(motorRev_S);
         final double velocityFFVolts = m_ff.velocityFFVolts(motorRev_S);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 

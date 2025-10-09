@@ -32,8 +32,6 @@ package org.team100.lib.config;
 public class Feedforward100 {
     private final double kV;
     private final double kA;
-    // TODO: make kD actually work
-    @SuppressWarnings("unused")
     private final double kD;
     private final double kSS;
     private final double kDS;
@@ -120,7 +118,7 @@ public class Feedforward100 {
     }
 
     public static Feedforward100 makeWCPSwerveDriveKraken6() {
-        return new Feedforward100(0.13, 0.022, 0.007, 0.26, 0.26, 0.06); //WAS 0.115
+        return new Feedforward100(0.13, 0.022, 0.007, 0.26, 0.26, 0.06); // WAS 0.115
     }
 
     public static Feedforward100 makeAMSwerveDriveFalcon6() {
@@ -161,25 +159,40 @@ public class Feedforward100 {
     }
 
     /**
-     * Uses kA all the time, because the resulting feedforward had a strange "tooth"
-     * in it, maybe because of the use of the measured velocity rather than the
-     * setpoint velocity?
-     * 
-     * TODO: make kD actually work?
      * Uses kA when speed and accel are in the same direction.
      * Uses kD when speed and accel are opposite.
+     * 
+     * @param motorRev_S   setpoint speed
+     * @param motorRev_S_S setpoint acceleration
      */
-    public double accelFFVolts(double currentMotorRev_S, double motorRev_S_S) {
-        // if ((currentMotorRev_S >= 0 && motorRev_S_S >= 0) || (currentMotorRev_S <= 0
-        // && motorRev_S_S <= 0))
-        // return kA * motorRev_S_S;
-        // return kD * motorRev_S_S;
-        return kA * motorRev_S_S;
+    public double accelFFVolts(double motorRev_S, double motorRev_S_S) {
+        if (motorRev_S >= 0) {
+            // moving forward
+            if (motorRev_S_S >= 0) {
+                // faster
+                return kA * motorRev_S_S;
+            } else {
+                // slower
+                return kD * motorRev_S_S;
+            }
+        } else {
+            // moving backward
+            if (motorRev_S_S < 0) {
+                // faster
+                return kA * motorRev_S_S;
+            } else {
+                // slower
+                return kD * motorRev_S_S;
+            }
+        }
     }
 
-    public double frictionFFVolts(double currentMotorRev_S, double desiredMotorRev_S) {
-        double direction = Math.signum(desiredMotorRev_S);
-        if (Math.abs(currentMotorRev_S) < staticFrictionSpeedLimit) {
+    /**
+     * @param motorRev_S setpoint speed
+     */
+    public double frictionFFVolts(double motorRev_S) {
+        double direction = Math.signum(motorRev_S);
+        if (Math.abs(motorRev_S) < staticFrictionSpeedLimit) {
             return kSS * direction;
         }
         return kDS * direction;

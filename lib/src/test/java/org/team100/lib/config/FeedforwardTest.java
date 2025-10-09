@@ -48,9 +48,7 @@ class FeedforwardTest {
         // kd is lower
         Feedforward100 ff100 = new Feedforward100(1, 1, 0.1, 0, 0, 0);
         assertEquals(1, ff100.accelFFVolts(1, 1), DELTA);
-        // TODO: make kd work again and fix this test.
-        assertEquals(1, ff100.accelFFVolts(-1, 1), DELTA);
-        // assertEquals(0.1, ff100.accelFFVolts(-1, 1), DELTA);
+        assertEquals(0.1, ff100.accelFFVolts(-1, 1), DELTA);
     }
 
     /** I forgot an abs() in the friction term, so this verifies it. */
@@ -59,17 +57,17 @@ class FeedforwardTest {
         // static friction = 2, dynamic friction = 1
         Feedforward100 ff100 = new Feedforward100(1, 1, 1, 2, 1, 1);
         // under the static friction limit, so this is static
-        assertEquals(2, ff100.frictionFFVolts(0.5, 0.5), DELTA);
+        assertEquals(2, ff100.frictionFFVolts(0.5), DELTA);
         // over the static friction limit, so sliding
-        assertEquals(1, ff100.frictionFFVolts(2, 2), DELTA);
+        assertEquals(1, ff100.frictionFFVolts(2), DELTA);
         // under the static friction limit, so this is static
-        assertEquals(-2, ff100.frictionFFVolts(-0.5, -0.5), DELTA);
+        assertEquals(-2, ff100.frictionFFVolts(-0.5), DELTA);
         // over the static friction limit, so sliding
-        assertEquals(-1, ff100.frictionFFVolts(-2, -2), DELTA);
+        assertEquals(-1, ff100.frictionFFVolts(-2), DELTA);
+        // want to go negative, get negative
+        assertEquals(-2, ff100.frictionFFVolts(-0.5), DELTA);
         // moving positive, want to go negative, get negative
-        assertEquals(-2, ff100.frictionFFVolts(0.5, -0.5), DELTA);
-        // moving positive, want to go negative, get negative
-        assertEquals(-1, ff100.frictionFFVolts(2, -2), DELTA);
+        assertEquals(-1, ff100.frictionFFVolts(-2), DELTA);
     }
 
 }

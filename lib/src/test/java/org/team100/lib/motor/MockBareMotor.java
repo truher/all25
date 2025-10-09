@@ -45,13 +45,10 @@ public class MockBareMotor implements BareMotor {
         final double motorRev_S = velocity / (2 * Math.PI);
         final double motorRev_S2 = accelRad_S2 / (2 * Math.PI);
 
-        // use the setpoint as the measurement
-        final double currentMotorRev_S = velocity;
-
-        frictionFFVolts = m_ff.frictionFFVolts(currentMotorRev_S, motorRev_S);
+        frictionFFVolts = m_ff.frictionFFVolts(motorRev_S);
         velocityFFVolts = m_ff.velocityFFVolts(motorRev_S);
         torqueFFVolts = getTorqueFFVolts(torque);
-        accelFFVolts = m_ff.accelFFVolts(currentMotorRev_S, motorRev_S2);
+        accelFFVolts = m_ff.accelFFVolts(motorRev_S, motorRev_S2);
         ffVolts = frictionFFVolts + velocityFFVolts + torqueFFVolts + accelFFVolts;
 
     }
