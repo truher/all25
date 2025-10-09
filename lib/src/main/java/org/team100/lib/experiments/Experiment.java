@@ -2,6 +2,8 @@ package org.team100.lib.experiments;
 
 /**
  * An experiment is something that can be selectively enabled.
+ * 
+ * TODO: delete stale experiments.
  */
 public enum Experiment {
     /**
@@ -53,10 +55,11 @@ public enum Experiment {
      * cross-track error on a per-module basis.
      * 
      * This could be the "cosine" used by some teams; our implementation is a narrow
-     * gaussian. The idea is simple: avoid driving direction. In this case, since
-     * the upper layers are unaware of it, it will introduce lag (thus controller
-     * error) into timed movements, and also, because the drive corrections are
-     * uncoordinated, this produces rotational errors, not just translational ones.
+     * gaussian. The idea is simple: avoid driving in the wrong direction. In this
+     * case, since the upper layers are unaware of it, it will introduce lag (thus
+     * controller error) into timed movements, and also, because the drive
+     * corrections are uncoordinated, this produces rotational errors, not just
+     * translational ones.
      * 
      * But it has the benefit of being simple.
      */
