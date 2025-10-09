@@ -29,7 +29,7 @@ public class SwerveModel {
         m_theta = theta;
     }
 
-    public SwerveModel(Pose2d x, FieldRelativeVelocity v) {
+    public SwerveModel(Pose2d x, GlobalSe2Velocity v) {
         this(
                 new Model100(x.getX(), v.x()),
                 new Model100(x.getY(), v.y()),
@@ -38,7 +38,7 @@ public class SwerveModel {
 
     /** Motionless with the specified pose */
     public SwerveModel(Pose2d x) {
-        this(x, new FieldRelativeVelocity(0, 0, 0));
+        this(x, new GlobalSe2Velocity(0, 0, 0));
     }
 
     /** Motionless at the origin with the specified heading */
@@ -87,8 +87,8 @@ public class SwerveModel {
         return new Rotation2d(m_theta.x());
     }
 
-    public FieldRelativeVelocity velocity() {
-        return new FieldRelativeVelocity(m_x.v(), m_y.v(), m_theta.v());
+    public GlobalSe2Velocity velocity() {
+        return new GlobalSe2Velocity(m_x.v(), m_y.v(), m_theta.v());
     }
 
     /** Robot-relative speeds */

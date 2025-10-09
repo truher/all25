@@ -11,7 +11,7 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
@@ -113,10 +113,10 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public FieldRelativeVelocity apply(
+    public GlobalSe2Velocity apply(
             final SwerveModel state,
             final Velocity twist1_1) {
-        final FieldRelativeVelocity control = clipAndScale(twist1_1);
+        final GlobalSe2Velocity control = clipAndScale(twist1_1);
 
         final double currentVelocity = state.velocity().norm();
 
@@ -171,7 +171,7 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
                 thetaFF + thetaFB,
                 -m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
-        FieldRelativeVelocity twistWithSnapM_S = new FieldRelativeVelocity(control.x(), control.y(), omega);
+        GlobalSe2Velocity twistWithSnapM_S = new GlobalSe2Velocity(control.x(), control.y(), omega);
 
         m_log_snap_mode.log(() -> true);
         m_log_goal_theta.log(m_goal::getRadians);
@@ -183,7 +183,7 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
         return twistWithSnapM_S;
     }
 
-    public FieldRelativeVelocity clipAndScale(Velocity twist1_1) {
+    public GlobalSe2Velocity clipAndScale(Velocity twist1_1) {
         // clip the input to the unit circle
         final Velocity clipped = twist1_1.clip(1.0);
 

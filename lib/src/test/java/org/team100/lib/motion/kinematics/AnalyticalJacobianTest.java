@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.trajectory.Trajectory100;
@@ -30,7 +30,7 @@ public class AnalyticalJacobianTest {
         Config q = new Config(0, 0, 0);
         // extended and motionless
         JointVelocities jv = new JointVelocities(0, 0, 0);
-        FieldRelativeVelocity v = j.forward(q, jv);
+        GlobalSe2Velocity v = j.forward(q, jv);
         assertEquals(0, v.x(), DELTA);
         assertEquals(0, v.y(), DELTA);
         assertEquals(0, v.theta(), DELTA);
@@ -84,21 +84,21 @@ public class AnalyticalJacobianTest {
         assertEquals(0, jv.wrist(), DELTA);
 
         // +x
-        v = new SwerveModel(p, new FieldRelativeVelocity(1, 0, 0));
+        v = new SwerveModel(p, new GlobalSe2Velocity(1, 0, 0));
         jv = j.inverse(v);
         assertEquals(1, jv.elevator(), DELTA);
         assertEquals(0, jv.shoulder(), DELTA);
         assertEquals(0, jv.wrist(), DELTA);
 
         // +y
-        v = new SwerveModel(p, new FieldRelativeVelocity(0, 1, 0));
+        v = new SwerveModel(p, new GlobalSe2Velocity(0, 1, 0));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(0.5, jv.shoulder(), DELTA);
         assertEquals(-0.5, jv.wrist(), DELTA);
 
         // +theta
-        v = new SwerveModel(p, new FieldRelativeVelocity(0, 0, 1));
+        v = new SwerveModel(p, new GlobalSe2Velocity(0, 0, 1));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(-0.5, jv.shoulder(), DELTA);
@@ -113,7 +113,7 @@ public class AnalyticalJacobianTest {
         // extended, motionless
         JointVelocities qdot = new JointVelocities(0, 0, 0);
         JointAccelerations qddot = new JointAccelerations(0, 0, 0);
-        FieldRelativeAcceleration a = j.forwardA(q, qdot, qddot);
+        GlobalSe2Acceleration a = j.forwardA(q, qdot, qddot);
         assertEquals(0, a.x(), DELTA);
         assertEquals(0, a.y(), DELTA);
         assertEquals(0, a.theta(), DELTA);
@@ -172,8 +172,8 @@ public class AnalyticalJacobianTest {
         // extended, motionless
         Config c = new Config(0, 0, 0);
         Pose2d p = k.forward(c);
-        FieldRelativeVelocity v = new FieldRelativeVelocity(0, 0, 0);
-        SwerveControl m = new SwerveControl(p, v, new FieldRelativeAcceleration(0, 0, 0));
+        GlobalSe2Velocity v = new GlobalSe2Velocity(0, 0, 0);
+        SwerveControl m = new SwerveControl(p, v, new GlobalSe2Acceleration(0, 0, 0));
         JointAccelerations ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -182,8 +182,8 @@ public class AnalyticalJacobianTest {
         // +x => +elevator
         c = new Config(0, 0, 0);
         p = k.forward(c);
-        v = new FieldRelativeVelocity(0, 0, 0);
-        m = new SwerveControl(p, v, new FieldRelativeAcceleration(1, 0, 0));
+        v = new GlobalSe2Velocity(0, 0, 0);
+        m = new SwerveControl(p, v, new GlobalSe2Acceleration(1, 0, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -192,8 +192,8 @@ public class AnalyticalJacobianTest {
         // +y => +shoulder and -wrist (because zero theta)
         c = new Config(0, 0, 0);
         p = k.forward(c);
-        v = new FieldRelativeVelocity(0, 0, 0);
-        m = new SwerveControl(p, v, new FieldRelativeAcceleration(0, 1, 0));
+        v = new GlobalSe2Velocity(0, 0, 0);
+        m = new SwerveControl(p, v, new GlobalSe2Acceleration(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(0.5, ja.shoulder(), DELTA);
@@ -202,8 +202,8 @@ public class AnalyticalJacobianTest {
         // +theta => -shoulder, +wrist (because no translation)
         c = new Config(0, 0, 0);
         p = k.forward(c);
-        v = new FieldRelativeVelocity(0, 0, 0);
-        m = new SwerveControl(p, v, new FieldRelativeAcceleration(0, 0, 1));
+        v = new GlobalSe2Velocity(0, 0, 0);
+        m = new SwerveControl(p, v, new GlobalSe2Acceleration(0, 0, 1));
         ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(-0.5, ja.shoulder(), DELTA);
@@ -213,8 +213,8 @@ public class AnalyticalJacobianTest {
         // using 45 deg because of singularity at 90
         c = new Config(0, Math.PI / 4, 0);
         p = k.forward(c);
-        v = new FieldRelativeVelocity(0, 0, 0);
-        m = new SwerveControl(p, v, new FieldRelativeAcceleration(1, 0, 0));
+        v = new GlobalSe2Velocity(0, 0, 0);
+        m = new SwerveControl(p, v, new GlobalSe2Acceleration(1, 0, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -224,8 +224,8 @@ public class AnalyticalJacobianTest {
         c = new Config(0, Math.PI / 4, 0);
         // using 45 deg because of singularity at 90
         p = k.forward(c);
-        v = new FieldRelativeVelocity(0, 0, 0);
-        m = new SwerveControl(p, v, new FieldRelativeAcceleration(0, 1, 0));
+        v = new GlobalSe2Velocity(0, 0, 0);
+        m = new SwerveControl(p, v, new GlobalSe2Acceleration(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0.707, ja.shoulder(), DELTA);
@@ -235,8 +235,8 @@ public class AnalyticalJacobianTest {
         c = new Config(0, Math.PI / 4, Math.PI / 4);
         // using 45 deg because of singularity at 90
         p = k.forward(c);
-        v = new FieldRelativeVelocity(0, 0, 0);
-        m = new SwerveControl(p, v, new FieldRelativeAcceleration(0, 1, 0));
+        v = new GlobalSe2Velocity(0, 0, 0);
+        m = new SwerveControl(p, v, new GlobalSe2Acceleration(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0.707, ja.shoulder(), DELTA);
@@ -258,7 +258,7 @@ public class AnalyticalJacobianTest {
             TimedPose tp = t.sample(time);
             SwerveModel sm = SwerveModel.fromTimedPose(tp);
             Pose2d p = sm.pose();
-            FieldRelativeVelocity v = sm.velocity();
+            GlobalSe2Velocity v = sm.velocity();
             Config c = k.inverse(p);
             JointVelocities jv = j.inverse(sm);
             if (DEBUG)

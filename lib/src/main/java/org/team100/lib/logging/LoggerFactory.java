@@ -12,9 +12,9 @@ import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.primitive.PrimitiveLogger;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
@@ -615,10 +615,10 @@ public class LoggerFactory {
             m_thetaLogger = doubleLogger(level, join(leaf, "theta rad_s"));
         }
 
-        public void log(Supplier<FieldRelativeVelocity> vals) {
+        public void log(Supplier<GlobalSe2Velocity> vals) {
             if (!allow(m_level))
                 return;
-            FieldRelativeVelocity val = vals.get();
+            GlobalSe2Velocity val = vals.get();
             m_xLogger.log(val::x);
             m_yLogger.log(val::y);
             m_thetaLogger.log(val::theta);
@@ -642,10 +642,10 @@ public class LoggerFactory {
             m_thetaLogger = doubleLogger(level, join(leaf, "theta rad_s_s"));
         }
 
-        public void log(Supplier<FieldRelativeAcceleration> vals) {
+        public void log(Supplier<GlobalSe2Acceleration> vals) {
             if (!allow(m_level))
                 return;
-            FieldRelativeAcceleration val = vals.get();
+            GlobalSe2Acceleration val = vals.get();
             m_xLogger.log(val::x);
             m_yLogger.log(val::y);
             m_thetaLogger.log(val::theta);

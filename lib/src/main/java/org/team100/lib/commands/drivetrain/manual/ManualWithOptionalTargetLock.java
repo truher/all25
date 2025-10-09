@@ -12,7 +12,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
@@ -89,7 +89,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public FieldRelativeVelocity apply(
+    public GlobalSe2Velocity apply(
             final SwerveModel state,
             final Velocity input) {
 
@@ -105,7 +105,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
         // clip the input to the unit circle
         Velocity clipped = input.clip(1.0);
         Optional<Translation2d> target = m_target.get();
-        FieldRelativeVelocity scaledInput = FieldRelativeDriver.scale(
+        GlobalSe2Velocity scaledInput = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
@@ -150,7 +150,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
                 target.get().getY(),
                 0 });
 
-        return new FieldRelativeVelocity(
+        return new GlobalSe2Velocity(
                 scaledInput.x(),
                 scaledInput.y(),
                 omega);

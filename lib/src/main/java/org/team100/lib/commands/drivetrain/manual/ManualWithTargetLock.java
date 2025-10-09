@@ -11,7 +11,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
@@ -88,7 +88,7 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public FieldRelativeVelocity apply(
+    public GlobalSe2Velocity apply(
             final SwerveModel state,
             final Velocity input) {
 
@@ -129,9 +129,9 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
                 -m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
 
-        final FieldRelativeVelocity scaledInput = getScaledInput(input);
+        final GlobalSe2Velocity scaledInput = getScaledInput(input);
 
-        final FieldRelativeVelocity twistWithLockM_S = new FieldRelativeVelocity(
+        final GlobalSe2Velocity twistWithLockM_S = new GlobalSe2Velocity(
                 scaledInput.x(), scaledInput.y(), omega);
 
         m_log_apparent_motion.log(() -> targetMotion);
@@ -143,11 +143,11 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
         return twistWithLockM_S;
     }
 
-    private FieldRelativeVelocity getScaledInput(Velocity input) {
+    private GlobalSe2Velocity getScaledInput(Velocity input) {
         // clip the input to the unit circle
         Velocity clipped = input.clip(1.0);
         // this is user input scaled to m/s and rad/s
-        FieldRelativeVelocity scaledInput = FieldRelativeDriver.scale(
+        GlobalSe2Velocity scaledInput = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());

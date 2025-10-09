@@ -9,7 +9,7 @@ import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.logging.LoggerFactory.SwerveControlLogger;
 import org.team100.lib.logging.LoggerFactory.SwerveModelLogger;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.util.Util;
@@ -86,7 +86,7 @@ public class FullStateSwerveController implements SwerveController {
     }
 
     @Override
-    public FieldRelativeVelocity calculate(
+    public GlobalSe2Velocity calculate(
             SwerveModel measurement,
             SwerveModel currentReference,
             SwerveControl nextReference) {
@@ -96,8 +96,8 @@ public class FullStateSwerveController implements SwerveController {
         m_log_measurement.log(() -> measurement);
         m_log_currentReference.log(() -> currentReference);
         m_log_nextReference.log(() -> nextReference);
-        FieldRelativeVelocity u_FF = feedforward(nextReference);
-        FieldRelativeVelocity u_FB = fullFeedback(measurement, currentReference);
+        GlobalSe2Velocity u_FF = feedforward(nextReference);
+        GlobalSe2Velocity u_FB = fullFeedback(measurement, currentReference);
         if (DEBUG)
             Util.printf("ff %s fb %s\n", u_FF, u_FB);
         return u_FF.plus(u_FB);
@@ -117,26 +117,26 @@ public class FullStateSwerveController implements SwerveController {
     //
     // package-private for testing
 
-    FieldRelativeVelocity feedforward(SwerveControl nextReference) {
+    GlobalSe2Velocity feedforward(SwerveControl nextReference) {
         m_log_u_FF.log(() -> nextReference.velocity());
         return nextReference.velocity();
     }
 
-    FieldRelativeVelocity fullFeedback(SwerveModel measurement, SwerveModel currentReference) {
+    GlobalSe2Velocity fullFeedback(SwerveModel measurement, SwerveModel currentReference) {
         // atReference is updated below
         m_atReference = true;
-        FieldRelativeVelocity u_XFB = positionFeedback(measurement, currentReference);
-        FieldRelativeVelocity u_VFB = velocityFeedback(measurement, currentReference);
+        GlobalSe2Velocity u_XFB = positionFeedback(measurement, currentReference);
+        GlobalSe2Velocity u_VFB = velocityFeedback(measurement, currentReference);
         return u_XFB.plus(u_VFB);
     }
 
-    FieldRelativeVelocity positionFeedback(SwerveModel measurement, SwerveModel currentReference) {
+    GlobalSe2Velocity positionFeedback(SwerveModel measurement, SwerveModel currentReference) {
         // wraps heading
         FieldRelativeDelta positionError = positionError(measurement, currentReference);
         m_atReference &= positionError.getTranslation().getNorm() < m_xTolerance
                 && Math.abs(positionError.getRotation().getRadians()) < m_thetaTolerance;
         
-        FieldRelativeVelocity u_FB = new FieldRelativeVelocity(
+        GlobalSe2Velocity u_FB = new GlobalSe2Velocity(
                 m_kPCart * positionError.getX(),
                 m_kPCart * positionError.getY(),
                 m_kPTheta * positionError.getRotation().getRadians());
@@ -150,12 +150,12 @@ public class FullStateSwerveController implements SwerveController {
         return u_FB;
     }
 
-    FieldRelativeVelocity velocityFeedback(SwerveModel currentPose, SwerveModel currentReference) {
-        final FieldRelativeVelocity velocityError = velocityError(currentPose, currentReference);
+    GlobalSe2Velocity velocityFeedback(SwerveModel currentPose, SwerveModel currentReference) {
+        final GlobalSe2Velocity velocityError = velocityError(currentPose, currentReference);
         m_atReference &= velocityError.norm() < m_xDotTolerance;
                 // && Math.abs(velocityError.angle().orElse(Rotation2d.kZero).getRadians()) < m_omegaTolerance;
 
-        final FieldRelativeVelocity u_VFB = new FieldRelativeVelocity(
+        final GlobalSe2Velocity u_VFB = new GlobalSe2Velocity(
                 m_kPCartV * velocityError.x(),
                 m_kPCartV * velocityError.y(),
                 m_kPThetaV * velocityError.theta());
@@ -173,8 +173,8 @@ public class FullStateSwerveController implements SwerveController {
         return positionError;
     }
 
-    FieldRelativeVelocity velocityError(SwerveModel measurement, SwerveModel currentReference) {
-        FieldRelativeVelocity velocityError = currentReference.minus(measurement).velocity();
+    GlobalSe2Velocity velocityError(SwerveModel measurement, SwerveModel currentReference) {
+        GlobalSe2Velocity velocityError = currentReference.minus(measurement).velocity();
         m_log_velocity_error.log(() -> velocityError);
         return velocityError;
     }

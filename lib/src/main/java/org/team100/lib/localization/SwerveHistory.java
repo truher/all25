@@ -5,7 +5,7 @@ import java.util.SortedMap;
 import java.util.function.DoubleFunction;
 
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.util.TimeInterpolatableBuffer100;
@@ -53,7 +53,7 @@ public class SwerveHistory implements DoubleFunction<SwerveModel> {
                         m_kinodynamics.getKinematics(),
                         new SwerveModel(
                                 initialPoseMeters,
-                                new FieldRelativeVelocity(0, 0, 0)),
+                                new GlobalSe2Velocity(0, 0, 0)),
                         modulePositions));
     }
 
@@ -75,7 +75,7 @@ public class SwerveHistory implements DoubleFunction<SwerveModel> {
                 timestampSeconds,
                 new InterpolationRecord(
                         m_kinodynamics.getKinematics(),
-                        new SwerveModel(pose, new FieldRelativeVelocity(0, 0, 0)),
+                        new SwerveModel(pose, new GlobalSe2Velocity(0, 0, 0)),
                         modulePositions));
     }
 

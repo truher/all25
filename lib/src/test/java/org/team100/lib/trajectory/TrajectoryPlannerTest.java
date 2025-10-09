@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -133,7 +133,7 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(0, 0, 0));
+        SwerveModel start = new SwerveModel(Pose2d.kZero, new GlobalSe2Velocity(0, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 trajectory = planner.restToRest(start.pose(), end);
         assertEquals(1.565, trajectory.duration(), DELTA);
@@ -161,7 +161,7 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(1, 0, 0));
+        SwerveModel start = new SwerveModel(Pose2d.kZero, new GlobalSe2Velocity(1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(1.176, traj.duration(), DELTA);
@@ -172,7 +172,7 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(-1, 0, 0));
+        SwerveModel start = new SwerveModel(Pose2d.kZero, new GlobalSe2Velocity(-1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(1.176, traj.duration(), DELTA);
@@ -183,7 +183,7 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        SwerveModel start = new SwerveModel(Pose2d.kZero, new FieldRelativeVelocity(0, 1, 0));
+        SwerveModel start = new SwerveModel(Pose2d.kZero, new GlobalSe2Velocity(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(2.958, traj.duration(), DELTA);

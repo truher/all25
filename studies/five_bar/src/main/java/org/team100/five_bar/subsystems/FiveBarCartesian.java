@@ -16,6 +16,8 @@ import org.team100.lib.motion.five_bar.Scenario;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.util.CanId;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -62,7 +64,8 @@ public class FiveBarCartesian extends SubsystemBase {
         LoggerFactory loggerP1 = logger.name("p1");
         Falcon6Motor motorP1 = new Falcon6Motor(
                 loggerP1,
-                1,
+                new CanId(1),
+                NeutralMode.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,
@@ -81,7 +84,8 @@ public class FiveBarCartesian extends SubsystemBase {
         LoggerFactory loggerP5 = logger.name("p5");
         Falcon6Motor motorP5 = new Falcon6Motor(
                 loggerP5,
-                2,
+                new CanId(2),
+                NeutralMode.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,

@@ -3,7 +3,7 @@ package org.team100.frc2025.CalgamesArm;
 import java.util.function.Supplier;
 
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,7 +40,7 @@ public class ManualCartesian extends Command {
         // control is velocity.
         // velocity in m/s and rad/s
         // we want full scale to be about 0.5 m/s and 0.5 rad/s
-        FieldRelativeVelocity jv = new FieldRelativeVelocity(
+        GlobalSe2Velocity jv = new GlobalSe2Velocity(
                 input.x() * 1.5,
                 input.y() * 1.5,
                 input.theta() * 3);

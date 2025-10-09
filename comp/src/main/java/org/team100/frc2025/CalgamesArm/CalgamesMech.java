@@ -33,8 +33,8 @@ import org.team100.lib.logging.LoggerFactory.JointForceLogger;
 import org.team100.lib.logging.LoggerFactory.JointVelocitiesLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
@@ -321,7 +321,7 @@ public class CalgamesMech extends SubsystemBase implements Music {
         Config c = getConfig();
         JointVelocities jv = getJointVelocity();
         Pose2d p = m_kinematics.forward(c);
-        FieldRelativeVelocity v = m_jacobian.forward(c, jv);
+        GlobalSe2Velocity v = m_jacobian.forward(c, jv);
         return new SwerveModel(p, v);
     }
 
@@ -641,8 +641,8 @@ public class CalgamesMech extends SubsystemBase implements Music {
         m_log_jointA.log(() -> ja);
         m_log_jointF.log(() -> jf);
         Pose2d p = m_kinematics.forward(c);
-        FieldRelativeVelocity v = m_jacobian.forward(c, jv);
-        FieldRelativeAcceleration a = m_jacobian.forwardA(c, jv, ja);
+        GlobalSe2Velocity v = m_jacobian.forward(c, jv);
+        GlobalSe2Acceleration a = m_jacobian.forwardA(c, jv, ja);
         m_log_pose.log(() -> p);
         m_log_cartesianV.log(() -> v);
         m_log_cartesianA.log(() -> a);

@@ -12,7 +12,7 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
@@ -110,7 +110,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public FieldRelativeVelocity apply(
+    public GlobalSe2Velocity apply(
             final SwerveModel state,
             final Velocity twist1_1) {
         final Model100 thetaState = state.theta();
@@ -120,7 +120,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
         // clip the input to the unit circle
         final Velocity clipped = twist1_1.clip(1.0);
         // scale to max in both translation and rotation
-        final FieldRelativeVelocity scaled = FieldRelativeDriver.scale(
+        final GlobalSe2Velocity scaled = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
@@ -161,7 +161,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
                 -m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
 
-        final FieldRelativeVelocity withSnap = new FieldRelativeVelocity(scaled.x(), scaled.y(), omega);
+        final GlobalSe2Velocity withSnap = new GlobalSe2Velocity(scaled.x(), scaled.y(), omega);
 
         m_log_snap_mode.log(() -> true);
         m_log_goal_theta.log(m_goal::getRadians);

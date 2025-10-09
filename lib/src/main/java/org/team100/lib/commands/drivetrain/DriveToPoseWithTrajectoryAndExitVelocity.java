@@ -7,7 +7,7 @@ import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.reference.TrajectoryReference;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
     private final Pose2d m_goal;
-    private final FieldRelativeVelocity m_endVelocity;
+    private final GlobalSe2Velocity m_endVelocity;
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final TrajectoryVisualization m_viz;
@@ -34,7 +34,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
 
     public DriveToPoseWithTrajectoryAndExitVelocity(
             Pose2d goal,
-            FieldRelativeVelocity endVelocity,
+            GlobalSe2Velocity endVelocity,
             SwerveDriveSubsystem drive,
             SwerveController controller,
             SwerveKinodynamics swerveKinodynamics,
@@ -52,7 +52,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
     public void initialize() {
         Pose2d pose = m_drive.getPose();
         Translation2d toGoal = m_goal.getTranslation().minus(pose.getTranslation());
-        FieldRelativeVelocity startVelocity = m_drive.getVelocity();
+        GlobalSe2Velocity startVelocity = m_drive.getVelocity();
         HolonomicPose2d startWaypoint = new HolonomicPose2d(
                 pose.getTranslation(),
                 pose.getRotation(),

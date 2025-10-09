@@ -5,8 +5,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
 import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
@@ -58,8 +58,8 @@ public class TrajectoryJointTest {
         for (double tt = 0; tt < t.duration(); tt += 0.02) {
             SwerveControl m = SwerveControl.fromTimedPose(t.sample(tt));
             Pose2d p = m.pose();
-            FieldRelativeVelocity v = m.velocity();
-            FieldRelativeAcceleration a = m.acceleration();
+            GlobalSe2Velocity v = m.velocity();
+            GlobalSe2Acceleration a = m.acceleration();
             Config q = k.inverse(p);
             JointVelocities jv = J.inverse(m.model());
             JointAccelerations ja = J.inverseA(m);

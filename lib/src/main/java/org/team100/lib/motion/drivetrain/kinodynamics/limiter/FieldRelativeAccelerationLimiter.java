@@ -6,8 +6,8 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeAccelerationLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.util.Util;
 
 /**
@@ -45,11 +45,11 @@ public class FieldRelativeAccelerationLimiter  {
         m_alphaScale = alphaScale;
     }
 
-    public FieldRelativeVelocity apply(
-            FieldRelativeVelocity prev,
-            FieldRelativeVelocity target) {
+    public GlobalSe2Velocity apply(
+            GlobalSe2Velocity prev,
+            GlobalSe2Velocity target) {
         // Acceleration required to achieve the target.
-        FieldRelativeAcceleration accel = target.accel(
+        GlobalSe2Acceleration accel = target.accel(
                 prev,
                 TimedRobot100.LOOP_PERIOD_S);
         m_log_accel.log(() -> accel);
@@ -57,7 +57,7 @@ public class FieldRelativeAccelerationLimiter  {
         double alphaScale = alphaScale(accel);
         double scale = Math.min(cartesianScale, alphaScale);
         m_log_scale.log(() -> scale);
-        FieldRelativeVelocity result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
+        GlobalSe2Velocity result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
         if (DEBUG)
             Util.printf(
                     "FieldRelativeAccelerationLimiter prev %s target %s accel %s cartesian scale %5.2f alpha scale %5.2f total scale %5.2f result %s\n",
@@ -66,9 +66,9 @@ public class FieldRelativeAccelerationLimiter  {
     }
 
     double cartesianScale(
-            FieldRelativeVelocity prev,
-            FieldRelativeVelocity target,
-            FieldRelativeAcceleration accel) {
+            GlobalSe2Velocity prev,
+            GlobalSe2Velocity target,
+            GlobalSe2Acceleration accel) {
         double a = accel.norm();
         if (Math.abs(a) < 1e-6) {
             // Avoid divide-by-zero.
@@ -82,7 +82,7 @@ public class FieldRelativeAccelerationLimiter  {
         return Math.min(1, accelLimit / a);
     }
 
-    private double alphaScale(FieldRelativeAcceleration accel) {
+    private double alphaScale(GlobalSe2Acceleration accel) {
         double a = accel.theta();
         if (Math.abs(a) < 1e-6) {
             // Avoid divide-by-zero.

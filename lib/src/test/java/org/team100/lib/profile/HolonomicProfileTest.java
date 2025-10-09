@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.util.Util;
@@ -20,9 +20,9 @@ class HolonomicProfileTest {
     void testSolve() {
         HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
         SwerveModel i = new SwerveModel(
-                new Pose2d(0, 0, Rotation2d.kZero), new FieldRelativeVelocity(1, 0, 0));
+                new Pose2d(0, 0, Rotation2d.kZero), new GlobalSe2Velocity(1, 0, 0));
         SwerveModel g = new SwerveModel(
-                new Pose2d(0, 2, Rotation2d.kZero), new FieldRelativeVelocity(0, 0, 0));
+                new Pose2d(0, 2, Rotation2d.kZero), new GlobalSe2Velocity(0, 0, 0));
         hp.solve(i, g);
         // scale factors
         assertEquals(0.8125, hp.sx, DELTA);
@@ -72,7 +72,7 @@ class HolonomicProfileTest {
     @Test
     void test2dWithEntrySpeed() {
         HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
-        SwerveModel i = new SwerveModel(new Pose2d(), new FieldRelativeVelocity(1, 0, 0));
+        SwerveModel i = new SwerveModel(new Pose2d(), new GlobalSe2Velocity(1, 0, 0));
         SwerveModel g = new SwerveModel(new Pose2d(0, 1, Rotation2d.kZero));
         hp.solve(i, g);
         SwerveControl s = i.control();
@@ -99,7 +99,7 @@ class HolonomicProfileTest {
     @Test
     void testSolvePerformance() {
         HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
-        SwerveModel i = new SwerveModel(new Pose2d(), new FieldRelativeVelocity(1, 0, 0));
+        SwerveModel i = new SwerveModel(new Pose2d(), new GlobalSe2Velocity(1, 0, 0));
         SwerveModel g = new SwerveModel(new Pose2d(0, 1, Rotation2d.kZero));
         int N = 10000;
         double t0 = Takt.actual();

@@ -16,7 +16,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
@@ -47,7 +47,7 @@ class ManualWithFullStateHeadingTest {
 
         Velocity twist1_1 = new Velocity(0, 0, 0);
 
-        FieldRelativeVelocity twistM_S = m_manualWithHeading.apply(new SwerveModel(), twist1_1);
+        GlobalSe2Velocity twistM_S = m_manualWithHeading.apply(new SwerveModel(), twist1_1);
         verify(0, 0, 0, twistM_S);
 
         // with a non-null desired rotation we're in snap mode
@@ -79,7 +79,7 @@ class ManualWithFullStateHeadingTest {
 
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
-        FieldRelativeVelocity twistM_S = m_manualWithHeading.apply(
+        GlobalSe2Velocity twistM_S = m_manualWithHeading.apply(
                 new SwerveModel(),
                 twist1_1);
 
@@ -116,7 +116,7 @@ class ManualWithFullStateHeadingTest {
         // no user input
         final Velocity zeroVelocity = new Velocity(0, 0, 0);
 
-        FieldRelativeVelocity twistM_S = m_manualWithHeading.apply(
+        GlobalSe2Velocity twistM_S = m_manualWithHeading.apply(
                 new SwerveModel(),
                 zeroVelocity);
         // in snap mode
@@ -188,8 +188,8 @@ class ManualWithFullStateHeadingTest {
 
         // no stick input
         Velocity twist1_1 = new Velocity(0, 0, 0);
-        FieldRelativeVelocity v = m_manualWithHeading.apply(
-                new SwerveModel(currentPose, new FieldRelativeVelocity(0, 0, 0)),
+        GlobalSe2Velocity v = m_manualWithHeading.apply(
+                new SwerveModel(currentPose, new GlobalSe2Velocity(0, 0, 0)),
                 twist1_1);
 
         // in snap mode
@@ -248,11 +248,11 @@ class ManualWithFullStateHeadingTest {
 
         SwerveModel currentState = new SwerveModel(
                 Pose2d.kZero,
-                new FieldRelativeVelocity(0, 0, 0));
+                new GlobalSe2Velocity(0, 0, 0));
         // no POV
         desiredRotation = null;
 
-        FieldRelativeVelocity v = m_manualWithHeading.apply(currentState, twist1_1);
+        GlobalSe2Velocity v = m_manualWithHeading.apply(currentState, twist1_1);
         // scale 1.0 input to max omega
         assertNull(m_manualWithHeading.m_goal);
         assertNull(m_manualWithHeading.m_thetaSetpoint);
@@ -261,7 +261,7 @@ class ManualWithFullStateHeadingTest {
         // already going full speed:
         currentState = new SwerveModel(
                 Pose2d.kZero,
-                new FieldRelativeVelocity(0, 0, 2.828));
+                new GlobalSe2Velocity(0, 0, 2.828));
         // gyro indicates the correct speed
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -273,7 +273,7 @@ class ManualWithFullStateHeadingTest {
         twist1_1 = new Velocity(0, 0, 0);
         currentState = new SwerveModel(
                 Pose2d.kZero,
-                new FieldRelativeVelocity(0, 0, 2.828));
+                new GlobalSe2Velocity(0, 0, 2.828));
         // gyro rate is still full speed.
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -304,11 +304,11 @@ class ManualWithFullStateHeadingTest {
 
         SwerveModel currentState = new SwerveModel(
                 Pose2d.kZero,
-                new FieldRelativeVelocity(0, 0, 0));
+                new GlobalSe2Velocity(0, 0, 0));
         // no POV
         desiredRotation = null;
 
-        FieldRelativeVelocity v = m_manualWithHeading.apply(currentState, twist1_1);
+        GlobalSe2Velocity v = m_manualWithHeading.apply(currentState, twist1_1);
         // scale 1.0 input to max omega
         assertNull(m_manualWithHeading.m_goal);
         assertNull(m_manualWithHeading.m_thetaSetpoint);
@@ -317,7 +317,7 @@ class ManualWithFullStateHeadingTest {
         // already going full speed:
         currentState = new SwerveModel(
                 Pose2d.kZero,
-                new FieldRelativeVelocity(0, 0, 2.828));
+                new GlobalSe2Velocity(0, 0, 2.828));
         // gyro indicates the correct speed
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -329,7 +329,7 @@ class ManualWithFullStateHeadingTest {
         twist1_1 = new Velocity(0, 0, 0);
         currentState = new SwerveModel(
                 Pose2d.kZero,
-                new FieldRelativeVelocity(0, 0, 2.828));
+                new GlobalSe2Velocity(0, 0, 2.828));
         // gyro rate is still full speed.
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -372,7 +372,7 @@ class ManualWithFullStateHeadingTest {
         }
     }
 
-    private void verify(double vx, double vy, double omega, FieldRelativeVelocity v) {
+    private void verify(double vx, double vy, double omega, GlobalSe2Velocity v) {
         assertEquals(vx, v.x(), DELTA);
         assertEquals(vy, v.y(), DELTA);
         assertEquals(omega, v.theta(), DELTA);

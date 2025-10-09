@@ -69,7 +69,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
@@ -719,7 +719,7 @@ public class Robot extends TimedRobot100 {
         planner.restToRest(waypoints);
 
         // Exercise the drive motors.
-        m_drive.driveInFieldCoords(new FieldRelativeVelocity(0, 0, 0));
+        m_drive.driveInFieldCoords(new GlobalSe2Velocity(0, 0, 0));
 
         // Exercise some mechanism commands.
         Command c = m_mech.homeToL4();

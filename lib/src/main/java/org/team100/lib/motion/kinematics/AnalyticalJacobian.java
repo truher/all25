@@ -1,8 +1,8 @@
 package org.team100.lib.motion.kinematics;
 
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.util.Util;
@@ -20,7 +20,6 @@ import edu.wpi.first.math.numbers.N3;
  * See doc/README.md
  */
 public class AnalyticalJacobian {
-    private static final boolean DEBUG = false;
     private final ElevatorArmWristKinematics m_k;
     // notation from PRRDynamics.
     private final double l2;
@@ -39,9 +38,9 @@ public class AnalyticalJacobian {
      * 
      * See doc/README.md equation 4
      */
-    public FieldRelativeVelocity forward(Config q, JointVelocities qdot) {
+    public GlobalSe2Velocity forward(Config q, JointVelocities qdot) {
         Matrix<N3, N3> j = getJ(q);
-        return FieldRelativeVelocity.fromVector(j.times(qdot.toVector()));
+        return GlobalSe2Velocity.fromVector(j.times(qdot.toVector()));
     }
 
     /**
@@ -53,7 +52,7 @@ public class AnalyticalJacobian {
      */
     public JointVelocities inverse(SwerveModel m) {
         Pose2d x = m.pose();
-        FieldRelativeVelocity xdot = m.velocity();
+        GlobalSe2Velocity xdot = m.velocity();
         Config q = m_k.inverse(x);
         Matrix<N3, N3> Jinv = getJinv(q);
         return JointVelocities.fromVector(Jinv.times(xdot.toVector()));
@@ -66,11 +65,11 @@ public class AnalyticalJacobian {
      * 
      * See doc/README.md equation 6
      */
-    public FieldRelativeAcceleration forwardA(
+    public GlobalSe2Acceleration forwardA(
             Config q, JointVelocities qdot, JointAccelerations qddot) {
         Matrix<N3, N3> J = getJ(q);
         Matrix<N3, N3> Jdot = getJdot(q, qdot);
-        return FieldRelativeAcceleration.fromVector(
+        return GlobalSe2Acceleration.fromVector(
                 Jdot.times(qdot.toVector()).plus(J.times(qddot.toVector())));
     }
 
@@ -83,8 +82,8 @@ public class AnalyticalJacobian {
      */
     public JointAccelerations inverseA(SwerveControl m) {
         Pose2d x = m.pose();
-        FieldRelativeVelocity xdot = m.velocity();
-        FieldRelativeAcceleration xddot = m.acceleration();
+        GlobalSe2Velocity xdot = m.velocity();
+        GlobalSe2Acceleration xddot = m.acceleration();
         Config q = m_k.inverse(x);
         Matrix<N3, N3> Jinv = getJinv(q);
         JointVelocities qdot = JointVelocities.fromVector(Jinv.times(xdot.toVector()));
@@ -158,9 +157,7 @@ public class AnalyticalJacobian {
             // Don't try to invert if it's not possible.
             // a zero inverse determinant will result in zero speed,
             // which is the safe thing.
-            // TODO: raise an exception
-            if (DEBUG)
-                Util.warnf("zero jacobian for config %s\n", q.toString());
+            Util.warnf("zero jacobian for config %s\n", q.toString());
             return new Matrix<>(Nat.N3(), Nat.N3());
         }
         return J.inv();

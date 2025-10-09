@@ -32,14 +32,14 @@ public class SwerveControl {
         m_theta = theta;
     }
 
-    public SwerveControl(Pose2d x, FieldRelativeVelocity v) {
+    public SwerveControl(Pose2d x, GlobalSe2Velocity v) {
         this(
                 new Control100(x.getX(), v.x(), 0),
                 new Control100(x.getY(), v.y(), 0),
                 new Control100(x.getRotation().getRadians(), v.theta(), 0));
     }
 
-    public SwerveControl(Pose2d x, FieldRelativeVelocity v, FieldRelativeAcceleration a) {
+    public SwerveControl(Pose2d x, GlobalSe2Velocity v, GlobalSe2Acceleration a) {
         this(
                 new Control100(x.getX(), v.x(), a.x()),
                 new Control100(x.getY(), v.y(), a.y()),
@@ -47,7 +47,7 @@ public class SwerveControl {
     }
 
     public SwerveControl(Pose2d x) {
-        this(x, new FieldRelativeVelocity(0, 0, 0));
+        this(x, new GlobalSe2Velocity(0, 0, 0));
     }
 
     public SwerveControl(Rotation2d x) {
@@ -93,8 +93,8 @@ public class SwerveControl {
         return new Rotation2d(m_theta.x());
     }
 
-    public FieldRelativeVelocity velocity() {
-        return new FieldRelativeVelocity(m_x.v(), m_y.v(), m_theta.v());
+    public GlobalSe2Velocity velocity() {
+        return new GlobalSe2Velocity(m_x.v(), m_y.v(), m_theta.v());
     }
 
     /** Robot-relative speeds */
@@ -102,8 +102,8 @@ public class SwerveControl {
         return SwerveKinodynamics.toInstantaneousChassisSpeeds(velocity(), rotation());
     }
 
-    public FieldRelativeAcceleration acceleration() {
-        return new FieldRelativeAcceleration(m_x.a(), m_y.a(), m_theta.a());
+    public GlobalSe2Acceleration acceleration() {
+        return new GlobalSe2Acceleration(m_x.a(), m_y.a(), m_theta.a());
     }
 
     public Control100 x() {

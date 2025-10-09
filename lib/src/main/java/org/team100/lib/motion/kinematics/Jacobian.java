@@ -2,7 +2,7 @@ package org.team100.lib.motion.kinematics;
 
 import java.util.function.Function;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.optimization.NumericalJacobian100;
 
@@ -33,13 +33,11 @@ public class Jacobian {
 
     /**
      * Given a joint configuration and velocities, what is the cartesian velocity?
-     * It's a bit weird to use the "field relative" concept here.
-     * TODO: rename it something like "GlobalVelocity"
      */
-    public FieldRelativeVelocity forward(Config c, JointVelocities v) {
+    public GlobalSe2Velocity forward(Config c, JointVelocities v) {
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
                 Nat.N3(), Nat.N3(), m_f, config(c));
-        return FieldRelativeVelocity.fromVector(j.times(v.toVector()));
+        return GlobalSe2Velocity.fromVector(j.times(v.toVector()));
     }
 
     /**
@@ -48,7 +46,7 @@ public class Jacobian {
      */
     public JointVelocities inverse(SwerveModel swerveModel) {
         Pose2d p = swerveModel.pose();
-        FieldRelativeVelocity v = swerveModel.velocity();
+        GlobalSe2Velocity v = swerveModel.velocity();
         Config c = m_k.inverse(p);
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
                 Nat.N3(), Nat.N3(), m_f, config(c));

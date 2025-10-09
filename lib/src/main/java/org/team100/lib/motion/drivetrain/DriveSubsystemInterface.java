@@ -1,6 +1,6 @@
 package org.team100.lib.motion.drivetrain;
 
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public interface DriveSubsystemInterface extends Subsystem {
 
     /** Scale and filter input before applying. */
-    void driveInFieldCoords(FieldRelativeVelocity setpoint);
+    void driveInFieldCoords(GlobalSe2Velocity setpoint);
 
     /** No scaling or filtering. */
-    void driveInFieldCoordsVerbatim(FieldRelativeVelocity setpoint);
+    void driveInFieldCoordsVerbatim(GlobalSe2Velocity setpoint);
 
     /** Drive state for the current Takt. */
     SwerveModel getState();

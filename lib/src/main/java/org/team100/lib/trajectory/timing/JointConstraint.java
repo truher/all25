@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
@@ -50,7 +50,7 @@ public class JointConstraint implements TimingConstraint {
         Pose2d pose = state.getPose();
         MotionDirection motion = state.getMotionDirection();
         // unit vector in cartesian space
-        FieldRelativeVelocity v = new FieldRelativeVelocity(
+        GlobalSe2Velocity v = new GlobalSe2Velocity(
                 motion.dx(), motion.dy(), motion.dtheta());
         SwerveModel m = new SwerveModel(pose, v);
 
@@ -69,7 +69,7 @@ public class JointConstraint implements TimingConstraint {
 
         Config q = m_k.inverse(pose);
 
-        FieldRelativeVelocity maxV = m_j.forward(q, maxQdotInMotionDirection);
+        GlobalSe2Velocity maxV = m_j.forward(q, maxQdotInMotionDirection);
         double norm = maxV.norm();
         if (Double.isNaN(norm))
             return new NonNegativeDouble(0);
@@ -90,14 +90,14 @@ public class JointConstraint implements TimingConstraint {
         double omega = velocityM_S * r;
 
         // actual cartesian velocity
-        FieldRelativeVelocity v = new FieldRelativeVelocity(vx, vy, omega);
+        GlobalSe2Velocity v = new GlobalSe2Velocity(vx, vy, omega);
 
         Config q = m_k.inverse(pose);
         // actual qdot
         JointVelocities qdot = m_j.inverse(new SwerveModel(pose, v));
 
         // find accel in motion
-        FieldRelativeAcceleration unitA = new FieldRelativeAcceleration(c, s, r);
+        GlobalSe2Acceleration unitA = new GlobalSe2Acceleration(c, s, r);
         SwerveControl sc = new SwerveControl(pose, v, unitA);
         // corresponding a vector in joint space
         JointAccelerations qddot = m_j.inverseA(sc);
@@ -112,7 +112,7 @@ public class JointConstraint implements TimingConstraint {
         // scale qddot to the nearest maximum
         JointAccelerations maxQddotInMotionDirection = qddot.times(1 / maxScale);
 
-        FieldRelativeAcceleration fa = m_j.forwardA(q, qdot, maxQddotInMotionDirection);
+        GlobalSe2Acceleration fa = m_j.forwardA(q, qdot, maxQddotInMotionDirection);
 
         double norm = fa.norm();
         if (Double.isNaN(norm))
