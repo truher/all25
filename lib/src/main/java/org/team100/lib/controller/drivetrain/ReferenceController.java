@@ -1,7 +1,7 @@
 package org.team100.lib.controller.drivetrain;
 
 import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.reference.SwerveReference;
 import org.team100.lib.util.Util;
@@ -42,7 +42,7 @@ public class ReferenceController {
     public void execute() {
         try {
             SwerveModel measurement = m_drive.getState();
-            FieldRelativeVelocity fieldRelativeTarget = m_controller.calculate(
+            GlobalSe2Velocity fieldRelativeTarget = m_controller.calculate(
                     measurement, m_reference.current(), m_reference.next());
             if (DEBUG) {
                 Util.printf("ReferenceController.execute() measurement %s current %s next %s output %s\n",

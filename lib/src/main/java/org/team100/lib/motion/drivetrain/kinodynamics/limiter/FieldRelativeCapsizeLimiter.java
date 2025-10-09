@@ -7,8 +7,8 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeAccelerationLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeAcceleration;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.util.Util;
 
 /**
@@ -35,13 +35,13 @@ public class FieldRelativeCapsizeLimiter  {
         limits = m_limits;
     }
 
-    public FieldRelativeVelocity apply(
-            FieldRelativeVelocity prev,
-            FieldRelativeVelocity target) {
+    public GlobalSe2Velocity apply(
+            GlobalSe2Velocity prev,
+            GlobalSe2Velocity target) {
         m_log_prev.log(() -> prev);
         m_log_target.log(() -> target);
         // Acceleration required to achieve the target.
-        FieldRelativeAcceleration accel = target.accel(
+        GlobalSe2Acceleration accel = target.accel(
                 prev,
                 TimedRobot100.LOOP_PERIOD_S);
         m_log_accel.log(() -> accel);
@@ -52,7 +52,7 @@ public class FieldRelativeCapsizeLimiter  {
         }
         double scale = scale(a);
         m_log_scale.log(() -> scale);
-        FieldRelativeVelocity result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
+        GlobalSe2Velocity result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
         if (DEBUG)
             Util.printf("FieldRelativeCapsizeLimiter prev %s target %s accel %s scale %5.2f result %s\n",
                     prev, target, accel, scale, result);

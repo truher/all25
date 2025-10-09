@@ -9,7 +9,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.util.Util;
 
 /**
@@ -31,7 +31,7 @@ public class SwerveLimiter  {
     private final FieldRelativeAccelerationLimiter m_accelerationLimiter;
     private final SwerveDeadband m_deadband;
     // Velocity expected at the current time, i.e. the previous time step's desire.
-    private FieldRelativeVelocity m_current;
+    private GlobalSe2Velocity m_current;
 
     public SwerveLimiter(LoggerFactory parent, SwerveKinodynamics dynamics, DoubleSupplier voltage) {
         LoggerFactory child = parent.type(this);
@@ -57,7 +57,7 @@ public class SwerveLimiter  {
      * Find a feasible setpoint in the direction of the target, and remember it for
      * next time.
      */
-    public FieldRelativeVelocity apply(FieldRelativeVelocity nextReference) {
+    public GlobalSe2Velocity apply(GlobalSe2Velocity nextReference) {
         m_log_next.log(() -> nextReference);
         m_log_normIn.log(nextReference::norm);
         if (DEBUG)
@@ -66,7 +66,7 @@ public class SwerveLimiter  {
             m_current = nextReference;
 
         // First, limit the goal to a feasible velocity.
-        FieldRelativeVelocity result = m_velocityLimiter.apply(nextReference);
+        GlobalSe2Velocity result = m_velocityLimiter.apply(nextReference);
         if (DEBUG)
             Util.printf("velocity limited %s\n", result);
 
@@ -94,7 +94,7 @@ public class SwerveLimiter  {
         return result;
     }
 
-    public void updateSetpoint(FieldRelativeVelocity setpoint) {
+    public void updateSetpoint(GlobalSe2Velocity setpoint) {
         m_current = setpoint;
     }
 

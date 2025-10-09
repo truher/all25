@@ -1,6 +1,6 @@
 package org.team100.lib.controller.drivetrain;
 
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
@@ -23,7 +23,7 @@ public interface SwerveController  {
      * @return Control output, should be given to
      *         SwerveDriveSubsystem.driveInFieldCoords() or something similar.
      */
-    FieldRelativeVelocity calculate(
+    GlobalSe2Velocity calculate(
             SwerveModel measurement,
             SwerveModel currentReference,
             SwerveControl nextReference);

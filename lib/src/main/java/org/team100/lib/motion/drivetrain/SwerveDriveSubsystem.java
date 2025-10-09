@@ -18,7 +18,7 @@ import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.logging.LoggerFactory.SwerveModelLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
@@ -94,10 +94,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      * of your command, see DriveManually).
      */
     @Override
-    public void driveInFieldCoords(final FieldRelativeVelocity input) {
+    public void driveInFieldCoords(final GlobalSe2Velocity input) {
         // scale for driver skill; default is half speed.
         final DriverSkill.Level driverSkillLevel = DriverSkill.level();
-        FieldRelativeVelocity scaled = GeometryUtil.scale(input, driverSkillLevel.scale());
+        GlobalSe2Velocity scaled = GeometryUtil.scale(input, driverSkillLevel.scale());
 
         // NEW! Apply field-relative limits here.
         if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {
@@ -126,7 +126,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     }
 
     /** Skip all scaling, setpoint generator, etc. */
-    public void driveInFieldCoordsVerbatim(FieldRelativeVelocity input) {
+    public void driveInFieldCoordsVerbatim(GlobalSe2Velocity input) {
         // keep the limiter up to date on what we're doing
         m_limiter.updateSetpoint(input);
 
@@ -279,7 +279,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     }
 
     /** Return cached velocity. */
-    public FieldRelativeVelocity getVelocity() {
+    public GlobalSe2Velocity getVelocity() {
         return m_stateCache.get().velocity();
     }
 

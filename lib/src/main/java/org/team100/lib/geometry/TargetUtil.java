@@ -2,7 +2,7 @@ package org.team100.lib.geometry;
 
 import java.util.Optional;
 
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -45,7 +45,7 @@ public class TargetUtil {
         Translation2d translation = target.minus(robot);
 
         Rotation2d bearing = translation.getAngle();
-        FieldRelativeVelocity twist = state.velocity();
+        GlobalSe2Velocity twist = state.velocity();
         Rotation2d relativeBearing = getRelativeBearing(bearing, twist);
 
         double speed = twist.norm();
@@ -53,7 +53,7 @@ public class TargetUtil {
         return speed * relativeBearing.getSin() / range;
     }
 
-    private static Rotation2d getRelativeBearing(Rotation2d bearing, FieldRelativeVelocity velo) {
+    private static Rotation2d getRelativeBearing(Rotation2d bearing, GlobalSe2Velocity velo) {
         Optional<Rotation2d> course = velo.angle();
         if (course.isEmpty()) {
             // if we're not moving, the relative bearing is just the bearing.

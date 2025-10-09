@@ -15,7 +15,7 @@ import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.MockGyro;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
@@ -55,7 +55,7 @@ class SwerveDrivePoseEstimator100Test {
     }
 
     private static void verifyVelocity(double xV, SwerveModel state) {
-        FieldRelativeVelocity v = state.velocity();
+        GlobalSe2Velocity v = state.velocity();
         assertEquals(xV, v.x(), DELTA);
     }
 

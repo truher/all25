@@ -11,7 +11,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.state.Control100;
@@ -30,7 +30,7 @@ class FullStateSwerveControllerTest implements Timeless {
     void testAtRest() {
         FullStateSwerveController c = SwerveControllerFactory.test2(logger);
         assertFalse(c.atReference());
-        FieldRelativeVelocity t = c.calculate(
+        GlobalSe2Velocity t = c.calculate(
                 new SwerveModel(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -54,7 +54,7 @@ class FullStateSwerveControllerTest implements Timeless {
         FullStateSwerveController c = SwerveControllerFactory.test2(logger);
         assertFalse(c.atReference());
         // no velocity, no feedforward
-        FieldRelativeVelocity t = c.calculate(
+        GlobalSe2Velocity t = c.calculate(
                 new SwerveModel(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -78,7 +78,7 @@ class FullStateSwerveControllerTest implements Timeless {
     void testFast() {
         FullStateSwerveController c = SwerveControllerFactory.test2(logger);
         assertFalse(c.atReference());
-        FieldRelativeVelocity t = c.calculate(
+        GlobalSe2Velocity t = c.calculate(
                 new SwerveModel(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -103,7 +103,7 @@ class FullStateSwerveControllerTest implements Timeless {
     void testOnTrack() {
         FullStateSwerveController c = SwerveControllerFactory.test2(logger);
         assertFalse(c.atReference());
-        FieldRelativeVelocity t = c.calculate(
+        GlobalSe2Velocity t = c.calculate(
                 new SwerveModel(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -128,7 +128,7 @@ class FullStateSwerveControllerTest implements Timeless {
         FullStateSwerveController c = SwerveControllerFactory.test2(logger);
         assertFalse(c.atReference());
         // none of these have any velocity so there's no feedforward.
-        FieldRelativeVelocity t = c.calculate(
+        GlobalSe2Velocity t = c.calculate(
                 new SwerveModel(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -152,7 +152,7 @@ class FullStateSwerveControllerTest implements Timeless {
     void testRotation() {
         FullStateSwerveController c = SwerveControllerFactory.test2(logger);
         assertFalse(c.atReference());
-        FieldRelativeVelocity t = c.calculate(
+        GlobalSe2Velocity t = c.calculate(
                 new SwerveModel(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -279,7 +279,7 @@ class FullStateSwerveControllerTest implements Timeless {
         // measurement position doesn't matter, rotation here matches velocity below
         SwerveModel measurement = new SwerveModel(
                 new Pose2d(1, 2, new Rotation2d(Math.PI)),
-                new FieldRelativeVelocity(1, 0, 0));
+                new GlobalSe2Velocity(1, 0, 0));
         // motion is in a straight line, down the x axis
         MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // setpoint is also at the origin
@@ -294,7 +294,7 @@ class FullStateSwerveControllerTest implements Timeless {
         // constant speed
         double acceleration = 0;
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity error = controller.velocityError(measurement, currentReference);
+        GlobalSe2Velocity error = controller.velocityError(measurement, currentReference);
         // we're exactly on the setpoint so zero error
         assertEquals(0, error.x(), DELTA);
         assertEquals(0, error.y(), DELTA);
@@ -308,7 +308,7 @@ class FullStateSwerveControllerTest implements Timeless {
         // measurement is the wrong velocity
         SwerveModel measurement = new SwerveModel(
                 new Pose2d(),
-                new FieldRelativeVelocity(0, 1, 0));
+                new GlobalSe2Velocity(0, 1, 0));
         // motion is in a straight line, down the x axis
         MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // at the origin
@@ -324,7 +324,7 @@ class FullStateSwerveControllerTest implements Timeless {
         double acceleration = 0;
 
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity error = controller.velocityError(measurement, currentReference);
+        GlobalSe2Velocity error = controller.velocityError(measurement, currentReference);
         // error should include both components
         assertEquals(1, error.x(), DELTA);
         assertEquals(-1, error.y(), DELTA);
@@ -350,7 +350,7 @@ class FullStateSwerveControllerTest implements Timeless {
         TimedPose setpoint = new TimedPose(state, t, velocity, acceleration);
         // feedforward should be straight ahead, no rotation.
         SwerveControl nextReference = SwerveControl.fromTimedPose(setpoint);
-        FieldRelativeVelocity speeds = controller.feedforward(nextReference);
+        GlobalSe2Velocity speeds = controller.feedforward(nextReference);
         assertEquals(1, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
         assertEquals(0, speeds.theta(), DELTA);
@@ -375,7 +375,7 @@ class FullStateSwerveControllerTest implements Timeless {
         TimedPose setpoint = new TimedPose(state, t, velocity, acceleration);
         // feedforward should be -y, robot relative, no rotation.
         SwerveControl nextReference = SwerveControl.fromTimedPose(setpoint);
-        FieldRelativeVelocity speeds = controller.feedforward(nextReference);
+        GlobalSe2Velocity speeds = controller.feedforward(nextReference);
         assertEquals(1, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
         assertEquals(0, speeds.theta(), DELTA);
@@ -398,7 +398,7 @@ class FullStateSwerveControllerTest implements Timeless {
         // constant speed
         double acceleration = 0;
         SwerveControl nextReference = SwerveControl.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity speeds = controller.feedforward(nextReference);
+        GlobalSe2Velocity speeds = controller.feedforward(nextReference);
         // feedforward should be ahead and rotating.
         assertEquals(1, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -430,10 +430,10 @@ class FullStateSwerveControllerTest implements Timeless {
         double acceleration = 0;
         SwerveModel measurement = new SwerveModel(
                 currentState,
-                new FieldRelativeVelocity(1, 0, 0));
+                new GlobalSe2Velocity(1, 0, 0));
         // feedforward should be straight ahead, no rotation.
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity speeds = controller.positionFeedback(measurement, currentReference);
+        GlobalSe2Velocity speeds = controller.positionFeedback(measurement, currentReference);
         // we're exactly on the setpoint so zero feedback
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -465,10 +465,10 @@ class FullStateSwerveControllerTest implements Timeless {
         double acceleration = 0;
         SwerveModel measurement = new SwerveModel(
                 currentState,
-                new FieldRelativeVelocity(1, 0, 0));
+                new GlobalSe2Velocity(1, 0, 0));
         // feedforward should be straight ahead, no rotation.
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity speeds = controller.positionFeedback(measurement, currentReference);
+        GlobalSe2Velocity speeds = controller.positionFeedback(measurement, currentReference);
         // setpoint should be negative y
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(-1, speeds.y(), DELTA);
@@ -500,10 +500,10 @@ class FullStateSwerveControllerTest implements Timeless {
         double acceleration = 0;
         SwerveModel measurement = new SwerveModel(
                 currentState,
-                new FieldRelativeVelocity(1, 0, 0));
+                new GlobalSe2Velocity(1, 0, 0));
         // feedforward should be straight ahead, no rotation.
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity speeds = controller.positionFeedback(measurement, currentReference);
+        GlobalSe2Velocity speeds = controller.positionFeedback(measurement, currentReference);
         // robot is on the setpoint in translation
         // but needs negative rotation
         // setpoint should be negative theta
@@ -538,9 +538,9 @@ class FullStateSwerveControllerTest implements Timeless {
         double acceleration = 0;
         SwerveModel measurement = new SwerveModel(
                 currentState,
-                new FieldRelativeVelocity(1, 0, 0));
+                new GlobalSe2Velocity(1, 0, 0));
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity speeds = controller.positionFeedback(measurement, currentReference);
+        GlobalSe2Velocity speeds = controller.positionFeedback(measurement, currentReference);
         // on target
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -572,9 +572,9 @@ class FullStateSwerveControllerTest implements Timeless {
         double acceleration = 0;
         SwerveModel measurement = new SwerveModel(
                 currentState,
-                new FieldRelativeVelocity(1, 0, 0));
+                new GlobalSe2Velocity(1, 0, 0));
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity speeds = controller.positionFeedback(measurement, currentReference);
+        GlobalSe2Velocity speeds = controller.positionFeedback(measurement, currentReference);
         // feedback is -y field relative
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(-1, speeds.y(), DELTA);
@@ -607,9 +607,9 @@ class FullStateSwerveControllerTest implements Timeless {
         // motion is on setpoint
         SwerveModel measurement = new SwerveModel(
                 currentState,
-                new FieldRelativeVelocity(1, 0, 0));
+                new GlobalSe2Velocity(1, 0, 0));
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity speeds = controller.fullFeedback(measurement, currentReference);
+        GlobalSe2Velocity speeds = controller.fullFeedback(measurement, currentReference);
         // we're exactly on the setpoint so zero feedback
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -643,9 +643,9 @@ class FullStateSwerveControllerTest implements Timeless {
         // measurement is too slow
         SwerveModel measurement = new SwerveModel(
                 currentPose,
-                new FieldRelativeVelocity(0.5, 0, 0));
+                new GlobalSe2Velocity(0.5, 0, 0));
         SwerveModel currentReference = SwerveModel.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        FieldRelativeVelocity speeds = controller.fullFeedback(measurement, currentReference);
+        GlobalSe2Velocity speeds = controller.fullFeedback(measurement, currentReference);
         // speed up
         assertEquals(0.5, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -661,7 +661,7 @@ class FullStateSwerveControllerTest implements Timeless {
         SwerveModel measurement = new SwerveModel(
                 new Pose2d(0.1, 0.1,
                         Rotation2d.kCCW_Pi_2.plus(new Rotation2d(0.1))),
-                new FieldRelativeVelocity(0.5, 0, 0));
+                new GlobalSe2Velocity(0.5, 0, 0));
 
         // setpoint postion is ahead in x and y and theta
         Pose2d setpointPose = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
@@ -686,7 +686,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
         // feedforward should be straight ahead, no rotation.
 
-        FieldRelativeVelocity positionFeedback = controller.positionFeedback(
+        GlobalSe2Velocity positionFeedback = controller.positionFeedback(
                 measurement, currentReference);
         // field-relative x is ahead
         assertEquals(-0.1, positionFeedback.x(), DELTA);
@@ -695,7 +695,7 @@ class FullStateSwerveControllerTest implements Timeless {
         // pull back theta
         assertEquals(-0.1, positionFeedback.theta(), DELTA);
 
-        FieldRelativeVelocity velocityFeedback = controller.velocityFeedback(
+        GlobalSe2Velocity velocityFeedback = controller.velocityFeedback(
                 measurement,
                 currentReference);
 
@@ -703,7 +703,7 @@ class FullStateSwerveControllerTest implements Timeless {
         assertEquals(0, velocityFeedback.y(), DELTA);
         assertEquals(0, velocityFeedback.theta(), DELTA);
 
-        FieldRelativeVelocity speeds = controller.fullFeedback(
+        GlobalSe2Velocity speeds = controller.fullFeedback(
                 measurement,
                 currentReference);
         // this is just the sum

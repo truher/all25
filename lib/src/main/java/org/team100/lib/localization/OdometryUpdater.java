@@ -8,7 +8,7 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
@@ -154,7 +154,7 @@ public class OdometryUpdater {
                 .div(dt);
 
         // use the gyro rate instead of the odometry-derived rate
-        FieldRelativeVelocity velocity = new FieldRelativeVelocity(
+        GlobalSe2Velocity velocity = new GlobalSe2Velocity(
                 odoVelo.getX(),
                 odoVelo.getY(),
                 gyroRateRad_SNWU);

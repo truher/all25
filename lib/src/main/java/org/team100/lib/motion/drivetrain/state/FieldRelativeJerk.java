@@ -9,7 +9,7 @@ public record FieldRelativeJerk(double x, double y, double theta) {
         return new FieldRelativeJerk(x * scalar, y * scalar, theta * scalar);
     }
 
-    public FieldRelativeAcceleration integrate(double dtSec) {
-        return new FieldRelativeAcceleration(x * dtSec, y * dtSec, theta * dtSec);
+    public GlobalSe2Acceleration integrate(double dtSec) {
+        return new GlobalSe2Acceleration(x * dtSec, y * dtSec, theta * dtSec);
     }
 }

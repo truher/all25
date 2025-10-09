@@ -8,7 +8,7 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.optimization.NumericalJacobian100;
 import org.team100.lib.trajectory.Trajectory100;
@@ -135,21 +135,21 @@ public class JacobianTest {
         assertEquals(0, jv.wrist(), DELTA);
 
         // +x
-        v = new SwerveModel(p, new FieldRelativeVelocity(1, 0, 0));
+        v = new SwerveModel(p, new GlobalSe2Velocity(1, 0, 0));
         jv = j.inverse(v);
         assertEquals(1, jv.elevator(), DELTA);
         assertEquals(0, jv.shoulder(), DELTA);
         assertEquals(0, jv.wrist(), DELTA);
 
         // +y
-        v = new SwerveModel(p, new FieldRelativeVelocity(0, 1, 0));
+        v = new SwerveModel(p, new GlobalSe2Velocity(0, 1, 0));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(0.5, jv.shoulder(), DELTA);
         assertEquals(-0.5, jv.wrist(), DELTA);
 
         // +theta
-        v = new SwerveModel(p, new FieldRelativeVelocity(0, 0, 1));
+        v = new SwerveModel(p, new GlobalSe2Velocity(0, 0, 1));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(-0.5, jv.shoulder(), DELTA);
@@ -234,7 +234,7 @@ public class JacobianTest {
             TimedPose tp = t.sample(time);
             SwerveModel sm = SwerveModel.fromTimedPose(tp);
             Pose2d p = sm.pose();
-            FieldRelativeVelocity v = sm.velocity();
+            GlobalSe2Velocity v = sm.velocity();
             Config c = k.inverse(p);
             JointVelocities jv = j.inverse(sm);
             if (DEBUG)

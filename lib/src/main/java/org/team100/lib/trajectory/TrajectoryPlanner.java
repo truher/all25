@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
@@ -116,10 +116,10 @@ public class TrajectoryPlanner {
 
     public Trajectory100 movingToMoving(SwerveModel startState, SwerveModel endState) {
         Translation2d startTranslation = startState.translation();
-        FieldRelativeVelocity startVelocity = startState.velocity();
+        GlobalSe2Velocity startVelocity = startState.velocity();
 
         Translation2d endTranslation = endState.translation();
-        FieldRelativeVelocity endVelocity = endState.velocity();
+        GlobalSe2Velocity endVelocity = endState.velocity();
 
         // should work with out this.
         if (startVelocity.norm() < VELOCITY_EPSILON && endVelocity.norm() < VELOCITY_EPSILON) {
@@ -157,10 +157,10 @@ public class TrajectoryPlanner {
 
     public Trajectory100 movingToMoving(SwerveModel startState, Rotation2d startCourse, double splineEntranceVelocity, SwerveModel endState, Rotation2d endCourse, double splineExitVelocity) {
         Translation2d startTranslation = startState.translation();
-        FieldRelativeVelocity startVelocity = startState.velocity();
+        GlobalSe2Velocity startVelocity = startState.velocity();
 
         Translation2d endTranslation = endState.translation();
-        FieldRelativeVelocity endVelocity = endState.velocity();
+        GlobalSe2Velocity endVelocity = endState.velocity();
 
         // should work with out this.
         if (startVelocity.norm() < VELOCITY_EPSILON && endVelocity.norm() < VELOCITY_EPSILON) {

@@ -5,7 +5,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 /**
@@ -29,12 +29,12 @@ public class ManualFieldRelativeSpeeds implements FieldRelativeDriver {
      * feasible) speeds.
      */
     @Override
-    public FieldRelativeVelocity apply(SwerveModel state, Velocity input) {
+    public GlobalSe2Velocity apply(SwerveModel state, Velocity input) {
         // clip the input to the unit circle
         final Velocity clipped = input.clip(1.0);
 
         // scale to max in both translation and rotation
-        final FieldRelativeVelocity scaled = FieldRelativeDriver.scale(
+        final GlobalSe2Velocity scaled = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());

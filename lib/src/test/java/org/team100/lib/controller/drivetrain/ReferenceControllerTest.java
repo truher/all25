@@ -18,7 +18,7 @@ import org.team100.lib.motion.drivetrain.Fixtured;
 import org.team100.lib.motion.drivetrain.MockDrive;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.reference.TrajectoryReference;
 import org.team100.lib.testing.Timeless;
@@ -171,7 +171,7 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
                 false);
 
         Pose2d pose = trajectory.sample(0).state().getPose();
-        FieldRelativeVelocity velocity = FieldRelativeVelocity.zero();
+        GlobalSe2Velocity velocity = GlobalSe2Velocity.zero();
 
         double mDt = 0.02;
         int i = 0;

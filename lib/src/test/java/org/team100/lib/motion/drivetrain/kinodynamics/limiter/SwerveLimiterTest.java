@@ -10,7 +10,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
@@ -26,23 +26,23 @@ public class SwerveLimiterTest {
     /** The setpoint generator never changes the field-relative course. */
     @Test
     void courseInvariant() {
-        FieldRelativeVelocity target = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity target = new GlobalSe2Velocity(0, 0, 0);
         SwerveLimiter limiter = new SwerveLimiter(logger, KINEMATIC_LIMITS, () -> 12);
 
         {
             // motionless
-            FieldRelativeVelocity prevSetpoint = new FieldRelativeVelocity(0, 0, 0);
+            GlobalSe2Velocity prevSetpoint = new GlobalSe2Velocity(0, 0, 0);
             limiter.updateSetpoint(prevSetpoint);
-            FieldRelativeVelocity setpoint = limiter.apply(target);
+            GlobalSe2Velocity setpoint = limiter.apply(target);
             assertTrue(prevSetpoint.angle().isEmpty());
             assertTrue(setpoint.angle().isEmpty());
         }
         {
             // at max speed, 45 to the left and spinning
-            FieldRelativeVelocity speed = new FieldRelativeVelocity(2.640, 2.640, 3.733);
-            FieldRelativeVelocity prevSetpoint = speed;
+            GlobalSe2Velocity speed = new GlobalSe2Velocity(2.640, 2.640, 3.733);
+            GlobalSe2Velocity prevSetpoint = speed;
             limiter.updateSetpoint(prevSetpoint);
-            FieldRelativeVelocity setpoint = limiter.apply(target);
+            GlobalSe2Velocity setpoint = limiter.apply(target);
             assertEquals(Math.PI / 4, prevSetpoint.angle().get().getRadians(), 1e-12);
             assertEquals(3.733, prevSetpoint.norm(), DELTA);
             assertEquals(3.733, prevSetpoint.theta(), DELTA);
@@ -57,12 +57,12 @@ public class SwerveLimiterTest {
     /** This is pulled from SimulatedDrivingTest, to isolate the problem. */
     @Test
     void courseInvariantRealistic() {
-        FieldRelativeVelocity targetSpeed = new FieldRelativeVelocity(2, 0, 3.5);
+        GlobalSe2Velocity targetSpeed = new GlobalSe2Velocity(2, 0, 3.5);
 
         // not going very fast. note the previous instantaneous robot-relative speed has
         // no "y" component at all, because at the previous time, we had heading of zero
         // (and no speed either).
-        FieldRelativeVelocity prevSpeed = new FieldRelativeVelocity(0.16333333, 0, 0.28583333);
+        GlobalSe2Velocity prevSpeed = new GlobalSe2Velocity(0.16333333, 0, 0.28583333);
 
         // the previous course is exactly zero: this is the first time step after
         // starting.
@@ -81,7 +81,7 @@ public class SwerveLimiterTest {
 
         SwerveLimiter limiter = new SwerveLimiter(logger, KINEMATIC_LIMITS, () -> 12);
         limiter.updateSetpoint(prevSpeed);
-        FieldRelativeVelocity setpoint = limiter.apply(targetSpeed);
+        GlobalSe2Velocity setpoint = limiter.apply(targetSpeed);
 
         assertEquals(0, setpoint.angle().get().getRadians(), 1e-12);
         assertEquals(0.3266666633333334, setpoint.norm(), 1e-12);
@@ -94,15 +94,15 @@ public class SwerveLimiterTest {
         SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
         SwerveLimiter limiter = new SwerveLimiter(logger, unlimited, () -> 12);
 
-        FieldRelativeVelocity target = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity target = new GlobalSe2Velocity(0, 0, 0);
 
         assertEquals(0, target.x(), DELTA);
         assertEquals(0, target.y(), DELTA);
         assertEquals(0, target.theta(), DELTA);
 
-        FieldRelativeVelocity prevSetpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity prevSetpoint = new GlobalSe2Velocity(0, 0, 0);
         limiter.updateSetpoint(prevSetpoint);
-        FieldRelativeVelocity setpoint = limiter.apply(target);
+        GlobalSe2Velocity setpoint = limiter.apply(target);
         assertEquals(0, setpoint.x(), DELTA);
         assertEquals(0, setpoint.y(), DELTA);
         assertEquals(0, setpoint.theta(), DELTA);
@@ -114,15 +114,15 @@ public class SwerveLimiterTest {
         SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
         SwerveLimiter limiter = new SwerveLimiter(logger, unlimited, () -> 12);
 
-        FieldRelativeVelocity target = new FieldRelativeVelocity(1, 0, 0);
+        GlobalSe2Velocity target = new GlobalSe2Velocity(1, 0, 0);
 
         assertEquals(1, target.x(), DELTA);
         assertEquals(0, target.y(), DELTA);
         assertEquals(0, target.theta(), DELTA);
 
-        FieldRelativeVelocity prevSetpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity prevSetpoint = new GlobalSe2Velocity(0, 0, 0);
         limiter.updateSetpoint(prevSetpoint);
-        FieldRelativeVelocity setpoint = limiter.apply(target);
+        GlobalSe2Velocity setpoint = limiter.apply(target);
         assertEquals(1, setpoint.x(), DELTA);
         assertEquals(0, setpoint.y(), DELTA);
         assertEquals(0, setpoint.theta(), DELTA);
@@ -134,15 +134,15 @@ public class SwerveLimiterTest {
         SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
         SwerveLimiter limiter = new SwerveLimiter(logger, unlimited, () -> 12);
 
-        FieldRelativeVelocity target = new FieldRelativeVelocity(0, 0, 1);
+        GlobalSe2Velocity target = new GlobalSe2Velocity(0, 0, 1);
 
         assertEquals(0, target.x(), DELTA);
         assertEquals(0, target.y(), DELTA);
         assertEquals(1, target.theta(), DELTA);
 
-        FieldRelativeVelocity prevSetpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity prevSetpoint = new GlobalSe2Velocity(0, 0, 0);
         limiter.updateSetpoint(prevSetpoint);
-        FieldRelativeVelocity setpoint = limiter.apply(target);
+        GlobalSe2Velocity setpoint = limiter.apply(target);
         assertEquals(0, setpoint.x(), DELTA);
         assertEquals(0, setpoint.y(), DELTA);
         assertEquals(1, setpoint.theta(), DELTA);
@@ -154,16 +154,16 @@ public class SwerveLimiterTest {
         SwerveLimiter limiter = new SwerveLimiter(logger, unlimited, () -> 12);
 
         // spin fast to make the discretization effect larger
-        FieldRelativeVelocity target = new FieldRelativeVelocity(5, 0, 25);
+        GlobalSe2Velocity target = new GlobalSe2Velocity(5, 0, 25);
 
         assertEquals(5, target.x(), DELTA);
         assertEquals(0, target.y(), DELTA);
         assertEquals(25, target.theta(), DELTA);
 
         // this should do nothing since the limits are so high
-        FieldRelativeVelocity prevSetpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity prevSetpoint = new GlobalSe2Velocity(0, 0, 0);
         limiter.updateSetpoint(prevSetpoint);
-        FieldRelativeVelocity setpoint = limiter.apply(target);
+        GlobalSe2Velocity setpoint = limiter.apply(target);
         assertEquals(5, setpoint.x(), DELTA);
         assertEquals(0, setpoint.y(), DELTA);
         assertEquals(25, setpoint.theta(), DELTA);
@@ -180,12 +180,12 @@ public class SwerveLimiterTest {
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         // initially at rest, wheels facing forward.
-        FieldRelativeVelocity setpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity setpoint = new GlobalSe2Velocity(0, 0, 0);
 
         // initial setpoint steering is at angle zero
 
         // desired speed +x
-        FieldRelativeVelocity desiredSpeeds = new FieldRelativeVelocity(10, 0, 0);
+        GlobalSe2Velocity desiredSpeeds = new GlobalSe2Velocity(10, 0, 0);
 
         // the first setpoint should be accel limited: 10 m/s^2, 0.02 sec,
         // so v = 0.2 m/s
@@ -214,10 +214,10 @@ public class SwerveLimiterTest {
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         // initially at rest.
-        FieldRelativeVelocity setpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity setpoint = new GlobalSe2Velocity(0, 0, 0);
 
         // desired speed is feasible, max accel = 10 * dt = 0.02 => v = 0.2
-        FieldRelativeVelocity desiredSpeeds = new FieldRelativeVelocity(0.2, 0, 0);
+        GlobalSe2Velocity desiredSpeeds = new GlobalSe2Velocity(0.2, 0, 0);
 
         limiter.updateSetpoint(setpoint);
         setpoint = limiter.apply(desiredSpeeds);
@@ -233,11 +233,11 @@ public class SwerveLimiterTest {
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         // initially at rest.
-        FieldRelativeVelocity setpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity setpoint = new GlobalSe2Velocity(0, 0, 0);
 
         // desired speed is double the feasible accel so we should reach it in two
         // iterations.
-        FieldRelativeVelocity desiredSpeeds = new FieldRelativeVelocity(0.4, 0, 0);
+        GlobalSe2Velocity desiredSpeeds = new GlobalSe2Velocity(0.4, 0, 0);
 
         limiter.updateSetpoint(setpoint);
         setpoint = limiter.apply(desiredSpeeds);
@@ -257,10 +257,10 @@ public class SwerveLimiterTest {
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         // initially moving 0.5 +y
-        FieldRelativeVelocity setpoint = new FieldRelativeVelocity(0, 0.5, 0);
+        GlobalSe2Velocity setpoint = new GlobalSe2Velocity(0, 0.5, 0);
 
         // desired state is 1 +x
-        final FieldRelativeVelocity desiredSpeeds = new FieldRelativeVelocity(1, 0, 0);
+        final GlobalSe2Velocity desiredSpeeds = new GlobalSe2Velocity(1, 0, 0);
         limiter.updateSetpoint(setpoint);
         setpoint = limiter.apply(desiredSpeeds);
 
@@ -288,9 +288,9 @@ public class SwerveLimiterTest {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.likeComp25();
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
         // target is infeasible and constant
-        final FieldRelativeVelocity target = new FieldRelativeVelocity(5, 0, 0);
+        final GlobalSe2Velocity target = new GlobalSe2Velocity(5, 0, 0);
         // start is motionless
-        FieldRelativeVelocity setpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity setpoint = new GlobalSe2Velocity(0, 0, 0);
         limiter.updateSetpoint(setpoint);
         for (int i = 0; i < 100; ++i) {
             if (DEBUG)
@@ -336,15 +336,15 @@ public class SwerveLimiterTest {
         final SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         Control100 profileTarget = initial.control();
-        FieldRelativeVelocity target = new FieldRelativeVelocity(profileTarget.v(), 0, 0);
+        GlobalSe2Velocity target = new GlobalSe2Velocity(profileTarget.v(), 0, 0);
         // start is motionless
-        FieldRelativeVelocity setpoint = new FieldRelativeVelocity(0, 0, 0);
+        GlobalSe2Velocity setpoint = new GlobalSe2Velocity(0, 0, 0);
         limiter.updateSetpoint(setpoint);
         for (int i = 0; i < 81; ++i) {
             double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1, setpoint, target);
 
             profileTarget = profile.calculate(TimedRobot100.LOOP_PERIOD_S, profileTarget, goal);
-            target = new FieldRelativeVelocity(profileTarget.v(), 0, 0);
+            target = new GlobalSe2Velocity(profileTarget.v(), 0, 0);
             setpoint = limiter.apply(target);
             if (DEBUG)
                 Util.printf("i %d accelLimit %5.2f setpoint %5.2f target %5.2f\n",

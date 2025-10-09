@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeVelocity;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.trajectory.timing.TimedPose;
 
@@ -21,7 +21,7 @@ class SwerveModelTest {
     @Test
     void testTransform() {
         Pose2d p = new Pose2d(new Translation2d(1, 1), new Rotation2d(1));
-        FieldRelativeVelocity t = new FieldRelativeVelocity(1, 1, 1);
+        GlobalSe2Velocity t = new GlobalSe2Velocity(1, 1, 1);
         SwerveModel s = new SwerveModel(p, t);
         assertEquals(1, s.x().x(), DELTA);
     }
@@ -95,7 +95,7 @@ class SwerveModelTest {
     void testChassisSpeeds0() {
         SwerveModel state = new SwerveModel(
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kPi),
-                new FieldRelativeVelocity(1, 0, 0));
+                new GlobalSe2Velocity(1, 0, 0));
         ChassisSpeeds speeds = state.chassisSpeeds();
         assertEquals(-1, speeds.vxMetersPerSecond, DELTA);
         assertEquals(0, speeds.vyMetersPerSecond, DELTA);
@@ -106,7 +106,7 @@ class SwerveModelTest {
     void testChassisSpeeds1() {
         SwerveModel state = new SwerveModel(
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kCCW_Pi_2),
-                new FieldRelativeVelocity(1, 0, 1));
+                new GlobalSe2Velocity(1, 0, 1));
         ChassisSpeeds speeds = state.chassisSpeeds();
         assertEquals(0, speeds.vxMetersPerSecond, DELTA);
         assertEquals(-1, speeds.vyMetersPerSecond, DELTA);
