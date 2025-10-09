@@ -43,8 +43,6 @@ public interface LynxArmKinematics {
      * This method projects the grip axis into the yaw-Z plane, finds the rotation
      * from the grip axis to that rotation, and applies it. This results in less
      * error than the method below.
-     * 
-     * TODO: add workspace envelope fixing
      */
     static Pose3d fix(Pose3d p) {
         Translation3d x = new Translation3d(1, 0, 0);
