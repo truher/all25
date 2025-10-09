@@ -21,10 +21,10 @@ import org.team100.lib.util.RoboRioChannel;
  * https://docs.google.com/document/d/1Znb4MQAqJWQ_Wk_SDJvLRaJxrAjNylkQKeC4OdLdMco/edit
  * 
  * The 5048 encoder (and, I think, all AMS sensors) produce clockwise-positive
- * output, which is opposite our convention. Accordingly, you'll want to use
- * EncoderDrive.INVERSE in most cases.
- * 
- * TODO: fix that, make this class produce conventional output.
+ * output, looking down onto the top face of the sensor package. Our usual
+ * mounting orientation puts this face against the rotating part, so our view of
+ * the sensor is through the back. In this orientation, the output will seem to
+ * be CCW-positive.
  */
 public class AS5048RotaryPositionSensor extends DutyCycleRotaryPositionSensor {
 
