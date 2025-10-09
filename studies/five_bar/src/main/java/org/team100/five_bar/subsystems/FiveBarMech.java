@@ -17,7 +17,9 @@ import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.Falcon6Motor;
 import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.util.CanId;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -73,8 +75,8 @@ public class FiveBarMech extends SubsystemBase {
         LoggerFactory loggerP5 = logger.name("p5");
         switch (Identity.instance) {
             case COMP_BOT -> {
-                Falcon6Motor motorP1 = makeMotor(loggerP1, 1);
-                Falcon6Motor motorP5 = makeMotor(loggerP5, 2);
+                Falcon6Motor motorP1 = makeMotor(loggerP1, new CanId(1));
+                Falcon6Motor motorP5 = makeMotor(loggerP5, new CanId(2));
                 m_motorP1 = motorP1;
                 m_motorP5 = motorP5;
 
@@ -191,10 +193,11 @@ public class FiveBarMech extends SubsystemBase {
 
     //////////////////////
 
-    private Falcon6Motor makeMotor(LoggerFactory logger, int canId) {
+    private Falcon6Motor makeMotor(LoggerFactory logger, CanId canId) {
         return new Falcon6Motor(
                 logger,
                 canId,
+                NeutralMode.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,

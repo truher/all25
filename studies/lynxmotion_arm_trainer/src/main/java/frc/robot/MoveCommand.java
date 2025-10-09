@@ -2,7 +2,7 @@ package frc.robot;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
-import org.team100.lib.profile.timed.JerkLimitedProfile100;
+import org.team100.lib.profile.timed.JerkLimitedIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
@@ -20,7 +20,7 @@ public class MoveCommand extends Command {
     private static final boolean DEBUG = false;
     private final LynxArm m_arm;
     private final Pose3d m_goal;
-    private final JerkLimitedProfile100 m_profile;
+    private final JerkLimitedIncrementalProfile m_profile;
     private final Timer m_timer;
 
     private Pose3d m_start;
@@ -31,7 +31,7 @@ public class MoveCommand extends Command {
     public MoveCommand(LynxArm arm, Pose3d goal, double velocity) {
         m_arm = arm;
         m_goal = goal;
-        m_profile = new JerkLimitedProfile100(velocity, 1, 10, true);
+        m_profile = new JerkLimitedIncrementalProfile(velocity, 1, 10, true);
         m_timer = new Timer();
         addRequirements(arm);
     }
