@@ -5,9 +5,6 @@ package org.team100.lib.encoder;
  * arm angles, shooter angles, etc. This does not "wind up", it only returns
  * values within [-pi, pi]. This type of sensor cannot be "reset" at runtime,
  * offsets should be fixed at instantiation.
- * 
- * In 2025 these position sensors always sense the absolute position of a
- * mechanism, not through any sort of gearing.
  */
 public interface RotaryPositionSensor {
 

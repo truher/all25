@@ -17,10 +17,21 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * Feedforward and feedback control of a single module.
+ * Control of a single module.
  * 
- * It used to be that the turning servo would contain the profile, but now it's
- * here.
+ * Everything here is package-private because SwerveModuleCollection is the only
+ * client.
+ * 
+ * Implements drive/steer coupling. The path from the drive motor to the wheel
+ * involves a shaft on the steering axis; driving the wheel requires *relative*
+ * motion of this shaft and the steering axis itself. So when the steering axis
+ * moves, it affects the relative position of the drive motor and the drive
+ * wheel.
+ * 
+ * TODO: this coupling implementation is, I think, totally broken.
+ * 
+ * There is some discussion of this topic here:
+ * https://www.chiefdelphi.com/t/kcoupleratio-in-ctre-swerve/483380
  */
 public abstract class SwerveModule100 {
     private final LinearVelocityServo m_driveServo;
@@ -37,20 +48,15 @@ public abstract class SwerveModule100 {
             AngularPositionServo turningServo) {
         m_driveServo = driveServo;
         m_turningServo = turningServo;
-        // note this will be wrong at instantiation.
-        // TODO: make previous desired angle null instead.
-        double measurement = m_turningServo.getPosition();
-        // the default previous angle is the measurement.
-        m_previousDesiredAngle = new Rotation2d(measurement);
+        // The initial previous angle is the measurement.
+        m_previousDesiredAngle = new Rotation2d(m_turningServo.getPosition());
         m_previousTime = Takt.get();
     }
 
     /**
      * Optimizes.
      * 
-     * Works fine with empty angles.
-     * 
-     * TODO: make it do nothing if the angle is empty
+     * Given an empty angle, it uses the previous one.
      */
     void setDesiredState(SwerveModuleState100 desired) {
         desired = usePreviousAngleIfEmpty(desired);
@@ -61,14 +67,83 @@ public abstract class SwerveModule100 {
     /**
      * Does not optimize.
      * 
-     * Works fine with empty angles.
-     * 
-     * TODO: make it do nothing if the angle is empty
+     * Given an empty angle, it uses the previous one.
      */
     void setRawDesiredState(SwerveModuleState100 desired) {
         desired = usePreviousAngleIfEmpty(desired);
         actuate(desired);
     }
+
+    /** Make sure the setpoint and measurement are the same. */
+    void reset() {
+        m_turningServo.reset();
+        m_driveServo.reset();
+    }
+
+    void close() {
+        m_turningServo.close();
+    }
+
+    /** FOR TEST ONLY */
+    SwerveModuleState100 getState() {
+        double driveVelocity = m_driveServo.getVelocity();
+        double turningPosition = m_turningServo.getPosition();
+
+        return new SwerveModuleState100(
+                driveVelocity,
+                Optional.of(new Rotation2d(turningPosition)));
+    }
+
+    /** Uses Cache so the position is fresh and coherent. */
+    SwerveModulePosition100 getPosition() {
+        double drive_M = m_driveServo.getDistance();
+        double steerRad = m_turningServo.getPosition();
+        switch (Identity.instance) {
+            case SWERVE_ONE:
+            case SWERVE_TWO:
+            case COMP_BOT:
+                drive_M = correctPositionForSteering(drive_M, steerRad);
+                break;
+            case BLANK:
+            default:
+                break;
+        }
+        return new SwerveModulePosition100(
+                drive_M,
+                Optional.of(new Rotation2d(steerRad)));
+    }
+
+    double turningPosition() {
+        return m_turningServo.getPosition();
+    }
+
+    boolean atSetpoint() {
+        return m_turningServo.atSetpoint();
+    }
+
+    void stop() {
+        m_driveServo.stop();
+        m_turningServo.stop();
+    }
+
+    /** Update logs. */
+    void periodic() {
+        m_driveServo.periodic();
+        m_turningServo.periodic();
+    }
+
+    static double reduceCrossTrackError(double measuredAngleRad, double desiredSpeed, Rotation2d desiredAngle) {
+        double error = MathUtil.angleModulus(desiredAngle.getRadians() - measuredAngleRad);
+        // cosine is pretty forgiving of misalignment
+        // double scale = Math.abs(Math.cos(error));
+        // gaussian is much less forgiving. note the adjustable factor. The value of
+        // 4 means there is almost no motion past about 60 degrees of error.
+        final double width = 4.0;
+        double scale = Math.exp(-width * error * error);
+        return scale * desiredSpeed;
+    }
+
+    /////////////////////////////////////////////////////////////////
 
     /** Turning servo commands always specify zero-velocity goal. */
     private void actuate(SwerveModuleState100 desired) {
@@ -98,39 +173,29 @@ public abstract class SwerveModule100 {
         m_previousDesiredAngle = desiredAngle;
     }
 
-    static double reduceCrossTrackError(double measuredAngleRad, double desiredSpeed, Rotation2d desiredAngle) {
-        double error = MathUtil.angleModulus(desiredAngle.getRadians() - measuredAngleRad);
-        // cosine is pretty forgiving of misalignment
-        // double scale = Math.abs(Math.cos(error));
-        // gaussian is much less forgiving. note the adjustable factor. The value of
-        // 4 means there is almost no motion past about 60 degrees of error.
-        final double width = 4.0;
-        double scale = Math.exp(-width * error * error);
-        return scale * desiredSpeed;
-    }
-
-    double dt() {
-        double now = Takt.get();
-        double dt = now - m_previousTime;
-        m_previousTime = now;
-        return dt;
-    }
-
     /** Correct the desired speed for steering coupling. */
     private double correctSpeedForSteering(double desiredSpeed, Rotation2d desiredAngle) {
-        Rotation2d dtheta = desiredAngle.minus(m_previousDesiredAngle);
         double dt = dt();
         if (dt > 0.04) {
-            // clock is unreliable
-            dt = 0;
+            // clock is unreliable, don't do anything.
+            return desiredSpeed;
         }
-        if (dt > 0.01) {
+        if (dt < 0.01) {
             // avoid short intervals
-            double omega = dtheta.getRadians() / dt;
-            // TODO: should this be positive or negative?
-            desiredSpeed += .0975 * (omega) / 3.8;
+            return desiredSpeed;
         }
-        return desiredSpeed;
+        Rotation2d dtheta = desiredAngle.minus(m_previousDesiredAngle);
+        double omega = dtheta.getRadians() / dt;
+        // TODO: should this be positive or negative?
+        return desiredSpeed + 0.0975 * omega / 3.8;
+    }
+
+    /** Correct position measurement for steering coupling. */
+    private double correctPositionForSteering(double drive_M, double steerRad) {
+        // TODO: replace the magic numbers here with .. i think this is like wheel
+        // diameter? radius? gear ratio? what is this?
+        // drive is 5.50:1, steer is 10.2, so
+        return drive_M - 0.0975 * steerRad / 3.8;
     }
 
     /**
@@ -154,68 +219,10 @@ public abstract class SwerveModule100 {
         return desired;
     }
 
-    /** Make sure the setpoint and measurement are the same. */
-    public void reset() {
-        m_turningServo.reset();
-        m_driveServo.reset();
-    }
-
-    public void close() {
-        m_turningServo.close();
-    }
-
-    /////////////////////////////////////////////////////////////
-    //
-    // Package private for SwerveModuleCollection
-    //
-
-    /** FOR TEST ONLY */
-    public SwerveModuleState100 getState() {
-        double driveVelocity = m_driveServo.getVelocity();
-        double turningPosition = m_turningServo.getPosition();
-
-        return new SwerveModuleState100(
-                driveVelocity,
-                Optional.of(new Rotation2d(turningPosition)));
-    }
-
-    /** Uses Cache so the position is fresh and coherent. */
-    public SwerveModulePosition100 getPosition() {
-        double drive_M = m_driveServo.getDistance();
-        double steerRad = m_turningServo.getPosition();
-        switch (Identity.instance) {
-            case SWERVE_ONE:
-            case SWERVE_TWO:
-            case COMP_BOT:
-                // TODO: replace the magic number here with .. i think this is like wheel
-                // diameter? radius? what is this?
-                drive_M -= 0.0975 * (steerRad) / 3.8;
-                break;
-            case BLANK:
-            default:
-                break;
-        }
-        return new SwerveModulePosition100(
-                drive_M,
-                Optional.of(new Rotation2d(steerRad)));
-    }
-
-    public double turningPosition() {
-        return m_turningServo.getPosition();
-    }
-
-    boolean atSetpoint() {
-        return m_turningServo.atSetpoint();
-    }
-
-    void stop() {
-        m_driveServo.stop();
-        m_turningServo.stop();
-    }
-
-    /** Update logs. */
-    void periodic() {
-        m_driveServo.periodic();
-        m_turningServo.periodic();
+    private double dt() {
+        double now = Takt.get();
+        double dt = now - m_previousTime;
+        m_previousTime = now;
+        return dt;
     }
 }

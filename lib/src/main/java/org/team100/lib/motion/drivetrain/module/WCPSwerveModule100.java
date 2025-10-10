@@ -265,6 +265,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double inputOffset,
             EncoderDrive drive) {
         if (encoderClass == AnalogTurningEncoder.class) {
+            // TODO: remove this, we never use analog encoders.
             return new AnalogTurningEncoder(
                     parent,
                     channel,
