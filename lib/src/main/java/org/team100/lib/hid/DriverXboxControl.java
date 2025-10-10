@@ -73,4 +73,8 @@ public class DriverXboxControl {
         return m_controller.getBButton();
     }
 
+    public double leftY() {
+        return m_controller.getLeftY();
+    }
+
 }

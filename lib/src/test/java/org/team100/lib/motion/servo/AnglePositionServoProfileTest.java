@@ -86,7 +86,7 @@ class AnglePositionServoProfileTest implements Timeless {
             previousMotorSpeed = motor.velocity;
         }
         assertEquals(motorVelocity, motor.velocity, DELTA, "velocity");
-        assertEquals(setpointPosition, servo.m_setpoint.x(), DELTA, "setpoint position");
-        assertEquals(setpointVelocity, servo.m_setpoint.v(), DELTA, "setpoint velocity");
+        assertEquals(setpointPosition, servo.m_unwrappedSetpoint.x(), DELTA, "setpoint position");
+        assertEquals(setpointVelocity, servo.m_unwrappedSetpoint.v(), DELTA, "setpoint velocity");
     }
 }

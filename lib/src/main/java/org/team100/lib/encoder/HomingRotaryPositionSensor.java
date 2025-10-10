@@ -24,12 +24,12 @@ public class HomingRotaryPositionSensor implements RotaryPositionSensor {
      * You should call this at the "homing position".
      */
     public void setPosition(double x) {
-        m_offset = x - m_sensor.getPositionRad();
+        m_offset = x - m_sensor.getWrappedPositionRad();
     }
 
     @Override
-    public double getPositionRad() {
-        return MathUtil.angleModulus(m_sensor.getPositionRad() + m_offset);
+    public double getWrappedPositionRad() {
+        return MathUtil.angleModulus(m_sensor.getWrappedPositionRad() + m_offset);
     }
 
     /** Velocity is independent of offset. */

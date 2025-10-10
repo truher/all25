@@ -6,7 +6,7 @@ public class MockRotaryPositionSensor implements RotaryPositionSensor {
     public double rate = 0;
 
     @Override
-    public double getPositionRad() {
+    public double getWrappedPositionRad() {
         return angle;
     }
 

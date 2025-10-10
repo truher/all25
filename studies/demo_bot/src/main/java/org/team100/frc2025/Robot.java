@@ -128,8 +128,6 @@ public class Robot extends TimedRobot100 {
             m_jvmLogger.logMemoryPools();
             m_jvmLogger.logMemoryUsage();
 
-            Logging.instance().periodic();
-
             if (Experiments.instance.enabled(Experiment.FlushOften)) {
                 // Util.warn("FLUSHING EVERY LOOP, DO NOT USE IN COMP");
                 NetworkTableInstance.getDefault().flush();

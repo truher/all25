@@ -161,19 +161,21 @@ public abstract class CANSparkMotor implements BareMotor {
      * Motor revolutions wind up, so setting 0 revs and 1 rev are different.
      */
     @Override
-    public void setPosition(
+    public void setUnwrappedPosition(
             double motorPositionRad,
             double motorVelocityRad_S,
             double motorAccelRad_S2,
             double motorTorqueNm) {
         final double motorRev = motorPositionRad / (2 * Math.PI);
         final double motorRev_S = motorVelocityRad_S / (2 * Math.PI);
+        final double motorRev_S2 = motorAccelRad_S2 / (2 * Math.PI);
 
         final double frictionFFVolts = m_ff.frictionFFVolts(motorRev_S);
         final double velocityFFVolts = m_ff.velocityFFVolts(motorRev_S);
+        final double accelFFVolts = m_ff.accelFFVolts(motorRev_S, motorRev_S2);
         final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
 
-        final double FF = frictionFFVolts + velocityFFVolts + torqueFFVolts;
+        final double FF = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
 
         Rev100.warn(() -> m_pidController.setReference(
                 motorRev, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF, ArbFFUnits.kVoltage));
@@ -198,7 +200,7 @@ public abstract class CANSparkMotor implements BareMotor {
     }
 
     @Override
-    public void setEncoderPositionRad(double positionRad) {
+    public void setUnwrappedEncoderPositionRad(double positionRad) {
         setEncoderPosition(positionRad / (2 * Math.PI));
     }
 
@@ -237,7 +239,7 @@ public abstract class CANSparkMotor implements BareMotor {
     }
 
     @Override
-    public double getPositionRad() {
+    public double getUnwrappedPositionRad() {
         double motorPositionRev = getPositionRot();
         double positionRad = motorPositionRev * 2 * Math.PI;
         return positionRad;

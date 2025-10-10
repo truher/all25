@@ -306,8 +306,8 @@ public class CalgamesMech extends SubsystemBase implements Music {
     public Config getConfig() {
         return new Config(
                 m_elevatorBack.getPositionM(),
-                m_shoulder.getPositionRad(),
-                m_wrist.getPositionRad());
+                m_shoulder.getWrappedPositionRad(),
+                m_wrist.getWrappedPositionRad());
     }
 
     public JointVelocities getJointVelocity() {
@@ -581,7 +581,7 @@ public class CalgamesMech extends SubsystemBase implements Music {
     /** Not too far extended in any direction. */
     public boolean isSafeToDrive() {
         double x = m_elevatorBack.getPositionM();
-        double y = m_shoulder.getPositionRad();
+        double y = m_shoulder.getWrappedPositionRad();
         return x < 1 && Math.abs(y) < 1;
     }
 
@@ -610,11 +610,11 @@ public class CalgamesMech extends SubsystemBase implements Music {
         m_elevatorFront.stop();
         m_elevatorBack.stop();
         if (DISABLED) {
-            m_wrist.setPosition(2, 0, 0, 0);
+            m_wrist.setUnwrappedPosition(2, 0, 0, 0);
             return;
         }
-        m_wrist.setPosition(0, 0, 0, 0);
-        m_shoulder.setPosition(0, 0, 0, 0);
+        m_wrist.setUnwrappedPosition(0, 0, 0, 0);
+        m_shoulder.setUnwrappedPosition(0, 0, 0, 0);
     }
 
     private void set(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
@@ -622,11 +622,11 @@ public class CalgamesMech extends SubsystemBase implements Music {
         m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
         m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
         if (DISABLED) {
-            m_wrist.setPosition(2, 0, 0, 0);
+            m_wrist.setUnwrappedPosition(2, 0, 0, 0);
             return;
         }
-        m_wrist.setPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
-        m_shoulder.setPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
+        m_wrist.setUnwrappedPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
+        m_shoulder.setUnwrappedPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
     }
 
     public Command setDisabled(boolean disabled) {

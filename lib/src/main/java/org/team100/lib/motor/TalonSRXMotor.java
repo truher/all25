@@ -111,18 +111,18 @@ public class TalonSRXMotor implements BareMotor {
     }
 
     @Override
-    public double getPositionRad() {
+    public double getUnwrappedPositionRad() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setEncoderPositionRad(double positionRad) {
+    public void setUnwrappedEncoderPositionRad(double positionRad) {
         // there actually is an encoder interface but it sucks
         throw new UnsupportedOperationException("TalonSRX has no encoder");
     }
 
     @Override
-    public void setPosition(double positionRad, double velocityRad_S, double accelRad_S2, double torqueNm) {
+    public void setUnwrappedPosition(double positionRad, double velocityRad_S, double accelRad_S2, double torqueNm) {
         throw new UnsupportedOperationException("TalonSRX cannot control position.");
     }
 

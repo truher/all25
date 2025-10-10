@@ -18,23 +18,23 @@ public class SimulatedBareEncoderTest {
 
         SimulatedBareMotor motor = new SimulatedBareMotor(log, 100);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
-        assertEquals(0, encoder.getPositionRad(), DELTA);
+        assertEquals(0, encoder.getUnwrappedPositionRad(), DELTA);
         assertEquals(0, encoder.getVelocityRad_S(), DELTA);
-        assertEquals(0, motor.getPositionRad(), DELTA);
+        assertEquals(0, motor.getUnwrappedPositionRad(), DELTA);
         assertEquals(0, motor.getVelocityRad_S(), DELTA);
 
-        encoder.setEncoderPositionRad(1);
+        encoder.setUnwrappedEncoderPositionRad(1);
 
-        assertEquals(1, encoder.getPositionRad(), DELTA);
+        assertEquals(1, encoder.getUnwrappedPositionRad(), DELTA);
         assertEquals(0, encoder.getVelocityRad_S(), DELTA);
-        assertEquals(1, motor.getPositionRad(), DELTA);
+        assertEquals(1, motor.getUnwrappedPositionRad(), DELTA);
         assertEquals(0, motor.getVelocityRad_S(), DELTA);
 
         encoder.reset();
 
-        assertEquals(0, encoder.getPositionRad(), DELTA);
+        assertEquals(0, encoder.getUnwrappedPositionRad(), DELTA);
         assertEquals(0, encoder.getVelocityRad_S(), DELTA);
-        assertEquals(0, motor.getPositionRad(), DELTA);
+        assertEquals(0, motor.getUnwrappedPositionRad(), DELTA);
         assertEquals(0, motor.getVelocityRad_S(), DELTA);
     }
 

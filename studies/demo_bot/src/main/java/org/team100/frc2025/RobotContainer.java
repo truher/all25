@@ -18,8 +18,7 @@ import org.team100.lib.examples.shooter.DualDrumShooter;
 import org.team100.lib.examples.tank.DriveTank;
 import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.hid.DriverControl;
-import org.team100.lib.hid.DriverControlProxy;
+import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
 import org.team100.lib.logging.LoggerFactory;
@@ -47,7 +46,7 @@ public class RobotContainer {
 
         final LoggerFactory logger = logging.rootLogger;
 
-        final DriverControl driverControl = new DriverControlProxy(logger, async);
+        final DriverXboxControl driverControl = new DriverXboxControl(0);
 
         final LoggerFactory sysLog = logger.name("Subsystems");
 
@@ -61,7 +60,7 @@ public class RobotContainer {
         m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
 
         m_pivot = new PivotSubsystem(sysLog, 15);
-        m_pivot.setDefaultCommand(new PivotDefault(driverControl::shooterPivot, m_pivot));
+        m_pivot.setDefaultCommand(new PivotDefault(driverControl::leftY, m_pivot));
 
         // this shows two ways to do the "shoot when spinning fast enough" thing.
 

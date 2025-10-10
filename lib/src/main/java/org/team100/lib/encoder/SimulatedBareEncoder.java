@@ -34,8 +34,8 @@ public class SimulatedBareEncoder implements IncrementalBareEncoder {
      * Derives position by integrating velocity over one time step.
      */
     @Override
-    public double getPositionRad() {
-        double positionRad = m_motor.getPositionRad();
+    public double getUnwrappedPositionRad() {
+        double positionRad = m_motor.getUnwrappedPositionRad();
         if (DEBUG)
             Util.printf("read encoder position %.6f\n", positionRad);
         return positionRad;
@@ -52,13 +52,13 @@ public class SimulatedBareEncoder implements IncrementalBareEncoder {
     }
 
     @Override
-    public void setEncoderPositionRad(double motorPositionRad) {
-        m_motor.setEncoderPositionRad(motorPositionRad);
+    public void setUnwrappedEncoderPositionRad(double motorPositionRad) {
+        m_motor.setUnwrappedEncoderPositionRad(motorPositionRad);
     }
 
     @Override
     public void periodic() {
-        m_log_position.log(this::getPositionRad);
+        m_log_position.log(this::getUnwrappedPositionRad);
         m_log_velocity.log(this::getVelocityRad_S);
     }
 }

@@ -5,7 +5,7 @@ import java.util.OptionalDouble;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motion.servo.OutboardLinearPositionServo;
-import org.team100.lib.profile.incremental.TrapezoidProfile100;
+import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,7 +30,7 @@ public class IndexerSubsystem extends SubsystemBase {
                 m_logger,
                 linearMechanism,
                 new IncrementalProfileReference1d(
-                        new TrapezoidProfile100(indexVelocityM_S, maxAccel, 0.02),
+                        new TrapezoidIncrementalProfile(indexVelocityM_S, maxAccel, 0.02),
                         0.02,
                         0.02),
                 0.02, 0.02);
@@ -45,18 +45,18 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     public void indexOne() {
-        setAngle(m_indexer.getPosition().getAsDouble() + m_objectLength);
+        setAngle(m_indexer.getPosition() + m_objectLength);
     }
 
     public void unindexOne() {
-        setAngle(m_indexer.getPosition().getAsDouble() - m_objectLength);
+        setAngle(m_indexer.getPosition() - m_objectLength);
     }
 
     public void stop() {
         m_indexer.stop();
     }
 
-    public OptionalDouble getVelocity() {
+    public double getVelocity() {
         return m_indexer.getVelocity();
     }
 
@@ -69,7 +69,7 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     public double getAngle() {
-        return m_indexer.getPosition().getAsDouble();
+        return m_indexer.getPosition();
     }
 
     @Override

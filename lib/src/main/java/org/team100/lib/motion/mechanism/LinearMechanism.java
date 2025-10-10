@@ -94,27 +94,31 @@ public class LinearMechanism {
     }
 
     /**
-     * Should actuate immediately. Limits position using the argument to this
-     * function.
+     * Apply limits, use wheel diameter, and gear ratio, and set the resulting
+     * motor position.
+     * 
+     * Should actuate immediately.
+     * 
+     * Make sure you don't double-count factors of torque/accel.
      */
     public void setPosition(
-            double outputPositionM,
-            double outputVelocityM_S,
-            double outputAccelM_S2,
-            double outputForceN) {
-        if (outputPositionM < m_minPositionM) {
+            double positionM,
+            double velocityM_S,
+            double accelM_S2,
+            double forceN) {
+        if (positionM < m_minPositionM) {
             m_motor.stop();
             return;
         }
-        if (outputPositionM > m_maxPositionM) {
+        if (positionM > m_maxPositionM) {
             m_motor.stop();
             return;
         }
-        m_motor.setPosition(
-                (outputPositionM / m_wheelRadiusM) * m_gearRatio,
-                (outputVelocityM_S / m_wheelRadiusM) * m_gearRatio,
-                (outputAccelM_S2 / m_wheelRadiusM) * m_gearRatio,
-                outputForceN * m_wheelRadiusM / m_gearRatio);
+        m_motor.setUnwrappedPosition(
+                (positionM / m_wheelRadiusM) * m_gearRatio,
+                (velocityM_S / m_wheelRadiusM) * m_gearRatio,
+                (accelM_S2 / m_wheelRadiusM) * m_gearRatio,
+                forceN * m_wheelRadiusM / m_gearRatio);
     }
 
     /** Nearly cached. */
@@ -125,7 +129,7 @@ public class LinearMechanism {
 
     /** Nearly cached. */
     public double getPositionM() {
-        double positionRad = m_encoder.getPositionRad();
+        double positionRad = m_encoder.getUnwrappedPositionRad();
 
         return positionRad * m_wheelRadiusM / m_gearRatio;
     }

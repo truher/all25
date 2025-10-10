@@ -96,7 +96,7 @@ public class SimulatedBareMotor implements BareMotor {
 
     /** ignores velocity and torque */
     @Override
-    public void setPosition(double position, double velocity, double accel, double torque) {
+    public void setUnwrappedPosition(double position, double velocity, double accel, double torque) {
         m_positionInput = position;
         // you can't use velocity and position control at the same time
         m_velocityInput = null;
@@ -135,7 +135,7 @@ public class SimulatedBareMotor implements BareMotor {
         return getVelocityRad_S() / 10.0;
     }
 
-    public double getPositionRad() {
+    public double getUnwrappedPositionRad() {
         double pos = m_stateCache.get().x();
         if (Double.isNaN(pos))
             throw new IllegalArgumentException("motor pos");
@@ -144,7 +144,7 @@ public class SimulatedBareMotor implements BareMotor {
 
     /** resets the caches, so the new value is immediately available. */
     @Override
-    public void setEncoderPositionRad(double positionRad) {
+    public void setUnwrappedEncoderPositionRad(double positionRad) {
         if (Double.isNaN(positionRad))
             throw new IllegalArgumentException("motor set position");
         m_positionInput = positionRad;

@@ -5,13 +5,10 @@ import org.team100.lib.config.PIDConstants;
 import org.team100.lib.examples.tank.BareMotorTank;
 import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motor.BareMotorGroup;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeoCANSparkMotor;
-import org.team100.lib.motor.TalonSRXMotor;
-
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.util.CanId;
 
 /** Configuration of motors on the Rookie Bot. */
 public class TankFactory {
@@ -19,10 +16,24 @@ public class TankFactory {
     public static TankDrive make(LoggerFactory parent, int supplyLimit) {
         LoggerFactory log = parent.name("Tank Drive");
 
-        NeoCANSparkMotor right = new NeoCANSparkMotor(log, 27, MotorPhase.FORWARD, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
+        NeoCANSparkMotor right = new NeoCANSparkMotor(
+                log.name("right"),
+                new CanId(27),
+                NeutralMode.BRAKE,
+                MotorPhase.FORWARD,
+                supplyLimit,
+                Feedforward100.makeNeo(),
+                new PIDConstants());
 
-        NeoCANSparkMotor left = new NeoCANSparkMotor(log, 3, MotorPhase.REVERSE, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
-       
+        NeoCANSparkMotor left = new NeoCANSparkMotor(
+                log.name("left"),
+                new CanId(3),
+                NeutralMode.BRAKE,
+                MotorPhase.REVERSE,
+                supplyLimit,
+                Feedforward100.makeNeo(),
+                new PIDConstants());
+
         return new BareMotorTank(left, right);
     }
 }

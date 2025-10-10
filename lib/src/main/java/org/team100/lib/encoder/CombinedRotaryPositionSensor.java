@@ -16,15 +16,16 @@ import edu.wpi.first.math.MathUtil;
  * Synchronizes the incremental one to the absolute one, using a separate thread
  * with a delay of a few seconds.
  * 
- * Why delay? Because the RoboRIO duty-cycle input seems to return slightly-wrong
+ * Why delay? Because the RoboRIO duty-cycle input seems to return
+ * slightly-wrong
  * values initially.
  * 
  * The use case is absolute + incremental encoders, in order to do outboard
  * closed-loop position control with only outboard incremental encoders --
  * RoboRIO-attached absolute encoders are the primary, and the incremental
  * encoders are the secondary. Note in this case the "primary" absolute
- * measurement is [-pi,pi] but the "secondary" measurement winds up to
- * [-inf,inf].
+ * measurement is [-pi,pi] but the "secondary" measurement is "unwrapped" i.e.
+ * the domain is [-inf,inf].
  * 
  * The secondary is a RotaryMechanism, instead of an encoder, because we want
  * the *gear reduction* to be applied to the underlying encoder.
@@ -84,7 +85,7 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
 
         final int N = 10;
         for (int i = 0; i < N; ++i) {
-            double pos = m_absolute.getPositionRad();
+            double pos = m_absolute.getWrappedPositionRad();
             cos += Math.cos(pos);
             sin += Math.sin(pos);
 
@@ -108,8 +109,8 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
      * The secondary (incremental motor-integrated) measurement.
      */
     @Override
-    public double getPositionRad() {
-        return m_incremental.getPositionRad();
+    public double getWrappedPositionRad() {
+        return m_incremental.getWrappedPositionRad();
     }
 
     /**
@@ -131,10 +132,10 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
     public void periodic() {
         m_absolute.periodic();
         m_incremental.periodic();
-        m_log_absolute.log(m_absolute::getPositionRad);
-        m_log_incremental.log(m_incremental::getPositionRad);
-        m_log_incremental_wrapped.log(() -> MathUtil.angleModulus(m_incremental.getPositionRad()));
-        m_log_combined.log(this::getPositionRad);
+        m_log_absolute.log(m_absolute::getWrappedPositionRad);
+        m_log_incremental.log(m_incremental::getWrappedPositionRad);
+        m_log_incremental_wrapped.log(() -> MathUtil.angleModulus(m_incremental.getWrappedPositionRad()));
+        m_log_combined.log(this::getWrappedPositionRad);
     }
 
     /**
@@ -142,6 +143,6 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
      * for the lash observer. Don't use this unless you know what you're doing.
      */
     double getAbsolutePositionRad() {
-        return m_absolute.getPositionRad();
+        return m_absolute.getWrappedPositionRad();
     }
 }

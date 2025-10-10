@@ -11,7 +11,7 @@ public class MockIncrementalBareEncoder implements IncrementalBareEncoder {
     }
 
     @Override
-    public double getPositionRad() {
+    public double getUnwrappedPositionRad() {
         return position;
     }
 
@@ -26,7 +26,7 @@ public class MockIncrementalBareEncoder implements IncrementalBareEncoder {
     }
 
     @Override
-    public void setEncoderPositionRad(double motorPositionRad) {
+    public void setUnwrappedEncoderPositionRad(double motorPositionRad) {
         position = motorPositionRad;
     }
 

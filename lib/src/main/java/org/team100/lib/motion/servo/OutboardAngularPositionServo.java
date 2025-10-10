@@ -13,12 +13,14 @@ import org.team100.lib.state.Model100;
 import edu.wpi.first.math.MathUtil;
 
 /**
- * Passthrough to outboard closed-loop angular control, using a profile with
- * velocity feedforward, also extra torque (e.g. for gravity). There's no
- * feedback at this level, and no feedforward calculation either, that's
- * delegated to the mechanism.
+ * Uses mechanism position control.
  * 
- * Must be used with a combined encoder, to "zero" the motor encoder.
+ * Uses a profile with velocity feedforward, also extra torque (e.g. for
+ * gravity). There's no feedback at this level, and no feedforward calculation
+ * either: the mechanism does that.
+ * 
+ * Must be used with a combined encoder, to "zero" the motor encoder so that
+ * positional commands make sense.
  */
 public class OutboardAngularPositionServo implements AngularPositionServo {
     private static final double POSITION_TOLERANCE = 0.05;
@@ -33,13 +35,13 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     private final Control100Logger m_log_setpoint;
 
     /**
-     * Goal "winds up" i.e. it's it's [-inf, inf], not [-pi,pi]
+     * Goal is "unwrapped" i.e. it's it's [-inf, inf], not [-pi,pi]
      */
-    private Model100 m_goal = new Model100(0, 0);
+    private Model100 m_unwrappedGoal = new Model100(0, 0);
     /**
-     * Setpoint "winds up" i.e. it's [-inf, inf], not [-pi,pi]
+     * Setpoint is "unwrapped" i.e. it's [-inf, inf], not [-pi,pi]
      */
-    private Control100 m_setpoint = new Control100(0, 0);
+    private Control100 m_unwrappedSetpoint = new Control100(0, 0);
 
     public OutboardAngularPositionServo(
             LoggerFactory parent,
@@ -60,15 +62,15 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
         Control100 measurement = new Control100(position, 0);
-        m_setpoint = measurement;
+        m_unwrappedSetpoint = measurement;
         m_ref.setGoal(measurement.model());
         m_ref.init(measurement.model());
     }
 
     @Override
     public void setDutyCycle(double dutyCycle) {
-        m_goal = null;
-        m_setpoint = null;
+        m_unwrappedGoal = null;
+        m_unwrappedSetpoint = null;
         m_mechanism.setDutyCycle(dutyCycle);
     }
 
@@ -83,18 +85,18 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
 
         Model100 goal = new Model100(mod(goalRad), 0);
 
-        if (!goal.near(m_goal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
-            m_goal = goal;
+        if (!goal.near(m_unwrappedGoal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
+            m_unwrappedGoal = goal;
             m_ref.setGoal(goal);
             // make sure the setpoint is near the measurement
-            if (m_setpoint == null) {
+            if (m_unwrappedSetpoint == null) {
                 // erased by dutycycle control
-                m_setpoint = new Control100(m_mechanism.getPositionRad(), 0);
+                m_unwrappedSetpoint = new Control100(m_mechanism.getWrappedPositionRad(), 0);
             } else {
-                m_setpoint = new Control100(mod(m_setpoint.x()), m_setpoint.v());
+                m_unwrappedSetpoint = new Control100(mod(m_unwrappedSetpoint.x()), m_unwrappedSetpoint.v());
             }
             // initialize with the setpoint, not the measurement, to avoid noise.
-            m_ref.init(m_setpoint.model());
+            m_ref.init(m_unwrappedSetpoint.model());
         }
 
         actuate(m_ref.get(), feedForwardTorqueNm);
@@ -108,7 +110,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      */
     @Override
     public void setPositionDirect(Setpoints1d setpoint, double feedForwardTorqueNm) {
-        m_goal = null;
+        m_unwrappedGoal = null;
         actuate(setpoint, feedForwardTorqueNm);
     }
 
@@ -116,16 +118,25 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      * Pass the setpoint directly to the mechanism's position controller.
      * For outboard control we only use the "next" setpoint.
      */
-    private void actuate(Setpoints1d setpoint, double feedForwardTorqueNm) {
-        m_setpoint = setpoint.next();
-        m_mechanism.setPosition(mod(m_setpoint.x()), m_setpoint.v(), m_setpoint.a(), feedForwardTorqueNm);
-        m_log_setpoint.log(() -> m_setpoint);
-        m_log_ff_torque.log(() -> feedForwardTorqueNm);
+    private void actuate(Setpoints1d setpoint, double torqueNm) {
+        m_unwrappedSetpoint = setpoint.next();
+
+        double positionRad = mod(m_unwrappedSetpoint.x());
+        double velocityRad_S = m_unwrappedSetpoint.v();
+        double accelRad_S2 = m_unwrappedSetpoint.a();
+        
+        m_mechanism.setUnwrappedPosition(
+                positionRad,
+                velocityRad_S,
+                accelRad_S2,
+                torqueNm);
+        m_log_setpoint.log(() -> m_unwrappedSetpoint);
+        m_log_ff_torque.log(() -> torqueNm);
     }
 
     /** Return an angle near the measurement */
     private double mod(double x) {
-        double measurement = m_mechanism.getPositionRad();
+        double measurement = m_mechanism.getWrappedPositionRad();
         m_log_measurement.log(() -> measurement);
         return MathUtil.angleModulus(x - measurement) + measurement;
     }
@@ -135,7 +146,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      */
     @Override
     public double getPosition() {
-        return m_mechanism.getPositionRad();
+        return m_mechanism.getWrappedPositionRad();
     }
 
     /**
@@ -145,15 +156,15 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      */
     @Override
     public boolean atSetpoint() {
-        double positionError = MathUtil.angleModulus(m_setpoint.x() - m_mechanism.getPositionRad());
-        double velocityError = m_setpoint.v() - m_mechanism.getVelocityRad_S();
+        double positionError = MathUtil.angleModulus(m_unwrappedSetpoint.x() - m_mechanism.getWrappedPositionRad());
+        double velocityError = m_unwrappedSetpoint.v() - m_mechanism.getVelocityRad_S();
         return Math.abs(positionError) < POSITION_TOLERANCE
                 && Math.abs(velocityError) < VELOCITY_TOLERANCE;
     }
 
     @Override
     public boolean profileDone() {
-        if (m_goal == null) {
+        if (m_unwrappedGoal == null) {
             // if there's no profile, it's always done.
             return true;
         }

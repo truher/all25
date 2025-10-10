@@ -9,9 +9,13 @@ package org.team100.lib.encoder;
 public interface RotaryPositionSensor {
 
     /**
+     * Returns the "wrapped" angular position, i.e. this dimension is cyclical, with
+     * values beyond +/- pi mapped back to the +/- pi interval: 2pi is mapped to 0,
+     * 5pi/4 is mapped to pi/4, etc.
+     * 
      * @return Counterclockwise-positive rad in [-pi,pi]
      */
-    double getPositionRad();
+    double getWrappedPositionRad();
 
     /**
      * Note some velocity implementations can be noisy.

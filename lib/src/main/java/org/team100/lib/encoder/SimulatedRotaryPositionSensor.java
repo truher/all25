@@ -41,7 +41,7 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
      * instant.
      */
     @Override
-    public double getPositionRad() {
+    public double getWrappedPositionRad() {
         double nowS = Takt.get();
         double dtS = nowS - m_timeS;
         if (dtS > 0.04) {

@@ -54,7 +54,7 @@ public class RotaryMechanism {
 
     /** Should actuate immediately. Enforces position limit using the encoder. */
     public void setDutyCycle(double output) {
-        double posRad = getPositionRad();
+        double posRad = getWrappedPositionRad();
         if (output < 0 && posRad < m_minPositionRad) {
             m_motor.stop();
             return;
@@ -83,48 +83,54 @@ public class RotaryMechanism {
 
     /** Should actuate immediately. Enforces position limit using the encoder. */
     public void setVelocity(
-            double outputRad_S,
-            double outputAccelRad_S2,
-            double outputTorqueNm) {
-        double posRad = getPositionRad();
-        if (outputRad_S < 0 && posRad < m_minPositionRad) {
+            double velocityRad_S,
+            double accelRad_S2,
+            double torqueNm) {
+        double posRad = getWrappedPositionRad();
+        if (velocityRad_S < 0 && posRad < m_minPositionRad) {
             m_motor.stop();
             return;
         }
-        if (outputRad_S > 0 && posRad > m_maxPositionRad) {
+        if (velocityRad_S > 0 && posRad > m_maxPositionRad) {
             m_motor.stop();
             return;
         }
         m_motor.setVelocity(
-                outputRad_S * m_gearRatio,
-                outputAccelRad_S2 * m_gearRatio,
-                outputTorqueNm / m_gearRatio);
+                velocityRad_S * m_gearRatio,
+                accelRad_S2 * m_gearRatio,
+                torqueNm / m_gearRatio);
     }
 
     /**
-     * Should actuate immediately. Enforces position limit using the arguments to
-     * this function.
+     * Apply limits and gear ratio, and set the resulting motor position.
+     * 
+     * This is the "unwrapped" position, i.e. the domain is infinite, not cyclical
+     * within +/- pi.
+     * 
+     * Should actuate immediately.
+     * 
+     * Make sure you don't double-count factors of torque/accel.
      */
-    public void setPosition(
-            double outputPositionRad,
-            double outputVelocityRad_S,
-            double outputAccelRad_S2,
-            double outputTorqueNm) {
-        if (outputPositionRad < m_minPositionRad) {
-            Util.warnf("requested position %8.3f less than min %8.3f\nn", outputPositionRad, m_minPositionRad);
+    public void setUnwrappedPosition(
+            double positionRad,
+            double velocityRad_S,
+            double accelRad_S2,
+            double torqueNm) {
+        if (positionRad < m_minPositionRad) {
+            Util.warnf("requested position %8.3f less than min %8.3f\nn", positionRad, m_minPositionRad);
             m_motor.stop();
             return;
         }
-        if (outputPositionRad > m_maxPositionRad) {
-            Util.warnf("requested position %8.3f more than max %8.3f\n", outputPositionRad, m_maxPositionRad);
+        if (positionRad > m_maxPositionRad) {
+            Util.warnf("requested position %8.3f more than max %8.3f\n", positionRad, m_maxPositionRad);
             m_motor.stop();
             return;
         }
-        m_motor.setPosition(
-                outputPositionRad * m_gearRatio,
-                outputVelocityRad_S * m_gearRatio,
-                outputAccelRad_S2 * m_gearRatio,
-                outputTorqueNm / m_gearRatio);
+        m_motor.setUnwrappedPosition(
+                positionRad * m_gearRatio,
+                velocityRad_S * m_gearRatio,
+                accelRad_S2 * m_gearRatio,
+                torqueNm / m_gearRatio);
     }
 
     /**
@@ -137,10 +143,14 @@ public class RotaryMechanism {
     }
 
     /**
+     * Returns the "wrapped" angular position, i.e. this dimension is cyclical, with
+     * values beyond +/- pi mapped back to the +/- pi interval: 2pi is mapped to 0,
+     * 5pi/4 is mapped to pi/4, etc.
+     * 
      * @return the absolute 1:1 position of the mechanism in rad [-pi, pi]
      */
-    public double getPositionRad() {
-        return m_sensor.getPositionRad();
+    public double getWrappedPositionRad() {
+        return m_sensor.getWrappedPositionRad();
     }
 
     public void stop() {
@@ -155,7 +165,7 @@ public class RotaryMechanism {
         m_motor.periodic();
         m_sensor.periodic();
         m_log_velocity.log(() -> getVelocityRad_S());
-        m_log_position.log(() -> getPositionRad());
+        m_log_position.log(() -> getWrappedPositionRad());
     }
 
 }

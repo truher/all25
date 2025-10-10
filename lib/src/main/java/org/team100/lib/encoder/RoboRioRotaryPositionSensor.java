@@ -42,7 +42,7 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
 
     /** This should be nearly cached. */
     @Override
-    public double getPositionRad() {
+    public double getWrappedPositionRad() {
         double positionRad = getRad();
         m_log_position.log(() -> positionRad);
         return positionRad;

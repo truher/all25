@@ -13,7 +13,7 @@ public class NoEncoder implements IncrementalBareEncoder {
     }
 
     @Override
-    public double getPositionRad() {
+    public double getUnwrappedPositionRad() {
         return 0;
     }
 
@@ -26,7 +26,7 @@ public class NoEncoder implements IncrementalBareEncoder {
     }
 
     @Override
-    public void setEncoderPositionRad(double motorPositionRad) {
+    public void setUnwrappedEncoderPositionRad(double motorPositionRad) {
     }
 
     @Override

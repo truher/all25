@@ -11,10 +11,10 @@ public class HomingRotaryPositionSensorTest {
     void testHome() {
         MockRotaryPositionSensor s = new MockRotaryPositionSensor();
         HomingRotaryPositionSensor h = new HomingRotaryPositionSensor(s);
-        assertEquals(0, h.getPositionRad(), DELTA);
+        assertEquals(0, h.getWrappedPositionRad(), DELTA);
         h.setPosition(1);
-        assertEquals(1, h.getPositionRad(), DELTA);
+        assertEquals(1, h.getWrappedPositionRad(), DELTA);
         s.angle = 1;
-        assertEquals(2, h.getPositionRad(), DELTA);
+        assertEquals(2, h.getWrappedPositionRad(), DELTA);
     }
 }

@@ -32,8 +32,8 @@ public class Talon6Encoder implements IncrementalBareEncoder {
      * Value is updated in Robot.robotPeriodic().
      */
     @Override
-    public double getPositionRad() {
-        return m_motor.getPositionRad();
+    public double getUnwrappedPositionRad() {
+        return m_motor.getUnwrappedPositionRad();
     }
 
     @Override
@@ -53,13 +53,13 @@ public class Talon6Encoder implements IncrementalBareEncoder {
      * at startup.
      */
     @Override
-    public void setEncoderPositionRad(double motorPositionRad) {
-        m_motor.setEncoderPositionRad(motorPositionRad);
+    public void setUnwrappedEncoderPositionRad(double motorPositionRad) {
+        m_motor.setUnwrappedEncoderPositionRad(motorPositionRad);
     }
 
     @Override
     public void periodic() {
-        m_log_position.log(this::getPositionRad);
+        m_log_position.log(this::getUnwrappedPositionRad);
         m_log_velocity.log(this::getVelocityRad_S);
     }
 

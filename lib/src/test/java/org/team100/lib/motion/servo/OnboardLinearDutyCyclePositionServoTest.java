@@ -45,7 +45,7 @@ public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
                         t,
                         driveMotor.getVelocityRad_S(),
                         driveEncoder.getVelocityRad_S(),
-                        driveEncoder.getPositionRad(),
+                        driveEncoder.getUnwrappedPositionRad(),
                         mech.getPositionM());
         }
 

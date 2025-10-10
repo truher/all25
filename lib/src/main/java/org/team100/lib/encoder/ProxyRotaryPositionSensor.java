@@ -22,13 +22,13 @@ public class ProxyRotaryPositionSensor implements RotaryPositionSensor {
      * It is very slow: call it only on startup.
      */
     public void setEncoderPosition(double positionRad) {
-        m_encoder.setEncoderPositionRad(positionRad * m_gearRatio);
+        m_encoder.setUnwrappedEncoderPositionRad(positionRad * m_gearRatio);
     }
 
     /** Idential to RotaryMechanism.getPositionRad() */
     @Override
-    public double getPositionRad() {
-        return m_encoder.getPositionRad() / m_gearRatio;
+    public double getWrappedPositionRad() {
+        return m_encoder.getUnwrappedPositionRad() / m_gearRatio;
     }
 
     /**
