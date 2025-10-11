@@ -59,15 +59,15 @@ class InterpreterFactory:
                 | Identity.SWERVE_LEFT
                 | Identity.FUNNEL
                 | Identity.DIST_TEST
-                | Identity.JOELS_TEST,
-                Identity.CORAL_RIGHT| Identity.CORAL_LEFT):
+                | Identity.JOELS_TEST
+                ):
                 display = RealDisplay(
                     int(scale * size.width),
                     int(scale * size.height),
                     "tag" + str(camera_num),
                 )
                 return TagDetector(identity, cam, camera_num, display, network)
-            case (Identity.DEV|Identity.DEV2):
+            case (Identity.DEV|Identity.DEV2|Identity.CORAL_RIGHT| Identity.CORAL_LEFT):
                 display = RealDisplay(
                     int(scale * size.width),
                     int(scale * size.height),

@@ -53,6 +53,7 @@ public class DriveToTranslationWithRelativeBearing extends Command {
         addRequirements(m_drive);
     }
 
+
     @Override
     public void initialize() {
         updateGoal();
@@ -65,12 +66,11 @@ public class DriveToTranslationWithRelativeBearing extends Command {
 
     @Override
     public void execute() {
-        updateGoal();
         if (m_goal == null || m_referenceController == null)
             return;
         m_reference.setGoal(new SwerveModel(m_goal));
         m_referenceController.execute();
-        m_field_log.m_log_target.log(() -> new double[] {
+        m_field_log.m_log_ball.log(() -> new double[] {
                 m_goal.getX(),
                 m_goal.getY(),
                 m_goal.getRotation().getRadians() });

@@ -377,28 +377,33 @@ public class Robot extends TimedRobot100 {
 
         // At the same time, move the arm to the floor and spin the intake,
         // and go back home when the button is released, ending when complete.
-        whileTrue(driver::rightTrigger,
-                parallel(
-                        m_mech.pickWithProfile(),
-                        m_manipulator.centerIntake()))
-                .onFalse(m_mech.profileHomeTerminal());
+        // whileTrue(driver::rightTrigger,
+        //         parallel(
+        //                 m_mech.pickWithProfile(),
+        //                 m_manipulator.centerIntake()))
+        //         .onFalse(m_mech.profileHomeTerminal());
 
         // Move to coral ground pick location.
         whileTrue(driver::rightBumper,
-                m_mech.pickWithProfile())
+            parallel(
+                m_mech.pickWithProfile(),
+                m_manipulator.centerIntake()))
+                
                 .onFalse(m_mech.profileHomeTerminal());
 
         // Pick a game piece from the floor, based on camera input.
-        whileTrue(() -> false,
+        whileTrue(driver::rightTrigger,
+            parallel(
+                m_mech.pickWithProfile(),
+                m_manipulator.centerIntake(),
+            
                 FloorPickSequence.get(
                         fieldLog, m_drive, m_targets,
                         SwerveControllerFactory.pick(driveLog), autoProfile)
-                        .withName("Floor Pick"));
+                        .withName("Floor Pick"))
+                        .until(m_manipulator::hasCoral
+                        ));
 
-        whileTrue(() -> (driver.rightTrigger() && driver.rightBumper()),
-                parallel(
-                        m_mech.stationWithProfile(),
-                        m_manipulator.centerIntake()));
 
         // Sideways intake for L1
         whileTrue(buttons::red2,
