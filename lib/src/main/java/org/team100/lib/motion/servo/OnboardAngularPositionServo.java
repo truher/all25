@@ -150,9 +150,11 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
 
         final Model100 measurement = new Model100(positionRad, velocityRad_S);
 
+        double setpointPosition = mod(setpoints.current().x());
+        double setpointVelocity = setpoints.current().v();
         final double u_FB = m_feedback.calculate(
                 measurement,
-                new Model100(mod(setpoints.current().x()), setpoints.current().v()));
+                new Model100(setpointPosition, setpointVelocity));
         final double u_FF = m_unwrappedSetpoint.v();
         final double u_TOTAL = u_FB + u_FF;
 

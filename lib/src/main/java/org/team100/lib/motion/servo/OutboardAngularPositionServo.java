@@ -124,7 +124,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
         double positionRad = mod(m_unwrappedSetpoint.x());
         double velocityRad_S = m_unwrappedSetpoint.v();
         double accelRad_S2 = m_unwrappedSetpoint.a();
-        
+
         m_mechanism.setUnwrappedPosition(
                 positionRad,
                 velocityRad_S,
@@ -135,7 +135,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     }
 
     /** Return an angle near the measurement */
-    private double mod(double x) {
+    double mod(double x) {
         double measurement = m_mechanism.getWrappedPositionRad();
         m_log_measurement.log(() -> measurement);
         return MathUtil.angleModulus(x - measurement) + measurement;
