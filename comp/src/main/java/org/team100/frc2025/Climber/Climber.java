@@ -84,7 +84,7 @@ public class Climber extends SubsystemBase {
     }
 
     public double angle() {
-        return m_servo.getPosition();
+        return m_servo.getWrappedPositionRad();
     }
 
     public void stopMotor() {

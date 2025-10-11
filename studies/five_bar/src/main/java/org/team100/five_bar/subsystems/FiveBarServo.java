@@ -133,8 +133,8 @@ public class FiveBarServo extends SubsystemBase {
     }
 
     public JointPositions getJointPositions() {
-        double q1 = m_servoP1.getPosition();
-        double q5 = m_servoP5.getPosition();
+        double q1 = m_servoP1.getWrappedPositionRad();
+        double q5 = m_servoP5.getWrappedPositionRad();
         return FiveBarKinematics.forward(SCENARIO, q1, q5);
     }
 

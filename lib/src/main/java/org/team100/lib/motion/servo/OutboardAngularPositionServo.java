@@ -58,7 +58,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
 
     @Override
     public void reset() {
-        double position = getPosition();
+        double position = getWrappedPositionRad();
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
         Control100 measurement = new Control100(position, 0);
@@ -145,7 +145,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      * @return the absolute 1:1 position of the mechanism in [-pi, pi]
      */
     @Override
-    public double getPosition() {
+    public double getWrappedPositionRad() {
         return m_mechanism.getWrappedPositionRad();
     }
 

@@ -28,7 +28,7 @@ public class MockAngularPositionServo implements AngularPositionServo {
     }
 
     @Override
-    public double getPosition() {
+    public double getWrappedPositionRad() {
         return 0;
     }
 

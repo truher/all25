@@ -48,11 +48,13 @@ public interface AngularPositionServo  {
     void setPositionDirect(Setpoints1d setpoint, double feedForwardTorqueNm);
 
     /**
+     * This is the "wrapped" value, i.e. it is periodic within +/- pi.
+     * 
      * Value should be updated in Robot.robotPeriodic().
      * 
      * @return Current position measurement, radians.
      */
-    double getPosition();
+    double getWrappedPositionRad();
 
     /** Mechanism is following the desired setpoint. */
     boolean atSetpoint();

@@ -49,7 +49,7 @@ public abstract class SwerveModule100 {
         m_driveServo = driveServo;
         m_turningServo = turningServo;
         // The initial previous angle is the measurement.
-        m_previousDesiredAngle = new Rotation2d(m_turningServo.getPosition());
+        m_previousDesiredAngle = new Rotation2d(m_turningServo.getWrappedPositionRad());
         m_previousTime = Takt.get();
     }
 
@@ -87,7 +87,7 @@ public abstract class SwerveModule100 {
     /** FOR TEST ONLY */
     SwerveModuleState100 getState() {
         double driveVelocity = m_driveServo.getVelocity();
-        double turningPosition = m_turningServo.getPosition();
+        double turningPosition = m_turningServo.getWrappedPositionRad();
 
         return new SwerveModuleState100(
                 driveVelocity,
@@ -97,7 +97,7 @@ public abstract class SwerveModule100 {
     /** Uses Cache so the position is fresh and coherent. */
     SwerveModulePosition100 getPosition() {
         double drive_M = m_driveServo.getDistance();
-        double steerRad = m_turningServo.getPosition();
+        double steerRad = m_turningServo.getWrappedPositionRad();
         switch (Identity.instance) {
             case SWERVE_ONE:
             case SWERVE_TWO:
@@ -114,7 +114,7 @@ public abstract class SwerveModule100 {
     }
 
     double turningPosition() {
-        return m_turningServo.getPosition();
+        return m_turningServo.getWrappedPositionRad();
     }
 
     boolean atSetpoint() {
@@ -157,7 +157,7 @@ public abstract class SwerveModule100 {
             speed = correctSpeedForSteering(speed, desiredAngle);
         }
         if (Experiments.instance.enabled(Experiment.ReduceCrossTrackError)) {
-            double measuredAngleRad = m_turningServo.getPosition();
+            double measuredAngleRad = m_turningServo.getWrappedPositionRad();
             speed = reduceCrossTrackError(measuredAngleRad, speed, desiredAngle);
 
         }
@@ -204,7 +204,7 @@ public abstract class SwerveModule100 {
     private SwerveModuleState100 optimize(SwerveModuleState100 desired) {
         return SwerveModuleState100.optimize(
                 desired,
-                new Rotation2d(m_turningServo.getPosition()));
+                new Rotation2d(m_turningServo.getWrappedPositionRad()));
     }
 
     /**

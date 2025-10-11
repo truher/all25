@@ -91,7 +91,7 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
         }
         // using the current velocity sometimes includes a whole lot of noise, and then
         // the profile tries to follow that noise. so instead, use zero.
-        Control100 measurement = new Control100(getPosition(), 0);
+        Control100 measurement = new Control100(getWrappedPositionRad(), 0);
         m_unwrappedSetpoint = measurement;
         // measurement is used for initialization only here.
         m_ref.setGoal(measurement.model());
@@ -180,7 +180,7 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
      * @return the absolute 1:1 position of the mechanism in [-pi, pi]
      */
     @Override
-    public double getPosition() {
+    public double getWrappedPositionRad() {
         return m_mechanism.getWrappedPositionRad();
     }
 
@@ -218,6 +218,6 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
     @Override
     public void periodic() {
         m_mechanism.periodic();
-        m_encoderValue.log(() -> getPosition());
+        m_encoderValue.log(() -> getWrappedPositionRad());
     }
 }

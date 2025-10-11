@@ -48,21 +48,21 @@ class GravityServoTest implements Timeless {
         AngularPositionServo servo = new OnboardAngularPositionServo(
                 logger, simMech, ref, pivotFeedback);
         servo.reset();
-        ref.init(new Model100(servo.getPosition(), 0));
+        ref.init(new Model100(servo.getWrappedPositionRad(), 0));
 
         Gravity gravity = new Gravity(logger, 5, 0);
         Spring spring = new Spring(logger);
         DoubleUnaryOperator torquefn = (x) -> gravity.applyAsDouble(x) + spring.applyAsDouble(x);
         Torque tt = new Torque(torquefn);
         // start at zero
-        assertEquals(0, servo.getPosition(), DELTA);
+        assertEquals(0, servo.getWrappedPositionRad(), DELTA);
         // one second
         for (int i = 0; i < 70; ++i) {
-            double torque = tt.torque(servo.getPosition());
+            double torque = tt.torque(servo.getWrappedPositionRad());
             servo.setPositionProfiled(1, torque);
             stepTime();
         }
-        assertEquals(1, servo.getPosition(), 1e-5);
+        assertEquals(1, servo.getWrappedPositionRad(), 1e-5);
     }
 
     /** For refactoring the gravity servo */
@@ -90,7 +90,7 @@ class GravityServoTest implements Timeless {
         sensor.angle = -0.1;
         assertEquals(4.714, gravity.applyAsDouble(sensor.angle), DELTA);
         assertEquals(-9.888, spring.applyAsDouble(sensor.angle), DELTA);
-        double torque = tt.torque(servo.getPosition());
+        double torque = tt.torque(servo.getWrappedPositionRad());
         assertEquals(-5.175, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
         assertEquals(0, motor.velocity, DELTA);
@@ -100,7 +100,7 @@ class GravityServoTest implements Timeless {
         sensor.angle = 0;
         assertEquals(3.925, gravity.applyAsDouble(sensor.angle), DELTA);
         assertEquals(-9.050, spring.applyAsDouble(sensor.angle), DELTA);
-        torque = tt.torque(servo.getPosition());
+        torque = tt.torque(servo.getWrappedPositionRad());
         assertEquals(-5.125, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
         assertEquals(0, motor.velocity, DELTA);
@@ -110,7 +110,7 @@ class GravityServoTest implements Timeless {
         sensor.angle = 0.5;
         assertEquals(-0.439, gravity.applyAsDouble(sensor.angle), DELTA);
         assertEquals(-5.631, spring.applyAsDouble(sensor.angle), DELTA);
-        torque = tt.torque(servo.getPosition());
+        torque = tt.torque(servo.getWrappedPositionRad());
         assertEquals(-6.069, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
         assertEquals(0, motor.velocity, DELTA);
@@ -120,7 +120,7 @@ class GravityServoTest implements Timeless {
         sensor.angle = 1.0;
         assertEquals(-4.695, gravity.applyAsDouble(sensor.angle), DELTA);
         assertEquals(-2.806, spring.applyAsDouble(sensor.angle), DELTA);
-        torque = tt.torque(servo.getPosition());
+        torque = tt.torque(servo.getWrappedPositionRad());
         assertEquals(-7.500, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
         assertEquals(0, motor.velocity, DELTA);
@@ -130,7 +130,7 @@ class GravityServoTest implements Timeless {
         sensor.angle = 1.5;
         assertEquals(-7.801, gravity.applyAsDouble(sensor.angle), DELTA);
         assertEquals(-1.576, spring.applyAsDouble(sensor.angle), DELTA);
-        torque = tt.torque(servo.getPosition());
+        torque = tt.torque(servo.getWrappedPositionRad());
         assertEquals(-9.377, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
         assertEquals(0, motor.velocity, DELTA);
@@ -140,7 +140,7 @@ class GravityServoTest implements Timeless {
         sensor.angle = 2.0;
         assertEquals(-8.998, gravity.applyAsDouble(sensor.angle), DELTA);
         assertEquals(-1.000, spring.applyAsDouble(sensor.angle), DELTA);
-        torque = tt.torque(servo.getPosition());
+        torque = tt.torque(servo.getWrappedPositionRad());
         assertEquals(-9.998, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
         assertEquals(0, motor.velocity, DELTA);
@@ -150,7 +150,7 @@ class GravityServoTest implements Timeless {
         sensor.angle = 2.5;
         assertEquals(-7.991, gravity.applyAsDouble(sensor.angle), DELTA);
         assertEquals(-1.0, spring.applyAsDouble(sensor.angle), DELTA);
-        torque = tt.torque(servo.getPosition());
+        torque = tt.torque(servo.getWrappedPositionRad());
         assertEquals(-8.991, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
         assertEquals(0, motor.velocity, DELTA);
@@ -160,7 +160,7 @@ class GravityServoTest implements Timeless {
         sensor.angle = 3.0;
         assertEquals(-5.028, gravity.applyAsDouble(sensor.angle), DELTA);
         assertEquals(-1.0, spring.applyAsDouble(sensor.angle), DELTA);
-        torque = tt.torque(servo.getPosition());
+        torque = tt.torque(servo.getWrappedPositionRad());
         assertEquals(-6.028, torque, DELTA);
         servo.setPositionDirect(setpoint, torque);
         assertEquals(0, motor.velocity, DELTA);
