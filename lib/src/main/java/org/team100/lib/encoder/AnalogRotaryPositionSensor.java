@@ -22,14 +22,14 @@ import edu.wpi.first.wpilibj.RobotController;
  * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
  * Robot.robotPeriodic().
  */
-public class AnalogTurningEncoder extends RoboRioRotaryPositionSensor {
+public class AnalogRotaryPositionSensor extends RoboRioRotaryPositionSensor {
     private final AnalogInput m_input;
     private final DoubleSupplier m_voltage;
     private final DoubleSupplier m_rail;
     private final DoubleLogger m_log_voltage;
     private final DoubleLogger m_log_ratio;
 
-    public AnalogTurningEncoder(
+    public AnalogRotaryPositionSensor(
             LoggerFactory parent,
             RoboRioChannel channel,
             double inputOffset,

@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,6 +53,6 @@ public class ManualCartesian extends Command {
 
         m_subsystem.set(new SwerveControl(m_pose));
         if (DEBUG)
-            System.out.printf("pose %s\n", m_pose);
+            Util.printf("pose %s\n", m_pose);
     }
 }

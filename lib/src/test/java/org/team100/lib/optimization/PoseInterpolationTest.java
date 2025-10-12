@@ -28,7 +28,7 @@ public class PoseInterpolationTest {
             double s = c.x() / distance;
             Pose3d setpoint = start.interpolate(end, s);
             if (DEBUG)
-                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.poseStr(setpoint));
+                Util.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.poseStr(setpoint));
             ++i;
         }
     }
@@ -47,7 +47,7 @@ public class PoseInterpolationTest {
             double s = c.x() / distance;
             Pose3d setpoint = GeometryUtil.interpolate(start, end, s);
             if (DEBUG)
-                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.poseStr(setpoint));
+                Util.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.poseStr(setpoint));
             ++i;
         }
     }
@@ -66,7 +66,7 @@ public class PoseInterpolationTest {
             double s = c.x() / distance;
             Rotation3d setpoint = start.interpolate(end, s);
             if (DEBUG)
-                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.rotStr(setpoint));
+                Util.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.rotStr(setpoint));
             ++i;
         }
     }
@@ -85,7 +85,7 @@ public class PoseInterpolationTest {
             double s = c.x() / distance;
             Rotation3d setpoint = GeometryUtil.interpolate(start, end, s);
             if (DEBUG)
-                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.rotStr(setpoint));
+                Util.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.rotStr(setpoint));
             ++i;
         }
     }
@@ -104,7 +104,7 @@ public class PoseInterpolationTest {
             double s = c.x() / distance;
             Translation3d setpoint = start.interpolate(end, s);
             if (DEBUG)
-                System.out.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.transStr(setpoint));
+                Util.printf("%d, %.8e, %.8e, %s\n", i, t, s, Util.transStr(setpoint));
             ++i;
         }
     }

@@ -1,6 +1,7 @@
 package org.team100.lib.trajectory.timing;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -61,7 +62,7 @@ public class TorqueConstraint implements TimingConstraint {
         double cross = r.getX() * u.getY() - r.getY() * u.getX();
         double a = Math.abs(m_maxTorque / (M * cross));
         if (DEBUG)
-            System.out.printf("Torque Constraint a: %6.3f p: %s r: %6.3f course: %6.3f\n",
+            Util.printf("Torque Constraint a: %6.3f p: %s r: %6.3f course: %6.3f\n",
                     a, state.getPose(), r.getNorm(), course.getRadians());
         return new MinMaxAcceleration(-a, a);
     }

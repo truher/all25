@@ -27,7 +27,7 @@ public class TestUtil {
 
     public static void verify(Pose3d expected, Pose3d actual, String name) {
         if (DEBUG)
-            System.out.printf("expected %s actual %s\n", Util.poseStr(expected), Util.poseStr(actual));
+            Util.printf("expected %s actual %s\n", Util.poseStr(expected), Util.poseStr(actual));
         assertEquals(expected.getX(), actual.getX(), 1e-3, name + " x");
         assertEquals(expected.getY(), actual.getY(), 1e-3, name + " y");
         assertEquals(expected.getZ(), actual.getZ(), 1e-3, name + " z");
@@ -46,7 +46,7 @@ public class TestUtil {
     }
 
     public static void print(Pose3d p) {
-        System.out.printf("x %6.3f y %6.3f z %6.3f r %6.3f p %6.3f y %6.3f\n",
+        Util.printf("x %6.3f y %6.3f z %6.3f r %6.3f p %6.3f y %6.3f\n",
                 p.getX(), p.getY(), p.getZ(),
                 p.getRotation().getX(), p.getRotation().getY(), p.getRotation().getZ());
     }

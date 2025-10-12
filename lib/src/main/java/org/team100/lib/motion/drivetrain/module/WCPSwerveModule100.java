@@ -3,7 +3,7 @@ package org.team100.lib.motion.drivetrain.module;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.encoder.AS5048RotaryPositionSensor;
-import org.team100.lib.encoder.AnalogTurningEncoder;
+import org.team100.lib.encoder.AnalogRotaryPositionSensor;
 import org.team100.lib.encoder.CombinedRotaryPositionSensor;
 import org.team100.lib.encoder.DutyCycleRotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
@@ -264,9 +264,9 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             RoboRioChannel channel,
             double inputOffset,
             EncoderDrive drive) {
-        if (encoderClass == AnalogTurningEncoder.class) {
+        if (encoderClass == AnalogRotaryPositionSensor.class) {
             // TODO: remove this, we never use analog encoders.
-            return new AnalogTurningEncoder(
+            return new AnalogRotaryPositionSensor(
                     parent,
                     channel,
                     inputOffset,

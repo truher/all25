@@ -7,8 +7,8 @@ import org.team100.lib.config.DriverSkill;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.FreshSwerveEstimate;
+import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
@@ -38,7 +38,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * from the state estimate.
  */
 public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsystemInterface {
-    // DEBUG produces a LOT of output, you should only enable it while you're looking
+    // DEBUG produces a LOT of output, you should only enable it while you're
+    // looking
     // at it.
     private static final boolean DEBUG = false;
     private final FreshSwerveEstimate m_estimate;
@@ -225,6 +226,8 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      */
     @Override
     public void periodic() {
+        if (DEBUG)
+            Util.println("drive periodic");
         // m_poseEstimator.periodic();
         // 4/2/25 Joel removed this state resetter because it happens earlier in
         // Robot.java

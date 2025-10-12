@@ -1,5 +1,7 @@
 package org.team100.lib.encoder;
 
+import edu.wpi.first.math.MathUtil;
+
 /** Contains no logic. */
 public class MockRotaryPositionSensor implements RotaryPositionSensor {
     public double angle = 0;
@@ -7,6 +9,11 @@ public class MockRotaryPositionSensor implements RotaryPositionSensor {
 
     @Override
     public double getWrappedPositionRad() {
+        return MathUtil.angleModulus(angle);
+    }
+
+    @Override
+    public double getUnwrappedPositionRad() {
         return angle;
     }
 
@@ -23,5 +30,4 @@ public class MockRotaryPositionSensor implements RotaryPositionSensor {
     public void close() {
         //
     }
-
 }

@@ -1,5 +1,7 @@
 package org.team100.lib.encoder;
 
+import edu.wpi.first.math.MathUtil;
+
 /**
  * Proxies an IncrementalBareEncoder to produce a RotaryPositionSensor, by
  * taking the angle modulus.
@@ -25,9 +27,14 @@ public class ProxyRotaryPositionSensor implements RotaryPositionSensor {
         m_encoder.setUnwrappedEncoderPositionRad(positionRad * m_gearRatio);
     }
 
-    /** Idential to RotaryMechanism.getPositionRad() */
+    /** TODO: verify this.*/
     @Override
     public double getWrappedPositionRad() {
+        return MathUtil.angleModulus(getUnwrappedPositionRad());
+    }
+
+    @Override
+    public double getUnwrappedPositionRad() {
         return m_encoder.getUnwrappedPositionRad() / m_gearRatio;
     }
 

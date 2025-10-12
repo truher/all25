@@ -29,7 +29,12 @@ public class HomingRotaryPositionSensor implements RotaryPositionSensor {
 
     @Override
     public double getWrappedPositionRad() {
-        return MathUtil.angleModulus(m_sensor.getWrappedPositionRad() + m_offset);
+        return MathUtil.angleModulus(getUnwrappedPositionRad());
+    }
+
+    @Override
+    public double getUnwrappedPositionRad() {
+        return m_sensor.getUnwrappedPositionRad() + m_offset;
     }
 
     /** Velocity is independent of offset. */

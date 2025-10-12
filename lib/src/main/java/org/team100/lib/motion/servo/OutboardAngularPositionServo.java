@@ -9,6 +9,7 @@ import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -23,6 +24,7 @@ import edu.wpi.first.math.MathUtil;
  * positional commands make sense.
  */
 public class OutboardAngularPositionServo implements AngularPositionServo {
+    private static final boolean DEBUG = false;
     private static final double POSITION_TOLERANCE = 0.05;
     private static final double VELOCITY_TOLERANCE = 0.05;
 
@@ -41,7 +43,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     /**
      * Setpoint is "unwrapped" i.e. it's [-inf, inf], not [-pi,pi]
      */
-    private Control100 m_unwrappedSetpoint = new Control100(0, 0);
+    Control100 m_unwrappedSetpoint = new Control100(0, 0);
 
     public OutboardAngularPositionServo(
             LoggerFactory parent,
@@ -83,7 +85,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     public void setPositionProfiled(double goalRad, double torqueNm) {
         m_log_goal.log(() -> goalRad);
 
-        Model100 goal = new Model100(mod(goalRad), 0);
+        Model100 goal = new Model100(wrapNearMeasurement(goalRad), 0);
 
         if (!goal.near(m_unwrappedGoal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
             m_unwrappedGoal = goal;
@@ -93,7 +95,8 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
                 // erased by dutycycle control
                 m_unwrappedSetpoint = new Control100(m_mechanism.getWrappedPositionRad(), 0);
             } else {
-                m_unwrappedSetpoint = new Control100(mod(m_unwrappedSetpoint.x()), m_unwrappedSetpoint.v());
+                m_unwrappedSetpoint = new Control100(wrapNearMeasurement(m_unwrappedSetpoint.x()),
+                        m_unwrappedSetpoint.v());
             }
             // initialize with the setpoint, not the measurement, to avoid noise.
             m_ref.init(m_unwrappedSetpoint.model());
@@ -107,26 +110,31 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      * measurement.
      * invalidates the current profile.
      * for outboard control we only use the "next" setpoint.
+     * The setpoint is "wrapped" i.e. we pick whatever unwrapped angle is closest.
      */
     @Override
-    public void setPositionDirect(Setpoints1d setpoint, double torqueNm) {
+    public void setPositionDirect(Setpoints1d wrappedSetpoint, double torqueNm) {
         m_unwrappedGoal = null;
-        actuate(setpoint, torqueNm);
+        actuate(wrappedSetpoint, torqueNm);
     }
 
     /**
      * Pass the setpoint directly to the mechanism's position controller.
      * For outboard control we only use the "next" setpoint.
      */
-    private void actuate(Setpoints1d setpoint, double torqueNm) {
-        m_unwrappedSetpoint = setpoint.next();
-        System.out.printf("unwrapped setpoint %6.3f\n", m_unwrappedSetpoint.x());
+    private void actuate(Setpoints1d wrappedSetpoint, double torqueNm) {
+        Control100 nextWrappedSetpoint = wrappedSetpoint.next();
+        if (DEBUG)
+            Util.printf("next wrapped setpoint %6.3f\n", nextWrappedSetpoint.x());
 
-        double positionRad = mod(m_unwrappedSetpoint.x());
-        double velocityRad_S = m_unwrappedSetpoint.v();
-        double accelRad_S2 = m_unwrappedSetpoint.a();
+        double positionRad = wrapNearMeasurement(nextWrappedSetpoint.x());
+        double velocityRad_S = nextWrappedSetpoint.v();
+        double accelRad_S2 = nextWrappedSetpoint.a();
 
-        System.out.printf("position %6.3f\n", positionRad);
+        m_unwrappedSetpoint = new Control100(positionRad, velocityRad_S, accelRad_S2);
+
+        if (DEBUG)
+            Util.printf("position %6.3f\n", positionRad);
 
         m_mechanism.setUnwrappedPosition(
                 positionRad,
@@ -137,15 +145,16 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
         m_log_ff_torque.log(() -> torqueNm);
     }
 
-    /** Return an angle near the measurement.
-     * 
-     * This uses the *unwrapped* measurement.
+    /**
+     * Given an unwrapped position, return an equivalent position within pi of the
+     * unwrapped measurement.
      */
-    double mod(double x) {
-        double measurement = m_mechanism.getWrappedPositionRad();
-        System.out.printf("measurement %6.3f\n", measurement);
+    double wrapNearMeasurement(double unwrappedPositionRad) {
+        double measurement = m_mechanism.getUnwrappedPositionRad();
+        if (DEBUG)
+            Util.printf("measurement %6.3f\n", measurement);
         m_log_measurement.log(() -> measurement);
-        return MathUtil.angleModulus(x - measurement) + measurement;
+        return MathUtil.angleModulus(unwrappedPositionRad - measurement) + measurement;
     }
 
     /**

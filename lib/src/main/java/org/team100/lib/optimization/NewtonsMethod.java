@@ -99,7 +99,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      * @param restarts number of random restarts in case of non-convergence
      */
     public Vector<X> solve2(Vector<X> initialX, int restarts) {
-        // System.out.printf("initialX: %s\n", Util.vecStr(initialX));
+        // Util.printf("initialX: %s\n", Util.vecStr(initialX));
         long startTime = System.nanoTime();
         int iter = 0;
         Vector<Y> error = new Vector<>(m_ydim);
@@ -108,26 +108,26 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             Vector<X> x = new Vector<>(initialX.getStorage().copy());
             for (iter = 0; iter < m_iterations; ++iter) {
                 // if (DEBUG)
-                // System.out.printf("x: %s\n", Util.vecStr(x));
+                // Util.printf("x: %s\n", Util.vecStr(x));
 
                 error = m_f.apply(x);
                 // if (DEBUG)
-                // System.out.printf("error: %s\n", Util.vecStr(error));
+                // Util.printf("error: %s\n", Util.vecStr(error));
 
                 if (within(error)) {
-                    // System.out.println("success");
+                    // Util.println("success");
                     return x;
                 }
                 Matrix<Y, X> j = NumericalJacobian100.numericalJacobian2(m_xdim, m_ydim, m_f, x);
 
                 // if (DEBUG)
-                // System.out.printf("J %s\n", Util.matStr(j));
+                // Util.printf("J %s\n", Util.matStr(j));
 
                 // the pseudoinverse should always work too
                 // note this is quite slow
                 // Matrix<X, Y> jInv = new Matrix<>(j.getStorage().pseudoInverse());
                 // if (DEBUG)
-                // System.out.printf("Jinv %s\n", Util.matStr(jInv));
+                // Util.printf("Jinv %s\n", Util.matStr(jInv));
 
                 // Vector<X> dx = new Vector<>(jInv.times(error));
 
@@ -139,7 +139,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 // Vector<X> dx = getDxWithQRDecomp(error, j);
 
                 // if (DEBUG)
-                // System.out.printf("dx: %s\n", Util.vecStr(dx));
+                // Util.printf("dx: %s\n", Util.vecStr(dx));
 
                 // Too-high dx results in oscillation.
                 clamp(dx);
@@ -149,13 +149,13 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             }
             if (restarts > 0) {
                 // if (DEBUG)
-                    System.out.println("convergence failed, trying random restart");
+                    Util.println("convergence failed, trying random restart");
                 // this is *really* random, including out-of-bounds.
                 // SimpleMatrix r = SimpleMatrix.random(m_xdim.getNum(), 1)
                 // .minus(0.5)
                 // .scale(1);
                 // Vector<X> rv = new Vector<>(r);
-                // System.out.printf("rv %s\n", Util.vecStr(rv));
+                // Util.printf("rv %s\n", Util.vecStr(rv));
                 // rv = rv.plus(x);
                 // limit(rv);
                 for (int i = 0; i < m_xdim.getNum(); i++) {
@@ -165,7 +165,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 return solve2(x, restarts - 1);
             }
             // if (DEBUG)
-                System.out.printf("random restart failed, error %f\n", error.maxAbs());
+                Util.printf("random restart failed, error %f\n", error.maxAbs());
             // throw new IllegalArgumentException(
             // String.format("failed to converge for inputs %s",
             // Util.vecStr(initialX)));
@@ -234,10 +234,10 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             double dxI = dx.get(i);
             if (Math.abs(dxI) > m_dxLimit) {
                 if (DEBUG)
-                    System.out.println("clamped!");
+                    Util.println("clamped!");
             }
             double clampedDxI = MathUtil.clamp(dxI, -m_dxLimit, m_dxLimit);
-            // System.out.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);
+            // Util.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);
             dx.set(i, 0, clampedDxI);
         }
     }

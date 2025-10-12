@@ -36,28 +36,14 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
         m_log_rate = child.doubleLogger(Level.TRACE, "rate");
     }
 
-    /**
-     * Integrates the mechanism velocity between the previous call and the current
-     * instant.
-     */
     @Override
     public double getWrappedPositionRad() {
-        double nowS = Takt.get();
-        double dtS = nowS - m_timeS;
-        if (dtS > 0.04) {
-            // clock is unreliable, skip the update
-            dtS = 0;
-        }
-        // this is the velocity at the current instant.
-        // motor velocity is rad/s
-        double velocityRad_S = encoderVelocityRad_S();
+        return MathUtil.angleModulus(getUnwrappedPositionRad());
+    }
 
-        // use the previous velocity to calculate the trapezoidal integral
-        m_positionRad += 0.5 * (velocityRad_S + m_previousVelocity) * dtS;
-        m_previousVelocity = velocityRad_S;
-
-        m_positionRad = MathUtil.angleModulus(m_positionRad);
-        m_timeS = nowS;
+    @Override
+    public double getUnwrappedPositionRad() {
+        updatePosition();
         return m_positionRad;
     }
 
@@ -86,6 +72,28 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
     /** The same as RotaryMechanism.getVelocityRad_S(). */
     private double encoderVelocityRad_S() {
         return m_encoder.getVelocityRad_S() / m_gearRatio;
+    }
+
+    /**
+     * Integrates the mechanism velocity between the previous call and the current
+     * instant.
+     */
+    private void updatePosition() {
+        double nowS = Takt.get();
+        double dtS = nowS - m_timeS;
+        if (dtS > 0.04) {
+            // clock is unreliable, skip the update
+            dtS = 0;
+        }
+        // this is the velocity at the current instant.
+        // motor velocity is rad/s
+        double velocityRad_S = encoderVelocityRad_S();
+
+        // use the previous velocity to calculate the trapezoidal integral
+        m_positionRad += 0.5 * (velocityRad_S + m_previousVelocity) * dtS;
+        m_previousVelocity = velocityRad_S;
+
+        m_timeS = nowS;
     }
 
 }

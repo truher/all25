@@ -128,6 +128,7 @@ public class SwerveLocal {
 
     /** Updates visualization. */
     void periodic() {
+        // TODO: make a collection logger to avoid calling positions() over and over.
         m_swerveModuleFrontLeftPosition.log(() -> positions().frontLeft());
         m_swerveModuleFrontRightPosition.log(() -> positions().frontRight());
         m_swerveModuleRearLeftPosition.log(() -> positions().rearLeft());

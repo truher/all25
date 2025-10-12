@@ -45,12 +45,12 @@ public class GradientDescent<R extends Num> {
             Vector<R> gradDirection = grad.unit();
             Vector<R> next = current.plus(gradDirection.times(-1.0 * stepSize));
             double fNext = m_f.apply(next);
-            // System.out.printf("current [%7.4f %7.4f] => %7.4f .. next [%7.4f %7.4f]
+            // Util.printf("current [%7.4f %7.4f] => %7.4f .. next [%7.4f %7.4f]
             // %7.4f\n",
             // current.get(0), current.get(1), fCurrent,
             // next.get(0), next.get(1), fNext);
-            // System.out.printf("current %7.4f \n", fCurrent);
-            // System.out.printf("%5.3f\n", current.get(0));
+            // Util.printf("current %7.4f \n", fCurrent);
+            // Util.printf("%5.3f\n", current.get(0));
             if (fNext > fCurrent) {
                 // if we go too far, turn down the step size and try again.
                 stepSize *= 0.5;

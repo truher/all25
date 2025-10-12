@@ -56,7 +56,7 @@ public class ReferenceController {
             else
                 m_drive.driveInFieldCoords(fieldRelativeTarget);
         } catch (IllegalStateException ex) {
-            // System.out.println(ex);
+            // Util.println(ex);
             // This happens when the trajectory generator produces an empty trajectory.
             // Ignore it for now.
         }

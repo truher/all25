@@ -19,9 +19,13 @@ public class Util {
         return true;
     }
 
-    /** This exists to make it clear which println statements to keep. */
+    /** These exists to make it clear which print statements to keep. */
     public static void println(Object s) {
         System.out.println(s);
+    }
+
+    public static void println() {
+        System.out.println();
     }
 
     public static void printf(String s, Object... args) {

@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
  * the RoboRIO.
  */
 public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSensor {
+    private static final boolean DEBUG = false;
     private static final double TWO_PI = 2.0 * Math.PI;
 
     private final double m_positionOffset;
@@ -26,7 +27,7 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
     private final DoubleLogger m_log_position_turns_offset;
 
     private int m_turnCount;
-    private double m_prevRatio;
+    private double m_prevWrappedPositionRad;
 
     protected RoboRioRotaryPositionSensor(
             LoggerFactory parent,
@@ -53,18 +54,27 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
     protected abstract double m_sensorMax();
 
     private int wrap() {
-        double ratio = getRatio();
-        if (m_prevRatio > 0.75 && ratio < 0.25) {
-            return m_turnCount++;
+        double current = getWrappedPositionRad();
+        double prev = m_prevWrappedPositionRad;
+        if (DEBUG)
+            Util.printf("wrap prev %6.3f curr %6.3f\n", prev, current);
+        m_prevWrappedPositionRad = current;
+        double diff = current - prev;
+        if (diff > Math.PI) {
+            return --m_turnCount;
         }
-        if (m_prevRatio < 0.25 && ratio > 0.75) {
-            return m_turnCount--;
+        if (diff < -Math.PI) {
+            return ++m_turnCount;
         }
         return m_turnCount;
     }
 
     public int getTurns() {
         return m_turns.get();
+    }
+
+    public double getUnwrappedPositionRad() {
+        return getWrappedPositionRad() + 2 * Math.PI * getTurns();
     }
 
     /** This should be nearly cached. */
@@ -76,16 +86,15 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
     }
 
     /** map to full [0,1] */
-    protected double mapSensorRange(double pos) {
+    protected double mapSensorRange(double ratio) {
         // map sensor range
-        if (pos < m_sensorMin()) {
-            pos = m_sensorMin();
+        if (ratio < m_sensorMin()) {
+            ratio = m_sensorMin();
         }
-        if (pos > m_sensorMax()) {
-            pos = m_sensorMax();
+        if (ratio > m_sensorMax()) {
+            ratio = m_sensorMax();
         }
-        pos = (pos - m_sensorMin()) / (m_sensorMax() - m_sensorMin());
-        return pos;
+        return (ratio - m_sensorMin()) / (m_sensorMax() - m_sensorMin());
     }
 
     /**

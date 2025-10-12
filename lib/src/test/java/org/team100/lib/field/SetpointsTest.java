@@ -2,6 +2,7 @@ package org.team100.lib.field;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.field.FieldConstants.ReefPoint;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -13,13 +14,17 @@ import edu.wpi.first.math.geometry.Translation2d;
  * https://docs.google.com/spreadsheets/d/1I3ZZU4iZdwebHROykgXosJXGss2YPVTT3JEtHqNjdpQ
  */
 public class SetpointsTest {
+    private static final boolean DEBUG = false;
+
     void print(Translation2d t) {
-        System.out.printf("%6.3f %6.3f\n", t.getX(), t.getY());
+        if (DEBUG)
+            Util.printf("%6.3f %6.3f\n", t.getX(), t.getY());
     }
 
     @Test
     void testSetA() {
-        System.out.println("x, y");
+        if (DEBUG)
+            Util.println("x, y");
         print(FieldConstants.getScoringDestination(ReefPoint.A, 1.4));
         print(FieldConstants.getScoringDestination(ReefPoint.AB, 1.4));
         print(FieldConstants.getScoringDestination(ReefPoint.B, 1.4));

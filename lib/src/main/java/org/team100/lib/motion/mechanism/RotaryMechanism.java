@@ -153,6 +153,11 @@ public class RotaryMechanism {
         return m_sensor.getWrappedPositionRad();
     }
 
+    /** Unwrapped domain is infinite. */
+    public double getUnwrappedPositionRad() {
+        return m_sensor.getUnwrappedPositionRad();
+    }
+
     public void stop() {
         m_motor.stop();
     }

@@ -113,6 +113,11 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
         return m_incremental.getWrappedPositionRad();
     }
 
+    @Override
+    public double getUnwrappedPositionRad() {
+        return m_incremental.getUnwrappedPositionRad();
+    }
+
     /**
      * Value is updated in Robot.robotPeriodic().
      * 

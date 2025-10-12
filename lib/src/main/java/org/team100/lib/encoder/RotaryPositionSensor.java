@@ -18,6 +18,14 @@ public interface RotaryPositionSensor {
     double getWrappedPositionRad();
 
     /**
+     * Counts turns to derive an "unwrapped" position. Note the "zero" of this
+     * measurement is arbitrary, i.e. the number of turns is zero on startup.
+     * 
+     * @return Counterclockwise-positive rad within an infinite domain.
+     */
+    double getUnwrappedPositionRad();
+
+    /**
      * Note some velocity implementations can be noisy.
      * 
      * @return Counterclockwise positive rad/s

@@ -86,6 +86,10 @@ public class LoggerFactory {
         return name(obj.getClass().getSimpleName());
     }
 
+    public String getRoot() {
+        return m_root;
+    }
+
     //////////////////////////////////////////////////////
 
     private boolean allow(Level level) {

@@ -32,7 +32,7 @@ public class CalgamesReferenceController {
             SwerveControl next = m_reference.next();
             m_subsystem.set(next);
         } catch (IllegalStateException ex) {
-            // System.out.println(ex);
+            // Util.println(ex);
             // This happens when the trajectory generator produces an empty trajectory.
             // Ignore it for now.
         }

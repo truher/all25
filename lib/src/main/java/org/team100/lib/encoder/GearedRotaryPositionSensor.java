@@ -29,7 +29,12 @@ public class GearedRotaryPositionSensor implements RotaryPositionSensor {
 
     @Override
     public double getWrappedPositionRad() {
-        return MathUtil.angleModulus(m_delegate.getWrappedPositionRad() / m_ratio);
+        return MathUtil.angleModulus(getUnwrappedPositionRad());
+    }
+
+    @Override
+    public double getUnwrappedPositionRad() {
+        return m_delegate.getWrappedPositionRad() / m_ratio;
     }
 
     @Override
