@@ -22,6 +22,9 @@ import edu.wpi.first.wpilibj.DutyCycle;
  * supply would produce noisy sensor output, and completely confuse the FPGA
  * counter.
  * 
+ * Note that for the first few seconds after the sensor is constructed on the
+ * RoboRIO, the duty cycle input produces garbage.  So the Robot class should sleep awhile.
+ * 
  * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
  * Robot.robotPeriodic().
  */
@@ -96,5 +99,10 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
         int frequency = m_dutyCycle.getFrequency();
         m_log_frequency.log(() -> frequency);
         return frequency > FREQ_THRESHOLD;
+    }
+
+    /** For testing */
+    DutyCycle getDutyCycle() {
+        return m_dutyCycle;
     }
 }

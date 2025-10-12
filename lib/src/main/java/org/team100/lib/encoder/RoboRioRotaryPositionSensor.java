@@ -1,5 +1,8 @@
 package org.team100.lib.encoder;
 
+import java.util.function.Supplier;
+
+import org.team100.lib.coherence.Cache;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -16,10 +19,14 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
 
     private final double m_positionOffset;
     private final EncoderDrive m_drive;
+    private final Supplier<Integer> m_turns;
     // LOGGERS
     private final DoubleLogger m_log_position;
     private final DoubleLogger m_log_position_turns;
     private final DoubleLogger m_log_position_turns_offset;
+
+    private int m_turnCount;
+    private double m_prevRatio;
 
     protected RoboRioRotaryPositionSensor(
             LoggerFactory parent,
@@ -28,17 +35,37 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
         LoggerFactory log = parent.type(this);
         m_positionOffset = Util.inRange(inputOffset, 0.0, 1.0);
         m_drive = drive;
+
+        m_turns = Cache.of(this::wrap);
         m_log_position = log.doubleLogger(Level.COMP, "position (rad)");
         m_log_position_turns = log.doubleLogger(Level.COMP, "position (turns)");
         m_log_position_turns_offset = log.doubleLogger(Level.TRACE, "position (turns-offset)");
     }
 
-    /** Implementations should cache this. */
+    /**
+     * Sensor ratio in the interval [0, 1].
+     * Implementations should cache this.
+     */
     protected abstract double getRatio();
 
     protected abstract double m_sensorMin();
 
     protected abstract double m_sensorMax();
+
+    private int wrap() {
+        double ratio = getRatio();
+        if (m_prevRatio > 0.75 && ratio < 0.25) {
+            return m_turnCount++;
+        }
+        if (m_prevRatio < 0.25 && ratio > 0.75) {
+            return m_turnCount--;
+        }
+        return m_turnCount;
+    }
+
+    public int getTurns() {
+        return m_turns.get();
+    }
 
     /** This should be nearly cached. */
     @Override

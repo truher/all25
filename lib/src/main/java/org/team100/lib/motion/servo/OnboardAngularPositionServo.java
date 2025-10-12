@@ -112,7 +112,7 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
     }
 
     @Override
-    public void setPositionProfiled(double goalRad, double feedForwardTorqueNm) {
+    public void setPositionProfiled(double goalRad, double torqueNm) {
         m_log_goal.log(() -> goalRad);
 
         Model100 goal = new Model100(goalRad, 0);
@@ -129,7 +129,7 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
             m_ref.init(m_unwrappedSetpoint.model());
 
         }
-        actuate(m_ref.get(), feedForwardTorqueNm);
+        actuate(m_ref.get(), torqueNm);
     }
 
     /**
@@ -137,9 +137,9 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
      * the next setpoint velocity as feedforward.
      */
     @Override
-    public void setPositionDirect(Setpoints1d setpoint, double feedForwardTorqueNm) {
+    public void setPositionDirect(Setpoints1d setpoint, double torqueNm) {
         m_unwrappedGoal = null;
-        actuate(setpoint, feedForwardTorqueNm);
+        actuate(setpoint, torqueNm);
     }
 
     private void actuate(Setpoints1d setpoints, double feedForwardTorqueNm) {

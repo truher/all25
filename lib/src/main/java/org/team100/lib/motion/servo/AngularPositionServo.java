@@ -9,7 +9,7 @@ import org.team100.lib.reference.Setpoints1d;
  * this just takes setpoints, and, for onboard versions, computes feedback
  * control.
  */
-public interface AngularPositionServo  {
+public interface AngularPositionServo {
     /**
      * Zeros controller errors, sets setpoint to current position.
      *
@@ -33,19 +33,22 @@ public interface AngularPositionServo  {
      * Sets the goal, updates the setpoint to the "next step" value towards it,
      * gives the setpoint to the outboard mechanism.
      * 
-     * @param goalRad             The goal angle here wraps within [-pi, pi], using
-     *                            output measurements, e.g. shaft radians, not motor
-     *                            radians
-     * @param feedForwardTorqueNm used for gravity or spring compensation
+     * @param goalRad  The goal angle here wraps within [-pi, pi], using output
+     *                 measurements, e.g. shaft radians, not motor radians
+     * @param torqueNm feedforward for gravity or spring compensation
      */
-    void setPositionProfiled(double goalRad, double feedForwardTorqueNm);
+    void setPositionProfiled(double goalRad, double torqueNm);
 
     /**
      * Invalidates the current profile, sets the setpoint directly.
-     * This takes both current and next setpoints so that the implementation can
-     * choose the current one for feedback and the next one for feedforward.
+     * 
+     * 
+     * @param setpoint both current and next setpoints so that the
+     *                 implementation can choose the current one for feedback and
+     *                 the next one for feedforward.
+     * @param torqueNm feedforward for gravity or spring compensation
      */
-    void setPositionDirect(Setpoints1d setpoint, double feedForwardTorqueNm);
+    void setPositionDirect(Setpoints1d setpoint, double torqueNm);
 
     /**
      * This is the "wrapped" value, i.e. it is periodic within +/- pi.

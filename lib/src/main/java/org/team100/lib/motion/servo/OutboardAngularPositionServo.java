@@ -80,7 +80,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     }
 
     @Override
-    public void setPositionProfiled(double goalRad, double feedForwardTorqueNm) {
+    public void setPositionProfiled(double goalRad, double torqueNm) {
         m_log_goal.log(() -> goalRad);
 
         Model100 goal = new Model100(mod(goalRad), 0);
@@ -99,7 +99,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
             m_ref.init(m_unwrappedSetpoint.model());
         }
 
-        actuate(m_ref.get(), feedForwardTorqueNm);
+        actuate(m_ref.get(), torqueNm);
     }
 
     /**
@@ -109,9 +109,9 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      * for outboard control we only use the "next" setpoint.
      */
     @Override
-    public void setPositionDirect(Setpoints1d setpoint, double feedForwardTorqueNm) {
+    public void setPositionDirect(Setpoints1d setpoint, double torqueNm) {
         m_unwrappedGoal = null;
-        actuate(setpoint, feedForwardTorqueNm);
+        actuate(setpoint, torqueNm);
     }
 
     /**
@@ -120,10 +120,13 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      */
     private void actuate(Setpoints1d setpoint, double torqueNm) {
         m_unwrappedSetpoint = setpoint.next();
+        System.out.printf("unwrapped setpoint %6.3f\n", m_unwrappedSetpoint.x());
 
         double positionRad = mod(m_unwrappedSetpoint.x());
         double velocityRad_S = m_unwrappedSetpoint.v();
         double accelRad_S2 = m_unwrappedSetpoint.a();
+
+        System.out.printf("position %6.3f\n", positionRad);
 
         m_mechanism.setUnwrappedPosition(
                 positionRad,
@@ -134,9 +137,13 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
         m_log_ff_torque.log(() -> torqueNm);
     }
 
-    /** Return an angle near the measurement */
+    /** Return an angle near the measurement.
+     * 
+     * This uses the *unwrapped* measurement.
+     */
     double mod(double x) {
         double measurement = m_mechanism.getWrappedPositionRad();
+        System.out.printf("measurement %6.3f\n", measurement);
         m_log_measurement.log(() -> measurement);
         return MathUtil.angleModulus(x - measurement) + measurement;
     }

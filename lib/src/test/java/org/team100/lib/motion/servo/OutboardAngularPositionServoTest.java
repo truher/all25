@@ -153,7 +153,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
      * motion, but the "long way around" for goals outside the limit.
      */
     // TODO: fix this
-    // @Test
+    @Test
     void testDirectMultiturn() {
         SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
@@ -180,7 +180,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(0, mech.getVelocityRad_S(), DELTA);
         assertEquals(0, servo.getWrappedPositionRad(), DELTA);
 
-        // Move a quarter turn in the positive direction
+        System.out.println("Move a quarter turn in the positive direction");
 
         servo.periodic();
         Control100 ignored = new Control100(0, 0);
@@ -208,7 +208,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(Math.PI / 2, sensor.getWrappedPositionRad(), DELTA);
         assertEquals(Math.PI / 2, servo.getWrappedPositionRad(), DELTA);
 
-        // Try to go one turn away directly? That does nothing.
+        System.out.println("Try to go one turn away directly? That does nothing.");
 
         servo.periodic();
         servo.setPositionDirect(new Setpoints1d(ignored, new Control100(5.0 * Math.PI / 2, 0)), 0);
@@ -222,27 +222,37 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(Math.PI / 2, sensor.getWrappedPositionRad(), DELTA);
         assertEquals(Math.PI / 2, servo.getWrappedPositionRad(), DELTA);
 
-        // move towards the limit a little at a time
+        System.out.println("move towards the limit a little at a time");
 
         servo.periodic();
         servo.setPositionDirect(new Setpoints1d(ignored, new Control100(Math.PI, 0)), 0);
         stepTime();
+        servo.periodic();
+        stepTime();
         assertEquals(Math.PI, motor.getUnwrappedPositionRad(), DELTA);
         servo.periodic();
-        servo.setPositionDirect(new Setpoints1d(ignored, new Control100(3.0 * Math.PI / 2, 0)), 0);
+        servo.setPositionDirect(new Setpoints1d(ignored, new Control100(3 * Math.PI / 2, 0)), 0);
+        stepTime();
+        servo.periodic();
         stepTime();
         assertEquals(3 * Math.PI / 2, motor.getUnwrappedPositionRad(), DELTA);
         servo.periodic();
-        servo.setPositionDirect(new Setpoints1d(ignored, new Control100(2.0 * Math.PI, 0)), 0);
+        servo.setPositionDirect(new Setpoints1d(ignored, new Control100(2 * Math.PI, 0)), 0);
+        stepTime();
+        servo.periodic();
         stepTime();
         assertEquals(2 * Math.PI, motor.getUnwrappedPositionRad(), DELTA);
         servo.periodic();
-        servo.setPositionDirect(new Setpoints1d(ignored, new Control100(5.0 * Math.PI / 2, 0)), 0);
+        servo.setPositionDirect(new Setpoints1d(ignored, new Control100(5 * Math.PI / 2, 0)), 0);
+        stepTime();
+        servo.periodic();
         stepTime();
         assertEquals(5 * Math.PI / 2, motor.getUnwrappedPositionRad(), DELTA);
         // again so the integrator catches up
         servo.periodic();
         servo.setPositionDirect(new Setpoints1d(ignored, new Control100(5.0 * Math.PI / 2, 0)), 0);
+        stepTime();
+        servo.periodic();
         stepTime();
 
         assertEquals(0, motor.getVelocityRad_S(), DELTA);

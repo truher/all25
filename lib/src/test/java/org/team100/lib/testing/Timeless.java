@@ -45,4 +45,11 @@ public interface Timeless {
         Cache.refresh();
     }
 
+    default void stepTime(double t) {
+        SimHooks.stepTiming(t);
+        Takt.update();
+        Cache.refresh();
+
+    }
+
 }
