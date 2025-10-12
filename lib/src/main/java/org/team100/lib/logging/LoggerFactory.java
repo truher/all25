@@ -782,8 +782,8 @@ public class LoggerFactory {
                 return;
             SwerveModulePosition100 val = vals.get();
             m_distanceLogger.log(() -> val.distanceMeters);
-            if (val.angle.isPresent()) {
-                m_rotation2dLogger.log(val.angle::get);
+            if (val.unwrappedAngle.isPresent()) {
+                m_rotation2dLogger.log(val.unwrappedAngle::get);
             }
         }
     }

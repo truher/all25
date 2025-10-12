@@ -19,7 +19,10 @@ public class Util {
         return true;
     }
 
-    /** These exists to make it clear which print statements to keep. */
+    /** These exists to make it clear which print statements to keep.
+     * 
+     * TODO: remove all these
+     */
     public static void println(Object s) {
         System.out.println(s);
     }

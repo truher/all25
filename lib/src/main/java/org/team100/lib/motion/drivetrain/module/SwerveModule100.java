@@ -202,6 +202,8 @@ public abstract class SwerveModule100 {
 
     /**
      * Use the current turning servo position to optimize the desired state.
+     * 
+     * TODO: should this use unwrapped?
      */
     private SwerveModuleState100 optimize(SwerveModuleState100 desired) {
         return SwerveModuleState100.optimize(

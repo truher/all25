@@ -56,11 +56,11 @@ public class SwerveModuleState100 implements Comparable<SwerveModuleState100>, S
             // this does happen
             return desiredState;
         }
-        var delta = desiredState.m_angle.get().minus(currentAngle);
+        Rotation2d delta = desiredState.m_angle.get().minus(currentAngle);
         if (Math.abs(delta.getDegrees()) > 90.0) {
             return new SwerveModuleState100(
                     -desiredState.m_speedM_S,
-                    Optional.of(desiredState.m_angle.get().rotateBy(Rotation2d.fromDegrees(180.0))));
+                    Optional.of(desiredState.m_angle.get().rotateBy(Rotation2d.k180deg)));
         } else {
             return new SwerveModuleState100(
                     desiredState.m_speedM_S,
