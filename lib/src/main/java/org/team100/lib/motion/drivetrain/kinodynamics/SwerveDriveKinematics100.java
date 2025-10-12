@@ -209,12 +209,12 @@ public class SwerveDriveKinematics100 {
         SimpleMatrix moduleDeltaMatrix = new SimpleMatrix(m_numModules * 2, 1);
         for (int i = 0; i < m_numModules; i++) {
             SwerveModuleDelta module = deltas[i];
-            if (Math.abs(module.distanceMeters) < 1e-6 || module.angle.isEmpty()) {
+            if (Math.abs(module.distanceMeters) < 1e-6 || module.wrappedAngle.isEmpty()) {
                 moduleDeltaMatrix.set(i * 2, 0, 0);
                 moduleDeltaMatrix.set(i * 2 + 1, 0, 0);
             } else {
-                moduleDeltaMatrix.set(i * 2, 0, module.distanceMeters * module.angle.get().getCos());
-                moduleDeltaMatrix.set(i * 2 + 1, 0, module.distanceMeters * module.angle.get().getSin());
+                moduleDeltaMatrix.set(i * 2, 0, module.distanceMeters * module.wrappedAngle.get().getCos());
+                moduleDeltaMatrix.set(i * 2 + 1, 0, module.distanceMeters * module.wrappedAngle.get().getSin());
             }
         }
         return moduleDeltaMatrix;

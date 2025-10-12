@@ -111,6 +111,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
      * invalidates the current profile.
      * for outboard control we only use the "next" setpoint.
      * The setpoint is "wrapped" i.e. we pick whatever unwrapped angle is closest.
+     * Ignores the current setpoint.
      */
     @Override
     public void setPositionDirect(Setpoints1d wrappedSetpoint, double torqueNm) {
@@ -120,7 +121,7 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
 
     /**
      * Pass the setpoint directly to the mechanism's position controller.
-     * For outboard control we only use the "next" setpoint.
+     * Ignores current setpoint. We only use the "next" setpoint.
      */
     private void actuate(Setpoints1d wrappedSetpoint, double torqueNm) {
         Control100 nextWrappedSetpoint = wrappedSetpoint.next();

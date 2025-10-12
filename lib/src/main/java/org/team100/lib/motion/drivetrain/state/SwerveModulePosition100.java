@@ -132,17 +132,18 @@ public class SwerveModulePosition100
      */
     public SwerveModulePosition100 plus(SwerveModuleDelta delta) {
         double posM = distanceMeters + delta.distanceMeters;
-        if (delta.angle.isPresent()) {
+        if (delta.wrappedAngle.isPresent()) {
             if (DEBUG) {
                 if (unwrappedAngle.isPresent()) {
-                    double angleDiff = delta.angle.get().getRadians() - unwrappedAngle.get().getRadians();
-                    if (Math.abs(angleDiff) > 0.2)
+                    // note wrapping here
+                    Rotation2d angleDiff = delta.wrappedAngle.get().minus(unwrappedAngle.get());
+                    if (Math.abs(angleDiff.getRadians()) > 0.2)
                         Util.printf("very fast steering start: %f end: %f\n",
                                 unwrappedAngle.get().getRadians(),
-                                delta.angle.get().getRadians());
+                                delta.wrappedAngle.get().getRadians());
                 }
             }
-            return new SwerveModulePosition100(posM, delta.angle);
+            return new SwerveModulePosition100(posM, delta.wrappedAngle);
         }
         // if there's no delta angle, we're not going anywhere.
         if (DEBUG)

@@ -43,6 +43,6 @@ public class SwerveModuleDeltaStruct implements Struct<SwerveModuleDelta> {
     @Override
     public void pack(ByteBuffer bb, SwerveModuleDelta value) {
         bb.putDouble(value.distanceMeters);
-        OptionalRotation2d.struct.pack(bb, new OptionalRotation2d(value.angle));
+        OptionalRotation2d.struct.pack(bb, new OptionalRotation2d(value.wrappedAngle));
     }
 }

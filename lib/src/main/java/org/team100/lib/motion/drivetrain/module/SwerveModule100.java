@@ -162,6 +162,10 @@ public abstract class SwerveModule100 {
 
         }
         m_driveServo.setVelocity(speed);
+
+        //
+        // TODO: without the profile there's no velocity feedforward, is that ok?
+        //
         // if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
         // no profile, just low-level position
         Control100 control = new Control100(desiredAngle.getRadians(), 0);

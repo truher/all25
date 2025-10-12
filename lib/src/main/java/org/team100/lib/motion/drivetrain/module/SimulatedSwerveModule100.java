@@ -77,13 +77,14 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
 
         Feedback100 turningPositionFeedback = new PIDFeedback(
                 parent,
-                20, // kP
+                10, // kP .. was 20
                 0, // kI
                 0, // kD
                 true,
                 0.05, // note low tolerance
                 1);
         IncrementalProfile profile = kinodynamics.getSteeringProfile();
+        // without a profile, there's no velocity feedforward.  Hm.
         IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         OnboardAngularPositionServo turningServo = new OnboardAngularPositionServo(
                 parent,
