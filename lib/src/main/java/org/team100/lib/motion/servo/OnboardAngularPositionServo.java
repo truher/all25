@@ -124,7 +124,8 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
                 // avoid velocity noise here
                 m_unwrappedSetpoint = new Control100(measurement, 0);
             } else {
-                m_unwrappedSetpoint = new Control100(mod(m_unwrappedSetpoint.x()), m_unwrappedSetpoint.v());
+                m_unwrappedSetpoint = new Control100(wrapNearMeasurement(m_unwrappedSetpoint.x()),
+                        m_unwrappedSetpoint.v());
             }
             m_ref.init(m_unwrappedSetpoint.model());
 
@@ -142,38 +143,50 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
         actuate(setpoint, torqueNm);
     }
 
-    private void actuate(Setpoints1d setpoints, double feedForwardTorqueNm) {
-        m_unwrappedSetpoint = setpoints.next();
+    private void actuate(Setpoints1d wrappedSetpoints, double feedForwardTorqueNm) {
+        Control100 nextWrappedSetpoint = wrappedSetpoints.next();
 
-        final double positionRad = m_mechanism.getWrappedPositionRad();
+        double nextPosRad = wrapNearMeasurement(nextWrappedSetpoint.x());
+        double nextVelRad_S = nextWrappedSetpoint.v();
+        double nextAccelRad_S2 = nextWrappedSetpoint.a();
+
+        m_unwrappedSetpoint = new Control100(nextPosRad, nextVelRad_S, nextAccelRad_S2);
+
+        final double unwrappedPositionRad = m_mechanism.getUnwrappedPositionRad();
         final double velocityRad_S = m_mechanism.getVelocityRad_S();
 
-        final Model100 measurement = new Model100(positionRad, velocityRad_S);
+        final Model100 unwrappedMeasurement = new Model100(unwrappedPositionRad, velocityRad_S);
 
-        double setpointPosition = mod(setpoints.current().x());
-        double setpointVelocity = setpoints.current().v();
-        final double u_FB = m_feedback.calculate(
-                measurement,
-                new Model100(setpointPosition, setpointVelocity));
+        double currentUnwrappedSetpointPosition = wrapNearMeasurement(wrappedSetpoints.current().x());
+        double currentSetpointVelocity = wrappedSetpoints.current().v();
+
+        Model100 currentUnwrappedSetpoint = new Model100(
+                currentUnwrappedSetpointPosition, currentSetpointVelocity);
+
+        final double u_FB = m_feedback.calculate(unwrappedMeasurement, currentUnwrappedSetpoint);
+
         final double u_FF = m_unwrappedSetpoint.v();
         final double u_TOTAL = u_FB + u_FF;
 
         m_mechanism.setVelocity(u_TOTAL, m_unwrappedSetpoint.a(), feedForwardTorqueNm);
 
         m_log_feedforward_torque.log(() -> feedForwardTorqueNm);
-        m_log_measurement.log(() -> measurement);
+        m_log_measurement.log(() -> unwrappedMeasurement);
         m_log_control.log(() -> m_unwrappedSetpoint);
         m_log_u_FB.log(() -> u_FB);
         m_log_u_FF.log(() -> u_FF);
         m_log_u_TOTAL.log(() -> u_TOTAL);
-        m_log_error.log(() -> setpoints.current().x() - positionRad);
-        m_log_velocity_error.log(() -> setpoints.current().v() - velocityRad_S);
+        m_log_error.log(() -> wrappedSetpoints.current().x() - unwrappedPositionRad);
+        m_log_velocity_error.log(() -> wrappedSetpoints.current().v() - velocityRad_S);
     }
 
-    /** Return an angle near the measurement */
-    private double mod(double x) {
-        double measurement = m_mechanism.getWrappedPositionRad();
-        return MathUtil.angleModulus(x - measurement) + measurement;
+    /**
+     * Given an unwrapped position, return an equivalent (but still unwrapped)
+     * position within pi of the unwrapped measurement.
+     */
+    private double wrapNearMeasurement(double unwrappedPositionRad) {
+        double unwrappedMeasurement = m_mechanism.getUnwrappedPositionRad();
+        return MathUtil.angleModulus(unwrappedPositionRad - unwrappedMeasurement) + unwrappedMeasurement;
     }
 
     /**
@@ -182,6 +195,11 @@ public class OnboardAngularPositionServo implements AngularPositionServo {
     @Override
     public double getWrappedPositionRad() {
         return m_mechanism.getWrappedPositionRad();
+    }
+
+    @Override
+    public double getUnwrappedPositionRad() {
+        return m_mechanism.getUnwrappedPositionRad();
     }
 
     @Override

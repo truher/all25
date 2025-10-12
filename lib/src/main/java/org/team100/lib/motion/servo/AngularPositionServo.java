@@ -59,6 +59,9 @@ public interface AngularPositionServo {
      */
     double getWrappedPositionRad();
 
+    /** The "unwrapped" value domain is infinite. */
+    double getUnwrappedPositionRad();
+
     /** Mechanism is following the desired setpoint. */
     boolean atSetpoint();
 

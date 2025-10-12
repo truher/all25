@@ -759,7 +759,13 @@ public class Robot extends TimedRobot100 {
 
         // the duty cycle encoder produces garbage for a few seconds so sleep.
         try {
-            Thread.sleep(3000);
+            Util.println("Waiting for DutyCycle sensors to work ...");
+            Thread.sleep(1000);
+            Util.println("Waiting for DutyCycle sensors to work ...");
+            Thread.sleep(1000);
+            Util.println("Waiting for DutyCycle sensors to work ...");
+            Thread.sleep(1000);
+            Util.println("Done!");
         } catch (InterruptedException e) {
 
         }

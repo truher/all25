@@ -33,6 +33,11 @@ public class MockAngularPositionServo implements AngularPositionServo {
     }
 
     @Override
+    public double getUnwrappedPositionRad() {
+        return 0;
+    }
+
+    @Override
     public boolean atSetpoint() {
         return false;
     }

@@ -162,14 +162,16 @@ public abstract class SwerveModule100 {
 
         }
         m_driveServo.setVelocity(speed);
-        if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
-            // no profile, just low-level position
-            Control100 control = new Control100(desiredAngle.getRadians(), 0);
-            m_turningServo.setPositionDirect(new Setpoints1d(control, control), 0);
-        } else {
-            // use the profile
-            m_turningServo.setPositionProfiled(desiredAngle.getRadians(), 0);
-        }
+        // if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
+        // no profile, just low-level position
+        Control100 control = new Control100(desiredAngle.getRadians(), 0);
+        m_turningServo.setPositionDirect(new Setpoints1d(control, control), 0);
+
+        // TODO: finish this
+        // } else {
+        // // use the profile
+        // m_turningServo.setPositionProfiled(desiredAngle.getRadians(), 0);
+        // }
         m_previousDesiredAngle = desiredAngle;
     }
 

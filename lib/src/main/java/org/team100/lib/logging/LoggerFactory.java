@@ -12,12 +12,13 @@ import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.primitive.PrimitiveLogger;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
 import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
+import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.kinematics.JointAccelerations;
 import org.team100.lib.motion.kinematics.JointForce;
 import org.team100.lib.motion.kinematics.JointVelocities;
@@ -789,6 +790,37 @@ public class LoggerFactory {
 
     public SwerveModulePosition100Logger swerveModulePosition100Logger(Level level, String leaf) {
         return new SwerveModulePosition100Logger(level, leaf);
+    }
+
+    public class SwerveModulePositionsLogger {
+        private final Level m_level;
+
+        private final SwerveModulePosition100Logger m_frontLeft;
+        private final SwerveModulePosition100Logger m_frontRight;
+        private final SwerveModulePosition100Logger m_rearLeft;
+        private final SwerveModulePosition100Logger m_rearRight;
+
+        SwerveModulePositionsLogger(Level level, String leaf) {
+            m_level = level;
+            m_frontLeft = swerveModulePosition100Logger(level, join(leaf, "front left"));
+            m_frontRight = swerveModulePosition100Logger(level, join(leaf, "front right"));
+            m_rearLeft = swerveModulePosition100Logger(level, join(leaf, "rear left"));
+            m_rearRight = swerveModulePosition100Logger(level, join(leaf, "rear right"));
+        }
+
+        public void log(Supplier<SwerveModulePositions> vals) {
+            if (!allow(m_level))
+                return;
+            SwerveModulePositions val = vals.get();
+            m_frontLeft.log(val::frontLeft);
+            m_frontRight.log(val::frontRight);
+            m_rearLeft.log(val::rearLeft);
+            m_rearRight.log(val::rearRight);
+        }
+    }
+
+    public SwerveModulePositionsLogger swerveModulePositionsLogger(Level level, String leaf) {
+        return new SwerveModulePositionsLogger(level, leaf);
     }
 
     // public class ArmAnglesLogger {

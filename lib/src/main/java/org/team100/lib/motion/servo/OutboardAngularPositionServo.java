@@ -146,15 +146,15 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     }
 
     /**
-     * Given an unwrapped position, return an equivalent position within pi of the
-     * unwrapped measurement.
+     * Given an unwrapped position, return an equivalent (but still unwrapped)
+     * position within pi of the unwrapped measurement.
      */
     double wrapNearMeasurement(double unwrappedPositionRad) {
-        double measurement = m_mechanism.getUnwrappedPositionRad();
+        double unwrappedMeasurement = m_mechanism.getUnwrappedPositionRad();
         if (DEBUG)
-            Util.printf("measurement %6.3f\n", measurement);
-        m_log_measurement.log(() -> measurement);
-        return MathUtil.angleModulus(unwrappedPositionRad - measurement) + measurement;
+            Util.printf("measurement %6.3f\n", unwrappedMeasurement);
+        m_log_measurement.log(() -> unwrappedMeasurement);
+        return MathUtil.angleModulus(unwrappedPositionRad - unwrappedMeasurement) + unwrappedMeasurement;
     }
 
     /**
@@ -163,6 +163,11 @@ public class OutboardAngularPositionServo implements AngularPositionServo {
     @Override
     public double getWrappedPositionRad() {
         return m_mechanism.getWrappedPositionRad();
+    }
+
+    @Override
+    public double getUnwrappedPositionRad() {
+        return m_mechanism.getUnwrappedPositionRad();
     }
 
     /**
