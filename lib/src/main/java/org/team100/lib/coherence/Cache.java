@@ -25,6 +25,7 @@ import com.ctre.phoenix6.StatusCode;
  * everything consistent.
  */
 public class Cache {
+    private static final boolean DEBUG = false;
     static final List<CotemporalCache<?>> caches = new ArrayList<>();
     private static final List<DoubleCache> doubles = new ArrayList<>();
     private static final List<SideEffect> sideEffects = new ArrayList<>();
@@ -70,8 +71,17 @@ public class Cache {
      * Should be run in Robot.robotPeriodic().
      */
     public static void refresh() {
+        if (DEBUG)
+            Util.println("Cache refresh");
         reset();
         update();
+    }
+
+    /** For testing only */
+    public static void clear() {
+        caches.clear();
+        doubles.clear();
+        sideEffects.clear();
     }
 
     /////////////////////////////////////////////////
@@ -93,6 +103,8 @@ public class Cache {
 
     /** Fetches fresh values for every stale cache. Should be called after reset. */
     private static void update() {
+        if (DEBUG)
+            Util.printf("Cache update %d\n", caches.size());
         if (!signals.isEmpty()) {
             StatusCode result = BaseStatusSignal.refreshAll(signals.toArray(new BaseStatusSignal[0]));
             if (result != StatusCode.OK) {
@@ -100,9 +112,13 @@ public class Cache {
             }
         }
         for (CotemporalCache<?> r : caches) {
+            if (DEBUG)
+                Util.printf("update %s\n", r.get().getClass().getSimpleName());
             r.get();
         }
         for (DoubleCache r : doubles) {
+            if (DEBUG)
+                Util.println("double update");
             r.getAsDouble();
         }
         for (SideEffect r : sideEffects) {

@@ -756,6 +756,19 @@ public class Robot extends TimedRobot100 {
         System.gc();
 
         double endS = Takt.actual();
+
+        // the duty cycle encoder produces garbage for a few seconds so sleep.
+        try {
+            Util.println("Waiting for DutyCycle sensors to work ...");
+            Thread.sleep(1000);
+            Util.println("Waiting for DutyCycle sensors to work ...");
+            Thread.sleep(1000);
+            Util.println("Waiting for DutyCycle sensors to work ...");
+            Thread.sleep(1000);
+            Util.println("Done!");
+        } catch (InterruptedException e) {
+
+        }
         Util.printf("\n*** PREWARM END ET: %f\n", endS - startS);
     }
 

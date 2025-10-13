@@ -7,7 +7,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.struct.SwerveModuleStateStruct;
 import edu.wpi.first.util.struct.StructSerializable;
 
-/** The state of one swerve module. */
+/**
+ * The state of one swerve module.
+ * 
+ * This class is used both for measurement and for control; in the control case,
+ * the angle can be empty, in case the velocity is ~zero: in that case, there's
+ * no requirement on the angle.
+ */
 public class SwerveModuleState100 implements Comparable<SwerveModuleState100>, StructSerializable {
     private final double m_speedM_S;
     private final Optional<Rotation2d> m_angle;
@@ -40,25 +46,25 @@ public class SwerveModuleState100 implements Comparable<SwerveModuleState100>, S
      * the PIDController class's continuous input functionality, the furthest a
      * wheel will ever rotate is 90 degrees.
      *
-     * @param desiredState The desired state.
-     * @param currentAngle The current module angle.
+     * @param desiredWrappedState The desired state, wrapped.
+     * @param currentWrappedAngle The current module angle.
      * @return Optimized swerve module state.
      */
     public static SwerveModuleState100 optimize(
-            SwerveModuleState100 desiredState, Rotation2d currentAngle) {
-        if (desiredState.m_angle.isEmpty()) {
+            SwerveModuleState100 desiredWrappedState, Rotation2d currentWrappedAngle) {
+        if (desiredWrappedState.m_angle.isEmpty()) {
             // this does happen
-            return desiredState;
+            return desiredWrappedState;
         }
-        var delta = desiredState.m_angle.get().minus(currentAngle);
+        Rotation2d delta = desiredWrappedState.m_angle.get().minus(currentWrappedAngle);
         if (Math.abs(delta.getDegrees()) > 90.0) {
             return new SwerveModuleState100(
-                    -desiredState.m_speedM_S,
-                    Optional.of(desiredState.m_angle.get().rotateBy(Rotation2d.fromDegrees(180.0))));
+                    -desiredWrappedState.m_speedM_S,
+                    Optional.of(desiredWrappedState.m_angle.get().rotateBy(Rotation2d.k180deg)));
         } else {
             return new SwerveModuleState100(
-                    desiredState.m_speedM_S,
-                    desiredState.m_angle);
+                    desiredWrappedState.m_speedM_S,
+                    desiredWrappedState.m_angle);
         }
     }
 

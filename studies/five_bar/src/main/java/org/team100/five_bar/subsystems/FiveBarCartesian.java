@@ -114,19 +114,19 @@ public class FiveBarCartesian extends SubsystemBase {
         double y3 = t.getY();
         ActuatorAngles p = FiveBarKinematics.inverse(
                 SCENARIO, x3 + SCENARIO.xcenter, y3 + SCENARIO.ycenter);
-        m_mechP1.setPosition(p.q1(), 0, 0, 0);
-        m_mechP5.setPosition(p.q5(), 0, 0, 0);
+        m_mechP1.setUnwrappedPosition(p.q1(), 0, 0, 0);
+        m_mechP5.setUnwrappedPosition(p.q5(), 0, 0, 0);
     }
 
     public JointPositions getJointPositions() {
-        double q1 = m_mechP1.getPositionRad().orElse(0);
-        double q5 = m_mechP5.getPositionRad().orElse(0);
+        double q1 = m_mechP1.getWrappedPositionRad();
+        double q5 = m_mechP5.getWrappedPositionRad();
         return FiveBarKinematics.forward(SCENARIO, q1, q5);
     }
 
     public Translation2d getPosition() {
-        double q1 = m_mechP1.getPositionRad().orElse(0);
-        double q5 = m_mechP5.getPositionRad().orElse(0);
+        double q1 = m_mechP1.getWrappedPositionRad();
+        double q5 = m_mechP5.getWrappedPositionRad();
         JointPositions j = FiveBarKinematics.forward(SCENARIO, q1, q5);
         return new Translation2d(j.P3().x(), j.P3().y());
     }

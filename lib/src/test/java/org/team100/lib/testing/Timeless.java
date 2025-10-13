@@ -1,6 +1,7 @@
 package org.team100.lib.testing;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
@@ -19,6 +20,15 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
  * You'll also need to reset whatever caches you use, perhaps in their periodic.
  */
 public interface Timeless {
+
+    /**
+     * Make sure the cache doesn't try to update stale things. This runs before the
+     * constructor so it is safe with the Fixtured tests.
+     */
+    @BeforeAll
+    static void clearCache() {
+        Cache.clear();
+    }
 
     /** Do any time-related setup *in your test method* ! */
     @BeforeEach

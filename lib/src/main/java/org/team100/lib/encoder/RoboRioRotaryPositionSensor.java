@@ -1,11 +1,11 @@
 package org.team100.lib.encoder;
 
-import java.util.OptionalDouble;
+import java.util.function.Supplier;
 
+import org.team100.lib.coherence.Cache;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.logging.LoggerFactory.OptionalDoubleLogger;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
@@ -15,14 +15,19 @@ import edu.wpi.first.math.MathUtil;
  * the RoboRIO.
  */
 public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSensor {
+    private static final boolean DEBUG = false;
     private static final double TWO_PI = 2.0 * Math.PI;
 
     private final double m_positionOffset;
     private final EncoderDrive m_drive;
+    private final Supplier<Integer> m_turns;
     // LOGGERS
-    private final OptionalDoubleLogger m_log_position;
+    private final DoubleLogger m_log_position;
     private final DoubleLogger m_log_position_turns;
     private final DoubleLogger m_log_position_turns_offset;
+
+    private int m_turnCount;
+    private double m_prevWrappedPositionRad;
 
     protected RoboRioRotaryPositionSensor(
             LoggerFactory parent,
@@ -31,37 +36,65 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
         LoggerFactory log = parent.type(this);
         m_positionOffset = Util.inRange(inputOffset, 0.0, 1.0);
         m_drive = drive;
-        m_log_position = log.optionalDoubleLogger(Level.COMP, "position (rad)");
+
+        m_turns = Cache.of(this::wrap);
+        m_log_position = log.doubleLogger(Level.COMP, "position (rad)");
         m_log_position_turns = log.doubleLogger(Level.COMP, "position (turns)");
         m_log_position_turns_offset = log.doubleLogger(Level.TRACE, "position (turns-offset)");
     }
 
-    /** Implementations should cache this. */
-    protected abstract OptionalDouble getRatio();
+    /**
+     * Sensor ratio in the interval [0, 1].
+     * Implementations should cache this.
+     */
+    protected abstract double getRatio();
 
     protected abstract double m_sensorMin();
 
     protected abstract double m_sensorMax();
 
+    private int wrap() {
+        double current = getWrappedPositionRad();
+        double prev = m_prevWrappedPositionRad;
+        if (DEBUG)
+            Util.printf("wrap prev %6.3f curr %6.3f\n", prev, current);
+        m_prevWrappedPositionRad = current;
+        double diff = current - prev;
+        if (diff > Math.PI) {
+            return --m_turnCount;
+        }
+        if (diff < -Math.PI) {
+            return ++m_turnCount;
+        }
+        return m_turnCount;
+    }
+
+    public int getTurns() {
+        return m_turns.get();
+    }
+
+    public double getUnwrappedPositionRad() {
+        return getWrappedPositionRad() + 2 * Math.PI * getTurns();
+    }
+
     /** This should be nearly cached. */
     @Override
-    public OptionalDouble getPositionRad() {
-        OptionalDouble positionRad = getRad();
+    public double getWrappedPositionRad() {
+        double positionRad = getRad();
         m_log_position.log(() -> positionRad);
         return positionRad;
     }
 
     /** map to full [0,1] */
-    protected double mapSensorRange(double pos) {
+    protected double mapSensorRange(double ratio) {
         // map sensor range
-        if (pos < m_sensorMin()) {
-            pos = m_sensorMin();
+        if (ratio < m_sensorMin()) {
+            ratio = m_sensorMin();
         }
-        if (pos > m_sensorMax()) {
-            pos = m_sensorMax();
+        if (ratio > m_sensorMax()) {
+            ratio = m_sensorMax();
         }
-        pos = (pos - m_sensorMin()) / (m_sensorMax() - m_sensorMin());
-        return pos;
+        return (ratio - m_sensorMin()) / (m_sensorMax() - m_sensorMin());
     }
 
     /**
@@ -69,12 +102,10 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
      * 
      * @return radians, [-pi, pi]
      */
-    protected OptionalDouble getRad() {
-        OptionalDouble ratio = getRatio();
-        if (ratio.isEmpty())
-            return OptionalDouble.empty();
+    protected double getRad() {
+        double ratio = getRatio();
 
-        double posTurns = mapSensorRange(ratio.getAsDouble());
+        double posTurns = mapSensorRange(ratio);
         m_log_position_turns.log(() -> posTurns);
 
         double turnsMinusOffset = posTurns - m_positionOffset;
@@ -82,9 +113,9 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
 
         switch (m_drive) {
             case DIRECT:
-                return OptionalDouble.of(MathUtil.angleModulus(turnsMinusOffset * TWO_PI));
+                return MathUtil.angleModulus(turnsMinusOffset * TWO_PI);
             case INVERSE:
-                return OptionalDouble.of(MathUtil.angleModulus(-1.0 * turnsMinusOffset * TWO_PI));
+                return MathUtil.angleModulus(-1.0 * turnsMinusOffset * TWO_PI);
             default:
                 throw new IllegalArgumentException();
         }
@@ -92,12 +123,12 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
 
     /**
      * Always returns zero.
-     *  
+     * 
      * Extracting velocity from the absolute position sensor does not work.
      */
     @Override
-    public OptionalDouble getVelocityRad_S() {
-        return OptionalDouble.of(0);
+    public double getVelocityRad_S() {
+        return 0;
     }
 
 }

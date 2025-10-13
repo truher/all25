@@ -45,10 +45,10 @@ public class RotaryMechanismTest {
 
         // positional limits filter the input
         // within bounds => ok
-        mech.setPosition(1.5, 1.0, 0, 0);
+        mech.setUnwrappedPosition(1.5, 1.0, 0, 0);
         assertEquals(1.0, motor.velocity, DELTA);
         // out of bounds => stop
-        mech.setPosition(2.5, 1.0, 0, 0);
+        mech.setUnwrappedPosition(2.5, 1.0, 0, 0);
         assertEquals(0.0, motor.velocity, DELTA);
     }
 
@@ -84,10 +84,10 @@ public class RotaryMechanismTest {
 
         // positional limits filter the input
         // within bounds => ok
-        mech.setPosition(1.5, 1.0, 0, 0);
+        mech.setUnwrappedPosition(1.5, 1.0, 0, 0);
         assertEquals(1.0, motor.velocity, DELTA);
         // out of bounds => stop
-        mech.setPosition(2.5, 1.0, 0, 0);
+        mech.setUnwrappedPosition(2.5, 1.0, 0, 0);
         assertEquals(1.0, motor.velocity, DELTA);
     }
 

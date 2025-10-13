@@ -7,6 +7,7 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -53,7 +54,7 @@ public class ProfiledTest {
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
         if (DEBUG)
-            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+            Util.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
@@ -62,7 +63,7 @@ public class ProfiledTest {
             Pose2d p = k.forward(c);
 
             if (DEBUG)
-                System.out.printf(
+                Util.printf(
                         "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
                         tt,
                         p.getX(), p.getY(), p.getRotation().getRadians(),
@@ -112,7 +113,7 @@ public class ProfiledTest {
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
         if (DEBUG)
-            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+            Util.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
@@ -121,7 +122,7 @@ public class ProfiledTest {
             Pose2d p = k.forward(c);
 
             if (DEBUG)
-                System.out.printf(
+                Util.printf(
                         "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
                         tt,
                         p.getX(), p.getY(), p.getRotation().getRadians(),
@@ -164,7 +165,7 @@ public class ProfiledTest {
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
         if (DEBUG)
-            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+            Util.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
@@ -173,7 +174,7 @@ public class ProfiledTest {
             Pose2d p = k.forward(c);
 
             if (DEBUG)
-                System.out.printf(
+                Util.printf(
                         "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
                         tt,
                         p.getX(), p.getY(), p.getRotation().getRadians(),

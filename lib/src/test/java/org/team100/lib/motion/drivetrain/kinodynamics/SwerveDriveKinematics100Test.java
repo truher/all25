@@ -63,7 +63,7 @@ class SwerveDriveKinematics100Test {
         SwerveModuleDeltas delta = SwerveModuleDeltas.modulePositionDelta(start, end);
 
         assertEquals(1, delta.frontLeft().distanceMeters, DELTA);
-        assertEquals(Math.PI, delta.frontLeft().angle.get().getRadians(), DELTA);
+        assertEquals(Math.PI, delta.frontLeft().wrappedAngle.get().getRadians(), DELTA);
 
         Twist2d twist = kinematics.toTwist2d(delta);
         assertEquals(-1, twist.dx, DELTA);
@@ -99,13 +99,13 @@ class SwerveDriveKinematics100Test {
         // so it assumes the corner paths are straight lines.
         SwerveModuleDeltas p = m_kinematics.toSwerveModuleDelta(t);
         assertEquals(Math.sqrt(2), p.frontLeft().distanceMeters, DELTA);
-        assertEquals(3 * Math.PI / 4, p.frontLeft().angle.get().getRadians(), DELTA);
+        assertEquals(3 * Math.PI / 4, p.frontLeft().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(Math.sqrt(2), p.frontRight().distanceMeters, DELTA);
-        assertEquals(3 * Math.PI / 4, p.frontRight().angle.get().getRadians(), DELTA);
+        assertEquals(3 * Math.PI / 4, p.frontRight().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(Math.sqrt(2), p.rearLeft().distanceMeters, DELTA);
-        assertEquals(3 * Math.PI / 4, p.rearLeft().angle.get().getRadians(), DELTA);
+        assertEquals(3 * Math.PI / 4, p.rearLeft().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(Math.sqrt(2), p.rearRight().distanceMeters, DELTA);
-        assertEquals(3 * Math.PI / 4, p.rearRight().angle.get().getRadians(), DELTA);
+        assertEquals(3 * Math.PI / 4, p.rearRight().wrappedAngle.get().getRadians(), DELTA);
     }
 
     @Test
@@ -149,13 +149,13 @@ class SwerveDriveKinematics100Test {
 
         SwerveModuleDeltas delta = SwerveModuleDeltas.modulePositionDelta(start, end);
         assertEquals(Math.sqrt(2) * Math.PI / 2, delta.frontLeft().distanceMeters, DELTA);
-        assertEquals(3 * Math.PI / 4, delta.frontLeft().angle.get().getRadians(), DELTA);
+        assertEquals(3 * Math.PI / 4, delta.frontLeft().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(Math.PI / 2, delta.frontRight().distanceMeters, DELTA);
-        assertEquals(Math.PI / 2, delta.frontRight().angle.get().getRadians(), DELTA);
+        assertEquals(Math.PI / 2, delta.frontRight().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(Math.PI / 2, delta.rearLeft().distanceMeters, DELTA);
-        assertEquals(Math.PI, delta.rearLeft().angle.get().getRadians(), DELTA);
+        assertEquals(Math.PI, delta.rearLeft().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(0, delta.rearRight().distanceMeters, DELTA);
-        assertTrue(delta.rearRight().angle.isEmpty());
+        assertTrue(delta.rearRight().wrappedAngle.isEmpty());
 
         Twist2d twist = kinematics.toTwist2d(delta);
 
@@ -226,14 +226,14 @@ class SwerveDriveKinematics100Test {
 
         SwerveModuleDeltas p = m_kinematics.toSwerveModuleDelta(t);
         assertEquals(Math.sqrt(2) * Math.PI / 2, p.frontLeft().distanceMeters, DELTA);
-        assertEquals(3 * Math.PI / 4, p.frontLeft().angle.get().getRadians(), DELTA);
+        assertEquals(3 * Math.PI / 4, p.frontLeft().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(Math.PI / 2, p.frontRight().distanceMeters, DELTA);
-        assertEquals(Math.PI / 2, p.frontRight().angle.get().getRadians(), DELTA);
+        assertEquals(Math.PI / 2, p.frontRight().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(Math.PI / 2, p.rearLeft().distanceMeters, DELTA);
-        assertEquals(Math.PI, p.rearLeft().angle.get().getRadians(), DELTA);
+        assertEquals(Math.PI, p.rearLeft().wrappedAngle.get().getRadians(), DELTA);
         // this is the one that shouldn't move
         assertEquals(0, p.rearRight().distanceMeters, DELTA);
-        assertTrue(p.rearRight().angle.isEmpty());
+        assertTrue(p.rearRight().wrappedAngle.isEmpty());
     }
 
     /**
@@ -370,12 +370,12 @@ class SwerveDriveKinematics100Test {
         Twist2d s = new Twist2d(0, 1, 0);
         // this sets the steering
         SwerveModuleDeltas m = k.toSwerveModuleDelta(s);
-        assertEquals(1.571, m.frontLeft().angle.get().getRadians(), DELTA);
+        assertEquals(1.571, m.frontLeft().wrappedAngle.get().getRadians(), DELTA);
         assertEquals(1, m.frontLeft().distanceMeters, DELTA);
         s = new Twist2d(0, 0, 0);
         // there's no positional state anymore so steering is empty.
         m = k.toSwerveModuleDelta(s);
-        assertTrue(m.frontLeft().angle.isEmpty());
+        assertTrue(m.frontLeft().wrappedAngle.isEmpty());
         assertEquals(0, m.frontLeft().distanceMeters, DELTA);
     }
 

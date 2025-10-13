@@ -17,6 +17,7 @@ import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -64,7 +65,7 @@ public class TrajectoryJointTest {
             JointVelocities jv = J.inverse(m.model());
             JointAccelerations ja = J.inverseA(m);
             if (DEBUG)
-                System.out.printf(
+                Util.printf(
                         "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
                         tt,
                         p.getX(), p.getY(), p.getRotation().getRadians(),

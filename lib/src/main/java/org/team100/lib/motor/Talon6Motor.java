@@ -273,26 +273,28 @@ public abstract class Talon6Motor implements BareMotor {
 
     /**
      * Use PositionVoltage outboard PID control to hold the given position, with
-     * friction, velocity, and torque feedforwards.
+     * friction, velocity, accel, and torque feedforwards.
      * 
      * Actuates immediately.
      * 
      * Motor revolutions wind up, so setting 0 revs and 1 rev are different.
      */
     @Override
-    public void setPosition(double motorPositionRad, double motorVelocityRad_S, double motorAccelRad_S2,
-            double motorTorqueNm) {
-        final double motorRev = motorPositionRad / (2 * Math.PI);
-        final double motorRev_S = motorVelocityRad_S / (2 * Math.PI);
-        final double motorRev_S2 = motorAccelRad_S2 / (2 * Math.PI);
+    public void setUnwrappedPosition(
+            double positionRad,
+            double velocityRad_S,
+            double accelRad_S2,
+            double torqueNm) {
+        final double motorRev = positionRad / (2 * Math.PI);
+        final double motorRev_S = velocityRad_S / (2 * Math.PI);
+        final double motorRev_S2 = accelRad_S2 / (2 * Math.PI);
 
         final double frictionFFVolts = m_ff.frictionFFVolts(motorRev_S);
         final double velocityFFVolts = m_ff.velocityFFVolts(motorRev_S);
         final double accelFFVolts = m_ff.accelFFVolts(motorRev_S, motorRev_S2);
-        final double torqueFFVolts = getTorqueFFVolts(motorTorqueNm);
+        final double torqueFFVolts = getTorqueFFVolts(torqueNm);
 
-        final double FFVolts = frictionFFVolts + velocityFFVolts + torqueFFVolts + accelFFVolts;
-        // final double FFVolts = torqueFFVolts;
+        final double FFVolts = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
 
         // PositionVoltage has a velocity field for kV feedforward but we use arbitrary
         // feedforward for that.
@@ -352,10 +354,13 @@ public abstract class Talon6Motor implements BareMotor {
     /**
      * Set integrated sensor position in rotations.
      * 
+     * This is the "unwrapped" position, i.e. the domain is infinite, not cyclical
+     * within +/- pi.
+     * 
      * Note this takes **FOREVER**, like tens of milliseconds, so you can only do it
      * at startup.
      */
-    private void setEncoderPosition(double motorPositionRev) {
+    private void setUnwrappedEncoderPosition(double motorPositionRev) {
         Util.warn("Setting CTRE encoder position is very slow!");
         Phoenix100.warn(() -> m_motor.setPosition(motorPositionRev, 1));
     }
@@ -363,13 +368,16 @@ public abstract class Talon6Motor implements BareMotor {
     /**
      * Set integrated sensor position in radians.
      * 
+     * This is the "unwrapped" position, i.e. the domain is infinite, not cyclical
+     * within +/- pi.
+     * 
      * Note this takes **FOREVER**, like tens of milliseconds, so you can only do it
      * at startup.
      */
     @Override
-    public void setEncoderPositionRad(double positionRad) {
+    public void setUnwrappedEncoderPositionRad(double positionRad) {
         double motorPositionRev = positionRad / (2.0 * Math.PI);
-        setEncoderPosition(motorPositionRev);
+        setUnwrappedEncoderPosition(motorPositionRev);
     }
 
     /**
@@ -381,22 +389,29 @@ public abstract class Talon6Motor implements BareMotor {
     }
 
     /**
+     * Returns the "unwrapped" position, i.e. the domain is infinite, not cyclical
+     * within +/- pi.
+     * 
      * Latency-compensated, represents the current Takt.
      * Updated in `Robot.robotPeriodic()`.
      */
-    public double getPositionRev() {
+    public double getUnwrappedPositionRev() {
         return m_position.getAsDouble();
     }
 
+    /**
+     * This is the "unwrapped" position, i.e. the domain is infinite, not cyclical
+     * within +/- pi.
+     */
     @Override
-    public double getPositionRad() {
-        double motorPositionRev = getPositionRev();
+    public double getUnwrappedPositionRad() {
+        double motorPositionRev = getUnwrappedPositionRev();
         double positionRad = motorPositionRev * 2 * Math.PI;
         return positionRad;
     }
 
     /** ait a long time for a new value, do not use outside testing. */
-    public double getPositionBlockingRev() {
+    public double getUnwrappedPositionBlockingRev() {
         return m_motor.getPosition().waitForUpdate(1).getValueAsDouble();
     }
 

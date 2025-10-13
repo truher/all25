@@ -10,6 +10,8 @@ import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.Neo550CANSparkMotor;
+import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.util.CanId;
 
 /** Configuration of motors on the Demo Bot. */
 public class TankFactory {
@@ -19,16 +21,17 @@ public class TankFactory {
 
     public static ServoTank make(LoggerFactory parent, int currentLimit) {
         LoggerFactory log = parent.type("Tank Drive");
-        LinearVelocityServo left = makeServo(log.name("left"), currentLimit, 3);
-        LinearVelocityServo right = makeServo(log.name("right"), currentLimit, 2);
+        LinearVelocityServo left = makeServo(log.name("left"), currentLimit, new CanId(3));
+        LinearVelocityServo right = makeServo(log.name("right"), currentLimit, new CanId(2));
         return new ServoTank(left, right);
     }
 
     public static LinearVelocityServo makeServo(
-            LoggerFactory log, int currentLimit, int canId) {
+            LoggerFactory log, int currentLimit, CanId canId) {
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 log,
                 canId,
+                NeutralMode.BRAKE,
                 MotorPhase.FORWARD,
                 currentLimit,
                 Feedforward100.makeNeo550(),

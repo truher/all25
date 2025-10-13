@@ -34,10 +34,14 @@ public class SwerveModuleDelta {
     /**
      * Angle of the straight line path. It can be empty, in cases where the angle is
      * indeterminate (e.g. calculating the angle required for zero speed). This is
-     * not
-     * the *difference* in angle from start to end; it is the angle at the end.
+     * not the *difference* in angle from start to end; it is the angle at the end.
+     * 
+     * Note this is the field-relative wrapped angle, i.e. it's just dy/dx for the
+     * delta.
+     * 
+     * TODO: maybe this should be sin and cos instead of an actual angle
      */
-    public Optional<Rotation2d> angle = Optional.empty();
+    public Optional<Rotation2d> wrappedAngle = Optional.empty();
 
     public static final SwerveModuleDeltaStruct struct = new SwerveModuleDeltaStruct();
 
@@ -48,7 +52,7 @@ public class SwerveModuleDelta {
 
     public SwerveModuleDelta(double distanceMeters, Optional<Rotation2d> angle) {
         this.distanceMeters = distanceMeters;
-        this.angle = angle;
+        this.wrappedAngle = angle.map((x) -> new Rotation2d(x.getCos(), x.getSin()));
     }
 
     /**
@@ -59,10 +63,10 @@ public class SwerveModuleDelta {
         if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) {
             // avoid the garbage rotation.
             this.distanceMeters = 0.0;
-            this.angle = Optional.empty();
+            this.wrappedAngle = Optional.empty();
         } else {
             this.distanceMeters = Math.hypot(dx, dy);
-            this.angle = Optional.of(new Rotation2d(dx, dy));
+            this.wrappedAngle = Optional.of(new Rotation2d(dx, dy));
         }
     }
 
@@ -73,8 +77,8 @@ public class SwerveModuleDelta {
             SwerveModulePosition100 start,
             SwerveModulePosition100 end) {
         double deltaM = end.distanceMeters - start.distanceMeters;
-        if (end.angle.isPresent()) {
-            return new SwerveModuleDelta(deltaM, end.angle);
+        if (end.unwrappedAngle.isPresent()) {
+            return new SwerveModuleDelta(deltaM, end.unwrappedAngle);
         }
         // the angle might be empty, if the encoder has failed
         // (which can seem to happen if the robot is *severely* overrunning).
@@ -83,7 +87,7 @@ public class SwerveModuleDelta {
 
     @Override
     public String toString() {
-        return "SwerveModuleDelta [distanceMeters=" + distanceMeters + ", angle=" + angle + "]";
+        return "SwerveModuleDelta [distanceMeters=" + distanceMeters + ", angle=" + wrappedAngle + "]";
     }
 
 }

@@ -105,8 +105,8 @@ class AngularPositionProfileTest implements Timeless {
         // useful to fix up the examples above
         if (DEBUG)
             Util.printf("verify(%5.3f, %5.3f, %5.3f);\n", motor.velocity,
-                    servo.m_setpoint.x(), servo.m_setpoint.v());
-        assertEquals(setpointPosition, servo.m_setpoint.x(), DELTA, "position");
-        assertEquals(setpointVelocity, servo.m_setpoint.v(), DELTA, "velocity");
+                    servo.m_unwrappedSetpoint.x(), servo.m_unwrappedSetpoint.v());
+        assertEquals(setpointPosition, servo.m_unwrappedSetpoint.x(), DELTA, "position");
+        assertEquals(setpointVelocity, servo.m_unwrappedSetpoint.v(), DELTA, "velocity");
     }
 }

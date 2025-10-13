@@ -64,8 +64,8 @@ public class LazySimulatedBareMotor implements BareMotor {
     }
 
     @Override
-    public double getPositionRad() {
-        return m_delegate.getPositionRad();
+    public double getUnwrappedPositionRad() {
+        return m_delegate.getUnwrappedPositionRad();
     }
 
     @Override
@@ -78,13 +78,13 @@ public class LazySimulatedBareMotor implements BareMotor {
     }
 
     @Override
-    public void setEncoderPositionRad(double positionRad) {
-        m_delegate.setEncoderPositionRad(positionRad);
+    public void setUnwrappedEncoderPositionRad(double positionRad) {
+        m_delegate.setUnwrappedEncoderPositionRad(positionRad);
     }
 
     @Override
-    public void setPosition(double positionRad, double velocityRad_S, double accelRad_S2, double torqueNm) {
-        m_delegate.setPosition(positionRad, velocityRad_S, accelRad_S2, torqueNm);
+    public void setUnwrappedPosition(double positionRad, double velocityRad_S, double accelRad_S2, double torqueNm) {
+        m_delegate.setUnwrappedPosition(positionRad, velocityRad_S, accelRad_S2, torqueNm);
     }
 
     @Override

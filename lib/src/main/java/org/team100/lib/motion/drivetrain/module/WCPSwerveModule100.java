@@ -3,7 +3,7 @@ package org.team100.lib.motion.drivetrain.module;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.encoder.AS5048RotaryPositionSensor;
-import org.team100.lib.encoder.AnalogTurningEncoder;
+import org.team100.lib.encoder.AnalogRotaryPositionSensor;
 import org.team100.lib.encoder.CombinedRotaryPositionSensor;
 import org.team100.lib.encoder.DutyCycleRotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
@@ -102,7 +102,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 drive,
                 neutral,
                 motorPhase);
-        return new WCPSwerveModule100(driveServo, turningServo);
+        return new WCPSwerveModule100(driveServo, turningServo, ratio);
     }
 
     /**
@@ -139,7 +139,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 drive,
                 neutral,
                 motorPhase);
-        return new WCPSwerveModule100(driveServo, turningServo);
+        return new WCPSwerveModule100(driveServo, turningServo, ratio);
     }
 
     private static LinearVelocityServo driveKrakenServo(
@@ -264,8 +264,9 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             RoboRioChannel channel,
             double inputOffset,
             EncoderDrive drive) {
-        if (encoderClass == AnalogTurningEncoder.class) {
-            return new AnalogTurningEncoder(
+        if (encoderClass == AnalogRotaryPositionSensor.class) {
+            // TODO: remove this, we never use analog encoders.
+            return new AnalogRotaryPositionSensor(
                     parent,
                     channel,
                     inputOffset,
@@ -283,8 +284,10 @@ public class WCPSwerveModule100 extends SwerveModule100 {
 
     private WCPSwerveModule100(
             LinearVelocityServo driveServo,
-            AngularPositionServo turningServo) {
-        super(driveServo, turningServo);
+            AngularPositionServo turningServo,
+            DriveRatio ratio) {
+        // primary is 2:1 so final is whatever is left.
+        super(driveServo, turningServo, WHEEL_DIAMETER_M, ratio.m_ratio / 2);
         //
     }
 }

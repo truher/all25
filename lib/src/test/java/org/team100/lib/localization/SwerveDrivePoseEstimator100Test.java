@@ -834,11 +834,12 @@ class SwerveDrivePoseEstimator100Test {
                         * (1 - rand.nextGaussian() * 0.05)
                         * 0.02;
                 Optional<Rotation2d> angle = moduleStatesAll[i].angle();
-                Rotation2d noise = new Rotation2d(rand.nextGaussian() * 0.005);
+                double noise = rand.nextGaussian() * 0.005;
                 if (angle.isPresent()) {
-                    positionsAll[i].angle = Optional.of(angle.get().plus(noise));
+                    positionsAll[i].unwrappedAngle = Optional.of(
+                            new Rotation2d(angle.get().getRadians() + noise));
                 } else {
-                    positionsAll[i].angle = Optional.empty();
+                    positionsAll[i].unwrappedAngle = Optional.empty();
                 }
             }
 

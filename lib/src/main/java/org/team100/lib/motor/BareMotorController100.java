@@ -44,7 +44,7 @@ public class BareMotorController100 implements BareMotor {
 
     /** MotorControllers do not support positional control. */
     @Override
-    public void setPosition(double position, double velocity, double accel, double torque) {
+    public void setUnwrappedPosition(double position, double velocity, double accel, double torque) {
         throw new UnsupportedOperationException();
     }
 
@@ -82,7 +82,7 @@ public class BareMotorController100 implements BareMotor {
     }
 
     @Override
-    public double getPositionRad() {
+    public double getUnwrappedPositionRad() {
         throw new UnsupportedOperationException();
     }
 
@@ -92,7 +92,7 @@ public class BareMotorController100 implements BareMotor {
     }
 
     @Override
-    public void setEncoderPositionRad(double positionRad) {
+    public void setUnwrappedEncoderPositionRad(double positionRad) {
         throw new UnsupportedOperationException();
     }
 

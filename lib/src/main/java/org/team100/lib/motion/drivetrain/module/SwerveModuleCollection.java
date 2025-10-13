@@ -1,7 +1,5 @@
 package org.team100.lib.motion.drivetrain.module;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.config.Identity;
 import org.team100.lib.encoder.DutyCycleRotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
@@ -210,8 +208,8 @@ public class SwerveModuleCollection {
                 m_rearRight.getPosition());
     }
 
-    public OptionalDouble[] turningPosition() {
-        return new OptionalDouble[] {
+    public double[] turningPosition() {
+        return new double[] {
                 m_frontLeft.turningPosition(),
                 m_frontRight.turningPosition(),
                 m_rearLeft.turningPosition(),

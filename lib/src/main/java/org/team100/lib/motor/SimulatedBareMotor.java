@@ -20,6 +20,7 @@ public class SimulatedBareMotor implements BareMotor {
 
     private final double m_freeSpeedRad_S;
 
+    private final LoggerFactory m_log;
     private final DoubleLogger m_log_duty;
     private final DoubleLogger m_log_velocityInput;
     private final DoubleLogger m_log_positionInput;
@@ -35,39 +36,43 @@ public class SimulatedBareMotor implements BareMotor {
     private double m_time = Takt.get();
 
     public SimulatedBareMotor(LoggerFactory parent, double freeSpeedRad_S) {
-        LoggerFactory child = parent.type(this);
+        m_log = parent.type(this);
         m_freeSpeedRad_S = freeSpeedRad_S;
-        m_log_duty = child.doubleLogger(Level.DEBUG, "duty_cycle");
-        m_log_velocityInput = child.doubleLogger(Level.DEBUG, "velocity input");
-        m_log_positionInput = child.doubleLogger(Level.DEBUG, "position input");
-        m_stateCache = Cache.of(() -> {
-            double dt = dt();
+        m_log_duty = m_log.doubleLogger(Level.DEBUG, "duty_cycle");
+        m_log_velocityInput = m_log.doubleLogger(Level.DEBUG, "velocity input");
+        m_log_positionInput = m_log.doubleLogger(Level.DEBUG, "position input");
+        m_stateCache = Cache.of(this::update);
+    }
+
+    private Model100 update() {
+        if (DEBUG)
+            Util.printf("motor %s update\n", m_log.getRoot());
+        double dt = dt();
+        if (DEBUG)
+            Util.printf("SimulatedBareMotor dt %f\n", dt);
+        if (m_velocityInput != null) {
             if (DEBUG)
-                Util.printf("SimulatedBareMotor dt %f\n", dt);
-            if (m_velocityInput != null) {
-                if (DEBUG)
-                    Util.printf("SimulatedBareMotor v %f\n", m_velocityInput);
-                if (dt > 0.04) {
-                    // probably we should not extrapolate
-                    m_state = new Model100(m_state.x(), m_velocityInput);
-                } else {
-                    m_state = new Model100(m_state.x() + m_velocityInput * dt, m_velocityInput);
-                }
+                Util.printf("SimulatedBareMotor v %f\n", m_velocityInput);
+            if (dt > 0.04) {
+                // probably we should not extrapolate
+                m_state = new Model100(m_state.x(), m_velocityInput);
+            } else {
+                m_state = new Model100(m_state.x() + m_velocityInput * dt, m_velocityInput);
             }
-            if (m_positionInput != null) {
-                if (DEBUG)
-                    Util.printf("SimulatedBareMotor x %f\n", m_positionInput);
-                if (dt < 0.01) {
-                    // probably we should not differentiate
-                    m_state = new Model100(m_positionInput, m_state.v());
-                } else {
-                    m_state = new Model100(m_positionInput, (m_positionInput - m_state.x()) / dt);
-                }
-            }
+        }
+        if (m_positionInput != null) {
             if (DEBUG)
-                Util.printf("SimulatedBareMotor state %s\n", m_state);
-            return m_state;
-        });
+                Util.printf("SimulatedBareMotor x %f\n", m_positionInput);
+            if (dt < 0.01) {
+                // probably we should not differentiate
+                m_state = new Model100(m_positionInput, m_state.v());
+            } else {
+                m_state = new Model100(m_positionInput, (m_positionInput - m_state.x()) / dt);
+            }
+        }
+        if (DEBUG)
+            Util.printf("SimulatedBareMotor state %s\n", m_state);
+        return m_state;
     }
 
     double dt() {
@@ -88,6 +93,8 @@ public class SimulatedBareMotor implements BareMotor {
     /** ignores accel and torque */
     @Override
     public void setVelocity(double velocityRad_S, double accelRad_S2, double torqueNm) {
+        if (DEBUG)
+            Util.printf("motor %s set velocity %6.3f\n", m_log.getRoot(), velocityRad_S);
         m_velocityInput = MathUtil.clamp(
                 Util.notNaN(velocityRad_S), -m_freeSpeedRad_S, m_freeSpeedRad_S);
         // you can't use velocity and position control at the same time
@@ -96,7 +103,9 @@ public class SimulatedBareMotor implements BareMotor {
 
     /** ignores velocity and torque */
     @Override
-    public void setPosition(double position, double velocity, double accel, double torque) {
+    public void setUnwrappedPosition(double position, double velocity, double accel, double torque) {
+        if (DEBUG)
+            Util.printf("motor %s set position %6.3f\n", m_log.getRoot(), position);
         m_positionInput = position;
         // you can't use velocity and position control at the same time
         m_velocityInput = null;
@@ -135,7 +144,7 @@ public class SimulatedBareMotor implements BareMotor {
         return getVelocityRad_S() / 10.0;
     }
 
-    public double getPositionRad() {
+    public double getUnwrappedPositionRad() {
         double pos = m_stateCache.get().x();
         if (Double.isNaN(pos))
             throw new IllegalArgumentException("motor pos");
@@ -144,7 +153,7 @@ public class SimulatedBareMotor implements BareMotor {
 
     /** resets the caches, so the new value is immediately available. */
     @Override
-    public void setEncoderPositionRad(double positionRad) {
+    public void setUnwrappedEncoderPositionRad(double positionRad) {
         if (Double.isNaN(positionRad))
             throw new IllegalArgumentException("motor set position");
         m_positionInput = positionRad;

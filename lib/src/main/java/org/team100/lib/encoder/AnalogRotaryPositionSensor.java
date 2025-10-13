@@ -1,6 +1,5 @@
 package org.team100.lib.encoder;
 
-import java.util.OptionalDouble;
 import java.util.function.DoubleSupplier;
 
 import org.team100.lib.coherence.Cache;
@@ -23,14 +22,14 @@ import edu.wpi.first.wpilibj.RobotController;
  * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
  * Robot.robotPeriodic().
  */
-public class AnalogTurningEncoder extends RoboRioRotaryPositionSensor {
+public class AnalogRotaryPositionSensor extends RoboRioRotaryPositionSensor {
     private final AnalogInput m_input;
     private final DoubleSupplier m_voltage;
     private final DoubleSupplier m_rail;
     private final DoubleLogger m_log_voltage;
     private final DoubleLogger m_log_ratio;
 
-    public AnalogTurningEncoder(
+    public AnalogRotaryPositionSensor(
             LoggerFactory parent,
             RoboRioChannel channel,
             double inputOffset,
@@ -66,11 +65,11 @@ public class AnalogTurningEncoder extends RoboRioRotaryPositionSensor {
 
     /** Cached, almost. */
     @Override
-    protected OptionalDouble getRatio() {
+    protected double getRatio() {
         double voltage = m_voltage.getAsDouble();
         double ratio = voltage / m_rail.getAsDouble();
         m_log_voltage.log(() -> voltage);
         m_log_ratio.log(() -> ratio);
-        return OptionalDouble.of(ratio);
+        return ratio;
     }
 }

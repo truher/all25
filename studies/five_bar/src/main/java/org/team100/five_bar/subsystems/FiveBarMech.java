@@ -135,8 +135,8 @@ public class FiveBarMech extends SubsystemBase {
 
     /** Update position by adding. */
     public void add(double p1, double p5) {
-        double q1 = m_mechP1.getPositionRad().orElseThrow() + p1;
-        double q5 = m_mechP5.getPositionRad().orElseThrow() + p5;
+        double q1 = m_mechP1.getWrappedPositionRad() + p1;
+        double q5 = m_mechP5.getWrappedPositionRad() + p5;
         setPosition(q1, q5);
     }
 
@@ -146,13 +146,13 @@ public class FiveBarMech extends SubsystemBase {
             Util.printf("FiveBarMech.setPosition %f %f\n", p1, p5);
         if (!feasible(p1, p5))
             return;
-        m_mechP1.setPosition(p1, 0, 0, 0);
-        m_mechP5.setPosition(p5, 0, 0, 0);
+        m_mechP1.setUnwrappedPosition(p1, 0, 0, 0);
+        m_mechP5.setUnwrappedPosition(p5, 0, 0, 0);
     }
 
     public JointPositions getJointPositions() {
-        double q1 = m_mechP1.getPositionRad().orElseThrow();
-        double q5 = m_mechP5.getPositionRad().orElseThrow();
+        double q1 = m_mechP1.getWrappedPositionRad();
+        double q5 = m_mechP5.getWrappedPositionRad();
         if (DEBUG)
             Util.printf("joint positions %f %f\n", q1, q5);
         return FiveBarKinematics.forward(SCENARIO, q1, q5);
@@ -216,8 +216,8 @@ public class FiveBarMech extends SubsystemBase {
      * cycle (gently) to the end of travel before pushing the "home" button.
      */
     private void setHomePosition() {
-        m_motorP1.setEncoderPositionRad(Q1_MAX);
-        m_motorP5.setEncoderPositionRad(Q5_MIN);
+        m_motorP1.setUnwrappedEncoderPositionRad(Q1_MAX);
+        m_motorP5.setUnwrappedEncoderPositionRad(Q5_MIN);
         // TODO: use the sensor?
         // m_sensorP1.setPosition(Math.PI/2);
         // m_sensorP5.setPosition(Math.PI);

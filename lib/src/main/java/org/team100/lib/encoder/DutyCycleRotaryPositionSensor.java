@@ -1,6 +1,5 @@
 package org.team100.lib.encoder;
 
-import java.util.OptionalDouble;
 import java.util.function.DoubleSupplier;
 
 import org.team100.lib.coherence.Cache;
@@ -23,10 +22,18 @@ import edu.wpi.first.wpilibj.DutyCycle;
  * supply would produce noisy sensor output, and completely confuse the FPGA
  * counter.
  * 
+ * Note that for the first few seconds after the sensor is constructed on the
+ * RoboRIO, the duty cycle input produces garbage.  So the Robot class should sleep awhile.
+ * 
  * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
  * Robot.robotPeriodic().
  */
 public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositionSensor {
+    /**
+     * Should sensor disconnect be a fatal error? I think in practice it is, but you
+     * might want to turn this off during development.
+     */
+    private static final boolean THROW_IF_DISCONNNECTED = true;
     private static final int FREQ_THRESHOLD = 500;
 
     private final int m_channel;
@@ -36,11 +43,6 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
     private final DoubleLogger m_log_duty;
     private final IntLogger m_log_frequency;
     private final BooleanLogger m_log_connected;
-
-    // If the encoder becomes disconnected, don't break, return the most-recent
-    // value.
-    // TODO: remove this, it's really up to the layers above to decide what to do.
-    private double m_dutyIfDisconnected;
 
     protected DutyCycleRotaryPositionSensor(
             LoggerFactory parent,
@@ -70,27 +72,37 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
     }
 
     /**
-     * Cached, almost.
-     * If the encoder becomes disconnected, this returns the most-recent value until
-     * the encoder becomes reconnected.
+     * If the encoder becomes disconnected, this will either return garbage or throw
+     * IllegalStateException, depending on THROW_IF_DISCONNECTED.
+     * 
+     * Disconnects used to return Optional.empty, but it never happened in practice,
+     * so I took it out to simplify the API.
+     * 
+     * Cached.
      */
     @Override
-    protected OptionalDouble getRatio() {
+    protected double getRatio() {
         if (!isConnected()) {
             m_log_connected.log(() -> false);
-            Util.warn(String.format("*** encoder %d not connected, returning previous value ***", m_channel));
-            return OptionalDouble.of(m_dutyIfDisconnected);
+            String msg = String.format("*** encoder %d not connected ***", m_channel);
+            Util.warn(msg);
+            if (THROW_IF_DISCONNNECTED)
+                throw new IllegalStateException(msg);
         }
         m_log_connected.log(() -> true);
         double dutyCycle = m_duty.getAsDouble();
         m_log_duty.log(() -> dutyCycle);
-        m_dutyIfDisconnected = dutyCycle;
-        return OptionalDouble.of(dutyCycle);
+        return dutyCycle;
     }
 
     private boolean isConnected() {
         int frequency = m_dutyCycle.getFrequency();
         m_log_frequency.log(() -> frequency);
         return frequency > FREQ_THRESHOLD;
+    }
+
+    /** For testing */
+    DutyCycle getDutyCycle() {
+        return m_dutyCycle;
     }
 }

@@ -3,7 +3,7 @@ package org.team100.lib.motion.drivetrain;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ChassisSpeedsLogger;
-import org.team100.lib.logging.LoggerFactory.SwerveModulePosition100Logger;
+import org.team100.lib.logging.LoggerFactory.SwerveModulePositionsLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
@@ -24,10 +24,8 @@ public class SwerveLocal {
     private static final boolean DEBUG = false;
     private final SwerveKinodynamics m_swerveKinodynamics;
     private final SwerveModuleCollection m_modules;
-    private final SwerveModulePosition100Logger m_swerveModuleFrontLeftPosition;
-    private final SwerveModulePosition100Logger m_swerveModuleFrontRightPosition;
-    private final SwerveModulePosition100Logger m_swerveModuleRearLeftPosition;
-    private final SwerveModulePosition100Logger m_swerveModuleRearRightPosition;
+
+    private final SwerveModulePositionsLogger m_logPositions;
     private final ChassisSpeedsLogger m_log_chassis_speed;
 
     public SwerveLocal(
@@ -36,10 +34,7 @@ public class SwerveLocal {
             SwerveModuleCollection modules) {
         LoggerFactory child = parent.type(this);
         m_log_chassis_speed = child.chassisSpeedsLogger(Level.TRACE, "chassis speed");
-        m_swerveModuleFrontLeftPosition = child.swerveModulePosition100Logger(Level.TRACE, "Fromt Left");
-        m_swerveModuleFrontRightPosition = child.swerveModulePosition100Logger(Level.TRACE, "Front Right");
-        m_swerveModuleRearLeftPosition = child.swerveModulePosition100Logger(Level.TRACE, "Rear Left");
-        m_swerveModuleRearRightPosition = child.swerveModulePosition100Logger(Level.TRACE, "Rear Right");
+        m_logPositions = child.swerveModulePositionsLogger(Level.TRACE, "positions");
         m_swerveKinodynamics = swerveKinodynamics;
         m_modules = modules;
     }
@@ -128,10 +123,7 @@ public class SwerveLocal {
 
     /** Updates visualization. */
     void periodic() {
-        m_swerveModuleFrontLeftPosition.log(() -> positions().frontLeft());
-        m_swerveModuleFrontRightPosition.log(() -> positions().frontRight());
-        m_swerveModuleRearLeftPosition.log(() -> positions().rearLeft());
-        m_swerveModuleRearRightPosition.log(() -> positions().rearRight());
+        m_logPositions.log(this::positions);
         m_modules.periodic();
     }
 

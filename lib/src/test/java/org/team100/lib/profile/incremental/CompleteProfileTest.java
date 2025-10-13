@@ -51,7 +51,7 @@ public class CompleteProfileTest {
         final Model100 goal = new Model100(2, 0);
         Control100 c = new Control100();
         double t = 0;
-        if (DEBUG) System.out.println("t, x, v, a");
+        if (DEBUG) Util.println("t, x, v, a");
         for (int i = 0; i < 100; ++i) {
             if (DEBUG)
                 Util.printf("%.3f, %.3f, %.3f, %.3f\n", 
@@ -67,7 +67,7 @@ public class CompleteProfileTest {
         final Model100 goal = new Model100(2, 0);
         Control100 c = new Control100();
         double t = 0;
-        if (DEBUG) System.out.println("t, x, v, a");
+        if (DEBUG) Util.println("t, x, v, a");
         for (int i = 0; i < 100; ++i) {
             if (DEBUG)
                 Util.printf("%.3f, %.3f, %.3f, %.3f\n", 
