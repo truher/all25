@@ -166,7 +166,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
 
     @Test
     void testDirect() {
-        SimulatedBareMotor motor = new SimulatedBareMotor(logger, 100);
+        SimulatedBareMotor motor = new SimulatedBareMotor(logger, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, motor);
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(

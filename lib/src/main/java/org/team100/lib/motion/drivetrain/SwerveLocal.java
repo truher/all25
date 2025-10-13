@@ -3,7 +3,6 @@ package org.team100.lib.motion.drivetrain;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ChassisSpeedsLogger;
-import org.team100.lib.logging.LoggerFactory.SwerveModulePosition100Logger;
 import org.team100.lib.logging.LoggerFactory.SwerveModulePositionsLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;

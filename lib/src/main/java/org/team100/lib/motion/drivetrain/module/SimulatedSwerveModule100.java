@@ -25,6 +25,9 @@ import org.team100.lib.reference.IncrementalProfileReference1d;
  */
 public class SimulatedSwerveModule100 extends SwerveModule100 {
 
+    private static final double DRIVE_GEAR_RATIO = 5.5;
+    private static final double WHEEL_DIAMETER_M = 0.1;
+
     public static SimulatedSwerveModule100 get(
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics) {
@@ -51,12 +54,15 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
     }
 
     private static LinearVelocityServo simulatedDriveServo(LoggerFactory parent) {
-        // simulated drive motor free speed is 5 m/s
-        SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 5);
-        // simulated gearing is 2 meter wheel, 1:1, so rad/s and m/s are the same.
+        SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, driveMotor);
         LinearMechanism mech = new LinearMechanism(parent,
-                driveMotor, encoder, 1, 2, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                driveMotor,
+                encoder,
+                DRIVE_GEAR_RATIO,
+                WHEEL_DIAMETER_M,
+                Double.NEGATIVE_INFINITY,
+                Double.POSITIVE_INFINITY);
         return new OutboardLinearVelocityServo(parent, mech);
     }
 
@@ -68,7 +74,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics) {
         // simulated turning motor free speed is 20 rad/s
-        SimulatedBareMotor turningMotor = new SimulatedBareMotor(parent, 20);
+        SimulatedBareMotor turningMotor = new SimulatedBareMotor(parent, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, turningMotor);
         SimulatedRotaryPositionSensor turningSensor = new SimulatedRotaryPositionSensor(
                 parent, encoder, 1);
@@ -84,7 +90,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
                 0.05, // note low tolerance
                 1);
         IncrementalProfile profile = kinodynamics.getSteeringProfile();
-        // without a profile, there's no velocity feedforward.  Hm.
+        // without a profile, there's no velocity feedforward. Hm.
         IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         OnboardAngularPositionServo turningServo = new OnboardAngularPositionServo(
                 parent,
@@ -104,7 +110,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics) {
         // simulated turning motor free speed is 20 rad/s
-        SimulatedBareMotor motor = new SimulatedBareMotor(parent, 20);
+        SimulatedBareMotor motor = new SimulatedBareMotor(parent, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, motor);
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(
                 parent, encoder, 1);
@@ -128,7 +134,8 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
     private SimulatedSwerveModule100(
             LinearVelocityServo driveServo,
             AngularPositionServo turningServo) {
-        super(driveServo, turningServo);
+        // primary is 2:1 so final is whatever is left.
+        super(driveServo, turningServo, WHEEL_DIAMETER_M, DRIVE_GEAR_RATIO / 2);
         //
     }
 

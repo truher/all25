@@ -33,22 +33,22 @@ public interface AngularPositionServo {
      * Sets the goal, updates the setpoint to the "next step" value towards it,
      * gives the setpoint to the outboard mechanism.
      * 
-     * @param goalRad  The goal angle here wraps within [-pi, pi], using output
-     *                 measurements, e.g. shaft radians, not motor radians
-     * @param torqueNm feedforward for gravity or spring compensation
+     * @param wrappedGoalRad The goal angle here wraps within [-pi, pi], using
+     *                       output measurements, e.g. shaft radians, not motor
+     *                       radians
+     * @param torqueNm       feedforward for gravity or spring compensation
      */
-    void setPositionProfiled(double goalRad, double torqueNm);
+    void setPositionProfiled(double wrappedGoalRad, double torqueNm);
 
     /**
      * Invalidates the current profile, sets the setpoint directly.
      * 
-     * 
-     * @param setpoint both current and next setpoints so that the
-     *                 implementation can choose the current one for feedback and
-     *                 the next one for feedforward.
-     * @param torqueNm feedforward for gravity or spring compensation
+     * @param wrappedSetpoint both current and next setpoints so that the
+     *                        implementation can choose the current one for feedback
+     *                        and the next one for feedforward.
+     * @param torqueNm        feedforward for gravity or spring compensation
      */
-    void setPositionDirect(Setpoints1d setpoint, double torqueNm);
+    void setPositionDirect(Setpoints1d wrappedSetpoint, double torqueNm);
 
     /**
      * This is the "wrapped" value, i.e. it is periodic within +/- pi.
@@ -67,7 +67,15 @@ public interface AngularPositionServo {
 
     boolean profileDone();
 
-    /** Profile is done, and we're on the setpoint. */
+    /**
+     * Profile is done, and we're on the setpoint.
+     * 
+     * Note this is affected by the setpoint update.
+     * 
+     * It really makes the most sense to call this *before* updating the setpoint,
+     * because the measurement comes from the recent-past Takt and the updated
+     * setpoint will be aiming at the next one.
+     */
     boolean atGoal();
 
     void stop();

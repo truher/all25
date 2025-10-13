@@ -9,6 +9,10 @@ import org.team100.lib.util.Util;
  * This profile takes incremental steps from the setpoint towards the goal.
  * 
  * Use the ETA to coordinate multiple dimensions.
+ * 
+ * TODO: make a special case incremental profile where the goal is always at
+ * rest -- this is what almost all real cases actually want, and it's simpler.
+ * 
  */
 public interface IncrementalProfile {
     public static final int MAX_ETA = 10;

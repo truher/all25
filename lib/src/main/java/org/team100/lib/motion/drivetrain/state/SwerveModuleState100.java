@@ -46,25 +46,25 @@ public class SwerveModuleState100 implements Comparable<SwerveModuleState100>, S
      * the PIDController class's continuous input functionality, the furthest a
      * wheel will ever rotate is 90 degrees.
      *
-     * @param desiredState The desired state.
-     * @param currentAngle The current module angle.
+     * @param desiredWrappedState The desired state, wrapped.
+     * @param currentWrappedAngle The current module angle.
      * @return Optimized swerve module state.
      */
     public static SwerveModuleState100 optimize(
-            SwerveModuleState100 desiredState, Rotation2d currentAngle) {
-        if (desiredState.m_angle.isEmpty()) {
+            SwerveModuleState100 desiredWrappedState, Rotation2d currentWrappedAngle) {
+        if (desiredWrappedState.m_angle.isEmpty()) {
             // this does happen
-            return desiredState;
+            return desiredWrappedState;
         }
-        Rotation2d delta = desiredState.m_angle.get().minus(currentAngle);
+        Rotation2d delta = desiredWrappedState.m_angle.get().minus(currentWrappedAngle);
         if (Math.abs(delta.getDegrees()) > 90.0) {
             return new SwerveModuleState100(
-                    -desiredState.m_speedM_S,
-                    Optional.of(desiredState.m_angle.get().rotateBy(Rotation2d.k180deg)));
+                    -desiredWrappedState.m_speedM_S,
+                    Optional.of(desiredWrappedState.m_angle.get().rotateBy(Rotation2d.k180deg)));
         } else {
             return new SwerveModuleState100(
-                    desiredState.m_speedM_S,
-                    desiredState.m_angle);
+                    desiredWrappedState.m_speedM_S,
+                    desiredWrappedState.m_angle);
         }
     }
 

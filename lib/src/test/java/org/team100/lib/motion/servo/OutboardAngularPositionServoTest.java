@@ -301,7 +301,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
      */
     @Test
     void testDirectContinuous() {
-        SimulatedBareMotor motor = new SimulatedBareMotor(log, 100);
+        SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
@@ -358,7 +358,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
     // TODO: fix this
     // @Test
     void testDirectUnwrapped() {
-        SimulatedBareMotor motor = new SimulatedBareMotor(log, 100);
+        SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
@@ -432,7 +432,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
     // TODO: fix this
     // @Test
     void testDirectWrapped() {
-        SimulatedBareMotor motor = new SimulatedBareMotor(log, 100);
+        SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(

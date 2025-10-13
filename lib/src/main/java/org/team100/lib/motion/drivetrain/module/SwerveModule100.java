@@ -12,6 +12,7 @@ import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
+import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,40 +29,58 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * moves, it affects the relative position of the drive motor and the drive
  * wheel.
  * 
- * TODO: this coupling implementation is, I think, totally broken.
+ * TODO: Verify the coupling
  * 
  * There is some discussion of this topic here:
  * https://www.chiefdelphi.com/t/kcoupleratio-in-ctre-swerve/483380
  */
 public abstract class SwerveModule100 {
+    private static final boolean DEBUG = false;
+
     private final LinearVelocityServo m_driveServo;
     private final AngularPositionServo m_turningServo;
+    /** For steer/drive coupling. */
+    private final double m_wheelRadiusM;
+    /**
+     * This is actually the final drive times the intermediate. The WCP modules
+     * final is 3, and the intermediate is like 0.9 or 1.1 depending on which ratio
+     * we're using.
+     */
+    private final double m_finalDriveRatio;
+
     /**
      * The previous desired angle, used if the current desired angle is empty (i.e.
      * the module is motionless) and to calculate steering velocity.
      */
-    private Rotation2d m_previousDesiredAngle;
+    private Rotation2d m_previousDesiredWrappedAngle;
     private double m_previousTime;
 
     protected SwerveModule100(
             LinearVelocityServo driveServo,
-            AngularPositionServo turningServo) {
+            AngularPositionServo turningServo,
+            double wheelDiameterM,
+            double finalDriveRatio) {
         m_driveServo = driveServo;
         m_turningServo = turningServo;
+        m_wheelRadiusM = wheelDiameterM / 2;
         // The initial previous angle is the measurement.
-        m_previousDesiredAngle = new Rotation2d(m_turningServo.getWrappedPositionRad());
+        m_previousDesiredWrappedAngle = new Rotation2d(m_turningServo.getWrappedPositionRad());
         m_previousTime = Takt.get();
+        m_finalDriveRatio = finalDriveRatio;
     }
 
     /**
      * Optimizes.
      * 
      * Given an empty angle, it uses the previous one.
+     * 
+     * Note: this uses "wrapped" states that come from inverse kinematics, since the
+     * kinematics doesn't care about the total turns of the modules;
      */
-    void setDesiredState(SwerveModuleState100 desired) {
-        desired = usePreviousAngleIfEmpty(desired);
-        desired = optimize(desired);
-        actuate(desired);
+    void setDesiredState(SwerveModuleState100 desiredWrapped) {
+        desiredWrapped = usePreviousAngleIfEmpty(desiredWrapped);
+        desiredWrapped = optimize(desiredWrapped);
+        actuate(desiredWrapped);
     }
 
     /**
@@ -96,21 +115,21 @@ public abstract class SwerveModule100 {
 
     /** Uses Cache so the position is fresh and coherent. */
     SwerveModulePosition100 getPosition() {
-        double drive_M = m_driveServo.getDistance();
-        double steerRad = m_turningServo.getWrappedPositionRad();
+        double driveM = m_driveServo.getDistance();
+        double unwrappedAngleRad = m_turningServo.getUnwrappedPositionRad();
         switch (Identity.instance) {
             case SWERVE_ONE:
             case SWERVE_TWO:
             case COMP_BOT:
-                drive_M = correctPositionForSteering(drive_M, steerRad);
+                driveM = correctPositionForSteering(driveM, unwrappedAngleRad);
                 break;
             case BLANK:
             default:
                 break;
         }
         return new SwerveModulePosition100(
-                drive_M,
-                Optional.of(new Rotation2d(steerRad)));
+                driveM,
+                Optional.of(new Rotation2d(unwrappedAngleRad)));
     }
 
     double turningPosition() {
@@ -132,8 +151,9 @@ public abstract class SwerveModule100 {
         m_turningServo.periodic();
     }
 
-    static double reduceCrossTrackError(double measuredAngleRad, double desiredSpeed, Rotation2d desiredAngle) {
-        double error = MathUtil.angleModulus(desiredAngle.getRadians() - measuredAngleRad);
+    static double reduceCrossTrackError(
+            double measuredWrappedAngleRad, double desiredSpeed, Rotation2d desiredWrappedAngle) {
+        double error = MathUtil.angleModulus(desiredWrappedAngle.getRadians() - measuredWrappedAngleRad);
         // cosine is pretty forgiving of misalignment
         // double scale = Math.abs(Math.cos(error));
         // gaussian is much less forgiving. note the adjustable factor. The value of
@@ -145,42 +165,45 @@ public abstract class SwerveModule100 {
 
     /////////////////////////////////////////////////////////////////
 
-    /** Turning servo commands always specify zero-velocity goal. */
-    private void actuate(SwerveModuleState100 desired) {
-        double speed = desired.speedMetersPerSecond();
-        if (desired.angle().isEmpty())
+    /**
+     * Turning servo commands always specify zero-velocity goal.
+     */
+    private void actuate(SwerveModuleState100 desiredWrapped) {
+        double speed = desiredWrapped.speedMetersPerSecond();
+        if (desiredWrapped.angle().isEmpty())
             throw new IllegalArgumentException("actuation needs a real angle");
-        Rotation2d desiredAngle = desired.angle().get();
+
+        Rotation2d desiredWrappedAngle = desiredWrapped.angle().get();
 
         if (Experiments.instance.enabled(Experiment.CorrectSpeedForSteering)) {
             // help drive motors overcome steering.
-            speed = correctSpeedForSteering(speed, desiredAngle);
+            speed = correctSpeedForSteering(speed, desiredWrappedAngle);
         }
         if (Experiments.instance.enabled(Experiment.ReduceCrossTrackError)) {
             double measuredAngleRad = m_turningServo.getWrappedPositionRad();
-            speed = reduceCrossTrackError(measuredAngleRad, speed, desiredAngle);
+            speed = reduceCrossTrackError(measuredAngleRad, speed, desiredWrappedAngle);
 
         }
         m_driveServo.setVelocity(speed);
 
-        //
-        // TODO: without the profile there's no velocity feedforward, is that ok?
-        //
-        // if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
-        // no profile, just low-level position
-        Control100 control = new Control100(desiredAngle.getRadians(), 0);
-        m_turningServo.setPositionDirect(new Setpoints1d(control, control), 0);
-
-        // TODO: finish this
-        // } else {
-        // // use the profile
-        // m_turningServo.setPositionProfiled(desiredAngle.getRadians(), 0);
-        // }
-        m_previousDesiredAngle = desiredAngle;
+        if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
+            // no profile, just low-level position
+            Control100 control = new Control100(desiredWrappedAngle.getRadians(), 0);
+            m_turningServo.setPositionDirect(new Setpoints1d(control, control), 0);
+        } else {
+            // use the profile
+            m_turningServo.setPositionProfiled(desiredWrappedAngle.getRadians(), 0);
+        }
+        m_previousDesiredWrappedAngle = desiredWrappedAngle;
     }
 
-    /** Correct the desired speed for steering coupling. */
-    private double correctSpeedForSteering(double desiredSpeed, Rotation2d desiredAngle) {
+    /**
+     * Correct the desired speed for steering coupling.
+     * 
+     * Angle can be the "wrapped" version since the difference from the previous
+     * iteration is surely small.
+     */
+    private double correctSpeedForSteering(double desiredSpeed, Rotation2d desiredWrappedAngle) {
         double dt = dt();
         if (dt > 0.04) {
             // clock is unreliable, don't do anything.
@@ -190,28 +213,30 @@ public abstract class SwerveModule100 {
             // avoid short intervals
             return desiredSpeed;
         }
-        Rotation2d dtheta = desiredAngle.minus(m_previousDesiredAngle);
-        double omega = dtheta.getRadians() / dt;
-        // TODO: should this be positive or negative?
-        return desiredSpeed + 0.0975 * omega / 3.8;
+        // dtheta is definitely a lot less than 2pi so wrapped is fine.
+        Rotation2d dthetaWrapped = desiredWrappedAngle.minus(m_previousDesiredWrappedAngle);
+        double omega = dthetaWrapped.getRadians() / dt;
+        double correction = m_wheelRadiusM * omega / m_finalDriveRatio;
+        if (DEBUG)
+            Util.printf("correction %6.3f\n", correction);
+        return desiredSpeed + correction;
     }
 
-    /** Correct position measurement for steering coupling. */
-    private double correctPositionForSteering(double drive_M, double steerRad) {
-        // TODO: replace the magic numbers here with .. i think this is like wheel
-        // diameter? radius? gear ratio? what is this?
-        // drive is 5.50:1, steer is 10.2, so
-        return drive_M - 0.0975 * steerRad / 3.8;
+    /**
+     * Correct position measurement for steering coupling.
+     */
+    private double correctPositionForSteering(double drive_M, double unwrappedAngleRad) {
+        // steering opposes driving.
+        // TODO: double-check that.
+        return drive_M - m_wheelRadiusM * unwrappedAngleRad / m_finalDriveRatio;
     }
 
     /**
      * Use the current turning servo position to optimize the desired state.
-     * 
-     * TODO: should this use unwrapped?
      */
-    private SwerveModuleState100 optimize(SwerveModuleState100 desired) {
+    private SwerveModuleState100 optimize(SwerveModuleState100 desiredWrapped) {
         return SwerveModuleState100.optimize(
-                desired,
+                desiredWrapped,
                 new Rotation2d(m_turningServo.getWrappedPositionRad()));
     }
 
@@ -222,7 +247,7 @@ public abstract class SwerveModule100 {
         if (desired.angle().isEmpty()) {
             return new SwerveModuleState100(
                     desired.speedMetersPerSecond(),
-                    Optional.of(m_previousDesiredAngle));
+                    Optional.of(m_previousDesiredWrappedAngle));
         }
         return desired;
     }

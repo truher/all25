@@ -60,7 +60,7 @@ public class Climber extends SubsystemBase {
             }
 
             default -> {
-                SimulatedBareMotor climberMotor = new SimulatedBareMotor(log, 100);
+                SimulatedBareMotor climberMotor = new SimulatedBareMotor(log, 600);
 
                 SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, climberMotor);
                 SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);

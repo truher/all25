@@ -88,7 +88,7 @@ public class Neo550Factory {
     }
 
     public static RotaryMechanism simulatedRotaryMechanism(LoggerFactory parent) {
-        SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 5);
+        SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, driveMotor);
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(parent, encoder, 1);
         return new RotaryMechanism(
@@ -96,9 +96,7 @@ public class Neo550Factory {
     }
 
     public static LinearMechanism simulatedLinearMechanism(LoggerFactory parent) {
-        // simulated drive motor free speed is 5 m/s
-        SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 5);
-        // simulated gearing is 2 meter wheel, 1:1, so rad/s and m/s are the same.
+        SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, driveMotor);
         return new LinearMechanism(
                 parent,

@@ -87,13 +87,13 @@ public class Manipulator extends SubsystemBase implements Music {
                         16, 0.1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
             }
             default -> {
-                BareMotor leftMotor = new SimulatedBareMotor(log, 100);
+                BareMotor leftMotor = new SimulatedBareMotor(log, 600);
                 SimulatedBareEncoder leftEncoder = new SimulatedBareEncoder(log, leftMotor);
-                BareMotor rightMotor = new SimulatedBareMotor(log, 100);
+                BareMotor rightMotor = new SimulatedBareMotor(log, 600);
                 SimulatedBareEncoder rightEncoder = new SimulatedBareEncoder(log, rightMotor);
                 // simulated algae motor gets overloaded 2 sec after starting
                 BareMotor algaeMotor = new LazySimulatedBareMotor(
-                        new SimulatedBareMotor(log, 100), 2);
+                        new SimulatedBareMotor(log, 600), 2);
                 SimulatedBareEncoder algaeEncoder = new SimulatedBareEncoder(log, algaeMotor);
                 m_algaeMotor = algaeMotor;
                 m_leftMech = new LinearMechanism(log, leftMotor, leftEncoder,

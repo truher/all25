@@ -16,7 +16,7 @@ public class SimulatedBareEncoderTest {
     void testSetAndReset() {
         // changing the encoder position should not produce a velocity signal.
 
-        SimulatedBareMotor motor = new SimulatedBareMotor(log, 100);
+        SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
         assertEquals(0, encoder.getUnwrappedPositionRad(), DELTA);
         assertEquals(0, encoder.getVelocityRad_S(), DELTA);

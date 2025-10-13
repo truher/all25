@@ -102,7 +102,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 drive,
                 neutral,
                 motorPhase);
-        return new WCPSwerveModule100(driveServo, turningServo);
+        return new WCPSwerveModule100(driveServo, turningServo, ratio);
     }
 
     /**
@@ -139,7 +139,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 drive,
                 neutral,
                 motorPhase);
-        return new WCPSwerveModule100(driveServo, turningServo);
+        return new WCPSwerveModule100(driveServo, turningServo, ratio);
     }
 
     private static LinearVelocityServo driveKrakenServo(
@@ -284,8 +284,10 @@ public class WCPSwerveModule100 extends SwerveModule100 {
 
     private WCPSwerveModule100(
             LinearVelocityServo driveServo,
-            AngularPositionServo turningServo) {
-        super(driveServo, turningServo);
+            AngularPositionServo turningServo,
+            DriveRatio ratio) {
+        // primary is 2:1 so final is whatever is left.
+        super(driveServo, turningServo, WHEEL_DIAMETER_M, ratio.m_ratio / 2);
         //
     }
 }

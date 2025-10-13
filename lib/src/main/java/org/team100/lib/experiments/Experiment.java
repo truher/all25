@@ -47,7 +47,7 @@ public enum Experiment {
     SwerveDeadband,
     /**
      * Help drive motors overcome steering.
-     * TODO(2/24/25) I think this doesn't help, should be deleted.
+     * TODO(: make this the default?
      */
     CorrectSpeedForSteering,
     /**
@@ -62,11 +62,13 @@ public enum Experiment {
      * translational ones.
      * 
      * But it has the benefit of being simple.
+     * TODO: make this the default?
      */
     ReduceCrossTrackError,
     /**
      * Use pure outboard PID for steering control, rather than the usual profiled
      * motion -- it's faster and less work for the RoboRIO.
+     * TODO: make this the default?
      */
     UnprofiledSteering,
 }
