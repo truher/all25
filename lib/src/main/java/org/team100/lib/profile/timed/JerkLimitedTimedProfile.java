@@ -8,7 +8,7 @@ import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
 
 /** Adapter for Roadrunner jerk-limited profiles. */
-public class JerkLimitedIncrementalProfile implements TimedProfile {
+public class JerkLimitedTimedProfile implements TimedProfile {
     private static final boolean DEBUG = false;
 
     private final double vel;
@@ -25,7 +25,7 @@ public class JerkLimitedIncrementalProfile implements TimedProfile {
      *                  it from the other side. false means to violate the
      *                  constraints. you should probably say "true" here.
      */
-    public JerkLimitedIncrementalProfile(double vel, double acc, double jerk, boolean overshoot) {
+    public JerkLimitedTimedProfile(double vel, double acc, double jerk, boolean overshoot) {
         this.vel = vel;
         this.acc = acc;
         this.jerk = jerk;

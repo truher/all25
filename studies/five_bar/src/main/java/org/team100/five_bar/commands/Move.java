@@ -1,7 +1,7 @@
 package org.team100.five_bar.commands;
 
 import org.team100.five_bar.subsystems.FiveBarCartesian;
-import org.team100.lib.profile.timed.JerkLimitedIncrementalProfile;
+import org.team100.lib.profile.timed.JerkLimitedTimedProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 
@@ -20,7 +20,7 @@ public class Move extends Command {
 
     private final FiveBarCartesian m_fiveBar;
     private final Translation2d m_goal;
-    private final JerkLimitedIncrementalProfile m_profile;
+    private final JerkLimitedTimedProfile m_profile;
     private final Timer m_timer;
 
     private Translation2d m_start;
@@ -30,7 +30,7 @@ public class Move extends Command {
     public Move(FiveBarCartesian fiveBar, Translation2d goal, double velocity) {
         m_fiveBar = fiveBar;
         m_goal = goal;
-        m_profile = new JerkLimitedIncrementalProfile(velocity, 1, 10, true);
+        m_profile = new JerkLimitedTimedProfile(velocity, 1, 10, true);
         m_timer = new Timer();
         addRequirements(fiveBar);
     }
