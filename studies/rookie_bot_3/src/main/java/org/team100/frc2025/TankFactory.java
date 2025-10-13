@@ -16,11 +16,20 @@ public class TankFactory {
 
     public static TankDrive make(LoggerFactory parent, int supplyLimit) {
         LoggerFactory log = parent.name("Tank Drive");
+        System.out.println("Identity" + Identity.instance);
+        int rightCanId = switch(Identity.instance) {
+            case ROOKIE_BOT -> 1; 
+            default -> 1;
+        };
+        int leftCanId = switch(Identity.instance) {
+            case ROOKIE_BOT ->  1;
+            default -> 1;
+        };
 
-        NeoCANSparkMotor right = new NeoCANSparkMotor(log.name("right"), new CanId(5), NeutralMode.BRAKE,
-        MotorPhase.FORWARD, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
+        NeoCANSparkMotor right = new NeoCANSparkMotor(log, new CanId(27), NeutralMode.BRAKE,
+         MotorPhase.FORWARD, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
 
-        NeoCANSparkMotor left = new NeoCANSparkMotor(log.name("left"), new CanId(6), NeutralMode.BRAKE, 
+        NeoCANSparkMotor left = new NeoCANSparkMotor(log, new CanId(3), NeutralMode.BRAKE, 
         MotorPhase.REVERSE, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
        
         return new BareMotorTank(left, right);
