@@ -25,33 +25,33 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Attempts to maintain aim. */
 public class Turret extends SubsystemBase {
-    private static final int GEAR_RATIO = 100;
+    private static final double GEAR_RATIO = 100;
     private static final double MIN_POSITION = -3;
     private static final double MAX_POSITION = 3;
-
     private final DoubleArrayLogger m_log_field_turret;
-
     private final Supplier<Pose2d> m_pose;
     private final Supplier<Translation2d> m_target;
-
     private final AngularPositionServo m_pivot;
+    private boolean m_aiming;
 
     /**
      * @param parent Log
+     * @param field  Field2d log
      * @param pose   Current robot pose, from the pose estimator.
      * @param target From the target designator; can change at any time.
      */
-    public Turret(LoggerFactory parent, LoggerFactory field, Supplier<Pose2d> pose, Supplier<Translation2d> target) {
+    public Turret(
+            LoggerFactory parent,
+            LoggerFactory field,
+            Supplier<Pose2d> pose,
+            Supplier<Translation2d> target) {
         LoggerFactory log = parent.type(this);
         m_log_field_turret = field.doubleArrayLogger(Level.COMP, "turret");
-
         m_pose = pose;
         m_target = target;
-
         IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 2, 0.05);
         ProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
-
         SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(
@@ -61,22 +61,25 @@ public class Turret extends SubsystemBase {
         m_pivot = new OnboardAngularPositionServo(
                 log, mech, ref, feedback);
         m_pivot.reset();
-
+        m_aiming = false;
     }
 
     public boolean onTarget() {
-        return false;
-
+        return m_aiming && m_pivot.atGoal();
     }
 
     private void moveToAim() {
+        m_aiming = true;
         Pose2d pose = m_pose.get();
         Translation2d target = m_target.get();
         Rotation2d absoluteBearing = target.minus(pose.getTranslation()).getAngle();
         Rotation2d relativeBearing = absoluteBearing.minus(pose.getRotation());
-        System.out.printf("move to aim %6.3f\n", relativeBearing.getRadians());
-
         m_pivot.setPositionProfiled(relativeBearing.getRadians(), 0);
+    }
+
+    private void stopAiming() {
+        m_aiming = false;
+        m_pivot.stop();
     }
 
     ////////////////////////////////////////////////////////
@@ -84,16 +87,26 @@ public class Turret extends SubsystemBase {
     /// COMMANDS
 
     public Command aim() {
-        return run(() -> moveToAim());
+        return run(this::moveToAim);
+    }
+
+    public Command stop() {
+        return run(this::stopAiming);
     }
 
     @Override
     public void periodic() {
         m_pivot.periodic();
-        m_log_field_turret.log(() -> new double[] {
-                m_pose.get().getX(),
-                m_pose.get().getY(),
-                Math.toDegrees(m_pivot.getWrappedPositionRad()) });
+        m_log_field_turret.log(() -> {
+            Pose2d pose = m_pose.get();
+            return new double[] {
+                    pose.getX(),
+                    pose.getY(),
+                    pose.getRotation().plus(
+                            new Rotation2d(m_pivot.getWrappedPositionRad()))
+                            .getDegrees()
+            };
+        });
     }
 
 }
