@@ -3,9 +3,7 @@ package org.team100.lib.motion.drivetrain.module;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.encoder.AS5048RotaryPositionSensor;
-import org.team100.lib.encoder.AnalogRotaryPositionSensor;
 import org.team100.lib.encoder.CombinedRotaryPositionSensor;
-import org.team100.lib.encoder.DutyCycleRotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
 import org.team100.lib.encoder.ProxyRotaryPositionSensor;
 import org.team100.lib.encoder.RotaryPositionSensor;
@@ -76,7 +74,6 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double statorLimitAmps,
             CanId driveMotorCanId,
             DriveRatio ratio,
-            Class<? extends RotaryPositionSensor> encoderClass,
             CanId turningMotorCanId,
             RoboRioChannel turningEncoderChannel,
             double turningOffset,
@@ -93,7 +90,6 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 ratio);
         AngularPositionServo turningServo = turningServo(
                 parent.name("Turning"),
-                encoderClass,
                 turningMotorCanId,
                 turningEncoderChannel,
                 turningOffset,
@@ -130,7 +126,6 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 ratio);
         AngularPositionServo turningServo = turningServo(
                 parent.name("Turning"),
-                encoderClass,
                 turningMotorCanId,
                 turningEncoderChannel,
                 turningOffset,
@@ -199,7 +194,6 @@ public class WCPSwerveModule100 extends SwerveModule100 {
 
     private static AngularPositionServo turningServo(
             LoggerFactory parent,
-            Class<? extends RotaryPositionSensor> encoderClass,
             CanId turningMotorCanId,
             RoboRioChannel turningEncoderChannel,
             double turningOffset,
@@ -228,8 +222,11 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 ff);
 
         // this reads the steering angle directly.
-        RotaryPositionSensor turningSensor = turningSensor(
-                encoderClass, parent, turningEncoderChannel, turningOffset, drive);
+        RotaryPositionSensor turningSensor = new AS5048RotaryPositionSensor(
+                parent,
+                turningEncoderChannel,
+                turningOffset,
+                drive);
 
         Talon6Encoder builtInEncoder = new Talon6Encoder(parent, turningMotor);
 
@@ -255,31 +252,6 @@ public class WCPSwerveModule100 extends SwerveModule100 {
         ProfileReference1d ref = new IncrementalProfileReference1d(
                 profile, STEERING_POSITION_TOLERANCE_RAD, STEERING_VELOCITY_TOLERANCE_RAD_S);
         return new OutboardAngularPositionServo(parent, mech, ref);
-    }
-
-    /** Produces either an AS5048 or an Analog sensor. */
-    private static RotaryPositionSensor turningSensor(
-            Class<? extends RotaryPositionSensor> encoderClass,
-            LoggerFactory parent,
-            RoboRioChannel channel,
-            double inputOffset,
-            EncoderDrive drive) {
-        if (encoderClass == AnalogRotaryPositionSensor.class) {
-            // TODO: remove this, we never use analog encoders.
-            return new AnalogRotaryPositionSensor(
-                    parent,
-                    channel,
-                    inputOffset,
-                    drive);
-        }
-        if (encoderClass == DutyCycleRotaryPositionSensor.class) {
-            return new AS5048RotaryPositionSensor(
-                    parent,
-                    channel,
-                    inputOffset,
-                    drive);
-        }
-        throw new IllegalArgumentException("unknown encoder class: " + encoderClass.getName());
     }
 
     private WCPSwerveModule100(
