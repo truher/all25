@@ -5,6 +5,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
+import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
 
 /**
@@ -131,6 +132,10 @@ public class RotaryMechanism {
                 velocityRad_S * m_gearRatio,
                 accelRad_S2 * m_gearRatio,
                 torqueNm / m_gearRatio);
+    }
+
+    public Model100 getUnwrappedMeasurement() {
+        return new Model100(getUnwrappedPositionRad(), getVelocityRad_S());
     }
 
     /**

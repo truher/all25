@@ -35,22 +35,20 @@ public class OutboardAngularPositionServo extends AngularPositionServoImpl {
     }
 
     /**
-     * Pass the setpoint directly to the mechanism's position controller.
+     * Pass the next setpoint directly to the mechanism's position controller.
      * Ignores current setpoint. We only use the "next" setpoint.
      */
-    void actuate(Setpoints1d wrappedSetpoint, double torqueNm) {
+    void actuate(Setpoints1d unwrappedSetpoint, double torqueNm) {
 
-        Control100 nextUnwrappedSetpoint = positionNearMeasurement(
-                wrappedSetpoint.next());
-
-        m_nextUnwrappedSetpoint = nextUnwrappedSetpoint;
+        Control100 nextUnwrappedSetpoint = unwrappedSetpoint.next();
 
         m_mechanism.setUnwrappedPosition(
-                m_nextUnwrappedSetpoint.x(),
-                m_nextUnwrappedSetpoint.v(),
-                m_nextUnwrappedSetpoint.a(),
+                nextUnwrappedSetpoint.x(),
+                nextUnwrappedSetpoint.v(),
+                nextUnwrappedSetpoint.a(),
                 torqueNm);
-        m_log_control.log(() -> m_nextUnwrappedSetpoint);
+
+        m_log_control.log(() -> nextUnwrappedSetpoint);
         m_log_ff_torque.log(() -> torqueNm);
     }
 

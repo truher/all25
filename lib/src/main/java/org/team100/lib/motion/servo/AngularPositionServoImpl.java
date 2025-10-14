@@ -78,11 +78,18 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         // make sure the reference gets reinitialized if required later
         m_unwrappedGoal = null;
 
-        // here we need to decide which unwrapped goal to use; this could happen in
-        // actuate, but
-        // since the profiled method needs to do it, we may as well too.
+        // TODO: here check the goal against the mechanism bounds
+        // TODO: here we need to decide setpoint to use (long or short)
 
-        actuate(wrappedSetpoint, torqueNm);
+        m_nextUnwrappedSetpoint = positionNearMeasurement(wrappedSetpoint.next());
+
+        Model100 currentUnwrappedSetpoint = positionNearMeasurement(
+                wrappedSetpoint.current().model());
+
+        Setpoints1d unwrappedSetpoint = new Setpoints1d(
+                currentUnwrappedSetpoint.control(), m_nextUnwrappedSetpoint);
+
+        actuate(unwrappedSetpoint, torqueNm);
     }
 
     @Override
@@ -93,15 +100,16 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         // this is the "short way" option.
         Model100 unwrappedGoal = new Model100(nearMeasurement(wrappedGoalRad), 0);
 
-        // here we need to decide which way the profile should go
+        // TODO: here check the goal against the mechanism bounds
+        // TODO: here we need to decide which way the profile should go
 
         initReference(unwrappedGoal);
 
-        Setpoints1d wrappedSetpoints = m_ref.get();
+        Setpoints1d unwrappedSetpoint = m_ref.get();
 
-        // this really should take wrapped setpoints
+        m_nextUnwrappedSetpoint = unwrappedSetpoint.next();
 
-        actuate(wrappedSetpoints, torqueNm);
+        actuate(unwrappedSetpoint, torqueNm);
     }
 
     /** The reference only understands unwrapped angles. */
@@ -115,12 +123,10 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         m_ref.setGoal(unwrappedGoal);
         // make sure the setpoint is near the measurement
         if (m_nextUnwrappedSetpoint == null) {
-            // erased by dutycycle control
-            m_nextUnwrappedSetpoint = new Control100(m_mechanism.getWrappedPositionRad(), 0);
-        } else {
-            m_nextUnwrappedSetpoint = new Control100(nearMeasurement(m_nextUnwrappedSetpoint.x()),
-                    m_nextUnwrappedSetpoint.v());
+            // erased by dutycycle control, use measurement
+            m_nextUnwrappedSetpoint = new Control100(m_mechanism.getUnwrappedPositionRad(), 0);
         }
+    
         // initialize with the setpoint, not the measurement, to avoid noise.
         m_ref.init(m_nextUnwrappedSetpoint.model());
     }
@@ -172,6 +178,8 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
 
     @Override
     public void stop() {
+        m_unwrappedGoal = null;
+        m_nextUnwrappedSetpoint = null;
         m_mechanism.stop();
     }
 

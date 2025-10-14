@@ -57,38 +57,30 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
         m_feedback.reset();
     }
 
-    void actuate(Setpoints1d wrappedSetpoints, double feedForwardTorqueNm) {
+    /**
+     * Feedback using measurement and current setpoint. Feedforward using next
+     * setpoint.
+     */
+    void actuate(Setpoints1d unwrappedSetpoint, double feedForwardTorqueNm) {
 
-        Control100 nextUnwrappedSetpoint = positionNearMeasurement(
-                wrappedSetpoints.next());
+        Model100 unwrappedMeasurement = m_mechanism.getUnwrappedMeasurement();
+        Model100 currentUnwrappedSetpoint = unwrappedSetpoint.current().model();
+        Control100 nextUnwrappedSetpoint = unwrappedSetpoint.next();
 
-        Model100 currentUnwrappedSetpoint = positionNearMeasurement(
-                wrappedSetpoints.current().model());
+        double u_FB = m_feedback.calculate(unwrappedMeasurement, currentUnwrappedSetpoint);
+        double u_FF = nextUnwrappedSetpoint.v();
+        double u_TOTAL = u_FB + u_FF;
 
-        //
-        //
-        m_nextUnwrappedSetpoint = nextUnwrappedSetpoint;
-
-        final double unwrappedPositionRad = m_mechanism.getUnwrappedPositionRad();
-        final double velocityRad_S = m_mechanism.getVelocityRad_S();
-
-        final Model100 unwrappedMeasurement = new Model100(unwrappedPositionRad, velocityRad_S);
-
-        final double u_FB = m_feedback.calculate(unwrappedMeasurement, currentUnwrappedSetpoint);
-
-        final double u_FF = m_nextUnwrappedSetpoint.v();
-        final double u_TOTAL = u_FB + u_FF;
-
-        m_mechanism.setVelocity(u_TOTAL, m_nextUnwrappedSetpoint.a(), feedForwardTorqueNm);
+        m_mechanism.setVelocity(u_TOTAL, nextUnwrappedSetpoint.a(), feedForwardTorqueNm);
 
         m_log_feedforward_torque.log(() -> feedForwardTorqueNm);
         m_log_measurement.log(() -> unwrappedMeasurement);
-        m_log_control.log(() -> m_nextUnwrappedSetpoint);
+        m_log_control.log(() -> nextUnwrappedSetpoint);
         m_log_u_FB.log(() -> u_FB);
         m_log_u_FF.log(() -> u_FF);
         m_log_u_TOTAL.log(() -> u_TOTAL);
-        m_log_error.log(() -> currentUnwrappedSetpoint.x() - unwrappedPositionRad);
-        m_log_velocity_error.log(() -> currentUnwrappedSetpoint.v() - velocityRad_S);
+        m_log_error.log(() -> currentUnwrappedSetpoint.x() - unwrappedMeasurement.x());
+        m_log_velocity_error.log(() -> currentUnwrappedSetpoint.v() - unwrappedMeasurement.v());
     }
 
 }
