@@ -18,6 +18,12 @@ public class DriverXboxControl {
         m_controller = new XboxController(port);
     }
 
+    /**
+     * "RC mode 2" control:
+     * * right Y (axis 5) is the field "X" direction, ahead
+     * * right X (axis 4) is the field "Y" direction, to the left
+     * * left X (axis 0) is rotation, counterclockwise
+     */
     public Velocity velocity() {
         return ControlUtil.velocity(
                 m_controller::getRightY,
@@ -57,20 +63,24 @@ public class DriverXboxControl {
         return m_controller.getRightBumperButton();
     }
 
-    public boolean x() {
-        return m_controller.getXButton();
-    }
-
-    public boolean y() {
-        return m_controller.getYButton();
-    }
-
+    /** Button 1 */
     public boolean a() {
         return m_controller.getAButton();
     }
 
+    /** Button 2 */
     public boolean b() {
         return m_controller.getBButton();
+    }
+
+    /** Button 3 */
+    public boolean x() {
+        return m_controller.getXButton();
+    }
+
+    /** Button 4 */
+    public boolean y() {
+        return m_controller.getYButton();
     }
 
     public double leftY() {

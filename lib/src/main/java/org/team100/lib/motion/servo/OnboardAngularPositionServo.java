@@ -11,7 +11,6 @@ import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 /**
  * Uses mechanism velocity control.
@@ -20,7 +19,6 @@ import org.team100.lib.util.Util;
  * extra torque (e.g. for gravity).
  */
 public class OnboardAngularPositionServo extends AngularPositionServoImpl {
-    private static final boolean DEBUG = false;
 
     private final Feedback100 m_feedback;
 
@@ -59,45 +57,30 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
         m_feedback.reset();
     }
 
+    /**
+     * Feedback using measurement and current setpoint. Feedforward using next
+     * setpoint.
+     */
+    void actuate(Setpoints1d unwrappedSetpoint, double feedForwardTorqueNm) {
 
-    void actuate(Setpoints1d wrappedSetpoints, double feedForwardTorqueNm) {
-        if (DEBUG)
-            Util.printf("wrappedSetpoints %s\n", wrappedSetpoints);
-        Control100 nextWrappedSetpoint = wrappedSetpoints.next();
+        Model100 unwrappedMeasurement = m_mechanism.getUnwrappedMeasurement();
+        Model100 currentUnwrappedSetpoint = unwrappedSetpoint.current().model();
+        Control100 nextUnwrappedSetpoint = unwrappedSetpoint.next();
 
-        double nextPosRad = wrapNearMeasurement(nextWrappedSetpoint.x());
-        double nextVelRad_S = nextWrappedSetpoint.v();
-        double nextAccelRad_S2 = nextWrappedSetpoint.a();
+        double u_FB = m_feedback.calculate(unwrappedMeasurement, currentUnwrappedSetpoint);
+        double u_FF = nextUnwrappedSetpoint.v();
+        double u_TOTAL = u_FB + u_FF;
 
-        m_unwrappedSetpoint = new Control100(nextPosRad, nextVelRad_S, nextAccelRad_S2);
-
-        final double unwrappedPositionRad = m_mechanism.getUnwrappedPositionRad();
-        final double velocityRad_S = m_mechanism.getVelocityRad_S();
-
-        final Model100 unwrappedMeasurement = new Model100(unwrappedPositionRad, velocityRad_S);
-
-        double currentUnwrappedSetpointPosition = wrapNearMeasurement(wrappedSetpoints.current().x());
-        double currentSetpointVelocity = wrappedSetpoints.current().v();
-
-        Model100 currentUnwrappedSetpoint = new Model100(
-                currentUnwrappedSetpointPosition, currentSetpointVelocity);
-
-        final double u_FB = m_feedback.calculate(unwrappedMeasurement, currentUnwrappedSetpoint);
-
-        final double u_FF = m_unwrappedSetpoint.v();
-        final double u_TOTAL = u_FB + u_FF;
-
-        m_mechanism.setVelocity(u_TOTAL, m_unwrappedSetpoint.a(), feedForwardTorqueNm);
+        m_mechanism.setVelocity(u_TOTAL, nextUnwrappedSetpoint.a(), feedForwardTorqueNm);
 
         m_log_feedforward_torque.log(() -> feedForwardTorqueNm);
         m_log_measurement.log(() -> unwrappedMeasurement);
-        m_log_control.log(() -> m_unwrappedSetpoint);
+        m_log_control.log(() -> nextUnwrappedSetpoint);
         m_log_u_FB.log(() -> u_FB);
         m_log_u_FF.log(() -> u_FF);
         m_log_u_TOTAL.log(() -> u_TOTAL);
-        m_log_error.log(() -> wrappedSetpoints.current().x() - unwrappedPositionRad);
-        m_log_velocity_error.log(() -> wrappedSetpoints.current().v() - velocityRad_S);
+        m_log_error.log(() -> currentUnwrappedSetpoint.x() - unwrappedMeasurement.x());
+        m_log_velocity_error.log(() -> currentUnwrappedSetpoint.v() - unwrappedMeasurement.v());
     }
-
 
 }

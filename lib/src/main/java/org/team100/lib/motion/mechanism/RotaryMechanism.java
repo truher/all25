@@ -5,6 +5,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
+import org.team100.lib.state.Model100;
 import org.team100.lib.util.Util;
 
 /**
@@ -133,6 +134,10 @@ public class RotaryMechanism {
                 torqueNm / m_gearRatio);
     }
 
+    public Model100 getUnwrappedMeasurement() {
+        return new Model100(getUnwrappedPositionRad(), getVelocityRad_S());
+    }
+
     /**
      * Value is updated in Robot.robotPeriodic().
      * 
@@ -156,6 +161,16 @@ public class RotaryMechanism {
     /** Unwrapped domain is infinite. */
     public double getUnwrappedPositionRad() {
         return m_sensor.getUnwrappedPositionRad();
+    }
+
+    /** Minimum unwrapped position. */
+    public double getMinPositionRad() {
+        return m_minPositionRad;
+    }
+
+    /** Maximum unwrapped position. */
+    public double getMaxPositionRad() {
+        return m_maxPositionRad;
     }
 
     public void stop() {

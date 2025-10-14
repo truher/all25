@@ -9,6 +9,8 @@ import org.team100.lib.state.Model100;
  * only produces one control output, which is treated here as a primitive: you
  * can apply it wherever you want (e.g. as a control effort, or a velocity
  * target for a servo, or whatever).
+ * 
+ * Some of the implementations know about angle wrapping, some don't.
  */
 public interface Feedback100 {
 

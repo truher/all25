@@ -13,6 +13,7 @@ import org.team100.lib.util.Util;
  * TODO: make a special case incremental profile where the goal is always at
  * rest -- this is what almost all real cases actually want, and it's simpler.
  * 
+ * NOTE: these profiles don't know anything about angle wrapping.
  */
 public interface IncrementalProfile {
     public static final int MAX_ETA = 10;

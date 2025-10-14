@@ -18,7 +18,7 @@ import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.profile.timed.JerkLimitedIncrementalProfile;
+import org.team100.lib.profile.timed.JerkLimitedTimedProfile;
 import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.reference.TimedProfileReference1d;
@@ -77,7 +77,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
         double maxVel = 40;
         double maxAccel = 40;
         double maxJerk = 70;
-        JerkLimitedIncrementalProfile profile = new JerkLimitedIncrementalProfile(maxVel, maxAccel, maxJerk, true);
+        JerkLimitedTimedProfile profile = new JerkLimitedTimedProfile(maxVel, maxAccel, maxJerk, true);
         ProfileReference1d ref = new TimedProfileReference1d(profile);
 
         /*

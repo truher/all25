@@ -139,27 +139,27 @@ public class OutboardAngularPositionServoTest implements Timeless {
         // 0 -> 3
         assertEquals(0, mech.getWrappedPositionRad(), DELTA);
         assertEquals(0, mech.getUnwrappedPositionRad(), DELTA);
-        assertEquals(3, servo.wrapNearMeasurement(3), DELTA);
+        assertEquals(3, servo.nearMeasurement(3), DELTA);
         // -3 -> 3 the short way around
         sensor.angle = -3;
         assertEquals(-3, mech.getWrappedPositionRad(), DELTA);
         assertEquals(-3, mech.getUnwrappedPositionRad(), DELTA);
-        assertEquals(-3.283, servo.wrapNearMeasurement(3), DELTA);
+        assertEquals(-3.283, servo.nearMeasurement(3), DELTA);
         // -3 -> 1 the short way around
         sensor.angle = -3;
         assertEquals(-3, mech.getWrappedPositionRad(), DELTA);
         assertEquals(-3, mech.getUnwrappedPositionRad(), DELTA);
-        assertEquals(-5.283, servo.wrapNearMeasurement(1), DELTA);
+        assertEquals(-5.283, servo.nearMeasurement(1), DELTA);
         // -pi/2 -> pi/2
         sensor.angle = -Math.PI / 2;
         assertEquals(-Math.PI / 2, mech.getWrappedPositionRad(), DELTA);
         assertEquals(-Math.PI / 2, mech.getUnwrappedPositionRad(), DELTA);
-        assertEquals(Math.PI / 2, servo.wrapNearMeasurement(Math.PI / 2), DELTA);
+        assertEquals(Math.PI / 2, servo.nearMeasurement(Math.PI / 2), DELTA);
         // unwrapped case, -5pi/2 -> -3pi/2
         sensor.angle = -5 * Math.PI / 2;
         assertEquals(-Math.PI / 2, mech.getWrappedPositionRad(), DELTA);
         assertEquals(-5 * Math.PI / 2, mech.getUnwrappedPositionRad(), DELTA);
-        assertEquals(-3 * Math.PI / 2, servo.wrapNearMeasurement(Math.PI / 2), DELTA);
+        assertEquals(-3 * Math.PI / 2, servo.nearMeasurement(Math.PI / 2), DELTA);
     }
 
     /**
@@ -196,7 +196,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(0, sensor.getWrappedPositionRad(), DELTA);
         assertEquals(0, mech.getVelocityRad_S(), DELTA);
         assertEquals(0, servo.getWrappedPositionRad(), DELTA);
-        assertEquals(0, servo.m_unwrappedSetpoint.x(), DELTA);
+        assertEquals(0, servo.m_nextUnwrappedSetpoint.x(), DELTA);
 
         if (DEBUG)
             Util.println("Move a quarter turn in the positive direction");
@@ -214,7 +214,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(78.540, mech.getVelocityRad_S(), DELTA);
         assertEquals(Math.PI / 4, sensor.getWrappedPositionRad(), DELTA);
         assertEquals(Math.PI / 4, servo.getWrappedPositionRad(), DELTA);
-        assertEquals(Math.PI / 2, servo.m_unwrappedSetpoint.x(), DELTA);
+        assertEquals(Math.PI / 2, servo.m_nextUnwrappedSetpoint.x(), DELTA);
 
         servo.periodic();
         servo.setPositionDirect(new Setpoints1d(ignored, new Control100(Math.PI / 2, 0)), 0);
@@ -227,7 +227,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(0, mech.getVelocityRad_S(), DELTA);
         assertEquals(Math.PI / 2, sensor.getWrappedPositionRad(), DELTA);
         assertEquals(Math.PI / 2, servo.getWrappedPositionRad(), DELTA);
-        assertEquals(Math.PI / 2, servo.m_unwrappedSetpoint.x(), DELTA);
+        assertEquals(Math.PI / 2, servo.m_nextUnwrappedSetpoint.x(), DELTA);
 
         if (DEBUG)
             Util.println("Try to go one turn away directly? That does nothing.");
@@ -243,7 +243,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(0, mech.getVelocityRad_S(), DELTA);
         assertEquals(Math.PI / 2, sensor.getWrappedPositionRad(), DELTA);
         assertEquals(Math.PI / 2, servo.getWrappedPositionRad(), DELTA);
-        assertEquals(Math.PI / 2, servo.m_unwrappedSetpoint.x(), DELTA);
+        assertEquals(Math.PI / 2, servo.m_nextUnwrappedSetpoint.x(), DELTA);
 
         if (DEBUG)
             Util.println("move towards the limit a little at a time");

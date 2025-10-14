@@ -50,12 +50,12 @@ public class OnboardAngularPositionServoTest implements Timeless {
             if (DEBUG)
                 Util.printf("i: %d position: %5.3f %5.3f\n", i, turningMotor.position, turningMotor.velocity);
             // lets say we're on the profile.
-            positionSensor.angle = servo.m_unwrappedSetpoint.x();
-            positionSensor.rate = servo.m_unwrappedSetpoint.v();
+            positionSensor.angle = servo.m_nextUnwrappedSetpoint.x();
+            positionSensor.rate = servo.m_nextUnwrappedSetpoint.v();
         }
         assertEquals(0, turningMotor.output, 0.001);
-        assertEquals(0.5, servo.m_unwrappedSetpoint.x(), DELTA);
-        assertEquals(1.0, servo.m_unwrappedSetpoint.v(), DELTA);
+        assertEquals(0.5, servo.m_nextUnwrappedSetpoint.x(), DELTA);
+        assertEquals(1.0, servo.m_nextUnwrappedSetpoint.v(), DELTA);
         assertEquals(0.5, positionSensor.getWrappedPositionRad(), DELTA);
         assertEquals(1.000, turningMotor.velocity, DELTA);
     }
