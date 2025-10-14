@@ -6,6 +6,8 @@ import org.team100.lib.state.Model100;
  * Provides current and next references for servos.
  * 
  * Goal must be set prior to initialization.
+ * 
+ * NOTE: this class doesn't know anything about angle wrapping.
  */
 public interface ProfileReference1d {
 

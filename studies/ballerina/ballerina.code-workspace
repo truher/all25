@@ -47,6 +47,7 @@
         "workbench.colorTheme": "Default Light Modern",
         "workbench.tree.enableStickyScroll": false,
         "editor.stickyScroll.scrollWithEditor": false,
-        "editor.stickyScroll.enabled": false
+        "editor.stickyScroll.enabled": false,
+        "workbench.editor.revealIfOpen": true
 	}
 }

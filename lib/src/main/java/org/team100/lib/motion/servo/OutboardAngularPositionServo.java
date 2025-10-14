@@ -8,7 +8,6 @@ import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
-import org.team100.lib.util.Util;
 
 /**
  * Uses mechanism position control.
@@ -21,7 +20,6 @@ import org.team100.lib.util.Util;
  * positional commands make sense.
  */
 public class OutboardAngularPositionServo extends AngularPositionServoImpl {
-    private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_ff_torque;
     private final Control100Logger m_log_control;
@@ -41,25 +39,18 @@ public class OutboardAngularPositionServo extends AngularPositionServoImpl {
      * Ignores current setpoint. We only use the "next" setpoint.
      */
     void actuate(Setpoints1d wrappedSetpoint, double torqueNm) {
-        Control100 nextWrappedSetpoint = wrappedSetpoint.next();
-        if (DEBUG)
-            Util.printf("next wrapped setpoint %6.3f\n", nextWrappedSetpoint.x());
 
-        double positionRad = wrapNearMeasurement(nextWrappedSetpoint.x());
-        double velocityRad_S = nextWrappedSetpoint.v();
-        double accelRad_S2 = nextWrappedSetpoint.a();
+        Control100 nextUnwrappedSetpoint = positionNearMeasurement(
+                wrappedSetpoint.next());
 
-        m_unwrappedSetpoint = new Control100(positionRad, velocityRad_S, accelRad_S2);
-
-        if (DEBUG)
-            Util.printf("position %6.3f\n", positionRad);
+        m_nextUnwrappedSetpoint = nextUnwrappedSetpoint;
 
         m_mechanism.setUnwrappedPosition(
-                positionRad,
-                velocityRad_S,
-                accelRad_S2,
+                m_nextUnwrappedSetpoint.x(),
+                m_nextUnwrappedSetpoint.v(),
+                m_nextUnwrappedSetpoint.a(),
                 torqueNm);
-        m_log_control.log(() -> m_unwrappedSetpoint);
+        m_log_control.log(() -> m_nextUnwrappedSetpoint);
         m_log_ff_torque.log(() -> torqueNm);
     }
 

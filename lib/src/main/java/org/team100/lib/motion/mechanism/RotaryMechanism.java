@@ -158,6 +158,14 @@ public class RotaryMechanism {
         return m_sensor.getUnwrappedPositionRad();
     }
 
+    public double getMinPositionRad() {
+        return m_minPositionRad;
+    }
+
+    public double getMaxPositionRad() {
+        return m_maxPositionRad;
+    }
+
     public void stop() {
         m_motor.stop();
     }
