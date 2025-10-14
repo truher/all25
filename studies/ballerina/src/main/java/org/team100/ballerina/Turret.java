@@ -23,7 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** Attempts to maintain aim. */
+/** Attempts to maintain aim.  Demonstrates "spotting". */
 public class Turret extends SubsystemBase {
     private static final double GEAR_RATIO = 100;
     private static final double MIN_POSITION = -3;
@@ -49,7 +49,7 @@ public class Turret extends SubsystemBase {
         m_log_field_turret = field.doubleArrayLogger(Level.COMP, "turret");
         m_pose = pose;
         m_target = target;
-        IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 2, 0.05);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(5, 10, 0.05);
         ProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
         SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);

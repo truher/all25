@@ -163,10 +163,12 @@ public class RotaryMechanism {
         return m_sensor.getUnwrappedPositionRad();
     }
 
+    /** Minimum unwrapped position. */
     public double getMinPositionRad() {
         return m_minPositionRad;
     }
 
+    /** Maximum unwrapped position. */
     public double getMaxPositionRad() {
         return m_maxPositionRad;
     }
