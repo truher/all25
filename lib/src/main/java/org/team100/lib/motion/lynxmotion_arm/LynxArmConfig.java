@@ -35,7 +35,7 @@ public record LynxArmConfig(
     public Transform3d swingT() {
         if (swing.isEmpty()) {
             if (DEBUG)
-                System.out.println((Object) "empty swing");
+                System.out.println("empty swing");
             return Transform3d.kZero;
         }
         return yaw(swing.getAsDouble());
@@ -56,7 +56,7 @@ public record LynxArmConfig(
     public Transform3d twistT() {
         if (twist.isEmpty()) {
             if (DEBUG)
-                System.out.println((Object) "empty twist");
+                System.out.println("empty twist");
             return Transform3d.kZero;
         }
         return roll(twist.getAsDouble());

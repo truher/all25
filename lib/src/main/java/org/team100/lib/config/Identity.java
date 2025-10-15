@@ -69,7 +69,7 @@ public enum Identity {
             System.out.printf("Identity: %s\n", identity);
             return identity;
         }
-        System.out.println((Object) "Identity: UNKNOWN");
+        System.out.println("Identity: UNKNOWN");
         return UNKNOWN;
     }
 }

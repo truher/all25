@@ -26,7 +26,7 @@ public class Phoenix100 {
 
     public static void logCrashStatus() {
         if (ACTUALLY_CRASH)
-            System.out.println("WARNING: " + "***** Motor config fail will CRASH the robot, NOT FOR COMP! *****");
+            System.out.println("WARNING: ***** Motor config fail will CRASH the robot, NOT FOR COMP! *****");
         // else
         // StrUtil.warn("***** Motor config fail will not be caught, NOT FOR DEV! *****");
 
@@ -37,8 +37,8 @@ public class Phoenix100 {
         if (statusCode.isError()) {
             if (ACTUALLY_CRASH)
                 throw new IllegalStateException(statusCode.toString());
-            System.out.println("WARNING: " + "******************************************************");
-            System.out.println("WARNING: " + "****** MOTOR CONFIG HAS FAILED MOTOR IS NOT SET CORRECTLY ******");
+            System.out.println("WARNING: ******************************************************");
+            System.out.println("WARNING: ****** MOTOR CONFIG HAS FAILED MOTOR IS NOT SET CORRECTLY ******");
             System.out.println("WARNING: " + statusCode.toString());
         }
     }

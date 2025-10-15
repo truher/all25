@@ -174,45 +174,45 @@ public class CompleteProfile implements IncrementalProfile {
 
         if (togo < 0) {
             if (DEBUG)
-                System.out.println((Object) "goal is to the right");
+                System.out.println("goal is to the right");
             if (setpoint.v() < 0) {
                 if (DEBUG)
-                    System.out.println((Object) "We're moving the wrong way (left), so brake.");
+                    System.out.println("We're moving the wrong way (left), so brake.");
                 return control(dt, setpoint, goal, togo, 1.0, m_maxD);
             }
             if (setpoint.v() + m_tolerance < lerp.v()) {
                 if (DEBUG)
-                    System.out.println((Object) "Setpoint is below the goal path, so push right.");
+                    System.out.println("Setpoint is below the goal path, so push right.");
                 return control(dt, setpoint, goal, togo, 1.0, maxA);
             }
             if (setpoint.v() - m_tolerance < lerp.v()) {
                 if (DEBUG)
-                    System.out.println((Object) "Setpoint is within tolerance of the goal path.");
+                    System.out.println("Setpoint is within tolerance of the goal path.");
                 return goalPath(dt, setpoint, goal, togo, lerp.a());
             }
             if (DEBUG)
-                System.out.println((Object) "Setpoint is above the goal path, so brake.");
+                System.out.println("Setpoint is above the goal path, so brake.");
             return control(dt, setpoint, goal, togo, -1.0, m_maxD);
         } else {
             if (DEBUG)
-                System.out.println((Object) "goal is to the left");
+                System.out.println("goal is to the left");
             if (setpoint.v() > 0) {
                 if (DEBUG)
-                    System.out.println((Object) "We're moving the wrong way (right), so brake.");
+                    System.out.println("We're moving the wrong way (right), so brake.");
                 return control(dt, setpoint, goal, togo, -1.0, m_maxD);
             }
             if (setpoint.v() - m_tolerance > lerp.v()) {
                 if (DEBUG)
-                    System.out.println((Object) "Setpoint is above the goal path, so push left.");
+                    System.out.println("Setpoint is above the goal path, so push left.");
                 return control(dt, setpoint, goal, togo, -1.0, maxA);
             }
             if (setpoint.v() + m_tolerance > lerp.v()) {
                 if (DEBUG)
-                    System.out.println((Object) "Setpoint is within tolerance of the goal path.");
+                    System.out.println("Setpoint is within tolerance of the goal path.");
                 return goalPath(dt, setpoint, goal, togo, lerp.a());
             }
             if (DEBUG)
-                System.out.println((Object) "Setpoint is below the goal path, so brake.");
+                System.out.println("Setpoint is below the goal path, so brake.");
 
             return control(dt, setpoint, goal, togo, 1.0, m_maxD);
         }

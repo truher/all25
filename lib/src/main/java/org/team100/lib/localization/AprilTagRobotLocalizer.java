@@ -224,7 +224,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         if (!optAlliance.isPresent()) {
             // this happens on startup
             if (DEBUG)
-                System.out.println("WARNING: " + "VisionDataProvider24: Alliance is not present!");
+                System.out.println("WARNING: VisionDataProvider24: Alliance is not present!");
             return;
         }
         Alliance alliance = optAlliance.get();
@@ -319,13 +319,13 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 // If we've turned vision off altogether, then don't apply this update to the
                 // pose estimator.
                 if (DEBUG)
-                    System.out.println((Object) "heedvision is off");
+                    System.out.println("heedvision is off");
                 continue;
             }
 
             if (blipTransform.getTranslation().getNorm() > m_heedRadiusM) {
                 if (DEBUG)
-                    System.out.println((Object) "tag is too far");
+                    System.out.println("tag is too far");
                 // Skip too-far tags.
                 continue;
             }
@@ -334,7 +334,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 // Ignore the very first update since we have no idea if it is far from the
                 // previous one.
                 if (DEBUG)
-                    System.out.println((Object) "skip first update");
+                    System.out.println("skip first update");
                 m_prevPose = pose;
                 continue;
             }
@@ -344,7 +344,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 // The new estimate is too far from the previous one: it's probably garbage.
                 m_prevPose = pose;
                 if (DEBUG)
-                    System.out.println((Object) "too far from previous");
+                    System.out.println("too far from previous");
                 continue;
             }
 

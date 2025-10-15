@@ -157,7 +157,7 @@ public class Robot extends TimedRobot100 {
         final Logging logging = Logging.instance();
         final LevelPoller poller = new LevelPoller(async, logging::setLevel, Level.TRACE);
         System.out.printf("Using log level %s\n", poller.getLevel().name());
-        System.out.println((Object) "Do not use TRACE in comp, with NT logging, it will overrun");
+        System.out.println("Do not use TRACE in comp, with NT logging, it will overrun");
         final LoggerFactory fieldLogger = logging.fieldLogger;
         final FieldLogger.Log fieldLog = new FieldLogger.Log(fieldLogger);
 
@@ -701,7 +701,7 @@ public class Robot extends TimedRobot100 {
      * happen right now.
      */
     private void initStuff() {
-        System.out.println((Object) "\n*** PREWARM START");
+        System.out.println("\n*** PREWARM START");
         double startS = Takt.actual();
 
         // Exercise the trajectory planner.
@@ -759,13 +759,13 @@ public class Robot extends TimedRobot100 {
 
         // the duty cycle encoder produces garbage for a few seconds so sleep.
         try {
-            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
+            System.out.println("Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
+            System.out.println("Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
+            System.out.println("Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            System.out.println((Object) "Done!");
+            System.out.println("Done!");
         } catch (InterruptedException e) {
 
         }
@@ -783,7 +783,7 @@ public class Robot extends TimedRobot100 {
         b.append(".....##....##.......##.....##.##.....##.......##....##...##...##...##...\n");
         b.append(".....##....########.##.....##.##.....##.....######...#####.....#####....\n");
         b.append("\n");
-        System.out.println((Object) b.toString());
+        System.out.println(b.toString());
     }
 
 }

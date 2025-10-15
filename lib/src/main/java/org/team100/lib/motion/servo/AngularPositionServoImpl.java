@@ -97,14 +97,14 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         double x = unwrappedMeasurement + dx;
         if (dx > 0) {
             if (DEBUG)
-                System.out.println((Object) "short way is positive");
+                System.out.println("short way is positive");
             if (x > m_mechanism.getMaxPositionRad()) {
                 if (DEBUG)
-                    System.out.println((Object) "short way is beyond the limit; go around");
+                    System.out.println("short way is beyond the limit; go around");
                 x = x - 2 * Math.PI;
                 if (x < m_mechanism.getMinPositionRad()) {
                     if (DEBUG)
-                        System.out.println((Object) "setpoint is inaccessible, hold position.");
+                        System.out.println("setpoint is inaccessible, hold position.");
                     m_nextUnwrappedSetpoint = m_mechanism.getUnwrappedMeasurement().control();
                     actuate(new Setpoints1d(m_nextUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
                     m_validSetpoint = false;
@@ -113,14 +113,14 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
             }
         } else {
             if (DEBUG)
-                System.out.println((Object) "short way is negative");
+                System.out.println("short way is negative");
             if (x < m_mechanism.getMinPositionRad()) {
                 if (DEBUG)
-                    System.out.println((Object) "short way is beyond the limit; go around");
+                    System.out.println("short way is beyond the limit; go around");
                 x = x + 2 * Math.PI;
                 if (x > m_mechanism.getMaxPositionRad()) {
                     if (DEBUG)
-                        System.out.println((Object) "setpoint is inaccessible; hold position.");
+                        System.out.println("setpoint is inaccessible; hold position.");
                     m_nextUnwrappedSetpoint = m_mechanism.getUnwrappedMeasurement().control();
                     actuate(new Setpoints1d(m_nextUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
                     m_validSetpoint = false;
@@ -141,28 +141,28 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         double goalX = unwrappedMeasurement + goalDx;
         if (goalDx > 0) {
             if (DEBUG)
-                System.out.println((Object) "short way is positive");
+                System.out.println("short way is positive");
             if (goalX > m_mechanism.getMaxPositionRad()) {
                 if (DEBUG)
-                    System.out.println((Object) "goal is beyond the mechanism range, go the other way.");
+                    System.out.println("goal is beyond the mechanism range, go the other way.");
                 goalX = goalX - 2 * Math.PI;
                 if (goalX < m_mechanism.getMinPositionRad()) {
                     if (DEBUG)
-                        System.out.println((Object) "the goal is inaccessible, just hold position.");
+                        System.out.println("the goal is inaccessible, just hold position.");
                     goalX = unwrappedMeasurement;
                     m_validSetpoint = false;
                 }
             }
         } else {
             if (DEBUG)
-                System.out.println((Object) "short way is negative");
+                System.out.println("short way is negative");
             if (goalX < m_mechanism.getMinPositionRad()) {
                 if (DEBUG)
-                    System.out.println((Object) "goal is too far, try an equivalent goal");
+                    System.out.println("goal is too far, try an equivalent goal");
                 goalX = goalX + 2 * Math.PI;
                 if (goalX > m_mechanism.getMaxPositionRad()) {
                     if (DEBUG)
-                        System.out.println((Object) "the goal is inaccessible, just hold position.");
+                        System.out.println("the goal is inaccessible, just hold position.");
                     goalX = unwrappedMeasurement;
                     m_validSetpoint = false;
                 }
@@ -182,13 +182,13 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         if (unwrappedGoal.near(m_unwrappedGoal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
             // If the new goal is the same as the old goal, no change is needed.
             if (DEBUG)
-                System.out.println((Object) "keep old goal");
+                System.out.println("keep old goal");
             return;
         }
         // The new goal is not the same as the old goal, so tell the reference about it.
         m_unwrappedGoal = unwrappedGoal;
         if (DEBUG)
-            System.out.println((Object) "replace goal");
+            System.out.println("replace goal");
         m_ref.setGoal(unwrappedGoal);
         // make sure the setpoint is near the measurement
         if (m_nextUnwrappedSetpoint == null) {

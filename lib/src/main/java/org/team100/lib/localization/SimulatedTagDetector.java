@@ -89,7 +89,7 @@ public class SimulatedTagDetector {
 
     public void periodic() {
         if (DEBUG)
-            System.out.println((Object) "simulated tag detector");
+            System.out.println("simulated tag detector");
         Optional<Alliance> opt = DriverStation.getAlliance();
         if (opt.isEmpty())
             return;

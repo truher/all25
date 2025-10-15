@@ -70,7 +70,7 @@ public class Cache {
      */
     public static void refresh() {
         if (DEBUG)
-            System.out.println((Object) "Cache refresh");
+            System.out.println("Cache refresh");
         reset();
         update();
     }
@@ -119,7 +119,7 @@ public class Cache {
         }
         for (DoubleCache r : doubles) {
             if (DEBUG)
-                System.out.println((Object) "double update");
+                System.out.println("double update");
             r.getAsDouble();
         }
         for (SideEffect r : sideEffects) {

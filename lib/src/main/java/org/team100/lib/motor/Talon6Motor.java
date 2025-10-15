@@ -163,7 +163,7 @@ public abstract class Talon6Motor implements BareMotor {
                 .ofDouble(() -> {
                     double latency = Utils.fpgaToCurrentTime(Takt.get()) - motorPosition.getTimestamp().getTime();
                     if (latency > 0.04) {
-                        System.out.println("WARNING: " + "!!!!!!! stale position! !!!!!!!" + canId);
+                        System.out.println("WARNING: !!!!!!! stale position! !!!!!!!" + canId);
                         latency = 0.1;
                     }
                     return motorPosition.getValueAsDouble() + (motorVelocity.getValueAsDouble() * latency);
@@ -344,7 +344,7 @@ public abstract class Talon6Motor implements BareMotor {
      * at startup.
      */
     public void resetEncoderPosition() {
-        System.out.println("WARNING: " + "Setting CTRE encoder position is very slow!");
+        System.out.println("WARNING: Setting CTRE encoder position is very slow!");
         Phoenix100.warn(() -> m_motor.setPosition(0, 1));
         m_position.reset();
         m_velocity.reset();
@@ -360,7 +360,7 @@ public abstract class Talon6Motor implements BareMotor {
      * at startup.
      */
     private void setUnwrappedEncoderPosition(double motorPositionRev) {
-        System.out.println("WARNING: " + "Setting CTRE encoder position is very slow!");
+        System.out.println("WARNING: Setting CTRE encoder position is very slow!");
         Phoenix100.warn(() -> m_motor.setPosition(motorPositionRev, 1));
     }
 

@@ -29,7 +29,7 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     @Override
     public void reset() {
         if (DEBUG)
-            System.out.println("WARNING: " + "make sure resetting encoder position doesn't break anything");
+            System.out.println("WARNING: make sure resetting encoder position doesn't break anything");
         m_mechanism.resetEncoderPosition();
     }
 

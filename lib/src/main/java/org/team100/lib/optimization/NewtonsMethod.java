@@ -147,7 +147,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             }
             if (restarts > 0) {
                 // if (DEBUG)
-                System.out.println((Object) "convergence failed, trying random restart");
+                System.out.println("convergence failed, trying random restart");
                 // this is *really* random, including out-of-bounds.
                 // SimpleMatrix r = SimpleMatrix.random(m_xdim.getNum(), 1)
                 // .minus(0.5)
@@ -232,7 +232,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             double dxI = dx.get(i);
             if (Math.abs(dxI) > m_dxLimit) {
                 if (DEBUG)
-                    System.out.println((Object) "clamped!");
+                    System.out.println("clamped!");
             }
             double clampedDxI = MathUtil.clamp(dxI, -m_dxLimit, m_dxLimit);
             // System.out.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);

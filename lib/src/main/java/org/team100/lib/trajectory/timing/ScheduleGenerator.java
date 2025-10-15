@@ -44,7 +44,7 @@ public class ScheduleGenerator {
             return timeParameterizeTrajectory(samples, start_vel, end_vel);
         } catch (TimingException e) {
             e.printStackTrace();
-            System.out.println("WARNING: " + "Timing exception");
+            System.out.println("WARNING: Timing exception");
             return new Trajectory100();
         }
     }
