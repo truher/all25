@@ -377,11 +377,11 @@ public class Robot extends TimedRobot100 {
 
         // At the same time, move the arm to the floor and spin the intake,
         // and go back home when the button is released, ending when complete.
-        // whileTrue(driver::rightTrigger,
-        //         parallel(
-        //                 m_mech.pickWithProfile(),
-        //                 m_manipulator.centerIntake()))
-        //         .onFalse(m_mech.profileHomeTerminal());
+        whileTrue(driver::rightTrigger,
+                parallel(
+                        m_mech.pickWithProfile(),
+                        m_manipulator.centerIntake()))
+                 .onFalse(m_mech.profileHomeTerminal());
 
         // Move to coral ground pick location.
         whileTrue(driver::rightBumper,
@@ -392,7 +392,7 @@ public class Robot extends TimedRobot100 {
                 .onFalse(m_mech.profileHomeTerminal());
 
         // Pick a game piece from the floor, based on camera input.
-        whileTrue(driver::rightTrigger,
+        whileTrue(operator::leftTrigger,
             parallel(
                 m_mech.pickWithProfile(),
                 m_manipulator.centerIntake(),
