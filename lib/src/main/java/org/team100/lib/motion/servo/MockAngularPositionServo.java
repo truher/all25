@@ -22,7 +22,7 @@ public class MockAngularPositionServo implements AngularPositionServo {
     }
 
     @Override
-    public void setPositionDirect(double goalRad, double torqueNm) {
+    public void setPositionDirect(double goalRad, double velocityRad_S, double torqueNm) {
     }
 
     @Override

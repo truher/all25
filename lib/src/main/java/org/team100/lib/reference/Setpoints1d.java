@@ -9,6 +9,9 @@ import org.team100.lib.state.Control100;
  * feedback can just compare the current setpoint to the current measurement.
  * More clever feedback might extrapolate the current measurements and compare
  * to the next setpoint.
+ * 
+ * @param current
+ * @param next
  */
 public record Setpoints1d(Control100 current, Control100 next) {
 

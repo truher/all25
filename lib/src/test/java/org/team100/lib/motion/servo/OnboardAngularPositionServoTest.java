@@ -80,7 +80,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         // move to the starting point of -3
         for (int i = 0; i < 50; ++i) {
             servo.periodic();
-            servo.setPositionDirect(-3, 0);
+            servo.setPositionDirect(-3, 0, 0);
             stepTime();
         }
 
@@ -145,7 +145,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         // move to the starting point of -3
         for (int i = 0; i < 50; ++i) {
             servo.periodic();
-            servo.setPositionDirect(-3, 0);
+            servo.setPositionDirect(-3, 0, 0);
             stepTime();
         }
 
@@ -208,7 +208,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
 
         for (int i = 0; i < 50; ++i) {
             servo.periodic();
-            servo.setPositionDirect(1, 0);
+            servo.setPositionDirect(1, 0, 0);
             stepTime();
         }
 
@@ -248,7 +248,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
 
         for (int i = 0; i < 50; ++i) {
             servo.periodic();
-            servo.setPositionDirect(-3, 0);
+            servo.setPositionDirect(-3, 0, 0);
             stepTime();
         }
 
@@ -263,8 +263,8 @@ public class OnboardAngularPositionServoTest implements Timeless {
         // since this relies (in this test) on feedback alone, the shape is
         // exponential.
 
-        for (int i = 0; i < 4; ++i) {
-            servo.setPositionDirect(3, 0);
+        for (int i = 0; i < 5; ++i) {
+            servo.setPositionDirect(3, 0, 0);
             servo.periodic();
             stepTime();
             if (DEBUG)
@@ -272,11 +272,11 @@ public class OnboardAngularPositionServoTest implements Timeless {
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // wrapped angle has crossed over
-        assertEquals(3.120, servo.getWrappedPositionRad(), 0.001);
+        assertEquals(3.12, servo.getWrappedPositionRad(), 0.001);
         // unwrapped continues
         assertEquals(-3.163, servo.getUnwrappedPositionRad(), 0.001);
-        for (int i = 4; i < 20; ++i) {
-            servo.setPositionDirect(3, 0);
+        for (int i = 5; i < 20; ++i) {
+            servo.setPositionDirect(3, 0, 0);
             servo.periodic();
             stepTime();
             if (DEBUG)
@@ -285,7 +285,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         }
         // feedback overshoots a little
         assertEquals(3.002, servo.getWrappedPositionRad(), 0.001);
-        assertEquals(-3.282, servo.getUnwrappedPositionRad(), 0.001);
+        assertEquals(-3.281, servo.getUnwrappedPositionRad(), 0.001);
     }
 
     /** From -3 to 3 the long way with "direct". */
@@ -296,7 +296,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, -3.1, 3.1);
-        final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(2, 2, 0.05);
         final IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         // lots of feedback here since control velocity is zero
         // note that we don't use "continuous" feedback here
@@ -312,7 +312,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         // move to the starting point of -3
         for (int i = 0; i < 50; ++i) {
             servo.periodic();
-            servo.setPositionDirect(-3, 0);
+            servo.setPositionDirect(-3, 0, 0);
             stepTime();
         }
 
@@ -330,28 +330,25 @@ public class OnboardAngularPositionServoTest implements Timeless {
         // since this relies (in this test) on feedback alone, the shape is
         // exponential.
 
-        for (int i = 0; i < 4; ++i) {
-            servo.setPositionDirect(3, 0);
+        for (int i = 0; i < 96; ++i) {
+            servo.setPositionDirect(3, 0, 0);
             servo.periodic();
             stepTime();
             if (DEBUG)
                 System.out.printf("i: %d position: %5.3f %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
-        // angle crosses zero
-        assertEquals(0.461, servo.getWrappedPositionRad(), 0.001);
-        assertEquals(0.461, servo.getUnwrappedPositionRad(), 0.001);
-        for (int i = 4; i < 50; ++i) {
-            // use the goal as both setpoints.
-            servo.setPositionDirect(3, 0);
+        // going around uses the profile which is much slower
+        assertEquals(-0.16, servo.getWrappedPositionRad(), 0.001);
+        assertEquals(-0.16, servo.getUnwrappedPositionRad(), 0.001);
+        for (int i = 96; i < 150; ++i) {
+            servo.setPositionDirect(3, 0, 0);
             servo.periodic();
             stepTime();
             if (DEBUG)
                 System.out.printf("i: %d position: %5.3f %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
-        // it takes a long time to get all the way there, since it's only proportional
-        // feedback
         assertEquals(3, servo.getWrappedPositionRad(), 0.001);
         assertEquals(3, servo.getUnwrappedPositionRad(), 0.001);
     }

@@ -28,7 +28,11 @@ public interface AngularPositionServo {
      * Initializes the profile if necessary.
      * 
      * Sets the goal, updates the setpoint to the "next step" value towards it,
-     * gives the setpoint to the outboard mechanism.
+     * uses the current and next setpoints for actuation.
+     * 
+     * Because it uses a profile, this method is not suitable for anything that
+     * needs to be coordinated, e.g. with another mechanism, or with a target. It's
+     * suitable for simple, smooth control of independent mechanisms.
      * 
      * @param wrappedGoalRad The goal angle here wraps within [-pi, pi], using
      *                       output measurements, e.g. shaft radians, not motor
@@ -39,17 +43,23 @@ public interface AngularPositionServo {
 
     /**
      * Invalidates the current profile, sets the setpoint directly, using the
-     * supplied position and zero for velocity and acceleration.
+     * supplied position and zero for acceleration.
      * 
      * This is really only appropriate for the Outboard control case, because the
-     * feedback controller there can be much firmer than in the Outboard case.
+     * feedback controller there can be much firmer than in the Outboard case, but
+     * it does work with Onboard feedback.
      * 
-     * @param wrappedGoalRad The goal angle here wraps within [-pi, pi], using
+     * This method goes the "short way" directly and the "long way" with a profile.
+     * 
+     * @param wrappedGoalRad Where the mechanism should be at the next time step.
+     *                       The angle here wraps within [-pi, pi], using
      *                       output measurements, e.g. shaft radians, not motor
      *                       radians.
+     * @param velocityRad_S  The desired velocity at the next time step, used for
+     *                       feedforward.
      * @param torqueNm       Feedforward for gravity or spring compensation.
      */
-    void setPositionDirect(double wrappedGoalRad, double torqueNm);
+    void setPositionDirect(double wrappedGoalRad, double velocityRad_S, double torqueNm);
 
     /**
      * This is the "wrapped" value, i.e. it is periodic within +/- pi.
