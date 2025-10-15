@@ -8,7 +8,6 @@ import org.team100.lib.logging.LoggerFactory.FieldRelativeAccelerationLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.util.Util;
 
 /**
  * Limits cartesian (a) and rotational (α) acceleration.
@@ -58,10 +57,10 @@ public class FieldRelativeAccelerationLimiter  {
         double scale = Math.min(cartesianScale, alphaScale);
         m_log_scale.log(() -> scale);
         GlobalSe2Velocity result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
-        if (DEBUG)
-            Util.printf(
-                    "FieldRelativeAccelerationLimiter prev %s target %s accel %s cartesian scale %5.2f alpha scale %5.2f total scale %5.2f result %s\n",
-                    prev, target, accel, cartesianScale, alphaScale, scale, result);
+        if (DEBUG) {
+            Object[] args = { prev, target, accel, cartesianScale, alphaScale, scale, result };
+            System.out.printf("FieldRelativeAccelerationLimiter prev %s target %s accel %s cartesian scale %5.2f alpha scale %5.2f total scale %5.2f result %s\n", args);
+        }
         return result;
     }
 

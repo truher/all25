@@ -9,7 +9,6 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
 import org.team100.lib.util.RoboRioChannel;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
@@ -85,7 +84,7 @@ public abstract class DutyCycleRotaryPositionSensor extends RoboRioRotaryPositio
         if (!isConnected()) {
             m_log_connected.log(() -> false);
             String msg = String.format("*** encoder %d not connected ***", m_channel);
-            Util.warn(msg);
+            System.out.println("WARNING: " + msg);
             if (THROW_IF_DISCONNNECTED)
                 throw new IllegalStateException(msg);
         }

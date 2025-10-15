@@ -121,8 +121,10 @@ public class Targets extends CameraReader<Rotation3d> {
     public Optional<Translation2d> getClosestTarget() {
         Pose2d robotPose = m_history.apply(Takt.get()).pose();
         List<Translation2d> targets = getTargets();
-        if (DEBUG)
-            Util.printf("translations %d\n", targets.size());
+        if (DEBUG) {
+            Object[] args = { targets.size() };
+            System.out.printf("translations %d\n", args);
+        }
         return ObjectPicker.closestObject(targets, robotPose);
     }
 

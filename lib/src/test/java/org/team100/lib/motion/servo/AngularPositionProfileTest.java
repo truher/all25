@@ -18,7 +18,6 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.util.Util;
 
 class AngularPositionProfileTest implements Timeless {
     private static final boolean DEBUG = false;
@@ -104,7 +103,7 @@ class AngularPositionProfileTest implements Timeless {
         }
         // useful to fix up the examples above
         if (DEBUG)
-            Util.printf("verify(%5.3f, %5.3f, %5.3f);\n", motor.velocity,
+            System.out.printf("verify(%5.3f, %5.3f, %5.3f);\n", motor.velocity,
                     servo.m_nextUnwrappedSetpoint.x(), servo.m_nextUnwrappedSetpoint.v());
         assertEquals(setpointPosition, servo.m_nextUnwrappedSetpoint.x(), DELTA, "position");
         assertEquals(setpointVelocity, servo.m_nextUnwrappedSetpoint.v(), DELTA, "velocity");

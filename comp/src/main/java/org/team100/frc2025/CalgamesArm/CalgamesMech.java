@@ -329,11 +329,13 @@ public class CalgamesMech extends SubsystemBase implements Music {
     public void set(SwerveControl control) {
         Pose2d pose = control.pose();
         Config config = m_kinematics.inverse(pose);
-        if (DEBUG)
-            Util.printf("pose %s config %s\n", Util.pose2Str(pose), config);
+        if (DEBUG) {
+            Object[] args = { Util.pose2Str(pose), config };
+            System.out.printf("pose %s config %s\n", args);
+        }
         if (config.isNaN()) {
             if (DEBUG)
-                Util.println("skipping invalid config");
+                System.out.println((Object) "skipping invalid config");
             stop();
             return;
         }

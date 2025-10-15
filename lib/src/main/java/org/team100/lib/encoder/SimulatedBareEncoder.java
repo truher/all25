@@ -4,7 +4,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
-import org.team100.lib.util.Util;
 
 public class SimulatedBareEncoder implements IncrementalBareEncoder {
     private static final boolean DEBUG = false;
@@ -36,8 +35,10 @@ public class SimulatedBareEncoder implements IncrementalBareEncoder {
     @Override
     public double getUnwrappedPositionRad() {
         double positionRad = m_motor.getUnwrappedPositionRad();
-        if (DEBUG)
-            Util.printf("read encoder position %.6f\n", positionRad);
+        if (DEBUG) {
+            Object[] args = { positionRad };
+            System.out.printf("read encoder position %.6f\n", args);
+        }
         return positionRad;
     }
 

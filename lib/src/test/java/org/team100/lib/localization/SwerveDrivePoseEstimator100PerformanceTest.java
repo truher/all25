@@ -10,7 +10,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,7 +49,7 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
      * writer to the pose reader, and save something like 20 us (0.4%) on average.
      */
     // There's no need to run this all the time
-    //@Test
+    // @Test
     void test0() {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
@@ -87,8 +86,8 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {
-            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+            System.out.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            System.out.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
         assertEquals(11, history.size());
         assertEquals(0.2, history.lastKey(), DELTA);
@@ -101,8 +100,8 @@ public class SwerveDrivePoseEstimator100PerformanceTest {
         }
         finishTime = System.currentTimeMillis();
         if (DEBUG) {
-            Util.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
-            Util.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
+            System.out.printf("ET (s): %6.3f\n", ((double) finishTime - startTime) / 1000);
+            System.out.printf("ET/call (ns): %6.3f\n ", 1000000 * ((double) finishTime - startTime) / iterations);
         }
         assertEquals(11, history.size());
         assertEquals(0.2, history.lastKey(), DELTA);

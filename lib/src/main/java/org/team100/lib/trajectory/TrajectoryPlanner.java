@@ -10,7 +10,6 @@ import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
 import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -150,7 +149,7 @@ public class TrajectoryPlanner {
                     endVelocity.norm(),
                     magicNumbers);
         } catch (TrajectoryGenerationException e) {
-            Util.warn("Trajectory Generation Exception");
+            System.out.println("WARNING: " + "Trajectory Generation Exception");
             return new Trajectory100();
         }
     }
@@ -189,7 +188,7 @@ public class TrajectoryPlanner {
                     splineExitVelocity,
                     magicNumbers);
         } catch (TrajectoryGenerationException e) {
-            Util.warn("Trajectory Generation Exception");
+            System.out.println("WARNING: " + "Trajectory Generation Exception");
             return new Trajectory100();
         }
     }
@@ -240,7 +239,7 @@ public class TrajectoryPlanner {
         } catch (IllegalArgumentException e) {
             // catches various kinds of malformed input, returns a no-op.
             // this should never actually happen.
-            Util.warn("Bad trajectory input!!");
+            System.out.println("WARNING: " + "Bad trajectory input!!");
             // print the stack trace if you want to know who is calling
             // e.printStackTrace();
             return new Trajectory100();
@@ -269,7 +268,7 @@ public class TrajectoryPlanner {
         } catch (IllegalArgumentException e) {
             // catches various kinds of malformed input, returns a no-op.
             // this should never actually happen.
-            Util.warn("Bad trajectory input!!");
+            System.out.println("WARNING: " + "Bad trajectory input!!");
             e.printStackTrace();
             return new Trajectory100();
         }

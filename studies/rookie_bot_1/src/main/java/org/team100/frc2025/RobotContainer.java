@@ -13,7 +13,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LevelPoller;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,8 +27,8 @@ public class RobotContainer {
         final Async async = asyncFactory.get();
         final Logging logging = Logging.instance();
         final LevelPoller poller = new LevelPoller(async, logging::setLevel, Level.COMP);
-        Util.printf("Using log level %s\n", poller.getLevel().name());
-        Util.println("Do not use TRACE in comp, with NT logging, it will overrun");
+        System.out.printf("Using log level %s\n", poller.getLevel().name());
+        System.out.println("Do not use TRACE in comp, with NT logging, it will overrun");
 
         final LoggerFactory logger = logging.rootLogger;
 

@@ -19,7 +19,6 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.util.Util;
 
 public class OnboardAngularPositionServoTest implements Timeless {
     private static final double DELTA = 0.001;
@@ -45,7 +44,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.setPositionProfiled(1, 0);
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f %5.3f\n", i, turningMotor.position, turningMotor.velocity);
+                System.out.printf("i: %d position: %5.3f %5.3f\n", i, turningMotor.position, turningMotor.velocity);
             // lets say we're on the profile.
             positionSensor.angle = servo.m_nextUnwrappedSetpoint.x();
             positionSensor.rate = servo.m_nextUnwrappedSetpoint.v();
@@ -99,7 +98,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.periodic();
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f velocity: %5.3f\n",
+                System.out.printf("i: %d position: %5.3f velocity: %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // heading towards -pi
@@ -110,7 +109,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.periodic();
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f %5.3f\n",
+                System.out.printf("i: %d position: %5.3f %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // now the wrapped angle is what we asked for
@@ -164,7 +163,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.periodic();
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f velocity: %5.3f\n",
+                System.out.printf("i: %d position: %5.3f velocity: %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // passing through zero
@@ -175,7 +174,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.periodic();
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f %5.3f\n",
+                System.out.printf("i: %d position: %5.3f %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // now the wrapped angle is what we asked for
@@ -269,7 +268,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.periodic();
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f %5.3f\n",
+                System.out.printf("i: %d position: %5.3f %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // wrapped angle has crossed over
@@ -281,7 +280,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.periodic();
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f %5.3f\n",
+                System.out.printf("i: %d position: %5.3f %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // feedback overshoots a little
@@ -327,7 +326,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
 
         // now try to go to 3
         if (DEBUG)
-            Util.println("** now try to go to 3, the long way");
+            System.out.println("** now try to go to 3, the long way");
         // since this relies (in this test) on feedback alone, the shape is
         // exponential.
 
@@ -336,7 +335,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.periodic();
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f %5.3f\n",
+                System.out.printf("i: %d position: %5.3f %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // angle crosses zero
@@ -348,7 +347,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
             servo.periodic();
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f %5.3f\n",
+                System.out.printf("i: %d position: %5.3f %5.3f\n",
                         i, motor.getUnwrappedPositionRad(), motor.getVelocityRad_S());
         }
         // it takes a long time to get all the way there, since it's only proportional

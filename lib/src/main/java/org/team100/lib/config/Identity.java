@@ -3,8 +3,6 @@ package org.team100.lib.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -68,10 +66,11 @@ public enum Identity {
         }
         if (identities.containsKey(serialNumber)) {
             Identity identity = identities.get(serialNumber);
-            Util.printf("Identity: %s\n", identity);
+            Object[] args = { identity };
+            System.out.printf("Identity: %s\n", args);
             return identity;
         }
-        Util.println("Identity: UNKNOWN");
+        System.out.println((Object) "Identity: UNKNOWN");
         return UNKNOWN;
     }
 }

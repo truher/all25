@@ -8,7 +8,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -117,7 +116,7 @@ public class SwerveLocal {
 
     void reset() {
         if (DEBUG)
-            Util.warn("make sure resetting in SwerveLocal doesn't break anything");
+            System.out.println("WARNING: " + "make sure resetting in SwerveLocal doesn't break anything");
         m_modules.reset();
     }
 

@@ -2,8 +2,6 @@ package org.team100.lib.optimization;
 
 import java.util.function.Function;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
@@ -45,12 +43,12 @@ public class GradientDescent<R extends Num> {
             Vector<R> gradDirection = grad.unit();
             Vector<R> next = current.plus(gradDirection.times(-1.0 * stepSize));
             double fNext = m_f.apply(next);
-            // Util.printf("current [%7.4f %7.4f] => %7.4f .. next [%7.4f %7.4f]
+            // System.out.printf("current [%7.4f %7.4f] => %7.4f .. next [%7.4f %7.4f]
             // %7.4f\n",
             // current.get(0), current.get(1), fCurrent,
             // next.get(0), next.get(1), fNext);
-            // Util.printf("current %7.4f \n", fCurrent);
-            // Util.printf("%5.3f\n", current.get(0));
+            // System.out.printf("current %7.4f \n", fCurrent);
+            // System.out.printf("%5.3f\n", current.get(0));
             if (fNext > fCurrent) {
                 // if we go too far, turn down the step size and try again.
                 stepSize *= 0.5;
@@ -63,7 +61,7 @@ public class GradientDescent<R extends Num> {
             current = next;
             fCurrent = fNext;
         }
-        Util.warn("did not meet tolerance");
+        System.out.println("WARNING: " + "did not meet tolerance");
         return current;
     }
 

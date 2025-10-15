@@ -10,7 +10,6 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.util.Util;
 
 /**
  * Makes drivetrain input feasible.
@@ -60,25 +59,33 @@ public class SwerveLimiter  {
     public GlobalSe2Velocity apply(GlobalSe2Velocity nextReference) {
         m_log_next.log(() -> nextReference);
         m_log_normIn.log(nextReference::norm);
-        if (DEBUG)
-            Util.printf("nextReference %s\n", nextReference);
+        if (DEBUG) {
+            Object[] args = { nextReference };
+            System.out.printf("nextReference %s\n", args);
+        }
         if (m_current == null)
             m_current = nextReference;
 
         // First, limit the goal to a feasible velocity.
         GlobalSe2Velocity result = m_velocityLimiter.apply(nextReference);
-        if (DEBUG)
-            Util.printf("velocity limited %s\n", result);
+        if (DEBUG) {
+            Object[] args1 = { result };
+            System.out.printf("velocity limited %s\n", args1);
+        }
 
         // then limit acceleration towards that goal to avoid capsize
         result = m_capsizeLimiter.apply(m_current, result);
-        if (DEBUG)
-            Util.printf("capsize limited %s\n", result);
+        if (DEBUG) {
+            Object[] args2 = { result };
+            System.out.printf("capsize limited %s\n", args2);
+        }
 
         // Finally, limit acceleration further, using motor physics.
         result = m_accelerationLimiter.apply(m_current, result);
-        if (DEBUG)
-            Util.printf("accel limited %s\n", result);
+        if (DEBUG) {
+            Object[] args3 = { result };
+            System.out.printf("accel limited %s\n", args3);
+        }
 
         // Ignore very small inputs.
         if (Experiments.instance.enabled(Experiment.SwerveDeadband)) {
@@ -87,8 +94,10 @@ public class SwerveLimiter  {
 
         updateSetpoint(result);
 
-        if (DEBUG)
-            Util.printf("result %s\n", result);
+        if (DEBUG) {
+            Object[] args4 = { result };
+            System.out.printf("result %s\n", args4);
+        }
         m_log_norm.log(result::norm);
 
         return result;

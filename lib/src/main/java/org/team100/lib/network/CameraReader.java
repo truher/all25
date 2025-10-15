@@ -64,8 +64,10 @@ public abstract class CameraReader<T> {
             ValueEventData valueEventData = e.valueData;
             NetworkTableValue ntValue = valueEventData.value;
             String name = valueEventData.getTopic().getName();
-            if (DEBUG)
-                Util.printf("poll %s\n", name);
+            if (DEBUG) {
+                Object[] args = { name };
+                System.out.printf("poll %s\n", args);
+            }
             String[] fields = name.split("/");
             if (fields.length != 4) {
                 Util.warnf("weird event name: %s\n", name);
@@ -74,11 +76,13 @@ public abstract class CameraReader<T> {
             // key is "rootName/cameraId/cameraNumber/valueName"
             String cameraId = fields[1];
             if (!fields[3].equals(m_ntValueName)) {
-                Util.warn("weird key: " + name);
+                System.out.println("WARNING: " + "weird key: " + name);
                 continue;
             }
-            if (DEBUG)
-                Util.printf("found value\n");
+            if (DEBUG) {
+                Object[] args1 = {};
+                System.out.printf("found value\n", args1);
+            }
             // decode the way StructArrayEntryImpl does
             byte[] valueBytes = ntValue.getRaw();
             if (valueBytes.length == 0) {
@@ -96,8 +100,10 @@ public abstract class CameraReader<T> {
             // Robot-to-camera, offset from Camera.java
             // in tests this offset is identity.
             Transform3d cameraOffset = Camera.get(cameraId).getOffset();
-            if (DEBUG)
-                Util.printf("camera %s offset %s\n", cameraId, cameraOffset);
+            if (DEBUG) {
+                Object[] args2 = { cameraId, cameraOffset };
+                System.out.printf("camera %s offset %s\n", args2);
+            }
 
             // server time is in microseconds
             // https://docs.wpilib.org/en/stable/docs/software/networktables/networktables-intro.html#timestamps
@@ -109,8 +115,10 @@ public abstract class CameraReader<T> {
             // time, so this uses "local" time now.
             // double valueTimestamp = ((double)ntValue.getServerTime()) / 1000000.0;
             double valueTimestamp = ((double) ntValue.getTime()) / 1000000.0;
-            if (DEBUG)
-                Util.printf("reader timestamp %f\n", valueTimestamp);
+            if (DEBUG) {
+                Object[] args3 = { valueTimestamp };
+                System.out.printf("reader timestamp %f\n", args3);
+            }
 
             perValue(cameraOffset, valueTimestamp, valueArray);
         }

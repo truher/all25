@@ -5,7 +5,6 @@ import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.util.Util;
 
 /**
  * Produces references based on profiles.
@@ -105,7 +104,8 @@ public class ProfileReference implements SwerveReference {
 
     private SwerveControl makeNext(SwerveModel current) {
         if (DEBUG) {
-            Util.printf("ProfileReference refreshing %s\n", m_name);
+            Object[] args = { m_name };
+            System.out.printf("ProfileReference refreshing %s\n", args);
         }
         if (current == null) {
             // happens at startup

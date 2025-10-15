@@ -8,7 +8,6 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.util.RoboRioChannel;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
@@ -77,7 +76,7 @@ public class AnalogRotaryPositionSensorTest {
                 // subtract the starting point so the wrapped numbers are the same.
                 double sensorUnwrapped = sensor.getUnwrappedPositionRad() - 6 * Math.PI;
                 if (DEBUG)
-                    Util.printf(
+                    System.out.printf(
                             "unwrapped %6.3f wrapped %6.3f piwrapped %6.3f sensorTurns %6.3f ratio %6.3f sensorWrapped %6.3f turns %6.3f sensorUnwrapped %6.3f\n",
                             unwrappedRad, wrapped, piwrapped, sensorTurns, ratio, sensorWrapped, turns,
                             sensorUnwrapped);

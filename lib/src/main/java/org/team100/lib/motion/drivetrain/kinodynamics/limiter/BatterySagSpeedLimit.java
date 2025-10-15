@@ -6,7 +6,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
@@ -47,15 +46,19 @@ public class BatterySagSpeedLimit  {
 
     public double getMaxDriveVelocityM_S() {
         double scale = getScale();
-        if (DEBUG)
-            Util.printf("BatterySagSpeedLimit velocity scale %.5f\n", scale);
+        if (DEBUG) {
+            Object[] args = { scale };
+            System.out.printf("BatterySagSpeedLimit velocity scale %.5f\n", args);
+        }
         return scale * m_dynamics.getMaxDriveVelocityM_S();
     }
 
     public double getMaxAngleSpeedRad_S() {
         double scale = getScale();
-        if (DEBUG)
-            Util.printf("BatterySagSpeedLimit  omega scale %.5f\n", scale);
+        if (DEBUG) {
+            Object[] args = { scale };
+            System.out.printf("BatterySagSpeedLimit  omega scale %.5f\n", args);
+        }
         return scale * m_dynamics.getMaxAngleSpeedRad_S();
     }
 

@@ -17,7 +17,6 @@ import org.team100.lib.trajectory.timing.ScheduleGenerator;
 import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,7 +37,7 @@ public class PathFactoryTest {
         // sample the path so we can see it
         for (double t = 0; t <= path.getMaxDistance(); t += 0.1) {
             if (DEBUG)
-                Util.printf("%.1f %5.2f %5.2f\n",
+                System.out.printf("%.1f %5.2f %5.2f\n",
                         t,
                         path.sample(t).getPose().getX(),
                         path.sample(t).getPose().getY());
@@ -56,7 +55,7 @@ public class PathFactoryTest {
 
         for (double t = 0; t < trajectory.duration(); t += 0.1) {
             if (DEBUG)
-                Util.printf("%.1f %5.2f %5.2f\n",
+                System.out.printf("%.1f %5.2f %5.2f\n",
                         t,
                         trajectory.sample(t).state().getPose().getX(),
                         trajectory.sample(t).state().getPose().getY());
@@ -204,7 +203,7 @@ public class PathFactoryTest {
         List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.001, 0.001, 0.001);
         for (Pose2dWithMotion p : motion) {
             if (DEBUG)
-                Util.printf("%5.3f %5.3f\n", p.getTranslation().getX(), p.getTranslation().getY());
+                System.out.printf("%5.3f %5.3f\n", p.getTranslation().getX(), p.getTranslation().getY());
         }
     }
 
@@ -233,8 +232,8 @@ public class PathFactoryTest {
         long endTimeNs = System.nanoTime();
         double totalDurationMs = (endTimeNs - startTimeNs) / 1000000.0;
         if (DEBUG) {
-            Util.printf("total duration ms: %5.3f\n", totalDurationMs);
-            Util.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
+            System.out.printf("total duration ms: %5.3f\n", totalDurationMs);
+            System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
         assertEquals(5, t.length());
         Pose2dWithMotion p = t.getPoint(1);

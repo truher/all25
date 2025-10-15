@@ -134,7 +134,7 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
 
         Rotation3d endRotation = end.getRotation();
         if (translation.getNorm() < 1e-3) {
-            // Util.println("The end pose is above the swing axis.");
+            // System.out.println("The end pose is above the swing axis.");
 
             if (MathUtil.isNear(-Math.PI / 2, endRotation.getY(), 0.01)) {
                 // The wrist axis is pointing up.
@@ -178,13 +178,13 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
             // twist.
             Rotation3d wrist3d = new Rotation3d(0, swingRelative3d.getY(), 0);
             Rotation3d twist3d = swingRelative3d.minus(wrist3d);
-            // Util.printf("twist3d %s\n", Util.rotStr(twist3d));
+            // System.out.printf("twist3d %s\n", Util.rotStr(twist3d));
             twist = OptionalDouble.of(twist3d.getX());
 
             if (MathUtil.isNear(-Math.PI / 2, endRotation.getY(), 0.01)) {
-                // Util.println("The wrist axis is straight up.");
+                // System.out.println("The wrist axis is straight up.");
             } else if (MathUtil.isNear(Math.PI / 2, endRotation.getY(), 0.01)) {
-                // Util.println("The wrist axis is straight down");
+                // System.out.println("The wrist axis is straight down");
             } else {
                 // Check that the swing angle matches the end angle.
                 Rotation2d endRotation2d = endRotation.toRotation2d();
@@ -192,7 +192,7 @@ public class AnalyticLynxArmKinematics implements LynxArmKinematics {
                     // throw new IllegalArgumentException(
                     // String.format("end rotation %s not equal to swing %s",
                     // endRotation2d, swingAngle));
-                    // Util.printf("end rotation %s not equal to swing %s for goal %s\n",
+                    // System.out.printf("end rotation %s not equal to swing %s for goal %s\n",
                     // endRotation2d, swingAngle, Util.poseStr(end));
                 }
             }

@@ -15,7 +15,6 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 public class SwerveLimiterTest {
     private static final double DELTA = 0.001;
@@ -294,7 +293,7 @@ public class SwerveLimiterTest {
         limiter.updateSetpoint(setpoint);
         for (int i = 0; i < 100; ++i) {
             if (DEBUG)
-                Util.printf("i %d setpoint %s target %s\n", i, setpoint, target);
+                System.out.printf("i %d setpoint %s target %s\n", i, setpoint, target);
             setpoint = limiter.apply(target);
         }
     }
@@ -347,7 +346,7 @@ public class SwerveLimiterTest {
             target = new GlobalSe2Velocity(profileTarget.v(), 0, 0);
             setpoint = limiter.apply(target);
             if (DEBUG)
-                Util.printf("i %d accelLimit %5.2f setpoint %5.2f target %5.2f\n",
+                System.out.printf("i %d accelLimit %5.2f setpoint %5.2f target %5.2f\n",
                         i, accelLimit, setpoint.x(), target.x());
         }
     }

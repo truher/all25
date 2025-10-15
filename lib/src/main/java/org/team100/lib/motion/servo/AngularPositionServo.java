@@ -3,10 +3,6 @@ package org.team100.lib.motion.servo;
 /**
  * Angular position control, e.g. for swerve steering axes or arm axes.
  * 
- * Servos no longer include profiles (in order to coordinate multiple axes), so
- * this just takes setpoints, and, for onboard versions, computes feedback
- * control.
- * 
  * An angular servo should generally get "wrapped" input. It figures out what
  * "unwrapped" commands to give the underlying mechanism.
  */

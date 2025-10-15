@@ -15,7 +15,6 @@ import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimedPose;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -40,7 +39,7 @@ public class JacobianTest {
                 f,
                 Jacobian.config(new Config(1, 0, 0)));
         if (DEBUG)
-            Util.println(j);
+            System.out.println(j);
 
         // dx/dh should be 1 in all positions
         assertEquals(1, j.get(0, 0), DELTA);
@@ -177,10 +176,10 @@ public class JacobianTest {
                         Jacobian.config(k.inverse(p)));
                 double det = j.det();
                 if (DEBUG)
-                    Util.printf("%8.2f", det);
+                    System.out.printf("%8.2f", det);
             }
             if (DEBUG)
-                Util.println();
+                System.out.println();
         }
     }
 
@@ -209,7 +208,7 @@ public class JacobianTest {
                     Jacobian.config(c));
             Matrix<N3, N3> jinv = j.inv();
             Vector<N3> cv = new Vector<>(jinv.times(tv));
-            if (DEBUG) Util.printf(
+            if (DEBUG) System.out.printf(
                     "s (%5.2f) pose(%5.2f %5.2f %5.2f) conf(%5.2f %5.2f %5.2f) tv(%5.2f %5.2f %5.2f) cv(%5.2f %5.2f %5.2f)\n",
                     s,
                     p.getX(), p.getY(), p.getRotation().getRadians(),
@@ -239,7 +238,7 @@ public class JacobianTest {
             Config c = k.inverse(p);
             JointVelocities jv = j.inverse(sm);
             if (DEBUG)
-                Util.printf(
+                System.out.printf(
                         "s (%5.2f) pose(%5.2f %5.2f %5.2f) conf(%5.2f %5.2f %5.2f) tv(%5.2f %5.2f %5.2f) jv(%5.2f %5.2f %5.2f)\n",
                         time,
                         p.getX(), p.getY(), p.getRotation().getRadians(),

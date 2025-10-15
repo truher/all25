@@ -3,7 +3,6 @@ package org.team100.lib.motor;
 import java.util.function.Supplier;
 
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.util.Util;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -26,7 +25,7 @@ public class Rev100 {
     public static void warn(Supplier<REVLibError> s) {
         REVLibError errorCode = s.get();
         if (errorCode != REVLibError.kOk) {
-            Util.warn(errorCode.name());
+            System.out.println("WARNING: " + errorCode.name());
         }
     }
 

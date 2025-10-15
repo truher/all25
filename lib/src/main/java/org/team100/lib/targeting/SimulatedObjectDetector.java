@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,8 +36,10 @@ public class SimulatedObjectDetector {
             Translation2d[] objects) {
         ArrayList<Rotation3d> list = new ArrayList<>();
         for (Translation2d object : objects) {
-            if (DEBUG)
-                Util.printf("object %s\n", object);
+            if (DEBUG) {
+                Object[] args = { object };
+                System.out.printf("object %s\n", args);
+            }
             getRotInCamera(robotPose, cameraOffset, object).ifPresent(list::add);
         }
         return list;
@@ -59,12 +59,16 @@ public class SimulatedObjectDetector {
         Rotation3d rot = new Rotation3d(VecBuilder.fill(x, 0, 0), VecBuilder.fill(x, y, z));
         if (Math.abs(rot.getY()) >= VFOV_HALF
                 && Math.abs(rot.getZ()) >= HFOV_HALF) {
-            if (DEBUG)
-                Util.printf("out of frame\n");
+            if (DEBUG) {
+                Object[] args = {};
+                System.out.printf("out of frame\n", args);
+            }
             return Optional.empty();
         }
-        if (DEBUG)
-            Util.printf("rot %s\n", rot);
+        if (DEBUG) {
+            Object[] args = { rot };
+            System.out.printf("rot %s\n", args);
+        }
         return Optional.of(rot);
     }
 

@@ -12,7 +12,6 @@ import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
-import org.team100.lib.util.Util;
 
 /**
  * Represents the modules in the drivetrain.
@@ -58,7 +57,7 @@ public class SwerveModuleCollection {
 
         switch (Identity.instance) {
             case COMP_BOT:
-                Util.println("************** WCP MODULES w/Duty-Cycle Encoders **************");
+                System.out.println((Object) "************** WCP MODULES w/Duty-Cycle Encoders **************");
                 return new SwerveModuleCollection(
                         WCPSwerveModule100.getKrakenDrive(frontLeftLogger, supplyLimit, statorLimit,
                                 new CanId(2),
@@ -93,7 +92,7 @@ public class SwerveModuleCollection {
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE));
             case SWERVE_ONE:
-                Util.println("************** WCP MODULES w/Duty-Cycle Encoders **************");
+                System.out.println((Object) "************** WCP MODULES w/Duty-Cycle Encoders **************");
                 return new SwerveModuleCollection(
                         WCPSwerveModule100.getFalconDrive(frontLeftLogger, supplyLimit, statorLimit,
                                 new CanId(32),
@@ -132,7 +131,7 @@ public class SwerveModuleCollection {
             case BLANK:
             default:
                 if (DEBUG)
-                    Util.println("************** SIMULATED MODULES **************");
+                    System.out.println((Object) "************** SIMULATED MODULES **************");
                 /*
                  * Uses simulated position sensors, must be used with clock control (e.g.
                  * {@link Timeless}).
@@ -158,8 +157,10 @@ public class SwerveModuleCollection {
      * @param swerveModuleStates
      */
     public void setDesiredStates(SwerveModuleStates swerveModuleStates) {
-        if (DEBUG)
-            Util.printf("setDesiredStates() %s\n", swerveModuleStates);
+        if (DEBUG) {
+            Object[] args = { swerveModuleStates };
+            System.out.printf("setDesiredStates() %s\n", args);
+        }
         m_frontLeft.setDesiredState(swerveModuleStates.frontLeft());
         m_frontRight.setDesiredState(swerveModuleStates.frontRight());
         m_rearLeft.setDesiredState(swerveModuleStates.rearLeft());

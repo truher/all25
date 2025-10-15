@@ -45,14 +45,20 @@ public class SimulatedBareMotor implements BareMotor {
     }
 
     private Model100 update() {
-        if (DEBUG)
-            Util.printf("motor %s update\n", m_log.getRoot());
+        if (DEBUG) {
+            Object[] args = { m_log.getRoot() };
+            System.out.printf("motor %s update\n", args);
+        }
         double dt = dt();
-        if (DEBUG)
-            Util.printf("SimulatedBareMotor dt %f\n", dt);
+        if (DEBUG) {
+            Object[] args1 = { dt };
+            System.out.printf("SimulatedBareMotor dt %f\n", args1);
+        }
         if (m_velocityInput != null) {
-            if (DEBUG)
-                Util.printf("SimulatedBareMotor v %f\n", m_velocityInput);
+            if (DEBUG) {
+                Object[] args2 = { m_velocityInput };
+                System.out.printf("SimulatedBareMotor v %f\n", args2);
+            }
             if (dt > 0.04) {
                 // probably we should not extrapolate
                 m_state = new Model100(m_state.x(), m_velocityInput);
@@ -61,8 +67,10 @@ public class SimulatedBareMotor implements BareMotor {
             }
         }
         if (m_positionInput != null) {
-            if (DEBUG)
-                Util.printf("SimulatedBareMotor x %f\n", m_positionInput);
+            if (DEBUG) {
+                Object[] args2 = { m_positionInput };
+                System.out.printf("SimulatedBareMotor x %f\n", args2);
+            }
             if (dt < 0.01) {
                 // probably we should not differentiate
                 m_state = new Model100(m_positionInput, m_state.v());
@@ -70,8 +78,10 @@ public class SimulatedBareMotor implements BareMotor {
                 m_state = new Model100(m_positionInput, (m_positionInput - m_state.x()) / dt);
             }
         }
-        if (DEBUG)
-            Util.printf("SimulatedBareMotor state %s\n", m_state);
+        if (DEBUG) {
+            Object[] args2 = { m_state };
+            System.out.printf("SimulatedBareMotor state %s\n", args2);
+        }
         return m_state;
     }
 
@@ -93,8 +103,10 @@ public class SimulatedBareMotor implements BareMotor {
     /** ignores accel and torque */
     @Override
     public void setVelocity(double velocityRad_S, double accelRad_S2, double torqueNm) {
-        if (DEBUG)
-            Util.printf("motor %s set velocity %6.3f\n", m_log.getRoot(), velocityRad_S);
+        if (DEBUG) {
+            Object[] args = { m_log.getRoot(), velocityRad_S };
+            System.out.printf("motor %s set velocity %6.3f\n", args);
+        }
         m_velocityInput = MathUtil.clamp(
                 Util.notNaN(velocityRad_S), -m_freeSpeedRad_S, m_freeSpeedRad_S);
         // you can't use velocity and position control at the same time
@@ -104,8 +116,10 @@ public class SimulatedBareMotor implements BareMotor {
     /** ignores velocity and torque */
     @Override
     public void setUnwrappedPosition(double position, double velocity, double accel, double torque) {
-        if (DEBUG)
-            Util.printf("motor %s set position %6.3f\n", m_log.getRoot(), position);
+        if (DEBUG) {
+            Object[] args = { m_log.getRoot(), position };
+            System.out.printf("motor %s set position %6.3f\n", args);
+        }
         m_positionInput = position;
         // you can't use velocity and position control at the same time
         m_velocityInput = null;

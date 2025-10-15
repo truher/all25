@@ -33,7 +33,7 @@ public class CoordinateDescent<R extends Num> {
         Vector<R> current = initial;
         for (int i = 0; i < m_iterations; ++i) {
             Vector<R> next = new Vector<>(current.getStorage().copy());
-            // Util.printf("%5.3f\n", next.get(0));
+            // System.out.printf("%5.3f\n", next.get(0));
             for (int j = 0; j < m_rows.getNum(); ++j) {
                 final int jj = j;
                 DoubleUnaryOperator cf = (x) -> {
@@ -47,7 +47,7 @@ public class CoordinateDescent<R extends Num> {
             }
             double step = next.minus(current).norm();
             if (step < m_tolerance) {
-                // Util.println(i);
+                // System.out.println(i);
                 return next;
             }
             current = next;

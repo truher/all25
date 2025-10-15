@@ -1,7 +1,6 @@
 package org.team100.frc2025;
 
 import org.team100.lib.config.Feedforward100;
-import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.examples.tank.BareMotorTank;
 import org.team100.lib.examples.tank.TankDrive;

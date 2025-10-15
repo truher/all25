@@ -72,7 +72,7 @@ public class Cache {
      */
     public static void refresh() {
         if (DEBUG)
-            Util.println("Cache refresh");
+            System.out.println((Object) "Cache refresh");
         reset();
         update();
     }
@@ -103,8 +103,10 @@ public class Cache {
 
     /** Fetches fresh values for every stale cache. Should be called after reset. */
     private static void update() {
-        if (DEBUG)
-            Util.printf("Cache update %d\n", caches.size());
+        if (DEBUG) {
+            Object[] args = { caches.size() };
+            System.out.printf("Cache update %d\n", args);
+        }
         if (!signals.isEmpty()) {
             StatusCode result = BaseStatusSignal.refreshAll(signals.toArray(new BaseStatusSignal[0]));
             if (result != StatusCode.OK) {
@@ -112,13 +114,15 @@ public class Cache {
             }
         }
         for (CotemporalCache<?> r : caches) {
-            if (DEBUG)
-                Util.printf("update %s\n", r.get().getClass().getSimpleName());
+            if (DEBUG) {
+                Object[] args1 = { r.get().getClass().getSimpleName() };
+                System.out.printf("update %s\n", args1);
+            }
             r.get();
         }
         for (DoubleCache r : doubles) {
             if (DEBUG)
-                Util.println("double update");
+                System.out.println((Object) "double update");
             r.getAsDouble();
         }
         for (SideEffect r : sideEffects) {

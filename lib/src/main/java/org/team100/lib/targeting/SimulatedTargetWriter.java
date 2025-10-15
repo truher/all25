@@ -8,7 +8,6 @@ import java.util.function.DoubleFunction;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -59,7 +58,7 @@ public class SimulatedTargetWriter {
 
     public void update() {
         if (DEBUG)
-            Util.println("simulated target write update");
+            System.out.println((Object) "simulated target write update");
         // select pose from a little while ago
         double timestampS = Takt.get() - DELAY;
         Pose2d pose = m_history.apply(timestampS).pose();
@@ -69,8 +68,10 @@ public class SimulatedTargetWriter {
             StructArrayPublisher<Rotation3d> publisher = entry.getValue();
             List<Rotation3d> rot = SimulatedObjectDetector.getRotations(
                     pose, camera.getOffset(), m_targets);
-            if (DEBUG)
-                Util.printf("rot size %d\n", rot.size());
+            if (DEBUG) {
+                Object[] args = { rot.size() };
+                System.out.printf("rot size %d\n", args);
+            }
             // tilt down 45
             // Rotation3d[] rots = new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) };
             Rotation3d[] rots = rot.toArray(new Rotation3d[0]);
@@ -81,8 +82,10 @@ public class SimulatedTargetWriter {
             // long timestampUs = (long)(Takt.get() * 1000000.0);
 
             long time = timestampUs - delayUs;
-            if (DEBUG)
-                Util.printf("writer timestamp %d\n", time);
+            if (DEBUG) {
+                Object[] args1 = { time };
+                System.out.printf("writer timestamp %d\n", args1);
+            }
             publisher.set(rots, time);
         }
     }

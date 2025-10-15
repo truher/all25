@@ -56,8 +56,10 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
     private int wrap() {
         double current = getWrappedPositionRad();
         double prev = m_prevWrappedPositionRad;
-        if (DEBUG)
-            Util.printf("wrap prev %6.3f curr %6.3f\n", prev, current);
+        if (DEBUG) {
+            Object[] args = { prev, current };
+            System.out.printf("wrap prev %6.3f curr %6.3f\n", args);
+        }
         m_prevWrappedPositionRad = current;
         double diff = current - prev;
         if (diff > Math.PI) {

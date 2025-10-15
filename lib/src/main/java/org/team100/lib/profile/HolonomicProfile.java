@@ -12,7 +12,6 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -160,7 +159,8 @@ public class HolonomicProfile {
     public void solve(SwerveModel i, SwerveModel g) {
         // first find the max ETA
         if (DEBUG) {
-            Util.printf("i %s g %s\n", i, g);
+            Object[] args = { i, g };
+            System.out.printf("i %s g %s\n", args);
         }
         // note coarser DT
         double xETA = px.simulateForETA(SOLVE_DT, i.x().control(), g.x());
@@ -168,7 +168,8 @@ public class HolonomicProfile {
         double thetaETA = ptheta.simulateForETA(SOLVE_DT, i.theta().control(), g.theta());
 
         if (DEBUG) {
-            Util.printf("ETAs: %f %f %f\n", xETA, yETA, thetaETA);
+            Object[] args = { xETA, yETA, thetaETA };
+            System.out.printf("ETAs: %f %f %f\n", args);
         }
         double slowETA = xETA;
         slowETA = Math.max(slowETA, yETA);
@@ -179,7 +180,8 @@ public class HolonomicProfile {
         stheta = ptheta.solve(SOLVE_DT, i.theta().control(), g.theta(), slowETA, ETA_TOLERANCE);
 
         if (DEBUG) {
-            Util.printf("sx %.3f sy %.3f stheta %.3f\n", sx, sy, stheta);
+            Object[] args = { sx, sy, stheta };
+            System.out.printf("sx %.3f sy %.3f stheta %.3f\n", args);
         }
 
         ppx = px.scale(sx);
@@ -201,7 +203,8 @@ public class HolonomicProfile {
             return SwerveControl.zero();
         }
         if (DEBUG) {
-            Util.printf("initial %s goal %s\n", i, g);
+            Object[] args = { i, g };
+            System.out.printf("initial %s goal %s\n", args);
         }
         Control100 stateX = ppx.calculate(DT, i.x().control(), g.x());
         Control100 stateY = ppy.calculate(DT, i.y().control(), g.y());

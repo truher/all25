@@ -12,7 +12,6 @@ import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.util.Util;
 
 /**
  * Velocity feedforward, proportional feedback on position and velocity.
@@ -90,16 +89,19 @@ public class FullStateSwerveController implements SwerveController {
             SwerveModel measurement,
             SwerveModel currentReference,
             SwerveControl nextReference) {
-        if (DEBUG)
-            Util.printf("measurement %s current %s next %s\n",
-                    measurement, currentReference, nextReference);
+        if (DEBUG) {
+            Object[] args = { measurement, currentReference, nextReference };
+            System.out.printf("measurement %s current %s next %s\n", args);
+        }
         m_log_measurement.log(() -> measurement);
         m_log_currentReference.log(() -> currentReference);
         m_log_nextReference.log(() -> nextReference);
         GlobalSe2Velocity u_FF = feedforward(nextReference);
         GlobalSe2Velocity u_FB = fullFeedback(measurement, currentReference);
-        if (DEBUG)
-            Util.printf("ff %s fb %s\n", u_FF, u_FB);
+        if (DEBUG) {
+            Object[] args1 = { u_FF, u_FB };
+            System.out.printf("ff %s fb %s\n", args1);
+        }
         return u_FF.plus(u_FB);
     }
 
@@ -143,8 +145,8 @@ public class FullStateSwerveController implements SwerveController {
 
         m_log_atPositionReference.log( () -> positionError.getTranslation().getNorm() < m_xTolerance
         && Math.abs(positionError.getRotation().getRadians()) < m_thetaTolerance);
-        // Util.println("THeta Tolerance" + (Math.abs(positionError.getRotation().getRadians()) < m_thetaTolerance));
-        // Util.println("Position Tolerance" + (positionError.getTranslation().getNorm() < m_xTolerance));
+        // System.out.println("THeta Tolerance" + (Math.abs(positionError.getRotation().getRadians()) < m_thetaTolerance));
+        // System.out.println("Position Tolerance" + (positionError.getTranslation().getNorm() < m_xTolerance));
         m_log_PositionError.log( () -> positionError.getTranslation().getNorm());
         m_log_u_FB.log(() -> u_FB);
         return u_FB;
@@ -160,9 +162,9 @@ public class FullStateSwerveController implements SwerveController {
                 m_kPCartV * velocityError.y(),
                 m_kPThetaV * velocityError.theta());
         m_log_u_VFB.log(() -> u_VFB);
-        // Util.println("Omega Tolerance" + (Math.abs(velocityError.angle().orElse(Rotation2d.kZero).getRadians()) < m_omegaTolerance));
+        // System.out.println("Omega Tolerance" + (Math.abs(velocityError.angle().orElse(Rotation2d.kZero).getRadians()) < m_omegaTolerance));
 
-        // Util.println("Velocity Tolerance" + (velocityError.norm() < m_xTolerance));
+        // System.out.println("Velocity Tolerance" + (velocityError.norm() < m_xTolerance));
 
         return u_VFB;
     }

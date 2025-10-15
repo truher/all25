@@ -11,7 +11,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.Path100;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -39,7 +38,7 @@ public class TrajectoryVelocityProfileTest {
         if (!DEBUG)
             return;
         for (double t = 0; t < traj.duration(); t += 0.02) {
-            Util.printf("%12.6f %12.6f\n", t, traj.sample(t).velocityM_S());
+            System.out.printf("%12.6f %12.6f\n", t, traj.sample(t).velocityM_S());
         }
 
     }

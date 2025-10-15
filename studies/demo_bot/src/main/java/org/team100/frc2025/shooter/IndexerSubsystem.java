@@ -1,7 +1,5 @@
 package org.team100.frc2025.shooter;
 
-import java.util.OptionalDouble;
-
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motion.servo.OutboardLinearPositionServo;

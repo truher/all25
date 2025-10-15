@@ -54,8 +54,8 @@ public class SequentialCommandGroup100 extends Command {
 
     @Override
     public final void initialize() {
-        // Util.println("Sequential Command Group 100 starts" + m_name);
-        // Util.println("Sequential Command Group 100" + m_name + " my size is " + m_commands.size());
+        // System.out.println("Sequential Command Group 100 starts" + m_name);
+        // System.out.println("Sequential Command Group 100" + m_name + " my size is " + m_commands.size());
 
         m_currentCommandIndex = 0;
 
@@ -74,7 +74,7 @@ public class SequentialCommandGroup100 extends Command {
         Command currentCommand = m_commands.get(m_currentCommandIndex);
         m_log_active.get(m_currentCommandIndex).log(() -> true);
         currentCommand.execute();
-        // Util.println("CURRENT COMMAND INDEX " + m_currentCommandIndex);
+        // System.out.println("CURRENT COMMAND INDEX " + m_currentCommandIndex);
         if (currentCommand.isFinished()) {
             m_log_active.get(m_currentCommandIndex).log(() -> false);
             currentCommand.end(false);
@@ -96,7 +96,7 @@ public class SequentialCommandGroup100 extends Command {
         }
         m_currentCommandIndex = -1;
 
-        // Util.println("I AM FI/NISHING MY COMMAND GROUP 100");
+        // System.out.println("I AM FI/NISHING MY COMMAND GROUP 100");
     }
 
     @Override

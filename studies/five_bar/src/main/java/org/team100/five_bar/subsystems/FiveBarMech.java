@@ -20,7 +20,6 @@ import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.util.CanId;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -143,7 +142,7 @@ public class FiveBarMech extends SubsystemBase {
     /** Set position goal, motionless. */
     public void setPosition(double p1, double p5) {
         if (DEBUG)
-            Util.printf("FiveBarMech.setPosition %f %f\n", p1, p5);
+            System.out.printf("FiveBarMech.setPosition %f %f\n", p1, p5);
         if (!feasible(p1, p5))
             return;
         m_mechP1.setUnwrappedPosition(p1, 0, 0, 0);
@@ -154,7 +153,7 @@ public class FiveBarMech extends SubsystemBase {
         double q1 = m_mechP1.getWrappedPositionRad();
         double q5 = m_mechP5.getWrappedPositionRad();
         if (DEBUG)
-            Util.printf("joint positions %f %f\n", q1, q5);
+            System.out.printf("joint positions %f %f\n", q1, q5);
         return FiveBarKinematics.forward(SCENARIO, q1, q5);
     }
 

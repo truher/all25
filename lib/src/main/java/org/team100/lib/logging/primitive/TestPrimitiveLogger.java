@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.team100.lib.util.Util;
-
 /** Prints logs to stdout. */
 public class TestPrimitiveLogger implements PrimitiveLogger {
     private final boolean m_print;
@@ -30,8 +28,10 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
         return new PrimitiveBooleanLogger() {
             @Override
             public void log(boolean val) {
-                if (m_print)
-                    Util.printf("%s/%b\n", label, val);
+                if (m_print) {
+                    Object[] args = { label, val };
+                    System.out.printf("%s/%b\n", args);
+                }
             }
         };
     }
@@ -42,8 +42,10 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
         return new PrimitiveDoubleLogger() {
             @Override
             public void log(double val) {
-                if (m_print)
-                    Util.printf("%s/%.2f\n", label, val);
+                if (m_print) {
+                    Object[] args = { label, val };
+                    System.out.printf("%s/%.2f\n", args);
+                }
             }
         };
     }
@@ -54,8 +56,10 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
         return new PrimitiveIntLogger() {
             @Override
             public void log(int val) {
-                if (m_print)
-                    Util.printf("%s/%d\n", label, val);
+                if (m_print) {
+                    Object[] args = { label, val };
+                    System.out.printf("%s/%d\n", args);
+                }
             }
         };
     }
@@ -66,8 +70,10 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
         return new PrimitiveDoubleArrayLogger() {
             @Override
             public void log(double[] val) {
-                if (m_print)
-                    Util.printf("%s/%s\n", label, Arrays.toString(val));
+                if (m_print) {
+                    Object[] args = { label, Arrays.toString(val) };
+                    System.out.printf("%s/%s\n", args);
+                }
             }
         };
     }
@@ -78,8 +84,10 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
         return new PrimitiveLongLogger() {
             @Override
             public void log(long val) {
-                if (m_print)
-                    Util.printf("%s/%d\n", label, val);
+                if (m_print) {
+                    Object[] args = { label, val };
+                    System.out.printf("%s/%d\n", args);
+                }
             }
         };
     }
@@ -90,8 +98,10 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
         return new PrimitiveStringLogger() {
             @Override
             public void log(String val) {
-                if (m_print)
-                    Util.printf("%s/%s\n", label, val);
+                if (m_print) {
+                    Object[] args = { label, val };
+                    System.out.printf("%s/%s\n", args);
+                }
             }
         };
     }

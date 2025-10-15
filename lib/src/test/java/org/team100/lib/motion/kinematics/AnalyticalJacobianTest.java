@@ -14,7 +14,6 @@ import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimedPose;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -263,7 +262,7 @@ public class AnalyticalJacobianTest {
             Config c = k.inverse(p);
             JointVelocities jv = j.inverse(sm);
             if (DEBUG)
-                Util.printf(
+                System.out.printf(
                         "s (%5.2f) pose(%5.2f %5.2f %5.2f) conf(%5.2f %5.2f %5.2f) tv(%5.2f %5.2f %5.2f) jv(%5.2f %5.2f %5.2f)\n",
                         time,
                         p.getX(), p.getY(), p.getRotation().getRadians(),

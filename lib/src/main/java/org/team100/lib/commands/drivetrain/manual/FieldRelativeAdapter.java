@@ -3,7 +3,6 @@ package org.team100.lib.commands.drivetrain.manual;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.util.Util;
 
 public class FieldRelativeAdapter implements DriverAdapter {
     private static final boolean DEBUG = false;
@@ -17,8 +16,10 @@ public class FieldRelativeAdapter implements DriverAdapter {
     }
 
     public void apply(SwerveModel s, Velocity t) {
-        if (DEBUG)
-            Util.printf("FieldRelativeDriver %s\n", t);
+        if (DEBUG) {
+            Object[] args = { t };
+            System.out.printf("FieldRelativeDriver %s\n", args);
+        }
         m_drive.driveInFieldCoords(m_driver.apply(s, t));
     }
 

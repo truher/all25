@@ -10,7 +10,6 @@ import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
 import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.LinearVelocityServo;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -214,8 +213,10 @@ public abstract class SwerveModule100 {
         Rotation2d dthetaWrapped = desiredWrappedAngle.minus(m_previousDesiredWrappedAngle);
         double omega = dthetaWrapped.getRadians() / dt;
         double correction = m_wheelRadiusM * omega / m_finalDriveRatio;
-        if (DEBUG)
-            Util.printf("correction %6.3f\n", correction);
+        if (DEBUG) {
+			Object[] args = { correction };
+			System.out.printf("correction %6.3f\n", args);
+		}
         return desiredSpeed + correction;
     }
 

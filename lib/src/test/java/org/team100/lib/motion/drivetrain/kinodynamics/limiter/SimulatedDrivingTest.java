@@ -32,7 +32,6 @@ import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -125,7 +124,7 @@ public class SimulatedDrivingTest implements Timeless {
                 startPositions,
                 endPositions);
         if (DEBUG)
-            Util.printf("%s\n", modulePositionDelta);
+            System.out.printf("%s\n", modulePositionDelta);
 
         Twist2d twist = swerveKinodynamics.getKinematics().toTwist2d(modulePositionDelta);
 
@@ -149,7 +148,7 @@ public class SimulatedDrivingTest implements Timeless {
             stepTime();
             drive.driveInFieldCoords(input);
             if (DEBUG)
-                Util.printf("%.2f %s\n", Takt.get() - start, drive.getPose());
+                System.out.printf("%.2f %s\n", Takt.get() - start, drive.getPose());
         }
     }
 
@@ -164,7 +163,7 @@ public class SimulatedDrivingTest implements Timeless {
             stepTime();
             drive.driveInFieldCoordsVerbatim(input);
             if (DEBUG)
-                Util.printf("%.2f %s\n", Takt.get() - start, drive.getPose());
+                System.out.printf("%.2f %s\n", Takt.get() - start, drive.getPose());
         }
     }
 
@@ -182,10 +181,10 @@ public class SimulatedDrivingTest implements Timeless {
         GlobalSe2Velocity input = new GlobalSe2Velocity(2, 0, 3.5);
         for (int i = 0; i < 50; ++i) {
             if (DEBUG)
-                Util.printf("\nstep time ...\n");
+                System.out.printf("\nstep time ...\n");
             stepTime();
             if (DEBUG)
-                Util.printf("takt: %.2f state: %s\n", Takt.get(), drive.getState());
+                System.out.printf("takt: %.2f state: %s\n", Takt.get(), drive.getState());
             drive.driveInFieldCoords(input);
         }
     }
@@ -200,10 +199,10 @@ public class SimulatedDrivingTest implements Timeless {
         GlobalSe2Velocity input = new GlobalSe2Velocity(2, 0, 3.5);
         for (int i = 0; i < 100; ++i) {
             if (DEBUG)
-                Util.printf("\nstep time ...\n");
+                System.out.printf("\nstep time ...\n");
             stepTime();
             if (DEBUG)
-                Util.printf("takt: %.2f state: %s\n", Takt.get(), drive.getState());
+                System.out.printf("takt: %.2f state: %s\n", Takt.get(), drive.getState());
             drive.driveInFieldCoordsVerbatim(input);
         }
     }
@@ -214,31 +213,31 @@ public class SimulatedDrivingTest implements Timeless {
         // spin fast
         GlobalSe2Velocity input = new GlobalSe2Velocity(0, 0, 4);
         if (DEBUG)
-            Util.printf("pose %s, gyro %s, rate %f\n",
+            System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());
         drive.driveInFieldCoordsVerbatim(input);
         if (DEBUG)
-            Util.printf("pose %s, gyro %s, rate %f\n",
+            System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());
         stepTime();
         if (DEBUG)
-            Util.printf("pose %s, gyro %s, rate %f\n",
+            System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());
         drive.driveInFieldCoordsVerbatim(input);
         if (DEBUG)
-            Util.printf("pose %s, gyro %s, rate %f\n",
+            System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());
         stepTime();
         if (DEBUG)
-            Util.printf("pose %s, gyro %s, rate %f\n",
+            System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());

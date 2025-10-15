@@ -77,7 +77,6 @@ import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
-import org.team100.lib.util.Util;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -139,12 +138,15 @@ public class Robot extends TimedRobot100 {
         // By default, LiveWindow turns off the CommandScheduler in test mode,
         // but we don't want that.
         enableLiveWindowInTest(false);
+        Object[] args = { WPILibVersion.Version };
 
         // CanBridge.runTCP();
 
-        Util.printf("WPILib Version: %s\n", WPILibVersion.Version); // 2023.2.1
-        Util.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
-        Util.printf("Identity: %s\n", Identity.instance.name());
+        System.out.printf("WPILib Version: %s\n", args);
+        Object[] args1 = { RobotController.getSerialNumber() }; // 2023.2.1
+        System.out.printf("RoboRIO serial number: %s\n", args1);
+        Object[] args2 = { Identity.instance.name() };
+        System.out.printf("Identity: %s\n", args2);
         RobotController.setBrownoutVoltage(5.5);
         banner();
 
@@ -156,8 +158,9 @@ public class Robot extends TimedRobot100 {
         final Async async = asyncFactory.get();
         final Logging logging = Logging.instance();
         final LevelPoller poller = new LevelPoller(async, logging::setLevel, Level.TRACE);
-        Util.printf("Using log level %s\n", poller.getLevel().name());
-        Util.println("Do not use TRACE in comp, with NT logging, it will overrun");
+        Object[] args3 = { poller.getLevel().name() };
+        System.out.printf("Using log level %s\n", args3);
+        System.out.println((Object) "Do not use TRACE in comp, with NT logging, it will overrun");
         final LoggerFactory fieldLogger = logging.fieldLogger;
         final FieldLogger.Log fieldLog = new FieldLogger.Log(fieldLogger);
 
@@ -510,7 +513,8 @@ public class Robot extends TimedRobot100 {
         );
 
         initStuff();
-        Util.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
+        Object[] args4 = { Logging.instance().keyCount() };
+        System.out.printf("Total Logger Keys: %d\n", args4);
 
     }
 
@@ -701,7 +705,7 @@ public class Robot extends TimedRobot100 {
      * happen right now.
      */
     private void initStuff() {
-        Util.println("\n*** PREWARM START");
+        System.out.println((Object) "\n*** PREWARM START");
         double startS = Takt.actual();
 
         // Exercise the trajectory planner.
@@ -759,17 +763,18 @@ public class Robot extends TimedRobot100 {
 
         // the duty cycle encoder produces garbage for a few seconds so sleep.
         try {
-            Util.println("Waiting for DutyCycle sensors to work ...");
+            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            Util.println("Waiting for DutyCycle sensors to work ...");
+            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            Util.println("Waiting for DutyCycle sensors to work ...");
+            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            Util.println("Done!");
+            System.out.println((Object) "Done!");
         } catch (InterruptedException e) {
 
         }
-        Util.printf("\n*** PREWARM END ET: %f\n", endS - startS);
+        Object[] args = { endS - startS };
+        System.out.printf("\n*** PREWARM END ET: %f\n", args);
     }
 
     private void banner() {
@@ -783,7 +788,7 @@ public class Robot extends TimedRobot100 {
         b.append(".....##....##.......##.....##.##.....##.......##....##...##...##...##...\n");
         b.append(".....##....########.##.....##.##.....##.....######...#####.....#####....\n");
         b.append("\n");
-        Util.println(b.toString());
+        System.out.println((Object) b.toString());
     }
 
 }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 public class ExponentialProfileWPITest {
     private static final boolean DEBUG = false;
@@ -28,7 +27,7 @@ public class ExponentialProfileWPITest {
             tt += 0.02;
             sample = profile.calculate(0.02, sample, end);
             if (DEBUG)
-                Util.printf("%5.3f %5.3f %5.3f\n", tt, sample.x(), sample.v());
+                System.out.printf("%5.3f %5.3f %5.3f\n", tt, sample.x(), sample.v());
         }
     }
 
@@ -61,8 +60,8 @@ public class ExponentialProfileWPITest {
         }
         double t1 = Takt.actual();
         if (DEBUG)
-            Util.printf("duration (ms)  %5.1f\n", 1e3 * (t1 - t0));
+            System.out.printf("duration (ms)  %5.1f\n", 1e3 * (t1 - t0));
         if (DEBUG)
-            Util.printf("per op (ns)    %5.1f\n", 1e9 * (t1 - t0) / N);
+            System.out.printf("per op (ns)    %5.1f\n", 1e9 * (t1 - t0) / N);
     }
 }

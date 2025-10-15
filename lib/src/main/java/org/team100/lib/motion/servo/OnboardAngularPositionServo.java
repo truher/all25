@@ -11,7 +11,6 @@ import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 /**
  * Uses mechanism velocity control.
@@ -66,21 +65,26 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
      * setpoint.
      */
     void actuate(Setpoints1d unwrappedSetpoint, double feedForwardTorqueNm) {
-        if (DEBUG)
-            Util.printf("setpoint %s\n", unwrappedSetpoint);
+        if (DEBUG) {
+            Object[] args = { unwrappedSetpoint };
+            System.out.printf("setpoint %s\n", args);
+        }
 
         Model100 unwrappedMeasurement = m_mechanism.getUnwrappedMeasurement();
         Model100 currentUnwrappedSetpoint = unwrappedSetpoint.current().model();
         Control100 nextUnwrappedSetpoint = unwrappedSetpoint.next();
 
-        if (DEBUG)
-            Util.printf("unwrapped Measurement %s currentUnwrappedSetpoint %s\n",
-                    unwrappedMeasurement, currentUnwrappedSetpoint);
+        if (DEBUG) {
+            Object[] args1 = { unwrappedMeasurement, currentUnwrappedSetpoint };
+            System.out.printf("unwrapped Measurement %s currentUnwrappedSetpoint %s\n", args1);
+        }
         double u_FB = m_feedback.calculate(unwrappedMeasurement, currentUnwrappedSetpoint);
         double u_FF = nextUnwrappedSetpoint.v();
         double u_TOTAL = u_FB + u_FF;
-        if (DEBUG)
-            Util.printf("u_FB %6.3f u_FF %6.3f u_TOTAL %6.3f\n", u_FB, u_FF, u_TOTAL);
+        if (DEBUG) {
+            Object[] args2 = { u_FB, u_FF, u_TOTAL };
+            System.out.printf("u_FB %6.3f u_FF %6.3f u_TOTAL %6.3f\n", args2);
+        }
 
         m_mechanism.setVelocity(u_TOTAL, nextUnwrappedSetpoint.a(), feedForwardTorqueNm);
 

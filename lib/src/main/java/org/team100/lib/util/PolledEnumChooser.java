@@ -54,11 +54,15 @@ public class PolledEnumChooser<T extends Enum<T>> {
         if (selected == null)
             return;
         if (selected != m_selected) {
-            if (DEBUG)
-                Util.printf("update %s (%d consumers) %s\n", m_name, m_consumers.size(), selected);
+            if (DEBUG) {
+                Object[] args = { m_name, m_consumers.size(), selected };
+                System.out.printf("update %s (%d consumers) %s\n", args);
+            }
             for (Consumer<T> consumer : m_consumers) {
-                if (DEBUG)
-                    Util.printf("consumer %s\n", consumer);
+                if (DEBUG) {
+                    Object[] args1 = { consumer };
+                    System.out.printf("consumer %s\n", args1);
+                }
                 consumer.accept(selected);
             }
             m_selected = selected;

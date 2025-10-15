@@ -22,7 +22,6 @@ import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.reference.MockProfileReference1d;
 import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.util.Util;
 
 public class OutboardAngularPositionServoTest implements Timeless {
     private static final boolean DEBUG = false;
@@ -66,7 +65,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
             servo.setPositionProfiled(1, 0);
             stepTime();
             if (DEBUG)
-                Util.printf("i: %d position: %5.3f\n", i, motor.position);
+                System.out.printf("i: %d position: %5.3f\n", i, motor.position);
         }
         assertEquals(1, motor.position, DELTA);
     }
@@ -197,7 +196,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(0, servo.m_nextUnwrappedSetpoint.x(), DELTA);
 
         if (DEBUG)
-            Util.println("Move a quarter turn in the positive direction");
+            System.out.println("Move a quarter turn in the positive direction");
 
         servo.periodic();
         servo.setPositionDirect(Math.PI / 2, 0);
@@ -227,7 +226,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(Math.PI / 2, servo.m_nextUnwrappedSetpoint.x(), DELTA);
 
         if (DEBUG)
-            Util.println("Try to go one turn away directly? That does nothing.");
+            System.out.println("Try to go one turn away directly? That does nothing.");
         // this also makes no sense, since setpoint is wrapped.
         servo.periodic();
         servo.setPositionDirect(5.0 * Math.PI / 2, 0);
@@ -243,7 +242,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         assertEquals(Math.PI / 2, servo.m_nextUnwrappedSetpoint.x(), DELTA);
 
         if (DEBUG)
-            Util.println("move towards the limit a little at a time");
+            System.out.println("move towards the limit a little at a time");
 
         servo.periodic();
         servo.setPositionDirect(Math.PI, 0);

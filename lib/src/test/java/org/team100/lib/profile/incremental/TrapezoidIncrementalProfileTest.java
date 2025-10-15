@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 /**
  * Note many of these cases were adjusted slightly to accommodate the treatment
@@ -23,7 +22,7 @@ class TrapezoidIncrementalProfileTest {
 
     private void dump(double tt, Control100 sample) {
         if (DEBUG)
-            Util.printf("%f %f %f %f\n", tt, sample.x(), sample.v(), sample.a());
+            System.out.printf("%f %f %f %f\n", tt, sample.x(), sample.v(), sample.a());
     }
 
     /** Double integrator system simulator, kinda */
@@ -76,9 +75,9 @@ class TrapezoidIncrementalProfileTest {
         }
         double t1 = Takt.actual();
         if (DEBUG)
-            Util.printf("duration (ms)  %5.1f\n", 1e3 * (t1 - t0));
+            System.out.printf("duration (ms)  %5.1f\n", 1e3 * (t1 - t0));
         if (DEBUG)
-            Util.printf("per op (ns)    %5.1f\n", 1e9 * (t1 - t0) / N);
+            System.out.printf("per op (ns)    %5.1f\n", 1e9 * (t1 - t0) / N);
     }
 
     /**
@@ -99,7 +98,7 @@ class TrapezoidIncrementalProfileTest {
                 double v = setpoint.v();
                 double a = setpoint.a();
                 double j = 0;
-                Util.printf("%8.3f %8.3f %8.3f %8.3f %8.3f\n",
+                System.out.printf("%8.3f %8.3f %8.3f %8.3f %8.3f\n",
                         t, x, v, a, j);
             }
         }
@@ -123,11 +122,11 @@ class TrapezoidIncrementalProfileTest {
 
         Model100 setpointModel = initial;
         if (DEBUG)
-            Util.printf(" t,      x,      v,      a,      y,      ydot,  fb,   eta\n");
+            System.out.printf(" t,      x,      v,      a,      y,      ydot,  fb,   eta\n");
 
         // log initial state
         if (DEBUG)
-            Util.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+            System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
                     0.0, setpointModel.x(), setpointModel.v(), 0.0, sim.y, sim.yDot, 0.0, 0.0);
 
         // eta to goal
@@ -138,7 +137,7 @@ class TrapezoidIncrementalProfileTest {
             // and the setpoint calculated in the previous time step (which applies to this
             // one)
             if (DEBUG)
-                Util.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
                         currentTime,
                         setpointControl.x(),
                         setpointControl.v(),
@@ -316,7 +315,7 @@ class TrapezoidIncrementalProfileTest {
         // first brake for 0.449 sec, which puts us at 1.188
         // then cruise at -0.01 until 0, so 118.8 sec
         // total is about 119.2
-        // Util.println("**** first calculate the ETA");
+        // System.out.println("**** first calculate the ETA");
         // very low max vel
         double maxV = 0.01;
         // high max accel
@@ -329,7 +328,7 @@ class TrapezoidIncrementalProfileTest {
         // the simulator times out at 10 sec
         assertTrue(Double.isInfinite(eta));
 
-        // Util.println("**** then find S for this very same ETA");
+        // System.out.println("**** then find S for this very same ETA");
         double s = px.solve(0.1, initial, goal, 119.2, DELTA);
 
         // previously the "s" value here was 0.292, not 1.0, even though we're using
@@ -351,7 +350,7 @@ class TrapezoidIncrementalProfileTest {
         // brake for 0.459, puts us at 6.058
         // cruise at 0.01, so 605.8 sec
         // around 606.2 total
-        // Util.println("**** first calculate the ETA");
+        // System.out.println("**** first calculate the ETA");
         // very low max vel
         double maxV = 0.01;
         // high max accel
@@ -364,7 +363,7 @@ class TrapezoidIncrementalProfileTest {
         double eta = px.simulateForETA(0.2, initial, goal);
         assertTrue(Double.isInfinite(eta));
 
-        // Util.println("**** then find S for this very same ETA");
+        // System.out.println("**** then find S for this very same ETA");
         double s = px.solve(0.1, initial, goal, 606.261, DELTA);
         // this is correct.
         assertEquals(1, s, DELTA);

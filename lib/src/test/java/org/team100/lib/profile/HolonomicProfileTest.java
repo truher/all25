@@ -7,7 +7,6 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,7 +46,7 @@ class HolonomicProfileTest {
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
             if (DEBUG)
-                Util.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
+                System.out.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
         }
     }
 
@@ -65,7 +64,7 @@ class HolonomicProfileTest {
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
             if (DEBUG)
-                Util.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
+                System.out.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
         }
     }
 
@@ -79,7 +78,7 @@ class HolonomicProfileTest {
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
             if (DEBUG)
-                Util.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
+                System.out.printf("%.2f %.3f %.3f\n", t, s.x().x(), s.y().x());
         }
     }
 
@@ -108,8 +107,8 @@ class HolonomicProfileTest {
         }
         double t1 = Takt.actual();
         if (DEBUG)
-            Util.printf("duration (ms)  %5.1f\n", 1e3 * (t1 - t0));
+            System.out.printf("duration (ms)  %5.1f\n", 1e3 * (t1 - t0));
         if (DEBUG)
-            Util.printf("per op (ns)    %5.1f\n", 1e9 * (t1 - t0) / N);
+            System.out.printf("per op (ns)    %5.1f\n", 1e9 * (t1 - t0) / N);
     }
 }

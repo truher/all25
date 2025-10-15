@@ -3,7 +3,6 @@ package org.team100.frc2025.CalgamesArm;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.reference.SwerveReference;
-import org.team100.lib.util.Util;
 
 /**
  * Like the drivetrain ReferenceController, but it does
@@ -26,13 +25,15 @@ public class CalgamesReferenceController {
             SwerveModel measurement = m_subsystem.getState();
             SwerveModel current = m_reference.current();
             SwerveModel error = current.minus(measurement);
-            if (DEBUG)
-                Util.printf("error %s\n", error);
+            if (DEBUG) {
+                Object[] args = { error };
+                System.out.printf("error %s\n", args);
+            }
 
             SwerveControl next = m_reference.next();
             m_subsystem.set(next);
         } catch (IllegalStateException ex) {
-            // Util.println(ex);
+            // System.out.println(ex);
             // This happens when the trajectory generator produces an empty trajectory.
             // Ignore it for now.
         }

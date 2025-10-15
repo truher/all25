@@ -9,8 +9,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.team100.lib.util.Util;
-
 /**
  * Runs low-priority, timing-insensitive stuff asynchronously.
  * 
@@ -68,10 +66,10 @@ public class ExecutorAsync implements Async {
             try {
                 m_runnable.run();
             } catch (Throwable e) {
-                Util.warn(e.toString());
+                System.out.println("WARNING: " + e.toString());
                 Writer writer = new StringWriter();
                 e.printStackTrace(new PrintWriter(writer));
-                Util.warn(writer.toString());
+                System.out.println("WARNING: " + writer.toString());
             }
         }
     }

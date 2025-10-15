@@ -12,7 +12,6 @@ import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -115,7 +114,7 @@ public class OdometryUpdater {
                 currentTimeS);
 
         if (lowerEntry == null) {
-            // Util.println("lower entry is null");
+            // System.out.println("lower entry is null");
             // We're at the beginning. There's nothing to apply the wheel position delta to.
             // This should never happen.
             return;
@@ -124,29 +123,39 @@ public class OdometryUpdater {
         double dt = currentTimeS - lowerEntry.getKey();
         InterpolationRecord value = lowerEntry.getValue();
         SwerveModel previousState = value.m_state;
-        if (DEBUG)
-            Util.printf("previous x %.6f y %.6f\n", previousState.pose().getX(), previousState.pose().getY());
+        if (DEBUG) {
+            Object[] args = { previousState.pose().getX(), previousState.pose().getY() };
+            System.out.printf("previous x %.6f y %.6f\n", args);
+        }
 
         SwerveModuleDeltas modulePositionDelta = SwerveModuleDeltas.modulePositionDelta(
                 value.m_wheelPositions,
                 wheelPositions);
-        if (DEBUG)
-            Util.printf("modulePositionDelta %s\n", modulePositionDelta);
+        if (DEBUG) {
+            Object[] args1 = { modulePositionDelta };
+            System.out.printf("modulePositionDelta %s\n", args1);
+        }
 
         Twist2d twist = m_kinodynamics.getKinematics().toTwist2d(modulePositionDelta);
-        if (DEBUG)
-            Util.printf("twist x %.6f y %.6f theta %.6f\n", twist.dx, twist.dy, twist.dtheta);
+        if (DEBUG) {
+            Object[] args2 = { twist.dx, twist.dy, twist.dtheta };
+            System.out.printf("twist x %.6f y %.6f theta %.6f\n", args2);
+        }
         // replace the twist dtheta with one derived from the current
         // pose angle based on the gyro (which is more accurate)
 
         Rotation2d angle = gyroAngleRadNWU.plus(m_gyroOffset);
-        if (DEBUG)
-            Util.printf("angle %.6f\n", angle.getRadians());
+        if (DEBUG) {
+            Object[] args3 = { angle.getRadians() };
+            System.out.printf("angle %.6f\n", args3);
+        }
         twist.dtheta = angle.minus(previousState.pose().getRotation()).getRadians();
 
         Pose2d newPose = previousState.pose().exp(twist);
-        if (DEBUG)
-            Util.printf("new pose x %.6f y %.6f\n", newPose.getX(), newPose.getY());
+        if (DEBUG) {
+            Object[] args4 = { newPose.getX(), newPose.getY() };
+            System.out.printf("new pose x %.6f y %.6f\n", args4);
+        }
 
         // this is the backward finite difference velocity from odometry
         FieldRelativeDelta odoVelo = FieldRelativeDelta.delta(
