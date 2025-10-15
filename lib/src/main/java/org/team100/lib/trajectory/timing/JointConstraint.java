@@ -27,6 +27,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * TODO: make acceleration constraint depend on position, to account for
  * gravity, because it's really a motor torque constraint, not an acceleration
  * constraint per se.
+ * TODO: make this constraint actually work, I think it's broken.
  */
 public class JointConstraint implements TimingConstraint {
     private final ElevatorArmWristKinematics m_k;
