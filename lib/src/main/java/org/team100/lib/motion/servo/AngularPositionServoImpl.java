@@ -88,22 +88,22 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
     }
 
     @Override
-    public void setPositionDirect(Setpoints1d wrappedSetpoint, double torqueNm) {
+    public void setPositionDirect(double wrappedGoalRad, double torqueNm) {
         // make sure the reference gets reinitialized if required later
         m_unwrappedGoal = null;
         m_validSetpoint = true;
 
         double unwrappedMeasurement = m_mechanism.getUnwrappedPositionRad();
-        double nextDx = MathUtil.angleModulus(wrappedSetpoint.next().x() - unwrappedMeasurement);
-        double nextX = unwrappedMeasurement + nextDx;
-        if (nextDx > 0) {
+        double dx = MathUtil.angleModulus(wrappedGoalRad - unwrappedMeasurement);
+        double x = unwrappedMeasurement + dx;
+        if (dx > 0) {
             if (DEBUG)
                 Util.println("short way is positive");
-            if (nextX > m_mechanism.getMaxPositionRad()) {
+            if (x > m_mechanism.getMaxPositionRad()) {
                 if (DEBUG)
                     Util.println("short way is beyond the limit; go around");
-                nextX = nextX - 2 * Math.PI;
-                if (nextX < m_mechanism.getMinPositionRad()) {
+                x = x - 2 * Math.PI;
+                if (x < m_mechanism.getMinPositionRad()) {
                     if (DEBUG)
                         Util.println("setpoint is inaccessible, hold position.");
                     m_nextUnwrappedSetpoint = m_mechanism.getUnwrappedMeasurement().control();
@@ -115,11 +115,11 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         } else {
             if (DEBUG)
                 Util.println("short way is negative");
-            if (nextX < m_mechanism.getMinPositionRad()) {
+            if (x < m_mechanism.getMinPositionRad()) {
                 if (DEBUG)
                     Util.println("short way is beyond the limit; go around");
-                nextX = nextX + 2 * Math.PI;
-                if (nextX > m_mechanism.getMaxPositionRad()) {
+                x = x + 2 * Math.PI;
+                if (x > m_mechanism.getMaxPositionRad()) {
                     if (DEBUG)
                         Util.println("setpoint is inaccessible; hold position.");
                     m_nextUnwrappedSetpoint = m_mechanism.getUnwrappedMeasurement().control();
@@ -129,17 +129,8 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
                 }
             }
         }
-        m_nextUnwrappedSetpoint = new Control100(
-                nextX,
-                wrappedSetpoint.next().v(),
-                wrappedSetpoint.next().a());
-        double nextMinusCurrentX = MathUtil.angleModulus(
-                wrappedSetpoint.next().x() - wrappedSetpoint.current().x());
-        double curX = nextX - nextMinusCurrentX;
-        Setpoints1d unwrappedSetpoint = new Setpoints1d(
-                new Control100(curX, wrappedSetpoint.current().v(), wrappedSetpoint.current().a()),
-                m_nextUnwrappedSetpoint);
-        actuate(unwrappedSetpoint, torqueNm);
+        m_nextUnwrappedSetpoint = new Control100(x, 0, 0);
+        actuate(new Setpoints1d(m_nextUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
     }
 
     @Override

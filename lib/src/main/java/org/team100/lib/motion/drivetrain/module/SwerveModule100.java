@@ -10,8 +10,6 @@ import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
 import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.LinearVelocityServo;
-import org.team100.lib.reference.Setpoints1d;
-import org.team100.lib.state.Control100;
 import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
@@ -188,8 +186,7 @@ public abstract class SwerveModule100 {
 
         if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
             // no profile, just low-level position
-            Control100 control = new Control100(desiredWrappedAngle.getRadians(), 0);
-            m_turningServo.setPositionDirect(new Setpoints1d(control, control), 0);
+            m_turningServo.setPositionDirect(desiredWrappedAngle.getRadians(), 0);
         } else {
             // use the profile
             m_turningServo.setPositionProfiled(desiredWrappedAngle.getRadians(), 0);

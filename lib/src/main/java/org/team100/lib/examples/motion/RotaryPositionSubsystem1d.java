@@ -20,7 +20,6 @@ import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.timed.JerkLimitedTimedProfile;
 import org.team100.lib.reference.ProfileReference1d;
-import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.reference.TimedProfileReference1d;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
@@ -129,8 +128,8 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
         m_servo.setPositionProfiled(goal, 0);
     }
 
-    public void setPositionDirect(Setpoints1d setpoint) {
-        m_servo.setPositionDirect(setpoint, 0);
+    public void setPositionDirect(double goal) {
+        m_servo.setPositionDirect(goal, 0);
     }
 
     ///////////////////////////////////////////////////////
