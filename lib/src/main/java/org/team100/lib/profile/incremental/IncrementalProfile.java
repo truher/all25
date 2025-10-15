@@ -3,7 +3,6 @@ package org.team100.lib.profile.incremental;
 import org.team100.lib.optimization.Bisection1d;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 /**
  * This profile takes incremental steps from the setpoint towards the goal.
@@ -79,8 +78,9 @@ public interface IncrementalProfile {
                 scale(maxS).simulateForETA(dt, i, g) - goalETA,
                 etaTolerance,
                 100);
-        if (DEBUG)
-            Util.printf("s %5.2f\n", ss);
+        if (DEBUG) {
+            System.out.printf("s %5.2f\n", ss);
+        }
         return ss;
     }
 

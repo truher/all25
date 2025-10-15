@@ -15,7 +15,6 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.Topic;
@@ -60,9 +59,9 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void robotInit() {
-        Util.printf("WPILib Version: %s\n", WPILibVersion.Version); // 2023.2.1
-        Util.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
-        Util.printf("Identity: %s\n", Identity.instance.name());
+        System.out.printf("WPILib Version: %s\n", WPILibVersion.Version); // 2023.2.1
+        System.out.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
+        System.out.printf("Identity: %s\n", Identity.instance.name());
         RobotController.setBrownoutVoltage(5.5);
         banner();
 
@@ -85,7 +84,7 @@ public class Robot extends TimedRobot100 {
 
         // DataLogManager.start();
 
-        Util.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
+        System.out.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
 
         // This reduces the allocated heap size, not just the used heap size, which
         // means more-frequent and smaller subsequent GC's.
@@ -177,7 +176,7 @@ public class Robot extends TimedRobot100 {
         clearCommands();
         for (Topic t : NetworkTableInstance.getDefault().getTopics()) {
             if (DEBUG)
-                Util.printf("%s\n", t.getName());
+                System.out.printf("%s\n", t.getName());
         }
     }
 
@@ -249,7 +248,7 @@ public class Robot extends TimedRobot100 {
         b.append(".....##....##.......##.....##.##.....##.......##....##...##...##...##...\n");
         b.append(".....##....########.##.....##.##.....##.....######...#####.....#####....\n");
         b.append("\n");
-        Util.println(b.toString());
+        System.out.println(b.toString());
 
     }
 }

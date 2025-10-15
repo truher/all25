@@ -8,7 +8,7 @@ import java.util.OptionalDouble;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.util.Util;
+import org.team100.lib.util.StrUtil;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -27,7 +27,7 @@ public class AnalyticLynxArmKinematicsTest {
         // figure out the twist axis
         Rotation3d r = new Rotation3d(Math.PI / 2, Math.PI / 2, Math.PI / 2);
         if (DEBUG)
-            Util.printf("r %s\n", Util.rotStr(r));
+            System.out.printf("r %s\n", StrUtil.rotStr(r));
 
     }
 
@@ -39,37 +39,37 @@ public class AnalyticLynxArmKinematicsTest {
         Pose3d end = new Pose3d(0.15, -0.1, 0.1, new Rotation3d(0, Math.PI / 2, 0));
         LynxArmConfig q = k.inverse(q0, end);
         if (DEBUG)
-            Util.printf("q %s\n", q);
+            System.out.printf("q %s\n", q);
         LynxArmPose p = k.forward(q);
         if (DEBUG) {
-            Util.printf("p1 %s\n", Util.poseStr(p.p1()));
-            Util.printf("p2 %s\n", Util.poseStr(p.p2()));
-            Util.printf("p3 %s\n", Util.poseStr(p.p3()));
-            Util.printf("p4 %s\n", Util.poseStr(p.p4()));
-            Util.printf("p5 %s\n", Util.poseStr(p.p5()));
-            Util.printf("p6 %s\n", Util.poseStr(p.p6()));
+            System.out.printf("p1 %s\n", StrUtil.poseStr(p.p1()));
+            System.out.printf("p2 %s\n", StrUtil.poseStr(p.p2()));
+            System.out.printf("p3 %s\n", StrUtil.poseStr(p.p3()));
+            System.out.printf("p4 %s\n", StrUtil.poseStr(p.p4()));
+            System.out.printf("p5 %s\n", StrUtil.poseStr(p.p5()));
+            System.out.printf("p6 %s\n", StrUtil.poseStr(p.p6()));
         }
         // the difference in joint poses here produces a pure pitch
         // which does not match my intuition (that the joint axis would be rotated)
         Rotation3d r = p.p3().getRotation().minus(p.p2().getRotation());
         if (DEBUG)
-            Util.printf("r %s\n", Util.rotStr(r));
+            System.out.printf("r %s\n", StrUtil.rotStr(r));
         Translation3d t = new Translation3d(1, 0, 0);
         Vector<N3> v2 = t.rotateBy(p.p2().getRotation()).toVector();
         Vector<N3> v3 = t.rotateBy(p.p3().getRotation()).toVector();
         Vector<N3> axis = Vector.cross(v2, v3);
         Rotation3d axisR = new Rotation3d(axis);
         if (DEBUG)
-            Util.printf("axisR %s\n", Util.rotStr(axisR));
+            System.out.printf("axisR %s\n", StrUtil.rotStr(axisR));
         Translation3d tR = new Translation3d(axis);
         if (DEBUG)
-            Util.printf("tR %s\n", tR);
+            System.out.printf("tR %s\n", tR);
 
         // this way is simpler
         Translation3d yt = new Translation3d(0, 1, 0);
         Translation3d a2 = new Translation3d(yt.rotateBy(p.p3().getRotation()).toVector());
         if (DEBUG)
-            Util.printf("a2 %s\n", a2);
+            System.out.printf("a2 %s\n", a2);
 
     }
 
@@ -84,7 +84,7 @@ public class AnalyticLynxArmKinematicsTest {
             // wrist should be pointing down the whole time
             q = k.inverse(q, lerp);
             if (DEBUG)
-                Util.printf("q %s\n", Util.poseStr(lerp));
+                System.out.printf("q %s\n", StrUtil.poseStr(lerp));
         }
     }
 
@@ -109,11 +109,11 @@ public class AnalyticLynxArmKinematicsTest {
 
         Rotation2d swingAngle = translation.getAngle();
         if (DEBUG)
-            Util.printf("swing angle rad %f\n", swingAngle.getRadians());
+            System.out.printf("swing angle rad %f\n", swingAngle.getRadians());
         Rotation3d swing3d = new Rotation3d(swingAngle);
         Rotation3d swingRelative3d = endRotation.minus(swing3d);
         if (DEBUG)
-            Util.printf("swing relative %s\n", swingRelative3d);
+            System.out.printf("swing relative %s\n", swingRelative3d);
 
     }
 
@@ -361,13 +361,13 @@ public class AnalyticLynxArmKinematicsTest {
         // end-effector rotation is fixed
         Rotation3d r = new Rotation3d(0, Math.PI / 2, 0);
         if (DEBUG)
-            Util.println("s, swing, boom, stick, wrist, twist");
+            System.out.println("s, swing, boom, stick, wrist, twist");
         for (double s = 0; s <= 1.0; s += 0.05) {
             Translation3d t = start.interpolate(end, s);
             Pose3d p = new Pose3d(t, r);
             q = k.inverse(q, p);
             if (DEBUG)
-                Util.printf("%6.3f, %s\n", s, q.str());
+                System.out.printf("%6.3f, %s\n", s, q.str());
         }
     }
 

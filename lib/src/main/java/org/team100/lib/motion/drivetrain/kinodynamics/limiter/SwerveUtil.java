@@ -5,7 +5,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.util.Math100;
-import org.team100.lib.util.Util;
 
 public class SwerveUtil {
     private static final boolean DEBUG = false;
@@ -41,7 +40,7 @@ public class SwerveUtil {
         double backEmfLimitedAcceleration = backEmfLimit * aScale * m_limits.getStallAccelerationM_S2();
         double currentLimitedAcceleration = aScale * m_limits.getMaxDriveAccelerationM_S2();
         if (DEBUG) {
-            Util.printf("speedFraction %5.2f backEmfLimitedAcceleration %5.2f currentLimitedAcceleration %5.2f\n",
+            System.out.printf("speedFraction %5.2f backEmfLimitedAcceleration %5.2f currentLimitedAcceleration %5.2f\n",
                     speedFraction, backEmfLimitedAcceleration, currentLimitedAcceleration);
         }
         return Math.min(backEmfLimitedAcceleration, currentLimitedAcceleration);

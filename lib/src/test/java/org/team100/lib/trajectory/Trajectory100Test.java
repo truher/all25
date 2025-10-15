@@ -11,7 +11,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.timing.TimedPose;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -179,7 +178,7 @@ class Trajectory100Test {
         long end = System.nanoTime();
         long duration = end - start;
         if (DEBUG)
-            Util.printf("duration (ns) total (ms) %.0f per sample (ns) %.2f\n",
+            System.out.printf("duration (ns) total (ms) %.0f per sample (ns) %.2f\n",
                     0.000001 * duration, (double) duration / (reps * times));
     }
 

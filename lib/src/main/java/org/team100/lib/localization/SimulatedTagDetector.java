@@ -11,7 +11,6 @@ import java.util.function.DoubleFunction;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -90,7 +89,7 @@ public class SimulatedTagDetector {
 
     public void periodic() {
         if (DEBUG)
-            Util.println("simulated tag detector");
+            System.out.println((Object) "simulated tag detector");
         Optional<Alliance> opt = DriverStation.getAlliance();
         if (opt.isEmpty())
             return;
@@ -102,13 +101,10 @@ public class SimulatedTagDetector {
 
         Pose3d robotPose3d = new Pose3d(pose);
         if (DEBUG) {
-            Util.printf("robot pose X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f \n",
-                    robotPose3d.getTranslation().getX(),
-                    robotPose3d.getTranslation().getY(),
-                    robotPose3d.getTranslation().getZ(),
-                    robotPose3d.getRotation().getX(),
-                    robotPose3d.getRotation().getY(),
-                    robotPose3d.getRotation().getZ());
+            System.out.printf("robot pose X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f \n",
+                    robotPose3d.getTranslation().getX(), robotPose3d.getTranslation().getY(),
+                    robotPose3d.getTranslation().getZ(), robotPose3d.getRotation().getX(),
+                    robotPose3d.getRotation().getY(), robotPose3d.getRotation().getZ());
         }
         for (Map.Entry<Camera, StructArrayPublisher<Blip24>> entry : m_publishers.entrySet()) {
             Camera camera = entry.getKey();
@@ -121,49 +117,40 @@ public class SimulatedTagDetector {
 
             for (int tagId = 1; tagId <= TAG_COUNT; ++tagId) {
                 if (DEBUG) {
-                    Util.printf("alliance %s camera %12s ", alliance.name(), camera.name());
+                    System.out.printf("alliance %s camera %12s ", alliance.name(), camera.name());
                 }
                 Pose3d tagPose = m_layout.getTagPose(alliance, tagId).get();
                 if (DEBUG) {
-                    Util.printf("tag id: %2d tag pose: X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f ",
-                            tagId,
-                            tagPose.getTranslation().getX(),
-                            tagPose.getTranslation().getY(),
-                            tagPose.getTranslation().getZ(),
-                            tagPose.getRotation().getX(),
-                            tagPose.getRotation().getY(),
+                    System.out.printf("tag id: %2d tag pose: X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f ",
+                            tagId, tagPose.getTranslation().getX(), tagPose.getTranslation().getY(),
+                            tagPose.getTranslation().getZ(), tagPose.getRotation().getX(), tagPose.getRotation().getY(),
                             tagPose.getRotation().getZ());
                 }
                 Transform3d tagInCamera = tagInCamera(cameraPose3d, tagPose);
                 if (visible(tagInCamera)) {
                     // publish it
                     if (DEBUG) {
-                        Util.printf("VISIBLE ");
+
+                        System.out.print("VISIBLE ");
                     }
                     blips.add(Blip24.fromXForward(tagId, tagInCamera));
                 } else {
                     // ignore it
                     if (DEBUG) {
-                        Util.printf(" . ");
+
+                        System.out.print(" . ");
                     }
                 }
                 if (DEBUG) {
-                    Util.printf("camera: X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f",
-                            cameraOffset.getTranslation().getX(),
-                            cameraOffset.getTranslation().getY(),
-                            cameraOffset.getTranslation().getZ(),
-                            cameraOffset.getRotation().getX(),
-                            cameraOffset.getRotation().getY(),
-                            cameraOffset.getRotation().getZ());
+                    System.out.printf("camera: X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f",
+                            cameraOffset.getTranslation().getX(), cameraOffset.getTranslation().getY(),
+                            cameraOffset.getTranslation().getZ(), cameraOffset.getRotation().getX(),
+                            cameraOffset.getRotation().getY(), cameraOffset.getRotation().getZ());
                     Translation3d tagTranslationInCamera = tagInCamera.getTranslation();
                     Rotation3d tagRotationInCamera = tagInCamera.getRotation();
-
-                    Util.printf(" tag in camera: X %6.2f Y %6.2f Z %6.2f  R %6.2f P %6.2f Y %6.2f\n",
-                            tagTranslationInCamera.getX(),
-                            tagTranslationInCamera.getY(),
-                            tagTranslationInCamera.getZ(),
-                            tagRotationInCamera.getX(),
-                            tagRotationInCamera.getY(),
+                    System.out.printf(" tag in camera: X %6.2f Y %6.2f Z %6.2f  R %6.2f P %6.2f Y %6.2f\n",
+                            tagTranslationInCamera.getX(), tagTranslationInCamera.getY(),
+                            tagTranslationInCamera.getZ(), tagRotationInCamera.getX(), tagRotationInCamera.getY(),
                             tagRotationInCamera.getZ());
                 }
 
@@ -176,7 +163,7 @@ public class SimulatedTagDetector {
             publisher.set(
                     blips.toArray(new Blip24[0]), timestampUs - delayUs);
             if (PUBLISH_DEBUG) {
-                Util.printf("%s\n", blips);
+                System.out.printf("%s\n", blips);
             }
         }
 
@@ -194,12 +181,14 @@ public class SimulatedTagDetector {
         Translation3d tagTranslationInCamera = tagInCamera.getTranslation();
         double x = tagTranslationInCamera.getX();
         if (x < 0) {
-            if (DEBUG)
-                Util.printf("   behind (%6.2f) ", x);
+            if (DEBUG) {
+                System.out.printf("   behind (%6.2f) ", x);
+            }
             return false;
         }
-        if (DEBUG)
-            Util.printf(" in front (%6.2f) ", x);
+        if (DEBUG) {
+            System.out.printf(" in front (%6.2f) ", x);
+        }
         return true;
     }
 
@@ -221,12 +210,14 @@ public class SimulatedTagDetector {
         double angle = apparentAngle.getAngle();
 
         if (Math.abs(angle) > OBLIQUE_LIMIT_RAD) {
-            if (DEBUG)
-                Util.printf(" facing away (%6.2f)", angle);
+            if (DEBUG) {
+                System.out.printf(" facing away (%6.2f)", angle);
+            }
             return false;
         }
-        if (DEBUG)
-            Util.printf("    angle ok (%6.2f)", angle);
+        if (DEBUG) {
+            System.out.printf("    angle ok (%6.2f)", angle);
+        }
         return true;
     }
 
@@ -244,32 +235,37 @@ public class SimulatedTagDetector {
         double xpp = -1.0 * tagTranslationInCamera.getY() / tagTranslationInCamera.getX();
         double ypp = -1.0 * tagTranslationInCamera.getZ() / tagTranslationInCamera.getX();
         if (Math.abs(xpp) < HFOV && Math.abs(ypp) < VFOV) {
-            if (DEBUG)
-                Util.printf("  FOV IN xpp %6.2f ypp %6.2f ", xpp, ypp);
+            if (DEBUG) {
+                System.out.printf("  FOV IN xpp %6.2f ypp %6.2f ", xpp, ypp);
+            }
             return true;
         }
-        if (DEBUG)
-            Util.printf(" FOV OUT xpp %6.2f ypp %6.2f ", xpp, ypp);
+        if (DEBUG) {
+            System.out.printf(" FOV OUT xpp %6.2f ypp %6.2f ", xpp, ypp);
+        }
         return false;
 
     }
 
     static boolean visible(Transform3d tagInCamera) {
         if (!inFront(tagInCamera)) {
-            if (DEBUG)
-                Util.printf(" ........................................................");
+            if (DEBUG) {
+                System.out.print(" ........................................................");
+            }
             return false;
         }
 
         if (!facing(tagInCamera)) {
-            if (DEBUG)
-                Util.printf(" ...................................");
+            if (DEBUG) {
+                System.out.print(" ...................................");
+            }
             return false;
         }
 
         if (!inFOV(tagInCamera)) {
-            if (DEBUG)
-                Util.printf(" ... ");
+            if (DEBUG) {
+                System.out.print(" ... ");
+            }
             return false;
         }
 

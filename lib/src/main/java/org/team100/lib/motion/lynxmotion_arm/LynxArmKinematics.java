@@ -1,7 +1,5 @@
 package org.team100.lib.motion.lynxmotion_arm;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -57,8 +55,9 @@ public interface LynxArmKinematics {
         }
         // it's not vertical.
         double yaw = p.getTranslation().toTranslation2d().getAngle().getRadians();
-        if (DEBUG)
-            Util.printf("yaw %s\n", yaw);
+        if (DEBUG) {
+            System.out.printf("yaw %s\n", yaw);
+        }
 
         Vector<N3> normal = Vector.cross(
                 VecBuilder.fill(Math.cos(yaw), Math.sin(yaw), 0),
@@ -92,8 +91,9 @@ public interface LynxArmKinematics {
         }
         // it's not vertical.
         double yaw = p.getTranslation().toTranslation2d().getAngle().getRadians();
-        if (DEBUG)
-            Util.printf("yaw %s\n", yaw);
+        if (DEBUG) {
+            System.out.printf("yaw %s\n", yaw);
+        }
         return new Pose3d(new Translation3d(p.getX(), p.getY(), p.getZ()),
                 new Rotation3d(p.getRotation().getX(), p.getRotation().getY(), yaw));
 

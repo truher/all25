@@ -9,7 +9,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.util.CanId;
-import org.team100.lib.util.Util;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
@@ -164,7 +163,7 @@ public abstract class Talon6Motor implements BareMotor {
                 .ofDouble(() -> {
                     double latency = Utils.fpgaToCurrentTime(Takt.get()) - motorPosition.getTimestamp().getTime();
                     if (latency > 0.04) {
-                        Util.warn("!!!!!!! stale position! !!!!!!!" + canId);
+                        System.out.println("WARNING: " + "!!!!!!! stale position! !!!!!!!" + canId);
                         latency = 0.1;
                     }
                     return motorPosition.getValueAsDouble() + (motorVelocity.getValueAsDouble() * latency);
@@ -345,7 +344,7 @@ public abstract class Talon6Motor implements BareMotor {
      * at startup.
      */
     public void resetEncoderPosition() {
-        Util.warn("Setting CTRE encoder position is very slow!");
+        System.out.println("WARNING: " + "Setting CTRE encoder position is very slow!");
         Phoenix100.warn(() -> m_motor.setPosition(0, 1));
         m_position.reset();
         m_velocity.reset();
@@ -361,7 +360,7 @@ public abstract class Talon6Motor implements BareMotor {
      * at startup.
      */
     private void setUnwrappedEncoderPosition(double motorPositionRev) {
-        Util.warn("Setting CTRE encoder position is very slow!");
+        System.out.println("WARNING: " + "Setting CTRE encoder position is very slow!");
         Phoenix100.warn(() -> m_motor.setPosition(motorPositionRev, 1));
     }
 

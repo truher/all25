@@ -1,13 +1,10 @@
 package org.team100.lib.motion.servo;
 
-import org.team100.lib.reference.Setpoints1d;
-
 /**
  * Angular position control, e.g. for swerve steering axes or arm axes.
  * 
- * Servos no longer include profiles (in order to coordinate multiple axes), so
- * this just takes setpoints, and, for onboard versions, computes feedback
- * control.
+ * An angular servo should generally get "wrapped" input. It figures out what
+ * "unwrapped" commands to give the underlying mechanism.
  */
 public interface AngularPositionServo {
     /**
@@ -35,20 +32,24 @@ public interface AngularPositionServo {
      * 
      * @param wrappedGoalRad The goal angle here wraps within [-pi, pi], using
      *                       output measurements, e.g. shaft radians, not motor
-     *                       radians
-     * @param torqueNm       feedforward for gravity or spring compensation
+     *                       radians.
+     * @param torqueNm       Feedforward for gravity or spring compensation.
      */
     void setPositionProfiled(double wrappedGoalRad, double torqueNm);
 
     /**
-     * Invalidates the current profile, sets the setpoint directly.
+     * Invalidates the current profile, sets the setpoint directly, using the
+     * supplied position and zero for velocity and acceleration.
      * 
-     * @param wrappedSetpoint both current and next setpoints so that the
-     *                        implementation can choose the current one for feedback
-     *                        and the next one for feedforward.
-     * @param torqueNm        feedforward for gravity or spring compensation
+     * This is really only appropriate for the Outboard control case, because the
+     * feedback controller there can be much firmer than in the Outboard case.
+     * 
+     * @param wrappedGoalRad The goal angle here wraps within [-pi, pi], using
+     *                       output measurements, e.g. shaft radians, not motor
+     *                       radians.
+     * @param torqueNm       Feedforward for gravity or spring compensation.
      */
-    void setPositionDirect(Setpoints1d wrappedSetpoint, double torqueNm);
+    void setPositionDirect(double wrappedGoalRad, double torqueNm);
 
     /**
      * This is the "wrapped" value, i.e. it is periodic within +/- pi.

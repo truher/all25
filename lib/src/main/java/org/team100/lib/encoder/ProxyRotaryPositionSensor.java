@@ -27,7 +27,6 @@ public class ProxyRotaryPositionSensor implements RotaryPositionSensor {
         m_encoder.setUnwrappedEncoderPositionRad(positionRad * m_gearRatio);
     }
 
-    /** TODO: verify this.*/
     @Override
     public double getWrappedPositionRad() {
         return MathUtil.angleModulus(getUnwrappedPositionRad());

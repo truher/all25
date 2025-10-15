@@ -3,8 +3,6 @@ package org.team100.lib.optimization;
 import java.util.Random;
 import java.util.function.Function;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -99,7 +97,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      * @param restarts number of random restarts in case of non-convergence
      */
     public Vector<X> solve2(Vector<X> initialX, int restarts) {
-        // Util.printf("initialX: %s\n", Util.vecStr(initialX));
+        // System.out.printf("initialX: %s\n", StrUtil.vecStr(initialX));
         long startTime = System.nanoTime();
         int iter = 0;
         Vector<Y> error = new Vector<>(m_ydim);
@@ -108,26 +106,26 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             Vector<X> x = new Vector<>(initialX.getStorage().copy());
             for (iter = 0; iter < m_iterations; ++iter) {
                 // if (DEBUG)
-                // Util.printf("x: %s\n", Util.vecStr(x));
+                // System.out.printf("x: %s\n", StrUtil.vecStr(x));
 
                 error = m_f.apply(x);
                 // if (DEBUG)
-                // Util.printf("error: %s\n", Util.vecStr(error));
+                // System.out.printf("error: %s\n", StrUtil.vecStr(error));
 
                 if (within(error)) {
-                    // Util.println("success");
+                    // System.out.println("success");
                     return x;
                 }
                 Matrix<Y, X> j = NumericalJacobian100.numericalJacobian2(m_xdim, m_ydim, m_f, x);
 
                 // if (DEBUG)
-                // Util.printf("J %s\n", Util.matStr(j));
+                // System.out.printf("J %s\n", StrUtil.matStr(j));
 
                 // the pseudoinverse should always work too
                 // note this is quite slow
                 // Matrix<X, Y> jInv = new Matrix<>(j.getStorage().pseudoInverse());
                 // if (DEBUG)
-                // Util.printf("Jinv %s\n", Util.matStr(jInv));
+                // System.out.printf("Jinv %s\n", StrUtil.matStr(jInv));
 
                 // Vector<X> dx = new Vector<>(jInv.times(error));
 
@@ -139,7 +137,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 // Vector<X> dx = getDxWithQRDecomp(error, j);
 
                 // if (DEBUG)
-                // Util.printf("dx: %s\n", Util.vecStr(dx));
+                // System.out.printf("dx: %s\n", StrUtil.vecStr(dx));
 
                 // Too-high dx results in oscillation.
                 clamp(dx);
@@ -149,13 +147,13 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             }
             if (restarts > 0) {
                 // if (DEBUG)
-                    Util.println("convergence failed, trying random restart");
+                System.out.println((Object) "convergence failed, trying random restart");
                 // this is *really* random, including out-of-bounds.
                 // SimpleMatrix r = SimpleMatrix.random(m_xdim.getNum(), 1)
                 // .minus(0.5)
                 // .scale(1);
                 // Vector<X> rv = new Vector<>(r);
-                // Util.printf("rv %s\n", Util.vecStr(rv));
+                // System.out.printf("rv %s\n", StrUtil.vecStr(rv));
                 // rv = rv.plus(x);
                 // limit(rv);
                 for (int i = 0; i < m_xdim.getNum(); i++) {
@@ -165,16 +163,17 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 return solve2(x, restarts - 1);
             }
             // if (DEBUG)
-                Util.printf("random restart failed, error %f\n", error.maxAbs());
+            System.out.printf("random restart failed, error %f\n", error.maxAbs());
             // throw new IllegalArgumentException(
             // String.format("failed to converge for inputs %s",
-            // Util.vecStr(initialX)));
+            // StrUtil.vecStr(initialX)));
             return x;
         } finally {
             long finishTime = System.nanoTime();
-            if (DEBUG)
-                Util.printf("solve2 iterations: %d ET (ms): %6.3f\n",
-                        iter, ((double) finishTime - startTime) / 1000000);
+            if (DEBUG) {
+                System.out.printf("solve2 iterations: %d ET (ms): %6.3f\n", iter,
+                        ((double) finishTime - startTime) / 1000000);
+            }
         }
     }
 
@@ -193,7 +192,6 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         Vector<X> dx = new Vector<>(new Matrix<>(m_xdim, Nat.N1(), dst));
         return dx;
     }
-
 
     private boolean within(Vector<Y> error) {
         return error.maxAbs() < m_tolerance;
@@ -234,10 +232,10 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             double dxI = dx.get(i);
             if (Math.abs(dxI) > m_dxLimit) {
                 if (DEBUG)
-                    Util.println("clamped!");
+                    System.out.println((Object) "clamped!");
             }
             double clampedDxI = MathUtil.clamp(dxI, -m_dxLimit, m_dxLimit);
-            // Util.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);
+            // System.out.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);
             dx.set(i, 0, clampedDxI);
         }
     }

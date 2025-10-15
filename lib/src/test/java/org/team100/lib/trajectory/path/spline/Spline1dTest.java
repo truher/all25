@@ -1,7 +1,6 @@
 package org.team100.lib.trajectory.path.spline;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
@@ -30,7 +29,7 @@ public class Spline1dTest {
             double a = spline.getAcceleration(t);
             double j = spline.getJerk(t);
             if (DEBUG)
-                Util.printf("%8.3f %8.3f %8.3f %8.3f %8.3f\n",
+                System.out.printf("%8.3f %8.3f %8.3f %8.3f %8.3f\n",
                         t, x, v, a, j);
         }
     }
@@ -59,7 +58,7 @@ public class Spline1dTest {
         // so to get the c vector we just invert the matrix
         Matrix<N6, N6> Ainv = A.inv();
         if (DEBUG)
-            Util.printf("%s\n", Ainv);
+            System.out.printf("%s\n", Ainv);
 
     }
 

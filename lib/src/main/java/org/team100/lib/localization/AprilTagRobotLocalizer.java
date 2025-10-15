@@ -17,7 +17,6 @@ import org.team100.lib.logging.LoggerFactory.Transform3dLogger;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.TrailingHistory;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -225,7 +224,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         if (!optAlliance.isPresent()) {
             // this happens on startup
             if (DEBUG)
-                Util.warn("VisionDataProvider24: Alliance is not present!");
+                System.out.println("WARNING: " + "VisionDataProvider24: Alliance is not present!");
             return;
         }
         Alliance alliance = optAlliance.get();
@@ -241,8 +240,9 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
 
         // The gyro rotation for the frame timestamp
         final Rotation2d gyroRotation = historicalPose.getRotation();
-        if (DEBUG)
-            Util.printf("gyro rotation %f\n", gyroRotation.getRadians());
+        if (DEBUG) {
+            System.out.printf("gyro rotation %f\n", gyroRotation.getRadians());
+        }
 
         for (int i = 0; i < blips.length; ++i) {
             Blip24 blip = blips[i];
@@ -250,7 +250,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             if (DEBUG) {
                 Translation3d t = blip.getRawPose().getTranslation();
                 Rotation3d r = blip.getRawPose().getRotation();
-                Util.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
+                System.out.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
                         blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ());
             }
 
@@ -258,7 +258,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             Optional<Pose3d> tagInFieldCoordsOptional = m_layout.getTagPose(alliance, blip.getId());
             if (!tagInFieldCoordsOptional.isPresent()) {
                 // This shouldn't happen, but it does.
-                Util.warnf("VisionDataProvider24: no tag for id %d\n", blip.getId());
+                System.out.printf("WARNING: VisionDataProvider24: no tag for id %d\n", blip.getId());
                 continue;
             }
 
@@ -275,14 +275,10 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 // This is used for camera offset calibration. Place a tag at a known position,
                 // observe the offset, and add it to Camera.java, inverted.
                 Transform3d tagInRobot = cameraOffset.plus(tagInCamera);
-                Util.printf("tagInRobot id %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
-                        blip.getId(),
-                        tagInRobot.getTranslation().getX(),
-                        tagInRobot.getTranslation().getY(),
-                        tagInRobot.getTranslation().getZ(),
-                        tagInRobot.getRotation().getX(),
-                        tagInRobot.getRotation().getY(),
-                        tagInRobot.getRotation().getZ());
+                System.out.printf("tagInRobot id %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
+                        blip.getId(), tagInRobot.getTranslation().getX(), tagInRobot.getTranslation().getY(),
+                        tagInRobot.getTranslation().getZ(), tagInRobot.getRotation().getX(),
+                        tagInRobot.getRotation().getY(), tagInRobot.getRotation().getZ());
             }
 
             if (tagInCamera.getTranslation().getNorm() > TAG_ROTATION_BELIEF_THRESHOLD_M) {
@@ -323,13 +319,13 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 // If we've turned vision off altogether, then don't apply this update to the
                 // pose estimator.
                 if (DEBUG)
-                    Util.println("heedvision is off");
+                    System.out.println((Object) "heedvision is off");
                 continue;
             }
 
             if (blipTransform.getTranslation().getNorm() > m_heedRadiusM) {
                 if (DEBUG)
-                    Util.println("tag is too far");
+                    System.out.println((Object) "tag is too far");
                 // Skip too-far tags.
                 continue;
             }
@@ -338,7 +334,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 // Ignore the very first update since we have no idea if it is far from the
                 // previous one.
                 if (DEBUG)
-                    Util.println("skip first update");
+                    System.out.println((Object) "skip first update");
                 m_prevPose = pose;
                 continue;
             }
@@ -348,7 +344,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 // The new estimate is too far from the previous one: it's probably garbage.
                 m_prevPose = pose;
                 if (DEBUG)
-                    Util.println("too far from previous");
+                    System.out.println((Object) "too far from previous");
                 continue;
             }
 

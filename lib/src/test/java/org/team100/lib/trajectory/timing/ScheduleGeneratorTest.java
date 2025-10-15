@@ -21,7 +21,6 @@ import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -297,8 +296,8 @@ public class ScheduleGeneratorTest {
         long endTimeNs = System.nanoTime();
         double totalDurationMs = (endTimeNs - startTimeNs) / 1000000.0;
         if (DEBUG) {
-            Util.printf("total duration ms: %5.3f\n", totalDurationMs);
-            Util.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
+            System.out.printf("total duration ms: %5.3f\n", totalDurationMs);
+            System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);

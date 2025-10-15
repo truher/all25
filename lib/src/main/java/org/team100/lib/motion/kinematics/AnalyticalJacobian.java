@@ -5,7 +5,6 @@ import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -157,7 +156,7 @@ public class AnalyticalJacobian {
             // Don't try to invert if it's not possible.
             // a zero inverse determinant will result in zero speed,
             // which is the safe thing.
-            Util.warnf("zero jacobian for config %s\n", q.toString());
+            System.out.printf("WARNING: zero jacobian for config %s\n", q.toString());
             return new Matrix<>(Nat.N3(), Nat.N3());
         }
         return J.inv();

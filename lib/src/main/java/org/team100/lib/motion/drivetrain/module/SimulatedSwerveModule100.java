@@ -86,7 +86,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
                 10, // kP .. was 20
                 0, // kI
                 0, // kD
-                true,
+                false,
                 0.05, // note low tolerance
                 1);
         IncrementalProfile profile = kinodynamics.getSteeringProfile();

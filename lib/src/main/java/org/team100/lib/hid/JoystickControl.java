@@ -4,8 +4,6 @@ import static org.team100.lib.hid.ControlUtil.clamp;
 import static org.team100.lib.hid.ControlUtil.deadband;
 import static org.team100.lib.hid.ControlUtil.expo;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 
@@ -60,8 +58,9 @@ public abstract class JoystickControl {
         double dy = expo(deadband(-1.0 * clamp(m_controller.getRawAxis(0), 1), DEADBAND, 1), EXPO);
         double dtheta = expo(deadband(-1.0 * clamp(m_controller.getRawAxis(2), 1), DEADBAND, 1), EXPO);
         Velocity velocity = new Velocity(dx, dy, dtheta);
-        if (DEBUG)
-            Util.printf("JoystickControl %s\n", velocity);
+        if (DEBUG) {
+            System.out.printf("JoystickControl %s\n", velocity);
+        }
         return velocity;
     }
 

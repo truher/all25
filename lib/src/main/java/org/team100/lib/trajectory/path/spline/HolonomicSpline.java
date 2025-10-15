@@ -7,7 +7,6 @@ import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
 import org.team100.lib.util.Math100;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -67,8 +66,9 @@ public class HolonomicSpline {
     public HolonomicSpline(HolonomicPose2d p0, HolonomicPose2d p1, double mN0, double mN1) {
         double scale0 = mN0 * GeometryUtil.distance(p0.translation(), p1.translation());
         double scale1 = mN1 * GeometryUtil.distance(p0.translation(), p1.translation());
-        if (DEBUG)
-            Util.printf("scale %f %f\n", scale0, scale1);
+        if (DEBUG) {
+            System.out.printf("scale %f %f\n",  scale0, scale1 );
+        }
         double x0 = p0.translation().getX();
         double x1 = p1.translation().getX();
         // first derivatives are just the course

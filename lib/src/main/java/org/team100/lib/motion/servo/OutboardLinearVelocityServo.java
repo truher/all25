@@ -5,7 +5,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.mechanism.LinearMechanism;
-import org.team100.lib.util.Util;
 
 /** There is no profile here. */
 public class OutboardLinearVelocityServo implements LinearVelocityServo {
@@ -30,7 +29,7 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     @Override
     public void reset() {
         if (DEBUG)
-            Util.warn("make sure resetting encoder position doesn't break anything");
+            System.out.println("WARNING: " + "make sure resetting encoder position doesn't break anything");
         m_mechanism.resetEncoderPosition();
     }
 
@@ -43,8 +42,9 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     /** Passthrough to the outboard control. */
     @Override
     public void setVelocity(double setpointM_S, double setpointM_S2) {
-        if (DEBUG)
-            Util.printf("setpointM_S %6.3f\n", setpointM_S);
+        if (DEBUG) {
+            System.out.printf("setpointM_S %6.3f\n", setpointM_S);
+        }
         m_goal = setpointM_S;
         m_mechanism.setVelocity(setpointM_S, setpointM_S2, 0);
         m_log_setpoint_v.log(() -> setpointM_S);

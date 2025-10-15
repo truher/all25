@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.team100.lib.motion.drivetrain.kinodynamics.struct.SwerveModulePosition100Struct;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -137,17 +136,17 @@ public class SwerveModulePosition100
                 if (unwrappedAngle.isPresent()) {
                     // note wrapping here
                     Rotation2d angleDiff = delta.wrappedAngle.get().minus(unwrappedAngle.get());
-                    if (Math.abs(angleDiff.getRadians()) > 0.2)
-                        Util.printf("very fast steering start: %f end: %f\n",
-                                unwrappedAngle.get().getRadians(),
-                                delta.wrappedAngle.get().getRadians());
+                    if (Math.abs(angleDiff.getRadians()) > 0.2) {
+                        System.out.printf("very fast steering start: %f end: %f\n",
+                                unwrappedAngle.get().getRadians(), delta.wrappedAngle.get().getRadians());
+                    }
                 }
             }
             return new SwerveModulePosition100(posM, delta.wrappedAngle);
         }
         // if there's no delta angle, we're not going anywhere.
         if (DEBUG)
-            Util.println("no delta angle");
+            System.out.println((Object) "no delta angle");
         return this;
     }
 

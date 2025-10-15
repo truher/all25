@@ -21,7 +21,6 @@ import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -853,7 +852,7 @@ class SwerveDrivePoseEstimator100Test {
             errorSum += error;
 
             if (DEBUG) {
-                Util.printf("t %5.3f refX %5.3f refY %5.3f xhatX %5.3f xhatY %5.3f\n",
+                System.out.printf("t %5.3f refX %5.3f refY %5.3f xhatX %5.3f xhatY %5.3f\n",
                         t,
                         groundTruthState.poseMeters.getX(),
                         groundTruthState.poseMeters.getY(),

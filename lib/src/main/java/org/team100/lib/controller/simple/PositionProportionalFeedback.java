@@ -34,4 +34,9 @@ public class PositionProportionalFeedback implements Feedback100 {
         m_atSetpoint = false;
     }
 
+    @Override
+    public boolean handlesWrapping() {
+        return false;
+    }
+
 }

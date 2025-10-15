@@ -52,7 +52,7 @@ import org.team100.lib.motor.Talon6Motor;
 import org.team100.lib.music.Music;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
-import org.team100.lib.util.Util;
+import org.team100.lib.util.StrUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -329,11 +329,12 @@ public class CalgamesMech extends SubsystemBase implements Music {
     public void set(SwerveControl control) {
         Pose2d pose = control.pose();
         Config config = m_kinematics.inverse(pose);
-        if (DEBUG)
-            Util.printf("pose %s config %s\n", Util.pose2Str(pose), config);
+        if (DEBUG) {
+            System.out.printf("pose %s config %s\n", StrUtil.pose2Str(pose), config);
+        }
         if (config.isNaN()) {
             if (DEBUG)
-                Util.println("skipping invalid config");
+                System.out.println((Object) "skipping invalid config");
             stop();
             return;
         }

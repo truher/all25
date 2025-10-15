@@ -39,7 +39,7 @@ class AnglePositionServoProfileTest implements Timeless {
                 1,
                 Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
-        feedback2 = new PIDFeedback(logger, 1, 0, 0, true, 0.05, 1);
+        feedback2 = new PIDFeedback(logger, 1, 0, 0, false, 0.05, 1);
         IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
         ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(logger, mech, ref, feedback2);

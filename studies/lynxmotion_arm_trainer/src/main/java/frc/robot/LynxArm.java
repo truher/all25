@@ -5,7 +5,7 @@ import java.util.function.DoubleSupplier;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmKinematics;
 import org.team100.lib.motion.lynxmotion_arm.LynxArmPose;
-import org.team100.lib.util.Util;
+import org.team100.lib.util.StrUtil;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -115,7 +115,7 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         // set the initial position to the actual desired value
         if (DEBUG) {
             System.out.println("-> initializing position to HOME");
-            System.out.printf("HOME: %s\n", Util.poseStr(HOME));
+            System.out.printf("HOME: %s\n", StrUtil.poseStr(HOME));
         }
         setPosition(HOME);
         if (DEBUG)
@@ -207,7 +207,7 @@ public class LynxArm extends SubsystemBase implements AutoCloseable {
         LynxArmConfig q = getMeasuredConfig();
         LynxArmPose p = m_kinematics.forward(q);
         if (DEBUG)
-            System.out.printf("p6: %s\n", Util.poseStr(p.p6()));
+            System.out.printf("p6: %s\n", StrUtil.poseStr(p.p6()));
         return p;
     }
 

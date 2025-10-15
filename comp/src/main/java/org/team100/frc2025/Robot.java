@@ -77,7 +77,6 @@ import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
-import org.team100.lib.util.Util;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -142,9 +141,10 @@ public class Robot extends TimedRobot100 {
 
         // CanBridge.runTCP();
 
-        Util.printf("WPILib Version: %s\n", WPILibVersion.Version); // 2023.2.1
-        Util.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
-        Util.printf("Identity: %s\n", Identity.instance.name());
+        System.out.printf("WPILib Version: %s\n", WPILibVersion.Version);
+        // 2023.2.1
+        System.out.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
+        System.out.printf("Identity: %s\n", Identity.instance.name());
         RobotController.setBrownoutVoltage(5.5);
         banner();
 
@@ -156,8 +156,8 @@ public class Robot extends TimedRobot100 {
         final Async async = asyncFactory.get();
         final Logging logging = Logging.instance();
         final LevelPoller poller = new LevelPoller(async, logging::setLevel, Level.TRACE);
-        Util.printf("Using log level %s\n", poller.getLevel().name());
-        Util.println("Do not use TRACE in comp, with NT logging, it will overrun");
+        System.out.printf("Using log level %s\n", poller.getLevel().name());
+        System.out.println((Object) "Do not use TRACE in comp, with NT logging, it will overrun");
         final LoggerFactory fieldLogger = logging.fieldLogger;
         final FieldLogger.Log fieldLog = new FieldLogger.Log(fieldLogger);
 
@@ -510,7 +510,7 @@ public class Robot extends TimedRobot100 {
         );
 
         initStuff();
-        Util.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
+        System.out.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
 
     }
 
@@ -558,7 +558,7 @@ public class Robot extends TimedRobot100 {
         m_log_voltage.log(RobotController::getBatteryVoltage);
 
         if (Experiments.instance.enabled(Experiment.FlushOften)) {
-            // Util.warn("FLUSHING EVERY LOOP, DO NOT USE IN COMP");
+            // StrUtil.warn("FLUSHING EVERY LOOP, DO NOT USE IN COMP");
             NetworkTableInstance.getDefault().flush();
         }
 
@@ -701,7 +701,7 @@ public class Robot extends TimedRobot100 {
      * happen right now.
      */
     private void initStuff() {
-        Util.println("\n*** PREWARM START");
+        System.out.println((Object) "\n*** PREWARM START");
         double startS = Takt.actual();
 
         // Exercise the trajectory planner.
@@ -759,17 +759,17 @@ public class Robot extends TimedRobot100 {
 
         // the duty cycle encoder produces garbage for a few seconds so sleep.
         try {
-            Util.println("Waiting for DutyCycle sensors to work ...");
+            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            Util.println("Waiting for DutyCycle sensors to work ...");
+            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            Util.println("Waiting for DutyCycle sensors to work ...");
+            System.out.println((Object) "Waiting for DutyCycle sensors to work ...");
             Thread.sleep(1000);
-            Util.println("Done!");
+            System.out.println((Object) "Done!");
         } catch (InterruptedException e) {
 
         }
-        Util.printf("\n*** PREWARM END ET: %f\n", endS - startS);
+        System.out.printf("\n*** PREWARM END ET: %f\n", endS - startS);
     }
 
     private void banner() {
@@ -783,7 +783,7 @@ public class Robot extends TimedRobot100 {
         b.append(".....##....##.......##.....##.##.....##.......##....##...##...##...##...\n");
         b.append(".....##....########.##.....##.##.....##.....######...#####.....#####....\n");
         b.append("\n");
-        Util.println(b.toString());
+        System.out.println((Object) b.toString());
     }
 
 }

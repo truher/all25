@@ -12,12 +12,11 @@ import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 class SimulatedHeadingTest implements Timeless {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
@@ -74,7 +73,7 @@ class SimulatedHeadingTest implements Timeless {
             // get the modules pointing the right way (wait for the steering profiles)
             c.setDesiredStates(states);
             if (DEBUG)
-                Util.printf("rotation %6.3f yaw %6.3f\n",
+                System.out.printf("rotation %6.3f yaw %6.3f\n",
                         c.positions().frontLeft().unwrappedAngle.get().getRadians(),
                         h.getYawNWU().getRadians());
             stepTime();

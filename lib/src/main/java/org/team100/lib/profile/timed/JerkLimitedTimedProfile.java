@@ -5,7 +5,6 @@ import org.team100.lib.profile.roadrunner.MotionProfile;
 import org.team100.lib.profile.roadrunner.MotionState;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 /** Adapter for Roadrunner jerk-limited profiles. */
 public class JerkLimitedTimedProfile implements TimedProfile {
@@ -39,15 +38,17 @@ public class JerkLimitedTimedProfile implements TimedProfile {
         // "true" below means "overshoot rather than violating constraints"
         m_profile = JerkLimitedProfileGenerator.generateMotionProfile(
                 start, end, vel, acc, jerk, overshoot);
-        if (DEBUG)
-            Util.printf("init %s goal %s profile %s\n", initial, goal, m_profile);
+        if (DEBUG) {
+            System.out.printf("init %s goal %s profile %s\n", initial, goal, m_profile);
+        }
     }
 
     @Override
     public Control100 sample(double timeS) {
         MotionState s = m_profile.get(timeS);
-        if (DEBUG)
-            Util.printf("time %f x %f v %f a %f\n", timeS, s.x(), s.v(), s.a());
+        if (DEBUG) {
+            System.out.printf("time %f x %f v %f a %f\n", timeS, s.x(), s.v(), s.a());
+        }
         return new Control100(s.x(), s.v(), s.a());
     }
 

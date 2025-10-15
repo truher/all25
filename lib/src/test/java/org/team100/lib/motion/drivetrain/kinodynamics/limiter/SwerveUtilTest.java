@@ -11,7 +11,6 @@ import org.team100.lib.motion.drivetrain.Fixture;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.util.Util;
 
 class SwerveUtilTest {
     private static final boolean DEBUG = false;
@@ -98,7 +97,7 @@ class SwerveUtilTest {
         final double dt = 0.02;
         for (double t = 0; t < 3; t += dt) {
             if (DEBUG)
-                Util.printf("%5.3f %5.3f\n", t, v);
+                System.out.printf("%5.3f %5.3f\n", t, v);
             double a = SwerveUtil.minAccel(limits, 1, 1, v);
             v += dt * a;
         }

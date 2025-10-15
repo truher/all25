@@ -2,8 +2,6 @@ package org.team100.lib.motion.lynxmotion_arm;
 
 import java.util.OptionalDouble;
 
-import org.team100.lib.util.Util;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -37,7 +35,7 @@ public record LynxArmConfig(
     public Transform3d swingT() {
         if (swing.isEmpty()) {
             if (DEBUG)
-                Util.println("empty swing");
+                System.out.println((Object) "empty swing");
             return Transform3d.kZero;
         }
         return yaw(swing.getAsDouble());
@@ -58,7 +56,7 @@ public record LynxArmConfig(
     public Transform3d twistT() {
         if (twist.isEmpty()) {
             if (DEBUG)
-                Util.println("empty twist");
+                System.out.println((Object) "empty twist");
             return Transform3d.kZero;
         }
         return roll(twist.getAsDouble());

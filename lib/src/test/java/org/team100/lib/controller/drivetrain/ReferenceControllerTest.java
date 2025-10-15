@@ -29,7 +29,6 @@ import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -153,7 +152,7 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
                 start_vel,
                 end_vel);
         if (DEBUG)
-            Util.printf("TRAJECTORY:\n%s\n", trajectory);
+            System.out.printf("TRAJECTORY:\n%s\n", trajectory);
 
         FullStateSwerveController swerveController = new FullStateSwerveController(
                 logger,
@@ -187,7 +186,7 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
                     pose.getY() + velocity.y() * mDt,
                     new Rotation2d(pose.getRotation().getRadians() + velocity.theta() * mDt));
             if (DEBUG)
-                Util.printf("pose %s vel %s\n", pose, velocity);
+                System.out.printf("pose %s vel %s\n", pose, velocity);
         }
 
         // this should be exactly right but it's not.

@@ -7,7 +7,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.ProfileReference;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -57,7 +56,7 @@ public class Rotate extends Command  {
     @Override
     public void initialize() {
         if (DEBUG)
-            Util.println("Rotate initialize");
+            System.out.println((Object) "Rotate initialize");
         Pose2d measurement = m_drive.getPose();
         // if we use the initial measurement x and y as the target, and we're moving,
         // then we make a u-turn to get back to the arbitrary place when we pushed the
@@ -73,7 +72,7 @@ public class Rotate extends Command  {
     @Override
     public void execute() {
         if (DEBUG)
-            Util.println("Rotate execute");
+            System.out.println((Object) "Rotate execute");
         if (m_referenceController != null)
             m_referenceController.execute();
     }

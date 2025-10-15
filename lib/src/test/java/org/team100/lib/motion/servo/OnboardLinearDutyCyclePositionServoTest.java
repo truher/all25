@@ -13,7 +13,6 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.IncrementalProfileReference1d;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.util.Util;
 
 public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
     private static final boolean DEBUG = false;
@@ -32,7 +31,7 @@ public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
 
         final double k1 = 1.0;
         final double k2 = 0.01;
-        Feedback100 feedback = new FullStateFeedback(logger, k1, k2, x -> x, 1, 1);
+        Feedback100 feedback = new FullStateFeedback(logger, k1, k2, false, 1, 1);
 
         OnboardLinearDutyCyclePositionServo s = new OnboardLinearDutyCyclePositionServo(
                 logger, mech, ref, feedback, 0.1);
@@ -41,7 +40,7 @@ public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
             s.setPositionProfiled(1, 0);
             stepTime();
             if (DEBUG)
-                Util.printf("%f, %f, %f, %f, %f\n",
+                System.out.printf("%f, %f, %f, %f, %f\n",
                         t,
                         driveMotor.getVelocityRad_S(),
                         driveEncoder.getVelocityRad_S(),

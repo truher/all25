@@ -70,7 +70,7 @@ public class ParallelDeadlineGroup100 extends Command {
 
     @Override
     public final void initialize() {
-        // Util.println("Parallel Deadline Group 100 starts" + m_name);
+        // System.out.println("Parallel Deadline Group 100 starts" + m_name);
         for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
             Command cmd = commandRunning.getKey();
             cmd.initialize();
@@ -109,7 +109,7 @@ public class ParallelDeadlineGroup100 extends Command {
             }
         }
 
-        // Util.println("Parallel Deadline Group 100 ends " + m_name);
+        // System.out.println("Parallel Deadline Group 100 ends " + m_name);
     }
 
     @Override

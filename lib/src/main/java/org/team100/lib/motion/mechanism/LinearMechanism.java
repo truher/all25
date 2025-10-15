@@ -5,7 +5,6 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
-import org.team100.lib.util.Util;
 
 /**
  * Uses a motor, gears, and a wheel to produce linear output, e.g. a drive wheel
@@ -81,8 +80,9 @@ public class LinearMechanism {
             double outputVelocityM_S,
             double outputAccelM_S2,
             double outputForceN) {
-        if (DEBUG)
-            Util.printf("velocity %6.3f\n", outputVelocityM_S);
+        if (DEBUG) {
+            System.out.printf("velocity %6.3f\n", outputVelocityM_S);
+        }
         double posM = getPositionM();
         if (outputVelocityM_S < 0 && posM < m_minPositionM) {
             m_motor.stop();

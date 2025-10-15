@@ -18,7 +18,6 @@ import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.CoalescingCollection;
 import org.team100.lib.util.TrailingHistory;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -93,9 +92,9 @@ public class Targets extends CameraReader<Rotation3d> {
             Rotation3d[] sights) {
         double age = Takt.get() - valueTimestamp;
         if (age > MAX_SIGHT_AGE) {
-            if (DEBUG)
-                Util.warnf("ignoring stale sight %f %f\n",
-                        Takt.get(), valueTimestamp);
+            if (DEBUG) {
+                System.out.printf("WARNING: ignoring stale sight %f %f\n", Takt.get(), valueTimestamp);
+            }
             return;
         }
         Pose2d robotPose = m_history.apply(valueTimestamp).pose();
@@ -121,16 +120,17 @@ public class Targets extends CameraReader<Rotation3d> {
     public Optional<Translation2d> getClosestTarget() {
         Pose2d robotPose = m_history.apply(Takt.get()).pose();
         List<Translation2d> targets = getTargets();
-        if (DEBUG)
-            Util.printf("translations %d\n", targets.size());
+        if (DEBUG) {
+            System.out.printf("translations %d\n", targets.size());
+        }
         return ObjectPicker.closestObject(targets, robotPose);
     }
 
     public void periodic() {
         // show the closest target we can see on the field2d widget.
         // getClosestTarget().ifPresent(
-        //         x -> m_field_log.m_log_target.log(
-        //                 () -> new double[] { x.getX(), x.getY(), 0 }));
+        // x -> m_field_log.m_log_target.log(
+        // () -> new double[] { x.getX(), x.getY(), 0 }));
 
         // show *all* targets on the field2d widget.
         m_field_log.m_log_target.log(

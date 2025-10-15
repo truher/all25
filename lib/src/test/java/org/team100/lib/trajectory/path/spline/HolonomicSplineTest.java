@@ -17,7 +17,6 @@ import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
 import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -149,7 +148,7 @@ class HolonomicSplineTest {
         // HolonomicSpline s = splines.get(i);
         // for (double j = 0; j < 0.99; j += 0.1) {
         // Pose2d p = s.getPose2d(j);
-        // Util.printf("%.1f, %.2f, %.2f, %.2f\n",
+        // System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
         // i + j, p.getX(), p.getY(), p.getRotation().getRadians());
         // }
         // }
@@ -180,7 +179,7 @@ class HolonomicSplineTest {
                 // 3/10/25 i made generation coarser so it's less accurate.
                 assertEquals(0, error.getRadians(), 0.05);
                 if (DEBUG)
-                    Util.printf("%.1f, %.2f, %.2f, %.2f\n",
+                    System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
                             i + j, p.getX(), p.getY(), p.getRotation().getRadians());
             }
         }
@@ -211,7 +210,7 @@ class HolonomicSplineTest {
         // for (double j = 0; j < 0.99; j += 0.1) {
         // Pose2d p = s.getPose2d(j);
         // if (DEBUG)
-        // Util.printf("%.1f, %.2f, %.2f, %.2f\n",
+        // System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
         // i + j, p.getX(), p.getY(), p.getRotation().getRadians());
         // }
         // }
@@ -232,7 +231,7 @@ class HolonomicSplineTest {
             for (double j = 0; j < 0.99; j += 0.1) {
                 Pose2d p = s.getPose2d(j);
                 if (DEBUG)
-                    Util.printf("%.1f, %.2f, %.2f, %.2f\n",
+                    System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
                             i + j, p.getX(), p.getY(), p.getRotation().getRadians());
             }
         }
@@ -264,7 +263,7 @@ class HolonomicSplineTest {
         // for (double j = 0; j < 0.99; j += 0.1) {
         // Pose2d p = s.getPose2d(j);
         // if (DEBUG)
-        // Util.printf("%.1f, %.2f, %.2f, %.2f\n",
+        // System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
         // i + j, p.getX(), p.getY(), p.getRotation().getRadians());
         // }
         // }
@@ -275,7 +274,7 @@ class HolonomicSplineTest {
 
         for (HolonomicSpline s : splines) {
             if (DEBUG)
-                Util.printf("spline %s\n", s);
+                System.out.printf("spline %s\n", s);
         }
 
         // spline joints are C1 smooth (i.e. same slope)
@@ -290,20 +289,20 @@ class HolonomicSplineTest {
             for (double j = 0; j < 0.99; j += 0.1) {
                 Pose2d p = s.getPose2d(j);
                 if (DEBUG)
-                    Util.printf("%.1f, %.2f, %.2f, %.2f\n",
+                    System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
                             i + j, p.getX(), p.getY(), p.getRotation().getRadians());
             }
         }
 
         Path100 path = new Path100(PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05));
         if (DEBUG)
-            Util.printf("path %s\n", path);
+            System.out.printf("path %s\n", path);
         List<TimingConstraint> constraints = new ArrayList<>();
         ScheduleGenerator scheduleGenerator = new ScheduleGenerator(constraints);
         Trajectory100 trajectory = scheduleGenerator.timeParameterizeTrajectory(path,
                 0.05, 0, 0);
         if (DEBUG)
-            Util.printf("trajectory %s\n", trajectory);
+            System.out.printf("trajectory %s\n", trajectory);
 
     }
 
@@ -317,7 +316,7 @@ class HolonomicSplineTest {
                 1.2, 1.2);
         if (DEBUG) {
             for (double t = 0; t < 1; t += 0.03) {
-                Util.printf("%5.3f %5.3f\n", s0.x(t), s0.y(t));
+                System.out.printf("%5.3f %5.3f\n", s0.x(t), s0.y(t));
             }
         }
 
@@ -325,13 +324,13 @@ class HolonomicSplineTest {
         List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05);
         if (DEBUG) {
             for (Pose2dWithMotion p : motion) {
-                Util.printf("%5.3f %5.3f\n", p.getTranslation().getX(), p.getTranslation().getY());
+                System.out.printf("%5.3f %5.3f\n", p.getTranslation().getX(), p.getTranslation().getY());
             }
         }
         Path100 path = new Path100(motion);
         if (DEBUG) {
             for (int i = 0; i < path.length(); ++i) {
-                Util.printf("%5.3f %5.3f\n",
+                System.out.printf("%5.3f %5.3f\n",
                         path.getPoint(i).getTranslation().getX(),
                         path.getPoint(i).getTranslation().getY());
             }
@@ -350,6 +349,6 @@ class HolonomicSplineTest {
         Trajectory100 trajectory = scheduleGenerator.timeParameterizeTrajectory(path,
                 0.05, 2.858, 2.858);
         if (DEBUG)
-            Util.printf("trajectory %s\n", trajectory);
+            System.out.printf("trajectory %s\n", trajectory);
     }
 }

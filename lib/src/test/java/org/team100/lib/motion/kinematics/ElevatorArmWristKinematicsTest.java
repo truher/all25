@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.motion.Config;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,7 +20,7 @@ public class ElevatorArmWristKinematicsTest {
         Translation2d wristPosition = new Translation2d(3, 3);
         double h = k.armX(wristPosition);
         if (DEBUG)
-            Util.println(wristPosition.getY());
+            System.out.println(wristPosition.getY());
         assertEquals(4, h);
     }
 

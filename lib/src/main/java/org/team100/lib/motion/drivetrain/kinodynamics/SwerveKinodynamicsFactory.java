@@ -1,7 +1,6 @@
 package org.team100.lib.motion.drivetrain.kinodynamics;
 
 import org.team100.lib.config.Identity;
-import org.team100.lib.util.Util;
 
 /**
  * Each drivetrain should be tuned, and the values here should be the physical
@@ -28,7 +27,7 @@ public class SwerveKinodynamicsFactory {
      * below instead.
      */
     public static SwerveKinodynamics get() {
-        Util.printf("Swerve Kinodynamics Factory using Identity %s\n", Identity.instance);
+        System.out.printf("Swerve Kinodynamics Factory using Identity %s\n", Identity.instance);
         switch (Identity.instance) {
             case COMP_BOT:
                 // these numbers are a guess based on the betabot numbers.
@@ -118,9 +117,9 @@ public class SwerveKinodynamicsFactory {
                         0.29, // front offset m
                         0.5); // vcg m HIGH LIKE COMP
             default:
-                Util.warn("***");
-                Util.warn("*** Using default kinodynamics, this should never happen.");
-                Util.warn("***");
+                System.out.println("WARNING: " + "***");
+                System.out.println("WARNING: " + "*** Using default kinodynamics, this should never happen.");
+                System.out.println("WARNING: " + "***");
                 return new SwerveKinodynamics(
                         5, // vel m/s
                         20, // stall m/s/s

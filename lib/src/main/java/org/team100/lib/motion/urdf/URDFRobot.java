@@ -7,7 +7,6 @@ import java.util.function.Function;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.optimization.NewtonsMethod;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -94,7 +93,7 @@ public class URDFRobot<Q extends Num> {
      * if not, then the "error" is between two tangent vectors whose origin is far
      * away.
      */
-    public  Map<String, Double> inverse(
+    public Map<String, Double> inverse(
             Vector<Q> q0,
             double dqLimit,
             String jointName,
@@ -137,8 +136,7 @@ public class URDFRobot<Q extends Num> {
 
         if (DEBUG) {
             long finishTime = System.nanoTime();
-            Util.printf("ET (ms): %6.3f\n",
-                    ((double) finishTime - startTime) / 1000000);
+            System.out.printf("ET (ms): %6.3f\n", ((double) finishTime - startTime) / 1000000);
         }
         return qMap(qVec);
     }

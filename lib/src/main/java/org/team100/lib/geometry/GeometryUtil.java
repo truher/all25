@@ -3,7 +3,6 @@ package org.team100.lib.geometry;
 import java.util.Optional;
 
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -40,8 +39,9 @@ public class GeometryUtil {
             return a;
         }
         double scale = dot(a, b) / (norm * norm);
-        if (DEBUG)
-            Util.printf("project() scale %.8f\n", scale);
+        if (DEBUG) {
+            System.out.printf("project() scale %.8f\n", scale );
+        }
         return new ChassisSpeeds(
                 b.vxMetersPerSecond * scale,
                 b.vyMetersPerSecond * scale,

@@ -19,7 +19,6 @@ import org.team100.lib.trajectory.timing.TimedPose;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -105,8 +104,8 @@ class TrajectoryPlannerTest {
         long endTimeNs = System.nanoTime();
         double totalDurationMs = (endTimeNs - startTimeNs) / 1000000.0;
         if (DEBUG) {
-            Util.printf("total duration ms: %5.3f\n", totalDurationMs);
-            Util.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
+            System.out.printf("total duration ms: %5.3f\n", totalDurationMs);
+            System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);

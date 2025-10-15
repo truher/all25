@@ -10,7 +10,6 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.util.Util;
 
 /**
  * Makes drivetrain input feasible.
@@ -18,7 +17,7 @@ import org.team100.lib.util.Util;
  * Keeps the current setpoint, to avoid round-tripping through the pose
  * estimator. Remember to update the setpoint!
  */
-public class SwerveLimiter  {
+public class SwerveLimiter {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_norm;
@@ -60,25 +59,29 @@ public class SwerveLimiter  {
     public GlobalSe2Velocity apply(GlobalSe2Velocity nextReference) {
         m_log_next.log(() -> nextReference);
         m_log_normIn.log(nextReference::norm);
-        if (DEBUG)
-            Util.printf("nextReference %s\n", nextReference);
+        if (DEBUG) {
+            System.out.printf("nextReference %s\n",  nextReference );
+        }
         if (m_current == null)
             m_current = nextReference;
 
         // First, limit the goal to a feasible velocity.
         GlobalSe2Velocity result = m_velocityLimiter.apply(nextReference);
-        if (DEBUG)
-            Util.printf("velocity limited %s\n", result);
+        if (DEBUG) {
+            System.out.printf("velocity limited %s\n", result );
+        }
 
         // then limit acceleration towards that goal to avoid capsize
         result = m_capsizeLimiter.apply(m_current, result);
-        if (DEBUG)
-            Util.printf("capsize limited %s\n", result);
+        if (DEBUG) {
+            System.out.printf("capsize limited %s\n", result);
+        }
 
         // Finally, limit acceleration further, using motor physics.
         result = m_accelerationLimiter.apply(m_current, result);
-        if (DEBUG)
-            Util.printf("accel limited %s\n", result);
+        if (DEBUG) {
+            System.out.printf("accel limited %s\n", result);
+        }
 
         // Ignore very small inputs.
         if (Experiments.instance.enabled(Experiment.SwerveDeadband)) {
@@ -87,8 +90,9 @@ public class SwerveLimiter  {
 
         updateSetpoint(result);
 
-        if (DEBUG)
-            Util.printf("result %s\n", result);
+        if (DEBUG) {
+            System.out.printf("result %s\n", result );
+        }
         m_log_norm.log(result::norm);
 
         return result;

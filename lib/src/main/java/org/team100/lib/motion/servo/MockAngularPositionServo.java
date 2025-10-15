@@ -1,7 +1,5 @@
 package org.team100.lib.motion.servo;
 
-import org.team100.lib.reference.Setpoints1d;
-
 /**
  * This is just for tests and illustration.
  */
@@ -24,7 +22,7 @@ public class MockAngularPositionServo implements AngularPositionServo {
     }
 
     @Override
-    public void setPositionDirect(Setpoints1d setpoint, double torqueNm) {
+    public void setPositionDirect(double goalRad, double torqueNm) {
     }
 
     @Override

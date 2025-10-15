@@ -3,7 +3,6 @@ package org.team100.lib.commands.drivetrain.manual;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.util.Util;
 
 public class ModuleStateAdapter implements DriverAdapter {
     private static final boolean DEBUG = false;
@@ -18,8 +17,9 @@ public class ModuleStateAdapter implements DriverAdapter {
 
     @Override
     public void apply(SwerveModel s, Velocity t) {
-        if (DEBUG)
-            Util.printf("ModuleStateDriver %s\n", t);
+        if (DEBUG) {
+            System.out.printf("ModuleStateDriver %s\n",  t );
+        }
         m_drive.setRawModuleStates(m_driver.apply(t));
     }
 
