@@ -1,5 +1,7 @@
 package org.team100.ballerina;
 
+import java.util.function.Supplier;
+
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.logging.Level;
@@ -39,11 +41,12 @@ public class TargetDesignator {
     }
 
     public void periodic() {
-        Translation2d target = m_targetCache.get();
-        m_log_field_target.log(() -> new double[] {
-                target.getX(),
-                target.getY(),
-                0 });
+        m_log_field_target.log(this::poseArray);
+    }
+
+    private double[] poseArray() {
+        Translation2d t = m_targetCache.get();
+        return new double[] { t.getX(), t.getY(), 0 };
     }
 
     private Translation2d update() {

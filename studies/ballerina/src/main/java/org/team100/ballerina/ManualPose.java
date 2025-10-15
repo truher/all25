@@ -9,6 +9,7 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,12 +39,20 @@ public class ManualPose {
         return m_poseCache.get();
     }
 
+    public SwerveModel getState() {
+        return new SwerveModel(getPose());
+    }
+
     public void periodic() {
+        m_log_field_robot.log(this::poseArray);
+    }
+
+    private double[] poseArray() {
         Pose2d pose = m_poseCache.get();
-        m_log_field_robot.log(() -> new double[] {
+        return new double[] {
                 pose.getX(),
                 pose.getY(),
-                pose.getRotation().getDegrees() });
+                pose.getRotation().getDegrees() };
     }
 
     private Pose2d update() {
