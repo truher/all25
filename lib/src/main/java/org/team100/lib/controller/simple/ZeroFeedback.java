@@ -4,19 +4,23 @@ import java.util.function.DoubleUnaryOperator;
 
 import org.team100.lib.state.Model100;
 
+import edu.wpi.first.math.MathUtil;
+
 /**
  * Feedback that is always zero: this is for use with outboard servos, where
  * feedback control is implemented in the motor controller.
  */
 public class ZeroFeedback implements Feedback100 {
+    private final boolean m_rotation;
     private final DoubleUnaryOperator m_modulus;
     private final double m_xtol;
     private final double m_vtol;
-    
+
     private boolean m_atSetpoint = false;
 
-    public ZeroFeedback(DoubleUnaryOperator modulus, double xtol, double vtol) {
-        m_modulus = modulus;
+    public ZeroFeedback(boolean rotation, double xtol, double vtol) {
+        m_rotation = rotation;
+        m_modulus = rotation ? MathUtil::angleModulus : x -> x;
         m_xtol = xtol;
         m_vtol = vtol;
     }
@@ -37,6 +41,11 @@ public class ZeroFeedback implements Feedback100 {
     @Override
     public void reset() {
         m_atSetpoint = false;
+    }
+
+    @Override
+    public boolean handlesWrapping() {
+        return m_rotation;
     }
 
 }

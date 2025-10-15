@@ -8,6 +8,9 @@ import org.team100.lib.reference.Setpoints1d;
  * Servos no longer include profiles (in order to coordinate multiple axes), so
  * this just takes setpoints, and, for onboard versions, computes feedback
  * control.
+ * 
+ * An angular servo should generally get "wrapped" input. It figures out what
+ * "unwrapped" commands to give the underlying mechanism.
  */
 public interface AngularPositionServo {
     /**
@@ -36,17 +39,32 @@ public interface AngularPositionServo {
      * @param wrappedGoalRad The goal angle here wraps within [-pi, pi], using
      *                       output measurements, e.g. shaft radians, not motor
      *                       radians
-     * @param torqueNm       feedforward for gravity or spring compensation
+     * @param torqueNm       Feedforward for gravity or spring compensation.
      */
     void setPositionProfiled(double wrappedGoalRad, double torqueNm);
 
     /**
      * Invalidates the current profile, sets the setpoint directly.
      * 
+     * If you want the servo to figure out which way to go, then it doesn't make
+     * sense to supply a control velocity. If you're sure you're not going to hit
+     * the mechanism limit, it's OK to supply a velocity.
+     * 
+     * This is really only appropriate for two cases.
+     * 
+     * One case is where you know the complete setpoint, e.g. you have a higher
+     * level controller, but in that case you should just be using the mechanism
+     * directly.
+     * 
+     * The other case is where you always supply zero setpoint velocity.
+     * 
+     * TODO: simplify this API, it should really just take a number not Setpoints1d.
+     * 
      * @param wrappedSetpoint both current and next setpoints so that the
      *                        implementation can choose the current one for feedback
-     *                        and the next one for feedforward.
-     * @param torqueNm        feedforward for gravity or spring compensation
+     *                        and the next one for feedforward. This is "wrapped"
+     *                        i.e. limited to [-pi, pi].
+     * @param torqueNm        Feedforward for gravity or spring compensation.
      */
     void setPositionDirect(Setpoints1d wrappedSetpoint, double torqueNm);
 

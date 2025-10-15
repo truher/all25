@@ -25,7 +25,6 @@ import org.team100.lib.reference.TimedProfileReference1d;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -72,7 +71,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
         double positionTolerance = 0.05;
         double velocityTolerance = 0.05;
         Feedback100 feedback = new FullStateFeedback(
-                log, positionGain, velocityGain, MathUtil::angleModulus, positionTolerance, velocityTolerance);
+                log, positionGain, velocityGain, true, positionTolerance, velocityTolerance);
 
         double maxVel = 40;
         double maxAccel = 40;

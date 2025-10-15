@@ -32,7 +32,7 @@ public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
 
         final double k1 = 1.0;
         final double k2 = 0.01;
-        Feedback100 feedback = new FullStateFeedback(logger, k1, k2, x -> x, 1, 1);
+        Feedback100 feedback = new FullStateFeedback(logger, k1, k2, false, 1, 1);
 
         OnboardLinearDutyCyclePositionServo s = new OnboardLinearDutyCyclePositionServo(
                 logger, mech, ref, feedback, 0.1);

@@ -72,7 +72,7 @@ class GravityServoTest implements Timeless {
         MockRotaryPositionSensor sensor = new MockRotaryPositionSensor();
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        Feedback100 fb = new ZeroFeedback(x -> x, 0.01, 0.01);
+        Feedback100 fb = new ZeroFeedback(false, 0.01, 0.01);
         ProfileReference1d ref = new MockProfileReference1d();
         OnboardAngularPositionServo servo = new OnboardAngularPositionServo(logger, mech, ref, fb);
         // these constants were used in Wrist2.

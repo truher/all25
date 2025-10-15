@@ -11,6 +11,7 @@ import org.team100.lib.reference.ProfileReference1d;
 import org.team100.lib.reference.Setpoints1d;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.util.Util;
 
 /**
  * Uses mechanism velocity control.
@@ -19,6 +20,7 @@ import org.team100.lib.state.Model100;
  * extra torque (e.g. for gravity).
  */
 public class OnboardAngularPositionServo extends AngularPositionServoImpl {
+    private static final boolean DEBUG = false;
 
     private final Feedback100 m_feedback;
 
@@ -37,6 +39,8 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
             ProfileReference1d ref,
             Feedback100 feedback) {
         super(parent, mech, ref);
+        if (feedback.handlesWrapping())
+            throw new IllegalArgumentException("Do not supply wrapping feedback");
         LoggerFactory child = parent.type(this);
         m_feedback = feedback;
 
@@ -62,14 +66,21 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
      * setpoint.
      */
     void actuate(Setpoints1d unwrappedSetpoint, double feedForwardTorqueNm) {
+        if (DEBUG)
+            Util.printf("setpoint %s\n", unwrappedSetpoint);
 
         Model100 unwrappedMeasurement = m_mechanism.getUnwrappedMeasurement();
         Model100 currentUnwrappedSetpoint = unwrappedSetpoint.current().model();
         Control100 nextUnwrappedSetpoint = unwrappedSetpoint.next();
 
+        if (DEBUG)
+            Util.printf("unwrapped Measurement %s currentUnwrappedSetpoint %s\n",
+                    unwrappedMeasurement, currentUnwrappedSetpoint);
         double u_FB = m_feedback.calculate(unwrappedMeasurement, currentUnwrappedSetpoint);
         double u_FF = nextUnwrappedSetpoint.v();
         double u_TOTAL = u_FB + u_FF;
+        if (DEBUG)
+            Util.printf("u_FB %6.3f u_FF %6.3f u_TOTAL %6.3f\n", u_FB, u_FF, u_TOTAL);
 
         m_mechanism.setVelocity(u_TOTAL, nextUnwrappedSetpoint.a(), feedForwardTorqueNm);
 

@@ -44,7 +44,8 @@ public class PIDFeedback implements Feedback100 {
      */
     @Override
     public double calculate(Model100 measurement, Model100 setpoint) {
-        // Util.printf("PIDFeedback measurement %s setpoint %s\n", measurement, setpoint);
+        // Util.printf("PIDFeedback measurement %s setpoint %s\n", measurement,
+        // setpoint);
         double u = m_controller.calculate(measurement.x(), setpoint.x());
         m_log_error.log(m_controller::getError);
         m_log_errorD.log(m_controller::getErrorDerivative);
@@ -61,6 +62,11 @@ public class PIDFeedback implements Feedback100 {
     @Override
     public void reset() {
         m_controller.reset();
+    }
+
+    @Override
+    public boolean handlesWrapping() {
+        return m_controller.isContinuousInputEnabled();
     }
 
 }

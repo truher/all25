@@ -20,4 +20,12 @@ public interface Feedback100 {
     boolean atSetpoint();
 
     void reset();
+
+    /**
+     * True if this feedback handles "wrapping" around a circle. For some uses,
+     * you'd like the controller to be aware of the wrapping. For others, you do not
+     * want that. In particular, OnboardAngularPositionServo handles wrapping
+     * itself, and want the controller not to do so.
+     */
+    boolean handlesWrapping();
 }

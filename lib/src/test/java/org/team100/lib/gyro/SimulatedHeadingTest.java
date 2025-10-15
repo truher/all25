@@ -17,7 +17,7 @@ import org.team100.lib.util.Util;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 class SimulatedHeadingTest implements Timeless {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
