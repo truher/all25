@@ -2,9 +2,11 @@ package org.team100.ballerina;
 
 import java.util.function.Supplier;
 
+import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
+import org.team100.lib.math.GlobalR2Velocity;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,12 +16,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 /** Simulated projectile. */
 public class Ball {
+    private static final double DT = TimedRobot100.LOOP_PERIOD_S;
+    private static final double SPEED_M_S = 1;
     private final DoubleArrayLogger m_log_field_ball;
     private final Supplier<SwerveModel> m_robot;
     private final Supplier<Rotation2d> m_azimuth;
 
     // null when contained in robot.
-    private SwerveModel m_ball;
+    private Translation2d m_location;
+    private GlobalR2Velocity m_velocity;
 
     public Ball(
             LoggerFactory field,
@@ -31,15 +36,23 @@ public class Ball {
     }
 
     private void launch() {
-
+        // velocity due only to the gun
+        GlobalR2Velocity v = GlobalR2Velocity.fromPolar(m_azimuth.get(), SPEED_M_S);
+        // velocity due to robot translation
+        GlobalR2Velocity mv = GlobalR2Velocity.fromSe2(m_robot.get().velocity());
+        // initial position
+        m_location = m_robot.get().pose().getTranslation();
+        // initial velocity
+        m_velocity = v.plus(mv);
     }
 
     private void fly() {
-
+        // evolve state with zero acceleration
+        m_location = m_velocity.integrate(m_location, DT);
     }
 
     private void reset() {
-        m_ball = null;
+        m_location = null;
     }
 
     /** Shoot the ball and continue its path as long as the command runs. */
@@ -53,8 +66,7 @@ public class Ball {
     }
 
     private double[] poseArray() {
-        SwerveModel m = m_ball == null ? m_robot.get() : m_ball;
-        Translation2d t = m.translation();
+        Translation2d t = m_location == null ? m_robot.get().translation() : m_location;
         return new double[] { t.getX(), t.getY(), 0 };
     }
 }
