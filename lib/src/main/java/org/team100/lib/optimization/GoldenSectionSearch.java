@@ -61,7 +61,7 @@ public class GoldenSectionSearch {
             }
             i++;
             if (i > m_iterations) {
-                System.out.println("WARNING: " + "iteration limit exceeded");
+                System.out.println("WARNING: iteration limit exceeded");
                 return bottom;
             }
         }

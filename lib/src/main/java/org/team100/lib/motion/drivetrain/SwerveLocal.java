@@ -116,7 +116,7 @@ public class SwerveLocal {
 
     void reset() {
         if (DEBUG)
-            System.out.println("WARNING: " + "make sure resetting in SwerveLocal doesn't break anything");
+            System.out.println("WARNING: make sure resetting in SwerveLocal doesn't break anything");
         m_modules.reset();
     }
 

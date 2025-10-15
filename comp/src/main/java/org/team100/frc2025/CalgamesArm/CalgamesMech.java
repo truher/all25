@@ -334,7 +334,7 @@ public class CalgamesMech extends SubsystemBase implements Music {
         }
         if (config.isNaN()) {
             if (DEBUG)
-                System.out.println((Object) "skipping invalid config");
+                System.out.println("skipping invalid config");
             stop();
             return;
         }

@@ -9,6 +9,8 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
+import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
+import org.team100.lib.motion.drivetrain.state.SwerveModel;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,9 +22,9 @@ public class ManualPose {
     private static final double MAX_OMEGA = 1.0;
     private final DoubleArrayLogger m_log_field_robot;
     private final Supplier<Velocity> m_v;
-    private final CotemporalCache<Pose2d> m_poseCache;
+    private final CotemporalCache<SwerveModel> m_stateCache;
     /** Used only by update(). */
-    private Pose2d m_pose;
+    private SwerveModel m_state;
 
     public ManualPose(
             LoggerFactory fieldLogger,
@@ -30,28 +32,41 @@ public class ManualPose {
             Pose2d initial) {
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
         m_v = v;
-        m_pose = initial;
-        m_poseCache = Cache.of(this::update);
+        m_state = new SwerveModel(initial);
+        m_stateCache = Cache.of(this::update);
     }
 
     public Pose2d getPose() {
-        return m_poseCache.get();
+        return getState().pose();
+    }
+
+    public SwerveModel getState() {
+        return m_stateCache.get();
     }
 
     public void periodic() {
-        Pose2d pose = m_poseCache.get();
-        m_log_field_robot.log(() -> new double[] {
-                pose.getX(),
-                pose.getY(),
-                pose.getRotation().getDegrees() });
+        m_log_field_robot.log(this::poseArray);
     }
 
-    private Pose2d update() {
+    private double[] poseArray() {
+        Pose2d pose = m_stateCache.get().pose();
+        return new double[] {
+                pose.getX(),
+                pose.getY(),
+                pose.getRotation().getDegrees() };
+    }
+
+    private SwerveModel update() {
         Velocity v = m_v.get();
-        m_pose = new Pose2d(
-                m_pose.getX() + v.x() * MAX_V * DT,
-                m_pose.getY() + v.y() * MAX_V * DT,
-                m_pose.getRotation().plus(new Rotation2d(v.theta() * MAX_OMEGA * DT)));
-        return m_pose;
+        double vx = v.x() * MAX_V;
+        double vy = v.y() * MAX_V;
+        double omega = v.theta() * MAX_OMEGA;
+        m_state = new SwerveModel(
+                new Pose2d(
+                        m_state.pose().getX() + vx * DT,
+                        m_state.pose().getY() + vy * DT,
+                        m_state.pose().getRotation().plus(new Rotation2d(omega * DT))),
+                new GlobalSe2Velocity(vx, vy, omega));
+        return m_state;
     }
 }

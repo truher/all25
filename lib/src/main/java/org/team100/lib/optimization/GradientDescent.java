@@ -61,7 +61,7 @@ public class GradientDescent<R extends Num> {
             current = next;
             fCurrent = fNext;
         }
-        System.out.println("WARNING: " + "did not meet tolerance");
+        System.out.println("WARNING: did not meet tolerance");
         return current;
     }
 

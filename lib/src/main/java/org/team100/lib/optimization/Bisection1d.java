@@ -43,12 +43,12 @@ public class Bisection1d {
         }
         if (Math.abs(f_0) < tolerance) {
             if (Math100.DEBUG)
-                System.out.println((Object) "left edge is the solution");
+                System.out.println("left edge is the solution");
             return x_0;
         }
         if (Math.abs(f_1) < tolerance) {
             if (Math100.DEBUG)
-                System.out.println((Object) "right edge is the solution");
+                System.out.println("right edge is the solution");
             return x_1;
         }
         // halfway between x_0 and x_1.

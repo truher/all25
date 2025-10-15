@@ -56,7 +56,7 @@ public class Rotate extends Command  {
     @Override
     public void initialize() {
         if (DEBUG)
-            System.out.println((Object) "Rotate initialize");
+            System.out.println("Rotate initialize");
         Pose2d measurement = m_drive.getPose();
         // if we use the initial measurement x and y as the target, and we're moving,
         // then we make a u-turn to get back to the arbitrary place when we pushed the
@@ -72,7 +72,7 @@ public class Rotate extends Command  {
     @Override
     public void execute() {
         if (DEBUG)
-            System.out.println((Object) "Rotate execute");
+            System.out.println("Rotate execute");
         if (m_referenceController != null)
             m_referenceController.execute();
     }

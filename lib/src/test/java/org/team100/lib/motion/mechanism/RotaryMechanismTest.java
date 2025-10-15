@@ -91,4 +91,33 @@ public class RotaryMechanismTest {
         assertEquals(1.0, motor.velocity, DELTA);
     }
 
+    @Test
+    void testWrapNearMeasurement() {
+        LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
+        MockBareMotor motor = new MockBareMotor(Feedforward100.makeSimple());
+        MockRotaryPositionSensor sensor = new MockRotaryPositionSensor();
+        RotaryMechanism mech = new RotaryMechanism(
+                log, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+        // 0 -> 3
+        assertEquals(0, mech.getWrappedPositionRad(), DELTA);
+        assertEquals(0, mech.getUnwrappedPositionRad(), DELTA);
+        // -3 -> 3 the short way around
+        sensor.angle = -3;
+        assertEquals(-3, mech.getWrappedPositionRad(), DELTA);
+        assertEquals(-3, mech.getUnwrappedPositionRad(), DELTA);
+        // -3 -> 1 the short way around
+        sensor.angle = -3;
+        assertEquals(-3, mech.getWrappedPositionRad(), DELTA);
+        assertEquals(-3, mech.getUnwrappedPositionRad(), DELTA);
+        // -pi/2 -> pi/2
+        sensor.angle = -Math.PI / 2;
+        assertEquals(-Math.PI / 2, mech.getWrappedPositionRad(), DELTA);
+        assertEquals(-Math.PI / 2, mech.getUnwrappedPositionRad(), DELTA);
+        // unwrapped case, -5pi/2 -> -3pi/2
+        sensor.angle = -5 * Math.PI / 2;
+        assertEquals(-Math.PI / 2, mech.getWrappedPositionRad(), DELTA);
+        assertEquals(-5 * Math.PI / 2, mech.getUnwrappedPositionRad(), DELTA);
+    }
+
 }

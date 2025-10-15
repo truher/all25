@@ -185,7 +185,7 @@ public abstract class SwerveModule100 {
 
         if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
             // no profile, just low-level position
-            m_turningServo.setPositionDirect(desiredWrappedAngle.getRadians(), 0);
+            m_turningServo.setPositionDirect(desiredWrappedAngle.getRadians(), 0, 0);
         } else {
             // use the profile
             m_turningServo.setPositionProfiled(desiredWrappedAngle.getRadians(), 0);
@@ -214,8 +214,8 @@ public abstract class SwerveModule100 {
         double omega = dthetaWrapped.getRadians() / dt;
         double correction = m_wheelRadiusM * omega / m_finalDriveRatio;
         if (DEBUG) {
-			System.out.printf("correction %6.3f\n",  correction );
-		}
+            System.out.printf("correction %6.3f\n", correction);
+        }
         return desiredSpeed + correction;
     }
 

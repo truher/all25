@@ -58,7 +58,7 @@ public class SimulatedTargetWriter {
 
     public void update() {
         if (DEBUG)
-            System.out.println((Object) "simulated target write update");
+            System.out.println("simulated target write update");
         // select pose from a little while ago
         double timestampS = Takt.get() - DELAY;
         Pose2d pose = m_history.apply(timestampS).pose();

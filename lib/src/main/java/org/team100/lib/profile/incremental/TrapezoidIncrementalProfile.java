@@ -119,7 +119,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         Control100 initial = initialRaw;
         // Too-high goal speed is not allowed
         if (goalRaw.v() > m_maxVelocity || goalRaw.v() < -m_maxVelocity) {
-            System.out.println("WARNING: " + "Goal velocity is higher than profile velocity");
+            System.out.println("WARNING: Goal velocity is higher than profile velocity");
         }
         Model100 goal = limitVelocity(goalRaw);
 
@@ -135,7 +135,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         double t1IminusGplus = t1IminusGplus(initial, goal);
 
         if (Double.isNaN(t1IminusGplus) && Double.isNaN(t1IplusGminus)) {
-            System.out.println("WARNING: " + "Both I-G+ and I+G- are NaN, this should never happen");
+            System.out.println("WARNING: Both I-G+ and I+G- are NaN, this should never happen");
             return initial;
         }
 

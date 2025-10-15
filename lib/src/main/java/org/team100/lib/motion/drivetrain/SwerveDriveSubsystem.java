@@ -190,7 +190,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
 
     public void resetPose(Pose2d robotPose) {
         if (DEBUG)
-            System.out.println("WARNING: " + "Make sure resetting the swerve module collection doesn't break anything");
+            System.out.println("WARNING: Make sure resetting the swerve module collection doesn't break anything");
         m_swerveLocal.reset();
         m_odometryUpdater.reset(robotPose);
         m_stateCache.reset();
@@ -226,7 +226,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     @Override
     public void periodic() {
         if (DEBUG)
-            System.out.println((Object) "drive periodic");
+            System.out.println("drive periodic");
         // m_poseEstimator.periodic();
         // 4/2/25 Joel removed this state resetter because it happens earlier in
         // Robot.java

@@ -146,7 +146,7 @@ public class SwerveModulePosition100
         }
         // if there's no delta angle, we're not going anywhere.
         if (DEBUG)
-            System.out.println((Object) "no delta angle");
+            System.out.println("no delta angle");
         return this;
     }
 

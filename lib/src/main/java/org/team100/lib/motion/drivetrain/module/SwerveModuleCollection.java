@@ -57,7 +57,7 @@ public class SwerveModuleCollection {
 
         switch (Identity.instance) {
             case COMP_BOT:
-                System.out.println((Object) "************** WCP MODULES w/Duty-Cycle Encoders **************");
+                System.out.println("************** WCP MODULES w/Duty-Cycle Encoders **************");
                 return new SwerveModuleCollection(
                         WCPSwerveModule100.getKrakenDrive(frontLeftLogger, supplyLimit, statorLimit,
                                 new CanId(2),
@@ -92,7 +92,7 @@ public class SwerveModuleCollection {
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE));
             case SWERVE_ONE:
-                System.out.println((Object) "************** WCP MODULES w/Duty-Cycle Encoders **************");
+                System.out.println("************** WCP MODULES w/Duty-Cycle Encoders **************");
                 return new SwerveModuleCollection(
                         WCPSwerveModule100.getFalconDrive(frontLeftLogger, supplyLimit, statorLimit,
                                 new CanId(32),
@@ -131,7 +131,7 @@ public class SwerveModuleCollection {
             case BLANK:
             default:
                 if (DEBUG)
-                    System.out.println((Object) "************** SIMULATED MODULES **************");
+                    System.out.println("************** SIMULATED MODULES **************");
                 /*
                  * Uses simulated position sensors, must be used with clock control (e.g.
                  * {@link Timeless}).

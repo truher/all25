@@ -201,7 +201,7 @@ public class SplineUtil {
             prev = current;
             count++;
         }
-        System.out.println("WARNING: " + "Spline optimization failed");
+        System.out.println("WARNING: Spline optimization failed");
         return prev;
     }
 

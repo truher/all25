@@ -19,6 +19,7 @@ public class Robot extends TimedRobot {
     private final ManualPose m_pose;
     private final TargetDesignator m_target;
     private final Indicator m_indicator;
+    private final Ball m_ball;
 
     public Robot() {
         Logging log = Logging.instance();
@@ -28,6 +29,7 @@ public class Robot extends TimedRobot {
         m_target = new TargetDesignator(log.fieldLogger, TargetDesignator.A);
         m_turret = new Turret(log.rootLogger, log.fieldLogger, m_pose::getPose, m_target::getTarget);
         m_indicator = new Indicator(m_turret::onTarget);
+        m_ball = new Ball(log.fieldLogger, m_pose::getState, m_turret::getAzimuth);
 
         // button 1
         new Trigger(m_controller::a).onTrue(m_target.a());
@@ -35,6 +37,8 @@ public class Robot extends TimedRobot {
         new Trigger(m_controller::b).onTrue(m_target.b());
         // button 3
         new Trigger(m_controller::x).whileTrue(m_turret.aim());
+        // button 4
+        new Trigger(m_controller::y).whileTrue(m_ball.shoot());
 
         m_turret.setDefaultCommand(m_turret.stop());
 
@@ -49,6 +53,7 @@ public class Robot extends TimedRobot {
         m_pose.periodic();
         m_target.periodic();
         m_indicator.periodic();
+        m_ball.periodic();
     }
 
     @Override

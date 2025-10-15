@@ -129,7 +129,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
     }
 
     public void setPositionDirect(double goal) {
-        m_servo.setPositionDirect(goal, 0);
+        m_servo.setPositionDirect(goal, 0, 0);
     }
 
     ///////////////////////////////////////////////////////

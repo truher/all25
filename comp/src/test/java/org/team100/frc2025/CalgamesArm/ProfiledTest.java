@@ -53,7 +53,7 @@ public class ProfiledTest {
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
         if (DEBUG)
-            System.out.println((Object) "t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
@@ -111,7 +111,7 @@ public class ProfiledTest {
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
         if (DEBUG)
-            System.out.println((Object) "t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
@@ -162,7 +162,7 @@ public class ProfiledTest {
         double eta = Math.max(eta1, Math.max(eta2, eta3));
 
         if (DEBUG)
-            System.out.println((Object) "t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
+            System.out.println("t, x, y, r, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < eta; tt += DT) {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);

@@ -117,9 +117,9 @@ public class SwerveKinodynamicsFactory {
                         0.29, // front offset m
                         0.5); // vcg m HIGH LIKE COMP
             default:
-                System.out.println("WARNING: " + "***");
-                System.out.println("WARNING: " + "*** Using default kinodynamics, this should never happen.");
-                System.out.println("WARNING: " + "***");
+                System.out.println("WARNING: ***");
+                System.out.println("WARNING: *** Using default kinodynamics, this should never happen.");
+                System.out.println("WARNING: ***");
                 return new SwerveKinodynamics(
                         5, // vel m/s
                         20, // stall m/s/s

@@ -23,7 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** Attempts to maintain aim.  Demonstrates "spotting". */
+/** Attempts to maintain aim. Demonstrates "spotting". */
 public class Turret extends SubsystemBase {
     private static final double GEAR_RATIO = 100;
     private static final double MIN_POSITION = -3;
@@ -68,6 +68,12 @@ public class Turret extends SubsystemBase {
         return m_aiming && m_pivot.atGoal();
     }
 
+    /** Absolute turret rotation */
+    public Rotation2d getAzimuth() {
+        Rotation2d relative = new Rotation2d(m_pivot.getWrappedPositionRad());
+        return m_pose.get().getRotation().plus(relative);
+    }
+
     private void moveToAim() {
         m_aiming = true;
         Pose2d pose = m_pose.get();
@@ -97,16 +103,17 @@ public class Turret extends SubsystemBase {
     @Override
     public void periodic() {
         m_pivot.periodic();
-        m_log_field_turret.log(() -> {
-            Pose2d pose = m_pose.get();
-            return new double[] {
-                    pose.getX(),
-                    pose.getY(),
-                    pose.getRotation().plus(
-                            new Rotation2d(m_pivot.getWrappedPositionRad()))
-                            .getDegrees()
-            };
-        });
+        m_log_field_turret.log(this::poseArray);
+    }
+
+    private double[] poseArray() {
+        Pose2d pose = m_pose.get();
+        return new double[] {
+                pose.getX(),
+                pose.getY(),
+                pose.getRotation().plus(
+                        new Rotation2d(m_pivot.getWrappedPositionRad()))
+                        .getDegrees() };
     }
 
 }

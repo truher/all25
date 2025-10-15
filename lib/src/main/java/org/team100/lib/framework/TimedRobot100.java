@@ -125,7 +125,7 @@ public class TimedRobot100 extends IterativeRobotBase {
         }
 
         // Tell the DS that the robot is ready to be enabled
-        System.out.println((Object) "********** Robot program startup complete **********");
+        System.out.println("********** Robot program startup complete **********");
         DriverStationJNI.observeUserProgramStarting();
 
         // Loop forever, calling the appropriate mode-dependent function
