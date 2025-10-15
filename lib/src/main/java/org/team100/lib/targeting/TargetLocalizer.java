@@ -25,15 +25,13 @@ public class TargetLocalizer {
             Transform3d cameraInRobotCoordinates,
             Rotation3d[] sights) {
         if (DEBUG) {
-            Object[] args = {};
-            System.out.printf("camera rots\n", args);
+            System.out.print("camera rots\n");
         }
 
         ArrayList<Translation2d> Tnotes = new ArrayList<>();
         for (Rotation3d note : sights) {
             if (DEBUG) {
-                Object[] args1 = { note };
-                System.out.printf("rotation %s\n", args1);
+                System.out.printf("rotation %s\n", note);
             }
             cameraRotToFieldRelative(
                     robotPose,
@@ -58,8 +56,7 @@ public class TargetLocalizer {
                 .sightToRobotRelative(cameraInRobotCoordinates, note);
         if (robotRelative.isEmpty()) {
             if (DEBUG) {
-                Object[] args = {};
-                System.out.printf("empty\n", args);
+                System.out.print("empty\n");
             }
             return Optional.empty();
         }
@@ -99,8 +96,7 @@ public class TargetLocalizer {
         double h = robotRelativeSight.getZ();
         if (h <= 0) {
             if (DEBUG) {
-                Object[] args = { h };
-                System.out.printf("camera is below the floor %f\n", args);
+                System.out.printf("camera is below the floor %f\n", h);
             }
             return Optional.empty();
         }
@@ -108,8 +104,7 @@ public class TargetLocalizer {
         double pitch = robotRelativeSight.getRotation().getY();
         if (pitch <= 0) {
             if (DEBUG) {
-                Object[] args = { pitch };
-                System.out.printf("target is above the horizon %f\n", args);
+                System.out.printf("target is above the horizon %f\n", pitch);
             }
             return Optional.empty();
         }

@@ -36,8 +36,7 @@ public class SimulatedBareEncoder implements IncrementalBareEncoder {
     public double getUnwrappedPositionRad() {
         double positionRad = m_motor.getUnwrappedPositionRad();
         if (DEBUG) {
-            Object[] args = { positionRad };
-            System.out.printf("read encoder position %.6f\n", args);
+            System.out.printf("read encoder position %.6f\n", positionRad);
         }
         return positionRad;
     }

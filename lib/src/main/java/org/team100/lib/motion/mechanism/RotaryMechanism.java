@@ -6,7 +6,6 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
 
 /**
  * Uses a motor and gears to produce rotational output, e.g. an arm joint.
@@ -118,12 +117,14 @@ public class RotaryMechanism {
             double accelRad_S2,
             double torqueNm) {
         if (positionRad < m_minPositionRad) {
-            Util.warnf("requested position %8.3f less than min %8.3f\nn", positionRad, m_minPositionRad);
+            System.out.printf("WARNING: requested position %8.3f less than min %8.3f\n",
+                    positionRad, m_minPositionRad);
             m_motor.stop();
             return;
         }
         if (positionRad > m_maxPositionRad) {
-            Util.warnf("requested position %8.3f more than max %8.3f\n", positionRad, m_maxPositionRad);
+            System.out.printf("WARNING: requested position %8.3f more than max %8.3f\n",
+                    positionRad, m_maxPositionRad);
             m_motor.stop();
             return;
         }

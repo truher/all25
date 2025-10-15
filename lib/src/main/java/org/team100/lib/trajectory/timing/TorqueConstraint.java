@@ -61,8 +61,8 @@ public class TorqueConstraint implements TimingConstraint {
         double cross = r.getX() * u.getY() - r.getY() * u.getX();
         double a = Math.abs(m_maxTorque / (M * cross));
         if (DEBUG) {
-            Object[] args = { a, state.getPose(), r.getNorm(), course.getRadians() };
-            System.out.printf("Torque Constraint a: %6.3f p: %s r: %6.3f course: %6.3f\n", args);
+            System.out.printf("Torque Constraint a: %6.3f p: %s r: %6.3f course: %6.3f\n",
+                    a, state.getPose(), r.getNorm(), course.getRadians());
         }
         return new MinMaxAcceleration(-a, a);
     }

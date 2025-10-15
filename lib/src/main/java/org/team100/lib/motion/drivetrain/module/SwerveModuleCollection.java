@@ -158,8 +158,7 @@ public class SwerveModuleCollection {
      */
     public void setDesiredStates(SwerveModuleStates swerveModuleStates) {
         if (DEBUG) {
-            Object[] args = { swerveModuleStates };
-            System.out.printf("setDesiredStates() %s\n", args);
+            System.out.printf("setDesiredStates() %s\n", swerveModuleStates);
         }
         m_frontLeft.setDesiredState(swerveModuleStates.frontLeft());
         m_frontRight.setDesiredState(swerveModuleStates.frontRight());

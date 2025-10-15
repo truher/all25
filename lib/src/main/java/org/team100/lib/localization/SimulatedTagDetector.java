@@ -101,8 +101,10 @@ public class SimulatedTagDetector {
 
         Pose3d robotPose3d = new Pose3d(pose);
         if (DEBUG) {
-            Object[] args = { robotPose3d.getTranslation().getX(), robotPose3d.getTranslation().getY(), robotPose3d.getTranslation().getZ(), robotPose3d.getRotation().getX(), robotPose3d.getRotation().getY(), robotPose3d.getRotation().getZ() };
-            System.out.printf("robot pose X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f \n", args);
+            System.out.printf("robot pose X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f \n",
+                    robotPose3d.getTranslation().getX(), robotPose3d.getTranslation().getY(),
+                    robotPose3d.getTranslation().getZ(), robotPose3d.getRotation().getX(),
+                    robotPose3d.getRotation().getY(), robotPose3d.getRotation().getZ());
         }
         for (Map.Entry<Camera, StructArrayPublisher<Blip24>> entry : m_publishers.entrySet()) {
             Camera camera = entry.getKey();
@@ -115,37 +117,41 @@ public class SimulatedTagDetector {
 
             for (int tagId = 1; tagId <= TAG_COUNT; ++tagId) {
                 if (DEBUG) {
-                    Object[] args = { alliance.name(), camera.name() };
-                    System.out.printf("alliance %s camera %12s ", args);
+                    System.out.printf("alliance %s camera %12s ", alliance.name(), camera.name());
                 }
                 Pose3d tagPose = m_layout.getTagPose(alliance, tagId).get();
                 if (DEBUG) {
-                    Object[] args = { tagId, tagPose.getTranslation().getX(), tagPose.getTranslation().getY(), tagPose.getTranslation().getZ(), tagPose.getRotation().getX(), tagPose.getRotation().getY(), tagPose.getRotation().getZ() };
-                    System.out.printf("tag id: %2d tag pose: X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f ", args);
+                    System.out.printf("tag id: %2d tag pose: X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f ",
+                            tagId, tagPose.getTranslation().getX(), tagPose.getTranslation().getY(),
+                            tagPose.getTranslation().getZ(), tagPose.getRotation().getX(), tagPose.getRotation().getY(),
+                            tagPose.getRotation().getZ());
                 }
                 Transform3d tagInCamera = tagInCamera(cameraPose3d, tagPose);
                 if (visible(tagInCamera)) {
                     // publish it
                     if (DEBUG) {
-                        Object[] args = {};
-                        System.out.printf("VISIBLE ", args);
+
+                        System.out.print("VISIBLE ");
                     }
                     blips.add(Blip24.fromXForward(tagId, tagInCamera));
                 } else {
                     // ignore it
                     if (DEBUG) {
-                        Object[] args = {};
-                        System.out.printf(" . ", args);
+
+                        System.out.print(" . ");
                     }
                 }
                 if (DEBUG) {
-                    Object[] args = { cameraOffset.getTranslation().getX(), cameraOffset.getTranslation().getY(), cameraOffset.getTranslation().getZ(), cameraOffset.getRotation().getX(), cameraOffset.getRotation().getY(), cameraOffset.getRotation().getZ() };
-                    System.out.printf("camera: X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f", args);
+                    System.out.printf("camera: X %6.2f Y %6.2f Z %6.2f R %6.2f P %6.2f Y %6.2f",
+                            cameraOffset.getTranslation().getX(), cameraOffset.getTranslation().getY(),
+                            cameraOffset.getTranslation().getZ(), cameraOffset.getRotation().getX(),
+                            cameraOffset.getRotation().getY(), cameraOffset.getRotation().getZ());
                     Translation3d tagTranslationInCamera = tagInCamera.getTranslation();
                     Rotation3d tagRotationInCamera = tagInCamera.getRotation();
-                    Object[] args1 = { tagTranslationInCamera.getX(), tagTranslationInCamera.getY(), tagTranslationInCamera.getZ(), tagRotationInCamera.getX(), tagRotationInCamera.getY(), tagRotationInCamera.getZ() };
-
-                    System.out.printf(" tag in camera: X %6.2f Y %6.2f Z %6.2f  R %6.2f P %6.2f Y %6.2f\n", args1);
+                    System.out.printf(" tag in camera: X %6.2f Y %6.2f Z %6.2f  R %6.2f P %6.2f Y %6.2f\n",
+                            tagTranslationInCamera.getX(), tagTranslationInCamera.getY(),
+                            tagTranslationInCamera.getZ(), tagRotationInCamera.getX(), tagRotationInCamera.getY(),
+                            tagRotationInCamera.getZ());
                 }
 
             }
@@ -157,8 +163,7 @@ public class SimulatedTagDetector {
             publisher.set(
                     blips.toArray(new Blip24[0]), timestampUs - delayUs);
             if (PUBLISH_DEBUG) {
-                Object[] args = { blips };
-                System.out.printf("%s\n", args);
+                System.out.printf("%s\n", blips);
             }
         }
 
@@ -177,14 +182,12 @@ public class SimulatedTagDetector {
         double x = tagTranslationInCamera.getX();
         if (x < 0) {
             if (DEBUG) {
-                Object[] args = { x };
-                System.out.printf("   behind (%6.2f) ", args);
+                System.out.printf("   behind (%6.2f) ", x);
             }
             return false;
         }
         if (DEBUG) {
-            Object[] args = { x };
-            System.out.printf(" in front (%6.2f) ", args);
+            System.out.printf(" in front (%6.2f) ", x);
         }
         return true;
     }
@@ -208,14 +211,12 @@ public class SimulatedTagDetector {
 
         if (Math.abs(angle) > OBLIQUE_LIMIT_RAD) {
             if (DEBUG) {
-                Object[] args = { angle };
-                System.out.printf(" facing away (%6.2f)", args);
+                System.out.printf(" facing away (%6.2f)", angle);
             }
             return false;
         }
         if (DEBUG) {
-            Object[] args = { angle };
-            System.out.printf("    angle ok (%6.2f)", args);
+            System.out.printf("    angle ok (%6.2f)", angle);
         }
         return true;
     }
@@ -235,14 +236,12 @@ public class SimulatedTagDetector {
         double ypp = -1.0 * tagTranslationInCamera.getZ() / tagTranslationInCamera.getX();
         if (Math.abs(xpp) < HFOV && Math.abs(ypp) < VFOV) {
             if (DEBUG) {
-                Object[] args = { xpp, ypp };
-                System.out.printf("  FOV IN xpp %6.2f ypp %6.2f ", args);
+                System.out.printf("  FOV IN xpp %6.2f ypp %6.2f ", xpp, ypp);
             }
             return true;
         }
         if (DEBUG) {
-            Object[] args = { xpp, ypp };
-            System.out.printf(" FOV OUT xpp %6.2f ypp %6.2f ", args);
+            System.out.printf(" FOV OUT xpp %6.2f ypp %6.2f ", xpp, ypp);
         }
         return false;
 
@@ -251,24 +250,21 @@ public class SimulatedTagDetector {
     static boolean visible(Transform3d tagInCamera) {
         if (!inFront(tagInCamera)) {
             if (DEBUG) {
-                Object[] args = {};
-                System.out.printf(" ........................................................", args);
+                System.out.print(" ........................................................");
             }
             return false;
         }
 
         if (!facing(tagInCamera)) {
             if (DEBUG) {
-                Object[] args = {};
-                System.out.printf(" ...................................", args);
+                System.out.print(" ...................................");
             }
             return false;
         }
 
         if (!inFOV(tagInCamera)) {
             if (DEBUG) {
-                Object[] args = {};
-                System.out.printf(" ... ", args);
+                System.out.print(" ... ");
             }
             return false;
         }

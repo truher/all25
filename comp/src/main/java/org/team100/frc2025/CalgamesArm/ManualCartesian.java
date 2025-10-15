@@ -52,8 +52,7 @@ public class ManualCartesian extends Command {
 
         m_subsystem.set(new SwerveControl(m_pose));
         if (DEBUG) {
-            Object[] args = { m_pose };
-            System.out.printf("pose %s\n", args);
+            System.out.printf("pose %s\n", m_pose);
         }
     }
 }

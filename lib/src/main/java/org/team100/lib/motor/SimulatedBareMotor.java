@@ -7,7 +7,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.state.Model100;
-import org.team100.lib.util.Util;
+import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -46,18 +46,15 @@ public class SimulatedBareMotor implements BareMotor {
 
     private Model100 update() {
         if (DEBUG) {
-            Object[] args = { m_log.getRoot() };
-            System.out.printf("motor %s update\n", args);
+            System.out.printf("motor %s update\n", m_log.getRoot());
         }
         double dt = dt();
         if (DEBUG) {
-            Object[] args1 = { dt };
-            System.out.printf("SimulatedBareMotor dt %f\n", args1);
+            System.out.printf("SimulatedBareMotor dt %f\n", dt);
         }
         if (m_velocityInput != null) {
             if (DEBUG) {
-                Object[] args2 = { m_velocityInput };
-                System.out.printf("SimulatedBareMotor v %f\n", args2);
+                System.out.printf("SimulatedBareMotor v %f\n", m_velocityInput);
             }
             if (dt > 0.04) {
                 // probably we should not extrapolate
@@ -68,8 +65,7 @@ public class SimulatedBareMotor implements BareMotor {
         }
         if (m_positionInput != null) {
             if (DEBUG) {
-                Object[] args2 = { m_positionInput };
-                System.out.printf("SimulatedBareMotor x %f\n", args2);
+                System.out.printf("SimulatedBareMotor x %f\n", m_positionInput);
             }
             if (dt < 0.01) {
                 // probably we should not differentiate
@@ -79,8 +75,7 @@ public class SimulatedBareMotor implements BareMotor {
             }
         }
         if (DEBUG) {
-            Object[] args2 = { m_state };
-            System.out.printf("SimulatedBareMotor state %s\n", args2);
+            System.out.printf("SimulatedBareMotor state %s\n", m_state);
         }
         return m_state;
     }
@@ -95,7 +90,7 @@ public class SimulatedBareMotor implements BareMotor {
     @Override
     public void setDutyCycle(double dutyCycle) {
         final double output = MathUtil.clamp(
-                Util.notNaN(dutyCycle), -1, 1);
+                Math100.notNaN(dutyCycle), -1, 1);
         m_log_duty.log(() -> output);
         setVelocity(output * m_freeSpeedRad_S, 0, 0);
     }
@@ -104,11 +99,10 @@ public class SimulatedBareMotor implements BareMotor {
     @Override
     public void setVelocity(double velocityRad_S, double accelRad_S2, double torqueNm) {
         if (DEBUG) {
-            Object[] args = { m_log.getRoot(), velocityRad_S };
-            System.out.printf("motor %s set velocity %6.3f\n", args);
+            System.out.printf("motor %s set velocity %6.3f\n", m_log.getRoot(), velocityRad_S );
         }
         m_velocityInput = MathUtil.clamp(
-                Util.notNaN(velocityRad_S), -m_freeSpeedRad_S, m_freeSpeedRad_S);
+                Math100.notNaN(velocityRad_S), -m_freeSpeedRad_S, m_freeSpeedRad_S);
         // you can't use velocity and position control at the same time
         m_positionInput = null;
     }
@@ -117,8 +111,7 @@ public class SimulatedBareMotor implements BareMotor {
     @Override
     public void setUnwrappedPosition(double position, double velocity, double accel, double torque) {
         if (DEBUG) {
-            Object[] args = { m_log.getRoot(), position };
-            System.out.printf("motor %s set position %6.3f\n", args);
+            System.out.printf("motor %s set position %6.3f\n", m_log.getRoot(), position);
         }
         m_positionInput = position;
         // you can't use velocity and position control at the same time

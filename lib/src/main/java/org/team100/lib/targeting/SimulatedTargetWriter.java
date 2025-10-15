@@ -69,8 +69,7 @@ public class SimulatedTargetWriter {
             List<Rotation3d> rot = SimulatedObjectDetector.getRotations(
                     pose, camera.getOffset(), m_targets);
             if (DEBUG) {
-                Object[] args = { rot.size() };
-                System.out.printf("rot size %d\n", args);
+                System.out.printf("rot size %d\n", rot.size());
             }
             // tilt down 45
             // Rotation3d[] rots = new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) };
@@ -83,8 +82,7 @@ public class SimulatedTargetWriter {
 
             long time = timestampUs - delayUs;
             if (DEBUG) {
-                Object[] args1 = { time };
-                System.out.printf("writer timestamp %d\n", args1);
+                System.out.printf("writer timestamp %d\n", time);
             }
             publisher.set(rots, time);
         }

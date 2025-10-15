@@ -3,7 +3,6 @@ package org.team100.lib.network;
 import java.util.EnumSet;
 
 import org.team100.lib.config.Camera;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.MultiSubscriber;
@@ -65,12 +64,11 @@ public abstract class CameraReader<T> {
             NetworkTableValue ntValue = valueEventData.value;
             String name = valueEventData.getTopic().getName();
             if (DEBUG) {
-                Object[] args = { name };
-                System.out.printf("poll %s\n", args);
+                System.out.printf("poll %s\n", name);
             }
             String[] fields = name.split("/");
             if (fields.length != 4) {
-                Util.warnf("weird event name: %s\n", name);
+                System.out.printf("WARNING: weird event name: %s\n", name);
                 continue;
             }
             // key is "rootName/cameraId/cameraNumber/valueName"
@@ -80,8 +78,7 @@ public abstract class CameraReader<T> {
                 continue;
             }
             if (DEBUG) {
-                Object[] args1 = {};
-                System.out.printf("found value\n", args1);
+                System.out.print("found value\n");
             }
             // decode the way StructArrayEntryImpl does
             byte[] valueBytes = ntValue.getRaw();
@@ -93,7 +90,7 @@ public abstract class CameraReader<T> {
             try {
                 valueArray = m_buf.readArray(valueBytes);
             } catch (RuntimeException ex) {
-                Util.warnf("decoding failed for name: %s\n", name);
+                System.out.printf("WARNING: decoding failed for name: %s\n", name);
                 continue;
             }
 
@@ -101,8 +98,7 @@ public abstract class CameraReader<T> {
             // in tests this offset is identity.
             Transform3d cameraOffset = Camera.get(cameraId).getOffset();
             if (DEBUG) {
-                Object[] args2 = { cameraId, cameraOffset };
-                System.out.printf("camera %s offset %s\n", args2);
+                System.out.printf("camera %s offset %s\n", cameraId, cameraOffset);
             }
 
             // server time is in microseconds
@@ -116,8 +112,7 @@ public abstract class CameraReader<T> {
             // double valueTimestamp = ((double)ntValue.getServerTime()) / 1000000.0;
             double valueTimestamp = ((double) ntValue.getTime()) / 1000000.0;
             if (DEBUG) {
-                Object[] args3 = { valueTimestamp };
-                System.out.printf("reader timestamp %f\n", args3);
+                System.out.printf("reader timestamp %f\n", valueTimestamp);
             }
 
             perValue(cameraOffset, valueTimestamp, valueArray);

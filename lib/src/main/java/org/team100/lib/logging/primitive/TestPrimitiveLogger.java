@@ -29,8 +29,7 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
             @Override
             public void log(boolean val) {
                 if (m_print) {
-                    Object[] args = { label, val };
-                    System.out.printf("%s/%b\n", args);
+                    System.out.printf("%s/%b\n", label, val);
                 }
             }
         };
@@ -43,8 +42,7 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
             @Override
             public void log(double val) {
                 if (m_print) {
-                    Object[] args = { label, val };
-                    System.out.printf("%s/%.2f\n", args);
+                    System.out.printf("%s/%.2f\n", label, val);
                 }
             }
         };
@@ -57,8 +55,7 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
             @Override
             public void log(int val) {
                 if (m_print) {
-                    Object[] args = { label, val };
-                    System.out.printf("%s/%d\n", args);
+                    System.out.printf("%s/%d\n", label, val);
                 }
             }
         };
@@ -71,8 +68,7 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
             @Override
             public void log(double[] val) {
                 if (m_print) {
-                    Object[] args = { label, Arrays.toString(val) };
-                    System.out.printf("%s/%s\n", args);
+                    System.out.printf("%s/%s\n", label, Arrays.toString(val));
                 }
             }
         };
@@ -85,8 +81,7 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
             @Override
             public void log(long val) {
                 if (m_print) {
-                    Object[] args = { label, val };
-                    System.out.printf("%s/%d\n", args);
+                    System.out.printf("%s/%d\n", label, val);
                 }
             }
         };
@@ -99,8 +94,7 @@ public class TestPrimitiveLogger implements PrimitiveLogger {
             @Override
             public void log(String val) {
                 if (m_print) {
-                    Object[] args = { label, val };
-                    System.out.printf("%s/%s\n", args);
+                    System.out.printf("%s/%s\n", label, val);
                 }
             }
         };

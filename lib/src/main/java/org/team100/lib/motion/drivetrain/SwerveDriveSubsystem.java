@@ -114,8 +114,12 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         m_log_skill.log(() -> driverSkillLevel);
         // here heading and course are exactly opposite, as they should be.
         if (DEBUG) {
-            Object[] args = { theta.getRadians(), GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(), targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.vyMetersPerSecond, targetChassisSpeeds.omegaRadiansPerSecond };
-            System.out.printf("driveInFieldCoords() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n", args);
+            System.out.printf(
+                    "driveInFieldCoords() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n",
+                    theta.getRadians(),
+                    GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(),
+                    targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.vyMetersPerSecond,
+                    targetChassisSpeeds.omegaRadiansPerSecond);
         }
 
         m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
@@ -132,8 +136,12 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         final Rotation2d theta = getPose().getRotation();
         // if we're going +x then heading and course should be opposite.
         if (DEBUG) {
-            Object[] args = { theta.getRadians(), GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(), targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.vyMetersPerSecond, targetChassisSpeeds.omegaRadiansPerSecond };
-            System.out.printf("driveInFieldCoordsVerbatim() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n", args);
+            System.out.printf(
+                    "driveInFieldCoordsVerbatim() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n",
+                    theta.getRadians(),
+                    GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(),
+                    targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.vyMetersPerSecond,
+                    targetChassisSpeeds.omegaRadiansPerSecond);
         }
 
         m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
@@ -262,8 +270,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         // m_cameraUpdater.run();
         SwerveModel swerveModel = m_estimate.apply(now);
         if (DEBUG) {
-            Object[] args = { positions, swerveModel };
-            System.out.printf("update() positions %s estimated pose: %s\n", args);
+            System.out.printf("update() positions %s estimated pose: %s\n", positions, swerveModel);
         }
         return swerveModel;
     }

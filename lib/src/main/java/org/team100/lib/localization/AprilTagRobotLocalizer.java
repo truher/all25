@@ -17,7 +17,6 @@ import org.team100.lib.logging.LoggerFactory.Transform3dLogger;
 import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.util.TrailingHistory;
-import org.team100.lib.util.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -242,8 +241,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         // The gyro rotation for the frame timestamp
         final Rotation2d gyroRotation = historicalPose.getRotation();
         if (DEBUG) {
-            Object[] args = { gyroRotation.getRadians() };
-            System.out.printf("gyro rotation %f\n", args);
+            System.out.printf("gyro rotation %f\n", gyroRotation.getRadians());
         }
 
         for (int i = 0; i < blips.length; ++i) {
@@ -252,15 +250,15 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             if (DEBUG) {
                 Translation3d t = blip.getRawPose().getTranslation();
                 Rotation3d r = blip.getRawPose().getRotation();
-                Object[] args1 = { blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ() };
-                System.out.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n", args1);
+                System.out.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
+                        blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ());
             }
 
             // Look up the pose of the tag in the field frame.
             Optional<Pose3d> tagInFieldCoordsOptional = m_layout.getTagPose(alliance, blip.getId());
             if (!tagInFieldCoordsOptional.isPresent()) {
                 // This shouldn't happen, but it does.
-                Util.warnf("VisionDataProvider24: no tag for id %d\n", blip.getId());
+                System.out.printf("WARNING: VisionDataProvider24: no tag for id %d\n", blip.getId());
                 continue;
             }
 
@@ -277,8 +275,10 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 // This is used for camera offset calibration. Place a tag at a known position,
                 // observe the offset, and add it to Camera.java, inverted.
                 Transform3d tagInRobot = cameraOffset.plus(tagInCamera);
-                Object[] args1 = { blip.getId(), tagInRobot.getTranslation().getX(), tagInRobot.getTranslation().getY(), tagInRobot.getTranslation().getZ(), tagInRobot.getRotation().getX(), tagInRobot.getRotation().getY(), tagInRobot.getRotation().getZ() };
-                System.out.printf("tagInRobot id %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n", args1);
+                System.out.printf("tagInRobot id %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
+                        blip.getId(), tagInRobot.getTranslation().getX(), tagInRobot.getTranslation().getY(),
+                        tagInRobot.getTranslation().getZ(), tagInRobot.getRotation().getX(),
+                        tagInRobot.getRotation().getY(), tagInRobot.getRotation().getZ());
             }
 
             if (tagInCamera.getTranslation().getNorm() > TAG_ROTATION_BELIEF_THRESHOLD_M) {

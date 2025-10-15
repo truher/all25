@@ -18,8 +18,7 @@ public class ChassisSpeedAdapter implements DriverAdapter {
     @Override
     public void apply(SwerveModel s, Velocity t) {
         if (DEBUG) {
-            Object[] args = { t };
-            System.out.printf("ChassisSpeedDriver %s\n", args);
+            System.out.printf("ChassisSpeedDriver %s\n", t);
         }
         m_drive.setChassisSpeeds(m_driver.apply(s, t));
     }

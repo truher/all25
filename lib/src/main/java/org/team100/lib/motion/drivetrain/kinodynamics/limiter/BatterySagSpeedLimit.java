@@ -17,7 +17,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
  * Note the motors actually get a bit less voltage than the battery, due to
  * wiring resistance, but it's ok to neglect that effect.
  */
-public class BatterySagSpeedLimit  {
+public class BatterySagSpeedLimit {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_scale;
@@ -47,8 +47,7 @@ public class BatterySagSpeedLimit  {
     public double getMaxDriveVelocityM_S() {
         double scale = getScale();
         if (DEBUG) {
-            Object[] args = { scale };
-            System.out.printf("BatterySagSpeedLimit velocity scale %.5f\n", args);
+            System.out.printf("BatterySagSpeedLimit velocity scale %.5f\n", scale);
         }
         return scale * m_dynamics.getMaxDriveVelocityM_S();
     }
@@ -56,8 +55,7 @@ public class BatterySagSpeedLimit  {
     public double getMaxAngleSpeedRad_S() {
         double scale = getScale();
         if (DEBUG) {
-            Object[] args = { scale };
-            System.out.printf("BatterySagSpeedLimit  omega scale %.5f\n", args);
+            System.out.printf("BatterySagSpeedLimit  omega scale %.5f\n", scale);
         }
         return scale * m_dynamics.getMaxAngleSpeedRad_S();
     }

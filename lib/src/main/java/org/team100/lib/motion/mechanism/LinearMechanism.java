@@ -81,8 +81,7 @@ public class LinearMechanism {
             double outputAccelM_S2,
             double outputForceN) {
         if (DEBUG) {
-            Object[] args = { outputVelocityM_S };
-            System.out.printf("velocity %6.3f\n", args);
+            System.out.printf("velocity %6.3f\n", outputVelocityM_S);
         }
         double posM = getPositionM();
         if (outputVelocityM_S < 0 && posM < m_minPositionM) {

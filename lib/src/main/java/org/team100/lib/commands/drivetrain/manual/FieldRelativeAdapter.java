@@ -17,8 +17,7 @@ public class FieldRelativeAdapter implements DriverAdapter {
 
     public void apply(SwerveModel s, Velocity t) {
         if (DEBUG) {
-            Object[] args = { t };
-            System.out.printf("FieldRelativeDriver %s\n", args);
+            System.out.printf("FieldRelativeDriver %s\n", t);
         }
         m_drive.driveInFieldCoords(m_driver.apply(s, t));
     }

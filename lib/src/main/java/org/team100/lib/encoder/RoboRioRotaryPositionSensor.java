@@ -6,7 +6,7 @@ import org.team100.lib.coherence.Cache;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.util.Util;
+import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -34,7 +34,7 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
             double inputOffset,
             EncoderDrive drive) {
         LoggerFactory log = parent.type(this);
-        m_positionOffset = Util.inRange(inputOffset, 0.0, 1.0);
+        m_positionOffset = Math100.throwIfOutOfRange(inputOffset, 0.0, 1.0);
         m_drive = drive;
 
         m_turns = Cache.of(this::wrap);
@@ -57,8 +57,7 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
         double current = getWrappedPositionRad();
         double prev = m_prevWrappedPositionRad;
         if (DEBUG) {
-            Object[] args = { prev, current };
-            System.out.printf("wrap prev %6.3f curr %6.3f\n", args);
+            System.out.printf("wrap prev %6.3f curr %6.3f\n", prev, current);
         }
         m_prevWrappedPositionRad = current;
         double diff = current - prev;

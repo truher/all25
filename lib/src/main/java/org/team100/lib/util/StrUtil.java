@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 
-public class Util {
+public class StrUtil {
 
     public static String pose2Str(Pose2d p) {
         return String.format("%6.3f, %6.3f, %6.3f",
@@ -60,26 +60,7 @@ public class Util {
         return b.toString();
     }
 
-    public static void warnf(String s, Object... args) {
-        System.out.printf("WARNING: " + String.format(s, args));
-    }
-
-    /** Throw if x is out of range. This is a more strict version of "clamp" :-) */
-    public static double inRange(double x, double minX, double maxX) {
-        if (x < minX)
-            throw new IllegalArgumentException(String.format("arg is %f which is below %f", x, minX));
-        if (x > maxX)
-            throw new IllegalArgumentException(String.format("arg is %f which is above %f", x, maxX));
-        return x;
-    }
-
-    public static double notNaN(double x) {
-        if (Double.isNaN(x))
-            throw new IllegalArgumentException("arg is NaN");
-        return x;
-    }
-
-    private Util() {
+    private StrUtil() {
         //
     }
 }

@@ -62,9 +62,11 @@ public class ProfiledTest {
             Pose2d p = k.forward(c);
 
             if (DEBUG) {
-                Object[] args = { tt, p.getX(), p.getY(), p.getRotation().getRadians(), c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(), i1.v(),
-                        i2.v(), i3.v(), i1.a(), i2.a(), i3.a() };
-                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", args);
+                System.out.printf(
+                        "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt, p.getX(), p.getY(), p.getRotation().getRadians(), c.shoulderHeight(),
+                        c.shoulderAngle(), c.wristAngle(), i1.v(),
+                        i2.v(), i3.v(), i1.a(), i2.a(), i3.a());
             }
         }
 
@@ -118,9 +120,11 @@ public class ProfiledTest {
             Pose2d p = k.forward(c);
 
             if (DEBUG) {
-                Object[] args = { tt, p.getX(), p.getY(), p.getRotation().getRadians(), c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(), i1.v(),
-                        i2.v(), i3.v(), i1.a(), i2.a(), i3.a() };
-                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", args);
+                System.out.printf(
+                        "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt, p.getX(), p.getY(), p.getRotation().getRadians(), c.shoulderHeight(),
+                        c.shoulderAngle(), c.wristAngle(), i1.v(),
+                        i2.v(), i3.v(), i1.a(), i2.a(), i3.a());
             }
         }
     }
@@ -167,9 +171,11 @@ public class ProfiledTest {
             Pose2d p = k.forward(c);
 
             if (DEBUG) {
-                Object[] args = { tt, p.getX(), p.getY(), p.getRotation().getRadians(), c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(), i1.v(),
-                        i2.v(), i3.v(), i1.a(), i2.a(), i3.a() };
-                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", args);
+                System.out.printf(
+                        "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt, p.getX(), p.getY(), p.getRotation().getRadians(), c.shoulderHeight(), c.shoulderAngle(),
+                        c.wristAngle(), i1.v(),
+                        i2.v(), i3.v(), i1.a(), i2.a(), i3.a());
             }
         }
     }

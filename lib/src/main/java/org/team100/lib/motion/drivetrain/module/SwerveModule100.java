@@ -214,8 +214,7 @@ public abstract class SwerveModule100 {
         double omega = dthetaWrapped.getRadians() / dt;
         double correction = m_wheelRadiusM * omega / m_finalDriveRatio;
         if (DEBUG) {
-			Object[] args = { correction };
-			System.out.printf("correction %6.3f\n", args);
+			System.out.printf("correction %6.3f\n",  correction );
 		}
         return desiredSpeed + correction;
     }

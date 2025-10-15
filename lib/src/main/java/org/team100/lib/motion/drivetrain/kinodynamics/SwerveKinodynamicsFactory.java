@@ -27,8 +27,7 @@ public class SwerveKinodynamicsFactory {
      * below instead.
      */
     public static SwerveKinodynamics get() {
-        Object[] args = { Identity.instance };
-        System.out.printf("Swerve Kinodynamics Factory using Identity %s\n", args);
+        System.out.printf("Swerve Kinodynamics Factory using Identity %s\n", Identity.instance);
         switch (Identity.instance) {
             case COMP_BOT:
                 // these numbers are a guess based on the betabot numbers.

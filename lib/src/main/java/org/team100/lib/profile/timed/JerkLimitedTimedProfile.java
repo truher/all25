@@ -39,8 +39,7 @@ public class JerkLimitedTimedProfile implements TimedProfile {
         m_profile = JerkLimitedProfileGenerator.generateMotionProfile(
                 start, end, vel, acc, jerk, overshoot);
         if (DEBUG) {
-            Object[] args = { initial, goal, m_profile };
-            System.out.printf("init %s goal %s profile %s\n", args);
+            System.out.printf("init %s goal %s profile %s\n", initial, goal, m_profile);
         }
     }
 
@@ -48,8 +47,7 @@ public class JerkLimitedTimedProfile implements TimedProfile {
     public Control100 sample(double timeS) {
         MotionState s = m_profile.get(timeS);
         if (DEBUG) {
-            Object[] args = { timeS, s.x(), s.v(), s.a() };
-            System.out.printf("time %f x %f v %f a %f\n", args);
+            System.out.printf("time %f x %f v %f a %f\n", timeS, s.x(), s.v(), s.a());
         }
         return new Control100(s.x(), s.v(), s.a());
     }

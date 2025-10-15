@@ -137,8 +137,8 @@ public class SwerveModulePosition100
                     // note wrapping here
                     Rotation2d angleDiff = delta.wrappedAngle.get().minus(unwrappedAngle.get());
                     if (Math.abs(angleDiff.getRadians()) > 0.2) {
-                        Object[] args = { unwrappedAngle.get().getRadians(), delta.wrappedAngle.get().getRadians() };
-                        System.out.printf("very fast steering start: %f end: %f\n", args);
+                        System.out.printf("very fast steering start: %f end: %f\n",
+                                unwrappedAngle.get().getRadians(), delta.wrappedAngle.get().getRadians());
                     }
                 }
             }

@@ -67,8 +67,7 @@ public class HolonomicSpline {
         double scale0 = mN0 * GeometryUtil.distance(p0.translation(), p1.translation());
         double scale1 = mN1 * GeometryUtil.distance(p0.translation(), p1.translation());
         if (DEBUG) {
-            Object[] args = { scale0, scale1 };
-            System.out.printf("scale %f %f\n", args);
+            System.out.printf("scale %f %f\n",  scale0, scale1 );
         }
         double x0 = p0.translation().getX();
         double x1 = p1.translation().getX();

@@ -10,7 +10,7 @@ import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 /**
  * Return feasible velocity, using a simple worst-case model (diagonal course).
  */
-public class FieldRelativeVelocityLimiter  {
+public class FieldRelativeVelocityLimiter {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_scale;
@@ -33,8 +33,7 @@ public class FieldRelativeVelocityLimiter  {
     /** Maintain translation and rotation proportionality. */
     GlobalSe2Velocity proportional(GlobalSe2Velocity target) {
         if (DEBUG) {
-            Object[] args = { target };
-            System.out.printf("proportional %s\n", args);
+            System.out.printf("proportional %s\n", target);
         }
         final double maxV = m_limits.getMaxDriveVelocityM_S();
         final double maxOmega = m_limits.getMaxAngleSpeedRad_S();
@@ -47,8 +46,7 @@ public class FieldRelativeVelocityLimiter  {
             // omega + xyspeed is feasible
             m_log_scale.log(() -> 1.0);
             if (DEBUG) {
-                Object[] args1 = { target };
-                System.out.printf("feasible %s\n", args1);
+                System.out.printf("feasible %s\n", target);
             }
             return target;
         }
@@ -74,8 +72,7 @@ public class FieldRelativeVelocityLimiter  {
         double scale = v / xySpeed;
         m_log_scale.log(() -> scale);
         if (DEBUG) {
-            Object[] args = { scale };
-            System.out.printf("FieldRelativeVelocityLimiter proportional scale %.5f\n", args);
+            System.out.printf("FieldRelativeVelocityLimiter proportional scale %.5f\n", scale);
         }
         return new GlobalSe2Velocity(
                 scale * target.x(),
@@ -89,8 +86,7 @@ public class FieldRelativeVelocityLimiter  {
         double scale = Math.abs(maxV / xySpeed);
         m_log_scale.log(() -> scale);
         if (DEBUG) {
-            Object[] args = { target };
-            System.out.printf("max v %s\n", args);
+            System.out.printf("max v %s\n", target);
         }
         return new GlobalSe2Velocity(
                 maxV * Math.cos(xyAngle),
@@ -103,8 +99,7 @@ public class FieldRelativeVelocityLimiter  {
         double scale = Math.abs(maxOmega / target.theta());
         m_log_scale.log(() -> scale);
         if (DEBUG) {
-            Object[] args = { target };
-            System.out.printf("max omega %s\n", args);
+            System.out.printf("max omega %s\n", target);
         }
         return new GlobalSe2Velocity(
                 0,
@@ -127,8 +122,7 @@ public class FieldRelativeVelocityLimiter  {
         double xyAngle = Math.atan2(speeds.y(), speeds.x());
 
         if (DEBUG) {
-            Object[] args = { ratio };
-            System.out.printf("FieldRelativeVelocityLimiter rotation ratio %.5f\n", args);
+            System.out.printf("FieldRelativeVelocityLimiter rotation ratio %.5f\n", ratio);
         }
 
         return new GlobalSe2Velocity(

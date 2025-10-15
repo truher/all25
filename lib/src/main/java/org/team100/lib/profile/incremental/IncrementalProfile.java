@@ -79,8 +79,7 @@ public interface IncrementalProfile {
                 etaTolerance,
                 100);
         if (DEBUG) {
-            Object[] args = { ss };
-            System.out.printf("s %5.2f\n", args);
+            System.out.printf("s %5.2f\n", ss);
         }
         return ss;
     }

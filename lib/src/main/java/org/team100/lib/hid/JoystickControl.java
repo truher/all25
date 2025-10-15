@@ -59,8 +59,7 @@ public abstract class JoystickControl {
         double dtheta = expo(deadband(-1.0 * clamp(m_controller.getRawAxis(2), 1), DEADBAND, 1), EXPO);
         Velocity velocity = new Velocity(dx, dy, dtheta);
         if (DEBUG) {
-            Object[] args = { velocity };
-            System.out.printf("JoystickControl %s\n", args);
+            System.out.printf("JoystickControl %s\n", velocity);
         }
         return velocity;
     }

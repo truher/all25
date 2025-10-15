@@ -44,8 +44,7 @@ public class CurrentLimitedExponentialProfile implements IncrementalProfile {
         boolean isAccel = Math.abs(setpointV) > Math.abs(initialV)
                 && Math.signum(setpointV) == Math.signum(initialV);
         if (DEBUG) {
-            Object[] args = { initialV, setpointV, isAccel };
-            System.out.printf("initial %5.2f setpoint %5.2f isAccel %b\n", args);
+            System.out.printf("initial %5.2f setpoint %5.2f isAccel %b\n", initialV, setpointV, isAccel);
         }
         return isAccel;
     }

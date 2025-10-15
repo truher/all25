@@ -30,8 +30,8 @@ public class Bisection1d {
             double tolerance,
             int iterations_left) {
         if (Math100.DEBUG) {
-            Object[] args = { iterations_left, x_0, f_0, x_1, f_1 };
-            System.out.printf("*************** i %d x_0 %.8f f_0 %.8f x_1 %.8f f_1 %.8f\n", args);
+            System.out.printf("*************** i %d x_0 %.8f f_0 %.8f x_1 %.8f f_1 %.8f\n",
+                    iterations_left, x_0, f_0, x_1, f_1);
         }
         if (iterations_left < 0) {
             // ran out of time
@@ -57,14 +57,12 @@ public class Bisection1d {
         double x_guess = (x_1 - x_0) * s_guess + x_0;
         double f_guess = func.applyAsDouble(x_guess);
         if (Math100.DEBUG) {
-            Object[] args1 = { x_guess, f_guess };
-            System.out.printf("************* guess f(%.8f) = %.8f\n", args1);
+            System.out.printf("************* guess f(%.8f) = %.8f\n", x_guess, f_guess);
         }
 
         if (Math.abs(f_guess) < tolerance) {
             if (Math100.DEBUG) {
-                Object[] args2 = { f_guess, tolerance };
-                System.out.printf("guess %.8f less than tolerance %.8f\n", args2);
+                System.out.printf("guess %.8f less than tolerance %.8f\n", f_guess, tolerance);
             }
             return s_guess;
         }

@@ -43,8 +43,7 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     @Override
     public void setVelocity(double setpointM_S, double setpointM_S2) {
         if (DEBUG) {
-            Object[] args = { setpointM_S };
-            System.out.printf("setpointM_S %6.3f\n", args);
+            System.out.printf("setpointM_S %6.3f\n", setpointM_S);
         }
         m_goal = setpointM_S;
         m_mechanism.setVelocity(setpointM_S, setpointM_S2, 0);

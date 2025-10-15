@@ -40,8 +40,8 @@ public class SwerveUtil {
         double backEmfLimitedAcceleration = backEmfLimit * aScale * m_limits.getStallAccelerationM_S2();
         double currentLimitedAcceleration = aScale * m_limits.getMaxDriveAccelerationM_S2();
         if (DEBUG) {
-            Object[] args = { speedFraction, backEmfLimitedAcceleration, currentLimitedAcceleration };
-            System.out.printf("speedFraction %5.2f backEmfLimitedAcceleration %5.2f currentLimitedAcceleration %5.2f\n", args);
+            System.out.printf("speedFraction %5.2f backEmfLimitedAcceleration %5.2f currentLimitedAcceleration %5.2f\n",
+                    speedFraction, backEmfLimitedAcceleration, currentLimitedAcceleration);
         }
         return Math.min(backEmfLimitedAcceleration, currentLimitedAcceleration);
     }

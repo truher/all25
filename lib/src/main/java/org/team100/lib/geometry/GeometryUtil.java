@@ -40,8 +40,7 @@ public class GeometryUtil {
         }
         double scale = dot(a, b) / (norm * norm);
         if (DEBUG) {
-            Object[] args = { scale };
-            System.out.printf("project() scale %.8f\n", args);
+            System.out.printf("project() scale %.8f\n", scale );
         }
         return new ChassisSpeeds(
                 b.vxMetersPerSecond * scale,

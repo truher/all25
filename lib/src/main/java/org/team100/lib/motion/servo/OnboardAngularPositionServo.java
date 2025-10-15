@@ -66,8 +66,7 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
      */
     void actuate(Setpoints1d unwrappedSetpoint, double feedForwardTorqueNm) {
         if (DEBUG) {
-            Object[] args = { unwrappedSetpoint };
-            System.out.printf("setpoint %s\n", args);
+            System.out.printf("setpoint %s\n", unwrappedSetpoint);
         }
 
         Model100 unwrappedMeasurement = m_mechanism.getUnwrappedMeasurement();
@@ -75,15 +74,14 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
         Control100 nextUnwrappedSetpoint = unwrappedSetpoint.next();
 
         if (DEBUG) {
-            Object[] args1 = { unwrappedMeasurement, currentUnwrappedSetpoint };
-            System.out.printf("unwrapped Measurement %s currentUnwrappedSetpoint %s\n", args1);
+            System.out.printf("unwrapped Measurement %s currentUnwrappedSetpoint %s\n",
+                    unwrappedMeasurement, currentUnwrappedSetpoint);
         }
         double u_FB = m_feedback.calculate(unwrappedMeasurement, currentUnwrappedSetpoint);
         double u_FF = nextUnwrappedSetpoint.v();
         double u_TOTAL = u_FB + u_FF;
         if (DEBUG) {
-            Object[] args2 = { u_FB, u_FF, u_TOTAL };
-            System.out.printf("u_FB %6.3f u_FF %6.3f u_TOTAL %6.3f\n", args2);
+            System.out.printf("u_FB %6.3f u_FF %6.3f u_TOTAL %6.3f\n", u_FB, u_FF, u_TOTAL);
         }
 
         m_mechanism.setVelocity(u_TOTAL, nextUnwrappedSetpoint.a(), feedForwardTorqueNm);

@@ -44,8 +44,8 @@ public class ReferenceController {
             GlobalSe2Velocity fieldRelativeTarget = m_controller.calculate(
                     measurement, m_reference.current(), m_reference.next());
             if (DEBUG) {
-                Object[] args = { measurement, m_reference.current(), m_reference.next(), fieldRelativeTarget };
-                System.out.printf("ReferenceController.execute() measurement %s current %s next %s output %s\n", args);
+                System.out.printf("ReferenceController.execute() measurement %s current %s next %s output %s\n", 
+                 measurement, m_reference.current(), m_reference.next(), fieldRelativeTarget );
             }
             if (m_verbatim)
                 m_drive.driveInFieldCoordsVerbatim(fieldRelativeTarget);

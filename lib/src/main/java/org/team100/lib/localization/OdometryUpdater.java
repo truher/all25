@@ -18,7 +18,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 /**
- * Updates SwerveModelHistory with new odometry by selecting the most-recent pose
+ * Updates SwerveModelHistory with new odometry by selecting the most-recent
+ * pose
  * and applying the pose delta represented by the odometry.
  * 
  * Uses the gyro angle and rate instead of the odometry-derived values, because
@@ -124,37 +125,32 @@ public class OdometryUpdater {
         InterpolationRecord value = lowerEntry.getValue();
         SwerveModel previousState = value.m_state;
         if (DEBUG) {
-            Object[] args = { previousState.pose().getX(), previousState.pose().getY() };
-            System.out.printf("previous x %.6f y %.6f\n", args);
+            System.out.printf("previous x %.6f y %.6f\n", previousState.pose().getX(), previousState.pose().getY());
         }
 
         SwerveModuleDeltas modulePositionDelta = SwerveModuleDeltas.modulePositionDelta(
                 value.m_wheelPositions,
                 wheelPositions);
         if (DEBUG) {
-            Object[] args1 = { modulePositionDelta };
-            System.out.printf("modulePositionDelta %s\n", args1);
+            System.out.printf("modulePositionDelta %s\n", modulePositionDelta);
         }
 
         Twist2d twist = m_kinodynamics.getKinematics().toTwist2d(modulePositionDelta);
         if (DEBUG) {
-            Object[] args2 = { twist.dx, twist.dy, twist.dtheta };
-            System.out.printf("twist x %.6f y %.6f theta %.6f\n", args2);
+            System.out.printf("twist x %.6f y %.6f theta %.6f\n", twist.dx, twist.dy, twist.dtheta);
         }
         // replace the twist dtheta with one derived from the current
         // pose angle based on the gyro (which is more accurate)
 
         Rotation2d angle = gyroAngleRadNWU.plus(m_gyroOffset);
         if (DEBUG) {
-            Object[] args3 = { angle.getRadians() };
-            System.out.printf("angle %.6f\n", args3);
+            System.out.printf("angle %.6f\n", angle.getRadians());
         }
         twist.dtheta = angle.minus(previousState.pose().getRotation()).getRadians();
 
         Pose2d newPose = previousState.pose().exp(twist);
         if (DEBUG) {
-            Object[] args4 = { newPose.getX(), newPose.getY() };
-            System.out.printf("new pose x %.6f y %.6f\n", args4);
+            System.out.printf("new pose x %.6f y %.6f\n", newPose.getX(), newPose.getY());
         }
 
         // this is the backward finite difference velocity from odometry

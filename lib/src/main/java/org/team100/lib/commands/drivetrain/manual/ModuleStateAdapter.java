@@ -18,8 +18,7 @@ public class ModuleStateAdapter implements DriverAdapter {
     @Override
     public void apply(SwerveModel s, Velocity t) {
         if (DEBUG) {
-            Object[] args = { t };
-            System.out.printf("ModuleStateDriver %s\n", args);
+            System.out.printf("ModuleStateDriver %s\n",  t );
         }
         m_drive.setRawModuleStates(m_driver.apply(t));
     }

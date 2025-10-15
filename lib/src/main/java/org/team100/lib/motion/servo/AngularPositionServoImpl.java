@@ -177,8 +177,7 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
     /** The reference only understands unwrapped angles. */
     private void initReference(Model100 unwrappedGoal) {
         if (DEBUG) {
-            Object[] args = { m_unwrappedGoal, unwrappedGoal };
-            System.out.printf("initReference old %s new %s\n", args);
+            System.out.printf("initReference old %s new %s\n", m_unwrappedGoal, unwrappedGoal);
         }
         if (unwrappedGoal.near(m_unwrappedGoal, POSITION_TOLERANCE, VELOCITY_TOLERANCE)) {
             // If the new goal is the same as the old goal, no change is needed.

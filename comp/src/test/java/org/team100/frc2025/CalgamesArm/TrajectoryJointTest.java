@@ -64,10 +64,12 @@ public class TrajectoryJointTest {
             JointVelocities jv = J.inverse(m.model());
             JointAccelerations ja = J.inverseA(m);
             if (DEBUG) {
-                Object[] args = { tt, p.getX(), p.getY(), p.getRotation().getRadians(), v.x(), v.y(), v.theta(), a.x(),
-                        a.y(), a.theta(), q.shoulderHeight(), q.shoulderAngle(), q.wristAngle(), jv.elevator(), jv.shoulder(), jv.wrist(),
-                        ja.elevator(), ja.shoulder(), ja.wrist() };
-                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", args);
+                System.out.printf(
+                        "%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt, p.getX(), p.getY(), p.getRotation().getRadians(), v.x(), v.y(), v.theta(), a.x(),
+                        a.y(), a.theta(), q.shoulderHeight(), q.shoulderAngle(), q.wristAngle(), jv.elevator(),
+                        jv.shoulder(), jv.wrist(),
+                        ja.elevator(), ja.shoulder(), ja.wrist());
             }
         }
     }

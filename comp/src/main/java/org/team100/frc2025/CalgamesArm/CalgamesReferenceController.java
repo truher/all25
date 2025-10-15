@@ -26,8 +26,7 @@ public class CalgamesReferenceController {
             SwerveModel current = m_reference.current();
             SwerveModel error = current.minus(measurement);
             if (DEBUG) {
-                Object[] args = { error };
-                System.out.printf("error %s\n", args);
+                System.out.printf("error %s\n", error);
             }
 
             SwerveControl next = m_reference.next();

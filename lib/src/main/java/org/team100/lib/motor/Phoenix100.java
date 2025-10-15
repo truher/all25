@@ -28,7 +28,7 @@ public class Phoenix100 {
         if (ACTUALLY_CRASH)
             System.out.println("WARNING: " + "***** Motor config fail will CRASH the robot, NOT FOR COMP! *****");
         // else
-        // Util.warn("***** Motor config fail will not be caught, NOT FOR DEV! *****");
+        // StrUtil.warn("***** Motor config fail will not be caught, NOT FOR DEV! *****");
 
     }
 

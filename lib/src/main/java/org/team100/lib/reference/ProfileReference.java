@@ -104,8 +104,7 @@ public class ProfileReference implements SwerveReference {
 
     private SwerveControl makeNext(SwerveModel current) {
         if (DEBUG) {
-            Object[] args = { m_name };
-            System.out.printf("ProfileReference refreshing %s\n", args);
+            System.out.printf("ProfileReference refreshing %s\n", m_name);
         }
         if (current == null) {
             // happens at startup

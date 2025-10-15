@@ -17,7 +17,7 @@ import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
  * Keeps the current setpoint, to avoid round-tripping through the pose
  * estimator. Remember to update the setpoint!
  */
-public class SwerveLimiter  {
+public class SwerveLimiter {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_norm;
@@ -60,8 +60,7 @@ public class SwerveLimiter  {
         m_log_next.log(() -> nextReference);
         m_log_normIn.log(nextReference::norm);
         if (DEBUG) {
-            Object[] args = { nextReference };
-            System.out.printf("nextReference %s\n", args);
+            System.out.printf("nextReference %s\n",  nextReference );
         }
         if (m_current == null)
             m_current = nextReference;
@@ -69,22 +68,19 @@ public class SwerveLimiter  {
         // First, limit the goal to a feasible velocity.
         GlobalSe2Velocity result = m_velocityLimiter.apply(nextReference);
         if (DEBUG) {
-            Object[] args1 = { result };
-            System.out.printf("velocity limited %s\n", args1);
+            System.out.printf("velocity limited %s\n", result );
         }
 
         // then limit acceleration towards that goal to avoid capsize
         result = m_capsizeLimiter.apply(m_current, result);
         if (DEBUG) {
-            Object[] args2 = { result };
-            System.out.printf("capsize limited %s\n", args2);
+            System.out.printf("capsize limited %s\n", result);
         }
 
         // Finally, limit acceleration further, using motor physics.
         result = m_accelerationLimiter.apply(m_current, result);
         if (DEBUG) {
-            Object[] args3 = { result };
-            System.out.printf("accel limited %s\n", args3);
+            System.out.printf("accel limited %s\n", result);
         }
 
         // Ignore very small inputs.
@@ -95,8 +91,7 @@ public class SwerveLimiter  {
         updateSetpoint(result);
 
         if (DEBUG) {
-            Object[] args4 = { result };
-            System.out.printf("result %s\n", args4);
+            System.out.printf("result %s\n", result );
         }
         m_log_norm.log(result::norm);
 

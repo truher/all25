@@ -56,8 +56,7 @@ public interface LynxArmKinematics {
         // it's not vertical.
         double yaw = p.getTranslation().toTranslation2d().getAngle().getRadians();
         if (DEBUG) {
-            Object[] args = { yaw };
-            System.out.printf("yaw %s\n", args);
+            System.out.printf("yaw %s\n", yaw);
         }
 
         Vector<N3> normal = Vector.cross(
@@ -93,8 +92,7 @@ public interface LynxArmKinematics {
         // it's not vertical.
         double yaw = p.getTranslation().toTranslation2d().getAngle().getRadians();
         if (DEBUG) {
-            Object[] args = { yaw };
-            System.out.printf("yaw %s\n", args);
+            System.out.printf("yaw %s\n", yaw);
         }
         return new Pose3d(new Translation3d(p.getX(), p.getY(), p.getZ()),
                 new Rotation3d(p.getRotation().getX(), p.getRotation().getY(), yaw));

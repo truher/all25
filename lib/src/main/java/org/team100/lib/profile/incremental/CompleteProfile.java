@@ -272,8 +272,9 @@ public class CompleteProfile implements IncrementalProfile {
         double jerkLimitedAcceleration = Math.abs(setpoint.a()) + m_takeoffJ * dt;
 
         if (DEBUG) {
-            Object[] args = { speedFraction, backEmfLimitedAcceleration, currentLimitedAcceleration, jerkLimitedAcceleration };
-            System.out.printf("fraction %5.2f backEmfLimited %5.2f currentLimited %5.2f jerklimited %5.2f\n", args);
+            System.out.printf("fraction %5.2f backEmfLimited %5.2f currentLimited %5.2f jerklimited %5.2f\n",
+                    speedFraction, backEmfLimitedAcceleration, currentLimitedAcceleration,
+                    jerkLimitedAcceleration);
         }
 
         return Math.min(Math.min(backEmfLimitedAcceleration, currentLimitedAcceleration), jerkLimitedAcceleration);
@@ -285,12 +286,10 @@ public class CompleteProfile implements IncrementalProfile {
     private void put(double t, Control100 c) {
         // t is just for debug
         if (DEBUG) {
-            Object[] args = { t, c.x(), c.v(), c.a() };
-            System.out.printf("%12.4f %12.4f %12.4f %12.4f\n", args);
+            System.out.printf("%12.4f %12.4f %12.4f %12.4f\n", t, c.x(), c.v(), c.a());
         }
         if (DEBUG) {
-            Object[] args1 = { t, -c.x(), -c.v(), -c.a() };
-            System.out.printf("%12.4f %12.4f %12.4f %12.4f\n", args1);
+            System.out.printf("%12.4f %12.4f %12.4f %12.4f\n", t, -c.x(), -c.v(), -c.a());
         }
         m_byDistance.put(c.x(), c);
         m_byDistance.put(-c.x(), c.mult(-1.0));

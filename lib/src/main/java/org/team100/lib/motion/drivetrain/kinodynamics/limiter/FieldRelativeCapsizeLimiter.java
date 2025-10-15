@@ -13,7 +13,7 @@ import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 /**
  * Limits acceleration to avoid tipping over.
  */
-public class FieldRelativeCapsizeLimiter  {
+public class FieldRelativeCapsizeLimiter {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_scale;
@@ -53,8 +53,8 @@ public class FieldRelativeCapsizeLimiter  {
         m_log_scale.log(() -> scale);
         GlobalSe2Velocity result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
         if (DEBUG) {
-            Object[] args = { prev, target, accel, scale, result };
-            System.out.printf("FieldRelativeCapsizeLimiter prev %s target %s accel %s scale %5.2f result %s\n", args);
+            System.out.printf("FieldRelativeCapsizeLimiter prev %s target %s accel %s scale %5.2f result %s\n",
+                    prev, target, accel, scale, result);
         }
         return result;
     }

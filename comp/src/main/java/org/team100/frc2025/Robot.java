@@ -138,15 +138,13 @@ public class Robot extends TimedRobot100 {
         // By default, LiveWindow turns off the CommandScheduler in test mode,
         // but we don't want that.
         enableLiveWindowInTest(false);
-        Object[] args = { WPILibVersion.Version };
 
         // CanBridge.runTCP();
 
-        System.out.printf("WPILib Version: %s\n", args);
-        Object[] args1 = { RobotController.getSerialNumber() }; // 2023.2.1
-        System.out.printf("RoboRIO serial number: %s\n", args1);
-        Object[] args2 = { Identity.instance.name() };
-        System.out.printf("Identity: %s\n", args2);
+        System.out.printf("WPILib Version: %s\n", WPILibVersion.Version);
+        // 2023.2.1
+        System.out.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
+        System.out.printf("Identity: %s\n", Identity.instance.name());
         RobotController.setBrownoutVoltage(5.5);
         banner();
 
@@ -158,8 +156,7 @@ public class Robot extends TimedRobot100 {
         final Async async = asyncFactory.get();
         final Logging logging = Logging.instance();
         final LevelPoller poller = new LevelPoller(async, logging::setLevel, Level.TRACE);
-        Object[] args3 = { poller.getLevel().name() };
-        System.out.printf("Using log level %s\n", args3);
+        System.out.printf("Using log level %s\n", poller.getLevel().name());
         System.out.println((Object) "Do not use TRACE in comp, with NT logging, it will overrun");
         final LoggerFactory fieldLogger = logging.fieldLogger;
         final FieldLogger.Log fieldLog = new FieldLogger.Log(fieldLogger);
@@ -513,8 +510,7 @@ public class Robot extends TimedRobot100 {
         );
 
         initStuff();
-        Object[] args4 = { Logging.instance().keyCount() };
-        System.out.printf("Total Logger Keys: %d\n", args4);
+        System.out.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
 
     }
 
@@ -562,7 +558,7 @@ public class Robot extends TimedRobot100 {
         m_log_voltage.log(RobotController::getBatteryVoltage);
 
         if (Experiments.instance.enabled(Experiment.FlushOften)) {
-            // Util.warn("FLUSHING EVERY LOOP, DO NOT USE IN COMP");
+            // StrUtil.warn("FLUSHING EVERY LOOP, DO NOT USE IN COMP");
             NetworkTableInstance.getDefault().flush();
         }
 
@@ -773,8 +769,7 @@ public class Robot extends TimedRobot100 {
         } catch (InterruptedException e) {
 
         }
-        Object[] args = { endS - startS };
-        System.out.printf("\n*** PREWARM END ET: %f\n", args);
+        System.out.printf("\n*** PREWARM END ET: %f\n", endS - startS);
     }
 
     private void banner() {

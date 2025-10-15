@@ -93,7 +93,7 @@ public class URDFRobot<Q extends Num> {
      * if not, then the "error" is between two tangent vectors whose origin is far
      * away.
      */
-    public  Map<String, Double> inverse(
+    public Map<String, Double> inverse(
             Vector<Q> q0,
             double dqLimit,
             String jointName,
@@ -136,8 +136,7 @@ public class URDFRobot<Q extends Num> {
 
         if (DEBUG) {
             long finishTime = System.nanoTime();
-            Object[] args = { ((double) finishTime - startTime) / 1000000 };
-            System.out.printf("ET (ms): %6.3f\n", args);
+            System.out.printf("ET (ms): %6.3f\n", ((double) finishTime - startTime) / 1000000);
         }
         return qMap(qVec);
     }

@@ -28,7 +28,7 @@ public class SimulatedObjectDetector {
      * 
      * @param robotPose    Pose of the robot
      * @param cameraOffset relative to the robot
-     * @param objects        field relative translation of any objects
+     * @param objects      field relative translation of any objects
      */
     public static List<Rotation3d> getRotations(
             Pose2d robotPose,
@@ -37,8 +37,7 @@ public class SimulatedObjectDetector {
         ArrayList<Rotation3d> list = new ArrayList<>();
         for (Translation2d object : objects) {
             if (DEBUG) {
-                Object[] args = { object };
-                System.out.printf("object %s\n", args);
+                System.out.printf("object %s\n", object);
             }
             getRotInCamera(robotPose, cameraOffset, object).ifPresent(list::add);
         }
@@ -60,14 +59,12 @@ public class SimulatedObjectDetector {
         if (Math.abs(rot.getY()) >= VFOV_HALF
                 && Math.abs(rot.getZ()) >= HFOV_HALF) {
             if (DEBUG) {
-                Object[] args = {};
-                System.out.printf("out of frame\n", args);
+                System.out.print("out of frame\n");
             }
             return Optional.empty();
         }
         if (DEBUG) {
-            Object[] args = { rot };
-            System.out.printf("rot %s\n", args);
+            System.out.printf("rot %s\n", rot);
         }
         return Optional.of(rot);
     }

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import org.team100.lib.util.Util;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 
@@ -104,19 +102,18 @@ public class Cache {
     /** Fetches fresh values for every stale cache. Should be called after reset. */
     private static void update() {
         if (DEBUG) {
-            Object[] args = { caches.size() };
-            System.out.printf("Cache update %d\n", args);
+            System.out.printf("Cache update %d\n", caches.size());
         }
         if (!signals.isEmpty()) {
             StatusCode result = BaseStatusSignal.refreshAll(signals.toArray(new BaseStatusSignal[0]));
             if (result != StatusCode.OK) {
-                Util.warnf("RefreshAll failed: %s: %s\n", result.toString(), result.getDescription());
+                System.out.printf("WARNING: RefreshAll failed: %s: %s\n",
+                        result.toString(), result.getDescription());
             }
         }
         for (CotemporalCache<?> r : caches) {
             if (DEBUG) {
-                Object[] args1 = { r.get().getClass().getSimpleName() };
-                System.out.printf("update %s\n", args1);
+                System.out.printf("update %s\n", r.get().getClass().getSimpleName());
             }
             r.get();
         }

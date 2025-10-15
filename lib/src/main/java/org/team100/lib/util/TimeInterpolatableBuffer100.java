@@ -45,8 +45,7 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>> {
      */
     public void put(double timeS, T value) {
         if (DEBUG) {
-            Object[] args = { timeS, value };
-            System.out.printf("put %f %s\n", args);
+            System.out.printf("put %f %s\n", timeS, value);
         }
         try {
             // wait for in-progress double-reads
@@ -71,8 +70,7 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>> {
      */
     public void reset(double timeS, T value) {
         if (DEBUG) {
-            Object[] args = { timeS, value };
-            System.out.printf("reset %f %s\n", args);
+            System.out.printf("reset %f %s\n", timeS, value);
         }
         try {
             // wait for in-progress double-reads
@@ -92,8 +90,7 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>> {
         T nowEntry = m_pastSnapshots.get(timeSeconds);
         if (nowEntry != null) {
             if (DEBUG) {
-                Object[] args = { timeSeconds };
-                System.out.printf("record for now %.2f\n", args);
+                System.out.printf("record for now %.2f\n", timeSeconds);
             }
             return nowEntry;
         }
@@ -127,8 +124,7 @@ public class TimeInterpolatableBuffer100<T extends Interpolatable<T>> {
         double timeSpan = topBound.getKey() - bottomBound.getKey();
         double timeFraction = timeSinceBottom / timeSpan;
         if (DEBUG) {
-            Object[] args = { timeFraction };
-            System.out.printf("interpolate %f\n", args);
+            System.out.printf("interpolate %f\n", timeFraction);
         }
         return bottomBound.getValue().interpolate(topBound.getValue(), timeFraction);
     }
