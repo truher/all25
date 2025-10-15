@@ -21,9 +21,10 @@ import edu.wpi.first.wpilibj2.command.Command;
  * it, and then sweep the intake over the target.
  */
 public class FloorPickSequence {
+
     // landing point distance to target
     private static final double DISTANCE = 1.0;
-    // pick is from the back
+    private static final double PICKOFFSET = 0.193;  // pick is from the back
     private static final Rotation2d RELATIVE_BEARING = Rotation2d.k180deg;
 
     public static Command get(
@@ -32,7 +33,8 @@ public class FloorPickSequence {
             Targets targets,
             SwerveController controller,
             HolonomicProfile profile) {
-        Supplier<Optional<Translation2d>> target = () -> targets.getClosestTarget();
+        Supplier<Optional<Translation2d>> target = () -> Optional.of(targets.getClosestTarget().get().plus(new Translation2d(0,PICKOFFSET
+        )));
         Supplier<Optional<Translation2d>> runway = () -> {
             Optional<Translation2d> t = target.get();
             if (t.isEmpty())
