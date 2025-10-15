@@ -38,8 +38,6 @@ public class SwerveModuleDelta {
      * 
      * Note this is the field-relative wrapped angle, i.e. it's just dy/dx for the
      * delta.
-     * 
-     * TODO: maybe this should be sin and cos instead of an actual angle
      */
     public Optional<Rotation2d> wrappedAngle = Optional.empty();
 
@@ -52,6 +50,7 @@ public class SwerveModuleDelta {
 
     public SwerveModuleDelta(double distanceMeters, Optional<Rotation2d> angle) {
         this.distanceMeters = distanceMeters;
+        // force the angle value to be wrapped
         this.wrappedAngle = angle.map((x) -> new Rotation2d(x.getCos(), x.getSin()));
     }
 
