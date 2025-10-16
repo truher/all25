@@ -234,22 +234,21 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         // m_stateSupplier.reset();
         m_log_state.log(this::getState);
         m_log_turning.log(() -> getPose().getRotation().getDegrees());
-        m_log_pose_array.log(
-                () -> new double[] {
-                        getPose().getX(),
-                        getPose().getY(),
-                        getPose().getRotation().getRadians()
-                });
+        m_log_pose_array.log(this::poseArray);
 
         // Update the Field2d widget
         // the name "field" is used by Field2d.
         // the name "robot" can be anything.
-        m_log_field_robot.log(() -> new double[] {
+        m_log_field_robot.log(this::poseArray);
+        m_swerveLocal.periodic();
+    }
+
+    private double[] poseArray() {
+        return new double[] {
                 getPose().getX(),
                 getPose().getY(),
                 getPose().getRotation().getDegrees()
-        });
-        m_swerveLocal.periodic();
+        };
     }
 
     public void close() {
