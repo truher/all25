@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.TargetUtil;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.FieldLogger;
@@ -12,12 +13,11 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -75,7 +75,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
     }
 
     @Override
-    public void reset(SwerveModel state) {
+    public void reset(ModelR3 state) {
         m_thetaSetpoint = state.theta().control();
         m_controller.reset();
     }
@@ -89,8 +89,8 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public GlobalSe2Velocity apply(
-            final SwerveModel state,
+    public GlobalVelocityR3 apply(
+            final ModelR3 state,
             final Velocity input) {
 
         //
@@ -105,7 +105,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
         // clip the input to the unit circle
         Velocity clipped = input.clip(1.0);
         Optional<Translation2d> target = m_target.get();
-        GlobalSe2Velocity scaledInput = FieldRelativeDriver.scale(
+        GlobalVelocityR3 scaledInput = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
@@ -150,7 +150,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
                 target.get().getY(),
                 0 });
 
-        return new GlobalSe2Velocity(
+        return new GlobalVelocityR3(
                 scaledInput.x(),
                 scaledInput.y(),
                 omega);

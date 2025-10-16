@@ -5,13 +5,13 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.geometry.GlobalDeltaR3;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -123,7 +123,7 @@ public class OdometryUpdater {
 
         double dt = currentTimeS - lowerEntry.getKey();
         InterpolationRecord value = lowerEntry.getValue();
-        SwerveModel previousState = value.m_state;
+        ModelR3 previousState = value.m_state;
         if (DEBUG) {
             System.out.printf("previous x %.6f y %.6f\n", previousState.pose().getX(), previousState.pose().getY());
         }
@@ -154,17 +154,17 @@ public class OdometryUpdater {
         }
 
         // this is the backward finite difference velocity from odometry
-        FieldRelativeDelta odoVelo = FieldRelativeDelta.delta(
+        GlobalDeltaR3 odoVelo = GlobalDeltaR3.delta(
                 previousState.pose(), newPose)
                 .div(dt);
 
         // use the gyro rate instead of the odometry-derived rate
-        GlobalSe2Velocity velocity = new GlobalSe2Velocity(
+        GlobalVelocityR3 velocity = new GlobalVelocityR3(
                 odoVelo.getX(),
                 odoVelo.getY(),
                 gyroRateRad_SNWU);
 
-        SwerveModel swerveState = new SwerveModel(newPose, velocity);
+        ModelR3 swerveState = new ModelR3(newPose, velocity);
 
         m_history.put(currentTimeS, swerveState, wheelPositions);
     }

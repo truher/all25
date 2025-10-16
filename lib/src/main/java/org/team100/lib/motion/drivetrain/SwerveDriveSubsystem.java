@@ -7,6 +7,7 @@ import org.team100.lib.config.DriverSkill;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.logging.Level;
@@ -14,14 +15,13 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
-import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
-import org.team100.lib.logging.LoggerFactory.SwerveModelLogger;
+import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,15 +47,15 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     private final SwerveLimiter m_limiter;
 
     // CACHES
-    private final CotemporalCache<SwerveModel> m_stateCache;
+    private final CotemporalCache<ModelR3> m_stateCache;
 
     // LOGGERS
-    private final SwerveModelLogger m_log_state;
+    private final ModelR3Logger m_log_state;
     private final DoubleLogger m_log_turning;
     private final DoubleArrayLogger m_log_pose_array;
     private final DoubleArrayLogger m_log_field_robot;
     private final EnumLogger m_log_skill;
-    private final FieldRelativeVelocityLogger m_log_input;
+    private final GlobalVelocityR3Logger m_log_input;
 
     public SwerveDriveSubsystem(
             LoggerFactory fieldLogger,
@@ -72,12 +72,12 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         m_limiter = limiter;
         m_stateCache = Cache.of(this::update);
         stop();
-        m_log_state = child.swerveModelLogger(Level.COMP, "state");
+        m_log_state = child.modelR3Logger(Level.COMP, "state");
         m_log_turning = child.doubleLogger(Level.TRACE, "Tur Deg");
         m_log_pose_array = child.doubleArrayLogger(Level.COMP, "pose array");
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
         m_log_skill = child.enumLogger(Level.TRACE, "skill level");
-        m_log_input = child.fieldRelativeVelocityLogger(Level.TRACE, "drive input");
+        m_log_input = child.globalVelocityR3Logger(Level.TRACE, "drive input");
     }
 
     ////////////////
@@ -94,10 +94,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      * of your command, see DriveManually).
      */
     @Override
-    public void driveInFieldCoords(final GlobalSe2Velocity input) {
+    public void driveInFieldCoords(final GlobalVelocityR3 input) {
         // scale for driver skill; default is half speed.
         final DriverSkill.Level driverSkillLevel = DriverSkill.level();
-        GlobalSe2Velocity scaled = GeometryUtil.scale(input, driverSkillLevel.scale());
+        GlobalVelocityR3 scaled = GeometryUtil.scale(input, driverSkillLevel.scale());
 
         // NEW! Apply field-relative limits here.
         if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {
@@ -126,7 +126,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     }
 
     /** Skip all scaling, setpoint generator, etc. */
-    public void driveInFieldCoordsVerbatim(GlobalSe2Velocity input) {
+    public void driveInFieldCoordsVerbatim(GlobalVelocityR3 input) {
         // keep the limiter up to date on what we're doing
         m_limiter.updateSetpoint(input);
 
@@ -214,7 +214,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      * acceleration.
      */
     @Override
-    public SwerveModel getState() {
+    public ModelR3 getState() {
         return m_stateCache.get();
     }
 
@@ -234,22 +234,21 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         // m_stateSupplier.reset();
         m_log_state.log(this::getState);
         m_log_turning.log(() -> getPose().getRotation().getDegrees());
-        m_log_pose_array.log(
-                () -> new double[] {
-                        getPose().getX(),
-                        getPose().getY(),
-                        getPose().getRotation().getRadians()
-                });
+        m_log_pose_array.log(this::poseArray);
 
         // Update the Field2d widget
         // the name "field" is used by Field2d.
         // the name "robot" can be anything.
-        m_log_field_robot.log(() -> new double[] {
+        m_log_field_robot.log(this::poseArray);
+        m_swerveLocal.periodic();
+    }
+
+    private double[] poseArray() {
+        return new double[] {
                 getPose().getX(),
                 getPose().getY(),
                 getPose().getRotation().getDegrees()
-        });
-        m_swerveLocal.periodic();
+        };
     }
 
     public void close() {
@@ -262,13 +261,13 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      * Compute the current state. This is a fairly heavyweight thing to do, so it
      * should be cached (thus refreshed once per cycle).
      */
-    private SwerveModel update() {
+    private ModelR3 update() {
         double now = Takt.get();
         SwerveModulePositions positions = m_swerveLocal.positions();
         // now that the pose estimator uses the SideEffect thing, we don't need this.
         // m_odometryUpdater.update();
         // m_cameraUpdater.run();
-        SwerveModel swerveModel = m_estimate.apply(now);
+        ModelR3 swerveModel = m_estimate.apply(now);
         if (DEBUG) {
             System.out.printf("update() positions %s estimated pose: %s\n", positions, swerveModel);
         }
@@ -281,7 +280,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     }
 
     /** Return cached velocity. */
-    public GlobalSe2Velocity getVelocity() {
+    public GlobalVelocityR3 getVelocity() {
         return m_stateCache.get().velocity();
     }
 

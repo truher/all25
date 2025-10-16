@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -18,9 +19,8 @@ import org.team100.lib.motion.drivetrain.Fixtured;
 import org.team100.lib.motion.drivetrain.MockDrive;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.reference.TrajectoryReference;
+import org.team100.lib.reference.TrajectoryReferenceR3;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -57,12 +57,12 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
 
         MockDrive drive = new MockDrive();
         // initially at rest
-        drive.m_state = new SwerveModel();
+        drive.m_state = new ModelR3();
 
         ReferenceController c = new ReferenceController(
                 drive,
                 controller,
-                new TrajectoryReference(t), false);
+                new TrajectoryReferenceR3(t), false);
 
         stepTime();
         c.execute();
@@ -108,12 +108,12 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
 
         MockDrive drive = new MockDrive();
         // initially at rest
-        drive.m_state = new SwerveModel();
+        drive.m_state = new ModelR3();
 
         ReferenceController c = new ReferenceController(
                 drive,
                 controller,
-                new TrajectoryReference(t),
+                new TrajectoryReferenceR3(t),
                 false);
 
         // the measurement never changes but that doesn't affect "done" as far as the
@@ -122,7 +122,7 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
             stepTime();
             c.execute();
             // we have magically reached the end
-            drive.m_state = new SwerveModel(new Pose2d(1, 0, Rotation2d.kZero));
+            drive.m_state = new ModelR3(new Pose2d(1, 0, Rotation2d.kZero));
         }
         assertTrue(c.isDone());
 
@@ -162,15 +162,15 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
                 0.01, 0.02);
 
         MockDrive drive = new MockDrive();
-        drive.m_state = new SwerveModel();
+        drive.m_state = new ModelR3();
         ReferenceController referenceController = new ReferenceController(
                 drive,
                 swerveController,
-                new TrajectoryReference(trajectory),
+                new TrajectoryReferenceR3(trajectory),
                 false);
 
         Pose2d pose = trajectory.sample(0).state().getPose();
-        GlobalSe2Velocity velocity = GlobalSe2Velocity.zero();
+        GlobalVelocityR3 velocity = GlobalVelocityR3.zero();
 
         double mDt = 0.02;
         int i = 0;
@@ -178,7 +178,7 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
             if (++i > 500)
                 break;
             stepTime();
-            drive.m_state = new SwerveModel(pose, velocity);
+            drive.m_state = new ModelR3(pose, velocity);
             referenceController.execute();
             velocity = drive.m_recentSetpoint;
             pose = new Pose2d(

@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -12,10 +13,9 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -89,7 +89,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
     }
 
     @Override
-    public void reset(SwerveModel state) {
+    public void reset(ModelR3 state) {
         m_thetaSetpoint = state.theta().control();
         m_goal = null;
         m_latch.unlatch();
@@ -110,8 +110,8 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public GlobalSe2Velocity apply(
-            final SwerveModel state,
+    public GlobalVelocityR3 apply(
+            final ModelR3 state,
             final Velocity twist1_1) {
         final Model100 thetaState = state.theta();
         final double yawMeasurement = thetaState.x();
@@ -120,7 +120,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
         // clip the input to the unit circle
         final Velocity clipped = twist1_1.clip(1.0);
         // scale to max in both translation and rotation
-        final GlobalSe2Velocity scaled = FieldRelativeDriver.scale(
+        final GlobalVelocityR3 scaled = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
@@ -161,7 +161,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
                 -m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
 
-        final GlobalSe2Velocity withSnap = new GlobalSe2Velocity(scaled.x(), scaled.y(), omega);
+        final GlobalVelocityR3 withSnap = new GlobalVelocityR3(scaled.x(), scaled.y(), omega);
 
         m_log_snap_mode.log(() -> true);
         m_log_goal_theta.log(m_goal::getRadians);

@@ -1,10 +1,11 @@
 package org.team100.lib.motion.kinematics;
 
 import java.util.function.Function;
+
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.optimization.NumericalJacobian100;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -34,19 +35,19 @@ public class Jacobian {
     /**
      * Given a joint configuration and velocities, what is the cartesian velocity?
      */
-    public GlobalSe2Velocity forward(Config c, JointVelocities v) {
+    public GlobalVelocityR3 forward(Config c, JointVelocities v) {
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
                 Nat.N3(), Nat.N3(), m_f, config(c));
-        return GlobalSe2Velocity.fromVector(j.times(v.toVector()));
+        return GlobalVelocityR3.fromVector(j.times(v.toVector()));
     }
 
     /**
      * Given a state (position and velocity), what are the joint velocities?
      * It's a bit weird to use "swerve" here. Maybe rename this SE2Model?
      */
-    public JointVelocities inverse(SwerveModel swerveModel) {
+    public JointVelocities inverse(ModelR3 swerveModel) {
         Pose2d p = swerveModel.pose();
-        GlobalSe2Velocity v = swerveModel.velocity();
+        GlobalVelocityR3 v = swerveModel.velocity();
         Config c = m_k.inverse(p);
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
                 Nat.N3(), Nat.N3(), m_f, config(c));

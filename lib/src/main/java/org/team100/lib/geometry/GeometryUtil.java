@@ -2,8 +2,6 @@ package org.team100.lib.geometry;
 
 import java.util.Optional;
 
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -56,7 +54,7 @@ public class GeometryUtil {
         return a.getX() * b.getX() + a.getY() * b.getY();
     }
 
-    public static double dot(Translation2d a, GlobalSe2Velocity b) {
+    public static double dot(Translation2d a, GlobalVelocityR3 b) {
         return a.getX() * b.x() + a.getY() * b.y();
     }
 
@@ -72,8 +70,8 @@ public class GeometryUtil {
         return new Twist2d(twist.dx * scale, twist.dy * scale, twist.dtheta * scale);
     }
 
-    public static GlobalSe2Velocity scale(GlobalSe2Velocity v, double scale) {
-        return new GlobalSe2Velocity(v.x() * scale, v.y() * scale, v.theta() * scale);
+    public static GlobalVelocityR3 scale(GlobalVelocityR3 v, double scale) {
+        return new GlobalVelocityR3(v.x() * scale, v.y() * scale, v.theta() * scale);
     }
 
     public static Pose2d transformBy(Pose2d a, Pose2d b) {

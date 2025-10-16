@@ -9,15 +9,15 @@ import org.team100.lib.state.Model100;
 /**
  * Extracts current and next references from an incremental profile.
  */
-public class IncrementalProfileReference1d implements ProfileReference1d {
+public class IncrementalProfileReferenceR1 implements ProfileReferenceR1 {
     private final IncrementalProfile m_profile;
     private final double m_positionTolerance;
     private final double m_velocityTolerance;
     private Model100 m_goal;
     private double m_currentInstant;
-    private Setpoints1d m_currentSetpoint;
+    private SetpointsR1 m_currentSetpoint;
 
-    public IncrementalProfileReference1d(
+    public IncrementalProfileReferenceR1(
             IncrementalProfile profile,
             double positionTolerance,
             double velocityTolerance) {
@@ -38,7 +38,7 @@ public class IncrementalProfileReference1d implements ProfileReference1d {
     }
 
     @Override
-    public Setpoints1d get() {
+    public SetpointsR1 get() {
         double t = Takt.get();
         if (t == m_currentInstant) {
             // Time hasn't passed since last time, so don't change anything.
@@ -60,10 +60,10 @@ public class IncrementalProfileReference1d implements ProfileReference1d {
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Setpoints1d advance(Control100 newCurrent) {
+    private SetpointsR1 advance(Control100 newCurrent) {
         if (m_goal == null)
             throw new IllegalStateException("goal must be set");
         Control100 next = m_profile.calculate(TimedRobot100.LOOP_PERIOD_S, newCurrent, m_goal);
-        return new Setpoints1d(newCurrent, next);
+        return new SetpointsR1(newCurrent, next);
     }
 }

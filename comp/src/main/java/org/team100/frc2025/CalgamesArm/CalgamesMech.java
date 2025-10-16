@@ -22,21 +22,19 @@ import org.team100.lib.encoder.RotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
 import org.team100.lib.encoder.Talon6Encoder;
+import org.team100.lib.geometry.GlobalAccelerationR3;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ConfigLogger;
-import org.team100.lib.logging.LoggerFactory.FieldRelativeAccelerationLogger;
-import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
+import org.team100.lib.logging.LoggerFactory.GlobalAccelerationR3Logger;
+import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
 import org.team100.lib.logging.LoggerFactory.JointAccelerationsLogger;
 import org.team100.lib.logging.LoggerFactory.JointForceLogger;
 import org.team100.lib.logging.LoggerFactory.JointVelocitiesLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
 import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
 import org.team100.lib.motion.kinematics.JointAccelerations;
@@ -50,6 +48,8 @@ import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.motor.Talon6Motor;
 import org.team100.lib.music.Music;
+import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.StrUtil;
@@ -102,8 +102,8 @@ public class CalgamesMech extends SubsystemBase implements Music {
     private final JointForceLogger m_log_jointF;
 
     private final Pose2dLogger m_log_pose;
-    private final FieldRelativeVelocityLogger m_log_cartesianV;
-    private final FieldRelativeAccelerationLogger m_log_cartesianA;
+    private final GlobalVelocityR3Logger m_log_cartesianV;
+    private final GlobalAccelerationR3Logger m_log_cartesianA;
 
     private final LinearMechanism m_elevatorFront;
     private final LinearMechanism m_elevatorBack;
@@ -140,8 +140,8 @@ public class CalgamesMech extends SubsystemBase implements Music {
 
         LoggerFactory cartesianLog = parent.name("cartesian");
         m_log_pose = cartesianLog.pose2dLogger(Level.DEBUG, "pose");
-        m_log_cartesianV = cartesianLog.fieldRelativeVelocityLogger(Level.DEBUG, "velocity");
-        m_log_cartesianA = cartesianLog.fieldRelativeAccelerationLogger(Level.DEBUG, "accel");
+        m_log_cartesianV = cartesianLog.globalVelocityR3Logger(Level.DEBUG, "velocity");
+        m_log_cartesianA = cartesianLog.globalAccelerationR3Logger(Level.DEBUG, "accel");
 
         LoggerFactory elevatorbackLog = parent.name("elevatorBack");
         LoggerFactory elevatorfrontLog = parent.name("elevatorFront");
@@ -317,16 +317,16 @@ public class CalgamesMech extends SubsystemBase implements Music {
                 m_wrist.getVelocityRad_S());
     }
 
-    public SwerveModel getState() {
+    public ModelR3 getState() {
         Config c = getConfig();
         JointVelocities jv = getJointVelocity();
         Pose2d p = m_kinematics.forward(c);
-        GlobalSe2Velocity v = m_jacobian.forward(c, jv);
-        return new SwerveModel(p, v);
+        GlobalVelocityR3 v = m_jacobian.forward(c, jv);
+        return new ModelR3(p, v);
     }
 
     /** There are no profiles here, so this control needs to be feasible. */
-    public void set(SwerveControl control) {
+    public void set(ControlR3 control) {
         Pose2d pose = control.pose();
         Config config = m_kinematics.inverse(pose);
         if (DEBUG) {
@@ -642,8 +642,8 @@ public class CalgamesMech extends SubsystemBase implements Music {
         m_log_jointA.log(() -> ja);
         m_log_jointF.log(() -> jf);
         Pose2d p = m_kinematics.forward(c);
-        GlobalSe2Velocity v = m_jacobian.forward(c, jv);
-        GlobalSe2Acceleration a = m_jacobian.forwardA(c, jv, ja);
+        GlobalVelocityR3 v = m_jacobian.forward(c, jv);
+        GlobalAccelerationR3 a = m_jacobian.forwardA(c, jv, ja);
         m_log_pose.log(() -> p);
         m_log_cartesianV.log(() -> v);
         m_log_cartesianA.log(() -> a);

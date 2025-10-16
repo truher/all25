@@ -1,8 +1,8 @@
 package org.team100.frc2025.CalgamesArm;
 
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.reference.SwerveReference;
+import org.team100.lib.reference.ReferenceR3;
+import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ModelR3;
 
 /**
  * Like the drivetrain ReferenceController, but it does
@@ -12,9 +12,9 @@ public class CalgamesReferenceController {
     private static final boolean DEBUG = false;
 
     private final CalgamesMech m_subsystem;
-    private final SwerveReference m_reference;
+    private final ReferenceR3 m_reference;
 
-    public CalgamesReferenceController(CalgamesMech subsystem, SwerveReference reference) {
+    public CalgamesReferenceController(CalgamesMech subsystem, ReferenceR3 reference) {
         m_subsystem = subsystem;
         m_reference = reference;
         m_reference.initialize(m_subsystem.getState());
@@ -22,14 +22,14 @@ public class CalgamesReferenceController {
 
     public void execute() {
         try {
-            SwerveModel measurement = m_subsystem.getState();
-            SwerveModel current = m_reference.current();
-            SwerveModel error = current.minus(measurement);
+            ModelR3 measurement = m_subsystem.getState();
+            ModelR3 current = m_reference.current();
+            ModelR3 error = current.minus(measurement);
             if (DEBUG) {
                 System.out.printf("error %s\n", error);
             }
 
-            SwerveControl next = m_reference.next();
+            ControlR3 next = m_reference.next();
             m_subsystem.set(next);
         } catch (IllegalStateException ex) {
             // System.out.println(ex);
@@ -49,8 +49,8 @@ public class CalgamesReferenceController {
 
     /** Distance between the measurement and the goal. */
     public double toGo() {
-        SwerveModel goal = m_reference.goal();
-        SwerveModel measurement = m_subsystem.getState();
+        ModelR3 goal = m_reference.goal();
+        ModelR3 measurement = m_subsystem.getState();
         return goal.minus(measurement).translation().getNorm();
     }
 

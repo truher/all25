@@ -7,8 +7,8 @@ import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.Model100Logger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
-import org.team100.lib.reference.ProfileReference1d;
-import org.team100.lib.reference.Setpoints1d;
+import org.team100.lib.reference.ProfileReferenceR1;
+import org.team100.lib.reference.SetpointsR1;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 
@@ -35,7 +35,7 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
     public OnboardAngularPositionServo(
             LoggerFactory parent,
             RotaryMechanism mech,
-            ProfileReference1d ref,
+            ProfileReferenceR1 ref,
             Feedback100 feedback) {
         super(parent, mech, ref);
         if (feedback.handlesWrapping())
@@ -64,7 +64,7 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
      * Feedback using measurement and current setpoint. Feedforward using next
      * setpoint.
      */
-    void actuate(Setpoints1d unwrappedSetpoint, double feedForwardTorqueNm) {
+    void actuate(SetpointsR1 unwrappedSetpoint, double feedForwardTorqueNm) {
         if (DEBUG) {
             System.out.printf("setpoint %s\n", unwrappedSetpoint);
         }

@@ -4,14 +4,14 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.CurrentLimitedExponentialProfile;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
 import org.team100.lib.state.Control100;
+import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.Model100;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -156,7 +156,7 @@ public class HolonomicProfile {
      * @param i initial
      * @param g goal
      */
-    public void solve(SwerveModel i, SwerveModel g) {
+    public void solve(ModelR3 i, ModelR3 g) {
         // first find the max ETA
         if (DEBUG) {
             System.out.printf("i %s g %s\n", i, g);
@@ -193,11 +193,11 @@ public class HolonomicProfile {
      * @param g goal
      * @return control
      */
-    public SwerveControl calculate(SwerveModel i, SwerveModel g) {
+    public ControlR3 calculate(ModelR3 i, ModelR3 g) {
         if (i == null || g == null) {
             // this can happen on startup when the initial state hasn't yet been defined,
             // but the cache refresher is trying to update the references.
-            return SwerveControl.zero();
+            return ControlR3.zero();
         }
         if (DEBUG) {
             System.out.printf("initial %s goal %s\n", i, g);
@@ -209,6 +209,6 @@ public class HolonomicProfile {
                 MathUtil.angleModulus(i.theta().x() - g.theta().x()) + g.theta().x(),
                 i.theta().v());
         Control100 stateTheta = pptheta.calculate(DT, theta.control(), g.theta());
-        return new SwerveControl(stateX, stateY, stateTheta);
+        return new ControlR3(stateX, stateY, stateTheta);
     }
 }

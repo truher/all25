@@ -1,9 +1,9 @@
 package org.team100.lib.motion.drivetrain.kinodynamics.limiter;
 
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 
 /**
  * Ignores very small inputs.
@@ -29,7 +29,7 @@ public class SwerveDeadband  {
         m_log_scale = child.doubleLogger(Level.TRACE, "scale");
     }
 
-    public GlobalSe2Velocity apply(GlobalSe2Velocity target) {
+    public GlobalVelocityR3 apply(GlobalVelocityR3 target) {
         if (Math.abs(target.x()) > m_translationLimit
                 || Math.abs(target.y()) > m_translationLimit
                 || Math.abs(target.theta()) > m_omegaLimit) {
@@ -37,6 +37,6 @@ public class SwerveDeadband  {
             return target;
         }
         m_log_scale.log(() -> 0.0);
-        return GlobalSe2Velocity.ZERO;
+        return GlobalVelocityR3.ZERO;
     }
 }

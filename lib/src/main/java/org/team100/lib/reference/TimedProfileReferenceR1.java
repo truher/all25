@@ -8,13 +8,13 @@ import org.team100.lib.state.Model100;
 /**
  * Extracts current and next references from a timed profile.
  */
-public class TimedProfileReference1d implements ProfileReference1d {
+public class TimedProfileReferenceR1 implements ProfileReferenceR1 {
 
     private final TimedProfile m_profile;
     private Model100 m_goal;
     private double m_startTimeS;
 
-    public TimedProfileReference1d(TimedProfile profile) {
+    public TimedProfileReferenceR1(TimedProfile profile) {
         m_profile = profile;
     }
 
@@ -32,9 +32,9 @@ public class TimedProfileReference1d implements ProfileReference1d {
     }
 
     @Override
-    public Setpoints1d get() {
+    public SetpointsR1 get() {
         double progress = progress();
-        return new Setpoints1d(
+        return new SetpointsR1(
                 m_profile.sample(progress),
                 m_profile.sample(progress + TimedRobot100.LOOP_PERIOD_S));
     }

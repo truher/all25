@@ -12,7 +12,7 @@ import edu.wpi.first.math.numbers.N6;
  * https://docs.google.com/spreadsheets/d/19WbkNaxcRGHwYwLH1pu9ER3qxZrsYqDlZTdV-cmOM0I
  * 
  */
-public class Spline1dTest {
+public class SplineR1Test {
     private static final boolean DEBUG = false;
 
     /** Look at an example */
@@ -21,8 +21,8 @@ public class Spline1dTest {
         // an example from 0 to 1 with zero first and second derivatives at the ends.
         // the jerk and snap of this spline is very high at the ends, so it
         // is not useful without modifying the schedule.
-        // Spline1d spline = Spline1d.newSpline1d(0, 1, 0, 0, 0, 0);
-        Spline1d spline = Spline1d.viaMatrix(0, 1, 0, 0, 0, 0);
+        // Spline1d spline = Spline1d.get(0, 1, 0, 0, 0, 0);
+        SplineR1 spline = SplineR1.viaMatrix(0, 1, 0, 0, 0, 0);
         for (double t = 0; t <= 1; t += 0.01) {
             double x = spline.getPosition(t);
             double v = spline.getVelocity(t);

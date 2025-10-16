@@ -9,10 +9,8 @@ import org.team100.lib.state.Model100;
 /**
  * Produces "next" and "current" references from a supplier, using the clock to
  * keep track of whether it's time to fetch a new one.
- * 
- * maybe make a generic reference?
  */
-public class Reference1d {
+public class ReferenceR1 {
 
     private final Supplier<Control100> m_setpoints;
     boolean done;
@@ -32,7 +30,7 @@ public class Reference1d {
         nextSetpoint = m_setpoints.get();
     }
 
-    public Reference1d(Supplier<Control100> setpoints) {
+    public ReferenceR1(Supplier<Control100> setpoints) {
         m_setpoints = setpoints;
     }
 

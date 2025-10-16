@@ -1,8 +1,8 @@
 package org.team100.lib.controller.drivetrain;
 
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ModelR3;
 
 /**
  * Feedback and feedforward control.
@@ -23,10 +23,10 @@ public interface SwerveController  {
      * @return Control output, should be given to
      *         SwerveDriveSubsystem.driveInFieldCoords() or something similar.
      */
-    GlobalSe2Velocity calculate(
-            SwerveModel measurement,
-            SwerveModel currentReference,
-            SwerveControl nextReference);
+    GlobalVelocityR3 calculate(
+            ModelR3 measurement,
+            ModelR3 currentReference,
+            ControlR3 nextReference);
 
     /**
      * True if the error is within tolerance of the reference. The definitions of

@@ -7,10 +7,10 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.optimization.NumericalJacobian100;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -127,7 +127,7 @@ public class JacobianTest {
 
         // some example velocities
         // zero velocity
-        SwerveModel v = new SwerveModel(p);
+        ModelR3 v = new ModelR3(p);
 
         JointVelocities jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
@@ -135,21 +135,21 @@ public class JacobianTest {
         assertEquals(0, jv.wrist(), DELTA);
 
         // +x
-        v = new SwerveModel(p, new GlobalSe2Velocity(1, 0, 0));
+        v = new ModelR3(p, new GlobalVelocityR3(1, 0, 0));
         jv = j.inverse(v);
         assertEquals(1, jv.elevator(), DELTA);
         assertEquals(0, jv.shoulder(), DELTA);
         assertEquals(0, jv.wrist(), DELTA);
 
         // +y
-        v = new SwerveModel(p, new GlobalSe2Velocity(0, 1, 0));
+        v = new ModelR3(p, new GlobalVelocityR3(0, 1, 0));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(0.5, jv.shoulder(), DELTA);
         assertEquals(-0.5, jv.wrist(), DELTA);
 
         // +theta
-        v = new SwerveModel(p, new GlobalSe2Velocity(0, 0, 1));
+        v = new ModelR3(p, new GlobalVelocityR3(0, 0, 1));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(-0.5, jv.shoulder(), DELTA);
@@ -232,9 +232,9 @@ public class JacobianTest {
         double dt = d / 20;
         for (double time = 0; time < d; time += dt) {
             TimedPose tp = t.sample(time);
-            SwerveModel sm = SwerveModel.fromTimedPose(tp);
+            ModelR3 sm = ModelR3.fromTimedPose(tp);
             Pose2d p = sm.pose();
-            GlobalSe2Velocity v = sm.velocity();
+            GlobalVelocityR3 v = sm.velocity();
             Config c = k.inverse(p);
             JointVelocities jv = j.inverse(sm);
             if (DEBUG)

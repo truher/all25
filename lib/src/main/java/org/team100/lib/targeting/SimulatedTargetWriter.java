@@ -7,7 +7,7 @@ import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -28,7 +28,7 @@ public class SimulatedTargetWriter {
 
     private final Map<Camera, StructArrayPublisher<Rotation3d>> m_publishers;
     private final List<Camera> m_cameras;
-    private final DoubleFunction<SwerveModel> m_history;
+    private final DoubleFunction<ModelR3> m_history;
 
     /** For now, a fixed list of targets */
     private final Translation2d[] m_targets;
@@ -37,7 +37,7 @@ public class SimulatedTargetWriter {
 
     public SimulatedTargetWriter(
             List<Camera> cameras,
-            DoubleFunction<SwerveModel> history,
+            DoubleFunction<ModelR3> history,
             Translation2d[] targets) {
         m_cameras = cameras;
         m_history = history;

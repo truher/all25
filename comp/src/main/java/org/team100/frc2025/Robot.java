@@ -42,6 +42,7 @@ import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.GyroFactory;
@@ -70,7 +71,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
@@ -393,10 +393,10 @@ public class Robot extends TimedRobot100 {
 
         // Move to coral ground pick location.
         whileTrue(driver::rightBumper,
-            parallel(
-                m_mech.pickWithProfile(),
-                m_manipulator.centerIntake()))
-                
+                parallel(
+                        m_mech.pickWithProfile(),
+                        m_manipulator.centerIntake()))
+
                 .onFalse(m_mech.profileHomeTerminal());
 
         // Pick a game piece from the floor, based on camera input.
@@ -412,6 +412,11 @@ public class Robot extends TimedRobot100 {
                         .until(m_manipulator::hasCoral
                         ));
 
+                        FloorPickSequence.get(
+                                fieldLog, m_drive, m_targets,
+                                SwerveControllerFactory.pick(driveLog), autoProfile)
+                                .withName("Floor Pick"))
+                        .until(m_manipulator::hasCoral));
 
         // Sideways intake for L1
         whileTrue(buttons::red2,
@@ -732,7 +737,7 @@ public class Robot extends TimedRobot100 {
         planner.restToRest(waypoints);
 
         // Exercise the drive motors.
-        m_drive.driveInFieldCoords(new GlobalSe2Velocity(0, 0, 0));
+        m_drive.driveInFieldCoords(new GlobalVelocityR3(0, 0, 0));
 
         // Exercise some mechanism commands.
         Command c = m_mech.homeToL4();
