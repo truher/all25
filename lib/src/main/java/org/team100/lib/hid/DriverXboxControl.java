@@ -33,6 +33,21 @@ public class DriverXboxControl {
                 0.65);
     }
 
+    /** Axis 5 */
+    public double rightY() {
+        return m_controller.getRightY();
+    }
+
+    /** Axis 4 */
+    public double rightX() {
+        return m_controller.getRightX();
+    }
+
+    /** Axis 0 */
+    public double leftX() {
+        return m_controller.getLeftX();
+    }
+
     public Rotation2d pov() {
         return ControlUtil.pov(m_controller::getPOV);
     }
@@ -83,6 +98,7 @@ public class DriverXboxControl {
         return m_controller.getYButton();
     }
 
+    /** Axis 1 */
     public double leftY() {
         return m_controller.getLeftY();
     }

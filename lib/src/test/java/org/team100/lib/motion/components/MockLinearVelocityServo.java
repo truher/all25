@@ -12,6 +12,10 @@ public class MockLinearVelocityServo implements LinearVelocityServo {
     }
 
     @Override
+    public void setDutyCycle(double dutyCycle) {
+    }
+
+    @Override
     public void setVelocity(double setpoint) {
         m_setpoint = setpoint;
     }
@@ -45,5 +49,4 @@ public class MockLinearVelocityServo implements LinearVelocityServo {
     public void periodic() {
         //
     }
-
 }

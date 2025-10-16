@@ -13,6 +13,8 @@ package org.team100.lib.motion.servo;
 public interface LinearVelocityServo {
     void reset();
 
+    void setDutyCycle(double dutyCycle);
+
     /**
      * There's no profile here, it just sets the mechanism velocity.
      * 
