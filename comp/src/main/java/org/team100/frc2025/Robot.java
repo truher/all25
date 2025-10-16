@@ -21,6 +21,7 @@ import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.Coral1Left;
+import org.team100.frc2025.Swerve.Auto.LolipopAuto;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
@@ -133,6 +134,7 @@ public class Robot extends TimedRobot100 {
     private final Runnable m_combinedViz;
     private final Runnable m_climberViz;
     private final Targets m_targets;
+    private final TrajectoryPlanner m_planner;
 
     public Robot() {
         // By default, LiveWindow turns off the CommandScheduler in test mode,
@@ -151,6 +153,8 @@ public class Robot extends TimedRobot100 {
         // Log what the scheduler is doing. This makes more-useful output
         // if you decorate your command collections with "withName()".
         SmartDashboard.putData(CommandScheduler.getInstance());
+        
+        ;
 
         final AsyncFactory asyncFactory = new AsyncFactory(this);
         final Async async = asyncFactory.get();
@@ -179,12 +183,15 @@ public class Robot extends TimedRobot100 {
 
         final TrajectoryVisualization viz = new TrajectoryVisualization(fieldLogger);
 
+
         // CONTROLS
         final DriverXboxControl driver = new DriverXboxControl(0);
         final OperatorXboxControl operator = new OperatorXboxControl(1);
         final Buttons2025 buttons = new Buttons2025(2);
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
+        m_planner = new TrajectoryPlanner(
+                new TimingConstraintFactory(m_swerveKinodynamics).medium());
         if (Identity.instance.equals(Identity.COMP_BOT)) {
             m_climber = new Climber(logger, new CanId(13));
             m_climberIntake = new ClimberIntake(logger, new CanId(14));
@@ -366,8 +373,9 @@ public class Robot extends TimedRobot100 {
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
         final FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
 
-        m_auton = Coral1Left.get(logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive,
+
+        m_auton = LolipopAuto.get(logger, m_mech, m_manipulator,
+                autoController, autoProfile, m_drive, m_planner,
                 localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
 
         ////////////////////////////////////////////////////////////
@@ -377,11 +385,11 @@ public class Robot extends TimedRobot100 {
 
         // At the same time, move the arm to the floor and spin the intake,
         // and go back home when the button is released, ending when complete.
-        // whileTrue(driver::rightTrigger,
-        // parallel(
-        // m_mech.pickWithProfile(),
-        // m_manipulator.centerIntake()))
-        // .onFalse(m_mech.profileHomeTerminal());
+        whileTrue(driver::rightTrigger,
+                parallel(
+                        m_mech.pickWithProfile(),
+                        m_manipulator.centerIntake()))
+                 .onFalse(m_mech.profileHomeTerminal());
 
         // Move to coral ground pick location.
         whileTrue(driver::rightBumper,
@@ -392,10 +400,17 @@ public class Robot extends TimedRobot100 {
                 .onFalse(m_mech.profileHomeTerminal());
 
         // Pick a game piece from the floor, based on camera input.
-        whileTrue(driver::rightTrigger,
-                parallel(
-                        m_mech.pickWithProfile(),
-                        m_manipulator.centerIntake(),
+        whileTrue(operator::leftTrigger,
+            parallel(
+                m_mech.pickWithProfile(),
+                m_manipulator.centerIntake(),
+            
+                FloorPickSequence.get(
+                        fieldLog, m_drive, m_targets,
+                        SwerveControllerFactory.pick(driveLog), autoProfile)
+                        .withName("Floor Pick"))
+                        .until(m_manipulator::hasCoral
+                        ));
 
                         FloorPickSequence.get(
                                 fieldLog, m_drive, m_targets,

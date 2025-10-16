@@ -42,4 +42,7 @@ public class OperatorXboxControl {
     public boolean rightTrigger() {
         return m_controller.getRightTriggerAxis() > 0.9;
     }
+    public boolean leftTrigger() {
+        return m_controller.getLeftTriggerAxis() > 0.9;
+    }
 }
