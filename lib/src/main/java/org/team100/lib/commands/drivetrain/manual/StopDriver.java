@@ -2,7 +2,7 @@ package org.team100.lib.commands.drivetrain.manual;
 
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 
 public class StopDriver implements DriverAdapter {
 
@@ -12,11 +12,11 @@ public class StopDriver implements DriverAdapter {
         m_drive = drive;
     }
 
-    public void apply(SwerveModel s, Velocity t) {
+    public void apply(ModelR3 s, Velocity t) {
         m_drive.stop();
     }
 
-    public void reset(SwerveModel p) {
+    public void reset(ModelR3 p) {
         //
     }
 

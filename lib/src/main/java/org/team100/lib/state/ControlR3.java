@@ -1,9 +1,10 @@
-package org.team100.lib.motion.drivetrain.state;
+package org.team100.lib.state;
 
 import java.util.Optional;
 
+import org.team100.lib.geometry.GlobalAccelerationR3;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.state.Control100;
 import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,69 +13,71 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 /**
- * Describes the state of a holonomic drive in three dimensions,
- * x, y, and theta, each of which is represented by position, velocity,
- * and acceleration.
+ * Describes the state of three independent dimensions, each of which is
+ * represented by position, velocity, and acceleration.
+ * 
+ * This could be used for navigation, or for other applications of rigid-body
+ * transforms in 2d, e.g. planar mechanisms.
  * 
  * This type is used for control, which is why it includes acceleration
  * 
  * Do not try to use zero as an initial location; always initialize with the
  * current location.
  */
-public class SwerveControl {
+public class ControlR3 {
     private final Control100 m_x;
     private final Control100 m_y;
     private final Control100 m_theta;
 
-    public SwerveControl(Control100 x, Control100 y, Control100 theta) {
+    public ControlR3(Control100 x, Control100 y, Control100 theta) {
         m_x = x;
         m_y = y;
         m_theta = theta;
     }
 
-    public SwerveControl(Pose2d x, GlobalSe2Velocity v) {
+    public ControlR3(Pose2d x, GlobalVelocityR3 v) {
         this(
                 new Control100(x.getX(), v.x(), 0),
                 new Control100(x.getY(), v.y(), 0),
                 new Control100(x.getRotation().getRadians(), v.theta(), 0));
     }
 
-    public SwerveControl(Pose2d x, GlobalSe2Velocity v, GlobalSe2Acceleration a) {
+    public ControlR3(Pose2d x, GlobalVelocityR3 v, GlobalAccelerationR3 a) {
         this(
                 new Control100(x.getX(), v.x(), a.x()),
                 new Control100(x.getY(), v.y(), a.y()),
                 new Control100(x.getRotation().getRadians(), v.theta(), a.theta()));
     }
 
-    public SwerveControl(Pose2d x) {
-        this(x, new GlobalSe2Velocity(0, 0, 0));
+    public ControlR3(Pose2d x) {
+        this(x, new GlobalVelocityR3(0, 0, 0));
     }
 
-    public SwerveControl(Rotation2d x) {
+    public ControlR3(Rotation2d x) {
         this(new Pose2d(0, 0, x));
     }
 
-    public static SwerveControl zero() {
-        return new SwerveControl(new Control100(), new Control100(), new Control100());
+    public static ControlR3 zero() {
+        return new ControlR3(new Control100(), new Control100(), new Control100());
     }
 
-    public SwerveModel model() {
-        return new SwerveModel(m_x.model(), m_y.model(), m_theta.model());
+    public ModelR3 model() {
+        return new ModelR3(m_x.model(), m_y.model(), m_theta.model());
     }
 
-    public SwerveControl withTheta(double theta) {
-        return new SwerveControl(m_x, m_y, new Control100(theta, m_theta.v(), m_theta.a()));
+    public ControlR3 withTheta(double theta) {
+        return new ControlR3(m_x, m_y, new Control100(theta, m_theta.v(), m_theta.a()));
     }
 
-    public SwerveControl minus(SwerveControl other) {
-        return new SwerveControl(x().minus(other.x()), y().minus(other.y()), theta().minus(other.theta()));
+    public ControlR3 minus(ControlR3 other) {
+        return new ControlR3(x().minus(other.x()), y().minus(other.y()), theta().minus(other.theta()));
     }
 
-    public SwerveControl plus(SwerveControl other) {
-        return new SwerveControl(x().plus(other.x()), y().plus(other.y()), theta().plus(other.theta()));
+    public ControlR3 plus(ControlR3 other) {
+        return new ControlR3(x().plus(other.x()), y().plus(other.y()), theta().plus(other.theta()));
     }
 
-    public boolean near(SwerveControl other, double tolerance) {
+    public boolean near(ControlR3 other, double tolerance) {
         return x().near(other.x(), tolerance)
                 && y().near(other.y(), tolerance)
                 && theta().near(other.theta(), tolerance);
@@ -93,8 +96,8 @@ public class SwerveControl {
         return new Rotation2d(m_theta.x());
     }
 
-    public GlobalSe2Velocity velocity() {
-        return new GlobalSe2Velocity(m_x.v(), m_y.v(), m_theta.v());
+    public GlobalVelocityR3 velocity() {
+        return new GlobalVelocityR3(m_x.v(), m_y.v(), m_theta.v());
     }
 
     /** Robot-relative speeds */
@@ -102,8 +105,8 @@ public class SwerveControl {
         return SwerveKinodynamics.toInstantaneousChassisSpeeds(velocity(), rotation());
     }
 
-    public GlobalSe2Acceleration acceleration() {
-        return new GlobalSe2Acceleration(m_x.a(), m_y.a(), m_theta.a());
+    public GlobalAccelerationR3 acceleration() {
+        return new GlobalAccelerationR3(m_x.a(), m_y.a(), m_theta.a());
     }
 
     public Control100 x() {
@@ -123,7 +126,7 @@ public class SwerveControl {
      * 
      * Correctly accounts for centripetal acceleration.
      */
-    public static SwerveControl fromTimedPose(TimedPose timedPose) {
+    public static ControlR3 fromTimedPose(TimedPose timedPose) {
         double xx = timedPose.state().getPose().getX();
         double yx = timedPose.state().getPose().getY();
         double thetax = timedPose.state().getHeading().getRadians();
@@ -146,7 +149,7 @@ public class SwerveControl {
         double xCa = -1.0 * motion_direction.getSin() * centripetalAccelM_s_s;
         double yCa = motion_direction.getCos() * centripetalAccelM_s_s;
 
-        return new SwerveControl(
+        return new ControlR3(
                 new Control100(xx, xv, xa + xCa),
                 new Control100(yx, yv, ya + yCa),
                 new Control100(thetax, thetav, thetaa));

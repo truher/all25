@@ -11,6 +11,7 @@ import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.gyro.MockGyro;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
@@ -18,11 +19,10 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -46,11 +46,11 @@ class ManualWithProfiledHeadingTest {
                 swerveKinodynamics,
                 rotationSupplier,
                 thetaFeedback);
-        m_manualWithHeading.reset(new SwerveModel());
+        m_manualWithHeading.reset(new ModelR3());
 
         Velocity twist1_1 = new Velocity(0, 0, 0);
 
-        GlobalSe2Velocity twistM_S = m_manualWithHeading.apply(new SwerveModel(), twist1_1);
+        GlobalVelocityR3 twistM_S = m_manualWithHeading.apply(new ModelR3(), twist1_1);
         verify(0, 0, 0, twistM_S);
 
         // with a non-null desired rotation we're in snap mode
@@ -58,7 +58,7 @@ class ManualWithProfiledHeadingTest {
         desiredRotation = null;
 
         twist1_1 = new Velocity(0, 0, 1);
-        twistM_S = m_manualWithHeading.apply(new SwerveModel(), twist1_1);
+        twistM_S = m_manualWithHeading.apply(new ModelR3(), twist1_1);
         // with a nonzero desired twist, we're out of snap mode
         assertNull(m_manualWithHeading.m_goal);
 
@@ -77,15 +77,15 @@ class ManualWithProfiledHeadingTest {
                 rotationSupplier,
                 thetaFeedback);
 
-        m_manualWithHeading.reset(new SwerveModel());
+        m_manualWithHeading.reset(new ModelR3());
 
         // no desired rotation
         desiredRotation = null;
 
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
-        GlobalSe2Velocity twistM_S = m_manualWithHeading.apply(
-                new SwerveModel(),
+        GlobalVelocityR3 twistM_S = m_manualWithHeading.apply(
+                new ModelR3(),
                 twist1_1);
 
         // not in snap mode
@@ -94,7 +94,7 @@ class ManualWithProfiledHeadingTest {
 
         twist1_1 = new Velocity(1, 0, 0);
 
-        twistM_S = m_manualWithHeading.apply(new SwerveModel(Pose2d.kZero, twistM_S), twist1_1);
+        twistM_S = m_manualWithHeading.apply(new ModelR3(Pose2d.kZero, twistM_S), twist1_1);
         assertNull(m_manualWithHeading.m_goal);
         verify(1, 0, 0, twistM_S);
     }
@@ -112,7 +112,7 @@ class ManualWithProfiledHeadingTest {
                 rotationSupplier,
                 thetaFeedback);
 
-        m_manualWithHeading.reset(new SwerveModel());
+        m_manualWithHeading.reset(new ModelR3());
         // reset means setpoint is currentpose.
         assertEquals(0, m_manualWithHeading.m_thetaSetpoint.x(), DELTA);
         assertEquals(0, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
@@ -123,8 +123,8 @@ class ManualWithProfiledHeadingTest {
         final Velocity twist1_1 = new Velocity(0, 0, 0);
 
         // initial state is motionless
-        GlobalSe2Velocity twistM_S = m_manualWithHeading.apply(
-                new SwerveModel(),
+        GlobalVelocityR3 twistM_S = m_manualWithHeading.apply(
+                new ModelR3(),
                 twist1_1);
         // in snap mode
         assertNotNull(m_manualWithHeading.m_goal);
@@ -144,9 +144,9 @@ class ManualWithProfiledHeadingTest {
         // say we've rotated a little.
         m_manualWithHeading.m_thetaSetpoint = new Control100(0.5, 1);
         twistM_S = m_manualWithHeading.apply(
-                new SwerveModel(
+                new ModelR3(
                         new Pose2d(0, 0, new Rotation2d(0.5)),
-                        new GlobalSe2Velocity(0, 0, 0.1)),
+                        new GlobalVelocityR3(0, 0, 0.1)),
                 twist1_1);
         assertEquals(1.017, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
@@ -155,9 +155,9 @@ class ManualWithProfiledHeadingTest {
         // mostly rotated
         m_manualWithHeading.m_thetaSetpoint = new Control100(1.55, 0.2);
         twistM_S = m_manualWithHeading.apply(
-                new SwerveModel(
+                new ModelR3(
                         new Pose2d(0, 0, new Rotation2d(1.55)),
-                        new GlobalSe2Velocity(0, 0, 0.2)),
+                        new GlobalVelocityR3(0, 0, 0.2)),
                 twist1_1);
         assertEquals(0.183, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
@@ -167,9 +167,9 @@ class ManualWithProfiledHeadingTest {
         // done
         m_manualWithHeading.m_thetaSetpoint = new Control100(Math.PI / 2, 0);
         twistM_S = m_manualWithHeading.apply(
-                new SwerveModel(
+                new ModelR3(
                         new Pose2d(0, 0, new Rotation2d(Math.PI / 2)),
-                        new GlobalSe2Velocity(0, 0, 0)),
+                        new GlobalVelocityR3(0, 0, 0)),
                 twist1_1);
         assertNotNull(m_manualWithHeading.m_goal);
 
@@ -193,7 +193,7 @@ class ManualWithProfiledHeadingTest {
                 thetaFeedback);
 
         // currently facing +x
-        m_manualWithHeading.reset(new SwerveModel());
+        m_manualWithHeading.reset(new ModelR3());
 
         // want to face towards +y
         desiredRotation = Rotation2d.kCCW_Pi_2;
@@ -201,8 +201,8 @@ class ManualWithProfiledHeadingTest {
 
         // no stick input
         final Velocity twist1_1 = new Velocity(0, 0, 0);
-        GlobalSe2Velocity v = m_manualWithHeading.apply(
-                new SwerveModel(),
+        GlobalVelocityR3 v = m_manualWithHeading.apply(
+                new ModelR3(),
                 twist1_1);
 
         // in snap mode
@@ -214,9 +214,9 @@ class ManualWithProfiledHeadingTest {
         // say we've rotated a little.
         m_manualWithHeading.m_thetaSetpoint = new Control100(0.5, 1);
         v = m_manualWithHeading.apply(
-                new SwerveModel(
+                new ModelR3(
                         new Pose2d(0, 0, new Rotation2d(0.5)),
-                        new GlobalSe2Velocity(0, 0, 1)),
+                        new GlobalVelocityR3(0, 0, 1)),
                 twist1_1);
         assertEquals(1.017, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
@@ -225,9 +225,9 @@ class ManualWithProfiledHeadingTest {
         // mostly rotated, so the FB controller is calm
         m_manualWithHeading.m_thetaSetpoint = new Control100(1.555, 0.2);
         v = m_manualWithHeading.apply(
-                new SwerveModel(
+                new ModelR3(
                         new Pose2d(0, 0, new Rotation2d(1.555)),
-                        new GlobalSe2Velocity(0, 0, 0.2)),
+                        new GlobalVelocityR3(0, 0, 0.2)),
                 twist1_1);
         assertEquals(0.183, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
@@ -238,9 +238,9 @@ class ManualWithProfiledHeadingTest {
         // at the setpoint
         m_manualWithHeading.m_thetaSetpoint = new Control100(Math.PI / 2, 0);
         v = m_manualWithHeading.apply(
-                new SwerveModel(
+                new ModelR3(
                         new Pose2d(0, 0, new Rotation2d(Math.PI / 2)),
-                        new GlobalSe2Velocity(0, 0, 0)),
+                        new GlobalVelocityR3(0, 0, 0)),
                 twist1_1);
         assertNotNull(m_manualWithHeading.m_goal);
         // there should be no more profile to follow
@@ -267,22 +267,22 @@ class ManualWithProfiledHeadingTest {
         // driver rotates a bit
         Velocity control = new Velocity(0, 0, 1);
 
-        SwerveModel currentState = new SwerveModel(
+        ModelR3 currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalSe2Velocity(0, 0, 0));
+                new GlobalVelocityR3(0, 0, 0));
         // no POV
         desiredRotation = null;
 
-        GlobalSe2Velocity v = m_manualWithHeading.apply(currentState, control);
+        GlobalVelocityR3 v = m_manualWithHeading.apply(currentState, control);
         // scale 1.0 input to max omega
         assertNull(m_manualWithHeading.m_goal);
         assertNull(m_manualWithHeading.m_thetaSetpoint);
         verify(0, 0, 2.828, v);
 
         // already going full speed:
-        currentState = new SwerveModel(
+        currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalSe2Velocity(0, 0, 2.828));
+                new GlobalVelocityR3(0, 0, 2.828));
         // gyro indicates the correct speed
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, control);
@@ -292,9 +292,9 @@ class ManualWithProfiledHeadingTest {
 
         // let go of the stick
         control = new Velocity(0, 0, 0);
-        currentState = new SwerveModel(
+        currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalSe2Velocity(0, 0, 2.828));
+                new GlobalVelocityR3(0, 0, 2.828));
         // gyro rate is still full speed.
         gyro.rate = 2.828;
 
@@ -338,22 +338,22 @@ class ManualWithProfiledHeadingTest {
         // driver rotates a bit
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
-        SwerveModel currentState = new SwerveModel(
+        ModelR3 currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalSe2Velocity(0, 0, 0));
+                new GlobalVelocityR3(0, 0, 0));
         // no POV
         desiredRotation = null;
 
-        GlobalSe2Velocity v = m_manualWithHeading.apply(currentState, twist1_1);
+        GlobalVelocityR3 v = m_manualWithHeading.apply(currentState, twist1_1);
         // scale 1.0 input to max omega
         assertNull(m_manualWithHeading.m_goal);
         assertNull(m_manualWithHeading.m_thetaSetpoint);
         verify(0, 0, 2.828, v);
 
         // already going full speed:
-        currentState = new SwerveModel(
+        currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalSe2Velocity(0, 0, 2.828));
+                new GlobalVelocityR3(0, 0, 2.828));
         // gyro indicates the correct speed
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -363,9 +363,9 @@ class ManualWithProfiledHeadingTest {
 
         // let go of the stick
         twist1_1 = new Velocity(0, 0, 0);
-        currentState = new SwerveModel(
+        currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalSe2Velocity(0, 0, 2.828));
+                new GlobalVelocityR3(0, 0, 2.828));
         // gyro rate is still full speed.
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -409,7 +409,7 @@ class ManualWithProfiledHeadingTest {
         }
     }
 
-    private void verify(double vx, double vy, double omega, GlobalSe2Velocity v) {
+    private void verify(double vx, double vy, double omega, GlobalVelocityR3 v) {
         assertEquals(vx, v.x(), DELTA);
         assertEquals(vy, v.y(), DELTA);
         assertEquals(omega, v.theta(), DELTA);

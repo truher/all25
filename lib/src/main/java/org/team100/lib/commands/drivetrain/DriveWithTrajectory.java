@@ -3,7 +3,7 @@ package org.team100.lib.commands.drivetrain;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
-import org.team100.lib.reference.TrajectoryReference;
+import org.team100.lib.reference.TrajectoryReferenceR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -40,7 +40,7 @@ public class DriveWithTrajectory extends Command  {
         m_referenceController = new ReferenceController(
                 m_drive,
                 m_controller,
-                new TrajectoryReference(m_trajectory),
+                new TrajectoryReferenceR3(m_trajectory),
                 false);
         m_viz.setViz(m_trajectory);
         m_drive.resetLimiter();

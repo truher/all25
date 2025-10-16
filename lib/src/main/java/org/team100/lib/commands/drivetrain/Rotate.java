@@ -4,9 +4,9 @@ import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.reference.ProfileReference;
+import org.team100.lib.reference.ProfileReferenceR3;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +31,7 @@ public class Rotate extends Command  {
     private final Rotation2d m_target;
     private final HolonomicProfile m_profile;
 
-    private ProfileReference m_reference;
+    private ProfileReferenceR3 m_reference;
     private ReferenceController m_referenceController;
 
     public Rotate(
@@ -64,8 +64,8 @@ public class Rotate extends Command  {
         // instead, pick a goal at the stopping distance in the current direction.
         Translation2d dx = m_drive.getVelocity().stopping(m_swerveKinodynamics.getMaxDriveAccelerationM_S2());
         Pose2d goal = new Pose2d(measurement.getX() + dx.getX(), measurement.getY() + dx.getY(), m_target);
-        m_reference = new ProfileReference(m_profile, "rotate");
-        m_reference.setGoal(new SwerveModel(goal));
+        m_reference = new ProfileReferenceR3(m_profile, "rotate");
+        m_reference.setGoal(new ModelR3(goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }
 

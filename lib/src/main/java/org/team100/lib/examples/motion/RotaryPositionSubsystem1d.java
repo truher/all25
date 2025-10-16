@@ -19,8 +19,8 @@ import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.timed.JerkLimitedTimedProfile;
-import org.team100.lib.reference.ProfileReference1d;
-import org.team100.lib.reference.TimedProfileReference1d;
+import org.team100.lib.reference.ProfileReferenceR1;
+import org.team100.lib.reference.TimedProfileReferenceR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 
@@ -76,7 +76,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
         double maxAccel = 40;
         double maxJerk = 70;
         JerkLimitedTimedProfile profile = new JerkLimitedTimedProfile(maxVel, maxAccel, maxJerk, true);
-        ProfileReference1d ref = new TimedProfileReference1d(profile);
+        ProfileReferenceR1 ref = new TimedProfileReferenceR1(profile);
 
         /*
          * Here we use the Team 100 "Identity" mechanism to allow different

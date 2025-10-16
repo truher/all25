@@ -14,7 +14,7 @@ import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
 import org.team100.lib.testing.Timeless;
 
 class AnglePositionServoProfileTest implements Timeless {
@@ -24,7 +24,7 @@ class AnglePositionServoProfileTest implements Timeless {
     private final MockBareMotor motor;
     private final MockRotaryPositionSensor sensor;
     private final Feedback100 feedback2;
-    private final IncrementalProfileReference1d ref;
+    private final IncrementalProfileReferenceR1 ref;
     private final OnboardAngularPositionServo servo;
     // for calculating the trapezoidal integral
     double previousMotorSpeed = 0;
@@ -41,7 +41,7 @@ class AnglePositionServoProfileTest implements Timeless {
                 Double.POSITIVE_INFINITY);
         feedback2 = new PIDFeedback(logger, 1, 0, 0, false, 0.05, 1);
         IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
+        ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(logger, mech, ref, feedback2);
         servo.reset();
     }

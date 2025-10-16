@@ -1,37 +1,37 @@
 package org.team100.lib.controller.drivetrain;
 
+import org.team100.lib.geometry.GlobalDeltaR3;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.logging.LoggerFactory.FieldRelativeDeltaLogger;
-import org.team100.lib.logging.LoggerFactory.FieldRelativeVelocityLogger;
-import org.team100.lib.logging.LoggerFactory.SwerveControlLogger;
-import org.team100.lib.logging.LoggerFactory.SwerveModelLogger;
-import org.team100.lib.motion.drivetrain.state.FieldRelativeDelta;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.logging.LoggerFactory.GlobaDeltaR3Logger;
+import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.ControlR3Logger;
+import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
+import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ModelR3;
 
 /**
  * Velocity feedforward, proportional feedback on position and velocity.
  */
 public class FullStateSwerveController implements SwerveController {
     private static final boolean DEBUG = false;
-    private final SwerveModelLogger m_log_measurement;
+    private final ModelR3Logger m_log_measurement;
     private final BooleanLogger m_log_atPositionReference;
     // private final BooleanLogger m_log_atVelocityReference;
 
     private final DoubleLogger m_log_PositionError;
     // private final DoubleLogger m_log_VelocityError;
 
-    private final SwerveModelLogger m_log_currentReference;
-    private final SwerveControlLogger m_log_nextReference;
-    private final FieldRelativeVelocityLogger m_log_u_FF;
-    private final FieldRelativeDeltaLogger m_log_position_error;
-    private final FieldRelativeVelocityLogger m_log_u_FB;
-    private final FieldRelativeVelocityLogger m_log_velocity_error;
-    private final FieldRelativeVelocityLogger m_log_u_VFB;
+    private final ModelR3Logger m_log_currentReference;
+    private final ControlR3Logger m_log_nextReference;
+    private final GlobalVelocityR3Logger m_log_u_FF;
+    private final GlobaDeltaR3Logger m_log_position_error;
+    private final GlobalVelocityR3Logger m_log_u_FB;
+    private final GlobalVelocityR3Logger m_log_velocity_error;
+    private final GlobalVelocityR3Logger m_log_u_VFB;
 
     private final double m_kPCart;
     private final double m_kPTheta;
@@ -55,14 +55,14 @@ public class FullStateSwerveController implements SwerveController {
             double xDotTolerance,
             double omegaTolerance) {
         LoggerFactory log = parent.type(this);
-        m_log_measurement = log.swerveModelLogger(Level.DEBUG, "measurement");
-        m_log_currentReference = log.swerveModelLogger(Level.DEBUG, "currentReference");
-        m_log_nextReference = log.swerveControlLogger(Level.DEBUG, "nextReference");
-        m_log_u_FF = log.fieldRelativeVelocityLogger(Level.TRACE, "u_FF");
-        m_log_position_error = log.fieldRelativeDeltaLogger(Level.TRACE, "positionError");
-        m_log_u_FB = log.fieldRelativeVelocityLogger(Level.TRACE, "u_FB");
-        m_log_velocity_error = log.fieldRelativeVelocityLogger(Level.TRACE, "velocityError");
-        m_log_u_VFB = log.fieldRelativeVelocityLogger(Level.TRACE, "u_VFB");
+        m_log_measurement = log.modelR3Logger(Level.DEBUG, "measurement");
+        m_log_currentReference = log.modelR3Logger(Level.DEBUG, "currentReference");
+        m_log_nextReference = log.controlR3Logger(Level.DEBUG, "nextReference");
+        m_log_u_FF = log.globalVelocityR3Logger(Level.TRACE, "u_FF");
+        m_log_position_error = log.globalDeltaR3Logger(Level.TRACE, "positionError");
+        m_log_u_FB = log.globalVelocityR3Logger(Level.TRACE, "u_FB");
+        m_log_velocity_error = log.globalVelocityR3Logger(Level.TRACE, "velocityError");
+        m_log_u_VFB = log.globalVelocityR3Logger(Level.TRACE, "u_VFB");
 
         m_log_atPositionReference = log.booleanLogger(Level.TRACE, "At Position Reference");
         // m_log_atVelocityReference = log.booleanLogger(Level.TRACE, "At Velocity
@@ -83,18 +83,18 @@ public class FullStateSwerveController implements SwerveController {
     }
 
     @Override
-    public GlobalSe2Velocity calculate(
-            SwerveModel measurement,
-            SwerveModel currentReference,
-            SwerveControl nextReference) {
+    public GlobalVelocityR3 calculate(
+            ModelR3 measurement,
+            ModelR3 currentReference,
+            ControlR3 nextReference) {
         if (DEBUG) {
             System.out.printf("measurement %s current %s next %s\n", measurement, currentReference, nextReference);
         }
         m_log_measurement.log(() -> measurement);
         m_log_currentReference.log(() -> currentReference);
         m_log_nextReference.log(() -> nextReference);
-        GlobalSe2Velocity u_FF = feedforward(nextReference);
-        GlobalSe2Velocity u_FB = fullFeedback(measurement, currentReference);
+        GlobalVelocityR3 u_FF = feedforward(nextReference);
+        GlobalVelocityR3 u_FB = fullFeedback(measurement, currentReference);
         if (DEBUG) {
             System.out.printf("ff %s fb %s\n", u_FF, u_FB);
         }
@@ -115,26 +115,26 @@ public class FullStateSwerveController implements SwerveController {
     //
     // package-private for testing
 
-    GlobalSe2Velocity feedforward(SwerveControl nextReference) {
+    GlobalVelocityR3 feedforward(ControlR3 nextReference) {
         m_log_u_FF.log(() -> nextReference.velocity());
         return nextReference.velocity();
     }
 
-    GlobalSe2Velocity fullFeedback(SwerveModel measurement, SwerveModel currentReference) {
+    GlobalVelocityR3 fullFeedback(ModelR3 measurement, ModelR3 currentReference) {
         // atReference is updated below
         m_atReference = true;
-        GlobalSe2Velocity u_XFB = positionFeedback(measurement, currentReference);
-        GlobalSe2Velocity u_VFB = velocityFeedback(measurement, currentReference);
+        GlobalVelocityR3 u_XFB = positionFeedback(measurement, currentReference);
+        GlobalVelocityR3 u_VFB = velocityFeedback(measurement, currentReference);
         return u_XFB.plus(u_VFB);
     }
 
-    GlobalSe2Velocity positionFeedback(SwerveModel measurement, SwerveModel currentReference) {
+    GlobalVelocityR3 positionFeedback(ModelR3 measurement, ModelR3 currentReference) {
         // wraps heading
-        FieldRelativeDelta positionError = positionError(measurement, currentReference);
+        GlobalDeltaR3 positionError = positionError(measurement, currentReference);
         m_atReference &= positionError.getTranslation().getNorm() < m_xTolerance
                 && Math.abs(positionError.getRotation().getRadians()) < m_thetaTolerance;
 
-        GlobalSe2Velocity u_FB = new GlobalSe2Velocity(
+        GlobalVelocityR3 u_FB = new GlobalVelocityR3(
                 m_kPCart * positionError.getX(),
                 m_kPCart * positionError.getY(),
                 m_kPTheta * positionError.getRotation().getRadians());
@@ -150,13 +150,13 @@ public class FullStateSwerveController implements SwerveController {
         return u_FB;
     }
 
-    GlobalSe2Velocity velocityFeedback(SwerveModel currentPose, SwerveModel currentReference) {
-        final GlobalSe2Velocity velocityError = velocityError(currentPose, currentReference);
+    GlobalVelocityR3 velocityFeedback(ModelR3 currentPose, ModelR3 currentReference) {
+        final GlobalVelocityR3 velocityError = velocityError(currentPose, currentReference);
         m_atReference &= velocityError.norm() < m_xDotTolerance;
         // && Math.abs(velocityError.angle().orElse(Rotation2d.kZero).getRadians()) <
         // m_omegaTolerance;
 
-        final GlobalSe2Velocity u_VFB = new GlobalSe2Velocity(
+        final GlobalVelocityR3 u_VFB = new GlobalVelocityR3(
                 m_kPCartV * velocityError.x(),
                 m_kPCartV * velocityError.y(),
                 m_kPThetaV * velocityError.theta());
@@ -171,14 +171,14 @@ public class FullStateSwerveController implements SwerveController {
         return u_VFB;
     }
 
-    FieldRelativeDelta positionError(SwerveModel measurement, SwerveModel currentReference) {
-        FieldRelativeDelta positionError = FieldRelativeDelta.delta(measurement.pose(), currentReference.pose());
+    GlobalDeltaR3 positionError(ModelR3 measurement, ModelR3 currentReference) {
+        GlobalDeltaR3 positionError = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
         m_log_position_error.log(() -> positionError);
         return positionError;
     }
 
-    GlobalSe2Velocity velocityError(SwerveModel measurement, SwerveModel currentReference) {
-        GlobalSe2Velocity velocityError = currentReference.minus(measurement).velocity();
+    GlobalVelocityR3 velocityError(ModelR3 measurement, ModelR3 currentReference) {
+        GlobalVelocityR3 velocityError = currentReference.minus(measurement).velocity();
         m_log_velocity_error.log(() -> velocityError);
         return velocityError;
     }

@@ -19,8 +19,8 @@ import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
-import org.team100.lib.reference.ProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.ProfileReferenceR1;
 import org.team100.lib.util.CanId;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -93,7 +93,7 @@ public class FiveBarServo extends SubsystemBase {
                 0.0,
                 1.0);
 
-        ProfileReference1d refP1 = new IncrementalProfileReference1d(
+        ProfileReferenceR1 refP1 = new IncrementalProfileReferenceR1(
                 profile, POSITION_TOLERANCE, VELOCITY_TOLERANCE);
         m_servoP1 = new OutboardAngularPositionServo(
                 loggerP1,
@@ -119,7 +119,7 @@ public class FiveBarServo extends SubsystemBase {
                 1.0,
                 0.0,
                 1.0);
-        ProfileReference1d refP5 = new IncrementalProfileReference1d(
+        ProfileReferenceR1 refP5 = new IncrementalProfileReferenceR1(
                 profile, POSITION_TOLERANCE, VELOCITY_TOLERANCE);
         m_servoP5 = new OutboardAngularPositionServo(
                 loggerP5,

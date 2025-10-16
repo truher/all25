@@ -2,7 +2,7 @@ package org.team100.lib.commands.drivetrain.manual;
 
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 
 public class ChassisSpeedAdapter implements DriverAdapter {
     private static final boolean DEBUG = false;
@@ -16,7 +16,7 @@ public class ChassisSpeedAdapter implements DriverAdapter {
     }
 
     @Override
-    public void apply(SwerveModel s, Velocity t) {
+    public void apply(ModelR3 s, Velocity t) {
         if (DEBUG) {
             System.out.printf("ChassisSpeedDriver %s\n", t);
         }
@@ -24,7 +24,7 @@ public class ChassisSpeedAdapter implements DriverAdapter {
     }
 
     @Override
-    public void reset(SwerveModel p) {
+    public void reset(ModelR3 p) {
         m_driver.reset(p);
     }
 }

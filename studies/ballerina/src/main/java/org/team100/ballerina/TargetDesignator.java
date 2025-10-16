@@ -1,7 +1,5 @@
 package org.team100.ballerina;
 
-import java.util.function.Supplier;
-
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.logging.Level;

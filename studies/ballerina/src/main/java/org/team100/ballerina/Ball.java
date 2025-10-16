@@ -7,7 +7,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.math.GlobalR2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,7 +19,7 @@ public class Ball {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private static final double SPEED_M_S = 1;
     private final DoubleArrayLogger m_log_field_ball;
-    private final Supplier<SwerveModel> m_robot;
+    private final Supplier<ModelR3> m_robot;
     private final Supplier<Rotation2d> m_azimuth;
 
     // null when contained in robot.
@@ -28,7 +28,7 @@ public class Ball {
 
     public Ball(
             LoggerFactory field,
-            Supplier<SwerveModel> robot,
+            Supplier<ModelR3> robot,
             Supplier<Rotation2d> azimuth) {
         m_log_field_ball = field.doubleArrayLogger(Level.COMP, "ball");
         m_robot = robot;

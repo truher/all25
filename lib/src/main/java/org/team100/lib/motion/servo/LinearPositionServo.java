@@ -1,6 +1,6 @@
 package org.team100.lib.motion.servo;
 
-import org.team100.lib.reference.Setpoints1d;
+import org.team100.lib.reference.SetpointsR1;
 
 /**
  * Linear position control, e.g. for elevators.
@@ -28,7 +28,7 @@ public interface LinearPositionServo {
      * This takes both current and next setpoints so that the implementation can
      * choose the current one for feedback and the next one for feedforward.
      */
-    void setPositionDirect(Setpoints1d setpoint, double feedForwardTorqueNm);
+    void setPositionDirect(SetpointsR1 setpoint, double feedForwardTorqueNm);
 
     double getPosition();
 

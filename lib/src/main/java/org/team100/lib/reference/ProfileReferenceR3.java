@@ -2,9 +2,9 @@ package org.team100.lib.reference;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ModelR3;
 
 /**
  * Produces references based on profiles.
@@ -19,14 +19,14 @@ import org.team100.lib.profile.HolonomicProfile;
  * continue forever unless we explicitly stop them, so if you use this class,
  * you need to remember to do that.
  */
-public class ProfileReference implements SwerveReference {
+public class ProfileReferenceR3 implements ReferenceR3 {
     private static final boolean DEBUG = false;
     private static final double TOLERANCE = 0.01;
 
     /**
      * Putting these in the same class allows us to refresh them both atomically.
      */
-    private record References(SwerveModel m_current, SwerveControl m_next) {
+    private record References(ModelR3 m_current, ControlR3 m_next) {
     }
 
     private final HolonomicProfile m_profile;
@@ -34,16 +34,16 @@ public class ProfileReference implements SwerveReference {
     private final String m_name;
     private final CotemporalCache<References> m_references;
 
-    private SwerveModel m_goal;
+    private ModelR3 m_goal;
     private boolean m_done;
 
     /**
      * The most-recently calculated "next" reference, which will be a future
      * "current" reference.
      */
-    private SwerveControl m_next;
+    private ControlR3 m_next;
 
-    public ProfileReference(HolonomicProfile profile, String name) {
+    public ProfileReferenceR3(HolonomicProfile profile, String name) {
         m_profile = profile;
         m_name = name;
         // this will keep polling until we stop it.
@@ -55,25 +55,25 @@ public class ProfileReference implements SwerveReference {
      * initialize(), you'll use the old scales. That's probably fine, if the goal
      * hasn't moved much, but it's not appropriate to move the goal a lot.
      */
-    public void setGoal(SwerveModel goal) {
+    public void setGoal(ModelR3 goal) {
         m_goal = goal;
     }
 
     /** Immediately overwrite the references. */
     @Override
-    public void initialize(SwerveModel measurement) {
+    public void initialize(ModelR3 measurement) {
         m_profile.solve(measurement, m_goal);
         m_references.set(refresh(measurement));
         m_done = false;
     }
 
     @Override
-    public SwerveModel current() {
+    public ModelR3 current() {
         return m_references.get().m_current;
     }
 
     @Override
-    public SwerveControl next() {
+    public ControlR3 next() {
         return m_references.get().m_next;
     }
 
@@ -83,7 +83,7 @@ public class ProfileReference implements SwerveReference {
     }
 
     @Override
-    public SwerveModel goal() {
+    public ModelR3 goal() {
         return m_goal;
     }
 
@@ -97,12 +97,12 @@ public class ProfileReference implements SwerveReference {
 
     ////////////////////////////////////
 
-    private References refresh(SwerveModel newCurrent) {
+    private References refresh(ModelR3 newCurrent) {
         m_next = makeNext(newCurrent);
         return new References(newCurrent, m_next);
     }
 
-    private SwerveControl makeNext(SwerveModel current) {
+    private ControlR3 makeNext(ModelR3 current) {
         if (DEBUG) {
             System.out.printf("ProfileReference refreshing %s\n", m_name);
         }
@@ -113,7 +113,7 @@ public class ProfileReference implements SwerveReference {
         if (m_goal == null) {
             return current.control();
         }
-        SwerveControl next = m_profile.calculate(current, m_goal);
+        ControlR3 next = m_profile.calculate(current, m_goal);
         if (current.near(m_goal, TOLERANCE))
             m_done = true;
         return next;

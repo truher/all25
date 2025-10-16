@@ -1,6 +1,6 @@
 package org.team100.frc2025.CalgamesArm;
 
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class HoldPosition extends Command {
     private final CalgamesMech m_subsystem;
 
-    private SwerveModel m_state;
+    private ModelR3 m_state;
 
     public HoldPosition(CalgamesMech subsystem) {
         m_subsystem = subsystem;
@@ -21,7 +21,7 @@ public class HoldPosition extends Command {
     @Override
     public void initialize() {
         // motionless at the current location
-        m_state = new SwerveModel(m_subsystem.getState().pose());
+        m_state = new ModelR3(m_subsystem.getState().pose());
     }
 
     @Override

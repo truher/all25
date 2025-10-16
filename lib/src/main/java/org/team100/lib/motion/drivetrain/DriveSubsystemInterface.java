@@ -1,7 +1,7 @@
 package org.team100.lib.motion.drivetrain;
 
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public interface DriveSubsystemInterface extends Subsystem {
 
     /** Scale and filter input before applying. */
-    void driveInFieldCoords(GlobalSe2Velocity setpoint);
+    void driveInFieldCoords(GlobalVelocityR3 setpoint);
 
     /** No scaling or filtering. */
-    void driveInFieldCoordsVerbatim(GlobalSe2Velocity setpoint);
+    void driveInFieldCoordsVerbatim(GlobalVelocityR3 setpoint);
 
     /** Drive state for the current Takt. */
-    SwerveModel getState();
+    ModelR3 getState();
 
     /** Passthrough to motor stop. This is not "hold position", it is "disable". */
     void stop();

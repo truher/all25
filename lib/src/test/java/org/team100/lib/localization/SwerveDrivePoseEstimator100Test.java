@@ -11,16 +11,16 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.MockGyro;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -46,15 +46,15 @@ class SwerveDrivePoseEstimator100Test {
 
     private SwerveModulePositions positions;
 
-    private static void verify(double x, SwerveModel state) {
+    private static void verify(double x, ModelR3 state) {
         Pose2d estimate = state.pose();
         assertEquals(x, estimate.getX(), DELTA);
         assertEquals(0, estimate.getY(), DELTA);
         assertEquals(0, estimate.getRotation().getRadians(), DELTA);
     }
 
-    private static void verifyVelocity(double xV, SwerveModel state) {
-        GlobalSe2Velocity v = state.velocity();
+    private static void verifyVelocity(double xV, ModelR3 state) {
+        GlobalVelocityR3 v = state.velocity();
         assertEquals(xV, v.x(), DELTA);
     }
 
@@ -843,7 +843,7 @@ class SwerveDrivePoseEstimator100Test {
             }
 
             ou.update(t);
-            SwerveModel xHat = estimator.apply(t);
+            ModelR3 xHat = estimator.apply(t);
 
             double error = groundTruthState.poseMeters.getTranslation().getDistance(xHat.pose().getTranslation());
             if (error > maxError) {

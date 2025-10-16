@@ -19,9 +19,9 @@ import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
-import org.team100.lib.reference.MockProfileReference1d;
-import org.team100.lib.reference.ProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.MockProfileReferenceR1;
+import org.team100.lib.reference.ProfileReferenceR1;
 import org.team100.lib.testing.Timeless;
 
 public class OutboardAngularPositionServoTest implements Timeless {
@@ -44,7 +44,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
                 log, motor, combinedEncoder, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        final IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.01, 0.01);
+        final IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.01, 0.01);
         final OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);
         servo.reset();
@@ -80,7 +80,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         RotaryMechanism mech = new RotaryMechanism(
                 log, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         // no profile for this test.
-        ProfileReference1d ref = new MockProfileReference1d();
+        ProfileReferenceR1 ref = new MockProfileReferenceR1();
         OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);
 
@@ -140,7 +140,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         RotaryMechanism mech = new RotaryMechanism(
                 log, motor, sensor, 1, -11.0 * Math.PI / 4.0, 11.0 * Math.PI / 4.0);
         // no profile for this test.
-        ProfileReference1d ref = new MockProfileReference1d();
+        ProfileReferenceR1 ref = new MockProfileReferenceR1();
         OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);
 
@@ -266,7 +266,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 log, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        ProfileReference1d ref = new MockProfileReference1d();
+        ProfileReferenceR1 ref = new MockProfileReferenceR1();
         OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);
 
@@ -325,7 +325,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         // very fast profile so we can see it; this is used for the "go around"
         // even though we're trying to use "direct" mode.
         IncrementalProfile profile = new TrapezoidIncrementalProfile(200, 10000, 0.05);
-        IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.01, 0.01);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.01, 0.01);
         OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);
 
@@ -420,7 +420,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 log, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        ProfileReference1d ref = new MockProfileReference1d();
+        ProfileReferenceR1 ref = new MockProfileReferenceR1();
         OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);
 

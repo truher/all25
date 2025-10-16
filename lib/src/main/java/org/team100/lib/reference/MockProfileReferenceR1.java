@@ -2,7 +2,7 @@ package org.team100.lib.reference;
 
 import org.team100.lib.state.Model100;
 
-public class MockProfileReference1d implements ProfileReference1d {
+public class MockProfileReferenceR1 implements ProfileReferenceR1 {
 
     @Override
     public void setGoal(Model100 goal) {
@@ -15,7 +15,7 @@ public class MockProfileReference1d implements ProfileReference1d {
     }
 
     @Override
-    public Setpoints1d get() {
+    public SetpointsR1 get() {
         return null;
     }
 

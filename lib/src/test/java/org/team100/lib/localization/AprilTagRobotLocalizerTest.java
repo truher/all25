@@ -14,7 +14,7 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.hal.AllianceStationID;
@@ -62,7 +62,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         // these lists receive the updates
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel();
+        DoubleFunction<ModelR3> history = t -> new ModelR3();
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -117,7 +117,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel();
+        DoubleFunction<ModelR3> history = t -> new ModelR3();
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -169,7 +169,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
         final List<Pose2d> poseEstimate = new ArrayList<Pose2d>();
         final List<Double> timeEstimate = new ArrayList<Double>();
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(-Math.PI / 4));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(-Math.PI / 4));
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
@@ -245,7 +245,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
 
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(3 * Math.PI / 4));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -290,7 +290,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(Math.PI));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(Math.PI));
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
@@ -328,7 +328,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(Math.PI));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(Math.PI));
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
             public void put(double t, Pose2d p, double[] sd1, double[] sd2) {
@@ -369,7 +369,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(Math.PI));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(Math.PI));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -412,7 +412,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(Math.PI));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(Math.PI));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -454,7 +454,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(Math.PI));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(Math.PI));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -494,7 +494,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(-3 * Math.PI / 4));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(-3 * Math.PI / 4));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -534,7 +534,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(3 * Math.PI / 4));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -573,7 +573,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(3 * Math.PI / 4));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override
@@ -615,7 +615,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         assertEquals(1.914, tag4pose.getY(), DELTA);
         assertEquals(1.868, tag4pose.getZ(), DELTA);
 
-        DoubleFunction<SwerveModel> history = t -> new SwerveModel(new Rotation2d(3 * Math.PI / 4));
+        DoubleFunction<ModelR3> history = t -> new ModelR3(new Rotation2d(3 * Math.PI / 4));
 
         VisionUpdater visionUpdater = new VisionUpdater() {
             @Override

@@ -6,9 +6,9 @@ import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.reference.ProfileReference;
+import org.team100.lib.reference.ProfileReferenceR3;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -18,18 +18,18 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class DriveToStateWithProfile extends Command {
     private final FieldLogger.Log m_field_log;
-    private final Supplier<SwerveModel> m_goals;
+    private final Supplier<ModelR3> m_goals;
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final HolonomicProfile m_profile;
 
-    private SwerveModel m_goal;
-    private ProfileReference m_reference;
+    private ModelR3 m_goal;
+    private ProfileReferenceR3 m_reference;
     private ReferenceController m_referenceController;
 
     public DriveToStateWithProfile(
             FieldLogger.Log fieldLogger,
-            Supplier<SwerveModel> goal,
+            Supplier<ModelR3> goal,
             SwerveDriveSubsystem drive,
             SwerveController controller,
             HolonomicProfile profile) {
@@ -46,7 +46,7 @@ public class DriveToStateWithProfile extends Command {
         m_goal = m_goals.get();
         if (m_goal == null)
             return;
-        m_reference = new ProfileReference(m_profile, "Drive to pose with profile");
+        m_reference = new ProfileReferenceR3(m_profile, "Drive to pose with profile");
         m_reference.setGoal(m_goal);
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }

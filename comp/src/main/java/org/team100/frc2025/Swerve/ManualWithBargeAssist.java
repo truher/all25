@@ -6,6 +6,7 @@ import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
 import org.team100.lib.commands.drivetrain.manual.HeadingLatch;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -14,11 +15,10 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.StringLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -89,7 +89,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
     }
 
     @Override
-    public void reset(SwerveModel state) {
+    public void reset(ModelR3 state) {
         m_thetaSetpoint = state.theta().control();
         m_goal = null;
         m_latch.unlatch();
@@ -111,10 +111,10 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public GlobalSe2Velocity apply(
-            final SwerveModel state,
+    public GlobalVelocityR3 apply(
+            final ModelR3 state,
             final Velocity twist1_1) {
-        final GlobalSe2Velocity control = clipAndScale(twist1_1);
+        final GlobalVelocityR3 control = clipAndScale(twist1_1);
 
         final double currentVelocity = state.velocity().norm();
 
@@ -168,7 +168,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
                 thetaFF + thetaFB,
                 -m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
-        GlobalSe2Velocity twistWithSnapM_S = new GlobalSe2Velocity(control.x(), control.y(), omega);
+        GlobalVelocityR3 twistWithSnapM_S = new GlobalVelocityR3(control.x(), control.y(), omega);
 
         m_log_mode.log(() -> "snap");
         m_log_goal_theta.log(m_goal::getRadians);
@@ -184,7 +184,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
      * Slow down when driving toward the barge scoring location, so you don't hit
      * it.
      */
-    public GlobalSe2Velocity clipAndScale(Velocity twist1_1) {
+    public GlobalVelocityR3 clipAndScale(Velocity twist1_1) {
         // clip the input to the unit circle
         final Velocity clipped = twist1_1.clip(1.0);
 

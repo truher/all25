@@ -1,10 +1,10 @@
 package org.team100.lib.motion.kinematics;
 
+import org.team100.lib.geometry.GlobalAccelerationR3;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -37,9 +37,9 @@ public class AnalyticalJacobian {
      * 
      * See doc/README.md equation 4
      */
-    public GlobalSe2Velocity forward(Config q, JointVelocities qdot) {
+    public GlobalVelocityR3 forward(Config q, JointVelocities qdot) {
         Matrix<N3, N3> j = getJ(q);
-        return GlobalSe2Velocity.fromVector(j.times(qdot.toVector()));
+        return GlobalVelocityR3.fromVector(j.times(qdot.toVector()));
     }
 
     /**
@@ -49,9 +49,9 @@ public class AnalyticalJacobian {
      * 
      * See README.md equation 5
      */
-    public JointVelocities inverse(SwerveModel m) {
+    public JointVelocities inverse(ModelR3 m) {
         Pose2d x = m.pose();
-        GlobalSe2Velocity xdot = m.velocity();
+        GlobalVelocityR3 xdot = m.velocity();
         Config q = m_k.inverse(x);
         Matrix<N3, N3> Jinv = getJinv(q);
         return JointVelocities.fromVector(Jinv.times(xdot.toVector()));
@@ -64,11 +64,11 @@ public class AnalyticalJacobian {
      * 
      * See doc/README.md equation 6
      */
-    public GlobalSe2Acceleration forwardA(
+    public GlobalAccelerationR3 forwardA(
             Config q, JointVelocities qdot, JointAccelerations qddot) {
         Matrix<N3, N3> J = getJ(q);
         Matrix<N3, N3> Jdot = getJdot(q, qdot);
-        return GlobalSe2Acceleration.fromVector(
+        return GlobalAccelerationR3.fromVector(
                 Jdot.times(qdot.toVector()).plus(J.times(qddot.toVector())));
     }
 
@@ -79,10 +79,10 @@ public class AnalyticalJacobian {
      * 
      * See doc/README.md equation 9
      */
-    public JointAccelerations inverseA(SwerveControl m) {
+    public JointAccelerations inverseA(ControlR3 m) {
         Pose2d x = m.pose();
-        GlobalSe2Velocity xdot = m.velocity();
-        GlobalSe2Acceleration xddot = m.acceleration();
+        GlobalVelocityR3 xdot = m.velocity();
+        GlobalAccelerationR3 xddot = m.acceleration();
         Config q = m_k.inverse(x);
         Matrix<N3, N3> Jinv = getJinv(q);
         JointVelocities qdot = JointVelocities.fromVector(Jinv.times(xdot.toVector()));

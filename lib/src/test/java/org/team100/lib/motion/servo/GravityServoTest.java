@@ -20,9 +20,9 @@ import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
-import org.team100.lib.reference.MockProfileReference1d;
-import org.team100.lib.reference.ProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.MockProfileReferenceR1;
+import org.team100.lib.reference.ProfileReferenceR1;
 import org.team100.lib.state.Model100;
 import org.team100.lib.testing.Timeless;
 
@@ -35,7 +35,7 @@ class GravityServoTest implements Timeless {
         Feedback100 pivotFeedback = new PIDFeedback(
                 logger, 4.5, 0.0, 0.000, false, 0.05, 1);
         IncrementalProfile profile = new TrapezoidIncrementalProfile(8, 8, 0.001);
-        IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         // motor speed is rad/s
         SimulatedBareMotor simMotor = new SimulatedBareMotor(logger, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, simMotor);
@@ -71,7 +71,7 @@ class GravityServoTest implements Timeless {
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         Feedback100 fb = new ZeroFeedback(false, 0.01, 0.01);
-        ProfileReference1d ref = new MockProfileReference1d();
+        ProfileReferenceR1 ref = new MockProfileReferenceR1();
         OnboardAngularPositionServo servo = new OnboardAngularPositionServo(logger, mech, ref, fb);
         // these constants were used in Wrist2.
         // negative force means pull in
