@@ -10,7 +10,7 @@ import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -51,7 +51,7 @@ public class SimulatedTagDetector {
 
     private final List<Camera> m_cameras;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
-    private final DoubleFunction<SwerveModel> m_history;
+    private final DoubleFunction<ModelR3> m_history;
 
     private final Map<Camera, StructArrayPublisher<Blip24>> m_publishers;
     /** client instance, not the default */
@@ -67,7 +67,7 @@ public class SimulatedTagDetector {
     public SimulatedTagDetector(
             List<Camera> cameras,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            DoubleFunction<SwerveModel> history) {
+            DoubleFunction<ModelR3> history) {
         m_cameras = cameras;
         m_layout = layout;
         m_history = history;

@@ -14,13 +14,13 @@ public class TimedProfileReference1dTest implements Timeless {
     void testSimple() {
         JerkLimitedTimedProfile p = new JerkLimitedTimedProfile(2, 6, 25, false);
         Model100 goal = new Model100(1, 0);
-        ProfileReference1d ref = new TimedProfileReference1d(p);
+        ProfileReferenceR1 ref = new TimedProfileReferenceR1(p);
         ref.setGoal(goal);
         Model100 measurement = new Model100();
         ref.init(measurement);
 
         // initial current setpoint is the measurement.
-        Setpoints1d s = ref.get();
+        SetpointsR1 s = ref.get();
         assertEquals(0, s.current().x(), DELTA);
         assertEquals(0, s.current().v(), DELTA);
         assertEquals(0, s.current().a(), DELTA);

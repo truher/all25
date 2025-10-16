@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.team100.lib.commands.Done;
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.reference.TrajectoryReference;
+import org.team100.lib.reference.TrajectoryReferenceR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 
@@ -40,7 +40,7 @@ public class GoToPoseCalGamesMech extends Done {
                 List.of(m_currentPose, m_goal));
         m_referenceController = new CalgamesReferenceController(
                 m_subsystem,
-                new TrajectoryReference(m_trajectory));
+                new TrajectoryReferenceR3(m_trajectory));
     }
 
     @Override

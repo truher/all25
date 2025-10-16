@@ -3,15 +3,15 @@ package org.team100.frc2025.CalgamesArm;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.GlobalAccelerationR3;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.Config;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Acceleration;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
 import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
 import org.team100.lib.motion.kinematics.JointAccelerations;
 import org.team100.lib.motion.kinematics.JointVelocities;
+import org.team100.lib.state.ControlR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -56,10 +56,10 @@ public class TrajectoryJointTest {
                     .println(
                             "t, x, y, r, vx, vy, vr, ax, ay, ar, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < t.duration(); tt += 0.02) {
-            SwerveControl m = SwerveControl.fromTimedPose(t.sample(tt));
+            ControlR3 m = ControlR3.fromTimedPose(t.sample(tt));
             Pose2d p = m.pose();
-            GlobalSe2Velocity v = m.velocity();
-            GlobalSe2Acceleration a = m.acceleration();
+            GlobalVelocityR3 v = m.velocity();
+            GlobalAccelerationR3 a = m.acceleration();
             Config q = k.inverse(p);
             JointVelocities jv = J.inverse(m.model());
             JointAccelerations ja = J.inverseA(m);

@@ -7,20 +7,20 @@ import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
 import org.team100.lib.state.Model100;
 import org.team100.lib.testing.Timeless;
 
-public class IncrementalProfileReference1dTest implements Timeless {
+public class IncrementalProfileReferenceR1Test implements Timeless {
     private static final double DELTA = 0.001;
 
     @Test
     void testSimple() {
         TrapezoidProfileWPI p = new TrapezoidProfileWPI(2, 6);
         Model100 goal = new Model100(1, 0);
-        ProfileReference1d ref = new IncrementalProfileReference1d(p, 0.05, 0.05);
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(p, 0.05, 0.05);
         ref.setGoal(goal);
         Model100 measurement = new Model100();
         ref.init(measurement);
 
         // initial current setpoint is the measurement.
-        Setpoints1d s = ref.get();
+        SetpointsR1 s = ref.get();
         assertEquals(0, s.current().x(), DELTA);
         assertEquals(0, s.current().v(), DELTA);
         assertEquals(0, s.current().a(), DELTA);

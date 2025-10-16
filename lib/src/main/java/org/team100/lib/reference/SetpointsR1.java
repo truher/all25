@@ -13,6 +13,6 @@ import org.team100.lib.state.Control100;
  * @param current
  * @param next
  */
-public record Setpoints1d(Control100 current, Control100 next) {
+public record SetpointsR1(Control100 current, Control100 next) {
 
 }

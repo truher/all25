@@ -1,9 +1,9 @@
 package org.team100.lib.controller.drivetrain;
 
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.reference.SwerveReference;
+import org.team100.lib.reference.ReferenceR3;
+import org.team100.lib.state.ModelR3;
 
 /**
  * Actuates the drivetrain based on a SwerveReference.
@@ -15,7 +15,7 @@ public class ReferenceController {
     private static final boolean DEBUG = false;
     private final DriveSubsystemInterface m_drive;
     private final SwerveController m_controller;
-    private final SwerveReference m_reference;
+    private final ReferenceR3 m_reference;
     private final boolean m_verbatim;
 
     /**
@@ -25,7 +25,7 @@ public class ReferenceController {
     public ReferenceController(
             DriveSubsystemInterface drive,
             SwerveController controller,
-            SwerveReference reference,
+            ReferenceR3 reference,
             boolean verbatim) {
         m_drive = drive;
         m_controller = controller;
@@ -40,8 +40,8 @@ public class ReferenceController {
 
     public void execute() {
         try {
-            SwerveModel measurement = m_drive.getState();
-            GlobalSe2Velocity fieldRelativeTarget = m_controller.calculate(
+            ModelR3 measurement = m_drive.getState();
+            GlobalVelocityR3 fieldRelativeTarget = m_controller.calculate(
                     measurement, m_reference.current(), m_reference.next());
             if (DEBUG) {
                 System.out.printf("ReferenceController.execute() measurement %s current %s next %s output %s\n", 
@@ -69,8 +69,8 @@ public class ReferenceController {
 
     /** Distance between the measurement and the goal. */
     public double toGo() {
-        SwerveModel goal = m_reference.goal();
-        SwerveModel measurement = m_drive.getState();
+        ModelR3 goal = m_reference.goal();
+        ModelR3 measurement = m_drive.getState();
         return goal.minus(measurement).translation().getNorm();
     }
 }

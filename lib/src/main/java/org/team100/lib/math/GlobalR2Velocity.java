@@ -1,6 +1,6 @@
 package org.team100.lib.math;
 
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
+import org.team100.lib.geometry.GlobalVelocityR3;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -12,7 +12,7 @@ public record GlobalR2Velocity(double x, double y) {
     }
 
     /** Pick up the translation component of v. */
-    public static GlobalR2Velocity fromSe2(GlobalSe2Velocity v) {
+    public static GlobalR2Velocity fromSe2(GlobalVelocityR3 v) {
         return new GlobalR2Velocity(v.x(), v.y());
     }
 

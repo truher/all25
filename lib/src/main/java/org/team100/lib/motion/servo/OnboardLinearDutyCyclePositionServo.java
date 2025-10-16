@@ -6,8 +6,8 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.mechanism.LinearMechanism;
-import org.team100.lib.reference.ProfileReference1d;
-import org.team100.lib.reference.Setpoints1d;
+import org.team100.lib.reference.ProfileReferenceR1;
+import org.team100.lib.reference.SetpointsR1;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 
@@ -20,7 +20,7 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
     private static final double POSITION_TOLERANCE = 0.01;
     private static final double VELOCITY_TOLERANCE = 0.01;
     private final LinearMechanism m_mechanism;
-    private final ProfileReference1d m_ref;
+    private final ProfileReferenceR1 m_ref;
     private final Feedback100 m_feedback;
     private final double m_kV;
     private final DoubleLogger m_log_goal;
@@ -40,7 +40,7 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
     public OnboardLinearDutyCyclePositionServo(
             LoggerFactory parent,
             LinearMechanism mechanism,
-            ProfileReference1d ref,
+            ProfileReferenceR1 ref,
             Feedback100 feedback,
             double kV) {
         LoggerFactory child = parent.type(this);
@@ -103,7 +103,7 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
      * @param feedForwardTorqueNm ignored
      */
     @Override
-    public void setPositionDirect(Setpoints1d setpoints, double feedForwardTorqueNm) {
+    public void setPositionDirect(SetpointsR1 setpoints, double feedForwardTorqueNm) {
         m_goal = null;
         actuate(setpoints, feedForwardTorqueNm);
     }
@@ -113,7 +113,7 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
      * setpoint, and actuate using duty cycle.
      * Ignores torque
      */
-    private void actuate(Setpoints1d setpoints, double feedForwardTorqueNm) {
+    private void actuate(SetpointsR1 setpoints, double feedForwardTorqueNm) {
         // setpoint must be updated so the profile can see it
         m_setpoint = setpoints.next();
 

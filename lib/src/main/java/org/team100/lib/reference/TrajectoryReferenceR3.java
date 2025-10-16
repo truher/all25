@@ -2,32 +2,32 @@ package org.team100.lib.reference;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.Trajectory100;
 
 /** Produces references based on a trajectory. */
-public class TrajectoryReference implements SwerveReference {
+public class TrajectoryReferenceR3 implements ReferenceR3 {
     private final Trajectory100 m_trajectory;
     private double m_startTimeS;
 
-    public TrajectoryReference(Trajectory100 trajectory) {
+    public TrajectoryReferenceR3(Trajectory100 trajectory) {
         m_trajectory = trajectory;
     }
 
     /** Ignores the measurement, resets the trajectory timer. */
     @Override
-    public void initialize(SwerveModel measurement) {
+    public void initialize(ModelR3 measurement) {
         m_startTimeS = Takt.get();
     }
 
     @Override
-    public SwerveModel current() {
+    public ModelR3 current() {
         return sample(progress()).model();
     }
 
     @Override
-    public SwerveControl next() {
+    public ControlR3 next() {
         return sample(progress() + TimedRobot100.LOOP_PERIOD_S);
     }
 
@@ -37,8 +37,8 @@ public class TrajectoryReference implements SwerveReference {
     }
 
     @Override
-    public SwerveModel goal() {
-        return SwerveControl.fromTimedPose(m_trajectory.getLastPoint()).model();
+    public ModelR3 goal() {
+        return ControlR3.fromTimedPose(m_trajectory.getLastPoint()).model();
     }
 
     ////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ public class TrajectoryReference implements SwerveReference {
         return Takt.get() - m_startTimeS;
     }
 
-    private SwerveControl sample(double t) {
-        return SwerveControl.fromTimedPose(m_trajectory.sample(t));
+    private ControlR3 sample(double t) {
+        return ControlR3.fromTimedPose(m_trajectory.sample(t));
     }
 }

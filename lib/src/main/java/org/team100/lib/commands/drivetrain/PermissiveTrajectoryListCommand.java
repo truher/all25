@@ -7,7 +7,7 @@ import java.util.function.Function;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.reference.TrajectoryReference;
+import org.team100.lib.reference.TrajectoryReferenceR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -55,7 +55,7 @@ public class PermissiveTrajectoryListCommand extends Command  {
                 m_referenceController = new ReferenceController(
                         m_drive,
                         m_controller,
-                        new TrajectoryReference(trajectory),
+                        new TrajectoryReferenceR3(trajectory),
                         false);
                 m_viz.setViz(trajectory);
             } else {

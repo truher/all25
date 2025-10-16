@@ -4,8 +4,8 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
-import org.team100.lib.reference.ProfileReference1d;
-import org.team100.lib.reference.Setpoints1d;
+import org.team100.lib.reference.ProfileReferenceR1;
+import org.team100.lib.reference.SetpointsR1;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 
@@ -23,7 +23,7 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
     private static final double POSITION_TOLERANCE = 0.02;
     private static final double VELOCITY_TOLERANCE = 0.02;
     protected final RotaryMechanism m_mechanism;
-    private final ProfileReference1d m_ref;
+    private final ProfileReferenceR1 m_ref;
     private final DoubleLogger m_log_goal;
 
     /**
@@ -47,7 +47,7 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
     protected AngularPositionServoImpl(
             LoggerFactory parent,
             RotaryMechanism mechanism,
-            ProfileReference1d ref) {
+            ProfileReferenceR1 ref) {
         m_mechanism = mechanism;
         m_ref = ref;
         LoggerFactory child = parent.type(this);
@@ -55,7 +55,7 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
 
     }
 
-    abstract void actuate(Setpoints1d wrappedSetpoints, double torqueNm);
+    abstract void actuate(SetpointsR1 wrappedSetpoints, double torqueNm);
 
     @Override
     public void reset() {
@@ -97,7 +97,7 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
                     if (DEBUG)
                         System.out.println("setpoint is inaccessible, hold position.");
                     m_nextUnwrappedSetpoint = m_mechanism.getUnwrappedMeasurement().control();
-                    actuate(new Setpoints1d(m_nextUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
+                    actuate(new SetpointsR1(m_nextUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
                     m_validSetpoint = false;
                     return;
                 }
@@ -118,7 +118,7 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
                     if (DEBUG)
                         System.out.println("setpoint is inaccessible; hold position.");
                     m_nextUnwrappedSetpoint = m_mechanism.getUnwrappedMeasurement().control();
-                    actuate(new Setpoints1d(m_nextUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
+                    actuate(new SetpointsR1(m_nextUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
                     m_validSetpoint = false;
                     return;
                 }
@@ -130,7 +130,7 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         m_nextUnwrappedSetpoint = new Control100(unwrappedGoalX, velocityRad_S);
         if (currentUnwrappedSetpoint == null)
             currentUnwrappedSetpoint = m_nextUnwrappedSetpoint;
-        actuate(new Setpoints1d(currentUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
+        actuate(new SetpointsR1(currentUnwrappedSetpoint, m_nextUnwrappedSetpoint), torqueNm);
     }
 
     @Override
@@ -175,7 +175,7 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
 
     private void actuateWithProfile(double unwrappedGoalX, double torqueNm) {
         initReference(new Model100(unwrappedGoalX, 0));
-        Setpoints1d unwrappedSetpoint = m_ref.get();
+        SetpointsR1 unwrappedSetpoint = m_ref.get();
         m_nextUnwrappedSetpoint = unwrappedSetpoint.next();
         actuate(unwrappedSetpoint, torqueNm);
     }

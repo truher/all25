@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveControl;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,10 +18,10 @@ class HolonomicProfileTest {
     @Test
     void testSolve() {
         HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
-        SwerveModel i = new SwerveModel(
-                new Pose2d(0, 0, Rotation2d.kZero), new GlobalSe2Velocity(1, 0, 0));
-        SwerveModel g = new SwerveModel(
-                new Pose2d(0, 2, Rotation2d.kZero), new GlobalSe2Velocity(0, 0, 0));
+        ModelR3 i = new ModelR3(
+                new Pose2d(0, 0, Rotation2d.kZero), new GlobalVelocityR3(1, 0, 0));
+        ModelR3 g = new ModelR3(
+                new Pose2d(0, 2, Rotation2d.kZero), new GlobalVelocityR3(0, 0, 0));
         hp.solve(i, g);
         // scale factors
         assertEquals(0.8125, hp.sx, DELTA);
@@ -39,10 +39,10 @@ class HolonomicProfileTest {
     @Test
     void test2d() {
         HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
-        SwerveModel i = new SwerveModel();
-        SwerveModel g = new SwerveModel(new Pose2d(1, 5, Rotation2d.kZero));
+        ModelR3 i = new ModelR3();
+        ModelR3 g = new ModelR3(new Pose2d(1, 5, Rotation2d.kZero));
         hp.solve(i, g);
-        SwerveControl s = i.control();
+        ControlR3 s = i.control();
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
             if (DEBUG)
@@ -57,10 +57,10 @@ class HolonomicProfileTest {
     @Test
     void test2dExp() {
         HolonomicProfile hp = HolonomicProfile.currentLimitedExponential(1, 1, 2, 1, 1, 2);
-        SwerveModel i = new SwerveModel();
-        SwerveModel g = new SwerveModel(new Pose2d(1, 5, Rotation2d.kZero));
+        ModelR3 i = new ModelR3();
+        ModelR3 g = new ModelR3(new Pose2d(1, 5, Rotation2d.kZero));
         hp.solve(i, g);
-        SwerveControl s = i.control();
+        ControlR3 s = i.control();
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
             if (DEBUG)
@@ -71,10 +71,10 @@ class HolonomicProfileTest {
     @Test
     void test2dWithEntrySpeed() {
         HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
-        SwerveModel i = new SwerveModel(new Pose2d(), new GlobalSe2Velocity(1, 0, 0));
-        SwerveModel g = new SwerveModel(new Pose2d(0, 1, Rotation2d.kZero));
+        ModelR3 i = new ModelR3(new Pose2d(), new GlobalVelocityR3(1, 0, 0));
+        ModelR3 g = new ModelR3(new Pose2d(0, 1, Rotation2d.kZero));
         hp.solve(i, g);
-        SwerveControl s = i.control();
+        ControlR3 s = i.control();
         for (double t = 0; t < 10; t += 0.02) {
             s = hp.calculate(s.model(), g);
             if (DEBUG)
@@ -98,8 +98,8 @@ class HolonomicProfileTest {
     @Test
     void testSolvePerformance() {
         HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
-        SwerveModel i = new SwerveModel(new Pose2d(), new GlobalSe2Velocity(1, 0, 0));
-        SwerveModel g = new SwerveModel(new Pose2d(0, 1, Rotation2d.kZero));
+        ModelR3 i = new ModelR3(new Pose2d(), new GlobalVelocityR3(1, 0, 0));
+        ModelR3 g = new ModelR3(new Pose2d(0, 1, Rotation2d.kZero));
         int N = 10000;
         double t0 = Takt.actual();
         for (int ii = 0; ii < N; ++ii) {

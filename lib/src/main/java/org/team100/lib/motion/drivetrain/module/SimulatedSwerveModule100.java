@@ -17,7 +17,7 @@ import org.team100.lib.motion.servo.OutboardAngularPositionServo;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
 
 /**
  * Uses simulated position sensors, must be used with clock control (e.g.
@@ -91,7 +91,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
                 1);
         IncrementalProfile profile = kinodynamics.getSteeringProfile();
         // without a profile, there's no velocity feedforward. Hm.
-        IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         OnboardAngularPositionServo turningServo = new OnboardAngularPositionServo(
                 parent,
                 turningMech,
@@ -123,7 +123,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
                 parent, motor, combinedEncoder, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         IncrementalProfile profile = kinodynamics.getSteeringProfile();
-        IncrementalProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
 
         OutboardAngularPositionServo turningServo = new OutboardAngularPositionServo(
                 parent, turningMech, ref);

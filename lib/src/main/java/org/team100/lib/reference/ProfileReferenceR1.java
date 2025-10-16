@@ -9,13 +9,13 @@ import org.team100.lib.state.Model100;
  * 
  * NOTE: this class doesn't know anything about angle wrapping.
  */
-public interface ProfileReference1d {
+public interface ProfileReferenceR1 {
 
     void setGoal(Model100 goal);
 
     void init(Model100 measurement);
 
-    Setpoints1d get();
+    SetpointsR1 get();
 
     /** The profile has reached the goal. */
     boolean profileDone();

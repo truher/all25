@@ -6,8 +6,8 @@ import java.util.function.Supplier;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.reference.TrajectoryReference;
+import org.team100.lib.reference.TrajectoryReferenceR3;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class DriveToPoseWithTrajectory extends Command {
     private final Supplier<Pose2d> m_goal;
     private final SwerveDriveSubsystem m_drive;
-    private final BiFunction<SwerveModel, Pose2d, Trajectory100> m_trajectories;
+    private final BiFunction<ModelR3, Pose2d, Trajectory100> m_trajectories;
     private final SwerveController m_controller;
     private final TrajectoryVisualization m_viz;
 
@@ -41,7 +41,7 @@ public class DriveToPoseWithTrajectory extends Command {
     public DriveToPoseWithTrajectory(
             Supplier<Pose2d> goal,
             SwerveDriveSubsystem drive,
-            BiFunction<SwerveModel, Pose2d, Trajectory100> trajectories,
+            BiFunction<ModelR3, Pose2d, Trajectory100> trajectories,
             SwerveController controller,
             TrajectoryVisualization viz) {
         m_goal = goal;
@@ -62,7 +62,7 @@ public class DriveToPoseWithTrajectory extends Command {
         m_referenceController = new ReferenceController(
                 m_drive,
                 m_controller,
-                new TrajectoryReference(m_trajectory),
+                new TrajectoryReferenceR3(m_trajectory),
                 false);
         m_viz.setViz(m_trajectory);
     }

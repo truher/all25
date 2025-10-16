@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -52,7 +52,7 @@ public class DriveManuallySimple extends Command {
     public void initialize() {
         m_heedRadiusM.accept(HEED_RADIUS_M);
         m_drive.resetLimiter();
-        SwerveModel p = m_drive.getState();
+        ModelR3 p = m_drive.getState();
         m_defaultDriver.reset(p);
     }
 
@@ -60,7 +60,7 @@ public class DriveManuallySimple extends Command {
     public void execute() {
 
         Velocity input = m_twistSupplier.get();
-        SwerveModel state = m_drive.getState();
+        ModelR3 state = m_drive.getState();
 
         if (m_useAlternative.get() == wasUsingDefault) { // we need to reset the driver because we switched modes from
                                                          // you WERE using default to now using alternative

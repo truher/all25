@@ -1,7 +1,7 @@
 package org.team100.frc2025.CalgamesArm;
 
 import org.team100.lib.commands.Done;
-import org.team100.lib.reference.TrajectoryReference;
+import org.team100.lib.reference.TrajectoryReferenceR3;
 import org.team100.lib.trajectory.Trajectory100;
 
 /** Analogous to DriveWithTrajectory, but for R3 positional control. */
@@ -24,7 +24,7 @@ public class FollowTrajectory extends Done {
     public void initialize() {
         m_referenceController = new CalgamesReferenceController(
                 m_subsystem,
-                new TrajectoryReference(m_trajectory));
+                new TrajectoryReferenceR3(m_trajectory));
     }
 
     @Override

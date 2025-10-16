@@ -13,7 +13,7 @@ import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -34,7 +34,7 @@ public class TargetsTest implements Timeless {
     @Test
     void testTargets() {
         stepTime();
-        SwerveModel p = new SwerveModel();
+        ModelR3 p = new ModelR3();
         Targets t = new Targets(logger, fieldLog, (x) -> p);
         t.update();
         assertTrue(t.getTargets().isEmpty());
@@ -65,7 +65,7 @@ public class TargetsTest implements Timeless {
     void testTranslations() {
         stepTime();
 
-        SwerveModel p = new SwerveModel();
+        ModelR3 p = new ModelR3();
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 List.of(Camera.TEST4),
                 x -> p,
@@ -96,7 +96,7 @@ public class TargetsTest implements Timeless {
     @Test
     void testMultipleCameras() {
         stepTime();
-        SwerveModel p = new SwerveModel();
+        ModelR3 p = new ModelR3();
 
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 List.of(Camera.TEST4, Camera.TEST5),
@@ -130,7 +130,7 @@ public class TargetsTest implements Timeless {
     void testMultipleTargets() {
         stepTime();
 
-        SwerveModel p = new SwerveModel();
+        ModelR3 p = new ModelR3();
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 List.of(Camera.TEST4),
                 x -> p,
@@ -163,7 +163,7 @@ public class TargetsTest implements Timeless {
     @Test
     void testMultipleTargetsAndCameras() {
         stepTime();
-        SwerveModel p = new SwerveModel();
+        ModelR3 p = new ModelR3();
 
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 List.of(Camera.TEST4, Camera.TEST5),

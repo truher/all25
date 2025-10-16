@@ -14,8 +14,8 @@ import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.CoalescingCollection;
 import org.team100.lib.util.TrailingHistory;
 
@@ -58,7 +58,7 @@ public class Targets extends CameraReader<Rotation3d> {
     private final FieldLogger.Log m_field_log;
 
     /** state = f(takt seconds) from history. */
-    private final DoubleFunction<SwerveModel> m_history;
+    private final DoubleFunction<ModelR3> m_history;
     /** Accumulation of targets we see. */
     // private final TrailingHistory<Translation2d> m_targets;
     private final CoalescingCollection<Translation2d> m_targets;
@@ -69,7 +69,7 @@ public class Targets extends CameraReader<Rotation3d> {
     public Targets(
             LoggerFactory log,
             FieldLogger.Log fieldLogger,
-            DoubleFunction<SwerveModel> history) {
+            DoubleFunction<ModelR3> history) {
         super(
                 "objectVision",
                 "Rotation3d",

@@ -3,9 +3,9 @@ package org.team100.lib.commands.drivetrain;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
-import org.team100.lib.reference.ConstantReference;
-import org.team100.lib.reference.SwerveReference;
+import org.team100.lib.reference.ConstantReferenceR3;
+import org.team100.lib.reference.ReferenceR3;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -21,17 +21,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class DriveToStateSimple extends Command {
     private final SwerveController m_controller;
     private final SwerveDriveSubsystem m_drive;
-    private final SwerveReference m_reference;
+    private final ReferenceR3 m_reference;
 
     private ReferenceController m_referenceController;
 
     public DriveToStateSimple(
             SwerveController controller,
             SwerveDriveSubsystem drive,
-            SwerveModel goal) {
+            ModelR3 goal) {
         m_controller = controller;
         m_drive = drive;
-        m_reference = new ConstantReference(goal);
+        m_reference = new ConstantReferenceR3(goal);
         addRequirements(drive);
     }
 

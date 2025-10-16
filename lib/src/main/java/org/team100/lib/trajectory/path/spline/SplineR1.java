@@ -13,7 +13,7 @@ import edu.wpi.first.math.numbers.N6;
  * 
  * The "t" parameter here is not time, its just a parameter.
  */
-public class Spline1d {
+public class SplineR1 {
     /** crackle */
     private final double a;
     /** snap */
@@ -27,7 +27,7 @@ public class Spline1d {
     /** position */
     private final double f;
 
-    private Spline1d(double a, double b, double c, double d, double e, double f) {
+    private SplineR1(double a, double b, double c, double d, double e, double f) {
         if (Double.isNaN(a))
             throw new IllegalArgumentException();
         if (Double.isNaN(b))
@@ -48,7 +48,7 @@ public class Spline1d {
         this.f = f;
     }
 
-    public static Spline1d newSpline1d(
+    public static SplineR1 get(
             double x0,
             double x1,
             double dx0,
@@ -77,10 +77,10 @@ public class Spline1d {
         double d = 0.5 * ddx0;
         double e = dx0;
         double f = x0;
-        return new Spline1d(a, b, c, d, e, f);
+        return new SplineR1(a, b, c, d, e, f);
     }
 
-    public static Spline1d viaMatrix(
+    public static SplineR1 viaMatrix(
             double x0,
             double x1,
             double dx0,
@@ -110,7 +110,7 @@ public class Spline1d {
         Matrix<N6, N6> Ainv = A.inv();
         Vector<N6> x = VecBuilder.fill(x0, dx0, ddx0, x1, dx1, ddx1);
         Matrix<N6, N1> c = Ainv.times(x);
-        return new Spline1d(
+        return new SplineR1(
                 c.get(5, 0),
                 c.get(4, 0),
                 c.get(3, 0),
@@ -119,14 +119,14 @@ public class Spline1d {
                 c.get(0, 0));
     }
 
-    Spline1d addCoefs(Spline1d other) {
+    SplineR1 addCoefs(SplineR1 other) {
         double aa = a + other.a;
         double bb = b + other.b;
         double cc = c + other.c;
         double dd = d + other.d;
         double ee = e + other.e;
         double ff = f + other.f;
-        return new Spline1d(aa, bb, cc, dd, ee, ff);
+        return new SplineR1(aa, bb, cc, dd, ee, ff);
     }
 
     /**

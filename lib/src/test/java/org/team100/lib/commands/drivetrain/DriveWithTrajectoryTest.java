@@ -19,7 +19,7 @@ import org.team100.lib.motion.drivetrain.MockDrive;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -52,7 +52,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
 
         MockDrive d = new MockDrive();
         // initially at rest
-        d.m_state = new SwerveModel();
+        d.m_state = new ModelR3();
 
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
 
@@ -104,7 +104,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
 
         MockDrive d = new MockDrive();
         // initially at rest
-        d.m_state = new SwerveModel();
+        d.m_state = new ModelR3();
 
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
         c.initialize();
@@ -113,7 +113,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
             stepTime();
             c.execute();
             // we have magically reached the end
-            d.m_state = new SwerveModel(new Pose2d(1, 0, Rotation2d.kZero));
+            d.m_state = new ModelR3(new Pose2d(1, 0, Rotation2d.kZero));
         }
         assertTrue(c.isDone());
 

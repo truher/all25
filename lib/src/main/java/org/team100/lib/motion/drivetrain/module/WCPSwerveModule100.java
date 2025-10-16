@@ -21,8 +21,8 @@ import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.profile.incremental.IncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
-import org.team100.lib.reference.ProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.ProfileReferenceR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 
@@ -249,7 +249,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             RotaryMechanism mech,
             CombinedRotaryPositionSensor combinedEncoder) {
         IncrementalProfile profile = kinodynamics.getSteeringProfile();
-        ProfileReference1d ref = new IncrementalProfileReference1d(
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(
                 profile, STEERING_POSITION_TOLERANCE_RAD, STEERING_VELOCITY_TOLERANCE_RAD_S);
         return new OutboardAngularPositionServo(parent, mech, ref);
     }

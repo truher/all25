@@ -16,7 +16,7 @@ import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
-import org.team100.lib.reference.IncrementalProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
 import org.team100.lib.testing.Timeless;
 
 class AngularPositionProfileTest implements Timeless {
@@ -28,7 +28,7 @@ class AngularPositionProfileTest implements Timeless {
     private final RotaryMechanism mech;
     private final MockRotaryPositionSensor sensor;
     private final Feedback100 feedback2;
-    IncrementalProfileReference1d ref;
+    IncrementalProfileReferenceR1 ref;
     private OnboardAngularPositionServo servo;
 
     public AngularPositionProfileTest() {
@@ -46,7 +46,7 @@ class AngularPositionProfileTest implements Timeless {
     @Test
     void testTrapezoid() {
         final IncrementalProfile profile = new TrapezoidProfileWPI(1, 1);
-        ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
+        ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(
                 logger,
                 mech,
@@ -60,7 +60,7 @@ class AngularPositionProfileTest implements Timeless {
     @Test
     void testProfile() {
         final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
+        ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(
                 logger,
                 mech,

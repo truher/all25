@@ -14,8 +14,8 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.logging.LoggerFactory.Transform3dLogger;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.network.CameraReader;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.TrailingHistory;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -74,7 +74,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             0.001,
             0.1 };
 
-    private final DoubleFunction<SwerveModel> m_history;
+    private final DoubleFunction<ModelR3> m_history;
     private final VisionUpdater m_visionUpdater;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
 
@@ -140,7 +140,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     public AprilTagRobotLocalizer(
             LoggerFactory parent,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            DoubleFunction<SwerveModel> history,
+            DoubleFunction<ModelR3> history,
             VisionUpdater visionUpdater) {
         super("vision", "blips", StructBuffer.create(Blip24.struct));
         LoggerFactory child = parent.type(this);
