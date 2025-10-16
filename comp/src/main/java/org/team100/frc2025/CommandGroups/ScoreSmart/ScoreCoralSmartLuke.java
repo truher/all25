@@ -15,6 +15,7 @@ import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.ReefPoint;
+import org.team100.lib.field.FieldConstantsLuke;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
@@ -36,7 +37,7 @@ public class ScoreCoralSmartLuke {
             DoubleConsumer heedRadiusM,
             Supplier<ScoringLevel> level,
             Supplier<ReefPoint> point) {
-        Supplier<Pose2d> goal = () -> FieldConstants.makeGoal(level.get(), point.get());
+        Supplier<Pose2d> goal = () -> FieldConstantsLuke.makeGoal(level.get(), point.get());
         return parallel(
                 runOnce(() -> heedRadiusM.accept(HEED_RADIUS_M)),
                 select(Map.ofEntries(
@@ -59,5 +60,5 @@ public class ScoreCoralSmartLuke {
                         Map.entry(ScoringLevel.NONE, print("No button pressed"))),
                         level))
                 .withName("ScoreCoralSmartLuke");
-        }
+    }
 }
