@@ -1,4 +1,4 @@
-package org.team100.lib.commands.drivetrain;
+package org.team100.lib.commands.drivetrain.test;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
@@ -80,6 +80,11 @@ public class Rotate extends MoveAndHold {
     @Override
     public boolean isDone() {
         return m_referenceController != null && m_referenceController.isDone();
+    }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
     }
 
     @Override

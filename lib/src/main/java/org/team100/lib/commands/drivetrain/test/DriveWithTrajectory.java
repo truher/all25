@@ -1,4 +1,4 @@
-package org.team100.lib.commands.drivetrain;
+package org.team100.lib.commands.drivetrain.test;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
@@ -11,8 +11,10 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 /**
  * Follow a single trajectory.
  * 
- * The starting point is fixed, obviously, so this command can
- * only be used from that point. It's kinda just for testing.
+ * Because the whole trajectory is fixed, this command can only be used if the
+ * robot happens to be in that spot -- and that is often hard to guarantee.
+ * 
+ * So this is really just for testing.
  */
 public class DriveWithTrajectory extends MoveAndHold {
     private final DriveSubsystemInterface m_drive;
@@ -54,6 +56,12 @@ public class DriveWithTrajectory extends MoveAndHold {
     public boolean isDone() {
         return m_referenceController.isDone();
     }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
 
     @Override
     public void end(boolean interrupted) {

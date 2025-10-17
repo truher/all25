@@ -81,6 +81,7 @@ public class FollowJointProfiles extends MoveAndHold {
                 new CompleteProfile(12, 8, 8, 16, 100, 100, 0.001), // arm
                 new CompleteProfile(8, 12, 4, 16, 50, 50, 0.001)); // wrist
     }
+
     public static FollowJointProfiles gentle(CalgamesMech subsystem, Config goal) {
         return new FollowJointProfiles(
                 subsystem,
@@ -98,7 +99,6 @@ public class FollowJointProfiles extends MoveAndHold {
                 new CompleteProfile(4, 4, 4, 8, 100, 100, 0.001), // arm
                 new CompleteProfile(8, 12, 4, 16, 50, 50, 0.001)); // wrist
     }
-
 
     FollowJointProfiles(
             CalgamesMech subsystem,
@@ -142,6 +142,11 @@ public class FollowJointProfiles extends MoveAndHold {
     @Override
     public boolean isDone() {
         return profileDone() && atReference();
+    }
+
+    @Override
+    public double toGo() {
+        return 0;
     }
 
     /** The profile has reached the goal. */

@@ -80,6 +80,12 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
         return m_referenceController != null && m_referenceController.isDone();
     }
 
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
+
     /** For the runway path we can switch to "go to goal" after we're aligned. */
     public boolean thetaAligned() {
         if (m_goal == null)

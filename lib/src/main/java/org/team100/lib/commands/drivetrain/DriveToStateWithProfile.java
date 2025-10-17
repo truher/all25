@@ -77,4 +77,9 @@ public class DriveToStateWithProfile extends MoveAndHold {
         return m_referenceController != null && m_referenceController.isDone();
     }
 
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
 }

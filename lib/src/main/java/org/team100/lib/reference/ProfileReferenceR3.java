@@ -47,7 +47,7 @@ public class ProfileReferenceR3 implements ReferenceR3 {
         m_profile = profile;
         m_name = name;
         // this will keep polling until we stop it.
-        m_references = Cache.of(() -> refresh(m_next.model()));
+        m_references = Cache.of(() -> refresh(m_next == null ? null : m_next.model()));
     }
 
     /**

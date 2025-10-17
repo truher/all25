@@ -1,14 +1,13 @@
 package org.team100.frc2025.CalgamesArm;
 
+import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.state.ModelR3;
-
-import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Record the current pose at initialization time and hold that pose,
  * motionless, forever.
  */
-public class HoldPosition extends Command {
+public class HoldPosition extends MoveAndHold {
     private final CalgamesMech m_subsystem;
 
     private ModelR3 m_state;
@@ -28,6 +27,16 @@ public class HoldPosition extends Command {
     public void execute() {
         m_subsystem.set(m_state.control());
         // m_subsystem.stop();
+    }
+
+    @Override
+    public boolean isDone() {
+        return true;
+    }
+
+    @Override
+    public double toGo() {
+        return 0;
     }
 
 }

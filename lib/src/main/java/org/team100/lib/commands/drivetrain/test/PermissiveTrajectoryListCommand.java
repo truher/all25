@@ -1,4 +1,4 @@
-package org.team100.lib.commands.drivetrain;
+package org.team100.lib.commands.drivetrain.test;
 
 import java.util.Iterator;
 import java.util.List;
@@ -72,6 +72,12 @@ public class PermissiveTrajectoryListCommand extends MoveAndHold {
     public boolean isDone() {
         return m_referenceController == null || m_referenceController.isDone();
     }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
 
     @Override
     public void end(boolean interrupted) {

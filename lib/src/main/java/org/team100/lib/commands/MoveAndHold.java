@@ -23,4 +23,7 @@ public abstract class MoveAndHold extends Command {
      * Note: after end, isDone will yield false.
      */
     public abstract boolean isDone();
+
+    /** Distance between the measurement and the goal. */
+    public abstract double toGo();
 }

@@ -1,4 +1,4 @@
-package org.team100.lib.commands.drivetrain;
+package org.team100.lib.commands.drivetrain.test;
 
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +18,10 @@ import edu.wpi.first.math.geometry.Pose2d;
  * Follow a list of trajectories created at initialization time, given the pose
  * at that time.
  * 
- * A list of trajectories is probably only useful for testing.
+ * The only reason you would want to use a list of trajectories, rather than a
+ * single trajectory with internal waypoints, is because you want the robot path
+ * to have sharp corners. And the only reason you'd really want that is for
+ * testing.
  */
 public class DriveWithTrajectoryListFunction extends MoveAndHold {
     private final SwerveDriveSubsystem m_drive;
@@ -74,6 +77,12 @@ public class DriveWithTrajectoryListFunction extends MoveAndHold {
     public boolean isDone() {
         return m_referenceController == null || m_referenceController.isDone();
     }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
 
     @Override
     public void end(boolean interrupted) {

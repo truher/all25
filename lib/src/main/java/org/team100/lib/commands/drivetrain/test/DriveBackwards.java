@@ -1,4 +1,4 @@
-package org.team100.lib.commands.drivetrain;
+package org.team100.lib.commands.drivetrain.test;
 
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 
@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 /**
  * A bang-bang controller that stops after the robot moves the specified
  * distance.
+ * 
+ * This is for testing odometry.
  */
 public class DriveBackwards extends Command {
     private static final ChassisSpeeds SPEED = new ChassisSpeeds(-0.1, 0, 0);

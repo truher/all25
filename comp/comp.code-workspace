@@ -43,6 +43,11 @@
             "org.mockito.ArgumentMatchers.*",
             "org.mockito.Answers.*"
         ],
-        "chat.disableAIFeatures": false
+        "chat.disableAIFeatures": true,
+        "editor.guides.bracketPairs": true,
+        "editor.guides.highlightActiveBracketPair": true,
+        "editor.bracketPairColorization.enabled": true,
+        "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+        "editor.guides.bracketPairsHorizontal": true,
     }
 }

@@ -48,23 +48,21 @@ public class GoToPoseCalGamesMech extends MoveAndHold {
         m_referenceController.execute();
     }
 
+    @Override
     public boolean isDone() {
-        if (m_referenceController == null) return false;
-        return  m_referenceController.isDone();
+        if (m_referenceController == null)
+            return false;
+        return m_referenceController.isDone();
+    }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
     }
 
     @Override
     public void end(boolean interrupted) {
         m_subsystem.stop();
     }
-
-
-
-
-
-
-
-
-
 
 }

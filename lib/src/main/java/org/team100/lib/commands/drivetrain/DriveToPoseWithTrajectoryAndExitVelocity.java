@@ -95,6 +95,12 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     }
 
     @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
+
+    @Override
     public void end(boolean interrupted) {
         m_drive.stop();
         m_viz.clear();

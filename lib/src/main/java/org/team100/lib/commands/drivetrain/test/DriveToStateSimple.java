@@ -1,4 +1,4 @@
-package org.team100.lib.commands.drivetrain;
+package org.team100.lib.commands.drivetrain.test;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
@@ -16,6 +16,8 @@ import org.team100.lib.state.ModelR3;
  * you want to go to, and it will go there. It makes no attempt to
  * impose feasibility constraints or coordinate the axes, so it tries
  * to use the setpoint generator to moderate the output.
+ * 
+ * This is really only intended for testing.
  */
 public class DriveToStateSimple extends MoveAndHold {
     private final SwerveController m_controller;
@@ -48,6 +50,12 @@ public class DriveToStateSimple extends MoveAndHold {
     public boolean isDone() {
         return m_referenceController.isDone();
     }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
 
     @Override
     public void end(boolean interrupted) {
