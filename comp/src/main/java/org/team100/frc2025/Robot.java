@@ -18,6 +18,10 @@ import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
+import org.team100.frc2025.Swerve.Auto.Auton;
+import org.team100.frc2025.Swerve.Auto.Coral1Left;
+import org.team100.frc2025.Swerve.Auto.Coral1Mid;
+import org.team100.frc2025.Swerve.Auto.Coral1Right;
 import org.team100.frc2025.Swerve.Auto.LolipopAuto;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
@@ -26,6 +30,7 @@ import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
+import org.team100.lib.config.AutonChooser;
 import org.team100.lib.config.Identity;
 import org.team100.lib.controller.drivetrain.FullStateSwerveController;
 import org.team100.lib.controller.drivetrain.SwerveController;
@@ -94,10 +99,14 @@ public class Robot extends TimedRobot100 {
     private static final double DRIVE_STATOR_LIMIT = 110;
 
     // LOGS
+    private final LoggerFactory m_logger;
+    private final FieldLogger.Log m_fieldLog;
+    private final LoggerFactory m_driveLog;
     private final RobotLog m_robotLog;
 
     private final SwerveModuleCollection m_modules;
-    private final Command m_auton;
+    private final AutonChooser m_autonChooser;
+    private final AprilTagRobotLocalizer m_localizer;
 
     // SUBSYSTEMS
     final SwerveDriveSubsystem m_drive;
@@ -138,12 +147,12 @@ public class Robot extends TimedRobot100 {
         System.out.printf("Using log level %s\n", poller.getLevel().name());
         System.out.println("Do not use TRACE in comp, with NT logging, it will overrun");
         final LoggerFactory fieldLogger = logging.fieldLogger;
-        final FieldLogger.Log fieldLog = new FieldLogger.Log(fieldLogger);
-        final LoggerFactory logger = logging.rootLogger;
-        final LoggerFactory driveLog = logger.name("Drive");
-        final LoggerFactory comLog = logger.name("Commands");
+        m_fieldLog = new FieldLogger.Log(fieldLogger);
+        m_logger = logging.rootLogger;
+        m_driveLog = m_logger.name("Drive");
+        final LoggerFactory comLog = m_logger.name("Commands");
 
-        m_robotLog = new RobotLog(logger);
+        m_robotLog = new RobotLog(m_logger);
 
         // CONTROLS
         final DriverXboxControl driver = new DriverXboxControl(0);
@@ -159,15 +168,15 @@ public class Robot extends TimedRobot100 {
         // SUBSYSTEMS
         //
         if (Identity.instance.equals(Identity.COMP_BOT)) {
-            m_climber = new Climber(logger, new CanId(13));
-            m_climberIntake = new ClimberIntake(logger, new CanId(14));
+            m_climber = new Climber(m_logger, new CanId(13));
+            m_climberIntake = new ClimberIntake(m_logger, new CanId(14));
         } else {
-            m_climber = new Climber(logger, new CanId(18));
-            m_climberIntake = new ClimberIntake(logger, new CanId(0));
+            m_climber = new Climber(m_logger, new CanId(18));
+            m_climberIntake = new ClimberIntake(m_logger, new CanId(0));
         }
 
-        m_manipulator = new Manipulator(logger);
-        m_mech = new CalgamesMech(logger, 0.5, 0.343);
+        m_manipulator = new Manipulator(m_logger);
+        m_mech = new CalgamesMech(m_logger, 0.5, 0.343);
 
         ////////////////////////////////////////////////////////////
         //
@@ -182,12 +191,12 @@ public class Robot extends TimedRobot100 {
         // POSE ESTIMATION
         //
         m_modules = SwerveModuleCollection.get(
-                driveLog,
+                m_driveLog,
                 DRIVE_SUPPLY_LIMIT,
                 DRIVE_STATOR_LIMIT,
                 m_swerveKinodynamics);
         final Gyro gyro = GyroFactory.get(
-                driveLog,
+                m_driveLog,
                 m_swerveKinodynamics,
                 m_modules);
         final SwerveHistory history = new SwerveHistory(
@@ -208,12 +217,12 @@ public class Robot extends TimedRobot100 {
         //
         final AprilTagFieldLayoutWithCorrectOrientation layout = getLayout();
 
-        final AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                driveLog,
+        m_localizer = new AprilTagRobotLocalizer(
+                m_driveLog,
                 layout,
                 history,
                 visionUpdater);
-        m_targets = new Targets(driveLog, fieldLog, history);
+        m_targets = new Targets(m_driveLog, m_fieldLog, history);
 
         ////////////////////////////////////////////////////////////
         //
@@ -228,9 +237,9 @@ public class Robot extends TimedRobot100 {
         //
         m_drive = SwerveDriveFactory.get(
                 fieldLogger,
-                driveLog,
+                m_driveLog,
                 m_swerveKinodynamics,
-                localizer,
+                m_localizer,
                 odometryUpdater,
                 history,
                 m_modules);
@@ -244,7 +253,7 @@ public class Robot extends TimedRobot100 {
         // This should observe the *mechanism*.
         m_leds = new LEDIndicator(
                 new RoboRioChannel(0),
-                localizer::getPoseAgeSec,
+                m_localizer::getPoseAgeSec,
                 () -> (m_manipulator.hasCoral()
                         || (m_manipulator.hasCoralSideways()
                                 && buttons.red2())),
@@ -270,7 +279,7 @@ public class Robot extends TimedRobot100 {
         // * barge-assist (slow when near barge)
         final Command driveDefault = new DriveManuallySimple(
                 driver::velocity,
-                localizer::setHeedRadiusM,
+                m_localizer::setHeedRadiusM,
                 m_drive,
                 new ManualWithProfiledReefLock(
                         comLog, m_swerveKinodynamics, driver::leftTrigger,
@@ -286,84 +295,57 @@ public class Robot extends TimedRobot100 {
         m_climberIntake.setDefaultCommand(m_climberIntake.stop().withName("climber intake default"));
         m_manipulator.setDefaultCommand(m_manipulator.stop().withName("manipulator default"));
 
-        /////////////////////////////////////////////////
-        //
-        // AUTONOMOUS
-        //
-        final LoggerFactory autoSequence = logger.name("Auto Sequence");
-        final HolonomicProfile autoProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
-                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
-        final FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoSequence);
-
-        m_auton = LolipopAuto.get(logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive, m_planner,
-                localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
-
-        ////////////////////////////////////////////////////////////
-        //
-        // CORAL PICK
-        //
-
-        // At the same time, move the arm to the floor and spin the intake,
-        // and go back home when the button is released, ending when complete.
-        whileTrue(driver::rightTrigger,
-                parallel(
-                        m_mech.pickWithProfile(),
-                        m_manipulator.centerIntake()))
-                .onFalse(m_mech.profileHomeTerminal());
-
-        // Move to coral ground pick location.
-        whileTrue(driver::rightBumper,
-                parallel(
-                        m_mech.pickWithProfile(),
-                        m_manipulator.centerIntake()))
-
-                .onFalse(m_mech.profileHomeTerminal());
-
-        // Pick a game piece from the floor, based on camera input.
-        whileTrue(operator::leftTrigger,
-                parallel(
-                        m_mech.pickWithProfile(),
-                        m_manipulator.centerIntake(),
-
-                        FloorPickSequence.get(
-                                fieldLog, m_drive, m_targets,
-                                SwerveControllerFactory.pick(driveLog), autoProfile)
-                                .withName("Floor Pick"))
-                        .until(m_manipulator::hasCoral));
-
-        FloorPickSequence.get(
-                fieldLog, m_drive, m_targets,
-                SwerveControllerFactory.pick(driveLog), autoProfile)
-                .withName("Floor Pick")
-                .until(m_manipulator::hasCoral);
-
-        // Sideways intake for L1
-        whileTrue(buttons::red2,
-                sequence(
-                        m_manipulator.sidewaysIntake()
-                                .until(m_manipulator::hasCoralSideways),
-                        m_manipulator.sidewaysHold()));
-
-        ////////////////////////////////////////////////////////////
-        //
-        // CORAL SCORING
-        //
-        final LoggerFactory coralSequence = logger.name("Coral Sequence");
-        final HolonomicProfile profile = HolonomicProfile.get(driveLog, m_swerveKinodynamics, 1, 0.5, 1, 0.2);
-        final SwerveController holonomicController = SwerveControllerFactory.byIdentity(comLog);
-
-        // Drive to a scoring location at the reef and score.
-        whileTrue(driver::a,
-                ScoreCoralSmart.get(
-                        coralSequence, m_mech, m_manipulator,
-                        holonomicController, profile, m_drive,
-                        localizer::setHeedRadiusM, buttons::level, buttons::point));
-
+        m_autonChooser = new AutonChooser();
+        auton(viz);
         bindings(driver, operator, buttons);
-
         Prewarmer.init(this);
         System.out.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
+    }
+
+    /*******************************************************************
+     * AUTONOMOUS
+     * 
+     * Populate the auton chooser here.
+     * 
+     * It's a good idea to instantiate them all here, even if you're not using them
+     * all, so they don't rot.
+     * 
+     *******************************************************************/
+    private void auton(TrajectoryVisualization viz) {
+        final LoggerFactory autoLog = m_logger.name("Auton");
+        final HolonomicProfile autoProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
+                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
+        final FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoLog);
+
+        // WARNING! The glass widget will override this value, so check it!
+        // Run the auto in pre-match testing!
+        m_autonChooser.addAsDefault("Lollipop", LolipopAuto.get(
+                m_logger, m_mech, m_manipulator,
+                autoController, autoProfile, m_drive, m_planner,
+                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz));
+
+        m_autonChooser.add("Coral 1 left", Coral1Left.get(
+                m_logger, m_mech, m_manipulator,
+                autoController, autoProfile, m_drive,
+                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz));
+        m_autonChooser.add("Coral 1 mid", Coral1Mid.get(
+                m_logger, m_mech, m_manipulator,
+                autoController, autoProfile, m_drive,
+                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz));
+        m_autonChooser.add("Coral 1 right", Coral1Right.get(
+                m_logger, m_mech, m_manipulator,
+                autoController, autoProfile, m_drive,
+                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz));
+
+        Auton auton = new Auton(m_logger, m_mech, m_manipulator,
+                autoController, autoProfile, m_drive,
+                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
+
+        m_autonChooser.add("Left Preload Only", auton.leftPreloadOnly());
+        m_autonChooser.add("Center Preload Only", auton.centerPreloadOnly());
+        m_autonChooser.add("Right Preload Only", auton.rightPreloadOnly());
+        m_autonChooser.add("Left Three Coral", auton.left());
+        m_autonChooser.add("Right Three Coral", auton.right());
     }
 
     /*******************************************************************
@@ -373,7 +355,7 @@ public class Robot extends TimedRobot100 {
      * 
      * TODO: finish moving button bindings from the constructor.
      * 
-     ********************************************************************/
+     *******************************************************************/
     private void bindings(DriverXboxControl driver, OperatorXboxControl operator, Buttons2025 buttons) {
 
         ///////////////////////////
@@ -399,6 +381,55 @@ public class Robot extends TimedRobot100 {
 
         ////////////////////////////////////////////////////////////
         //
+        // CORAL PICK
+        //
+
+        // At the same time, move the arm to the floor and spin the intake,
+        // and go back home when the button is released, ending when complete.
+        whileTrue(driver::rightTrigger,
+                parallel(
+                        m_mech.pickWithProfile(),
+                        m_manipulator.centerIntake()))
+                .onFalse(m_mech.profileHomeTerminal());
+
+        // Move to coral ground pick location.
+        whileTrue(driver::rightBumper,
+                parallel(
+                        m_mech.pickWithProfile(),
+                        m_manipulator.centerIntake()))
+
+                .onFalse(m_mech.profileHomeTerminal());
+
+        final HolonomicProfile coralPickProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
+                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
+
+        // Pick a game piece from the floor, based on camera input.
+        whileTrue(operator::leftTrigger,
+                parallel(
+                        m_mech.pickWithProfile(),
+                        m_manipulator.centerIntake(),
+
+                        FloorPickSequence.get(
+                                m_fieldLog, m_drive, m_targets,
+                                SwerveControllerFactory.pick(m_driveLog), coralPickProfile)
+                                .withName("Floor Pick"))
+                        .until(m_manipulator::hasCoral));
+
+        FloorPickSequence.get(
+                m_fieldLog, m_drive, m_targets,
+                SwerveControllerFactory.pick(m_driveLog), coralPickProfile)
+                .withName("Floor Pick")
+                .until(m_manipulator::hasCoral);
+
+        // Sideways intake for L1
+        whileTrue(buttons::red2,
+                sequence(
+                        m_manipulator.sidewaysIntake()
+                                .until(m_manipulator::hasCoralSideways),
+                        m_manipulator.sidewaysHold()));
+
+        ////////////////////////////////////////////////////////////
+        //
         // CORAL SCORING
         //
         // Manual movement of arm, for testing.
@@ -407,6 +438,17 @@ public class Robot extends TimedRobot100 {
         // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
         // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
         // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
+
+        final LoggerFactory coralSequence = m_logger.name("Coral Sequence");
+        final HolonomicProfile profile = HolonomicProfile.get(coralSequence, m_swerveKinodynamics, 1, 0.5, 1, 0.2);
+        final SwerveController holonomicController = SwerveControllerFactory.byIdentity(coralSequence);
+
+        // Drive to a scoring location at the reef and score.
+        whileTrue(driver::a,
+                ScoreCoralSmart.get(
+                        coralSequence, m_mech, m_manipulator,
+                        holonomicController, profile, m_drive,
+                        m_localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         ////////////////////////////////////////////////////////////
         //
@@ -542,9 +584,10 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void autonomousInit() {
-        if (m_auton == null)
+        Command auton = m_autonChooser.get();
+        if (auton == null)
             return;
-        m_auton.schedule();
+        auton.schedule();
     }
 
     @Override
