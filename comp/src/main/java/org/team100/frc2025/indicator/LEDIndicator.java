@@ -1,10 +1,9 @@
-package org.team100.lib.indicator;
+package org.team100.frc2025.indicator;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
+import org.team100.frc2025.Climber.ClimberIntake;
+import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.util.RoboRioChannel;
+import org.team100.lib.localization.AprilTagRobotLocalizer;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -42,28 +41,24 @@ public class LEDIndicator {
     private final AddressableLEDBuffer m_orangeBuffer;
     private final AddressableLEDBuffer m_blackBuffer;
     private final AddressableLEDBuffer m_whiteBuffer;
-    
-    private final DoubleSupplier m_timeSinceLastPose;
-    private final BooleanSupplier m_hasCoral;
-    private final BooleanSupplier m_hasAlgae;
-    private final BooleanSupplier m_intakingCoral;
-    private final BooleanSupplier m_intakingAlgae;
-    private final BooleanSupplier m_climbing;
-    private final BooleanSupplier m_climbed;
+
+    private final AprilTagRobotLocalizer m_localizer;
+    private final Manipulator m_manipulator;
+    private final ClimberIntake m_climberIntake;
 
     private double m_lastBlinkTime = 0;
     private boolean m_blinkState = false;
 
+    /**
+     * The constructor should take *subsystems* not *buttons.*
+     * 
+     * Since this has logic about the 2025 game it should be in the "comp" project.
+     */
     public LEDIndicator(
-            RoboRioChannel port,
-            DoubleSupplier timeSinceLastPose,
-            BooleanSupplier hasCoral,
-            BooleanSupplier hasAlgae,
-            BooleanSupplier intakingCoral,
-            BooleanSupplier intakingAlgae,
-            BooleanSupplier climbing,
-            BooleanSupplier climbed) {
-        m_led = new AddressableLED(port.channel);
+            AprilTagRobotLocalizer localizer,
+            Manipulator manipulator,
+            ClimberIntake climberIntake) {
+        m_led = new AddressableLED(0);
         m_led.setLength(LENGTH);
         m_greenBuffer = fill(Color.kGreen);
         m_tealBuffer = fill(Color.kTeal);
@@ -73,52 +68,41 @@ public class LEDIndicator {
         m_blackBuffer = fill(Color.kBlack);
         m_led.setData(m_redBuffer);
         m_led.start();
-        m_timeSinceLastPose = timeSinceLastPose;
-        m_hasCoral = hasCoral;
-        m_hasAlgae = hasAlgae;
-        m_intakingCoral = intakingCoral;
-        m_intakingAlgae = intakingAlgae;
-        m_climbed = climbed;
-        m_climbing = climbing;
+        m_localizer = localizer;
+        m_manipulator = manipulator;
+        m_climberIntake = climberIntake;
     }
 
     /**
      * Periodic does all the real work in this class.
      */
     public void periodic() {
-        boolean hasCoral = m_hasCoral.getAsBoolean();
-        boolean hasAlgae = m_hasAlgae.getAsBoolean();
-        boolean intakingCoral = m_intakingCoral.getAsBoolean();
-        boolean intakingAlgae = m_intakingAlgae.getAsBoolean();
-        boolean climbing = m_climbing.getAsBoolean();
-        boolean climbed = m_climbed.getAsBoolean();
 
         if (RobotState.isDisabled()) {
-            double poseAge = m_timeSinceLastPose.getAsDouble();
-            if (poseAge < 1) {
+            if (m_localizer.getPoseAgeSec() < 1) {
                 m_led.setData(m_greenBuffer);
             } else {
                 m_led.setData(m_redBuffer);
             }
-        } else if (climbing && climbed) {
+        } else if (m_climberIntake.isIn()) {
             if (shouldBlink()) {
                 m_led.setData(m_blinkState ? m_greenBuffer : m_blackBuffer);
             }
-        } else if (hasCoral) {
-            if (hasAlgae) {
+        } else if (m_manipulator.hasCoral() || m_manipulator.hasCoralSideways()) {
+            if (m_manipulator.hasAlgae()) {
                 if (shouldBlink()) {
                     m_led.setData(m_blinkState ? m_tealBuffer : m_whiteBuffer);
                 }
             } else {
                 m_led.setData(m_whiteBuffer);
             }
-        } else if (hasAlgae) {
+        } else if (m_manipulator.hasAlgae()) {
             m_led.setData(m_tealBuffer);
-        } else if (intakingAlgae) {
+        } else if (m_manipulator.intakingAlgae()) {
             if (shouldBlink()) {
                 m_led.setData(m_blinkState ? m_tealBuffer : m_orangeBuffer);
             }
-        } else if (intakingCoral) {
+        } else if (m_manipulator.intakingCoral()) {
             if (shouldBlink()) {
                 m_led.setData(m_blinkState ? m_whiteBuffer : m_orangeBuffer);
             }

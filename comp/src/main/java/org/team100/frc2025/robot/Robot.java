@@ -7,28 +7,18 @@ import org.team100.frc2025.CalgamesArm.CalgamesViz;
 import org.team100.frc2025.Climber.Climber;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
-import org.team100.frc2025.Swerve.ManualWithBargeAssist;
-import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.grip.Manipulator;
+import org.team100.frc2025.indicator.LEDIndicator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
 import org.team100.lib.config.Identity;
-import org.team100.lib.controller.drivetrain.FullStateSwerveController;
-import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
-import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.GyroFactory;
-import org.team100.lib.hid.Buttons2025;
-import org.team100.lib.hid.DriverXboxControl;
-import org.team100.lib.hid.OperatorXboxControl;
-import org.team100.lib.indicator.LEDIndicator;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.NudgingVisionUpdater;
@@ -46,14 +36,12 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
-import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
-import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -85,7 +73,6 @@ public class Robot extends TimedRobot100 {
     private final RobotLog m_robotLog;
 
     private final SwerveModuleCollection m_modules;
-    private final AllAutons m_allAutons;
     final AprilTagRobotLocalizer m_localizer;
 
     // SUBSYSTEMS
@@ -97,9 +84,11 @@ public class Robot extends TimedRobot100 {
     final CalgamesMech m_mech;
 
     final SwerveKinodynamics m_swerveKinodynamics;
-    final HolonomicProfile m_autoProfile;
-    final FullStateSwerveController m_autoController;
+
     final Beeper m_beeper;
+
+    private final Machinery m_Machinery;
+    private final AllAutons m_allAutons;
     private final Binder m_binder;
 
     private final Runnable m_simulatedTagDetector;
@@ -135,31 +124,22 @@ public class Robot extends TimedRobot100 {
         m_fieldLog = new FieldLogger.Log(fieldLogger);
         m_logger = logging.rootLogger;
         m_driveLog = m_logger.name("Drive");
-        final LoggerFactory comLog = m_logger.name("Commands");
 
         m_robotLog = new RobotLog(m_logger);
-
-        // CONTROLS
-        final DriverXboxControl driver = new DriverXboxControl(0);
-        final OperatorXboxControl operator = new OperatorXboxControl(1);
-        final Buttons2025 buttons = new Buttons2025(2);
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
         m_planner = new TrajectoryPlanner(
                 new TimingConstraintFactory(m_swerveKinodynamics).medium());
 
+        // TODO: move all the subsystems from here to Machinery.
+        m_Machinery = new Machinery();
+
         ////////////////////////////////////////////////////////////
         //
         // SUBSYSTEMS
         //
-        if (Identity.instance.equals(Identity.COMP_BOT)) {
-            m_climber = new Climber(m_logger, new CanId(13));
-            m_climberIntake = new ClimberIntake(m_logger, new CanId(14));
-        } else {
-            m_climber = new Climber(m_logger, new CanId(18));
-            m_climberIntake = new ClimberIntake(m_logger, new CanId(0));
-        }
-
+        m_climber = new Climber(m_logger, new CanId(13));
+        m_climberIntake = new ClimberIntake(m_logger, new CanId(14));
         m_manipulator = new Manipulator(m_logger);
         m_mech = new CalgamesMech(m_logger, 0.5, 0.343);
 
@@ -236,60 +216,15 @@ public class Robot extends TimedRobot100 {
         //
         // LED INDICATOR
         //
-        // TODO: including buttons here is a bad idea (because they can change).
-        // This should observe the *mechanism*.
         m_leds = new LEDIndicator(
-                new RoboRioChannel(0),
-                m_localizer::getPoseAgeSec,
-                () -> (m_manipulator.hasCoral()
-                        || (m_manipulator.hasCoralSideways()
-                                && buttons.red2())),
-                m_manipulator::hasAlgae,
-                () -> (driver.rightTrigger()
-                        || (driver.rightTrigger()
-                                && driver.rightBumper())
-                        || buttons.red2()),
-                buttons::algae,
-                buttons::red1,
-                m_climberIntake::isIn);
-
-        /////////////////////////////////////////////////
-        //
-        // DEFAULT COMMANDS
-        //
-        final Feedback100 thetaFeedback = new PIDFeedback(
-                comLog, 3.2, 0, 0, true, 0.05, 1);
-
-        // There are 3 modes:
-        // * normal
-        // * lock rotation to reef center
-        // * barge-assist (slow when near barge)
-        final Command driveDefault = new DriveManuallySimple(
-                driver::velocity,
-                m_localizer::setHeedRadiusM,
-                m_drive,
-                new ManualWithProfiledReefLock(
-                        comLog, m_swerveKinodynamics, driver::leftTrigger,
-                        thetaFeedback, m_drive),
-                new ManualWithBargeAssist(
-                        comLog, m_swerveKinodynamics, driver::pov,
-                        thetaFeedback, m_drive),
-                driver::leftBumper);
-        m_drive.setDefaultCommand(driveDefault.withName("drive default"));
-        // WARNING! This default command *MOVES IMMEDIATELY WHEN ENABLED*!
-        m_mech.setDefaultCommand(m_mech.profileHomeAndThenRest().withName("mech default"));
-        m_climber.setDefaultCommand(m_climber.stop().withName("climber default"));
-        m_climberIntake.setDefaultCommand(m_climberIntake.stop().withName("climber intake default"));
-        m_manipulator.setDefaultCommand(m_manipulator.stop().withName("manipulator default"));
-
-        m_autoProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
-                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
-        m_autoController = SwerveControllerFactory.auto2025LooseTolerance(m_logger.name("Auton"));
+                m_localizer,
+                m_manipulator,
+                m_climberIntake);
 
         m_allAutons = new AllAutons(this);
 
         m_binder = new Binder(this);
-        m_binder.bind(driver, operator, buttons);
+        m_binder.bind();
 
         Prewarmer.init(this);
         System.out.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());

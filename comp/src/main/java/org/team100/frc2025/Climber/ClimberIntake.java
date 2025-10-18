@@ -48,6 +48,10 @@ public class ClimberIntake extends SubsystemBase {
         return m_motor.getVelocityRad_S() < 1;
     }
 
+    public boolean intaking() {
+        return count > 0;
+    }
+
     public boolean isIn() {
         return count > 25;
     }
@@ -60,7 +64,7 @@ public class ClimberIntake extends SubsystemBase {
 
     public Command intake() {
         return startRun(
-            () -> count = 0,
+                () -> count = 0,
                 () -> {
                     fullSpeed();
                     if (isSlow()) {

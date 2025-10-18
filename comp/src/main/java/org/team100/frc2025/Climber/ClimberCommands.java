@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class ClimberCommands {
     /**
      * Set arm position and start spinning.
-     * Wait a second.
-     * Command ends when spin velocity slows and the climber is in position
      */
     public static Command climbIntake(Climber climber, ClimberIntake intake, CalgamesMech mech) {
         return parallel(
