@@ -10,9 +10,14 @@ import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
+import org.team100.frc2025.Swerve.ManualWithBargeAssist;
+import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.lib.commands.drivetrain.SetRotation;
+import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
+import org.team100.lib.controller.simple.Feedback100;
+import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.examples.semiauto.FloorPickSequence;
 import org.team100.lib.hid.Buttons2025;
 import org.team100.lib.hid.DriverXboxControl;
@@ -26,20 +31,57 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
- * Binds buttons to commands.
+ * Binds buttons to commands. Also creates default commands.
  */
 public class Binder {
 
     private final Robot robot;
+
     public Binder(Robot robot) {
         this.robot = robot;
     }
 
     /** Call only this after all the member initialization in Robot is done! */
-    public void bind(
-            DriverXboxControl driver,
-            OperatorXboxControl operator,
-            Buttons2025 buttons) {
+    public void bind() {
+
+        final LoggerFactory comLog = robot.m_logger.name("Commands");
+
+        /////////////////////////////////////////////////
+        ///
+        /// CONTROLS
+        ///
+        final DriverXboxControl driver = new DriverXboxControl(0);
+        final OperatorXboxControl operator = new OperatorXboxControl(1);
+        final Buttons2025 buttons = new Buttons2025(2);
+
+        /////////////////////////////////////////////////
+        //
+        // DEFAULT COMMANDS
+        //
+        final Feedback100 thetaFeedback = new PIDFeedback(
+                comLog, 3.2, 0, 0, true, 0.05, 1);
+
+        // There are 3 modes:
+        // * normal
+        // * lock rotation to reef center
+        // * barge-assist (slow when near barge)
+        final Command driveDefault = new DriveManuallySimple(
+                driver::velocity,
+                robot.m_localizer::setHeedRadiusM,
+                robot.m_drive,
+                new ManualWithProfiledReefLock(
+                        comLog, robot.m_swerveKinodynamics, driver::leftTrigger,
+                        thetaFeedback, robot.m_drive),
+                new ManualWithBargeAssist(
+                        comLog, robot.m_swerveKinodynamics, driver::pov,
+                        thetaFeedback, robot.m_drive),
+                driver::leftBumper);
+        robot.m_drive.setDefaultCommand(driveDefault.withName("drive default"));
+        // WARNING! This default command *MOVES IMMEDIATELY WHEN ENABLED*!
+        robot.m_mech.setDefaultCommand(robot.m_mech.profileHomeAndThenRest().withName("mech default"));
+        robot.m_climber.setDefaultCommand(robot.m_climber.stop().withName("climber default"));
+        robot.m_climberIntake.setDefaultCommand(robot.m_climberIntake.stop().withName("climber intake default"));
+        robot.m_manipulator.setDefaultCommand(robot.m_manipulator.stop().withName("manipulator default"));
 
         ///////////////////////////
         //
@@ -80,7 +122,6 @@ public class Binder {
                 parallel(
                         robot.m_mech.pickWithProfile(),
                         robot.m_manipulator.centerIntake()))
-
                 .onFalse(robot.m_mech.profileHomeTerminal());
 
         final HolonomicProfile coralPickProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,

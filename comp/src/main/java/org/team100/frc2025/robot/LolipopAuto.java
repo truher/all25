@@ -12,9 +12,11 @@ import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.commands.drivetrain.DriveToTranslationFacingWithProfile;
 import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
+import org.team100.lib.controller.drivetrain.FullStateSwerveController;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.profile.HolonomicProfile;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,42 +27,49 @@ public class LolipopAuto {
     private static final double HEED_RADIUS_M = 3;
 
     private final Robot m_robot;
+    private final HolonomicProfile m_autoProfile;
+    private final FullStateSwerveController m_autoController;
 
     /** Call only this after all the member initialization in Robot is done! */
-    public LolipopAuto(Robot robot) {
-        this.m_robot = robot;
+    public LolipopAuto(
+            Robot robot,
+            HolonomicProfile autoProfile,
+            FullStateSwerveController autoController) {
+        m_robot = robot;
+        m_autoProfile = autoProfile;
+        m_autoController = autoController;
     }
 
     public Command get() {
         // this one uses some curvature
         DriveWithTrajectoryFunction toReefTrajectory = new DriveWithTrajectoryFunction(
-                m_robot.m_drive, m_robot.m_autoController, m_robot.m_trajectoryViz,
+                m_robot.m_drive, m_autoController, m_robot.m_trajectoryViz,
                 (p) -> m_robot.m_planner.restToRest(List.of(
                         HolonomicPose2d.make(m_robot.m_drive.getPose(), Math.PI),
                         HolonomicPose2d.make(3, 5, 0, -2))));
 
         DriveToPoseWithProfile toReefA = new DriveToPoseWithProfile(
-                m_robot.m_logger, m_robot.m_drive, m_robot.m_autoController, m_robot.m_autoProfile,
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A));
 
         DriveToTranslationFacingWithProfile toCenterCoral = new DriveToTranslationFacingWithProfile(
-                m_robot.m_logger, m_robot.m_drive, m_robot.m_autoController, m_robot.m_autoProfile,
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.CoralMark.CENTER.value
                         .plus(new Translation2d(0.7, 0)),
                 new Rotation2d(Math.PI));
 
         DriveToPoseWithProfile toReefB = new DriveToPoseWithProfile(
-                m_robot.m_logger, m_robot.m_drive, m_robot.m_autoController, m_robot.m_autoProfile,
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.B));
 
         DriveToTranslationFacingWithProfile toCoralRight = new DriveToTranslationFacingWithProfile(
-                m_robot.m_logger, m_robot.m_drive, m_robot.m_autoController, m_robot.m_autoProfile,
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.CoralMark.RIGHT.value
                         .plus(new Translation2d(0.7, 0).rotateBy(new Rotation2d(Math.PI / 4))),
                 new Rotation2d(Math.PI));
 
         DriveToPoseWithProfile toReefC = new DriveToPoseWithProfile(
-                m_robot.m_logger, m_robot.m_drive, m_robot.m_autoController, m_robot.m_autoProfile,
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.C));
 
         MoveAndHold toL4 = m_robot.m_mech.homeToL4();

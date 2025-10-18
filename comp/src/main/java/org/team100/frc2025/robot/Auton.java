@@ -19,21 +19,30 @@ import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
+import org.team100.lib.controller.drivetrain.FullStateSwerveController;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.CoralStation;
 import org.team100.lib.field.FieldConstants.ReefPoint;
+import org.team100.lib.profile.HolonomicProfile;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
 // it's a record to make it less verbose
 public class Auton {
 
-    static final boolean AUTON_FIXED = false;
-    Robot robot;
+    private static final boolean AUTON_FIXED = false;
+    private final Robot m_robot;
+    private final HolonomicProfile m_autoProfile;
+    private final FullStateSwerveController m_autoController;
 
     /** Call only this after all the member initialization in Robot is done! */
-    public Auton(Robot robot) {
-        this.robot = robot;
+    public Auton(
+            Robot robot,
+            HolonomicProfile autoProfile,
+            FullStateSwerveController autoController) {
+        m_robot = robot;
+        m_autoProfile = autoProfile;
+        m_autoController = autoController;
     }
 
     /** While driving to scoring tag, pay attention only to very close tags. */
@@ -42,22 +51,22 @@ public class Auton {
     public Command leftPreloadOnly() {
         return sequence(
                 embarkAndPreplace(L4, I),
-                robot.m_manipulator.centerEject().withTimeout(0.5),
-                robot.m_mech.l4ToHome());
+                m_robot.m_manipulator.centerEject().withTimeout(0.5),
+                m_robot.m_mech.l4ToHome());
     }
 
     public Command centerPreloadOnly() {
         return sequence(
                 embarkAndPreplace(L4, H),
-                robot.m_manipulator.centerEject().withTimeout(0.5),
-                robot.m_mech.l4ToHome());
+                m_robot.m_manipulator.centerEject().withTimeout(0.5),
+                m_robot.m_mech.l4ToHome());
     }
 
     public Command rightPreloadOnly() {
         return sequence(
                 embarkAndPreplace(L4, F),
-                robot.m_manipulator.centerEject().withTimeout(0.5),
-                robot.m_mech.l4ToHome());
+                m_robot.m_manipulator.centerEject().withTimeout(0.5),
+                m_robot.m_mech.l4ToHome());
     }
 
     public Command left() {
@@ -69,8 +78,8 @@ public class Auton {
                 embarkAndPreplace(L4, K),
                 scoreAndReload(CoralStation.LEFT),
                 embarkAndPreplace(L4, L),
-                robot.m_manipulator.centerEject().withTimeout(0.5),
-                robot.m_mech.l4ToHome());
+                m_robot.m_manipulator.centerEject().withTimeout(0.5),
+                m_robot.m_mech.l4ToHome());
     }
 
     public Command right() {
@@ -82,19 +91,19 @@ public class Auton {
                 embarkAndPreplace(L4, D),
                 scoreAndReload(CoralStation.RIGHT),
                 embarkAndPreplace(L4, C),
-                robot.m_manipulator.centerEject().withTimeout(0.5),
-                robot.m_mech.l4ToHome());
+                m_robot.m_manipulator.centerEject().withTimeout(0.5),
+                m_robot.m_mech.l4ToHome());
     }
 
     /** Drive to the reef and go up. */
     private Command embarkAndPreplace(ScoringLevel position, ReefPoint point) {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
-                robot.m_logger, robot.m_drive, robot.m_autoController,
-                robot.m_autoProfile,
+                m_robot.m_logger, m_robot.m_drive, m_autoController,
+                m_autoProfile,
                 () -> FieldConstants.makeGoal(position, point));
-        MoveAndHold toL4 = robot.m_mech.homeToL4();
+        MoveAndHold toL4 = m_robot.m_mech.homeToL4();
         return parallel(
-                runOnce(() -> robot.m_localizer.setHeedRadiusM(HEED_RADIUS_M)),
+                runOnce(() -> m_robot.m_localizer.setHeedRadiusM(HEED_RADIUS_M)),
                 toReef,
                 waitUntil(() -> toReef.toGo() < 1)
                         .andThen(toL4) //
@@ -103,29 +112,29 @@ public class Auton {
 
     /** Score, drive to the station, and pause briefly. */
     private Command scoreAndReload(CoralStation station) {
-        GoToCoralStation toStation = new GoToCoralStation(robot.m_swerveKinodynamics, station, 0.5);
+        GoToCoralStation toStation = new GoToCoralStation(m_robot.m_swerveKinodynamics, station, 0.5);
         DriveWithTrajectoryFunction navigator = new DriveWithTrajectoryFunction(
-                robot.m_drive, robot.m_autoController, robot.m_trajectoryViz,
+                m_robot.m_drive, m_autoController, m_robot.m_trajectoryViz,
                 toStation);
         return sequence(
                 // first fire the coral at the peg
-                robot.m_manipulator.centerEject()
+                m_robot.m_manipulator.centerEject()
                         .withTimeout(0.5),
                 parallel(
                         // then stow the arm
-                        robot.m_mech.l4ToHome(),
+                        m_robot.m_mech.l4ToHome(),
                         sequence(
                                 // while the arm is still in motion
                                 // wait for it to be low enough
-                                waitUntil(robot.m_mech::isSafeToDrive),
+                                waitUntil(m_robot.m_mech::isSafeToDrive),
                                 // and then drive to pick
                                 navigator) //
                 ).until(navigator::isDone),
                 // then move the arm into the station and run the intake.
                 parallel(
-                        robot.m_mech.stationWithProfile(),
-                        robot.m_manipulator.centerIntake() //
-                ).until(robot.m_manipulator::hasCoral) //
+                        m_robot.m_mech.stationWithProfile(),
+                        m_robot.m_manipulator.centerIntake() //
+                ).until(m_robot.m_manipulator::hasCoral) //
         );
     }
 }
