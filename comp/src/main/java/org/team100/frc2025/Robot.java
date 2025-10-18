@@ -45,6 +45,7 @@ public class Robot extends TimedRobot100 {
         System.out.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
         System.out.printf("Identity: %s\n", Identity.instance.name());
         RobotController.setBrownoutVoltage(5.5);
+        DriverStation.silenceJoystickConnectionWarning(true);
         Banner.printBanner();
 
         // Log what the scheduler is doing. Use "withName()".
@@ -103,11 +104,6 @@ public class Robot extends TimedRobot100 {
     }
 
     @Override
-    public void simulationInit() {
-        DriverStation.silenceJoystickConnectionWarning(true);
-    }
-
-    @Override
     public void close() {
         super.close();
         m_machinery.close();
@@ -120,6 +116,10 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void robotInit() {
+    }
+
+    @Override
+    public void simulationInit() {
     }
 
     @Override

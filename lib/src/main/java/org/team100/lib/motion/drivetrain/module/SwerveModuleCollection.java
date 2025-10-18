@@ -95,35 +95,35 @@ public class SwerveModuleCollection {
                 System.out.println("************** WCP MODULES w/Duty-Cycle Encoders **************");
                 return new SwerveModuleCollection(
                         WCPSwerveModule100.getFalconDrive(frontLeftLogger, supplyLimit, statorLimit,
-                                new CanId(32),
+                                new CanId(12), // drive
                                 DriveRatio.FAST, DutyCycleRotaryPositionSensor.class,
-                                new CanId(12),
-                                new RoboRioChannel(7),
-                                0.658,
+                                new CanId(32), // steer
+                                new RoboRioChannel(6),
+                                0.160218,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(frontRightLogger, supplyLimit, statorLimit,
-                                new CanId(30),
+                                new CanId(11), // drive
                                 DriveRatio.FAST, DutyCycleRotaryPositionSensor.class,
-                                new CanId(11),
+                                new CanId(30), // steer
                                 new RoboRioChannel(8),
-                                0.379,
+                                0.876519,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(rearLeftLogger, supplyLimit, statorLimit,
-                                new CanId(31),
+                                new CanId(21), // drive
                                 DriveRatio.FAST, DutyCycleRotaryPositionSensor.class,
-                                new CanId(21),
-                                new RoboRioChannel(6),
-                                0.41,
+                                new CanId(31), // steer
+                                new RoboRioChannel(7),
+                                0.406423,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(rearRightLogger, supplyLimit, statorLimit,
-                                new CanId(22),
+                                new CanId(22), // drive
                                 DriveRatio.FAST, DutyCycleRotaryPositionSensor.class,
-                                new CanId(33),
+                                new CanId(33), // steer
                                 new RoboRioChannel(9),
-                                0.03,
+                                0.032502,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE));
             case BETA_BOT:
