@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * happen right now.
  */
 public class Prewarmer {
-    public static void init(Robot robot) {
+    public static void init(Machinery machinery) {
         System.out.println("\n*** PREWARM START");
         double startS = Takt.actual();
 
@@ -33,40 +33,40 @@ public class Prewarmer {
                 Rotation2d.kZero,
                 Rotation2d.kZero));
         TrajectoryPlanner planner = new TrajectoryPlanner(
-                new TimingConstraintFactory(robot.m_swerveKinodynamics).medium());
+                new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium());
         planner.restToRest(waypoints);
 
         // Exercise the drive motors.
-        robot.m_drive.driveInFieldCoords(new GlobalVelocityR3(0, 0, 0));
+        machinery.m_drive.driveInFieldCoords(new GlobalVelocityR3(0, 0, 0));
 
         // Exercise some mechanism commands.
-        Command c = robot.m_mech.homeToL4();
+        Command c = machinery.m_mech.homeToL4();
         c.initialize();
         c.execute();
 
-        c = robot.m_mech.pickWithProfile();
+        c = machinery.m_mech.pickWithProfile();
         c.initialize();
         c.execute();
 
-        robot.m_mech.stop();
+        machinery.m_mech.stop();
 
-        c = robot.m_manipulator.centerIntake();
+        c = machinery.m_manipulator.centerIntake();
         c.initialize();
         c.execute();
 
-        robot.m_manipulator.stopMotors();
+        machinery.m_manipulator.stopMotors();
 
-        c = robot.m_climber.goToIntakePosition();
+        c = machinery.m_climber.goToIntakePosition();
         c.initialize();
         c.execute();
 
-        robot.m_climber.stopMotor();
+        machinery.m_climber.stopMotor();
 
-        c = robot.m_climberIntake.intake();
+        c = machinery.m_climberIntake.intake();
         c.initialize();
         c.execute();
 
-        robot.m_climberIntake.stopMotor();
+        machinery.m_climberIntake.stopMotor();
 
         // Force full garbage collection.
         // This reduces the allocated heap size, not just the used heap size, which

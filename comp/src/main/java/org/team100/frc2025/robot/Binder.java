@@ -34,17 +34,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * Binds buttons to commands. Also creates default commands.
  */
 public class Binder {
+    private final Machinery m_machinery;
 
-    private final Robot robot;
-
-    public Binder(Robot robot) {
-        this.robot = robot;
+    public Binder(Machinery machinery) {
+        m_machinery = machinery;
     }
 
-    /** Call only this after all the member initialization in Robot is done! */
-    public void bind() {
+    public void bind(LoggerFactory m_logger) {
 
-        final LoggerFactory comLog = robot.m_logger.name("Commands");
+        final LoggerFactory comLog = m_logger.name("Commands");
 
         /////////////////////////////////////////////////
         ///
@@ -67,21 +65,22 @@ public class Binder {
         // * barge-assist (slow when near barge)
         final Command driveDefault = new DriveManuallySimple(
                 driver::velocity,
-                robot.m_localizer::setHeedRadiusM,
-                robot.m_drive,
+                m_machinery.m_localizer::setHeedRadiusM,
+                m_machinery.m_drive,
                 new ManualWithProfiledReefLock(
-                        comLog, robot.m_swerveKinodynamics, driver::leftTrigger,
-                        thetaFeedback, robot.m_drive),
+                        comLog, m_machinery.m_swerveKinodynamics, driver::leftTrigger,
+                        thetaFeedback, m_machinery.m_drive),
                 new ManualWithBargeAssist(
-                        comLog, robot.m_swerveKinodynamics, driver::pov,
-                        thetaFeedback, robot.m_drive),
+                        comLog, m_machinery.m_swerveKinodynamics, driver::pov,
+                        thetaFeedback, m_machinery.m_drive),
                 driver::leftBumper);
-        robot.m_drive.setDefaultCommand(driveDefault.withName("drive default"));
+        m_machinery.m_drive.setDefaultCommand(driveDefault.withName("drive default"));
         // WARNING! This default command *MOVES IMMEDIATELY WHEN ENABLED*!
-        robot.m_mech.setDefaultCommand(robot.m_mech.profileHomeAndThenRest().withName("mech default"));
-        robot.m_climber.setDefaultCommand(robot.m_climber.stop().withName("climber default"));
-        robot.m_climberIntake.setDefaultCommand(robot.m_climberIntake.stop().withName("climber intake default"));
-        robot.m_manipulator.setDefaultCommand(robot.m_manipulator.stop().withName("manipulator default"));
+        m_machinery.m_mech.setDefaultCommand(m_machinery.m_mech.profileHomeAndThenRest().withName("mech default"));
+        m_machinery.m_climber.setDefaultCommand(m_machinery.m_climber.stop().withName("climber default"));
+        m_machinery.m_climberIntake
+                .setDefaultCommand(m_machinery.m_climberIntake.stop().withName("climber intake default"));
+        m_machinery.m_manipulator.setDefaultCommand(m_machinery.m_manipulator.stop().withName("manipulator default"));
 
         ///////////////////////////
         //
@@ -89,11 +88,11 @@ public class Binder {
         //
         // Reset pose estimator so the current gyro rotation corresponds to zero.
         onTrue(driver::back,
-                new SetRotation(robot.m_drive, Rotation2d.kZero));
+                new SetRotation(m_machinery.m_drive, Rotation2d.kZero));
 
         // Reset pose estimator so the current gyro rotation corresponds to 180.
         onTrue(driver::start,
-                new SetRotation(robot.m_drive, Rotation2d.kPi));
+                new SetRotation(m_machinery.m_drive, Rotation2d.kPi));
 
         ////////////////////////////////////////////////////////////
         //
@@ -101,7 +100,7 @@ public class Binder {
         //
         // "fly" the joints manually
         whileTrue(operator::leftBumper,
-                new ManualCartesian(operator::velocity, robot.m_mech));
+                new ManualCartesian(operator::velocity, m_machinery.m_mech));
         // new ManualConfig(operatorControl::velocity, mech));
 
         ////////////////////////////////////////////////////////////
@@ -113,68 +112,70 @@ public class Binder {
         // and go back home when the button is released, ending when complete.
         whileTrue(driver::rightTrigger,
                 parallel(
-                        robot.m_mech.pickWithProfile(),
-                        robot.m_manipulator.centerIntake()))
-                .onFalse(robot.m_mech.profileHomeTerminal());
+                        m_machinery.m_mech.pickWithProfile(),
+                        m_machinery.m_manipulator.centerIntake()))
+                .onFalse(m_machinery.m_mech.profileHomeTerminal());
 
         // Move to coral ground pick location.
         whileTrue(driver::rightBumper,
                 parallel(
-                        robot.m_mech.pickWithProfile(),
-                        robot.m_manipulator.centerIntake()))
-                .onFalse(robot.m_mech.profileHomeTerminal());
+                        m_machinery.m_mech.pickWithProfile(),
+                        m_machinery.m_manipulator.centerIntake()))
+                .onFalse(m_machinery.m_mech.profileHomeTerminal());
 
         final HolonomicProfile coralPickProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
-                robot.m_swerveKinodynamics.getMaxAngleSpeedRad_S(), robot.m_swerveKinodynamics.getMaxAngleAccelRad_S2(),
+                m_machinery.m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
+                m_machinery.m_swerveKinodynamics.getMaxAngleAccelRad_S2(),
                 5);
 
         // Pick a game piece from the floor, based on camera input.
         whileTrue(operator::leftTrigger,
                 parallel(
-                        robot.m_mech.pickWithProfile(),
-                        robot.m_manipulator.centerIntake(),
+                        m_machinery.m_mech.pickWithProfile(),
+                        m_machinery.m_manipulator.centerIntake(),
 
                         FloorPickSequence.get(
-                                robot.m_fieldLog, robot.m_drive, robot.m_targets,
-                                SwerveControllerFactory.pick(robot.m_driveLog), coralPickProfile)
+                                m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
+                                SwerveControllerFactory.pick(comLog), coralPickProfile)
                                 .withName("Floor Pick"))
-                        .until(robot.m_manipulator::hasCoral));
+                        .until(m_machinery.m_manipulator::hasCoral));
 
         FloorPickSequence.get(
-                robot.m_fieldLog, robot.m_drive, robot.m_targets,
-                SwerveControllerFactory.pick(robot.m_driveLog), coralPickProfile)
+                m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
+                SwerveControllerFactory.pick(comLog), coralPickProfile)
                 .withName("Floor Pick")
-                .until(robot.m_manipulator::hasCoral);
+                .until(m_machinery.m_manipulator::hasCoral);
 
         // Sideways intake for L1
         whileTrue(buttons::red2,
                 sequence(
-                        robot.m_manipulator.sidewaysIntake()
-                                .until(robot.m_manipulator::hasCoralSideways),
-                        robot.m_manipulator.sidewaysHold()));
+                        m_machinery.m_manipulator.sidewaysIntake()
+                                .until(m_machinery.m_manipulator::hasCoralSideways),
+                        m_machinery.m_manipulator.sidewaysHold()));
 
         ////////////////////////////////////////////////////////////
         //
         // CORAL SCORING
         //
         // Manual movement of arm, for testing.
-        whileTrue(buttons::l1, robot.m_mech.profileHomeToL1());
+        whileTrue(buttons::l1, m_machinery.m_mech.profileHomeToL1());
         // whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
         // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
         // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
         // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
 
-        final LoggerFactory coralSequence = robot.m_logger.name("Coral Sequence");
-        final HolonomicProfile profile = HolonomicProfile.get(coralSequence, robot.m_swerveKinodynamics, 1, 0.5, 1,
+        final LoggerFactory coralSequence = m_logger.name("Coral Sequence");
+        final HolonomicProfile profile = HolonomicProfile.get(coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5,
+                1,
                 0.2);
         final SwerveController holonomicController = SwerveControllerFactory.byIdentity(coralSequence);
 
         // Drive to a scoring location at the reef and score.
         whileTrue(driver::a,
                 ScoreCoralSmart.get(
-                        coralSequence, robot.m_mech, robot.m_manipulator,
-                        holonomicController, profile, robot.m_drive,
-                        robot.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
+                        coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
+                        holonomicController, profile, m_machinery.m_drive,
+                        m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         ////////////////////////////////////////////////////////////
         //
@@ -186,28 +187,28 @@ public class Binder {
         // grab and hold algae, and then eject it when you let go of the button
         onTrue(buttons::algae,
                 MoveToAlgaePosition.get(
-                        robot.m_mech, buttons::algaeLevel, buttons::algae));
+                        m_machinery.m_mech, buttons::algaeLevel, buttons::algae));
 
-        FollowJointProfiles homeGentle = robot.m_mech.homeAlgae();
-        whileTrue(driver::b, robot.m_mech.algaePickGround()).onFalse(homeGentle.until(homeGentle::isDone));
+        FollowJointProfiles homeGentle = m_machinery.m_mech.homeAlgae();
+        whileTrue(driver::b, m_machinery.m_mech.algaePickGround()).onFalse(homeGentle.until(homeGentle::isDone));
 
         // Intake algae and puke it when you let go.
         whileTrue(buttons::barge,
                 sequence(
-                        robot.m_manipulator.algaeIntake()
-                                .until(robot.m_manipulator::hasAlgae),
-                        robot.m_manipulator.algaeHold()) //
+                        m_machinery.m_manipulator.algaeIntake()
+                                .until(m_machinery.m_manipulator::hasAlgae),
+                        m_machinery.m_manipulator.algaeHold()) //
         ).onFalse(
-                robot.m_manipulator.algaeEject()
+                m_machinery.m_manipulator.algaeEject()
                         .withTimeout(0.5));
 
         // Move mech to processor
         whileTrue(buttons::red4,
-                robot.m_mech.processorWithProfile());
+                m_machinery.m_mech.processorWithProfile());
 
         // Move mech to barge
         whileTrue(buttons::red3,
-                robot.m_mech.homeToBarge()).onFalse(robot.m_mech.bargeToHome());
+                m_machinery.m_mech.homeToBarge()).onFalse(m_machinery.m_mech.bargeToHome());
 
         // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
         // whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
@@ -219,15 +220,15 @@ public class Binder {
         //
         // Extend, spin, wait for intake, and pull climber in and drive forward.
         whileTrue(buttons::red1,
-                ClimberCommands.climbIntake(robot.m_climber, robot.m_climberIntake, robot.m_mech));
+                ClimberCommands.climbIntake(m_machinery.m_climber, m_machinery.m_climberIntake, m_machinery.m_mech));
 
         // Step 2, driver: Pull climber in and drive forward.
         onTrue(driver::y,
-                ClimberCommands.climb(robot.m_climber, robot.m_drive, robot.m_mech));
+                ClimberCommands.climb(m_machinery.m_climber, m_machinery.m_drive, m_machinery.m_mech));
 
         // Between matches, operator: Reset the climber position.
         whileTrue(operator::rightBumper,
-                robot.m_climber.manual(operator::leftY));
+                m_machinery.m_climber.manual(operator::leftY));
 
         ////////////////////////////////////////////////////////////
         //
@@ -250,8 +251,8 @@ public class Binder {
         whileTrue(() -> (RobotState.isTest() && operator.leftBumper() && driver.rightBumper()),
                 // for now, it just beeps and does one thing.
                 sequence(
-                        robot.m_beeper.startingBeeps(),
-                        robot.m_manipulator.centerIntake().withTimeout(1) //
+                        m_machinery.m_beeper.startingBeeps(),
+                        m_machinery.m_manipulator.centerIntake().withTimeout(1) //
                 ).withName("test all movements") //
         );
 
