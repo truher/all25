@@ -1,6 +1,7 @@
 package org.team100.frc2025;
 
 import org.junit.jupiter.api.Test;
+import org.team100.frc2025.robot.Robot;
 
 /** This just checks for crashers. */
 public class RobotTest {

@@ -1,43 +1,25 @@
-package org.team100.frc2025;
-
-import static edu.wpi.first.wpilibj2.command.Commands.parallel;
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+package org.team100.frc2025.robot;
 
 import java.io.IOException;
-import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.CalgamesViz;
-import org.team100.frc2025.CalgamesArm.FollowJointProfiles;
-import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.Climber.Climber;
-import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
-import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
-import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
-import org.team100.frc2025.Swerve.Auto.Auton;
-import org.team100.frc2025.Swerve.Auto.Coral1Left;
-import org.team100.frc2025.Swerve.Auto.Coral1Mid;
-import org.team100.frc2025.Swerve.Auto.Coral1Right;
-import org.team100.frc2025.Swerve.Auto.LolipopAuto;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.async.Async;
 import org.team100.lib.async.AsyncFactory;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
-import org.team100.lib.config.AutonChooser;
 import org.team100.lib.config.Identity;
 import org.team100.lib.controller.drivetrain.FullStateSwerveController;
-import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
-import org.team100.lib.examples.semiauto.FloorPickSequence;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
@@ -79,12 +61,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot100 {
     // for background on drive current limits:
@@ -99,14 +79,14 @@ public class Robot extends TimedRobot100 {
     private static final double DRIVE_STATOR_LIMIT = 110;
 
     // LOGS
-    private final LoggerFactory m_logger;
-    private final FieldLogger.Log m_fieldLog;
-    private final LoggerFactory m_driveLog;
+    final LoggerFactory m_logger;
+    final FieldLogger.Log m_fieldLog;
+    final LoggerFactory m_driveLog;
     private final RobotLog m_robotLog;
 
     private final SwerveModuleCollection m_modules;
-    private final AutonChooser m_autonChooser;
-    private final AprilTagRobotLocalizer m_localizer;
+    private final AllAutons m_allAutons;
+    final AprilTagRobotLocalizer m_localizer;
 
     // SUBSYSTEMS
     final SwerveDriveSubsystem m_drive;
@@ -117,13 +97,18 @@ public class Robot extends TimedRobot100 {
     final CalgamesMech m_mech;
 
     final SwerveKinodynamics m_swerveKinodynamics;
+    final HolonomicProfile m_autoProfile;
+    final FullStateSwerveController m_autoController;
+    final Beeper m_beeper;
+    private final Binder m_binder;
 
     private final Runnable m_simulatedTagDetector;
     private final Runnable m_targetSimulator;
+    final TrajectoryVisualization m_trajectoryViz;
     private final Runnable m_combinedViz;
     private final Runnable m_climberViz;
-    private final Targets m_targets;
-    private final TrajectoryPlanner m_planner;
+    final Targets m_targets;
+    final TrajectoryPlanner m_planner;
 
     public Robot() {
         // We want the CommandScheduler, not LiveWindow.
@@ -182,7 +167,7 @@ public class Robot extends TimedRobot100 {
         //
         // VISUALIZATIONS
         //
-        final TrajectoryVisualization viz = new TrajectoryVisualization(fieldLogger);
+        m_trajectoryViz = new TrajectoryVisualization(fieldLogger);
         m_combinedViz = new CalgamesViz(m_mech);
         m_climberViz = new ClimberVisualization(m_climber, m_climberIntake);
 
@@ -245,6 +230,8 @@ public class Robot extends TimedRobot100 {
                 m_modules);
         m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(Math.PI)));
 
+        m_beeper = new Beeper(this);
+
         ////////////////////////////////////////////////////////////
         //
         // LED INDICATOR
@@ -295,239 +282,17 @@ public class Robot extends TimedRobot100 {
         m_climberIntake.setDefaultCommand(m_climberIntake.stop().withName("climber intake default"));
         m_manipulator.setDefaultCommand(m_manipulator.stop().withName("manipulator default"));
 
-        m_autonChooser = new AutonChooser();
-        auton(viz);
-        bindings(driver, operator, buttons);
+        m_autoProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
+                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
+        m_autoController = SwerveControllerFactory.auto2025LooseTolerance(m_logger.name("Auton"));
+
+        m_allAutons = new AllAutons(this);
+
+        m_binder = new Binder(this);
+        m_binder.bind(driver, operator, buttons);
+
         Prewarmer.init(this);
         System.out.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
-    }
-
-    /*******************************************************************
-     * AUTONOMOUS
-     * 
-     * Populate the auton chooser here.
-     * 
-     * It's a good idea to instantiate them all here, even if you're not using them
-     * all, so they don't rot.
-     * 
-     *******************************************************************/
-    private void auton(TrajectoryVisualization viz) {
-        final LoggerFactory autoLog = m_logger.name("Auton");
-        final HolonomicProfile autoProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
-                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
-        final FullStateSwerveController autoController = SwerveControllerFactory.auto2025LooseTolerance(autoLog);
-
-        // WARNING! The glass widget will override this value, so check it!
-        // Run the auto in pre-match testing!
-        m_autonChooser.addAsDefault("Lollipop", LolipopAuto.get(
-                m_logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive, m_planner,
-                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz));
-
-        m_autonChooser.add("Coral 1 left", Coral1Left.get(
-                m_logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive,
-                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz));
-        m_autonChooser.add("Coral 1 mid", Coral1Mid.get(
-                m_logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive,
-                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz));
-        m_autonChooser.add("Coral 1 right", Coral1Right.get(
-                m_logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive,
-                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz));
-
-        Auton auton = new Auton(m_logger, m_mech, m_manipulator,
-                autoController, autoProfile, m_drive,
-                m_localizer::setHeedRadiusM, m_swerveKinodynamics, viz);
-
-        m_autonChooser.add("Left Preload Only", auton.leftPreloadOnly());
-        m_autonChooser.add("Center Preload Only", auton.centerPreloadOnly());
-        m_autonChooser.add("Right Preload Only", auton.rightPreloadOnly());
-        m_autonChooser.add("Left Three Coral", auton.left());
-        m_autonChooser.add("Right Three Coral", auton.right());
-    }
-
-    /*******************************************************************
-     * BINDINGS
-     * 
-     * Bind buttons to commands here.
-     * 
-     * TODO: finish moving button bindings from the constructor.
-     * 
-     *******************************************************************/
-    private void bindings(DriverXboxControl driver, OperatorXboxControl operator, Buttons2025 buttons) {
-
-        ///////////////////////////
-        //
-        // DRIVETRAIN
-        //
-        // Reset pose estimator so the current gyro rotation corresponds to zero.
-        onTrue(driver::back,
-                new SetRotation(m_drive, Rotation2d.kZero));
-
-        // Reset pose estimator so the current gyro rotation corresponds to 180.
-        onTrue(driver::start,
-                new SetRotation(m_drive, Rotation2d.kPi));
-
-        ////////////////////////////////////////////////////////////
-        //
-        // MECHANISM
-        //
-        // "fly" the joints manually
-        whileTrue(operator::leftBumper,
-                new ManualCartesian(operator::velocity, m_mech));
-        // new ManualConfig(operatorControl::velocity, mech));
-
-        ////////////////////////////////////////////////////////////
-        //
-        // CORAL PICK
-        //
-
-        // At the same time, move the arm to the floor and spin the intake,
-        // and go back home when the button is released, ending when complete.
-        whileTrue(driver::rightTrigger,
-                parallel(
-                        m_mech.pickWithProfile(),
-                        m_manipulator.centerIntake()))
-                .onFalse(m_mech.profileHomeTerminal());
-
-        // Move to coral ground pick location.
-        whileTrue(driver::rightBumper,
-                parallel(
-                        m_mech.pickWithProfile(),
-                        m_manipulator.centerIntake()))
-
-                .onFalse(m_mech.profileHomeTerminal());
-
-        final HolonomicProfile coralPickProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
-                m_swerveKinodynamics.getMaxAngleSpeedRad_S(), m_swerveKinodynamics.getMaxAngleAccelRad_S2(), 5);
-
-        // Pick a game piece from the floor, based on camera input.
-        whileTrue(operator::leftTrigger,
-                parallel(
-                        m_mech.pickWithProfile(),
-                        m_manipulator.centerIntake(),
-
-                        FloorPickSequence.get(
-                                m_fieldLog, m_drive, m_targets,
-                                SwerveControllerFactory.pick(m_driveLog), coralPickProfile)
-                                .withName("Floor Pick"))
-                        .until(m_manipulator::hasCoral));
-
-        FloorPickSequence.get(
-                m_fieldLog, m_drive, m_targets,
-                SwerveControllerFactory.pick(m_driveLog), coralPickProfile)
-                .withName("Floor Pick")
-                .until(m_manipulator::hasCoral);
-
-        // Sideways intake for L1
-        whileTrue(buttons::red2,
-                sequence(
-                        m_manipulator.sidewaysIntake()
-                                .until(m_manipulator::hasCoralSideways),
-                        m_manipulator.sidewaysHold()));
-
-        ////////////////////////////////////////////////////////////
-        //
-        // CORAL SCORING
-        //
-        // Manual movement of arm, for testing.
-        whileTrue(buttons::l1, m_mech.profileHomeToL1());
-        // whileTrue(buttons::l2, mech.homeToL2()).onFalse(mech.l2ToHome());
-        // whileTrue(buttons::l3, mech.homeToL3()).onFalse(mech.l3ToHome());
-        // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
-        // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
-
-        final LoggerFactory coralSequence = m_logger.name("Coral Sequence");
-        final HolonomicProfile profile = HolonomicProfile.get(coralSequence, m_swerveKinodynamics, 1, 0.5, 1, 0.2);
-        final SwerveController holonomicController = SwerveControllerFactory.byIdentity(coralSequence);
-
-        // Drive to a scoring location at the reef and score.
-        whileTrue(driver::a,
-                ScoreCoralSmart.get(
-                        coralSequence, m_mech, m_manipulator,
-                        holonomicController, profile, m_drive,
-                        m_localizer::setHeedRadiusM, buttons::level, buttons::point));
-
-        ////////////////////////////////////////////////////////////
-        //
-        // ALGAE
-        //
-        // Algae commands have two components: one button for manipulator,
-        // one button for arm mechanism.
-
-        // grab and hold algae, and then eject it when you let go of the button
-        onTrue(buttons::algae,
-                MoveToAlgaePosition.get(
-                        m_mech, buttons::algaeLevel, buttons::algae));
-
-        FollowJointProfiles homeGentle = m_mech.homeAlgae();
-        whileTrue(driver::b, m_mech.algaePickGround()).onFalse(homeGentle.until(homeGentle::isDone));
-
-        // Intake algae and puke it when you let go.
-        whileTrue(buttons::barge,
-                sequence(
-                        m_manipulator.algaeIntake()
-                                .until(m_manipulator::hasAlgae),
-                        m_manipulator.algaeHold()) //
-        ).onFalse(
-                m_manipulator.algaeEject()
-                        .withTimeout(0.5));
-
-        // Move mech to processor
-        whileTrue(buttons::red4,
-                m_mech.processorWithProfile());
-
-        // Move mech to barge
-        whileTrue(buttons::red3,
-                m_mech.homeToBarge()).onFalse(m_mech.bargeToHome());
-
-        // whileTrue(driverControl::a, m_manipulator.run(m_manipulator::intakeCenter));
-        // whileTrue(driverControl::b, m_manipulator.run(m_manipulator::ejectCenter));
-        // whileTrue(driverControl::x, m_manipulator.run(m_manipulator::intakeCenter));
-
-        ////////////////////////////////////////////////////////////
-        //
-        // CLIMB
-        //
-        // Extend, spin, wait for intake, and pull climber in and drive forward.
-        whileTrue(buttons::red1,
-                ClimberCommands.climbIntake(m_climber, m_climberIntake, m_mech));
-
-        // Step 2, driver: Pull climber in and drive forward.
-        onTrue(driver::y,
-                ClimberCommands.climb(m_climber, m_drive, m_mech));
-
-        // Between matches, operator: Reset the climber position.
-        whileTrue(operator::rightBumper,
-                m_climber.manual(operator::leftY));
-
-        ////////////////////////////////////////////////////////////
-        //
-        // TEST ALL MOVEMENTS
-        //
-        // For pre- and post-match testing.
-        //
-        // Enable "test" mode and press operator left bumper and driver right bumper.
-        //
-        // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
-        //
-        // THIS WILL MOVE THE ROBOT VERY FAST!
-        //
-        // DO NOT RUN with the wheels on the floor!
-        //
-        // DO NOT RUN without tiedown clamps.
-        //
-        // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
-        //
-        whileTrue(() -> (RobotState.isTest() && operator.leftBumper() && driver.rightBumper()),
-                // for now, it just beeps and does one thing.
-                sequence(
-                        startingBeeps(),
-                        m_manipulator.centerIntake().withTimeout(1) //
-                ).withName("test all movements") //
-        );
     }
 
     @Override
@@ -554,29 +319,6 @@ public class Robot extends TimedRobot100 {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    ///
-    /// COMMANDS
-    ///
-    public Command play(double freq) {
-        return parallel(
-                m_mech.play(freq),
-                m_manipulator.play(freq));
-    }
-
-    /** Three beeps and one long beep. */
-    public Command startingBeeps() {
-        return sequence(
-                play(880).withTimeout(0.5),
-                play(0).withTimeout(0.5),
-                play(880).withTimeout(0.5),
-                play(0).withTimeout(0.5),
-                play(880).withTimeout(0.5),
-                play(0).withTimeout(0.5),
-                play(1760).withTimeout(1.0),
-                play(0).withTimeout(0.1));
-    }
-
     //////////////////////////////////////////////////////////////////////
     //
     // INITIALIZERS, DO NOT CHANGE THESE
@@ -584,7 +326,7 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void autonomousInit() {
-        Command auton = m_autonChooser.get();
+        Command auton = m_allAutons.get();
         if (auton == null)
             return;
         auton.schedule();
@@ -655,13 +397,4 @@ public class Robot extends TimedRobot100 {
             throw new IllegalStateException("Could not read Apriltag layout file", e);
         }
     }
-
-    private Trigger whileTrue(BooleanSupplier condition, Command command) {
-        return new Trigger(condition).whileTrue(command);
-    }
-
-    private Trigger onTrue(BooleanSupplier condition, Command command) {
-        return new Trigger(condition).onTrue(command);
-    }
-
 }
