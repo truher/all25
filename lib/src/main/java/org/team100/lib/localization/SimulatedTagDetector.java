@@ -24,6 +24,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * Publishes AprilTag Blip24 sightings on Network Tables, just like real
@@ -84,6 +85,26 @@ public class SimulatedTagDetector {
                     camera,
                     m_inst.getStructArrayTopic(
                             name, Blip24.struct).publish());
+        }
+    }
+
+    public static Runnable get(AprilTagFieldLayoutWithCorrectOrientation layout, SwerveHistory history) {
+        if (RobotBase.isReal()) {
+            // Real robots get an empty simulated tag detector.
+            return () -> {
+            };
+        } else {
+            // In simulation, we want the real simulated tag detector.
+            SimulatedTagDetector sim = new SimulatedTagDetector(
+                    List.of(
+                            Camera.SWERVE_LEFT,
+                            Camera.SWERVE_RIGHT,
+                            Camera.FUNNEL,
+                            Camera.CORAL_LEFT,
+                            Camera.CORAL_RIGHT),
+                    layout,
+                    history);
+            return sim::periodic;
         }
     }
 

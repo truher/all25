@@ -32,9 +32,16 @@ public class FollowTrajectory extends MoveAndHold {
         m_referenceController.execute();
     }
 
+    @Override
     public boolean isDone() {
         return m_referenceController.isDone();
     }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
 
     @Override
     public void end(boolean interrupted) {
