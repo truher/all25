@@ -10,7 +10,7 @@ import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,6 +24,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * Publishes AprilTag Blip24 sightings on Network Tables, just like real
@@ -51,7 +52,7 @@ public class SimulatedTagDetector {
 
     private final List<Camera> m_cameras;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
-    private final DoubleFunction<SwerveModel> m_history;
+    private final DoubleFunction<ModelR3> m_history;
 
     private final Map<Camera, StructArrayPublisher<Blip24>> m_publishers;
     /** client instance, not the default */
@@ -67,7 +68,7 @@ public class SimulatedTagDetector {
     public SimulatedTagDetector(
             List<Camera> cameras,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            DoubleFunction<SwerveModel> history) {
+            DoubleFunction<ModelR3> history) {
         m_cameras = cameras;
         m_layout = layout;
         m_history = history;
@@ -84,6 +85,26 @@ public class SimulatedTagDetector {
                     camera,
                     m_inst.getStructArrayTopic(
                             name, Blip24.struct).publish());
+        }
+    }
+
+    public static Runnable get(AprilTagFieldLayoutWithCorrectOrientation layout, SwerveHistory history) {
+        if (RobotBase.isReal()) {
+            // Real robots get an empty simulated tag detector.
+            return () -> {
+            };
+        } else {
+            // In simulation, we want the real simulated tag detector.
+            SimulatedTagDetector sim = new SimulatedTagDetector(
+                    List.of(
+                            Camera.SWERVE_LEFT,
+                            Camera.SWERVE_RIGHT,
+                            Camera.FUNNEL,
+                            Camera.CORAL_LEFT,
+                            Camera.CORAL_RIGHT),
+                    layout,
+                    history);
+            return sim::periodic;
         }
     }
 

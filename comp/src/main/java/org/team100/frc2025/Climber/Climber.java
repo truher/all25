@@ -21,8 +21,8 @@ import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
-import org.team100.lib.reference.ProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.ProfileReferenceR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 
@@ -37,7 +37,7 @@ public class Climber extends SubsystemBase {
         LoggerFactory log = parent.name("Climber");
 
         IncrementalProfile profile100 = new TrapezoidIncrementalProfile(1, 2, 0.05);
-        ProfileReference1d ref = new IncrementalProfileReference1d(profile100, 0.05, 0.05);
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile100, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
 
         switch (Identity.instance) {

@@ -1,0 +1,114 @@
+package org.team100.frc2025.robot;
+
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
+
+import java.util.List;
+
+import org.team100.lib.commands.MoveAndHold;
+import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
+import org.team100.lib.commands.drivetrain.DriveToTranslationFacingWithProfile;
+import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
+import org.team100.lib.config.ElevatorUtil.ScoringLevel;
+import org.team100.lib.controller.drivetrain.FullStateSwerveController;
+import org.team100.lib.field.FieldConstants;
+import org.team100.lib.field.FieldConstants.ReefPoint;
+import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.profile.HolonomicProfile;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+
+public class LolipopAuto {
+    private static final double HEED_RADIUS_M = 3;
+
+    private final Robot m_robot;
+    private final HolonomicProfile m_autoProfile;
+    private final FullStateSwerveController m_autoController;
+
+    /** Call only this after all the member initialization in Robot is done! */
+    public LolipopAuto(
+            Robot robot,
+            HolonomicProfile autoProfile,
+            FullStateSwerveController autoController) {
+        m_robot = robot;
+        m_autoProfile = autoProfile;
+        m_autoController = autoController;
+    }
+
+    public Command get() {
+        // this one uses some curvature
+        DriveWithTrajectoryFunction toReefTrajectory = new DriveWithTrajectoryFunction(
+                m_robot.m_drive, m_autoController, m_robot.m_trajectoryViz,
+                (p) -> m_robot.m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(m_robot.m_drive.getPose(), Math.PI),
+                        HolonomicPose2d.make(3, 5, 0, -2))));
+
+        DriveToPoseWithProfile toReefA = new DriveToPoseWithProfile(
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A));
+
+        DriveToTranslationFacingWithProfile toCenterCoral = new DriveToTranslationFacingWithProfile(
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
+                () -> FieldConstants.CoralMark.CENTER.value
+                        .plus(new Translation2d(0.7, 0)),
+                new Rotation2d(Math.PI));
+
+        DriveToPoseWithProfile toReefB = new DriveToPoseWithProfile(
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.B));
+
+        DriveToTranslationFacingWithProfile toCoralRight = new DriveToTranslationFacingWithProfile(
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
+                () -> FieldConstants.CoralMark.RIGHT.value
+                        .plus(new Translation2d(0.7, 0).rotateBy(new Rotation2d(Math.PI / 4))),
+                new Rotation2d(Math.PI));
+
+        DriveToPoseWithProfile toReefC = new DriveToPoseWithProfile(
+                m_robot.m_logger, m_robot.m_drive, m_autoController, m_autoProfile,
+                () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.C));
+
+        MoveAndHold toL4 = m_robot.m_mech.homeToL4();
+        MoveAndHold toL4second = m_robot.m_mech.homeToL4();
+        MoveAndHold toL4third = m_robot.m_mech.homeToL4();
+        ParallelRaceGroup eject = m_robot.m_manipulator.centerEject().withTimeout(0.3);
+        ParallelRaceGroup ejectsecond = m_robot.m_manipulator.centerEject().withTimeout(0.3);
+        ParallelRaceGroup ejectthird = m_robot.m_manipulator.centerEject().withTimeout(0.3);
+        return sequence(
+                toReefTrajectory.until(toReefTrajectory::isDone),
+                parallel(
+                        runOnce(() -> m_robot.m_localizer.setHeedRadiusM(HEED_RADIUS_M)),
+                        toReefA,
+                        m_robot.m_mech.profileHomeAndThenRest().until(toReefA::isDone).andThen(toL4),
+                        waitUntil(() -> toReefA.isDone() && toL4.isDone())
+                                .andThen(eject))
+                        .until(() -> (toReefA.isDone() && toL4.isDone() && eject.isFinished())),
+                parallel(
+                        toCenterCoral,
+                        m_robot.m_mech.pickWithProfile(),
+                        m_robot.m_manipulator.centerIntake()).until(m_robot.m_manipulator::hasCoral).withTimeout(3)
+                        .andThen(m_robot.m_manipulator::stop),
+                parallel(
+                        toReefB,
+                        m_robot.m_mech.profileHomeAndThenRest().until(toReefB::isDone).andThen(toL4second),
+                        waitUntil(() -> toReefB.isDone() && toL4second.isDone())
+                                .andThen(ejectsecond))
+                        .until(() -> (toReefB.isDone() && toL4second.isDone() && ejectsecond.isFinished())),
+                parallel(
+                        toCoralRight,
+                        m_robot.m_mech.pickWithProfile(),
+                        m_robot.m_manipulator.centerIntake()).until(m_robot.m_manipulator::hasCoral).withTimeout(3)
+                        .andThen(m_robot.m_manipulator::stop),
+                parallel(
+                        toReefC,
+                        m_robot.m_mech.profileHomeAndThenRest().until(toReefC::isDone).andThen(toL4third),
+                        waitUntil(() -> toReefC.isDone() && toL4third.isDone())
+                                .andThen(ejectthird))
+                        .until(() -> (toReefC.isDone() && toL4third.isDone() && ejectthird.isFinished())),
+                m_robot.m_mech.l4ToHome());
+    }
+}

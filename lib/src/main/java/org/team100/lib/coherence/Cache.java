@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
+import org.team100.lib.logging.Logging;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 
@@ -24,6 +28,9 @@ import com.ctre.phoenix6.StatusCode;
  */
 public class Cache {
     private static final boolean DEBUG = false;
+    /** How long it takes to update the cache. */
+    private static final DoubleLogger m_log_update = Logging.instance().rootLogger.name("Cache")
+            .doubleLogger(Level.COMP, "update time (s)");
     static final List<CotemporalCache<?>> caches = new ArrayList<>();
     private static final List<DoubleCache> doubles = new ArrayList<>();
     private static final List<SideEffect> sideEffects = new ArrayList<>();
@@ -71,8 +78,10 @@ public class Cache {
     public static void refresh() {
         if (DEBUG)
             System.out.println("Cache refresh");
+        double startUpdateS = Takt.actual();
         reset();
         update();
+        m_log_update.log(() -> (Takt.actual() - startUpdateS));
     }
 
     /** For testing only */

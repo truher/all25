@@ -2,13 +2,14 @@ package org.team100.lib.commands.drivetrain;
 
 import java.util.List;
 
+import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.reference.TrajectoryReference;
+import org.team100.lib.reference.TrajectoryReferenceR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
@@ -16,15 +17,14 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Drive to a specified pose and exit velocity, using a trajectory constructed
  * at initialization time.
  */
-public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
+public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     private final Pose2d m_goal;
-    private final GlobalSe2Velocity m_endVelocity;
+    private final GlobalVelocityR3 m_endVelocity;
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final TrajectoryVisualization m_viz;
@@ -34,7 +34,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
 
     public DriveToPoseWithTrajectoryAndExitVelocity(
             Pose2d goal,
-            GlobalSe2Velocity endVelocity,
+            GlobalVelocityR3 endVelocity,
             SwerveDriveSubsystem drive,
             SwerveController controller,
             SwerveKinodynamics swerveKinodynamics,
@@ -52,7 +52,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
     public void initialize() {
         Pose2d pose = m_drive.getPose();
         Translation2d toGoal = m_goal.getTranslation().minus(pose.getTranslation());
-        GlobalSe2Velocity startVelocity = m_drive.getVelocity();
+        GlobalVelocityR3 startVelocity = m_drive.getVelocity();
         HolonomicPose2d startWaypoint = new HolonomicPose2d(
                 pose.getTranslation(),
                 pose.getRotation(),
@@ -76,7 +76,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
         m_referenceController = new ReferenceController(
                 m_drive,
                 m_controller,
-                new TrajectoryReference(trajectory),
+                new TrajectoryReferenceR3(trajectory),
                 false);
     }
 
@@ -87,11 +87,18 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends Command {
 
     }
 
+    @Override
     public boolean isDone() {
         if (m_referenceController == null)
             return true;
         return m_referenceController.isDone();
     }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+    }
+
 
     @Override
     public void end(boolean interrupted) {

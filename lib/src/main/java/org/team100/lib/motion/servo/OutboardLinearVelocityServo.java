@@ -33,6 +33,11 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
         m_mechanism.resetEncoderPosition();
     }
 
+    @Override
+    public void setDutyCycle(double dutyCycle) {
+        m_mechanism.setDutyCycle(dutyCycle);
+    }
+
     /** Passthrough to the outboard control. */
     @Override
     public void setVelocity(double setpointM_S) {

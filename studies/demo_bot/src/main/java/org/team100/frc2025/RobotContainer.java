@@ -50,7 +50,7 @@ public class RobotContainer {
         final LoggerFactory sysLog = logger.name("Subsystems");
 
         m_drive = TankFactory.make(logger, 20);
-        m_drive.setDefaultCommand(new DriveTank(driverControl::velocity, m_drive));
+        m_drive.setDefaultCommand(new DriveTank(driverControl::rightY, driverControl::rightX, m_drive));
 
         m_shooter = DrumShooterFactory.make(sysLog, 20);
         m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));

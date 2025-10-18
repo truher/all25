@@ -2,25 +2,25 @@ package org.team100.lib.commands.drivetrain;
 
 import java.util.function.Supplier;
 
+import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.reference.ProfileReference;
+import org.team100.lib.reference.ProfileReferenceR3;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Drive to a pose supplied at initialization, using a profile.
  */
-public class DriveToTranslationFacingWithProfile extends Command {
+public class DriveToTranslationFacingWithProfile extends MoveAndHold {
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final HolonomicProfile m_profile;
@@ -28,7 +28,7 @@ public class DriveToTranslationFacingWithProfile extends Command {
     private final Supplier<Translation2d> m_goal;
     private final Rotation2d m_sideFacing;
 
-    private ProfileReference m_reference;
+    private ProfileReferenceR3 m_reference;
     private ReferenceController m_referenceController;
 
     public DriveToTranslationFacingWithProfile(
@@ -52,8 +52,8 @@ public class DriveToTranslationFacingWithProfile extends Command {
     public void initialize() {
         Pose2d goal = getGoal(m_goal.get(), m_drive.getPose().getTranslation());
         m_log_goal.log(() -> goal);
-        m_reference = new ProfileReference(m_profile, "embark");
-        m_reference.setGoal(new SwerveModel(goal));
+        m_reference = new ProfileReferenceR3(m_profile, "embark");
+        m_reference.setGoal(new ModelR3(goal));
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }
 
@@ -70,16 +70,13 @@ public class DriveToTranslationFacingWithProfile extends Command {
         m_referenceController = null;
     }
 
-    /**
-     * Done if we've started and we're finished.
-     * Note calling isDone after end will yield false.
-     */
+    @Override
     public boolean isDone() {
         return m_referenceController != null && m_referenceController.isDone();
     }
 
     public Pose2d getGoal(Translation2d goalTranslation, Translation2d robotTranslation) {
-        return new Pose2d(goalTranslation,goalTranslation.minus(robotTranslation).getAngle().plus(m_sideFacing));
+        return new Pose2d(goalTranslation, goalTranslation.minus(robotTranslation).getAngle().plus(m_sideFacing));
     }
 
     public double toGo() {

@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.NamedChooser;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -66,7 +66,7 @@ public class DriveManually extends Command {
     public void initialize() {
         m_heedRadiusM.accept(HEED_RADIUS_M);
         m_drive.resetLimiter();
-        SwerveModel p = m_drive.getState();
+        ModelR3 p = m_drive.getState();
         for (DriverAdapter d : m_drivers.values()) {
             d.reset(p);
         }
@@ -82,7 +82,7 @@ public class DriveManually extends Command {
         if (!(manualMode.equals(currentManualMode))) {
             currentManualMode = manualMode;
             // there's state in there we'd like to forget
-            SwerveModel p = m_drive.getState();
+            ModelR3 p = m_drive.getState();
             for (DriverAdapter d : m_drivers.values()) {
                 d.reset(p);
             }
@@ -90,7 +90,7 @@ public class DriveManually extends Command {
 
         // input in [-1,1] control units
         Velocity input = m_twistSupplier.get();
-        SwerveModel state = m_drive.getState();
+        ModelR3 state = m_drive.getState();
         DriverAdapter d = m_drivers.getOrDefault(manualMode, m_defaultDriver);
         d.apply(state, input);
 

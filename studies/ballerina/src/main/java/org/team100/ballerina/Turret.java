@@ -14,8 +14,8 @@ import org.team100.lib.motion.servo.OnboardAngularPositionServo;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
-import org.team100.lib.reference.ProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.ProfileReferenceR1;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,7 +50,7 @@ public class Turret extends SubsystemBase {
         m_pose = pose;
         m_target = target;
         IncrementalProfile profile = new TrapezoidIncrementalProfile(5, 10, 0.05);
-        ProfileReference1d ref = new IncrementalProfileReference1d(profile, 0.05, 0.05);
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
         SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
         SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);

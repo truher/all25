@@ -4,7 +4,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motion.servo.OutboardLinearPositionServo;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReference1d;
+import org.team100.lib.reference.IncrementalProfileReferenceR1;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -27,7 +27,7 @@ public class IndexerSubsystem extends SubsystemBase {
         m_indexer = new OutboardLinearPositionServo(
                 m_logger,
                 linearMechanism,
-                new IncrementalProfileReference1d(
+                new IncrementalProfileReferenceR1(
                         new TrapezoidIncrementalProfile(indexVelocityM_S, maxAccel, 0.02),
                         0.02,
                         0.02),

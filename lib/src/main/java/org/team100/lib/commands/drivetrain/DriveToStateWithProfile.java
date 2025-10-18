@@ -2,34 +2,33 @@ package org.team100.lib.commands.drivetrain;
 
 import java.util.function.Supplier;
 
+import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.drivetrain.SwerveController;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.reference.ProfileReference;
-
-import edu.wpi.first.wpilibj2.command.Command;
+import org.team100.lib.reference.ProfileReferenceR3;
+import org.team100.lib.state.ModelR3;
 
 /**
  * Drive to the supplied goal state using a profile. Allows the goal to change
  * after initialization.
  */
-public class DriveToStateWithProfile extends Command {
+public class DriveToStateWithProfile extends MoveAndHold {
     private final FieldLogger.Log m_field_log;
-    private final Supplier<SwerveModel> m_goals;
+    private final Supplier<ModelR3> m_goals;
     private final SwerveDriveSubsystem m_drive;
     private final SwerveController m_controller;
     private final HolonomicProfile m_profile;
 
-    private SwerveModel m_goal;
-    private ProfileReference m_reference;
+    private ModelR3 m_goal;
+    private ProfileReferenceR3 m_reference;
     private ReferenceController m_referenceController;
 
     public DriveToStateWithProfile(
             FieldLogger.Log fieldLogger,
-            Supplier<SwerveModel> goal,
+            Supplier<ModelR3> goal,
             SwerveDriveSubsystem drive,
             SwerveController controller,
             HolonomicProfile profile) {
@@ -46,7 +45,7 @@ public class DriveToStateWithProfile extends Command {
         m_goal = m_goals.get();
         if (m_goal == null)
             return;
-        m_reference = new ProfileReference(m_profile, "Drive to pose with profile");
+        m_reference = new ProfileReferenceR3(m_profile, "Drive to pose with profile");
         m_reference.setGoal(m_goal);
         m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
     }
@@ -73,12 +72,14 @@ public class DriveToStateWithProfile extends Command {
         m_goal = null;
     }
 
-    /**
-     * Done if we've started and we're finished.
-     * Note calling isDone after end will yield false.
-     */
+    @Override
     public boolean isDone() {
         return m_referenceController != null && m_referenceController.isDone();
+    }
+
+    @Override
+    public double toGo() {
+        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
     }
 
 }

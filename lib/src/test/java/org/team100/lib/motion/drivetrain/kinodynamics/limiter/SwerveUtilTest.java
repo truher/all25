@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.motion.drivetrain.Fixture;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
 
 class SwerveUtilTest {
     private static final boolean DEBUG = false;
@@ -20,12 +20,12 @@ class SwerveUtilTest {
     void testIsAccel() {
         // hard left turn is not accel
         assertFalse(SwerveUtil.isAccel(
-                new GlobalSe2Velocity(1, 0, 0),
-                new GlobalSe2Velocity(0, 1, 0)));
+                new GlobalVelocityR3(1, 0, 0),
+                new GlobalVelocityR3(0, 1, 0)));
         // speed up veering left
         assertTrue(SwerveUtil.isAccel(
-                new GlobalSe2Velocity(0.5, 0.5, 0),
-                new GlobalSe2Velocity(0, 1, 0)));
+                new GlobalVelocityR3(0.5, 0.5, 0),
+                new GlobalVelocityR3(0, 1, 0)));
     }
 
     @Test
@@ -41,8 +41,8 @@ class SwerveUtilTest {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
         assertEquals(10, limits.getMaxDriveAccelerationM_S2(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
-                new GlobalSe2Velocity(0, 0, 0),
-                new GlobalSe2Velocity(1, 0, 0));
+                new GlobalVelocityR3(0, 0, 0),
+                new GlobalVelocityR3(1, 0, 0));
         // low speed, current limited.
         assertEquals(10, accelLimit, DELTA);
     }
@@ -53,8 +53,8 @@ class SwerveUtilTest {
         assertEquals(10, limits.getMaxDriveAccelerationM_S2(), DELTA);
         assertEquals(5, limits.getMaxDriveVelocityM_S(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
-                new GlobalSe2Velocity(4.9, 0, 0),
-                new GlobalSe2Velocity(5, 0, 0));
+                new GlobalVelocityR3(4.9, 0, 0),
+                new GlobalVelocityR3(5, 0, 0));
         // near top speed, EMF-limited
         assertEquals(0.2, accelLimit, DELTA);
     }
@@ -66,8 +66,8 @@ class SwerveUtilTest {
         SwerveKinodynamics limits = new Fixture().swerveKinodynamics;
         assertEquals(1, limits.getMaxDriveAccelerationM_S2(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
-                new GlobalSe2Velocity(0.92, 0, 0),
-                new GlobalSe2Velocity(0.94, 0, 0));
+                new GlobalVelocityR3(0.92, 0, 0),
+                new GlobalVelocityR3(0.94, 0, 0));
         assertEquals(0.8, accelLimit, DELTA);
     }
 

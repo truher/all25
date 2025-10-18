@@ -119,6 +119,7 @@ public class Manipulator extends SubsystemBase implements Music {
         });
     }
 
+    /** Intake and hold. */
     public void intakeCenter() {
         if (hasCoral()) {
             stopMotors();
@@ -161,6 +162,14 @@ public class Manipulator extends SubsystemBase implements Music {
         }
     }
 
+    public boolean intakingCoral() {
+        return Math.abs(m_leftMech.getVelocityM_S()) > 0;
+    }
+
+    public boolean intakingAlgae() {
+        return Math.abs(m_algaeMech.getVelocityM_S()) > 0;
+    }
+
     public boolean hasCoralSideways() {
         return coralIsClose(m_leftLaser) && coralIsClose(m_rightLaser);
     }
@@ -200,6 +209,7 @@ public class Manipulator extends SubsystemBase implements Music {
         return startRun(this::highAlgaeTorque, this::ejectAlgae);
     }
 
+    /** Intake and hold. */
     public Command centerIntake() {
         return startRun(this::highAlgaeTorque, this::intakeCenter);
     }

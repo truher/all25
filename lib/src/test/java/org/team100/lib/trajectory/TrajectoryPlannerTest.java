@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.GlobalSe2Velocity;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.SwerveDriveDynamicsConstraint;
@@ -64,12 +64,11 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
 
         // these are the same as StraightLineTrajectoryTest.
-        List<TimingConstraint> constraints =
-                List.of(
-                        new ConstantConstraint(1, 1, limits),
-                        new SwerveDriveDynamicsConstraint(limits, 1, 1),
-                        new YawRateConstraint(limits, 0.2),
-                        new CapsizeAccelerationConstraint(limits, 0.2));
+        List<TimingConstraint> constraints = List.of(
+                new ConstantConstraint(1, 1, limits),
+                new SwerveDriveDynamicsConstraint(limits, 1, 1),
+                new YawRateConstraint(limits, 0.2),
+                new CapsizeAccelerationConstraint(limits, 0.2));
         double start_vel = 1;
         double end_vel = 0;
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
@@ -132,7 +131,7 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        SwerveModel start = new SwerveModel(Pose2d.kZero, new GlobalSe2Velocity(0, 0, 0));
+        ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(0, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 trajectory = planner.restToRest(start.pose(), end);
         assertEquals(1.565, trajectory.duration(), DELTA);
@@ -160,7 +159,7 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        SwerveModel start = new SwerveModel(Pose2d.kZero, new GlobalSe2Velocity(1, 0, 0));
+        ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(1.176, traj.duration(), DELTA);
@@ -171,7 +170,7 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        SwerveModel start = new SwerveModel(Pose2d.kZero, new GlobalSe2Velocity(-1, 0, 0));
+        ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(-1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(1.176, traj.duration(), DELTA);
@@ -182,7 +181,7 @@ class TrajectoryPlannerTest {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        SwerveModel start = new SwerveModel(Pose2d.kZero, new GlobalSe2Velocity(0, 1, 0));
+        ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(2.958, traj.duration(), DELTA);

@@ -7,7 +7,9 @@ import java.util.function.DoubleFunction;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
-import org.team100.lib.motion.drivetrain.state.SwerveModel;
+import org.team100.lib.field.FieldConstants;
+import org.team100.lib.localization.SwerveHistory;
+import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -15,6 +17,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * Write simulated targets to Network Tables, so the Targets receiver can pick
@@ -28,7 +31,7 @@ public class SimulatedTargetWriter {
 
     private final Map<Camera, StructArrayPublisher<Rotation3d>> m_publishers;
     private final List<Camera> m_cameras;
-    private final DoubleFunction<SwerveModel> m_history;
+    private final DoubleFunction<ModelR3> m_history;
 
     /** For now, a fixed list of targets */
     private final Translation2d[] m_targets;
@@ -37,7 +40,7 @@ public class SimulatedTargetWriter {
 
     public SimulatedTargetWriter(
             List<Camera> cameras,
-            DoubleFunction<SwerveModel> history,
+            DoubleFunction<ModelR3> history,
             Translation2d[] targets) {
         m_cameras = cameras;
         m_history = history;
@@ -54,6 +57,27 @@ public class SimulatedTargetWriter {
                     m_inst.getStructArrayTopic(
                             name, Rotation3d.struct).publish());
         }
+    }
+
+    public static Runnable get(SwerveHistory history) {
+        if (RobotBase.isReal()) {
+            // Real robots get an empty simulated target detector.
+            return () -> {
+            };
+        }
+        // In simulation, we want the real simulated target detector.
+        SimulatedTargetWriter tsim = new SimulatedTargetWriter(
+                List.of(Camera.SWERVE_LEFT,
+                        Camera.SWERVE_RIGHT,
+                        Camera.FUNNEL,
+                        Camera.CORAL_LEFT,
+                        Camera.CORAL_RIGHT),
+                history,
+                new Translation2d[] {
+                        FieldConstants.CoralMark.LEFT.value,
+                        FieldConstants.CoralMark.CENTER.value,
+                        FieldConstants.CoralMark.RIGHT.value });
+        return tsim::update;
     }
 
     public void update() {
