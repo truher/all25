@@ -30,7 +30,7 @@ public class FieldConstantsLuke {
         Translation2d spoke = new Translation2d(radius, sectorAngle);
         // center of the face of the reef
         Translation2d center = REEF_CENTER.plus(spoke);
-        Rotation2d newRotation = sectorAngle.rotateBy(Rotation2d.kCW_90deg);
+        Rotation2d newRotation = sectorAngle.rotateBy(Rotation2d.kCCW_90deg);
 
         // end-effector is not in the center of robot y, it's offset a little.
         double endEffectorOffset = -0.193;
@@ -54,7 +54,7 @@ public class FieldConstantsLuke {
     public static Pose2d makeGoal(ScoringLevel level, ReefPoint point) {
         double radius = FieldConstants.getRadius(point, level);
         Translation2d destination = getScoringDestination(point, radius);
-        Rotation2d heading = point.angle().rotateBy(Rotation2d.k180deg);
+        Rotation2d heading = point.angle();
         return new Pose2d(destination, heading);
     }
 }
