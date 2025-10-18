@@ -8,16 +8,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 /** Plays warnings using the CTRE music feature. */
 public class Beeper {
 
-    Robot robot;
+    private final Machinery m_machinery;
 
-    public Beeper(Robot robot) {
-        this.robot = robot;
+    public Beeper(Machinery machinery) {
+        m_machinery = machinery;
     }
 
     public Command play(double freq) {
         return parallel(
-                robot.m_mech.play(freq),
-                robot.m_manipulator.play(freq));
+                m_machinery.m_mech.play(freq),
+                m_machinery.m_manipulator.play(freq));
     }
 
     /** Three beeps and one long beep. */
