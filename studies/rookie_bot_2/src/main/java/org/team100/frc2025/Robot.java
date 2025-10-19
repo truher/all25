@@ -25,7 +25,6 @@ public class Robot extends TimedRobot100 {
         banner();
         SmartDashboard.putData(CommandScheduler.getInstance());
         Logging logging = Logging.instance();
-        logging.setLevel(Level.TRACE);
         LoggerFactory fieldLogger = logging.fieldLogger;
         DriverXboxControl driverControl = new DriverXboxControl(0);
         LoggerFactory logger = logging.rootLogger;
