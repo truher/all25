@@ -18,6 +18,7 @@ import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.trajectory.TrajectoryPlanner;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -30,23 +31,26 @@ public class LolipopAuto {
     private final Machinery m_machinery;
     private final HolonomicProfile m_autoProfile;
     private final FullStateSwerveController m_autoController;
+    private final TrajectoryPlanner m_planner;
 
     public LolipopAuto(
             LoggerFactory logger,
             Machinery machinery,
             HolonomicProfile autoProfile,
-            FullStateSwerveController autoController) {
+            FullStateSwerveController autoController,
+            TrajectoryPlanner planner) {
         m_logger = logger;
         m_machinery = machinery;
         m_autoProfile = autoProfile;
         m_autoController = autoController;
+        m_planner = planner;
     }
 
     public Command get() {
         // this one uses some curvature
         DriveWithTrajectoryFunction toReefTrajectory = new DriveWithTrajectoryFunction(
                 m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
-                (p) -> m_machinery.m_planner.restToRest(List.of(
+                (p) -> m_planner.restToRest(List.of(
                         HolonomicPose2d.make(m_machinery.m_drive.getPose(), Math.PI),
                         HolonomicPose2d.make(3, 5, 0, -2))));
 
