@@ -7,8 +7,8 @@ import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.Model100Logger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
-import org.team100.lib.reference.ProfileReferenceR1;
-import org.team100.lib.reference.SetpointsR1;
+import org.team100.lib.reference.r1.ProfileReferenceR1;
+import org.team100.lib.reference.r1.SetpointsR1;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 

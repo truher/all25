@@ -2,9 +2,9 @@ package org.team100.lib.commands.drivetrain.test;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
-import org.team100.lib.reference.TrajectoryReferenceR3;
+import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -18,7 +18,7 @@ import org.team100.lib.visualization.TrajectoryVisualization;
  */
 public class DriveWithTrajectory extends MoveAndHold {
     private final DriveSubsystemInterface m_drive;
-    private final SwerveController m_controller;
+    private final ControllerR3 m_controller;
     private final Trajectory100 m_trajectory;
     private final TrajectoryVisualization m_viz;
 
@@ -26,7 +26,7 @@ public class DriveWithTrajectory extends MoveAndHold {
 
     public DriveWithTrajectory(
             DriveSubsystemInterface drive,
-            SwerveController controller,
+            ControllerR3 controller,
             Trajectory100 trajectory,
             TrajectoryVisualization viz) {
         m_drive = drive;
@@ -38,11 +38,9 @@ public class DriveWithTrajectory extends MoveAndHold {
 
     @Override
     public void initialize() {
+        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(m_trajectory);
         m_referenceController = new ReferenceController(
-                m_drive,
-                m_controller,
-                new TrajectoryReferenceR3(m_trajectory),
-                false);
+                m_drive, m_controller, reference);
         m_viz.setViz(m_trajectory);
         m_drive.resetLimiter();
     }
@@ -61,7 +59,6 @@ public class DriveWithTrajectory extends MoveAndHold {
     public double toGo() {
         return (m_referenceController == null) ? 0 : m_referenceController.toGo();
     }
-
 
     @Override
     public void end(boolean interrupted) {

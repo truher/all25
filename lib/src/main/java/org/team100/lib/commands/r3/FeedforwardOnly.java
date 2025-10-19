@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.reference.ProfileReferenceR3;
+import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;

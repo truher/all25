@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.drivetrain.DriveToTranslationWithRelativeBearing;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
@@ -31,7 +31,7 @@ public class FloorPickSequence {
             FieldLogger.Log fieldLog,
             SwerveDriveSubsystem drive,
             Targets targets,
-            SwerveController controller,
+            ControllerR3 controller,
             HolonomicProfile profile) {
         Supplier<Optional<Translation2d>> target = () -> Optional.of(targets.getClosestTarget().get().plus(new Translation2d(0,PICKOFFSET
         )));

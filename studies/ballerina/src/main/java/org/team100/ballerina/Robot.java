@@ -3,7 +3,6 @@ package org.team100.ballerina;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.hid.DriverXboxControl;
-import org.team100.lib.logging.Level;
 import org.team100.lib.logging.Logging;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,7 +22,6 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         Logging log = Logging.instance();
-        log.setLevel(Level.TRACE);
         m_controller = new DriverXboxControl(0);
         m_pose = new ManualPose(log.fieldLogger, m_controller::velocity, new Pose2d(6, 4, Rotation2d.kZero));
         m_target = new TargetDesignator(log.fieldLogger, TargetDesignator.A);

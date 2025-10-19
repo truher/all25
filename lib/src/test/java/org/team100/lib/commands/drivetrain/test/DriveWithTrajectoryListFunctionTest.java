@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
+import org.team100.lib.controller.r3.ControllerFactoryR3;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
@@ -47,7 +47,7 @@ class DriveWithTrajectoryListFunctionTest extends Fixtured implements Timeless {
         // this initial step is required since the timebase is different?
         stepTime();
         Experiments.instance.testOverride(Experiment.UseSetpointGenerator, true);
-        SwerveController control = SwerveControllerFactory.test(logger);
+        ControllerR3 control = ControllerFactoryR3.test(logger);
         DriveWithTrajectoryListFunction c = new DriveWithTrajectoryListFunction(
                 fixture.drive,
                 control,

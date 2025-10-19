@@ -1,4 +1,4 @@
-package org.team100.lib.controller.drivetrain;
+package org.team100.lib.controller.r3;
 
 import org.team100.lib.geometry.GlobalDeltaR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
@@ -16,7 +16,7 @@ import org.team100.lib.state.ModelR3;
 /**
  * Velocity feedforward, proportional feedback on position and velocity.
  */
-public class FullStateSwerveController implements SwerveController {
+public class FullStateControllerR3 implements ControllerR3 {
     private static final boolean DEBUG = false;
     private final ModelR3Logger m_log_measurement;
     private final BooleanLogger m_log_atPositionReference;
@@ -44,7 +44,7 @@ public class FullStateSwerveController implements SwerveController {
 
     private boolean m_atReference;
 
-    public FullStateSwerveController(
+    public FullStateControllerR3(
             LoggerFactory parent,
             double kPCart,
             double kPTheta,

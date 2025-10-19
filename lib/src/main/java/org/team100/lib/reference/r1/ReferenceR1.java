@@ -1,4 +1,4 @@
-package org.team100.lib.reference;
+package org.team100.lib.reference.r1;
 
 import java.util.function.Supplier;
 

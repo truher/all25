@@ -1,8 +1,9 @@
 package org.team100.lib.controller.drivetrain;
 
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
-import org.team100.lib.reference.ReferenceR3;
+import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ModelR3;
 
 /**
@@ -14,9 +15,8 @@ import org.team100.lib.state.ModelR3;
 public class ReferenceController {
     private static final boolean DEBUG = false;
     private final DriveSubsystemInterface m_drive;
-    private final SwerveController m_controller;
+    private final ControllerR3 m_controller;
     private final ReferenceR3 m_reference;
-    private final boolean m_verbatim;
 
     /**
      * Initializes the reference with the current measurement, so you should call
@@ -24,13 +24,11 @@ public class ReferenceController {
      */
     public ReferenceController(
             DriveSubsystemInterface drive,
-            SwerveController controller,
-            ReferenceR3 reference,
-            boolean verbatim) {
+            ControllerR3 controller,
+            ReferenceR3 reference) {
         m_drive = drive;
         m_controller = controller;
         m_reference = reference;
-        m_verbatim = verbatim;
 
         m_controller.reset();
         // initialize here so that the "done" state knows about the clock
@@ -44,13 +42,12 @@ public class ReferenceController {
             GlobalVelocityR3 fieldRelativeTarget = m_controller.calculate(
                     measurement, m_reference.current(), m_reference.next());
             if (DEBUG) {
-                System.out.printf("ReferenceController.execute() measurement %s current %s next %s output %s\n", 
-                 measurement, m_reference.current(), m_reference.next(), fieldRelativeTarget );
+                System.out.printf("ReferenceController.execute() measurement %s current %s next %s output %s\n",
+                        measurement, m_reference.current(), m_reference.next(), fieldRelativeTarget);
             }
-            if (m_verbatim)
-                m_drive.driveInFieldCoordsVerbatim(fieldRelativeTarget);
-            else
-                m_drive.driveInFieldCoords(fieldRelativeTarget);
+
+            m_drive.driveInFieldCoordsVerbatim(fieldRelativeTarget);
+            // m_drive.driveInFieldCoords(fieldRelativeTarget);
         } catch (IllegalStateException ex) {
             // System.out.println(ex);
             // This happens when the trajectory generator produces an empty trajectory.

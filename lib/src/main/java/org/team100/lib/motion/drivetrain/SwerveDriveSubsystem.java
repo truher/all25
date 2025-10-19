@@ -38,8 +38,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsystemInterface {
     // DEBUG produces a LOT of output, you should only enable it while you're
-    // looking
-    // at it.
+    // looking at it.
     private static final boolean DEBUG = false;
     private final FreshSwerveEstimate m_estimate;
     private final OdometryUpdater m_odometryUpdater;
@@ -95,56 +94,27 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
      */
     @Override
     public void driveInFieldCoords(final GlobalVelocityR3 input) {
-        // scale for driver skill; default is half speed.
-        final DriverSkill.Level driverSkillLevel = DriverSkill.level();
-        GlobalVelocityR3 scaled = GeometryUtil.scale(input, driverSkillLevel.scale());
+        // scale for driver skill.
+        GlobalVelocityR3 scaled = GeometryUtil.scale(input, DriverSkill.level().scale());
 
-        // NEW! Apply field-relative limits here.
+        // Apply field-relative limits.
         if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {
             scaled = m_limiter.apply(scaled);
-        } else {
-            // keep the limiter up to date on what we're doing
-            m_limiter.updateSetpoint(scaled);
         }
 
-        final Rotation2d theta = getPose().getRotation();
-        final ChassisSpeeds targetChassisSpeeds = SwerveKinodynamics.toInstantaneousChassisSpeeds(scaled, theta);
-
-        m_log_input.log(() -> input);
-        m_log_skill.log(() -> driverSkillLevel);
-        // here heading and course are exactly opposite, as they should be.
-        if (DEBUG) {
-            System.out.printf(
-                    "driveInFieldCoords() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n",
-                    theta.getRadians(),
-                    GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(),
-                    targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.vyMetersPerSecond,
-                    targetChassisSpeeds.omegaRadiansPerSecond);
-        }
-
-        m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
+        driveInFieldCoordsVerbatim(scaled);
     }
 
-    /** Skip all scaling, setpoint generator, etc. */
+    /** Skip all scaling, limits generator, etc. */
     public void driveInFieldCoordsVerbatim(GlobalVelocityR3 input) {
         // keep the limiter up to date on what we're doing
         m_limiter.updateSetpoint(input);
 
-        final ChassisSpeeds targetChassisSpeeds = SwerveKinodynamics.toInstantaneousChassisSpeeds(
-                input, getPose().getRotation());
-
-        final Rotation2d theta = getPose().getRotation();
-        // if we're going +x then heading and course should be opposite.
-        if (DEBUG) {
-            System.out.printf(
-                    "driveInFieldCoordsVerbatim() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n",
-                    theta.getRadians(),
-                    GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(),
-                    targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.vyMetersPerSecond,
-                    targetChassisSpeeds.omegaRadiansPerSecond);
-        }
-
+        Rotation2d theta = getPose().getRotation();
+        ChassisSpeeds targetChassisSpeeds = SwerveKinodynamics.toInstantaneousChassisSpeeds(
+                input, theta);
         m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
+        m_log_input.log(() -> input);
     }
 
     /**
@@ -156,7 +126,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         // scale for driver skill; default is half speed.
         DriverSkill.Level driverSkillLevel = DriverSkill.level();
         m_swerveLocal.setChassisSpeeds(speeds.times(driverSkillLevel.scale()));
-        m_log_skill.log(() -> driverSkillLevel);
     }
 
     /**
@@ -240,6 +209,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         // the name "field" is used by Field2d.
         // the name "robot" can be anything.
         m_log_field_robot.log(this::poseArray);
+        m_log_skill.log(() -> DriverSkill.level());
         m_swerveLocal.periodic();
     }
 

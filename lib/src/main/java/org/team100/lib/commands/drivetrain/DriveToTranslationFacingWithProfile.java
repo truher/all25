@@ -4,13 +4,13 @@ import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.reference.ProfileReferenceR3;
+import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,7 +22,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  */
 public class DriveToTranslationFacingWithProfile extends MoveAndHold {
     private final SwerveDriveSubsystem m_drive;
-    private final SwerveController m_controller;
+    private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
     private final Pose2dLogger m_log_goal;
     private final Supplier<Translation2d> m_goal;
@@ -34,7 +34,7 @@ public class DriveToTranslationFacingWithProfile extends MoveAndHold {
     public DriveToTranslationFacingWithProfile(
             LoggerFactory logger,
             SwerveDriveSubsystem drive,
-            SwerveController controller,
+            ControllerR3 controller,
             HolonomicProfile profile,
             Supplier<Translation2d> goal,
             Rotation2d sideFacing) {
@@ -54,7 +54,8 @@ public class DriveToTranslationFacingWithProfile extends MoveAndHold {
         m_log_goal.log(() -> goal);
         m_reference = new ProfileReferenceR3(m_profile, "embark");
         m_reference.setGoal(new ModelR3(goal));
-        m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
+        m_referenceController = new ReferenceController(
+                m_drive, m_controller, m_reference);
     }
 
     @Override

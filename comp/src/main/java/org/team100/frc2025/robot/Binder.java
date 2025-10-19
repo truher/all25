@@ -14,8 +14,8 @@ import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
-import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
+import org.team100.lib.controller.r3.ControllerFactoryR3;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.simple.Feedback100;
 import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.examples.semiauto.FloorPickSequence;
@@ -137,13 +137,13 @@ public class Binder {
 
                         FloorPickSequence.get(
                                 m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
-                                SwerveControllerFactory.pick(comLog), coralPickProfile)
+                                ControllerFactoryR3.pick(comLog), coralPickProfile)
                                 .withName("Floor Pick"))
                         .until(m_machinery.m_manipulator::hasCoral));
 
         FloorPickSequence.get(
                 m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
-                SwerveControllerFactory.pick(comLog), coralPickProfile)
+                ControllerFactoryR3.pick(comLog), coralPickProfile)
                 .withName("Floor Pick")
                 .until(m_machinery.m_manipulator::hasCoral);
 
@@ -168,7 +168,7 @@ public class Binder {
         final LoggerFactory coralSequence = logger.name("Coral Sequence");
         final HolonomicProfile profile = HolonomicProfile.get(
                 coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5, 1, 0.2);
-        final SwerveController holonomicController = SwerveControllerFactory.byIdentity(coralSequence);
+        final ControllerR3 holonomicController = ControllerFactoryR3.byIdentity(coralSequence);
 
         // Drive to a scoring location at the reef and score.
         whileTrue(driver::a,

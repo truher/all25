@@ -21,8 +21,8 @@ import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReferenceR1;
-import org.team100.lib.reference.ProfileReferenceR1;
+import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 

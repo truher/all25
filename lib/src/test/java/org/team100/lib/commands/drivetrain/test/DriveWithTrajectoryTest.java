@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
+import org.team100.lib.controller.r3.ControllerFactoryR3;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.logging.LoggerFactory;
@@ -48,7 +48,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
-        SwerveController controller = SwerveControllerFactory.test(logger);
+        ControllerR3 controller = ControllerFactoryR3.test(logger);
 
         MockDrive d = new MockDrive();
         // initially at rest
@@ -100,7 +100,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
-        SwerveController controller = SwerveControllerFactory.test(logger);
+        ControllerR3 controller = ControllerFactoryR3.test(logger);
 
         MockDrive d = new MockDrive();
         // initially at rest
@@ -132,7 +132,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
         assertEquals(0, trajectory.sample(0).velocityM_S(), DELTA);
-        SwerveController controller = SwerveControllerFactory.test(logger);
+        ControllerR3 controller = ControllerFactoryR3.test(logger);
 
         SwerveDriveSubsystem drive = fixture.drive;
 
@@ -153,13 +153,13 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         stepTime();
         command.execute();
         // this is the output from the previous takt
-        assertEquals(0.02, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(0.033, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
         assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
 
         // etc
         stepTime();
         command.execute();
-        assertEquals(0.04, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(0.064, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
         assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
     }
 

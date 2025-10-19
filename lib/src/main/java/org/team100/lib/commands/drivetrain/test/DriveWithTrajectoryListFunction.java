@@ -6,9 +6,9 @@ import java.util.function.Function;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.reference.TrajectoryReferenceR3;
+import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -25,7 +25,7 @@ import edu.wpi.first.math.geometry.Pose2d;
  */
 public class DriveWithTrajectoryListFunction extends MoveAndHold {
     private final SwerveDriveSubsystem m_drive;
-    private final SwerveController m_controller;
+    private final ControllerR3 m_controller;
     private final Function<Pose2d, List<Trajectory100>> m_trajectories;
     private final TrajectoryVisualization m_viz;
 
@@ -34,7 +34,7 @@ public class DriveWithTrajectoryListFunction extends MoveAndHold {
 
     public DriveWithTrajectoryListFunction(
             SwerveDriveSubsystem swerve,
-            SwerveController controller,
+            ControllerR3 controller,
             Function<Pose2d, List<Trajectory100>> trajectories,
             TrajectoryVisualization viz) {
         m_drive = swerve;
@@ -56,11 +56,9 @@ public class DriveWithTrajectoryListFunction extends MoveAndHold {
             // get the next trajectory
             if (m_trajectoryIter.hasNext()) {
                 Trajectory100 m_trajectory = m_trajectoryIter.next();
+                TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(m_trajectory);
                 m_referenceController = new ReferenceController(
-                        m_drive,
-                        m_controller,
-                        new TrajectoryReferenceR3(m_trajectory),
-                        false);
+                        m_drive, m_controller, reference);
                 m_viz.setViz(m_trajectory);
             } else {
                 return;
@@ -82,7 +80,6 @@ public class DriveWithTrajectoryListFunction extends MoveAndHold {
     public double toGo() {
         return (m_referenceController == null) ? 0 : m_referenceController.toGo();
     }
-
 
     @Override
     public void end(boolean interrupted) {

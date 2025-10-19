@@ -17,7 +17,7 @@ import org.team100.lib.motion.servo.OutboardAngularPositionServo;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 
 /**
  * Uses simulated position sensors, must be used with clock control (e.g.

@@ -1,4 +1,4 @@
-package org.team100.lib.reference;
+package org.team100.lib.reference.r3;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
