@@ -23,6 +23,7 @@ import org.team100.lib.hid.Buttons2025;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.hid.OperatorXboxControl;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.Logging;
 import org.team100.lib.profile.HolonomicProfile;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,9 +41,9 @@ public class Binder {
         m_machinery = machinery;
     }
 
-    public void bind(LoggerFactory m_logger) {
-
-        final LoggerFactory comLog = m_logger.name("Commands");
+    public void bind() {
+        final LoggerFactory logger = Logging.instance().rootLogger;
+        final LoggerFactory comLog = logger.name("Commands");
 
         /////////////////////////////////////////////////
         ///
@@ -164,10 +165,9 @@ public class Binder {
         // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
         // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
 
-        final LoggerFactory coralSequence = m_logger.name("Coral Sequence");
-        final HolonomicProfile profile = HolonomicProfile.get(coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5,
-                1,
-                0.2);
+        final LoggerFactory coralSequence = logger.name("Coral Sequence");
+        final HolonomicProfile profile = HolonomicProfile.get(
+                coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5, 1, 0.2);
         final SwerveController holonomicController = SwerveControllerFactory.byIdentity(coralSequence);
 
         // Drive to a scoring location at the reef and score.
