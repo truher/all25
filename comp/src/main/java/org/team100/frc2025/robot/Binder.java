@@ -9,7 +9,7 @@ import org.team100.frc2025.CalgamesArm.FollowJointProfiles;
 import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
-import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmart;
+import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmartLuke;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.lib.commands.drivetrain.SetRotation;
@@ -181,10 +181,15 @@ public class Binder {
 
         // Drive to a scoring location at the reef and score.
         whileTrue(driver::a,
-                ScoreCoralSmart.get(
+        //TODO make this seperate/combined with scoring in general
+                ScoreCoralSmartLuke.get(
                         coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
                         holonomicController, profile, m_machinery.m_drive,
                         m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
+//                 ScoreCoralSmart.get(
+//                         coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
+//                         holonomicController, profile, m_machinery.m_drive,
+//                         m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         ////////////////////////////////////////////////////////////
         //

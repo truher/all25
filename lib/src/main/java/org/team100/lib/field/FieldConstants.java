@@ -118,7 +118,7 @@ public class FieldConstants {
      * These often need to be calibrated for specific reef setups, and to compensate
      * for any lingering inaccuracy in pose estimation.
      */
-    private static double getRadius(ReefPoint letter, ScoringLevel level) {
+    public static double getRadius(ReefPoint letter, ScoringLevel level) {
         return switch (level) {
             case L1 -> switch (letter) {
                 case A, B, C, D, E, F, G, H, I, J, K, L -> 3;
