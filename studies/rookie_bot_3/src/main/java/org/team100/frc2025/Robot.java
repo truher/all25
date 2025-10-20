@@ -4,6 +4,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.config.Identity;
 import org.team100.lib.examples.tank.DriveTank;
 import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.examples.tank.TankDriveFactory;
@@ -15,6 +16,7 @@ import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -35,7 +37,7 @@ public class Robot extends TimedRobot100 {
         m_drive = TankDriveFactory.make(
                 fieldLogger,
                 logger,
-                20, // supply current
+                80, // supply current
                 new CanId(3), // left
                 new CanId(27), // right
                 6.0, // gear ratio
