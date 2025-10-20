@@ -3,6 +3,7 @@ package org.team100.lib.examples.tank;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,16 +28,21 @@ public class BareMotorTank extends SubsystemBase implements TankDrive {
     private static final double GEAR_RATIO = 6.0;
 
     private final DoubleArrayLogger m_log_field_robot;
+    private final DoubleLogger m_log_translation;
+    private final DoubleLogger m_log_rotation;
     private final BareMotor m_left;
     private final BareMotor m_right;
     private final DifferentialDriveKinematics m_kinematics;
-    
+
     private double m_leftPosM;
     private double m_rightPosM;
     private Pose2d m_pose;
 
-    public BareMotorTank(LoggerFactory fieldLogger, BareMotor left, BareMotor right) {
+    public BareMotorTank(LoggerFactory fieldLogger, LoggerFactory parent, BareMotor left, BareMotor right) {
+        LoggerFactory log = parent.type(this);
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
+        m_log_translation = log.doubleLogger(Level.COMP, "translation");
+        m_log_rotation = log.doubleLogger(Level.COMP, "rotation");
         m_left = left;
         m_right = right;
         m_kinematics = new DifferentialDriveKinematics(TRACK_WIDTH_M);
@@ -55,6 +61,8 @@ public class BareMotorTank extends SubsystemBase implements TankDrive {
 
     @Override
     public void setVelocity(double translationM_S, double rotationRad_S) {
+        m_log_translation.log(() -> translationM_S);
+        m_log_rotation.log(() -> rotationRad_S);
         ChassisSpeeds speed = new ChassisSpeeds(translationM_S, 0, rotationRad_S);
         DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(speed);
         wheelSpeeds.desaturate(MAX_SPEED_M_S);

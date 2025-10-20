@@ -25,13 +25,13 @@ public class TankFactory {
     private static TankDrive realRobot(LoggerFactory fieldLogger, LoggerFactory parent, int supplyLimit) {
         LoggerFactory log = parent.name("Tank Drive");
 
-        NeoCANSparkMotor right = new NeoCANSparkMotor(log, new CanId(27), NeutralMode.BRAKE,
+        NeoCANSparkMotor right = new NeoCANSparkMotor(log.name("right"), new CanId(27), NeutralMode.BRAKE,
                 MotorPhase.FORWARD, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
 
-        NeoCANSparkMotor left = new NeoCANSparkMotor(log, new CanId(3), NeutralMode.BRAKE,
+        NeoCANSparkMotor left = new NeoCANSparkMotor(log.name("left"), new CanId(25), NeutralMode.BRAKE,
                 MotorPhase.REVERSE, supplyLimit, Feedforward100.makeNeo(), new PIDConstants());
 
-        return new BareMotorTank(fieldLogger, left, right);
+        return new BareMotorTank(fieldLogger, parent, left, right);
     }
 
     private static TankDrive sim(LoggerFactory fieldLogger, LoggerFactory parent) {
@@ -41,6 +41,6 @@ public class TankFactory {
 
         BareMotor left = new SimulatedBareMotor(log.name("left"), 600);
 
-        return new BareMotorTank(fieldLogger, left, right);
+        return new BareMotorTank(fieldLogger, parent, left, right);
     }
 }
