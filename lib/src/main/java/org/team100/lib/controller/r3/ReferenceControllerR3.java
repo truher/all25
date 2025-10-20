@@ -1,6 +1,5 @@
-package org.team100.lib.controller.drivetrain;
+package org.team100.lib.controller.r3;
 
-import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ModelR3;
@@ -12,7 +11,7 @@ import org.team100.lib.subsystems.SubsystemR3;
  * The lifespan of this object is intended to be a single "playback" of a
  * trajectory, so create it in Command.initialize().
  */
-public class ReferenceController {
+public class ReferenceControllerR3 {
     private static final boolean DEBUG = false;
     private final SubsystemR3 m_drive;
     private final ControllerR3 m_controller;
@@ -22,7 +21,7 @@ public class ReferenceController {
      * Initializes the reference with the current measurement, so you should call
      * this from, e.g. Command.initialize(), not in the constructor.
      */
-    public ReferenceController(
+    public ReferenceControllerR3(
             SubsystemR3 drive,
             ControllerR3 controller,
             ReferenceR3 reference) {

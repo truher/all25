@@ -1,12 +1,14 @@
 package org.team100.lib.motion.servo;
 
+import org.team100.lib.music.Player;
+
 /**
  * Angular position control, e.g. for swerve steering axes or arm axes.
  * 
  * An angular servo should generally get "wrapped" input. It figures out what
  * "unwrapped" commands to give the underlying mechanism.
  */
-public interface AngularPositionServo {
+public interface AngularPositionServo extends Player {
     /**
      * Zeros controller errors, sets setpoint to current position.
      *

@@ -3,8 +3,8 @@ package org.team100.lib.commands.drivetrain;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
@@ -31,7 +31,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     private final TrajectoryVisualization m_viz;
     private final TrajectoryPlanner m_planner;
 
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     public DriveToPoseWithTrajectoryAndExitVelocity(
             Pose2d goal,
@@ -75,7 +75,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
         m_viz.setViz(trajectory);
 
         TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
-        m_referenceController = new ReferenceController(
+        m_referenceController = new ReferenceControllerR3(
                 m_drive, m_controller, reference);
     }
 

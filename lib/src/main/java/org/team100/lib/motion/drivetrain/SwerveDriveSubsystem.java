@@ -18,23 +18,17 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
+import org.team100.lib.music.Music;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/**
- * There are four mutually exclusive drive methods.
- * We depend on CommandScheduler to enforce the mutex.
- * 
- * This class used to depend on the gyro directly, but no longer does: the only
- * direct gyro access is in the odometry updater. Consumers should get rotation
- * from the state estimate.
- */
-public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3 {
+public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3, Music {
     // DEBUG produces a LOT of output, you should only enable it while you're
     // looking at it.
     private static final boolean DEBUG = false;
@@ -82,8 +76,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3 {
     // ACTUATORS
     //
 
-
-
     /** Skip all scaling, limits generator, etc. */
     public void setVelocity(GlobalVelocityR3 input) {
         // keep the limiter up to date on what we're doing
@@ -116,6 +108,18 @@ public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3 {
         m_swerveLocal.setRawModuleStates(states);
     }
 
+    /** Use raw mode to set modules driving ahead */
+    public Command aheadSlow() {
+        return run(() -> setRawModuleStates(SwerveModuleStates.aheadSlow))
+                .finallyDo(() -> stop());
+    }
+
+    /** Use robot-relative mode to set modules driving to the right */
+    public Command rightwardSlow() {
+        return run(() -> setChassisSpeeds(new ChassisSpeeds(0, -1.0, 0)))
+                .finallyDo(() -> stop());
+    }
+
     /** Make an X, stopped. */
     public void defense() {
         m_swerveLocal.defense();
@@ -143,8 +147,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3 {
         m_odometryUpdater.reset(robotPose);
         m_stateCache.reset();
     }
-
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -232,6 +234,13 @@ public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3 {
     /** Return cached speeds. */
     public ChassisSpeeds getChassisSpeeds() {
         return m_stateCache.get().chassisSpeeds();
+    }
+
+    @Override
+    public Command play(double freq) {
+        return run(() -> {
+            m_swerveLocal.play(freq);
+        });
     }
 
 }

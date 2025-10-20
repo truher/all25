@@ -1,7 +1,7 @@
 package org.team100.lib.motion.drivetrain.module;
 
-import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.controller.simple.PIDFeedback;
+import org.team100.lib.controller.r1.Feedback100;
+import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.encoder.CombinedRotaryPositionSensor;
 import org.team100.lib.encoder.ProxyRotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
@@ -138,5 +138,4 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
         super(driveServo, turningServo, WHEEL_DIAMETER_M, DRIVE_GEAR_RATIO / 2);
         //
     }
-
 }

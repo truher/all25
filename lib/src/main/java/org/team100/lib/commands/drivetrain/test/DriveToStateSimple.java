@@ -1,8 +1,8 @@
 package org.team100.lib.commands.drivetrain.test;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.reference.r3.ConstantReferenceR3;
 import org.team100.lib.reference.r3.ReferenceR3;
@@ -24,7 +24,7 @@ public class DriveToStateSimple extends MoveAndHold {
     private final SwerveDriveSubsystem m_drive;
     private final ReferenceR3 m_reference;
 
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     public DriveToStateSimple(
             ControllerR3 controller,
@@ -38,7 +38,7 @@ public class DriveToStateSimple extends MoveAndHold {
 
     @Override
     public void initialize() {
-        m_referenceController = new ReferenceController(
+        m_referenceController = new ReferenceControllerR3(
                 m_drive, m_controller, m_reference);
     }
 

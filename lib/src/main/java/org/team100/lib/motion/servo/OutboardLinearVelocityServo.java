@@ -101,4 +101,9 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
         m_prevGoal = setpoint;
         return accel;
     }
+
+    @Override
+    public void play(double freq) {
+        m_mechanism.play(freq);
+    }
 }

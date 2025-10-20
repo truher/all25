@@ -1,11 +1,13 @@
 package org.team100.lib.motor;
 
+import org.team100.lib.music.Player;
+
 /**
  * Methods pertain only to the output shaft, not the motion of the attached
  * mechanism. Accordingly, the units are always rotational, and there should be
  * no gear ratios in any implementation.
  */
-public interface BareMotor {
+public interface BareMotor extends Player {
 
     /**
      * Some motors allow torque limiting through current limiting.

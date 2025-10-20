@@ -25,7 +25,6 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveLocal;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.module.SimulatedSwerveModule100;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
@@ -43,11 +42,8 @@ public class SimulatedDrivingTest implements Timeless {
     final LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
     LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
-    SwerveModuleCollection collection = new SwerveModuleCollection(
-            SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics),
-            SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics),
-            SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics),
-            SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics));
+    SwerveModuleCollection collection = SwerveModuleCollection.forTest(
+            logger, swerveKinodynamics);
 
     final Gyro gyro;
     final SwerveHistory history;

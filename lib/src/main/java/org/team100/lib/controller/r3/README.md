@@ -6,3 +6,5 @@ swerve control uses this sort of method, even though the SE(2) group
 of Pose2d is not R3.  It is *tangent* to R3, and if the control
 errors are small, R3 is an acceptable approximation to SE(2).
 
+The same controllers can be used for any problem with three independent
+dimensions, e.g. a planar mechanism like the 2025 elevator/arm.

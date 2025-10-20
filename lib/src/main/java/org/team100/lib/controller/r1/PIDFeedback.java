@@ -1,4 +1,4 @@
-package org.team100.lib.controller.simple;
+package org.team100.lib.controller.r1;
 
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;

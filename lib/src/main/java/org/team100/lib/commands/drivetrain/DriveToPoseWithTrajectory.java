@@ -4,8 +4,8 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.SubsystemR3;
@@ -32,7 +32,7 @@ public class DriveToPoseWithTrajectory extends MoveAndHold {
 
     private Trajectory100 m_trajectory;
 
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     /**
      * @param trajectories function that takes a start and end pose and returns a
@@ -60,7 +60,7 @@ public class DriveToPoseWithTrajectory extends MoveAndHold {
             return;
         }
         TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(m_trajectory);
-        m_referenceController = new ReferenceController(
+        m_referenceController = new ReferenceControllerR3(
                 m_drive, m_controller, reference);
         m_viz.setViz(m_trajectory);
     }

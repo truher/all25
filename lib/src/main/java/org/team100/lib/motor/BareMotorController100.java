@@ -105,4 +105,8 @@ public class BareMotorController100 implements BareMotor {
     public void periodic() {
         m_log_reported.log(m_motor::get);
     }
+
+    @Override
+    public void play(double freq) {
+    }
 }

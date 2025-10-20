@@ -1,4 +1,4 @@
-package org.team100.lib.controller.simple;
+package org.team100.lib.controller.r1;
 
 import java.util.function.DoubleUnaryOperator;
 

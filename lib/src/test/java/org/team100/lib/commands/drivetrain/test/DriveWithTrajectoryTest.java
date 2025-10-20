@@ -50,9 +50,8 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
         ControllerR3 controller = ControllerFactoryR3.test(logger);
 
-        MockSubsystemR3 d = new MockSubsystemR3();
         // initially at rest
-        d.m_state = new ModelR3();
+        MockSubsystemR3 d = new MockSubsystemR3(new ModelR3());
 
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
 
@@ -102,10 +101,9 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
         ControllerR3 controller = ControllerFactoryR3.test(logger);
 
-        MockSubsystemR3 d = new MockSubsystemR3();
         // initially at rest
-        d.m_state = new ModelR3();
-
+        MockSubsystemR3 d = new MockSubsystemR3(new ModelR3());
+        
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
         c.initialize();
 

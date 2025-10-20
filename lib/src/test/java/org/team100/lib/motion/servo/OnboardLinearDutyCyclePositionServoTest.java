@@ -1,8 +1,8 @@
 package org.team100.lib.motion.servo;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.controller.simple.FullStateFeedback;
+import org.team100.lib.controller.r1.Feedback100;
+import org.team100.lib.controller.r1.FullStateFeedback;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
