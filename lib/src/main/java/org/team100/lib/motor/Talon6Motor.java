@@ -266,6 +266,7 @@ public abstract class Talon6Motor implements BareMotor {
         log();
     }
 
+    @Override
     public void play(double freq) {
         m_motor.setControl(m_music.withAudioFrequency(freq));
     }

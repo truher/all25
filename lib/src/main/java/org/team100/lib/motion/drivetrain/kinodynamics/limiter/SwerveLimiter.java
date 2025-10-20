@@ -60,7 +60,7 @@ public class SwerveLimiter {
         m_log_next.log(() -> nextReference);
         m_log_normIn.log(nextReference::norm);
         if (DEBUG) {
-            System.out.printf("nextReference %s\n",  nextReference );
+            System.out.printf("nextReference %s\n", nextReference);
         }
         if (m_current == null)
             m_current = nextReference;
@@ -68,7 +68,7 @@ public class SwerveLimiter {
         // First, limit the goal to a feasible velocity.
         GlobalVelocityR3 result = m_velocityLimiter.apply(nextReference);
         if (DEBUG) {
-            System.out.printf("velocity limited %s\n", result );
+            System.out.printf("velocity limited %s\n", result);
         }
 
         // then limit acceleration towards that goal to avoid capsize
@@ -91,13 +91,17 @@ public class SwerveLimiter {
         updateSetpoint(result);
 
         if (DEBUG) {
-            System.out.printf("result %s\n", result );
+            System.out.printf("result %s\n", result);
         }
         m_log_norm.log(result::norm);
 
         return result;
     }
 
+    /**
+     * Set the current setpoint to the current velocity measurement.
+     * This is required to make resumption of manual control smooth.
+     */
     public void updateSetpoint(GlobalVelocityR3 setpoint) {
         m_current = setpoint;
     }

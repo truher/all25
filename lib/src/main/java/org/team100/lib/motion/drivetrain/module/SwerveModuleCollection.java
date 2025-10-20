@@ -1,7 +1,6 @@
 package org.team100.lib.motion.drivetrain.module;
 
 import org.team100.lib.config.Identity;
-import org.team100.lib.encoder.DutyCycleRotaryPositionSensor;
 import org.team100.lib.encoder.EncoderDrive;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
@@ -10,6 +9,7 @@ import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.music.Player;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 
@@ -17,7 +17,7 @@ import org.team100.lib.util.RoboRioChannel;
  * Represents the modules in the drivetrain.
  * Do not put logic here; this is just for bundling the modules together.
  */
-public class SwerveModuleCollection {
+public class SwerveModuleCollection implements Player {
     private static final boolean DEBUG = false;
     private static final String SWERVE_MODULES = "Swerve Modules";
     private static final String FRONT_LEFT = "Front Left";
@@ -30,7 +30,7 @@ public class SwerveModuleCollection {
     private final SwerveModule100 m_rearLeft;
     private final SwerveModule100 m_rearRight;
 
-    public SwerveModuleCollection(
+    SwerveModuleCollection(
             SwerveModule100 frontLeft,
             SwerveModule100 frontRight,
             SwerveModule100 rearLeft,
@@ -95,35 +95,35 @@ public class SwerveModuleCollection {
                 System.out.println("************** WCP MODULES w/Duty-Cycle Encoders **************");
                 return new SwerveModuleCollection(
                         WCPSwerveModule100.getFalconDrive(frontLeftLogger, supplyLimit, statorLimit,
-                                new CanId(32),
-                                DriveRatio.FAST, DutyCycleRotaryPositionSensor.class,
-                                new CanId(12),
-                                new RoboRioChannel(7),
-                                0.658,
+                                new CanId(12), // drive
+                                DriveRatio.FAST,
+                                new CanId(32), // steer
+                                new RoboRioChannel(6),
+                                0.160218,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(frontRightLogger, supplyLimit, statorLimit,
-                                new CanId(30),
-                                DriveRatio.FAST, DutyCycleRotaryPositionSensor.class,
-                                new CanId(11),
+                                new CanId(11), // drive
+                                DriveRatio.FAST,
+                                new CanId(30), // steer
                                 new RoboRioChannel(8),
-                                0.379,
+                                0.876519,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(rearLeftLogger, supplyLimit, statorLimit,
-                                new CanId(31),
-                                DriveRatio.FAST, DutyCycleRotaryPositionSensor.class,
-                                new CanId(21),
-                                new RoboRioChannel(6),
-                                0.41,
+                                new CanId(21), // drive
+                                DriveRatio.FAST,
+                                new CanId(31), // steer
+                                new RoboRioChannel(7),
+                                0.406423,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE),
                         WCPSwerveModule100.getFalconDrive(rearRightLogger, supplyLimit, statorLimit,
-                                new CanId(22),
-                                DriveRatio.FAST, DutyCycleRotaryPositionSensor.class,
-                                new CanId(33),
+                                new CanId(22), // drive
+                                DriveRatio.FAST,
+                                new CanId(33), // steer
                                 new RoboRioChannel(9),
-                                0.03,
+                                0.032502,
                                 kinodynamics,
                                 EncoderDrive.INVERSE, NeutralMode.COAST, MotorPhase.REVERSE));
             case BETA_BOT:
@@ -142,6 +142,14 @@ public class SwerveModuleCollection {
                         SimulatedSwerveModule100.get(rearLeftLogger, kinodynamics),
                         SimulatedSwerveModule100.get(rearRightLogger, kinodynamics));
         }
+    }
+
+    public static SwerveModuleCollection forTest(LoggerFactory log, SwerveKinodynamics kinodynamics) {
+        return new SwerveModuleCollection(
+                SimulatedSwerveModule100.withInstantaneousSteering(log, kinodynamics),
+                SimulatedSwerveModule100.withInstantaneousSteering(log, kinodynamics),
+                SimulatedSwerveModule100.withInstantaneousSteering(log, kinodynamics),
+                SimulatedSwerveModule100.withInstantaneousSteering(log, kinodynamics));
     }
 
     //////////////////////////////////////////////////
@@ -254,10 +262,17 @@ public class SwerveModuleCollection {
 
     /** Updates visualization. */
     public void periodic() {
-
         m_frontLeft.periodic();
         m_frontRight.periodic();
         m_rearLeft.periodic();
         m_rearRight.periodic();
+    }
+
+    @Override
+    public void play(double freq) {
+        m_frontLeft.play(freq);
+        m_frontRight.play(freq);
+        m_rearLeft.play(freq);
+        m_rearRight.play(freq);
     }
 }

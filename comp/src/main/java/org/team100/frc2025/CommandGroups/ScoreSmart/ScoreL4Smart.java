@@ -10,7 +10,7 @@ import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
@@ -23,7 +23,7 @@ public class ScoreL4Smart {
             LoggerFactory logger,
             CalgamesMech mech,
             Manipulator manipulator,
-            SwerveController controller,
+            ControllerR3 controller,
             HolonomicProfile profile,
             SwerveDriveSubsystem m_drive,
             Supplier<Pose2d> goal) {
