@@ -173,6 +173,11 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
         actuateWithProfile(unwrappedGoalX, torqueNm);
     }
 
+    @Override
+    public void play(double freq) {
+        m_mechanism.play(freq);
+    }
+
     private void actuateWithProfile(double unwrappedGoalX, double torqueNm) {
         initReference(new Model100(unwrappedGoalX, 0));
         SetpointsR1 unwrappedSetpoint = m_ref.get();

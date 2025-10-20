@@ -3,8 +3,8 @@ package org.team100.lib.commands.drivetrain;
 import java.util.function.Function;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.subsystems.SubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
@@ -27,7 +27,7 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
      * Non-null when the command is active (between initialize and end), null
      * otherwise.
      */
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     public DriveWithTrajectoryFunction(
             SubsystemR3 drive,
@@ -46,7 +46,7 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
         Trajectory100 trajectory = m_trajectoryFn.apply(m_drive.getState().pose());
         m_viz.setViz(trajectory);
         TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
-        m_referenceController = new ReferenceController(
+        m_referenceController = new ReferenceControllerR3(
                 m_drive, m_controller, reference);
     }
 

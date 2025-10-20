@@ -1,6 +1,6 @@
 package org.team100.lib.motion.servo;
 
-import org.team100.lib.controller.simple.Feedback100;
+import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;

@@ -1,15 +1,25 @@
 package org.team100.frc2025;
 
+import java.util.List;
+
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
+import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
 import org.team100.lib.commands.r3.FeedforwardOnly;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.examples.mecanum.MecanumDrive;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.trajectory.Trajectory100;
+import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.YawRateConstraint;
+import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,32 +33,52 @@ public class Autons {
     private final AutonChooser m_autonChooser;
     private final MecanumDrive m_drive;
     private final HolonomicProfile m_profile;
+    private final TrajectoryPlanner m_planner;
+    private final TrajectoryVisualization m_viz;
 
     public Autons(
             LoggerFactory log,
+            LoggerFactory fieldLogger,
             MecanumDrive drive) {
         LoggerFactory autoLog = log.name("Auton");
         m_autonChooser = new AutonChooser();
         m_drive = drive;
         m_profile = HolonomicProfile.wpi(4, 8, 3, 6);
+        List<TimingConstraint> constraints = List.of(
+                new ConstantConstraint(2, 2),
+                new YawRateConstraint(1, 1));
+        m_planner = new TrajectoryPlanner(constraints);
+        m_viz = new TrajectoryVisualization(fieldLogger);
 
         ControllerR3 controller = ControllerFactoryR3.byIdentity(autoLog);
 
         MoveAndHold one = new FeedforwardOnly(m_profile, ONE, m_drive);
         m_autonChooser.add("one", one.until(one::isDone).withName("auto one"));
+
         MoveAndHold two = new FeedforwardOnly(m_profile, TWO, m_drive);
         m_autonChooser.add("two", two.until(two::isDone).withName("auto two"));
-        m_autonChooser.add("three",
-                m_drive.driveWithGlobalVelocity(
-                        new GlobalVelocityR3(1.5, 0, 0))
-                        .withTimeout(1.0).withName("auto three"));
+
+        Command three = m_drive.driveWithGlobalVelocity(
+                new GlobalVelocityR3(1.5, 0, 0)).withTimeout(1.0);
+        m_autonChooser.add("three", three.withName("auto three"));
+
         MoveAndHold four = new DriveToPoseWithProfile(
                 autoLog, drive, controller, m_profile, () -> FOUR);
-        m_autonChooser.add("four", four);
+        m_autonChooser.add("four", four.withName("auto four"));
+
+        MoveAndHold five = new DriveWithTrajectoryFunction(
+                drive, controller, m_viz, this::five);
+        m_autonChooser.add("five", five.withName("auto five"));
     }
 
     public Command get() {
         return m_autonChooser.get();
+    }
+
+    private Trajectory100 five(Pose2d p) {
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(1, 2, Math.PI / 2, Math.PI / 2)));
     }
 
 }

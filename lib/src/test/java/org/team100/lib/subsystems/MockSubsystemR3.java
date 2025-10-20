@@ -8,6 +8,10 @@ public class MockSubsystemR3 implements SubsystemR3 {
     public GlobalVelocityR3 m_recentSetpoint;
     public ModelR3 m_state;
 
+    public MockSubsystemR3(ModelR3 initial) {
+        m_state = initial;
+    }
+
     @Override
     public ModelR3 getState() {
         return m_state;

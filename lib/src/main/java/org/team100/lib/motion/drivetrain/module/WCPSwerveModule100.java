@@ -110,7 +110,6 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double statorLimitAmps,
             CanId driveMotorCanId,
             DriveRatio ratio,
-            Class<? extends RotaryPositionSensor> encoderClass,
             CanId turningMotorCanId,
             RoboRioChannel turningEncoderChannel,
             double turningOffset,

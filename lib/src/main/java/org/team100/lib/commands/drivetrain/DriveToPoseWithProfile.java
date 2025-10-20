@@ -3,8 +3,8 @@ package org.team100.lib.commands.drivetrain;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
@@ -26,7 +26,7 @@ public class DriveToPoseWithProfile extends MoveAndHold {
     private final Supplier<Pose2d> m_goal;
 
     private ProfileReferenceR3 m_reference;
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     public DriveToPoseWithProfile(
             LoggerFactory logger,
@@ -49,7 +49,7 @@ public class DriveToPoseWithProfile extends MoveAndHold {
         m_log_goal.log(() -> goal);
         m_reference = new ProfileReferenceR3(m_profile, "embark");
         m_reference.setGoal(new ModelR3(goal));
-        m_referenceController = new ReferenceController(
+        m_referenceController = new ReferenceControllerR3(
                 m_drive, m_controller, m_reference);
     }
 

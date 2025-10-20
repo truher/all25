@@ -4,8 +4,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
@@ -35,7 +35,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
 
     private Pose2d m_goal;
     private ProfileReferenceR3 m_reference;
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     public DriveToTranslationWithRelativeBearing(
             FieldLogger.Log fieldLogger,
@@ -60,7 +60,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
             return;
         m_reference = new ProfileReferenceR3(m_profile, "DriveToTranslationWithRelativeBearing");
         m_reference.setGoal(new ModelR3(m_goal));
-        m_referenceController = new ReferenceController(
+        m_referenceController = new ReferenceControllerR3(
                 m_drive, m_controller, m_reference);
     }
 

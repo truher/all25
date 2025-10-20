@@ -99,7 +99,7 @@ public class SimulatedBareMotor implements BareMotor {
     @Override
     public void setVelocity(double velocityRad_S, double accelRad_S2, double torqueNm) {
         if (DEBUG) {
-            System.out.printf("motor %s set velocity %6.3f\n", m_log.getRoot(), velocityRad_S );
+            System.out.printf("motor %s set velocity %6.3f\n", m_log.getRoot(), velocityRad_S);
         }
         m_velocityInput = MathUtil.clamp(
                 Math100.notNaN(velocityRad_S), -m_freeSpeedRad_S, m_freeSpeedRad_S);
@@ -186,5 +186,9 @@ public class SimulatedBareMotor implements BareMotor {
         m_velocityInput = 0.0;
         m_time = Takt.get();
         m_stateCache.reset();
+    }
+
+    @Override
+    public void play(double freq) {
     }
 }

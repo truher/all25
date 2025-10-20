@@ -1,6 +1,7 @@
 package org.team100.frc2025.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.print;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.function.BooleanSupplier;
@@ -14,10 +15,10 @@ import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
+import org.team100.lib.controller.r1.Feedback100;
+import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.controller.simple.PIDFeedback;
 import org.team100.lib.examples.semiauto.FloorPickSequence;
 import org.team100.lib.hid.Buttons2025;
 import org.team100.lib.hid.DriverXboxControl;
@@ -245,7 +246,8 @@ public class Binder {
         //
         // For pre- and post-match testing.
         //
-        // Enable "test" mode and press operator left bumper and driver right bumper.
+        // Enable "test" mode and press driver "a" and "b" together.
+        // (in simulation this is buttons 1 and 2, or "z" and "x" on the keyboard)
         //
         // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
         //
@@ -257,11 +259,32 @@ public class Binder {
         //
         // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
         //
-        whileTrue(() -> (RobotState.isTest() && operator.leftBumper() && driver.rightBumper()),
+        whileTrue(() -> (RobotState.isTest() && driver.a() && driver.b()),
                 // for now, it just beeps and does one thing.
                 sequence(
+                        print("*** WARNING MOTION STARTS IN 4 SECONDS ***"),
                         m_machinery.m_beeper.startingBeeps(),
-                        m_machinery.m_manipulator.centerIntake().withTimeout(1) //
+                        print("ahead slow"),
+                        m_machinery.m_beeper.intermediateBeep(),
+                        m_machinery.m_drive.aheadSlow().withTimeout(1),
+                        print("rightward slow"),
+                        m_machinery.m_beeper.intermediateBeep(),
+                        m_machinery.m_drive.rightwardSlow().withTimeout(1),
+                        print("center intake"),
+                        m_machinery.m_beeper.intermediateBeep(),
+                        m_machinery.m_manipulator.centerIntake().withTimeout(1),
+                        print("L1"),
+                        m_machinery.m_beeper.intermediateBeep(),
+                        m_machinery.m_mech.homeToL1().withTimeout(1),
+                        print("home"),
+                        m_machinery.m_beeper.intermediateBeep(),
+                        m_machinery.m_mech.l1ToHome().withTimeout(1),
+                        print("L2"),
+                        m_machinery.m_beeper.intermediateBeep(),
+                        m_machinery.m_mech.homeToL2().withTimeout(1),
+                        print("home"),
+                        m_machinery.m_beeper.intermediateBeep(),
+                        m_machinery.m_mech.l2ToHome().withTimeout(1)//
                 ).withName("test all movements") //
         );
 

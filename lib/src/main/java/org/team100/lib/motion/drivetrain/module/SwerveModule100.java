@@ -10,6 +10,7 @@ import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
 import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.LinearVelocityServo;
+import org.team100.lib.music.Player;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +32,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * There is some discussion of this topic here:
  * https://www.chiefdelphi.com/t/kcoupleratio-in-ctre-swerve/483380
  */
-public abstract class SwerveModule100 {
+public abstract class SwerveModule100 implements Player {
     private static final boolean DEBUG = false;
 
     private final LinearVelocityServo m_driveServo;
@@ -64,6 +65,12 @@ public abstract class SwerveModule100 {
         m_previousDesiredWrappedAngle = new Rotation2d(m_turningServo.getWrappedPositionRad());
         m_previousTime = Takt.get();
         m_finalDriveRatio = finalDriveRatio;
+    }
+
+    @Override
+    public void play(double freq) {
+        m_driveServo.play(freq);
+        m_turningServo.play(freq);
     }
 
     /**

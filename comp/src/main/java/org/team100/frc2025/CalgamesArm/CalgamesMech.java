@@ -3,8 +3,6 @@ package org.team100.frc2025.CalgamesArm;
 import static edu.wpi.first.wpilibj2.command.Commands.select;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -46,10 +44,10 @@ import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
-import org.team100.lib.motor.Talon6Motor;
 import org.team100.lib.music.Music;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.StrUtil;
@@ -59,7 +57,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CalgamesMech extends SubsystemBase implements Music {
+public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
     private static final boolean DEBUG = false;
     private boolean DISABLED = false;
     ////////////////////////////////////////////////////////
@@ -114,8 +112,6 @@ public class CalgamesMech extends SubsystemBase implements Music {
     /** Home pose is Config(0,0,0), from forward kinematics. */
     private final Pose2d m_home;
 
-    private final List<Talon6Motor> m_players;
-
     public CalgamesMech(
             LoggerFactory log,
             double armLength,
@@ -148,8 +144,6 @@ public class CalgamesMech extends SubsystemBase implements Music {
         LoggerFactory shoulderLog = parent.name("shoulder");
         LoggerFactory wristLog = parent.name("wrist");
 
-        m_players = new ArrayList<>();
-
         switch (Identity.instance) {
             case COMP_BOT -> {
 
@@ -166,7 +160,6 @@ public class CalgamesMech extends SubsystemBase implements Music {
                         100,
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
-                m_players.add(elevatorFrontMotor);
                 Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
                         elevatorfrontLog, elevatorFrontMotor);
 
@@ -183,7 +176,6 @@ public class CalgamesMech extends SubsystemBase implements Music {
                         100, // originally 90
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
-                m_players.add(elevatorBackMotor);
                 Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
                         elevatorbackLog, elevatorBackMotor);
                 m_elevatorBack = new LinearMechanism(
@@ -200,7 +192,6 @@ public class CalgamesMech extends SubsystemBase implements Music {
                         100, // og 90
                         PIDConstants.makePositionPID(5),
                         Feedforward100.makeWCPSwerveTurningFalcon6());
-                m_players.add(shoulderMotor);
                 Talon6Encoder shoulderEncoder = new Talon6Encoder(
                         shoulderLog, shoulderMotor);
                 // The shoulder has a 5048 on the intermediate shaft
@@ -232,7 +223,6 @@ public class CalgamesMech extends SubsystemBase implements Music {
                         60, // og 90
                         PIDConstants.makePositionPID(8), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6());
-                m_players.add(wristMotor);
                 // the wrist has no angle sensor, so it needs to start in the "zero" position.
                 Talon6Encoder wristEncoder = new Talon6Encoder(
                         wristLog, wristMotor);
@@ -289,9 +279,10 @@ public class CalgamesMech extends SubsystemBase implements Music {
     @Override
     public Command play(double freq) {
         return run(() -> {
-            for (Talon6Motor m : m_players) {
-                m.play(freq);
-            }
+            m_elevatorBack.play(freq);
+            m_elevatorFront.play(freq);
+            m_shoulder.play(freq);
+            m_wrist.play(freq);
         });
     }
 
@@ -317,12 +308,33 @@ public class CalgamesMech extends SubsystemBase implements Music {
                 m_wrist.getVelocityRad_S());
     }
 
+    @Override
     public ModelR3 getState() {
         Config c = getConfig();
         JointVelocities jv = getJointVelocity();
         Pose2d p = m_kinematics.forward(c);
         GlobalVelocityR3 v = m_jacobian.forward(c, jv);
         return new ModelR3(p, v);
+    }
+
+    @Override
+    public void setVelocity(GlobalVelocityR3 v) {
+        Pose2d pose = getState().pose();
+        GlobalAccelerationR3 a = new GlobalAccelerationR3(0, 0, 0);
+        ControlR3 control = new ControlR3(pose, v, a);
+
+        JointVelocities jv = m_jacobian.inverse(control.model());
+        JointAccelerations ja = m_jacobian.inverseA(control);
+        JointForce jf = m_dynamics.forward(getConfig(), jv, ja);
+
+        m_elevatorFront.setVelocity(jv.elevator(), ja.elevator(), jf.elevator());
+        m_elevatorBack.setVelocity(jv.elevator(), ja.elevator(), jf.elevator());
+        if (DISABLED) {
+            m_wrist.setUnwrappedPosition(2, 0, 0, 0);
+            return;
+        }
+        m_wrist.setVelocity(jv.wrist(), ja.wrist(), jf.wrist());
+        m_shoulder.setVelocity(jv.shoulder(), ja.shoulder(), jf.shoulder());
     }
 
     /** There are no profiles here, so this control needs to be feasible. */
@@ -349,6 +361,7 @@ public class CalgamesMech extends SubsystemBase implements Music {
     }
 
     /** This is not "hold position" this is "torque off". */
+    @Override
     public void stop() {
         m_elevatorFront.stop();
         m_elevatorBack.stop();
@@ -626,7 +639,7 @@ public class CalgamesMech extends SubsystemBase implements Music {
             m_wrist.setUnwrappedPosition(2, 0, 0, 0);
             return;
         }
-        m_wrist.setUnwrappedPosition(c.wristAngle(), jv.shoulder(), 0, jf.wrist());
+        m_wrist.setUnwrappedPosition(c.wristAngle(), jv.wrist(), 0, jf.wrist());
         m_shoulder.setUnwrappedPosition(c.shoulderAngle(), jv.shoulder(), 0, jf.shoulder());
     }
 

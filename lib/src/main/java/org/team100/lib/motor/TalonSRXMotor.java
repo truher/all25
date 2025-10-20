@@ -126,4 +126,8 @@ public class TalonSRXMotor implements BareMotor {
         throw new UnsupportedOperationException("TalonSRX cannot control position.");
     }
 
+    @Override
+    public void play(double freq) {
+    }
+
 }

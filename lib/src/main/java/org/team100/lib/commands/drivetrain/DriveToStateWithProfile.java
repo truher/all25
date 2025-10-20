@@ -3,8 +3,8 @@ package org.team100.lib.commands.drivetrain;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
@@ -24,7 +24,7 @@ public class DriveToStateWithProfile extends MoveAndHold {
 
     private ModelR3 m_goal;
     private ProfileReferenceR3 m_reference;
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     public DriveToStateWithProfile(
             FieldLogger.Log fieldLogger,
@@ -47,7 +47,7 @@ public class DriveToStateWithProfile extends MoveAndHold {
             return;
         m_reference = new ProfileReferenceR3(m_profile, "Drive to pose with profile");
         m_reference.setGoal(m_goal);
-        m_referenceController = new ReferenceController(
+        m_referenceController = new ReferenceControllerR3(
                 m_drive, m_controller, m_reference);
     }
 

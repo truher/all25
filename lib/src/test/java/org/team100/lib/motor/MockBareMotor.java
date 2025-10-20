@@ -103,12 +103,14 @@ public class MockBareMotor implements BareMotor {
 
     @Override
     public void setTorqueLimit(double torqueNm) {
-        //
     }
 
     @Override
     public void periodic() {
-        //
+    }
+
+    @Override
+    public void play(double freq) {
     }
 
 }
