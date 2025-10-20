@@ -15,11 +15,11 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.Fixtured;
-import org.team100.lib.motion.drivetrain.MockDrive;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.MockSubsystemR3;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -50,7 +50,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
         ControllerR3 controller = ControllerFactoryR3.test(logger);
 
-        MockDrive d = new MockDrive();
+        MockSubsystemR3 d = new MockSubsystemR3();
         // initially at rest
         d.m_state = new ModelR3();
 
@@ -102,7 +102,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
         ControllerR3 controller = ControllerFactoryR3.test(logger);
 
-        MockDrive d = new MockDrive();
+        MockSubsystemR3 d = new MockSubsystemR3();
         // initially at rest
         d.m_state = new ModelR3();
 

@@ -8,10 +8,10 @@ import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -19,7 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
  * Drive to a pose supplied at initialization, using a profile.
  */
 public class DriveToPoseWithProfile extends MoveAndHold {
-    private final SwerveDriveSubsystem m_drive;
+    private final SubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
     private final Pose2dLogger m_log_goal;
@@ -30,7 +30,7 @@ public class DriveToPoseWithProfile extends MoveAndHold {
 
     public DriveToPoseWithProfile(
             LoggerFactory logger,
-            SwerveDriveSubsystem drive,
+            SubsystemR3 drive,
             ControllerR3 controller,
             HolonomicProfile profile,
             Supplier<Pose2d> goal) {

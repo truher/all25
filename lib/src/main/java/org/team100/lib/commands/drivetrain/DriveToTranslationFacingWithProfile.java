@@ -8,10 +8,10 @@ import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,7 +21,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * Drive to a pose supplied at initialization, using a profile.
  */
 public class DriveToTranslationFacingWithProfile extends MoveAndHold {
-    private final SwerveDriveSubsystem m_drive;
+    private final SubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
     private final Pose2dLogger m_log_goal;
@@ -33,7 +33,7 @@ public class DriveToTranslationFacingWithProfile extends MoveAndHold {
 
     public DriveToTranslationFacingWithProfile(
             LoggerFactory logger,
-            SwerveDriveSubsystem drive,
+            SubsystemR3 drive,
             ControllerR3 controller,
             HolonomicProfile profile,
             Supplier<Translation2d> goal,
@@ -50,7 +50,8 @@ public class DriveToTranslationFacingWithProfile extends MoveAndHold {
 
     @Override
     public void initialize() {
-        Pose2d goal = getGoal(m_goal.get(), m_drive.getPose().getTranslation());
+        Pose2d goal = getGoal(m_goal.get(),
+                m_drive.getState().pose().getTranslation());
         m_log_goal.log(() -> goal);
         m_reference = new ProfileReferenceR3(m_profile, "embark");
         m_reference.setGoal(new ModelR3(goal));

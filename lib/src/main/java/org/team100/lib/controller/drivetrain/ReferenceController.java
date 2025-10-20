@@ -2,9 +2,9 @@ package org.team100.lib.controller.drivetrain;
 
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 /**
  * Actuates the drivetrain based on a SwerveReference.
@@ -14,7 +14,7 @@ import org.team100.lib.state.ModelR3;
  */
 public class ReferenceController {
     private static final boolean DEBUG = false;
-    private final DriveSubsystemInterface m_drive;
+    private final SubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final ReferenceR3 m_reference;
 
@@ -23,7 +23,7 @@ public class ReferenceController {
      * this from, e.g. Command.initialize(), not in the constructor.
      */
     public ReferenceController(
-            DriveSubsystemInterface drive,
+            SubsystemR3 drive,
             ControllerR3 controller,
             ReferenceR3 reference) {
         m_drive = drive;
@@ -33,7 +33,6 @@ public class ReferenceController {
         m_controller.reset();
         // initialize here so that the "done" state knows about the clock
         m_reference.initialize(m_drive.getState());
-        m_drive.resetLimiter();
     }
 
     public void execute() {
@@ -46,7 +45,7 @@ public class ReferenceController {
                         measurement, m_reference.current(), m_reference.next(), fieldRelativeTarget);
             }
 
-            m_drive.driveInFieldCoordsVerbatim(fieldRelativeTarget);
+            m_drive.setVelocity(fieldRelativeTarget);
             // m_drive.driveInFieldCoords(fieldRelativeTarget);
         } catch (IllegalStateException ex) {
             // System.out.println(ex);

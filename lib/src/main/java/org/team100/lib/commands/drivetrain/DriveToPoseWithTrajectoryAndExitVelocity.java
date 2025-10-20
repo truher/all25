@@ -10,6 +10,7 @@ import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
+import org.team100.lib.subsystems.SubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
@@ -25,7 +26,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     private final Pose2d m_goal;
     private final GlobalVelocityR3 m_endVelocity;
-    private final SwerveDriveSubsystem m_drive;
+    private final SubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final TrajectoryVisualization m_viz;
     private final TrajectoryPlanner m_planner;
@@ -50,9 +51,9 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
 
     @Override
     public void initialize() {
-        Pose2d pose = m_drive.getPose();
+        Pose2d pose = m_drive.getState().pose();
         Translation2d toGoal = m_goal.getTranslation().minus(pose.getTranslation());
-        GlobalVelocityR3 startVelocity = m_drive.getVelocity();
+        GlobalVelocityR3 startVelocity = m_drive.getState().velocity();
         HolonomicPose2d startWaypoint = new HolonomicPose2d(
                 pose.getTranslation(),
                 pose.getRotation(),

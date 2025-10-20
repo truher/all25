@@ -7,10 +7,10 @@ import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.FieldLogger;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,7 +28,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     private static final double THETA_TOLERANCE = 0.1;
     private final FieldLogger.Log m_field_log;
     private final Supplier<Optional<Translation2d>> m_targets;
-    private final SwerveDriveSubsystem m_drive;
+    private final SubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
     private final Rotation2d m_relativeBearing;
@@ -40,7 +40,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     public DriveToTranslationWithRelativeBearing(
             FieldLogger.Log fieldLogger,
             Supplier<Optional<Translation2d>> targetes,
-            SwerveDriveSubsystem drive,
+            SubsystemR3 drive,
             ControllerR3 controller,
             HolonomicProfile profile,
             Rotation2d relativeBearing) {
@@ -90,7 +90,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     public boolean thetaAligned() {
         if (m_goal == null)
             return false;
-        Pose2d pose = m_drive.getPose();
+        Pose2d pose = m_drive.getState().pose();
         Rotation2d goalR = m_goal.getRotation();
         Rotation2d poseR = pose.getRotation();
         return Math.abs(goalR.minus(poseR).getRadians()) < THETA_TOLERANCE;
@@ -114,7 +114,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
 
     /** Robot heading to achieve the desired relative bearing to the target. */
     private Rotation2d heading(Translation2d target) {
-        return absoluteBearing(m_drive.getPose(), target).minus(m_relativeBearing);
+        return absoluteBearing(m_drive.getState().pose(), target).minus(m_relativeBearing);
     }
 
     /** Field relative bearing from the robot to the target */

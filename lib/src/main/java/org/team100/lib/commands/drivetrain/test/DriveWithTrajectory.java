@@ -3,8 +3,8 @@ package org.team100.lib.commands.drivetrain.test;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.motion.drivetrain.DriveSubsystemInterface;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
+import org.team100.lib.subsystems.SubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -17,7 +17,7 @@ import org.team100.lib.visualization.TrajectoryVisualization;
  * So this is really just for testing.
  */
 public class DriveWithTrajectory extends MoveAndHold {
-    private final DriveSubsystemInterface m_drive;
+    private final SubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final Trajectory100 m_trajectory;
     private final TrajectoryVisualization m_viz;
@@ -25,7 +25,7 @@ public class DriveWithTrajectory extends MoveAndHold {
     private ReferenceController m_referenceController;
 
     public DriveWithTrajectory(
-            DriveSubsystemInterface drive,
+            SubsystemR3 drive,
             ControllerR3 controller,
             Trajectory100 trajectory,
             TrajectoryVisualization viz) {
@@ -42,7 +42,6 @@ public class DriveWithTrajectory extends MoveAndHold {
         m_referenceController = new ReferenceController(
                 m_drive, m_controller, reference);
         m_viz.setViz(m_trajectory);
-        m_drive.resetLimiter();
     }
 
     @Override

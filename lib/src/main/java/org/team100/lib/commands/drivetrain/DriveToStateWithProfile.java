@@ -6,10 +6,10 @@ import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.FieldLogger;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 /**
  * Drive to the supplied goal state using a profile. Allows the goal to change
@@ -18,7 +18,7 @@ import org.team100.lib.state.ModelR3;
 public class DriveToStateWithProfile extends MoveAndHold {
     private final FieldLogger.Log m_field_log;
     private final Supplier<ModelR3> m_goals;
-    private final SwerveDriveSubsystem m_drive;
+    private final SubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
 
@@ -29,7 +29,7 @@ public class DriveToStateWithProfile extends MoveAndHold {
     public DriveToStateWithProfile(
             FieldLogger.Log fieldLogger,
             Supplier<ModelR3> goal,
-            SwerveDriveSubsystem drive,
+            SubsystemR3 drive,
             ControllerR3 controller,
             HolonomicProfile profile) {
         m_field_log = fieldLogger;

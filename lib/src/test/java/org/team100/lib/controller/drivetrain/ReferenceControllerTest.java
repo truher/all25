@@ -19,11 +19,11 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.Fixtured;
-import org.team100.lib.motion.drivetrain.MockDrive;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.MockSubsystemR3;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -58,7 +58,7 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
         ControllerR3 controller = ControllerFactoryR3.test(logger);
 
-        MockDrive drive = new MockDrive();
+        MockSubsystemR3 drive = new MockSubsystemR3();
         // initially at rest
         drive.m_state = new ModelR3();
 
@@ -108,7 +108,7 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
         ControllerR3 controller = ControllerFactoryR3.test(logger);
 
-        MockDrive drive = new MockDrive();
+        MockSubsystemR3 drive = new MockSubsystemR3();
         // initially at rest
         drive.m_state = new ModelR3();
 
@@ -161,7 +161,7 @@ public class ReferenceControllerTest extends Fixtured implements Timeless {
                 0.01, 0.02,
                 0.01, 0.02);
 
-        MockDrive drive = new MockDrive();
+        MockSubsystemR3 drive = new MockSubsystemR3();
         drive.m_state = new ModelR3();
         TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
         ReferenceController referenceController = new ReferenceController(

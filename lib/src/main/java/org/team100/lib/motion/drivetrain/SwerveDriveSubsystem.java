@@ -4,9 +4,6 @@ import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.DriverSkill;
-import org.team100.lib.experiments.Experiment;
-import org.team100.lib.experiments.Experiments;
-import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.localization.OdometryUpdater;
@@ -22,6 +19,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * direct gyro access is in the odometry updater. Consumers should get rotation
  * from the state estimate.
  */
-public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsystemInterface {
+public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3 {
     // DEBUG produces a LOT of output, you should only enable it while you're
     // looking at it.
     private static final boolean DEBUG = false;
@@ -84,29 +82,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     // ACTUATORS
     //
 
-    /**
-     * Scales the supplied twist by the "speed" driver control modifier.
-     * 
-     * Feasibility is enforced by the SwerveLimiter.
-     * 
-     * Remember to reset the setpoint before calling this (e.g. in the "initialize"
-     * of your command, see DriveManually).
-     */
-    @Override
-    public void driveInFieldCoords(final GlobalVelocityR3 input) {
-        // scale for driver skill.
-        GlobalVelocityR3 scaled = GeometryUtil.scale(input, DriverSkill.level().scale());
 
-        // Apply field-relative limits.
-        if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {
-            scaled = m_limiter.apply(scaled);
-        }
-
-        driveInFieldCoordsVerbatim(scaled);
-    }
 
     /** Skip all scaling, limits generator, etc. */
-    public void driveInFieldCoordsVerbatim(GlobalVelocityR3 input) {
+    public void setVelocity(GlobalVelocityR3 input) {
         // keep the limiter up to date on what we're doing
         m_limiter.updateSetpoint(input);
 
@@ -165,11 +144,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         m_stateCache.reset();
     }
 
-    @Override
-    public void resetLimiter() {
-        m_limiter.updateSetpoint(getVelocity());
 
-    }
 
     ///////////////////////////////////////////////////////////////
     //

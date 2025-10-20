@@ -38,7 +38,7 @@ public class Prewarmer {
         planner.restToRest(waypoints);
 
         // Exercise the drive motors.
-        machinery.m_drive.driveInFieldCoords(new GlobalVelocityR3(0, 0, 0));
+        machinery.m_drive.setVelocity(new GlobalVelocityR3(0, 0, 0));
 
         // Exercise some mechanism commands.
         Command c = machinery.m_mech.homeToL4();
