@@ -81,6 +81,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
     private static final Pose2d L2 = new Pose2d(0.56, 0.54, rad(2.0));
     private static final Pose2d L3 = new Pose2d(0.94, 0.56, rad(1.7));
     private static final Pose2d L4 = new Pose2d(1.57, 0.54, rad(2.0));
+    private static final Pose2d L4_BACK = new Pose2d(1.57, -.54, rad(-2));
     private static final Pose2d ALGAE_L2 = new Pose2d(0.85, 0.7, rad(1.5));
     private static final Pose2d ALGAE_L3 = new Pose2d(1.15, 0.7, rad(1.5));
     private static final Pose2d BARGE = new Pose2d(2.3, -0.5, rad(-1.5));
@@ -526,9 +527,21 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
                 HolonomicPose2d.make(L4, 1.5));
     }
 
+    public MoveAndHold homeToL4Back() {
+        return m_transit.endless("homeToL4",
+                HolonomicPose2d.make(m_home, 0.1),
+                HolonomicPose2d.make(L4_BACK, -1.5));
+    }
+
     public Command l4ToHome() {
         return m_transit.terminal("l4ToHome",
                 HolonomicPose2d.make(L4, -1.5),
+                HolonomicPose2d.make(m_home, -3));
+    }
+
+    public Command l4BackToHome() {
+        return m_transit.terminal("l4ToHome",
+                HolonomicPose2d.make(L4_BACK, 1.5),
                 HolonomicPose2d.make(m_home, -3));
     }
 
