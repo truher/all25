@@ -30,7 +30,7 @@ public class ScoreL4SmartBack {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
                 logger, m_drive, controller, profile, goal);
         MoveAndHold toL4 = mech.homeToL4Back();
-        Command eject = manipulator.centerEject().withTimeout(0.5);
+        Command eject = manipulator.centerEjectBack().withTimeout(0.5);
         return sequence(
                 parallel(
                         toReef,

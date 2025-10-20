@@ -146,6 +146,12 @@ public class Manipulator extends SubsystemBase implements Music {
         m_rightMech.setDutyCycle(-0.75);
     }
 
+    public void ejectCenterBack() {
+        m_algaeMech.setDutyCycle(-1);
+        m_leftMech.setDutyCycle(.75);
+        m_rightMech.setDutyCycle(.75);
+    }
+
     public void intakeSideways() {
         if (hasCoralSideways()) {
             stopMotors();
@@ -224,6 +230,10 @@ public class Manipulator extends SubsystemBase implements Music {
 
     public Command centerEject() {
         return run(this::ejectCenter);
+    }
+
+    public Command centerEjectBack() {
+        return run(this::ejectCenterBack);
     }
 
     //////////////////////////////////////////////////
