@@ -3,10 +3,10 @@ package org.team100.ballerina;
 import java.util.function.Supplier;
 
 import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.geometry.GlobalVelocityR2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
-import org.team100.lib.math.GlobalR2Velocity;
 import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,7 +24,7 @@ public class Ball {
 
     // null when contained in robot.
     private Translation2d m_location;
-    private GlobalR2Velocity m_velocity;
+    private GlobalVelocityR2 m_velocity;
 
     public Ball(
             LoggerFactory field,
@@ -37,9 +37,9 @@ public class Ball {
 
     private void launch() {
         // velocity due only to the gun
-        GlobalR2Velocity v = GlobalR2Velocity.fromPolar(m_azimuth.get(), SPEED_M_S);
+        GlobalVelocityR2 v = GlobalVelocityR2.fromPolar(m_azimuth.get(), SPEED_M_S);
         // velocity due to robot translation
-        GlobalR2Velocity mv = GlobalR2Velocity.fromSe2(m_robot.get().velocity());
+        GlobalVelocityR2 mv = GlobalVelocityR2.fromSe2(m_robot.get().velocity());
         // initial position
         m_location = m_robot.get().pose().getTranslation();
         // initial velocity

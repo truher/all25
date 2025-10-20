@@ -12,15 +12,11 @@ import org.team100.frc2025.shooter.IndexerServo;
 import org.team100.frc2025.shooter.PivotDefault;
 import org.team100.frc2025.shooter.PivotSubsystem;
 import org.team100.frc2025.shooter.Shoot;
-import org.team100.lib.async.Async;
-import org.team100.lib.async.AsyncFactory;
 import org.team100.lib.examples.shooter.DualDrumShooter;
 import org.team100.lib.examples.tank.DriveTank;
 import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
-import org.team100.lib.logging.Level;
-import org.team100.lib.logging.LevelPoller;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 
@@ -36,12 +32,9 @@ public class RobotContainer {
     private final PivotSubsystem m_pivot;
 
     public RobotContainer(TimedRobot100 robot) throws IOException {
-        final AsyncFactory asyncFactory = new AsyncFactory(robot);
-        final Async async = asyncFactory.get();
         final Logging logging = Logging.instance();
-        final LevelPoller poller = new LevelPoller(async, logging::setLevel, Level.COMP);
-        System.out.printf("Using log level %s\n", poller.getLevel().name());
-        System.out.println("Do not use TRACE in comp, with NT logging, it will overrun");
+
+        LoggerFactory fieldLogger = logging.fieldLogger;
 
         final LoggerFactory logger = logging.rootLogger;
 
@@ -49,7 +42,7 @@ public class RobotContainer {
 
         final LoggerFactory sysLog = logger.name("Subsystems");
 
-        m_drive = TankFactory.make(logger, 20);
+        m_drive = TankFactory.make(fieldLogger, logger, 20);
         m_drive.setDefaultCommand(new DriveTank(driverControl::rightY, driverControl::rightX, m_drive));
 
         m_shooter = DrumShooterFactory.make(sysLog, 20);

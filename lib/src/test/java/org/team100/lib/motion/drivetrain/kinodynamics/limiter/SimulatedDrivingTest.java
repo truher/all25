@@ -25,7 +25,6 @@ import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveLocal;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.module.SimulatedSwerveModule100;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleDeltas;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
@@ -43,11 +42,8 @@ public class SimulatedDrivingTest implements Timeless {
     final LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
     LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
-    SwerveModuleCollection collection = new SwerveModuleCollection(
-            SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics),
-            SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics),
-            SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics),
-            SimulatedSwerveModule100.withInstantaneousSteering(logger, swerveKinodynamics));
+    SwerveModuleCollection collection = SwerveModuleCollection.forTest(
+            logger, swerveKinodynamics);
 
     final Gyro gyro;
     final SwerveHistory history;
@@ -146,7 +142,7 @@ public class SimulatedDrivingTest implements Timeless {
         double start = Takt.get();
         for (int i = 0; i < 100; ++i) {
             stepTime();
-            drive.driveInFieldCoords(input);
+            drive.setVelocity(input);
             if (DEBUG)
                 System.out.printf("%.2f %s\n", Takt.get() - start, drive.getPose());
         }
@@ -161,7 +157,7 @@ public class SimulatedDrivingTest implements Timeless {
         double start = Takt.get();
         for (int i = 0; i < 100; ++i) {
             stepTime();
-            drive.driveInFieldCoordsVerbatim(input);
+            drive.setVelocity(input);
             if (DEBUG)
                 System.out.printf("%.2f %s\n", Takt.get() - start, drive.getPose());
         }
@@ -185,7 +181,7 @@ public class SimulatedDrivingTest implements Timeless {
             stepTime();
             if (DEBUG)
                 System.out.printf("takt: %.2f state: %s\n", Takt.get(), drive.getState());
-            drive.driveInFieldCoords(input);
+            drive.setVelocity(input);
         }
     }
 
@@ -203,7 +199,7 @@ public class SimulatedDrivingTest implements Timeless {
             stepTime();
             if (DEBUG)
                 System.out.printf("takt: %.2f state: %s\n", Takt.get(), drive.getState());
-            drive.driveInFieldCoordsVerbatim(input);
+            drive.setVelocity(input);
         }
     }
 
@@ -217,7 +213,7 @@ public class SimulatedDrivingTest implements Timeless {
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());
-        drive.driveInFieldCoordsVerbatim(input);
+        drive.setVelocity(input);
         if (DEBUG)
             System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),
@@ -229,7 +225,7 @@ public class SimulatedDrivingTest implements Timeless {
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());
-        drive.driveInFieldCoordsVerbatim(input);
+        drive.setVelocity(input);
         if (DEBUG)
             System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),

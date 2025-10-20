@@ -6,9 +6,9 @@ import java.util.function.DoubleUnaryOperator;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.config.Feedforward100;
-import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.controller.simple.PIDFeedback;
-import org.team100.lib.controller.simple.ZeroFeedback;
+import org.team100.lib.controller.r1.Feedback100;
+import org.team100.lib.controller.r1.PIDFeedback;
+import org.team100.lib.controller.r1.ZeroFeedback;
 import org.team100.lib.encoder.MockRotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
@@ -20,9 +20,9 @@ import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReferenceR1;
-import org.team100.lib.reference.MockProfileReferenceR1;
-import org.team100.lib.reference.ProfileReferenceR1;
+import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.r1.MockProfileReferenceR1;
+import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.state.Model100;
 import org.team100.lib.testing.Timeless;
 

@@ -1,7 +1,7 @@
 package org.team100.frc2025.CalgamesArm;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.reference.TrajectoryReferenceR3;
+import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.trajectory.Trajectory100;
 
 /** Analogous to DriveWithTrajectory, but for R3 positional control. */

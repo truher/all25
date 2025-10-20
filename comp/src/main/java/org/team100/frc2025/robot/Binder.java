@@ -14,18 +14,21 @@ import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.lib.commands.drivetrain.SetRotation;
 import org.team100.lib.commands.drivetrain.manual.DriveManuallySimple;
-import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
-import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.controller.simple.PIDFeedback;
+import org.team100.lib.controller.r1.Feedback100;
+import org.team100.lib.controller.r1.PIDFeedback;
+import org.team100.lib.controller.r3.ControllerFactoryR3;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.examples.semiauto.FloorPickSequence;
 import org.team100.lib.hid.Buttons2025;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.hid.OperatorXboxControl;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.Logging;
+import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.profile.HolonomicProfile;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -40,9 +43,9 @@ public class Binder {
         m_machinery = machinery;
     }
 
-    public void bind(LoggerFactory m_logger) {
-
-        final LoggerFactory comLog = m_logger.name("Commands");
+    public void bind() {
+        final LoggerFactory logger = Logging.instance().rootLogger;
+        final LoggerFactory comLog = logger.name("Commands");
 
         /////////////////////////////////////////////////
         ///
@@ -59,6 +62,12 @@ public class Binder {
         final Feedback100 thetaFeedback = new PIDFeedback(
                 comLog, 3.2, 0, 0, true, 0.05, 1);
 
+        SwerveLimiter limiter = new SwerveLimiter(
+                comLog,
+                m_machinery.m_swerveKinodynamics,
+                RobotController::getBatteryVoltage);
+        limiter.updateSetpoint(m_machinery.m_drive.getVelocity());
+
         // There are 3 modes:
         // * normal
         // * lock rotation to reef center
@@ -67,12 +76,13 @@ public class Binder {
                 driver::velocity,
                 m_machinery.m_localizer::setHeedRadiusM,
                 m_machinery.m_drive,
+                limiter,
                 new ManualWithProfiledReefLock(
                         comLog, m_machinery.m_swerveKinodynamics, driver::leftTrigger,
-                        thetaFeedback, m_machinery.m_drive),
+                        thetaFeedback, () -> m_machinery.m_drive.getPose().getTranslation()),
                 new ManualWithBargeAssist(
                         comLog, m_machinery.m_swerveKinodynamics, driver::pov,
-                        thetaFeedback, m_machinery.m_drive),
+                        thetaFeedback, m_machinery.m_drive::getPose),
                 driver::leftBumper);
         m_machinery.m_drive.setDefaultCommand(driveDefault.withName("drive default"));
         // WARNING! This default command *MOVES IMMEDIATELY WHEN ENABLED*!
@@ -136,13 +146,13 @@ public class Binder {
 
                         FloorPickSequence.get(
                                 m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
-                                SwerveControllerFactory.pick(comLog), coralPickProfile)
+                                ControllerFactoryR3.pick(comLog), coralPickProfile)
                                 .withName("Floor Pick"))
                         .until(m_machinery.m_manipulator::hasCoral));
 
         FloorPickSequence.get(
                 m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
-                SwerveControllerFactory.pick(comLog), coralPickProfile)
+                ControllerFactoryR3.pick(comLog), coralPickProfile)
                 .withName("Floor Pick")
                 .until(m_machinery.m_manipulator::hasCoral);
 
@@ -164,11 +174,10 @@ public class Binder {
         // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
         // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
 
-        final LoggerFactory coralSequence = m_logger.name("Coral Sequence");
-        final HolonomicProfile profile = HolonomicProfile.get(coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5,
-                1,
-                0.2);
-        final SwerveController holonomicController = SwerveControllerFactory.byIdentity(coralSequence);
+        final LoggerFactory coralSequence = logger.name("Coral Sequence");
+        final HolonomicProfile profile = HolonomicProfile.get(
+                coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5, 1, 0.2);
+        final ControllerR3 holonomicController = ControllerFactoryR3.byIdentity(coralSequence);
 
         // Drive to a scoring location at the reef and score.
         whileTrue(driver::a,
@@ -232,30 +241,10 @@ public class Binder {
 
         ////////////////////////////////////////////////////////////
         //
-        // TEST ALL MOVEMENTS
+        // TEST
         //
-        // For pre- and post-match testing.
-        //
-        // Enable "test" mode and press operator left bumper and driver right bumper.
-        //
-        // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
-        //
-        // THIS WILL MOVE THE ROBOT VERY FAST!
-        //
-        // DO NOT RUN with the wheels on the floor!
-        //
-        // DO NOT RUN without tiedown clamps.
-        //
-        // DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
-        //
-        whileTrue(() -> (RobotState.isTest() && operator.leftBumper() && driver.rightBumper()),
-                // for now, it just beeps and does one thing.
-                sequence(
-                        m_machinery.m_beeper.startingBeeps(),
-                        m_machinery.m_manipulator.centerIntake().withTimeout(1) //
-                ).withName("test all movements") //
-        );
-
+        whileTrue(() -> (RobotState.isTest() && driver.a() && driver.b()),
+                Tester.prematch(m_machinery));
     }
 
     private static Trigger whileTrue(BooleanSupplier condition, Command command) {

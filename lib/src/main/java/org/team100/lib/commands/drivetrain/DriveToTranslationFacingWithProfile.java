@@ -3,15 +3,15 @@ package org.team100.lib.commands.drivetrain;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
-import org.team100.lib.reference.ProfileReferenceR3;
+import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,20 +21,20 @@ import edu.wpi.first.math.geometry.Translation2d;
  * Drive to a pose supplied at initialization, using a profile.
  */
 public class DriveToTranslationFacingWithProfile extends MoveAndHold {
-    private final SwerveDriveSubsystem m_drive;
-    private final SwerveController m_controller;
+    private final SubsystemR3 m_drive;
+    private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
     private final Pose2dLogger m_log_goal;
     private final Supplier<Translation2d> m_goal;
     private final Rotation2d m_sideFacing;
 
     private ProfileReferenceR3 m_reference;
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     public DriveToTranslationFacingWithProfile(
             LoggerFactory logger,
-            SwerveDriveSubsystem drive,
-            SwerveController controller,
+            SubsystemR3 drive,
+            ControllerR3 controller,
             HolonomicProfile profile,
             Supplier<Translation2d> goal,
             Rotation2d sideFacing) {
@@ -50,11 +50,13 @@ public class DriveToTranslationFacingWithProfile extends MoveAndHold {
 
     @Override
     public void initialize() {
-        Pose2d goal = getGoal(m_goal.get(), m_drive.getPose().getTranslation());
+        Pose2d goal = getGoal(m_goal.get(),
+                m_drive.getState().pose().getTranslation());
         m_log_goal.log(() -> goal);
         m_reference = new ProfileReferenceR3(m_profile, "embark");
         m_reference.setGoal(new ModelR3(goal));
-        m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
+        m_referenceController = new ReferenceControllerR3(
+                m_drive, m_controller, m_reference);
     }
 
     @Override

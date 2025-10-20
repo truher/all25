@@ -8,7 +8,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
-import org.team100.lib.controller.drivetrain.FullStateSwerveController;
+import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.logging.LoggerFactory;
@@ -27,13 +27,13 @@ public class DriveAndScore {
     private final LoggerFactory m_logger;
     private final Machinery m_machinery;
     private final HolonomicProfile m_autoProfile;
-    private final FullStateSwerveController m_autoController;
+    private final FullStateControllerR3 m_autoController;
 
     public DriveAndScore(
             LoggerFactory logger,
             Machinery machinery,
             HolonomicProfile autoProfile,
-            FullStateSwerveController autoController) {
+            FullStateControllerR3 autoController) {
         m_logger = logger;
         m_machinery = machinery;
         m_autoProfile = autoProfile;

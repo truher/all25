@@ -5,6 +5,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
+import org.team100.lib.music.Player;
 
 /**
  * Uses a motor, gears, and a wheel to produce linear output, e.g. a drive wheel
@@ -13,7 +14,7 @@ import org.team100.lib.motor.BareMotor;
  * The limits used to be enforced by a proxy, but now they're here: it seems
  * simpler that way.
  */
-public class LinearMechanism {
+public class LinearMechanism implements Player {
     private static final boolean DEBUG = false;
 
     private final BareMotor m_motor;
@@ -162,6 +163,11 @@ public class LinearMechanism {
         m_encoder.periodic();
         m_log_position.log(this::getPositionM);
         m_log_velocity.log(this::getVelocityM_S);
+    }
+
+    @Override
+    public void play(double freq) {
+        m_motor.play(freq);
     }
 
 }

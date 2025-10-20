@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
+import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.NamedChooser;
 
@@ -44,6 +45,7 @@ public class DriveManually extends Command {
     private final Supplier<Velocity> m_twistSupplier;
     private final DoubleConsumer m_heedRadiusM;
     private final SwerveDriveSubsystem m_drive;
+    private final SwerveLimiter m_limiter;
     private final Map<String, DriverAdapter> m_drivers;
     private final DriverAdapter m_defaultDriver;
     String currentManualMode = null;
@@ -51,11 +53,13 @@ public class DriveManually extends Command {
     public DriveManually(
             Supplier<Velocity> twistSupplier,
             DoubleConsumer heedRadiusM,
-            SwerveDriveSubsystem drive) {
+            SwerveDriveSubsystem drive,
+            SwerveLimiter limiter) {
         m_mode = m_manualModeChooser::getSelected;
         m_twistSupplier = twistSupplier;
         m_heedRadiusM = heedRadiusM;
         m_drive = drive;
+        m_limiter = limiter;
         m_defaultDriver = new StopDriver(m_drive);
         m_drivers = new ConcurrentHashMap<>();
         SmartDashboard.putData(m_manualModeChooser);
@@ -65,7 +69,8 @@ public class DriveManually extends Command {
     @Override
     public void initialize() {
         m_heedRadiusM.accept(HEED_RADIUS_M);
-        m_drive.resetLimiter();
+        // make sure the limiter knows what we're doing
+        m_limiter.updateSetpoint(m_drive.getVelocity());
         ModelR3 p = m_drive.getState();
         for (DriverAdapter d : m_drivers.values()) {
             d.reset(p);
@@ -125,7 +130,7 @@ public class DriveManually extends Command {
     /** Register a driver for field-relative speed mode */
     public void register(String name, boolean isDefault, FieldRelativeDriver d) {
         addName(name, isDefault);
-        m_drivers.put(name, new FieldRelativeAdapter(m_drive, d));
+        m_drivers.put(name, new FieldRelativeAdapter(m_limiter, m_drive, d));
     }
 
     //////////////
