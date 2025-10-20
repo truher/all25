@@ -2,6 +2,7 @@ package org.team100.lib.controller.r3;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.reference.r3.ReferenceR3;
+import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.SubsystemR3;
 
@@ -13,7 +14,8 @@ import org.team100.lib.subsystems.SubsystemR3;
  */
 public class ReferenceControllerR3 {
     private static final boolean DEBUG = false;
-    private final SubsystemR3 m_drive;
+    
+    private final SubsystemR3 m_subsystem;
     private final ControllerR3 m_controller;
     private final ReferenceR3 m_reference;
 
@@ -25,27 +27,28 @@ public class ReferenceControllerR3 {
             SubsystemR3 drive,
             ControllerR3 controller,
             ReferenceR3 reference) {
-        m_drive = drive;
+        m_subsystem = drive;
         m_controller = controller;
         m_reference = reference;
 
         m_controller.reset();
         // initialize here so that the "done" state knows about the clock
-        m_reference.initialize(m_drive.getState());
+        m_reference.initialize(m_subsystem.getState());
     }
 
     public void execute() {
         try {
-            ModelR3 measurement = m_drive.getState();
+            ModelR3 measurement = m_subsystem.getState();
+            ModelR3 current = m_reference.current();
+            ControlR3 next = m_reference.next();
             GlobalVelocityR3 fieldRelativeTarget = m_controller.calculate(
-                    measurement, m_reference.current(), m_reference.next());
+                    measurement, current, next);
             if (DEBUG) {
                 System.out.printf("ReferenceController.execute() measurement %s current %s next %s output %s\n",
-                        measurement, m_reference.current(), m_reference.next(), fieldRelativeTarget);
+                        measurement, current, next, fieldRelativeTarget);
             }
 
-            m_drive.setVelocity(fieldRelativeTarget);
-            // m_drive.driveInFieldCoords(fieldRelativeTarget);
+            m_subsystem.setVelocity(fieldRelativeTarget);
         } catch (IllegalStateException ex) {
             // System.out.println(ex);
             // This happens when the trajectory generator produces an empty trajectory.
@@ -65,7 +68,7 @@ public class ReferenceControllerR3 {
     /** Distance between the measurement and the goal. */
     public double toGo() {
         ModelR3 goal = m_reference.goal();
-        ModelR3 measurement = m_drive.getState();
+        ModelR3 measurement = m_subsystem.getState();
         return goal.minus(measurement).translation().getNorm();
     }
 }
