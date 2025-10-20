@@ -17,7 +17,7 @@ import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.testing.Timeless;
 
 public class OnboardAngularPositionServoTest implements Timeless {

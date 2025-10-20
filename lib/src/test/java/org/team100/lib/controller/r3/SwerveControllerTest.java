@@ -1,4 +1,4 @@
-package org.team100.lib.controller.drivetrain;
+package org.team100.lib.controller.r3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -22,13 +22,13 @@ import org.team100.lib.trajectory.timing.TimedPose;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-class FullStateSwerveControllerTest implements Timeless {
+class FullStateControllerR3Test implements Timeless {
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testAtRest() {
-        FullStateSwerveController c = SwerveControllerFactory.test2(logger);
+        FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
         GlobalVelocityR3 t = c.calculate(
                 new ModelR3(
@@ -51,7 +51,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFar() {
-        FullStateSwerveController c = SwerveControllerFactory.test2(logger);
+        FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
         // no velocity, no feedforward
         GlobalVelocityR3 t = c.calculate(
@@ -76,7 +76,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFast() {
-        FullStateSwerveController c = SwerveControllerFactory.test2(logger);
+        FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
         GlobalVelocityR3 t = c.calculate(
                 new ModelR3(
@@ -101,7 +101,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testOnTrack() {
-        FullStateSwerveController c = SwerveControllerFactory.test2(logger);
+        FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
         GlobalVelocityR3 t = c.calculate(
                 new ModelR3(
@@ -125,7 +125,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testAllAxes() {
-        FullStateSwerveController c = SwerveControllerFactory.test2(logger);
+        FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
         // none of these have any velocity so there's no feedforward.
         GlobalVelocityR3 t = c.calculate(
@@ -150,7 +150,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testRotation() {
-        FullStateSwerveController c = SwerveControllerFactory.test2(logger);
+        FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
         GlobalVelocityR3 t = c.calculate(
                 new ModelR3(
@@ -174,7 +174,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testErrZero() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
                 0.01, 0.02);
         ModelR3 measurement = new ModelR3();
         ModelR3 currentReference = ModelR3
@@ -187,7 +187,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testErrXAhead() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
                 0.01, 0.02);
         ModelR3 measurement = new ModelR3(new Pose2d(1, 0, new Rotation2d()));
         ModelR3 currentReference = ModelR3
@@ -200,7 +200,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testErrXBehind() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
                 0.01, 0.02);
         ModelR3 measurement = new ModelR3(new Pose2d(0, 0, new Rotation2d()));
         ModelR3 currentReference = ModelR3
@@ -214,7 +214,7 @@ class FullStateSwerveControllerTest implements Timeless {
     /** Rotation should not matter. */
     @Test
     void testErrXAheadWithRotation() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
                 0.01, 0.02);
         ModelR3 measurement = new ModelR3(new Pose2d(1, 0, new Rotation2d(1)));
         ModelR3 currentReference = ModelR3
@@ -227,7 +227,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testErrorAhead() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
                 0.01, 0.02);
         // measurement is at the origin, facing ahead
         ModelR3 measurement = new ModelR3(new Pose2d());
@@ -255,7 +255,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testErrorSideways() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 2.4, 2.4, 0.0, 0.0, 0.01, 0.02,
                 0.01, 0.02);
         // measurement is at the origin, facing down y
         ModelR3 measurement = new ModelR3(new Pose2d(0, 0, Rotation2d.kCCW_Pi_2));
@@ -281,7 +281,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testVelocityErrorZero() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // measurement position doesn't matter, rotation here matches velocity below
         ModelR3 measurement = new ModelR3(
@@ -310,7 +310,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testVelocityErrorAhead() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // measurement is at the origin, facing ahead
         // measurement is the wrong velocity
@@ -341,7 +341,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFeedForwardAhead() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // motion is in a straight line, down the x axis
         MotionDirection motionDirection = new MotionDirection(1, 0, 0);
@@ -367,7 +367,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFeedForwardSideways() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // motion is in a straight line, down the x axis
         MotionDirection motionDirection = new MotionDirection(1, 0, 0);
@@ -393,7 +393,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFeedForwardTurning() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // motion is tangential to the x axis but turning left
         MotionDirection motionDirection = new MotionDirection(1, 0, 1);
@@ -418,7 +418,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFeedbackAhead() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // measurement is at the origin, facing ahead
         Pose2d currentState = new Pose2d();
@@ -454,7 +454,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFeedbackAheadPlusY() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // measurement is plus-Y, facing ahead
         Pose2d currentState = new Pose2d(0, 1, Rotation2d.kZero);
@@ -490,7 +490,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFeedbackAheadPlusTheta() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // measurement is plus-theta
         Pose2d currentState = new Pose2d(0, 0, new Rotation2d(1.0));
@@ -528,7 +528,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFeedbackSideways() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
 
         // measurement is at the origin, facing down the y axis
@@ -564,7 +564,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFeedbackSidewaysPlusY() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // measurement is plus-y, facing down the y axis
         Pose2d currentState = new Pose2d(0, 1, Rotation2d.kCCW_Pi_2);
@@ -599,7 +599,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFullFeedbackAhead() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 1, 1, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 1, 1, 0.01, 0.02, 0.01,
                 0.02);
         // measurement is at the origin, facing ahead
         Pose2d currentState = new Pose2d();
@@ -635,7 +635,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFullFeedbackSideways() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 1, 1, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 1, 1, 0.01, 0.02, 0.01,
                 0.02);
 
         // measurement is at the origin, facing +y
@@ -672,7 +672,7 @@ class FullStateSwerveControllerTest implements Timeless {
 
     @Test
     void testFullFeedbackSidewaysWithRotation() {
-        FullStateSwerveController controller = new FullStateSwerveController(logger, 1, 1, 1, 1, 0.01, 0.02, 0.01,
+        FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 1, 1, 0.01, 0.02, 0.01,
                 0.02);
 
         // measurement is ahead in x and y and theta

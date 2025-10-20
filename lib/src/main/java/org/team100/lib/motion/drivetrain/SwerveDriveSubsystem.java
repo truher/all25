@@ -4,9 +4,6 @@ import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.CotemporalCache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.DriverSkill;
-import org.team100.lib.experiments.Experiment;
-import org.team100.lib.experiments.Experiments;
-import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.localization.OdometryUpdater;
@@ -22,6 +19,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,10 +34,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * direct gyro access is in the odometry updater. Consumers should get rotation
  * from the state estimate.
  */
-public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsystemInterface {
+public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3 {
     // DEBUG produces a LOT of output, you should only enable it while you're
-    // looking
-    // at it.
+    // looking at it.
     private static final boolean DEBUG = false;
     private final FreshSwerveEstimate m_estimate;
     private final OdometryUpdater m_odometryUpdater;
@@ -85,66 +82,18 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
     // ACTUATORS
     //
 
-    /**
-     * Scales the supplied twist by the "speed" driver control modifier.
-     * 
-     * Feasibility is enforced by the SwerveLimiter.
-     * 
-     * Remember to reset the setpoint before calling this (e.g. in the "initialize"
-     * of your command, see DriveManually).
-     */
-    @Override
-    public void driveInFieldCoords(final GlobalVelocityR3 input) {
-        // scale for driver skill; default is half speed.
-        final DriverSkill.Level driverSkillLevel = DriverSkill.level();
-        GlobalVelocityR3 scaled = GeometryUtil.scale(input, driverSkillLevel.scale());
 
-        // NEW! Apply field-relative limits here.
-        if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {
-            scaled = m_limiter.apply(scaled);
-        } else {
-            // keep the limiter up to date on what we're doing
-            m_limiter.updateSetpoint(scaled);
-        }
 
-        final Rotation2d theta = getPose().getRotation();
-        final ChassisSpeeds targetChassisSpeeds = SwerveKinodynamics.toInstantaneousChassisSpeeds(scaled, theta);
-
-        m_log_input.log(() -> input);
-        m_log_skill.log(() -> driverSkillLevel);
-        // here heading and course are exactly opposite, as they should be.
-        if (DEBUG) {
-            System.out.printf(
-                    "driveInFieldCoords() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n",
-                    theta.getRadians(),
-                    GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(),
-                    targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.vyMetersPerSecond,
-                    targetChassisSpeeds.omegaRadiansPerSecond);
-        }
-
-        m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
-    }
-
-    /** Skip all scaling, setpoint generator, etc. */
-    public void driveInFieldCoordsVerbatim(GlobalVelocityR3 input) {
+    /** Skip all scaling, limits generator, etc. */
+    public void setVelocity(GlobalVelocityR3 input) {
         // keep the limiter up to date on what we're doing
         m_limiter.updateSetpoint(input);
 
-        final ChassisSpeeds targetChassisSpeeds = SwerveKinodynamics.toInstantaneousChassisSpeeds(
-                input, getPose().getRotation());
-
-        final Rotation2d theta = getPose().getRotation();
-        // if we're going +x then heading and course should be opposite.
-        if (DEBUG) {
-            System.out.printf(
-                    "driveInFieldCoordsVerbatim() target heading %.8f target course %.8f speeds x %.6f y %.6f theta %.6f\n",
-                    theta.getRadians(),
-                    GeometryUtil.getCourse(targetChassisSpeeds).orElse(new Rotation2d()).getRadians(),
-                    targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.vyMetersPerSecond,
-                    targetChassisSpeeds.omegaRadiansPerSecond);
-        }
-
+        Rotation2d theta = getPose().getRotation();
+        ChassisSpeeds targetChassisSpeeds = SwerveKinodynamics.toInstantaneousChassisSpeeds(
+                input, theta);
         m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
+        m_log_input.log(() -> input);
     }
 
     /**
@@ -156,7 +105,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         // scale for driver skill; default is half speed.
         DriverSkill.Level driverSkillLevel = DriverSkill.level();
         m_swerveLocal.setChassisSpeeds(speeds.times(driverSkillLevel.scale()));
-        m_log_skill.log(() -> driverSkillLevel);
     }
 
     /**
@@ -196,11 +144,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         m_stateCache.reset();
     }
 
-    @Override
-    public void resetLimiter() {
-        m_limiter.updateSetpoint(getVelocity());
 
-    }
 
     ///////////////////////////////////////////////////////////////
     //
@@ -240,6 +184,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements DriveSubsyste
         // the name "field" is used by Field2d.
         // the name "robot" can be anything.
         m_log_field_robot.log(this::poseArray);
+        m_log_skill.log(() -> DriverSkill.level());
         m_swerveLocal.periodic();
     }
 

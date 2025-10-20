@@ -1,6 +1,5 @@
 package org.team100.lib.examples.mecanum;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
@@ -12,6 +11,8 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.mechanism.LinearMechanism;
+import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,8 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Mecanum drive with optional gyro. */
-public class MecanumDrive extends SubsystemBase
-        implements Consumer<GlobalVelocityR3>, Supplier<Pose2d> {
+public class MecanumDrive extends SubsystemBase implements SubsystemR3 {
     private static final double TRACK_WIDTH_M = 0.4;
     private static final double WHEELBASE_M = 0.4;
 
@@ -40,6 +40,7 @@ public class MecanumDrive extends SubsystemBase
     private final MecanumDriveKinematics m_kinematics;
 
     private MecanumDriveWheelPositions m_positions;
+    private GlobalVelocityR3 m_input;
     private Pose2d m_pose;
     private Rotation2d m_gyroOffset;
 
@@ -65,21 +66,19 @@ public class MecanumDrive extends SubsystemBase
                 new Translation2d(-WHEELBASE_M / 2, TRACK_WIDTH_M / 2),
                 new Translation2d(-WHEELBASE_M / 2, -TRACK_WIDTH_M / 2));
         m_positions = new MecanumDriveWheelPositions();
+        m_input = new GlobalVelocityR3(0, 0, 0);
         m_pose = new Pose2d();
         m_gyroOffset = new Rotation2d();
     }
 
     @Override
-    public void accept(GlobalVelocityR3 v) {
-        setVelocity(v);
-    }
-
-    @Override
-    public Pose2d get() {
-        return getPose();
+    public ModelR3 getState() {
+        // assume the velocity is exactly what was requested.
+        return new ModelR3(m_pose, m_input);
     }
 
     /** Use inverse kinematics to set wheel speeds. */
+    @Override
     public void setVelocity(GlobalVelocityR3 input) {
         Rotation2d yaw = getYaw();
         ChassisSpeeds speed = SwerveKinodynamics.toInstantaneousChassisSpeeds(
@@ -102,10 +101,6 @@ public class MecanumDrive extends SubsystemBase
         m_frontRight.stop();
         m_rearLeft.stop();
         m_rearRight.stop();
-    }
-
-    public Pose2d getPose() {
-        return m_pose;
     }
 
     /** Set the drive velocity with joystick input. */

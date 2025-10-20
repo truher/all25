@@ -49,7 +49,7 @@ public class Robot extends TimedRobot100 {
         m_drive.setDefaultCommand(m_drive.driveManual(
                 driverControl::velocity, MAX_SPEED_M_S, MAX_OMEGA_RAD_S));
 
-        m_autons = new Autons(m_drive);
+        m_autons = new Autons(logger, m_drive);
 
         new Trigger(driverControl::x).whileTrue(
                 m_drive.run(

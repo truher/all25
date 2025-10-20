@@ -1,4 +1,4 @@
-package org.team100.lib.reference;
+package org.team100.lib.reference.r3;
 
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;

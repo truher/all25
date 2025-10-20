@@ -13,7 +13,6 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.StringLogger;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
@@ -22,6 +21,7 @@ import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
@@ -42,7 +42,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
     private final Supplier<Rotation2d> m_desiredRotation;
     private final HeadingLatch m_latch;
     private final Feedback100 m_thetaFeedback;
-    private final SwerveDriveSubsystem m_drive;
+    private final Supplier<Pose2d> m_pose;
     // LOGGERS
     private final StringLogger m_log_mode;
     private final DoubleLogger m_log_max_speed;
@@ -71,13 +71,13 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
             SwerveKinodynamics swerveKinodynamics,
             Supplier<Rotation2d> desiredRotation,
             Feedback100 thetaController,
-            SwerveDriveSubsystem drive) {
+            Supplier<Pose2d> pose) {
         LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_desiredRotation = desiredRotation;
         m_thetaFeedback = thetaController;
         m_latch = new HeadingLatch();
-        m_drive = drive;
+        m_pose = pose;
         m_log_mode = child.stringLogger(Level.TRACE, "mode");
         m_log_max_speed = child.doubleLogger(Level.TRACE, "maxSpeedRad_S");
         m_log_max_accel = child.doubleLogger(Level.TRACE, "maxAccelRad_S2");
@@ -193,7 +193,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
         if (clipped.x() > 0) {
             // x coordinate of the barge scoring location
             double BARGE_X = 7.4;
-            double distance = BARGE_X - m_drive.getPose().getX();
+            double distance = BARGE_X - m_pose.get().getX();
             scale = distance * scale;
 
             if (Math.abs(distance) < 0.01) {

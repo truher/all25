@@ -14,7 +14,10 @@ import org.team100.lib.motion.drivetrain.Fixtured;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.testing.Timeless;
+
+import edu.wpi.first.wpilibj.RobotController;
 
 class DriveManuallyTest extends Fixtured implements Timeless {
     public DriveManuallyTest() throws IOException {
@@ -32,12 +35,16 @@ class DriveManuallyTest extends Fixtured implements Timeless {
         fixture.collection.reset();
         stepTime();
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
-
+        SwerveLimiter limiter = new SwerveLimiter(
+                logger,
+                swerveKinodynamics,
+                RobotController::getBatteryVoltage);
         DriveManually command = new DriveManually(
                 twistSupplier,
                 (x) -> {
                 },
-                drive);
+                drive,
+                limiter);
 
         command.register("MODULE_STATE", false,
                 new SimpleManualModuleStates(logger, swerveKinodynamics));

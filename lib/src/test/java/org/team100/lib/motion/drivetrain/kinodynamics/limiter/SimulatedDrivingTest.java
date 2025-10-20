@@ -146,7 +146,7 @@ public class SimulatedDrivingTest implements Timeless {
         double start = Takt.get();
         for (int i = 0; i < 100; ++i) {
             stepTime();
-            drive.driveInFieldCoords(input);
+            drive.setVelocity(input);
             if (DEBUG)
                 System.out.printf("%.2f %s\n", Takt.get() - start, drive.getPose());
         }
@@ -161,7 +161,7 @@ public class SimulatedDrivingTest implements Timeless {
         double start = Takt.get();
         for (int i = 0; i < 100; ++i) {
             stepTime();
-            drive.driveInFieldCoordsVerbatim(input);
+            drive.setVelocity(input);
             if (DEBUG)
                 System.out.printf("%.2f %s\n", Takt.get() - start, drive.getPose());
         }
@@ -185,7 +185,7 @@ public class SimulatedDrivingTest implements Timeless {
             stepTime();
             if (DEBUG)
                 System.out.printf("takt: %.2f state: %s\n", Takt.get(), drive.getState());
-            drive.driveInFieldCoords(input);
+            drive.setVelocity(input);
         }
     }
 
@@ -203,7 +203,7 @@ public class SimulatedDrivingTest implements Timeless {
             stepTime();
             if (DEBUG)
                 System.out.printf("takt: %.2f state: %s\n", Takt.get(), drive.getState());
-            drive.driveInFieldCoordsVerbatim(input);
+            drive.setVelocity(input);
         }
     }
 
@@ -217,7 +217,7 @@ public class SimulatedDrivingTest implements Timeless {
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());
-        drive.driveInFieldCoordsVerbatim(input);
+        drive.setVelocity(input);
         if (DEBUG)
             System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),
@@ -229,7 +229,7 @@ public class SimulatedDrivingTest implements Timeless {
                     drive.getPose(),
                     gyro.getYawNWU(),
                     gyro.getYawRateNWU());
-        drive.driveInFieldCoordsVerbatim(input);
+        drive.setVelocity(input);
         if (DEBUG)
             System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),

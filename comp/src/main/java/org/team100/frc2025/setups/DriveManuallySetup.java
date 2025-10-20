@@ -10,13 +10,13 @@ import org.team100.lib.commands.drivetrain.manual.ManualWithProfiledHeading;
 import org.team100.lib.commands.drivetrain.manual.ManualWithTargetLock;
 import org.team100.lib.commands.drivetrain.manual.SimpleManualModuleStates;
 import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.hid.Buttons2025;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -31,37 +31,38 @@ public class DriveManuallySetup {
             FieldLogger.Log fieldLog,
             DriverXboxControl driverControl,
             AprilTagRobotLocalizer localizer,
-            SwerveDriveSubsystem m_drive,
-            SwerveKinodynamics m_swerveKinodynamics,
-            Feedback100 thetaFeedback,
-            Buttons2025 buttons) {
-
+            SwerveDriveSubsystem drive,
+            SwerveLimiter limiter,
+            SwerveKinodynamics swerveKinodynamics,
+            Feedback100 thetaFeedback) {
         final DriveManually driveManually = new DriveManually(
                 driverControl::velocity,
                 localizer::setHeedRadiusM,
-                m_drive);
+                drive,
+                limiter);
+
         final LoggerFactory manLog = comLog.type(driveManually);
 
         driveManually.register("MODULE_STATE", false,
-                new SimpleManualModuleStates(manLog, m_swerveKinodynamics));
+                new SimpleManualModuleStates(manLog, swerveKinodynamics));
 
         driveManually.register("ROBOT_RELATIVE_CHASSIS_SPEED", false,
-                new ManualChassisSpeeds(manLog, m_swerveKinodynamics));
+                new ManualChassisSpeeds(manLog, swerveKinodynamics));
 
         driveManually.register("FIELD_RELATIVE_TWIST", false,
-                new ManualFieldRelativeSpeeds(manLog, m_swerveKinodynamics));
+                new ManualFieldRelativeSpeeds(manLog, swerveKinodynamics));
 
         driveManually.register("SNAPS_PROFILED", true,
                 new ManualWithProfiledHeading(
                         manLog,
-                        m_swerveKinodynamics,
+                        swerveKinodynamics,
                         driverControl::pov,
                         thetaFeedback));
 
         driveManually.register("SNAPS_FULL_STATE", true,
                 new ManualWithFullStateHeading(
                         manLog,
-                        m_swerveKinodynamics,
+                        swerveKinodynamics,
                         driverControl::pov,
                         new double[] {
                                 5,
@@ -76,24 +77,24 @@ public class DriveManuallySetup {
                 new ManualWithTargetLock(
                         fieldLog,
                         manLog,
-                        m_swerveKinodynamics,
+                        swerveKinodynamics,
                         () -> new Translation2d(6, 4),
                         thetaFeedback));
 
         driveManually.register("BARGE ASSIST", false,
                 new ManualWithBargeAssist(
                         manLog,
-                        m_swerveKinodynamics,
+                        swerveKinodynamics,
                         driverControl::pov,
                         thetaFeedback,
-                        m_drive));
+                        drive::getPose));
 
         driveManually.register("REEF LOCK", false,
                 new ManualWithProfiledReefLock(
                         manLog,
-                        m_swerveKinodynamics,
+                        swerveKinodynamics,
                         driverControl::leftTrigger,
                         thetaFeedback,
-                        m_drive));
+                        () -> drive.getPose().getTranslation()));
     }
 }

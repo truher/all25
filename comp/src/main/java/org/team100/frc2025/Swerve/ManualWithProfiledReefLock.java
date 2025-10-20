@@ -13,7 +13,6 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
@@ -23,6 +22,7 @@ import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * Function that supports manual cartesian control, and both manual and locked
@@ -38,7 +38,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
     // accelerate gently to avoid upset
     private static final double PROFILE_ACCEL = 0.5;
     private final SwerveKinodynamics m_swerveKinodynamics;
-    private final SwerveDriveSubsystem m_drive;
+    private final Supplier<Translation2d> m_robotLocation;
 
     /** lock rotation to reef center */
     private final Supplier<Boolean> m_lockToReef;
@@ -64,11 +64,11 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
             SwerveKinodynamics swerveKinodynamics,
             Supplier<Boolean> lockToReef,
             Feedback100 thetaController,
-            SwerveDriveSubsystem drive) {
+            Supplier<Translation2d> robotLocation) {
         LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_lockToReef = lockToReef;
-        m_drive = drive;
+        m_robotLocation = robotLocation;
         m_thetaFeedback = thetaController;
         m_log_snap_mode = child.booleanLogger(Level.TRACE, "snap mode");
         m_log_max_speed = child.doubleLogger(Level.TRACE, "maxSpeedRad_S");
@@ -126,7 +126,7 @@ public class ManualWithProfiledReefLock implements FieldRelativeDriver {
         // take the short path
         Rotation2d m_goal = Math100.getMinDistance(
                 yawMeasurement,
-                FieldConstants.angleToReefCenter(m_drive.getPose().getTranslation()));
+                FieldConstants.angleToReefCenter(m_robotLocation.get()));
 
         // use the modulus closest to the measurement
         m_thetaSetpoint = new Control100(

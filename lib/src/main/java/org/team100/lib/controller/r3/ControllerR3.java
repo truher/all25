@@ -1,4 +1,4 @@
-package org.team100.lib.controller.drivetrain;
+package org.team100.lib.controller.r3;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.state.ControlR3;
@@ -7,7 +7,7 @@ import org.team100.lib.state.ModelR3;
 /**
  * Feedback and feedforward control.
  */
-public interface SwerveController  {
+public interface ControllerR3  {
 
     /**
      * Feedback should compare the current-instant measurement to the

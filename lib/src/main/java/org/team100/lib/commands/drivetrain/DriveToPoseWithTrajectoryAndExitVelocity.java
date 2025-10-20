@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.drivetrain.ReferenceController;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.reference.TrajectoryReferenceR3;
+import org.team100.lib.reference.r3.TrajectoryReferenceR3;
+import org.team100.lib.subsystems.SubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
@@ -25,8 +26,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     private final Pose2d m_goal;
     private final GlobalVelocityR3 m_endVelocity;
-    private final SwerveDriveSubsystem m_drive;
-    private final SwerveController m_controller;
+    private final SubsystemR3 m_drive;
+    private final ControllerR3 m_controller;
     private final TrajectoryVisualization m_viz;
     private final TrajectoryPlanner m_planner;
 
@@ -36,7 +37,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
             Pose2d goal,
             GlobalVelocityR3 endVelocity,
             SwerveDriveSubsystem drive,
-            SwerveController controller,
+            ControllerR3 controller,
             SwerveKinodynamics swerveKinodynamics,
             TrajectoryVisualization viz) {
         m_goal = goal;
@@ -50,9 +51,9 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
 
     @Override
     public void initialize() {
-        Pose2d pose = m_drive.getPose();
+        Pose2d pose = m_drive.getState().pose();
         Translation2d toGoal = m_goal.getTranslation().minus(pose.getTranslation());
-        GlobalVelocityR3 startVelocity = m_drive.getVelocity();
+        GlobalVelocityR3 startVelocity = m_drive.getState().velocity();
         HolonomicPose2d startWaypoint = new HolonomicPose2d(
                 pose.getTranslation(),
                 pose.getRotation(),
@@ -73,11 +74,9 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
 
         m_viz.setViz(trajectory);
 
+        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
         m_referenceController = new ReferenceController(
-                m_drive,
-                m_controller,
-                new TrajectoryReferenceR3(trajectory),
-                false);
+                m_drive, m_controller, reference);
     }
 
     @Override
@@ -98,7 +97,6 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     public double toGo() {
         return (m_referenceController == null) ? 0 : m_referenceController.toGo();
     }
-
 
     @Override
     public void end(boolean interrupted) {

@@ -2,8 +2,8 @@ package org.team100.frc2025.robot;
 
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
-import org.team100.lib.controller.drivetrain.FullStateSwerveController;
-import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
+import org.team100.lib.controller.r3.ControllerFactoryR3;
+import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
@@ -30,7 +30,7 @@ public class AllAutons {
                 machinery.m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 machinery.m_swerveKinodynamics.getMaxAngleAccelRad_S2(),
                 5);
-        final FullStateSwerveController controller = SwerveControllerFactory
+        final FullStateControllerR3 controller = ControllerFactoryR3
                 .auto2025LooseTolerance(logger.name("Auton"));
         final TrajectoryPlanner planner = new TrajectoryPlanner(
                 new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium());

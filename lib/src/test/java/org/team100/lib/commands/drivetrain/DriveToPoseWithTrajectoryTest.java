@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
+import org.team100.lib.controller.r3.ControllerFactoryR3;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.logging.LoggerFactory;
@@ -48,7 +48,7 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
         Pose2d goal = Pose2d.kZero;
         SwerveDriveSubsystem drive = fixture.drive;
 
-        SwerveController controller = SwerveControllerFactory.test(logger);
+        ControllerR3 controller = ControllerFactoryR3.test(logger);
         DriveToPoseWithTrajectory command = new DriveToPoseWithTrajectory(
                 () -> goal,
                 drive,
@@ -78,7 +78,7 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
         assertEquals(0.876, goal.getY(), DELTA);
         assertEquals(-0.942, goal.getRotation().getRadians(), DELTA);
 
-        SwerveController m_controller = SwerveControllerFactory.test(logger);
+        ControllerR3 m_controller = ControllerFactoryR3.test(logger);
         DriveToPoseWithTrajectory command = new DriveToPoseWithTrajectory(
                 () -> goal, drive,
                 (start, end) -> planner.movingToRest(start, end),

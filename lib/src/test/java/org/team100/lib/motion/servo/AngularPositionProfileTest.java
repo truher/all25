@@ -16,7 +16,7 @@ import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
-import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.testing.Timeless;
 
 class AngularPositionProfileTest implements Timeless {

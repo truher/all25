@@ -1,6 +1,6 @@
 package org.team100.frc2025.CalgamesArm;
 
-import org.team100.lib.reference.ReferenceR3;
+import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 

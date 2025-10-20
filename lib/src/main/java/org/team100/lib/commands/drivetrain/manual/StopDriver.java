@@ -1,14 +1,14 @@
 package org.team100.lib.commands.drivetrain.manual;
 
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.SubsystemR3;
 
 public class StopDriver implements DriverAdapter {
 
-    private final SwerveDriveSubsystem m_drive;
+    private final SubsystemR3 m_drive;
 
-    public StopDriver(SwerveDriveSubsystem drive) {
+    public StopDriver(SubsystemR3 drive) {
         m_drive = drive;
     }
 

@@ -19,8 +19,8 @@ import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.timed.JerkLimitedTimedProfile;
-import org.team100.lib.reference.ProfileReferenceR1;
-import org.team100.lib.reference.TimedProfileReferenceR1;
+import org.team100.lib.reference.r1.ProfileReferenceR1;
+import org.team100.lib.reference.r1.TimedProfileReferenceR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 
