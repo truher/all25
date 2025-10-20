@@ -8,6 +8,7 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
 import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
+import org.team100.lib.music.Player;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -19,7 +20,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * Most methods in this class should be package-private, they're only used by
  * SwerveDriveSubsystem, and by tests.
  */
-public class SwerveLocal {
+public class SwerveLocal implements Player {
     private static final boolean DEBUG = false;
     private final SwerveKinodynamics m_swerveKinodynamics;
     private final SwerveModuleCollection m_modules;
@@ -36,6 +37,11 @@ public class SwerveLocal {
         m_logPositions = child.swerveModulePositionsLogger(Level.TRACE, "positions");
         m_swerveKinodynamics = swerveKinodynamics;
         m_modules = modules;
+    }
+
+    @Override
+    public void play(double freq) {
+        m_modules.play(freq);
     }
 
     //////////////////////////////////////////////////////////
@@ -94,7 +100,7 @@ public class SwerveLocal {
     //
     // Observers
     //
-    
+
     /** Uses Cache so the position is fresh and coherent. */
     SwerveModulePositions positions() {
         return m_modules.positions();

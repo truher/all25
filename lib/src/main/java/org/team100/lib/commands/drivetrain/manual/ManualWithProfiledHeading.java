@@ -2,7 +2,7 @@ package org.team100.lib.commands.drivetrain.manual;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.controller.simple.Feedback100;
+import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;

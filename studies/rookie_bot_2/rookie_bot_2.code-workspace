@@ -44,6 +44,7 @@
 		"editor.minimap.enabled": false,
 		"editor.inlayHints.enabled": "off",
 		"workbench.colorTheme": "Default Light Modern",
-		"editor.stickyScroll.enabled": false
+		"editor.stickyScroll.enabled": false,
+		"workbench.editor.revealIfOpen": true
 	}
 }

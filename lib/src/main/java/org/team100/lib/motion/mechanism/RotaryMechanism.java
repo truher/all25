@@ -5,6 +5,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
+import org.team100.lib.music.Player;
 import org.team100.lib.state.Model100;
 
 /**
@@ -16,7 +17,7 @@ import org.team100.lib.state.Model100;
  * The position limits used to be enforced by a proxy, but now they're here: it
  * seems simpler that way.
  */
-public class RotaryMechanism {
+public class RotaryMechanism implements Player {
     private final BareMotor m_motor;
     private final RotaryPositionSensor m_sensor;
     private final double m_gearRatio;
@@ -187,6 +188,11 @@ public class RotaryMechanism {
         m_sensor.periodic();
         m_log_velocity.log(() -> getVelocityRad_S());
         m_log_position.log(() -> getWrappedPositionRad());
+    }
+
+    @Override
+    public void play(double freq) {
+        m_motor.play(freq);
     }
 
 }

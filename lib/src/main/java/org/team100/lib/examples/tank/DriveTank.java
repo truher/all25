@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * xbox style control, this will be the right-hand stick).
  */
 public class DriveTank extends Command {
-    private static final double SCALE = 1;
+    private static final double SCALE = 2;
 
     private final DoubleSupplier m_translation;
     private final DoubleSupplier m_rotation;
@@ -27,8 +27,8 @@ public class DriveTank extends Command {
 
     @Override
     public void execute() {
-        double rotscale = 1 - 0.5 * Math.abs(m_translation.getAsDouble());
-        m_drive.setVelocity(m_translation.getAsDouble() * SCALE, m_rotation.getAsDouble() * rotscale);
+        // double rotscale = 1 - 0.5 * Math.abs(m_translation.getAsDouble());
+        m_drive.setVelocity(m_translation.getAsDouble() * SCALE, m_rotation.getAsDouble() * 10 * SCALE);
         // m_drive.setDutyCycle(m_translation.getAsDouble() * SCALE,
         // m_rotation.getAsDouble() * rotscale);
     }

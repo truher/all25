@@ -285,4 +285,8 @@ public abstract class CANSparkMotor implements BareMotor {
     public void periodic() {
         log();
     }
+
+    @Override
+    public void play(double freq) {
+    }
 }

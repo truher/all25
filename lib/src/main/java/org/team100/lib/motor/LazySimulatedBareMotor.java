@@ -117,4 +117,9 @@ public class LazySimulatedBareMotor implements BareMotor {
     public void periodic() {
         m_delegate.periodic();
     }
+
+    @Override
+    public void play(double freq) {
+        m_delegate.play(freq);
+    }
 }

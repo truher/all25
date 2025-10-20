@@ -21,8 +21,8 @@ import org.team100.lib.motor.Kraken6Motor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.profile.incremental.IncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReferenceR1;
-import org.team100.lib.reference.ProfileReferenceR1;
+import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 
@@ -110,7 +110,6 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double statorLimitAmps,
             CanId driveMotorCanId,
             DriveRatio ratio,
-            Class<? extends RotaryPositionSensor> encoderClass,
             CanId turningMotorCanId,
             RoboRioChannel turningEncoderChannel,
             double turningOffset,

@@ -1,11 +1,11 @@
 package org.team100.lib.commands.drivetrain.test;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.drivetrain.ReferenceController;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.reference.ConstantReferenceR3;
-import org.team100.lib.reference.ReferenceR3;
+import org.team100.lib.reference.r3.ConstantReferenceR3;
+import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ModelR3;
 
 /**
@@ -20,14 +20,14 @@ import org.team100.lib.state.ModelR3;
  * This is really only intended for testing.
  */
 public class DriveToStateSimple extends MoveAndHold {
-    private final SwerveController m_controller;
+    private final ControllerR3 m_controller;
     private final SwerveDriveSubsystem m_drive;
     private final ReferenceR3 m_reference;
 
-    private ReferenceController m_referenceController;
+    private ReferenceControllerR3 m_referenceController;
 
     public DriveToStateSimple(
-            SwerveController controller,
+            ControllerR3 controller,
             SwerveDriveSubsystem drive,
             ModelR3 goal) {
         m_controller = controller;
@@ -38,7 +38,8 @@ public class DriveToStateSimple extends MoveAndHold {
 
     @Override
     public void initialize() {
-        m_referenceController = new ReferenceController(m_drive, m_controller, m_reference, false);
+        m_referenceController = new ReferenceControllerR3(
+                m_drive, m_controller, m_reference);
     }
 
     @Override
@@ -55,7 +56,6 @@ public class DriveToStateSimple extends MoveAndHold {
     public double toGo() {
         return (m_referenceController == null) ? 0 : m_referenceController.toGo();
     }
-
 
     @Override
     public void end(boolean interrupted) {

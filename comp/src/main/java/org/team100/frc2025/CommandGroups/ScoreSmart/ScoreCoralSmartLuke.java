@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
-import org.team100.lib.controller.drivetrain.SwerveController;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.field.FieldConstantsLuke;
 import org.team100.lib.logging.LoggerFactory;
@@ -27,7 +27,7 @@ public class ScoreCoralSmartLuke {
             LoggerFactory logger,
             CalgamesMech mech,
             Manipulator manipulator,
-            SwerveController controller,
+            ControllerR3 controller,
             HolonomicProfile profile,
             SwerveDriveSubsystem drive,
             DoubleConsumer heedRadiusM,

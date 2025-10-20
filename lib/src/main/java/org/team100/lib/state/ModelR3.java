@@ -70,6 +70,16 @@ public class ModelR3 {
         return new ModelR3(x().plus(other.x()), y().plus(other.y()), theta().plus(other.theta()));
     }
 
+    /**
+     * Use the current velocity to evolve the position of each dimension
+     * independently.
+     * 
+     * This is wrong for Pose2d; if you want the correct thing, see Twist2d.
+     */
+    public ModelR3 evolve(double dt) {
+        return new ModelR3(m_x.evolve(dt), m_y.evolve(dt), m_theta.evolve(dt));
+    }
+
     /** all dimensions position and velocity are within (the same) tolerance */
     public boolean near(ModelR3 other, double tolerance) {
         return x().near(other.x(), tolerance)

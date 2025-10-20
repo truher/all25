@@ -1,6 +1,6 @@
 package org.team100.lib.commands.drivetrain;
 
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
+import org.team100.lib.subsystems.SubsystemR3;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Stop the drivetrain.
  */
 public class DriveStop extends Command {
-    private final SwerveDriveSubsystem m_drive;
+    private final SubsystemR3 m_drive;
 
-    public DriveStop(SwerveDriveSubsystem robotDrive) {
+    public DriveStop(SubsystemR3 robotDrive) {
         m_drive = robotDrive;
         addRequirements(m_drive);
     }
