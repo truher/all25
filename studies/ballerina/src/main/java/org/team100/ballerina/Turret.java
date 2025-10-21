@@ -2,7 +2,7 @@ package org.team100.ballerina;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.controller.simple.PIDFeedback;
+import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.encoder.SimulatedBareEncoder;
 import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
 import org.team100.lib.logging.Level;
