@@ -38,12 +38,12 @@ public class Robot extends TimedRobot100 {
         m_drive = MecanumDriveFactory.make(
                 fieldLogger,
                 logger,
-                20, // supply limit
+                5, // supply limit -- current, in amps
                 null, // gyro
-                new CanId(3), // front left
-                new CanId(27), // front right
-                new CanId(28), // rear left
-                new CanId(29), // rear right
+                new CanId(2), // front left
+                new CanId(1), // front right
+                new CanId(3), // rear left
+                new CanId(4), // rear right
                 6.0, // gears
                 0.15); // wheel dia (m)
         m_drive.setDefaultCommand(m_drive.driveManual(
