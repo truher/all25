@@ -91,6 +91,16 @@ public class LoggerFactory {
         return m_root;
     }
 
+    /** @return root/stem */
+    public String root(String stem) {
+        return m_root + "/" + stem;
+    }
+
+    /** @return a/b */
+    public String join(String a, String b) {
+        return a + "/" + b;
+    }
+    
     //////////////////////////////////////////////////////
 
     private boolean allow(Level level) {
@@ -100,16 +110,6 @@ public class LoggerFactory {
             return true;
         }
         return allowed.admit(level);
-    }
-
-    /** @return root/stem */
-    private String root(String stem) {
-        return m_root + "/" + stem;
-    }
-
-    /** @return a/b */
-    private String join(String a, String b) {
-        return a + "/" + b;
     }
 
     /////////////////////////////////////////////////////
