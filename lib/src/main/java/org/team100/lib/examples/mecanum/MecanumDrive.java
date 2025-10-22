@@ -116,6 +116,10 @@ public class MecanumDrive extends SubsystemBase implements SubsystemR3 {
                 .withName("drive with global velocity");
     }
 
+    public Command resetPose() {
+        return runOnce(() -> m_pose = new Pose2d());
+    }
+
     /** Set yaw to zero. */
     public Command resetYaw() {
         return runOnce(this::resetGyroOffset);

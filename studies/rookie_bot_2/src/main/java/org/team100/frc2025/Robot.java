@@ -38,7 +38,7 @@ public class Robot extends TimedRobot100 {
         m_drive = MecanumDriveFactory.make(
                 fieldLogger,
                 logger,
-                5, // supply limit -- current, in amps
+                25, // supply limit -- current, in amps
                 null, // gyro
                 new CanId(2), // front left
                 new CanId(1), // front right
@@ -51,6 +51,9 @@ public class Robot extends TimedRobot100 {
 
         m_autons = new Autons(logger, fieldLogger, m_drive);
 
+        new Trigger(driverControl::back).onTrue(
+            m_drive.resetPose());
+            
         new Trigger(driverControl::x).whileTrue(
                 m_drive.run(
                         () -> m_drive.setVelocity(new GlobalVelocityR3(1, 0, 0)))
