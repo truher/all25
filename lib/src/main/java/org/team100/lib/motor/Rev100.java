@@ -13,33 +13,40 @@ import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+/** Configuration for one SparkBase motor */
 public class Rev100 {
 
-    public static void crash(Supplier<REVLibError> s) {
-        REVLibError errorCode = s.get();
-        if (errorCode != REVLibError.kOk) {
-            throw new IllegalStateException(errorCode.name());
-        }
+    private final SparkBase m_motor;
+
+    public Rev100(SparkBase motor) {
+        m_motor = motor;
     }
 
-    public static void warn(Supplier<REVLibError> s) {
-        REVLibError errorCode = s.get();
-        if (errorCode != REVLibError.kOk) {
-            System.out.println("WARNING: " + errorCode.name());
-        }
+    /**
+     * Makes config synchronous so we can see the errors
+     */
+    public void longCANTimeout() {
+        crash(() -> m_motor.setCANTimeout(500));
     }
 
-    public static void baseConfig(SparkBase motor) {
+    /**
+     * Makes everything asynchronous.
+     * NOTE: this makes error-checking not work at all.
+     */
+    public void zeroCANTimeout() {
+        crash(() -> m_motor.setCANTimeout(0));
+    }
+
+    public void baseConfig() {
         SparkMaxConfig conf = new SparkMaxConfig();
         conf.limitSwitch.forwardLimitSwitchEnabled(false);
         conf.limitSwitch.reverseLimitSwitchEnabled(false);
         conf.limitSwitch.forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed);
         conf.limitSwitch.reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed);
-        crash(() -> motor.configure(conf, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        crash(() -> m_motor.configure(conf, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
     }
 
-    public static void motorConfig(
-            SparkBase motor,
+    public void motorConfig(
             NeutralMode neutral,
             MotorPhase phase,
             int periodMs) {
@@ -59,13 +66,13 @@ public class Rev100 {
         // slower than default of 10; also affects things like motor temperature and
         // applied output.
         conf.signals.limitsPeriodMs(20);
-        crash(() -> motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
+        crash(() -> m_motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
     }
 
-    public static void currentConfig(SparkBase motor, int currentLimit) {
+    public void currentConfig(int currentLimit) {
         SparkMaxConfig conf = new SparkMaxConfig();
         conf.smartCurrentLimit(currentLimit);
-        crash(() -> motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
+        crash(() -> m_motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
     }
 
     /**
@@ -74,7 +81,7 @@ public class Rev100 {
      * a desired control output would be a duty cycle of 0.1 or so, which implies a
      * value of P like 3e-4.
      */
-    public static void pidConfig(SparkBase motor, PIDConstants pid) {
+    public void pidConfig(PIDConstants pid) {
         SparkMaxConfig conf = new SparkMaxConfig();
         conf.closedLoop.positionWrappingEnabled(false); // don't use position control
         conf.closedLoop.p(pid.getPositionP(), ClosedLoopSlot.kSlot0);
@@ -89,11 +96,13 @@ public class Rev100 {
         conf.closedLoop.velocityFF(0, ClosedLoopSlot.kSlot1); // use arbitrary FF instead
         conf.closedLoop.outputRange(-1, 1, ClosedLoopSlot.kSlot0);
         conf.closedLoop.outputRange(-1, 1, ClosedLoopSlot.kSlot1);
-        crash(() -> motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
+        crash(() -> m_motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
     }
 
-    private Rev100() {
-        //
+    private static void crash(Supplier<REVLibError> s) {
+        REVLibError errorCode = s.get();
+        if (errorCode != REVLibError.kOk) {
+            throw new IllegalStateException(errorCode.name());
+        }
     }
-
 }

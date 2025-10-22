@@ -15,8 +15,7 @@ import com.revrobotics.spark.SparkMax;
  */
 public class NeoCANSparkMotor extends CANSparkMotor {
     /**
-     * Note the PID values should be in duty cycle per RPM, i.e. very small. {@link
-     * Rev100}
+     * Note the PID values should be in duty cycle per RPM, so, like 3e-4.
      */
     public NeoCANSparkMotor(
             LoggerFactory parent,
