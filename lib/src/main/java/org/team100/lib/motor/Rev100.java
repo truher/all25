@@ -81,8 +81,8 @@ public class Rev100 {
         conf.closedLoop.i(pid.getPositionI(), ClosedLoopSlot.kSlot0);
         conf.closedLoop.d(pid.getPositionD(), ClosedLoopSlot.kSlot0);
         conf.closedLoop.p(pid.getVelocityP(), ClosedLoopSlot.kSlot1);
-        conf.closedLoop.i(pid.getVelocityP(), ClosedLoopSlot.kSlot1);
-        conf.closedLoop.d(pid.getVelocityP(), ClosedLoopSlot.kSlot1);
+        conf.closedLoop.i(pid.getVelocityI(), ClosedLoopSlot.kSlot1);
+        conf.closedLoop.d(pid.getVelocityD(), ClosedLoopSlot.kSlot1);
         conf.closedLoop.iZone(pid.getPositionIZone(), ClosedLoopSlot.kSlot0);
         conf.closedLoop.iZone(pid.getVelocityIZone(), ClosedLoopSlot.kSlot1);
         conf.closedLoop.velocityFF(0, ClosedLoopSlot.kSlot0); // use arbitrary FF instead
