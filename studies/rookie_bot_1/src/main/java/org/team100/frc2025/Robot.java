@@ -1,5 +1,8 @@
 package org.team100.frc2025;
 
+import static edu.wpi.first.wpilibj2.command.Commands.print;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.examples.tank.DriveTank;
@@ -32,7 +35,7 @@ public class Robot extends TimedRobot100 {
         m_drive = TankDriveFactory.make(
                 fieldLogger,
                 logger,
-                20, // supply current
+                60, // supply current
                 new CanId(6), // left
                 new CanId(5), // right
                 6.0, // gear ratio
@@ -41,7 +44,10 @@ public class Robot extends TimedRobot100 {
                 new DriveTank(() -> -1.0 * driverControl.rightY(),
                         () -> -1.0 * driverControl.rightX(),
                         m_drive));
-        m_auton = null;
+        m_auton = sequence(
+                m_drive.run(() -> m_drive.setVelocity(1, 0)).withTimeout(1),
+                m_drive.run(() -> m_drive.setVelocity(1, 1)).withTimeout(1),
+                m_drive.run(() -> m_drive.setVelocity(1, 0)).withTimeout(1));
     }
 
     @Override
