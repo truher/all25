@@ -28,7 +28,6 @@ public class TankDrive extends SubsystemBase {
     private final LinearMechanism m_left;
     private final LinearMechanism m_right;
     private final DifferentialDriveKinematics m_kinematics;
-
     private DifferentialDriveWheelPositions m_positions;
     private Pose2d m_pose;
 
@@ -72,6 +71,10 @@ public class TankDrive extends SubsystemBase {
         m_log_field_robot.log(this::poseArray);
         m_left.periodic();
         m_right.periodic();
+    }
+
+    public Pose2d getPose() {
+        return m_pose;
     }
 
     /** Set the drive velocity. */
