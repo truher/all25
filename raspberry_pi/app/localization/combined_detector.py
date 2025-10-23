@@ -148,7 +148,7 @@ class CombinedDetector(Interpreter):
             cY = int(mmnts["m01"] / mmnts["m00"])
             if (mmnts["m00"] < 500 or mmnts["m00"] > ((30000)*((self.height/2)/(self.height-cY+1))))  :  # Minimum contour area
                 continue
-
+                #calculates how big the object is based on how far it is.
             cX = int(mmnts["m10"] / mmnts["m00"])
             
             
