@@ -30,7 +30,10 @@ public class LinearMechanismFactory {
                                 log, id, NeutralMode.BRAKE,
                                 phase, supplyLimit,
                                 Feedforward100.makeNeo(),
+                                // 10/22/25: Anay found this value worked well
                                 PIDConstants.makeVelocityPID(0.00005));
+                                // 10/22/25: Lincoln used this value
+                                // PIDConstants.makeVelocityPID(0.0003));
                 CANSparkEncoder leftEncoder = new CANSparkEncoder(
                                 log, left);
                 LinearMechanism leftMech = new LinearMechanism(
