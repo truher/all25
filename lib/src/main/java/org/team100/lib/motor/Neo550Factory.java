@@ -23,7 +23,7 @@ public class Neo550Factory {
             NeutralMode neutral,
             MotorPhase motorPhase,
             double wheelDiameterM) {
-        Feedforward100 ff = Feedforward100.makeNeo550();
+        Feedforward100 ff = Feedforward100.makeNeo550(log);
         PIDConstants pid = PIDConstants.zero(log);
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 log,
@@ -46,7 +46,7 @@ public class Neo550Factory {
             double gearRatio,
             NeutralMode neutral,
             MotorPhase motorPhase) {
-        Feedforward100 ff = Feedforward100.makeNeo550();
+        Feedforward100 ff = Feedforward100.makeNeo550(log);
         PIDConstants pid = PIDConstants.makePositionPID(log, 1);
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 log,

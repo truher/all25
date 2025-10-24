@@ -93,7 +93,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
                 double inputOffset = 0.135541;
                 PIDConstants PID = PIDConstants.makeVelocityPID(log, 0.3);
                 // you should make a case in the feedforward class for your constants
-                Feedforward100 FF = Feedforward100.makeSimple();
+                Feedforward100 FF = Feedforward100.makeSimple(log);
                 Kraken6Motor motor = new Kraken6Motor(
                         log, new CanId(1), NeutralMode.COAST, MotorPhase.REVERSE, supplyLimit, statorLimit, PID, FF);
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(

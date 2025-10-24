@@ -160,7 +160,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
                         100,
                         100,
                         PIDConstants.makePositionPID(elevatorfrontLog, 5),
-                        Feedforward100.makeWCPSwerveTurningFalcon6());
+                        Feedforward100.makeWCPSwerveTurningFalcon6(elevatorfrontLog));
                 Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
                         elevatorfrontLog, elevatorFrontMotor);
 
@@ -176,7 +176,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
                         100, // orginally 60
                         100, // originally 90
                         PIDConstants.makePositionPID(elevatorbackLog, 5),
-                        Feedforward100.makeWCPSwerveTurningFalcon6());
+                        Feedforward100.makeWCPSwerveTurningFalcon6(elevatorbackLog));
                 Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
                         elevatorbackLog, elevatorBackMotor);
                 m_elevatorBack = new LinearMechanism(
@@ -192,7 +192,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
                         100, // og 60
                         100, // og 90
                         PIDConstants.makePositionPID(shoulderLog, 5),
-                        Feedforward100.makeWCPSwerveTurningFalcon6());
+                        Feedforward100.makeWCPSwerveTurningFalcon6(shoulderLog));
                 Talon6Encoder shoulderEncoder = new Talon6Encoder(
                         shoulderLog, shoulderMotor);
                 // The shoulder has a 5048 on the intermediate shaft
@@ -223,7 +223,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
                         40, // og 60
                         60, // og 90
                         PIDConstants.makePositionPID(wristLog, 8), // og 10
-                        Feedforward100.makeWCPSwerveTurningFalcon6());
+                        Feedforward100.makeWCPSwerveTurningFalcon6(wristLog));
                 // the wrist has no angle sensor, so it needs to start in the "zero" position.
                 Talon6Encoder wristEncoder = new Talon6Encoder(
                         wristLog, wristMotor);

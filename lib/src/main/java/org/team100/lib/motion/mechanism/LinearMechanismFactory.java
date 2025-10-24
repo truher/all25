@@ -26,7 +26,7 @@ public class LinearMechanismFactory {
             MotorPhase phase,
             double gearRatio,
             double wheelDiaM) {
-        Feedforward100 ff = Feedforward100.makeNeo();
+        Feedforward100 ff = Feedforward100.makeNeo(log);
         // 10/22/25: Anay found this value worked well
         PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.00005);
         // 10/22/25: Lincoln used this value
@@ -53,7 +53,7 @@ public class LinearMechanismFactory {
             MotorPhase phase,
             double gearRatio,
             double wheelDiaM) {
-        Feedforward100 ff = Feedforward100.makeNeo550();
+        Feedforward100 ff = Feedforward100.makeNeo550(log);
         PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.0001);
         Neo550CANSparkMotor left = new Neo550CANSparkMotor(
                 log, id, NeutralMode.BRAKE,

@@ -3,6 +3,9 @@ package org.team100.lib.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
@@ -12,6 +15,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
  */
 class FeedforwardTest {
     private static final double DELTA = 0.001;
+    private static final LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @SuppressWarnings("removal")
     @Test
@@ -32,13 +36,13 @@ class FeedforwardTest {
 
         // for the usual time step this is a small correction.
         assertEquals(2.010,
-            new SimpleMotorFeedforward(0, 1, 1).calculateWithVelocities(1, 1.02), DELTA);
+                new SimpleMotorFeedforward(0, 1, 1).calculateWithVelocities(1, 1.02), DELTA);
     }
 
     @Test
     void test100() {
         // behaves the same as the naive model above, ignoring friction.
-        Feedforward100 ff100 = new Feedforward100(1, 1, 1, 0, 0, 0);
+        Feedforward100 ff100 = new Feedforward100(log, 1, 1, 1, 0, 0, 0);
         assertEquals(1, ff100.velocityFFVolts(1), DELTA);
         assertEquals(1, ff100.accelFFVolts(1, 1), DELTA);
     }
@@ -46,7 +50,7 @@ class FeedforwardTest {
     @Test
     void testkD() {
         // kd is lower
-        Feedforward100 ff100 = new Feedforward100(1, 1, 0.1, 0, 0, 0);
+        Feedforward100 ff100 = new Feedforward100(log, 1, 1, 0.1, 0, 0, 0);
         assertEquals(1, ff100.accelFFVolts(1, 1), DELTA);
         assertEquals(0.1, ff100.accelFFVolts(-1, 1), DELTA);
     }
@@ -55,7 +59,7 @@ class FeedforwardTest {
     @Test
     void testFriction() {
         // static friction = 2, dynamic friction = 1
-        Feedforward100 ff100 = new Feedforward100(1, 1, 1, 2, 1, 1);
+        Feedforward100 ff100 = new Feedforward100(log, 1, 1, 1, 2, 1, 1);
         // under the static friction limit, so this is static
         assertEquals(2, ff100.frictionFFVolts(0.5), DELTA);
         // over the static friction limit, so sliding

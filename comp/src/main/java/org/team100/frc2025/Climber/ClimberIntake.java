@@ -30,7 +30,7 @@ public class ClimberIntake extends SubsystemBase {
                         20, // og 50
                         20, // og 2
                         PIDConstants.zero(log),
-                        Feedforward100.makeKrakenClimberIntake());
+                        Feedforward100.makeKrakenClimberIntake(log));
             }
             default -> {
                 m_motor = new LazySimulatedBareMotor(

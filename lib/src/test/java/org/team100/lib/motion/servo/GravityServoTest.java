@@ -66,7 +66,7 @@ class GravityServoTest implements Timeless {
     /** For refactoring the gravity servo */
     @Test
     void testGravity() {
-        MockBareMotor motor = new MockBareMotor(Feedforward100.makeSimple());
+        MockBareMotor motor = new MockBareMotor(Feedforward100.makeSimple(logger));
         MockRotaryPositionSensor sensor = new MockRotaryPositionSensor();
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);

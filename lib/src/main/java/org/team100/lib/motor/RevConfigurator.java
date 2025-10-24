@@ -3,6 +3,8 @@ package org.team100.lib.motor;
 import java.util.function.Supplier;
 
 import org.team100.lib.config.PIDConstants;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.tuning.Mutable;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -25,10 +27,15 @@ public class RevConfigurator {
     private final SparkBase m_motor;
     private final NeutralMode m_neutral;
     private final MotorPhase m_phase;
-    private final int m_statorCurrentLimit;
+    private final Mutable m_statorCurrentLimit;
     private final PIDConstants m_pid;
 
+    /**
+     * statorCurrentLimit is mutable.
+     * pid has mutable parts.
+     */
     public RevConfigurator(
+            LoggerFactory log,
             SparkBase motor,
             NeutralMode neutral,
             MotorPhase phase,
@@ -37,7 +44,7 @@ public class RevConfigurator {
         m_motor = motor;
         m_neutral = neutral;
         m_phase = phase;
-        m_statorCurrentLimit = statorCurrentLimit;
+        m_statorCurrentLimit = new Mutable(log, "stator current limit (a)", statorCurrentLimit, (x) -> currentConfig());
         m_pid = pid;
         // reapply the pid parameters if any change.
         m_pid.register(this::pidConfig);
@@ -89,7 +96,7 @@ public class RevConfigurator {
 
     public void currentConfig() {
         SparkMaxConfig conf = new SparkMaxConfig();
-        conf.smartCurrentLimit(m_statorCurrentLimit);
+        conf.smartCurrentLimit((int) m_statorCurrentLimit.getAsDouble());
         crash(() -> m_motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
     }
 

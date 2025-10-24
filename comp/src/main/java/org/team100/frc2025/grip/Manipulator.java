@@ -53,19 +53,19 @@ public class Manipulator extends SubsystemBase implements Music {
                         40, // og 40
                         40, // og 40
                         PIDConstants.zero(leftMotorLog),
-                        Feedforward100.makeShooterFalcon6());
+                        Feedforward100.makeShooterFalcon6(leftMotorLog));
                 Kraken6Motor rightMotor = new Kraken6Motor(rightMotorLog, new CanId(20), NeutralMode.COAST,
                         MotorPhase.REVERSE,
                         40, // og 40
                         40, // og 40
                         PIDConstants.zero(rightMotorLog),
-                        Feedforward100.makeShooterFalcon6());
+                        Feedforward100.makeShooterFalcon6(rightMotorLog));
                 Kraken6Motor algaeMotor = new Kraken6Motor(algaeMotorLog, new CanId(21), NeutralMode.COAST,
                         MotorPhase.FORWARD,
                         120, // og 120
                         120, // og 120
                         PIDConstants.zero(algaeMotorLog),
-                        Feedforward100.makeShooterFalcon6());
+                        Feedforward100.makeShooterFalcon6(algaeMotorLog));
                 algaeMotor.setTorqueLimit(4);
                 m_algaeMotor = algaeMotor;
                 m_rightLaser = new LaserCan100(new CanId(17));

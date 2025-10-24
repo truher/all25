@@ -17,7 +17,7 @@ class CombinedRotaryPositionSensorTest implements Timeless {
 
     @Test
     void testZeroing() {
-        MockBareMotor motor = new MockBareMotor(Feedforward100.makeSimple());
+        MockBareMotor motor = new MockBareMotor(Feedforward100.makeSimple(logger));
 
         // this is the "correct" value
         MockRotaryPositionSensor sensor = new MockRotaryPositionSensor();

@@ -73,6 +73,7 @@ public abstract class CANSparkMotor implements BareMotor {
         m_ff = ff;
 
         m_configurator = new RevConfigurator(
+                child,
                 m_motor,
                 neutral,
                 motorPhase,

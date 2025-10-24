@@ -16,7 +16,8 @@ public class PIDConstants {
 
     private final List<Runnable> m_listeners = new ArrayList<>();
 
-    private final double m_positionP;
+    // private final double m_positionP;
+    private final Mutable m_positionP;
     private final double m_positionI;
     private final double m_positionD;
     private final double m_positionIZone;
@@ -40,7 +41,7 @@ public class PIDConstants {
     }
 
     public double getPositionP() {
-        return m_positionP;
+        return m_positionP.getAsDouble();
     }
 
     public double getPositionI() {
@@ -84,7 +85,8 @@ public class PIDConstants {
     private PIDConstants(LoggerFactory log, double positionP, double positionI, double positionD, double velocityP,
             double velocityI,
             double velocityD) {
-        m_positionP = positionP;
+        // m_positionP = positionP;
+        m_positionP = new Mutable(log, "position P", positionP, this::onChange);
         m_positionI = positionI;
         m_positionD = positionD;
         m_positionIZone = 0;
