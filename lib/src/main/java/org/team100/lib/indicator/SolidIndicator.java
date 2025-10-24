@@ -64,7 +64,10 @@ public class SolidIndicator extends SubsystemBase {
      * Show the supplied color.
      */
     public void state(Supplier<Color> color) {
-        setDefaultCommand(runOnce(() -> set(color.get())));
+        setDefaultCommand(
+                runOnce(() -> set(color.get()))
+                        .ignoringDisable(true)
+                        .withName("indicator default"));
     }
 
     /**

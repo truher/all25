@@ -6,6 +6,7 @@ import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
 import org.team100.lib.commands.r3.FeedforwardOnly;
+import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
@@ -53,26 +54,31 @@ public class Autons {
         ControllerR3 controller = ControllerFactoryR3.byIdentity(autoLog);
 
         MoveAndHold one = new FeedforwardOnly(m_profile, ONE, m_drive);
-        m_autonChooser.add("one", one.until(one::isDone).withName("auto one"));
+        m_autonChooser.add("one",
+                new AnnotatedCommand(one.until(one::isDone).withName("auto one"), null, null));
 
         MoveAndHold two = new FeedforwardOnly(m_profile, TWO, m_drive);
-        m_autonChooser.add("two", two.until(two::isDone).withName("auto two"));
+        m_autonChooser.add("two",
+                new AnnotatedCommand(two.until(two::isDone).withName("auto two"), null, null));
 
         Command three = m_drive.driveWithGlobalVelocity(
                 new GlobalVelocityR3(1.5, 0, 0)).withTimeout(1.0);
-        m_autonChooser.add("three", three.withName("auto three"));
+        m_autonChooser.add("three",
+                new AnnotatedCommand(three.withName("auto three"), null, null));
 
         MoveAndHold four = new DriveToPoseWithProfile(
                 autoLog, drive, controller, m_profile, () -> FOUR);
-        m_autonChooser.add("four", four.withName("auto four"));
+        m_autonChooser.add("four",
+                new AnnotatedCommand(four.withName("auto four"), null, null));
 
         MoveAndHold five = new DriveWithTrajectoryFunction(
                 drive, controller, m_viz, this::five);
-        m_autonChooser.add("five", five.withName("auto five"));
+        m_autonChooser.add("five",
+                new AnnotatedCommand(five.withName("auto five"), null, null));
     }
 
     public Command get() {
-        return m_autonChooser.get();
+        return m_autonChooser.get().command();
     }
 
     private Trajectory100 five(Pose2d p) {

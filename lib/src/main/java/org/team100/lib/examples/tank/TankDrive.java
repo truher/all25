@@ -73,6 +73,10 @@ public class TankDrive extends SubsystemBase {
         m_right.periodic();
     }
 
+    public void setPose(Pose2d p) {
+        m_pose = p;
+    }
+
     public Pose2d getPose() {
         return m_pose;
     }
