@@ -75,7 +75,7 @@ public class LoggerFactory {
      * Each child level is separated by slashes, to make a tree in glass.
      */
     public LoggerFactory name(String stem) {
-        return new LoggerFactory(m_level, m_root + "/" + stem, m_pLogger);
+        return new LoggerFactory(m_level, root(stem), m_pLogger);
     }
 
     /**

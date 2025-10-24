@@ -14,16 +14,19 @@ import com.revrobotics.spark.SparkMax;
  * @see https://www.revrobotics.com/rev-21-1651/
  */
 public class Neo550CANSparkMotor extends CANSparkMotor {
+    /**
+     * Current limit is stator current.
+     */
     public Neo550CANSparkMotor(
             LoggerFactory parent,
             CanId canId,
             NeutralMode neutral,
             MotorPhase motorPhase,
-            int currentLimit,
+            int statorCurrentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
         super(parent, new SparkMax(canId.id, MotorType.kBrushless),
-                neutral, motorPhase, currentLimit, ff, pid);
+                neutral, motorPhase, statorCurrentLimit, ff, pid);
     }
 
     @Override

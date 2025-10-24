@@ -144,7 +144,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             DriveRatio ratio) {
         Feedforward100 ff = Feedforward100.makeWCPSwerveDriveKraken6();
         // note (10/2/24) 0.4 produces oscillation, on carpet.
-        PIDConstants pid = PIDConstants.makeVelocityPID(0.3);
+        PIDConstants pid = PIDConstants.makeVelocityPID(parent, 0.3);
         Kraken6Motor driveMotor = new Kraken6Motor(
                 parent,
                 driveMotorCanId,
@@ -172,7 +172,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             CanId driveMotorCanId,
             DriveRatio ratio) {
         Feedforward100 ff = Feedforward100.makeWCPSwerveDriveFalcon6();
-        PIDConstants pid = PIDConstants.makeVelocityPID(0.3);
+        PIDConstants pid = PIDConstants.makeVelocityPID(parent, 0.3);
         Falcon6Motor driveMotor = new Falcon6Motor(
                 parent,
                 driveMotorCanId,
@@ -205,7 +205,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
         // Talon outboard POSITION PID
         // 10/2/24 drive torque produces about a 0.5 degree deviation so maybe
         // this is too low.
-        PIDConstants lowLevelPID = PIDConstants.makePositionPID(10.0);
+        PIDConstants lowLevelPID = PIDConstants.makePositionPID(parent, 10.0);
 
         // java uses this to calculate feedforward voltages from target velocities etc
         Feedforward100 ff = Feedforward100.makeWCPSwerveTurningFalcon6();

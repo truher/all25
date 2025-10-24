@@ -14,16 +14,19 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
  * @see https://www.revrobotics.com/rev-21-1652/
  */
 public class NeoVortexCANSparkMotor extends CANSparkMotor {
+    /**
+     * Current limit is stator current.
+     */
     public NeoVortexCANSparkMotor(
             LoggerFactory parent,
             CanId canId,
             NeutralMode neutral,
             MotorPhase motorPhase,
-            int currentLimit,
+            int statorCurrentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
         super(parent, new SparkFlex(canId.id, MotorType.kBrushless),
-                neutral, motorPhase, currentLimit, ff, pid);
+                neutral, motorPhase, statorCurrentLimit, ff, pid);
     }
 
     @Override

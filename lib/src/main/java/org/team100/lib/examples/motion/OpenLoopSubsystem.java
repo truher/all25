@@ -42,7 +42,7 @@ public class OpenLoopSubsystem extends SubsystemBase {
                 CanId canId = new CanId(1);
                 int supplyLimit = 60;
                 int statorLimit = 90;
-                PIDConstants PID = PIDConstants.makeVelocityPID(0.3);
+                PIDConstants PID = PIDConstants.makeVelocityPID(log, 0.3);
                 // you should make a case in the feedforward class for your constants
                 Feedforward100 FF = Feedforward100.makeSimple();
                 m_motor = new Falcon6Motor(

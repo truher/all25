@@ -11,7 +11,7 @@ public class TankDriveFactory {
     public static TankDrive make(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
-            int supplyLimit,
+            int statorCurrentLimit,
             CanId left,
             CanId right,
             double trackWidthM,
@@ -27,7 +27,7 @@ public class TankDriveFactory {
             default -> realRobot(
                     fieldLogger,
                     parent,
-                    supplyLimit,
+                    statorCurrentLimit,
                     left,
                     right,
                     trackWidthM,
@@ -39,7 +39,7 @@ public class TankDriveFactory {
     private static TankDrive realRobot(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
-            int supplyLimit,
+            int statorCurrentLimit,
             CanId left,
             CanId right,
             double trackWidthM,
@@ -51,14 +51,14 @@ public class TankDriveFactory {
                 trackWidthM,
                 LinearMechanismFactory.neo(
                         log.name("left"),
-                        supplyLimit,
+                        statorCurrentLimit,
                         left,
                         MotorPhase.REVERSE,
                         gearRatio,
                         wheelDiaM),
                 LinearMechanismFactory.neo(
                         log.name("right"),
-                        supplyLimit,
+                        statorCurrentLimit,
                         right,
                         MotorPhase.FORWARD,
                         gearRatio,

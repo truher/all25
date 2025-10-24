@@ -45,7 +45,7 @@ public class Robot extends TimedRobot100 {
         m_drive = MecanumDriveFactory.make(
                 fieldLogger,
                 logger,
-                25, // supply limit -- current, in amps
+                25, // stator current limit (a)
                 new CanId(60), // gyro
                 new CanId(2), // front left
                 new CanId(1), // front right

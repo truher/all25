@@ -13,7 +13,7 @@ public class MecanumDriveFactory {
     public static MecanumDrive100 make(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
-            int supplyLimit,
+            int statorCurrentLimit,
             CanId gyroId,
             CanId frontLeft,
             CanId frontRight,
@@ -32,7 +32,7 @@ public class MecanumDriveFactory {
                     gearRatio,
                     wheelDiaM);
             default -> realRobot(
-                    fieldLogger, parent, supplyLimit,
+                    fieldLogger, parent, statorCurrentLimit,
                     gyroId,
                     frontLeft,
                     frontRight,
@@ -48,7 +48,7 @@ public class MecanumDriveFactory {
     private static MecanumDrive100 realRobot(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
-            int supplyLimit,
+            int statorCurrentLimit,
             CanId gyroId,
             CanId frontLeft,
             CanId frontRight,
@@ -70,28 +70,28 @@ public class MecanumDriveFactory {
                 wheelbaseM,
                 LinearMechanismFactory.neo(
                         log.name("frontLeft"),
-                        supplyLimit,
+                        statorCurrentLimit,
                         frontLeft,
                         MotorPhase.REVERSE,
                         gearRatio,
                         wheelDiaM),
                 LinearMechanismFactory.neo(
                         log.name("frontRight"),
-                        supplyLimit,
+                        statorCurrentLimit,
                         frontRight,
                         MotorPhase.FORWARD,
                         gearRatio,
                         wheelDiaM),
                 LinearMechanismFactory.neo(
                         log.name("rearLeft"),
-                        supplyLimit,
+                        statorCurrentLimit,
                         rearLeft,
                         MotorPhase.REVERSE,
                         gearRatio,
                         wheelDiaM),
                 LinearMechanismFactory.neo(
                         log.name("rearRight"),
-                        supplyLimit,
+                        statorCurrentLimit,
                         rearRight,
                         MotorPhase.FORWARD,
                         gearRatio,

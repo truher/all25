@@ -91,7 +91,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
                 int supplyLimit = 60;
                 int statorLimit = 90;
                 double inputOffset = 0.135541;
-                PIDConstants PID = PIDConstants.makeVelocityPID(0.3);
+                PIDConstants PID = PIDConstants.makeVelocityPID(log, 0.3);
                 // you should make a case in the feedforward class for your constants
                 Feedforward100 FF = Feedforward100.makeSimple();
                 Kraken6Motor motor = new Kraken6Motor(

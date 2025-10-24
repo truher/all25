@@ -71,7 +71,7 @@ public class Robot extends TimedRobot100 {
         m_drive = TankDriveFactory.make(
                 fieldLogger,
                 logger,
-                60, // supply current
+                60, // stator current limit (a)
                 new CanId(6), // left
                 new CanId(5), // right
                 0.4, // track width
