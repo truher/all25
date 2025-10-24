@@ -69,12 +69,12 @@ public class Autons {
         MoveAndHold four = new DriveToPoseWithProfile(
                 autoLog, drive, controller, m_profile, () -> FOUR);
         m_autonChooser.add("four",
-                new AnnotatedCommand(four.withName("auto four"), null, null));
+                new AnnotatedCommand(four.until(four::isDone).withName("auto four"), null, null));
 
         MoveAndHold five = new DriveWithTrajectoryFunction(
                 drive, controller, m_viz, this::five);
         m_autonChooser.add("five",
-                new AnnotatedCommand(five.withName("auto five"), null, null));
+                new AnnotatedCommand(five.until(five::isDone).withName("auto five"), null, null));
     }
 
     public Command get() {

@@ -28,6 +28,7 @@ import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
+import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Alert;
@@ -45,6 +46,7 @@ public class Robot extends TimedRobot100 {
     private static final double MAX_SPEED_M_S = 3.0;
     private static final double MAX_OMEGA_RAD_S = 3.0;
     private final TankDrive m_drive;
+    private final TrajectoryVisualization m_trajectoryViz;
     private final Command m_auton;
     private final Autons m_autons;
     private final SolidIndicator m_indicator;
@@ -89,6 +91,7 @@ public class Robot extends TimedRobot100 {
                 m_drive);
         m_drive.setDefaultCommand(
                 manual);
+        m_trajectoryViz = new TrajectoryVisualization(fieldLogger);
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 List.of(new ConstantConstraint(1, 1)));
         List<HolonomicPose2d> waypoints = List.of(
@@ -96,11 +99,11 @@ public class Robot extends TimedRobot100 {
                 HolonomicPose2d.tank(1, 1, Math.PI / 2),
                 HolonomicPose2d.tank(2, 2, 0));
         Trajectory100 trajectory = planner.restToRest(waypoints);
-        FixedTrajectory c1 = new FixedTrajectory(trajectory, m_drive);
+        FixedTrajectory c1 = new FixedTrajectory(trajectory, m_drive, m_trajectoryViz);
 
         new Trigger(driverControl::a).whileTrue(c1.until(c1::isDone));
 
-        m_autons = new Autons(m_drive);
+        m_autons = new Autons(m_drive, m_trajectoryViz);
 
         m_auton = sequence(
                 m_drive.run(() -> m_drive.setVelocity(1, 0)).withTimeout(1),

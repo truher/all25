@@ -13,6 +13,7 @@ import org.team100.lib.motion.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -40,12 +41,13 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class Autons {
     private final TankDrive m_drive;
-
+    private final TrajectoryVisualization m_trajectoryViz;
     private final AutonChooser m_autonChooser;
     private final TrajectoryPlanner m_planner;
 
-    public Autons(TankDrive drive) {
+    public Autons(TankDrive drive, TrajectoryVisualization trajectoryViz) {
         m_drive = drive;
+        m_trajectoryViz = trajectoryViz;
         m_planner = new TrajectoryPlanner(
                 List.of(new ConstantConstraint(1, 1)));
 
@@ -78,7 +80,7 @@ public class Autons {
                         .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg))),
                 HolonomicPose2d.tank(Field.START_RED_LEFT
                         .plus(new Transform2d(2, 2, Rotation2d.kZero)))));
-        FixedTrajectory cmd = new FixedTrajectory(trajectory, m_drive);
+        FixedTrajectory cmd = new FixedTrajectory(trajectory, m_drive, m_trajectoryViz);
         return cmd.until(cmd::isDone).withName("red left");
     }
 
@@ -86,7 +88,8 @@ public class Autons {
         ToPoseWithTrajectory cmd = new ToPoseWithTrajectory(
                 Field.START_RED_RIGHT
                         .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg)),
-                m_drive);
+                m_drive,
+                m_trajectoryViz);
         return cmd.until(cmd::isDone).withName("red right");
     }
 }
