@@ -38,14 +38,11 @@ import org.team100.lib.tuning.Mutable;
 public class Feedforward100 {
     private final List<Runnable> m_listeners = new ArrayList<>();
 
-    // private final double kV;
     private final Mutable kV;
-    // private final double kA;
     private final Mutable kA;
-    private final double kD;
-    // private final double kSS;
+    private final Mutable kD;
     private final Mutable kSS;
-    private final double kDS;
+    private final Mutable kDS;
     private final double staticFrictionSpeedLimit;
 
     Feedforward100(
@@ -56,14 +53,11 @@ public class Feedforward100 {
             double kSS,
             double kDS,
             double staticFrictionSpeedLimit) {
-        // this.kV = kV;
         this.kV = new Mutable(log, "kV", kV, this::onChange);
-        // this.kA = kA;
         this.kA = new Mutable(log, "kA", kA, this::onChange);
-        this.kD = kD;
+        this.kD = new Mutable(log, "kD", kD, this::onChange);
         this.kSS = new Mutable(log, "kSS", kSS, this::onChange);
-        // this.kSS = kSS;
-        this.kDS = kDS;
+        this.kDS = new Mutable(log, "kDS", kDS, this::onChange);
         this.staticFrictionSpeedLimit = staticFrictionSpeedLimit;
     }
 
@@ -190,7 +184,7 @@ public class Feedforward100 {
                 return kA.getAsDouble() * motorRev_S_S;
             } else {
                 // slower
-                return kD * motorRev_S_S;
+                return kD.getAsDouble() * motorRev_S_S;
             }
         } else {
             // moving backward
@@ -199,7 +193,7 @@ public class Feedforward100 {
                 return kA.getAsDouble() * motorRev_S_S;
             } else {
                 // slower
-                return kD * motorRev_S_S;
+                return kD.getAsDouble() * motorRev_S_S;
             }
         }
     }
@@ -212,7 +206,7 @@ public class Feedforward100 {
         if (Math.abs(motorRev_S) < staticFrictionSpeedLimit) {
             return kSS.getAsDouble() * direction;
         }
-        return kDS * direction;
+        return kDS.getAsDouble() * direction;
     }
 
     public static Feedforward100 makeTest1(LoggerFactory log) {
