@@ -40,7 +40,7 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);
 
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
-    List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
+    List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
     TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
     @Test

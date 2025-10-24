@@ -93,7 +93,7 @@ public class Robot extends TimedRobot100 {
                 manual);
         m_trajectoryViz = new TrajectoryVisualization(fieldLogger);
         TrajectoryPlanner planner = new TrajectoryPlanner(
-                List.of(new ConstantConstraint(1, 1)));
+                List.of(new ConstantConstraint(logger.name("c1"), 1, 1)));
         List<HolonomicPose2d> waypoints = List.of(
                 HolonomicPose2d.tank(0, 0, 0),
                 HolonomicPose2d.tank(1, 1, Math.PI / 2),
@@ -103,7 +103,7 @@ public class Robot extends TimedRobot100 {
 
         new Trigger(driverControl::a).whileTrue(c1.until(c1::isDone));
 
-        m_autons = new Autons(m_drive, m_trajectoryViz);
+        m_autons = new Autons(logger, m_drive, m_trajectoryViz);
 
         m_auton = sequence(
                 m_drive.run(() -> m_drive.setVelocity(1, 0)).withTimeout(1),

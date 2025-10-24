@@ -7,6 +7,7 @@ import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.r3.ReferenceControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
@@ -34,6 +35,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     private ReferenceControllerR3 m_referenceController;
 
     public DriveToPoseWithTrajectoryAndExitVelocity(
+            LoggerFactory log,
             Pose2d goal,
             GlobalVelocityR3 endVelocity,
             SwerveDriveSubsystem drive,
@@ -44,7 +46,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
         m_endVelocity = endVelocity;
         m_drive = drive;
         m_controller = controller;
-        m_planner = new TrajectoryPlanner(new TimingConstraintFactory(swerveKinodynamics).fast());
+        m_planner = new TrajectoryPlanner(new TimingConstraintFactory(swerveKinodynamics).fast(log));
         m_viz = viz;
         addRequirements(m_drive);
     }

@@ -46,8 +46,8 @@ public class Autons {
         m_drive = drive;
         m_profile = HolonomicProfile.wpi(4, 8, 3, 6);
         List<TimingConstraint> constraints = List.of(
-                new ConstantConstraint(2, 2),
-                new YawRateConstraint(1, 1));
+                new ConstantConstraint(autoLog, 2, 2),
+                new YawRateConstraint(autoLog, 1, 1));
         m_planner = new TrajectoryPlanner(constraints);
         m_viz = new TrajectoryVisualization(fieldLogger);
 

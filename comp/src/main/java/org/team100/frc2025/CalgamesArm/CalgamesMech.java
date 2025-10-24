@@ -127,7 +127,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
 
         m_home = m_kinematics.forward(HOME);
 
-        m_transit = new MechTrajectories(this, m_kinematics, m_jacobian);
+        m_transit = new MechTrajectories(parent, this, m_kinematics, m_jacobian);
 
         LoggerFactory jointLog = parent.name("joints");
         m_log_config = jointLog.logConfig(Level.DEBUG, "config");

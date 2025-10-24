@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
@@ -26,6 +29,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 public class PathFactoryTest {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.01;
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testForced() throws TimingException {
@@ -45,7 +49,7 @@ public class PathFactoryTest {
         // schedule it so we can see it
         // no constraints
         TimingConstraintFactory f = new TimingConstraintFactory(SwerveKinodynamicsFactory.forTest());
-        List<TimingConstraint> constraints = f.forTest();
+        List<TimingConstraint> constraints = f.forTest(logger);
         ScheduleGenerator scheduler = new ScheduleGenerator(constraints);
         Trajectory100 trajectory = scheduler.timeParameterizeTrajectory(
                 path,

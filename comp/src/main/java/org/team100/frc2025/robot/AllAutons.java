@@ -25,24 +25,24 @@ public class AllAutons {
 
     public AllAutons(Machinery machinery) {
         m_autonChooser = new AutonChooser();
-        final LoggerFactory logger = Logging.instance().rootLogger;
+        LoggerFactory autoLog = Logging.instance().rootLogger.name("Auton");
 
         final HolonomicProfile profile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
                 machinery.m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 machinery.m_swerveKinodynamics.getMaxAngleAccelRad_S2(),
                 5);
         final FullStateControllerR3 controller = ControllerFactoryR3
-                .auto2025LooseTolerance(logger.name("Auton"));
+                .auto2025LooseTolerance(autoLog);
         final TrajectoryPlanner planner = new TrajectoryPlanner(
-                new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium());
+                new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium(autoLog));
 
         // WARNING! The glass widget will override the default, so check it!
         // Run the auto in pre-match testing!
         m_autonChooser.addAsDefault("Lollipop",
                 new AnnotatedCommand(
-                        new LolipopAuto(logger, machinery, profile, controller, planner).get(), null, null));
+                        new LolipopAuto(autoLog, machinery, profile, controller, planner).get(), null, null));
 
-        DriveAndScore driveAndScore = new DriveAndScore(logger, machinery, profile, controller);
+        DriveAndScore driveAndScore = new DriveAndScore(autoLog, machinery, profile, controller);
         m_autonChooser.add("Coral 1 left",
                 new AnnotatedCommand(driveAndScore.get(ScoringLevel.L4, ReefPoint.J), null, null));
         m_autonChooser.add("Coral 1 mid",
@@ -50,7 +50,7 @@ public class AllAutons {
         m_autonChooser.add("Coral 1 right",
                 new AnnotatedCommand(driveAndScore.get(ScoringLevel.L4, ReefPoint.F), null, null));
 
-        Auton auton = new Auton(logger, machinery, profile, controller);
+        Auton auton = new Auton(autoLog, machinery, profile, controller);
         m_autonChooser.add("Left Preload Only", new AnnotatedCommand(
                 auton.leftPreloadOnly(), null, null));
         m_autonChooser.add("Center Preload Only", new AnnotatedCommand(

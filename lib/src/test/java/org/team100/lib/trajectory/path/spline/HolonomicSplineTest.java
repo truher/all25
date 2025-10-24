@@ -9,6 +9,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.Trajectory100;
@@ -25,6 +28,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 class HolonomicSplineTest {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testStationary() {
@@ -342,7 +346,7 @@ class HolonomicSplineTest {
         // centripetal accel is 8.166 m/s^2
         assertEquals(8.166666, limits.getMaxCapsizeAccelM_S2(), 1e-6);
         List<TimingConstraint> constraints = List.of(
-                new CapsizeAccelerationConstraint(limits, 1.0));
+                new CapsizeAccelerationConstraint(logger, limits, 1.0));
         ScheduleGenerator scheduleGenerator = new ScheduleGenerator(constraints);
         // speed
         // a = v^2/r so v = sqrt(ar) = 2.858

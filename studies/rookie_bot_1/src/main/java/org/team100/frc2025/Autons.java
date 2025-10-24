@@ -9,6 +9,7 @@ import org.team100.lib.commands.drivetrain.tank.ToPoseWithTrajectory;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -40,16 +41,21 @@ import edu.wpi.first.wpilibj2.command.Command;
  * position and color if that's required to choose it in the dashboard.
  */
 public class Autons {
+    private final LoggerFactory m_log;
     private final TankDrive m_drive;
     private final TrajectoryVisualization m_trajectoryViz;
     private final AutonChooser m_autonChooser;
     private final TrajectoryPlanner m_planner;
 
-    public Autons(TankDrive drive, TrajectoryVisualization trajectoryViz) {
+    public Autons(
+            LoggerFactory log,
+            TankDrive drive,
+            TrajectoryVisualization trajectoryViz) {
+        m_log = log.type(this);
         m_drive = drive;
         m_trajectoryViz = trajectoryViz;
         m_planner = new TrajectoryPlanner(
-                List.of(new ConstantConstraint(1, 1)));
+                List.of(new ConstantConstraint(m_log, 1, 1)));
 
         m_autonChooser = new AutonChooser();
         m_autonChooser.add("red left",
@@ -86,6 +92,7 @@ public class Autons {
 
     private Command redRight() {
         ToPoseWithTrajectory cmd = new ToPoseWithTrajectory(
+                m_log,
                 Field.START_RED_RIGHT
                         .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg)),
                 m_drive,

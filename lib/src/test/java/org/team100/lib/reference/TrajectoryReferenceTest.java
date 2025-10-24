@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Cache;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
@@ -23,7 +26,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class TrajectoryReferenceTest implements Timeless {
     private static final double DELTA = 0.001;
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
-    List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
+    List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
     TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
     @Test

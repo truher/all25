@@ -43,7 +43,7 @@ public class ReferenceControllerR3Test extends Fixtured implements Timeless {
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
-    List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood();
+    List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
     TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
     @Test

@@ -5,6 +5,7 @@ import java.util.List;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -29,14 +30,16 @@ public class ToPoseWithTrajectory extends Command {
     private Trajectory100 m_trajectory;
 
     public ToPoseWithTrajectory(
+            LoggerFactory parent,
             Pose2d goal,
             TankDrive drive,
             TrajectoryVisualization viz) {
+        LoggerFactory log = parent.type(this);
         m_goal = goal;
         m_drive = drive;
         m_viz = viz;
         m_planner = new TrajectoryPlanner(
-                List.of(new ConstantConstraint(1, 1)));
+                List.of(new ConstantConstraint(log, 1, 1)));
         m_controller = new LTVUnicycleController(0.020);
         addRequirements(drive);
     }

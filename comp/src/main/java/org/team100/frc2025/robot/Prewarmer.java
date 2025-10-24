@@ -6,6 +6,7 @@ import java.util.List;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
@@ -21,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class Prewarmer {
     public static void init(Machinery machinery) {
         System.out.println("\n*** PREWARM START");
+
+        final LoggerFactory logger = Logging.instance().rootLogger.name("Prewarmer");
         double startS = Takt.actual();
 
         // Exercise the trajectory planner.
@@ -34,7 +37,7 @@ public class Prewarmer {
                 Rotation2d.kZero,
                 Rotation2d.kZero));
         TrajectoryPlanner planner = new TrajectoryPlanner(
-                new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium());
+                new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium(logger));
         planner.restToRest(waypoints);
 
         // Exercise the drive motors.

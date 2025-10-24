@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.timing.TimedPose;
@@ -20,6 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 class Trajectory100Test {
     private static final double DELTA = 0.001;
     private static final boolean DEBUG = false;
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testPreviewAndAdvance() {
@@ -33,9 +37,9 @@ class Trajectory100Test {
         Rotation2d angleToGoal = translationToGoal.getAngle();
         List<HolonomicPose2d> waypoints = List.of(
                 new HolonomicPose2d(currentTranslation, start.getRotation(), angleToGoal),
-                new HolonomicPose2d(goalTranslation,end.getRotation(), angleToGoal));
+                new HolonomicPose2d(goalTranslation, end.getRotation(), angleToGoal));
 
-        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast();
+        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
@@ -67,7 +71,7 @@ class Trajectory100Test {
                 new HolonomicPose2d(currentTranslation, start.getRotation(), angleToGoal),
                 new HolonomicPose2d(goalTranslation, end.getRotation(), angleToGoal));
 
-        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast();
+        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
@@ -92,7 +96,7 @@ class Trajectory100Test {
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3();
-        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast();
+        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
@@ -123,7 +127,7 @@ class Trajectory100Test {
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kCCW_Pi_2, Rotation2d.kZero));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3();
-        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast();
+        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
@@ -161,7 +165,7 @@ class Trajectory100Test {
                 new HolonomicPose2d(new Translation2d(10, 10), Rotation2d.kPi, Rotation2d.kZero));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3();
-        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast();
+        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);

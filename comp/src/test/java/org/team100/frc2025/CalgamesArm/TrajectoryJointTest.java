@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.Config;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
 import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
@@ -23,6 +26,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 /** How do the joints respond to trajectories? */
 public class TrajectoryJointTest {
     private static final boolean DEBUG = false;
+    LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /**
      * How does the smooth cartesian trajectory work in configuration space?
@@ -40,8 +44,8 @@ public class TrajectoryJointTest {
     @Test
     void homeToL4() {
         List<TimingConstraint> c = List.of(
-                new ConstantConstraint(1, 1),
-                new YawRateConstraint(1, 1));
+                new ConstantConstraint(log, 1, 1),
+                new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner m_planner = new TrajectoryPlanner(c);
 
         Trajectory100 t = m_planner.restToRest(List.of(

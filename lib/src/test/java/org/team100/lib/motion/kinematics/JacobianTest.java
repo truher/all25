@@ -8,6 +8,9 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.Config;
 import org.team100.lib.optimization.NumericalJacobian100;
 import org.team100.lib.state.ModelR3;
@@ -27,6 +30,7 @@ import edu.wpi.first.math.numbers.N3;
 public class JacobianTest {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void test0() {
@@ -208,13 +212,14 @@ public class JacobianTest {
                     Jacobian.config(c));
             Matrix<N3, N3> jinv = j.inv();
             Vector<N3> cv = new Vector<>(jinv.times(tv));
-            if (DEBUG) System.out.printf(
-                    "s (%5.2f) pose(%5.2f %5.2f %5.2f) conf(%5.2f %5.2f %5.2f) tv(%5.2f %5.2f %5.2f) cv(%5.2f %5.2f %5.2f)\n",
-                    s,
-                    p.getX(), p.getY(), p.getRotation().getRadians(),
-                    c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
-                    tv.get(0), tv.get(1), tv.get(2),
-                    cv.get(0), cv.get(1), cv.get(2));
+            if (DEBUG)
+                System.out.printf(
+                        "s (%5.2f) pose(%5.2f %5.2f %5.2f) conf(%5.2f %5.2f %5.2f) tv(%5.2f %5.2f %5.2f) cv(%5.2f %5.2f %5.2f)\n",
+                        s,
+                        p.getX(), p.getY(), p.getRotation().getRadians(),
+                        c.shoulderHeight(), c.shoulderAngle(), c.wristAngle(),
+                        tv.get(0), tv.get(1), tv.get(2),
+                        cv.get(0), cv.get(1), cv.get(2));
             prev = p;
         }
     }
@@ -224,7 +229,7 @@ public class JacobianTest {
         final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         Jacobian j = new Jacobian(k);
 
-        TrajectoryPlanner planner = new TrajectoryPlanner(List.of(new ConstantConstraint(1, 1)));
+        TrajectoryPlanner planner = new TrajectoryPlanner(List.of(new ConstantConstraint(logger, 1, 1)));
         Pose2d start = new Pose2d(1, -1, Rotation2d.kZero);
         Pose2d end = new Pose2d(2, 1, Rotation2d.k180deg);
         Trajectory100 t = planner.restToRest(start, end);

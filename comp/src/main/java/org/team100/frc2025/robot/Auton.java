@@ -41,7 +41,7 @@ public class Auton {
             Machinery machinery,
             HolonomicProfile autoProfile,
             FullStateControllerR3 autoController) {
-        m_logger = logger;
+        m_logger = logger.type(this);
         m_machinery = machinery;
         m_autoProfile = autoProfile;
         m_autoController = autoController;
@@ -114,7 +114,7 @@ public class Auton {
 
     /** Score, drive to the station, and pause briefly. */
     private Command scoreAndReload(CoralStation station) {
-        GoToCoralStation toStation = new GoToCoralStation(m_machinery.m_swerveKinodynamics, station, 0.5);
+        GoToCoralStation toStation = new GoToCoralStation(m_logger, m_machinery.m_swerveKinodynamics, station, 0.5);
         DriveWithTrajectoryFunction navigator = new DriveWithTrajectoryFunction(
                 m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
                 toStation);
