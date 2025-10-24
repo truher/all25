@@ -4,9 +4,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.examples.tank.DriveTank;
-import org.team100.lib.examples.tank.TankDrive;
-import org.team100.lib.examples.tank.TankDriveFactory;
+import org.team100.lib.commands.drivetrain.tank.TankManual;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
@@ -15,6 +13,8 @@ import org.team100.lib.logging.Logging;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.tank.TankDrive;
+import org.team100.lib.motion.tank.TankDriveFactory;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 
@@ -46,6 +46,7 @@ public class Robot extends TimedRobot100 {
                 80, // supply current
                 new CanId(3), // left
                 new CanId(27), // right
+                0.4, // track width
                 6.0, // gear ratio
                 0.15); // wheel dia (m)
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.tank();
@@ -53,7 +54,7 @@ public class Robot extends TimedRobot100 {
                 logger,
                 kinodynamics,
                 RobotController::getBatteryVoltage);
-        DriveTank manual = new DriveTank(
+        TankManual manual = new TankManual(
                 () -> -1.0 * driverControl.rightY(),
                 () -> -1.0 * driverControl.rightX(),
                 MAX_SPEED_M_S,

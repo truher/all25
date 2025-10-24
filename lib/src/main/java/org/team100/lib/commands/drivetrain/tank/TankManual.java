@@ -1,4 +1,4 @@
-package org.team100.lib.examples.tank;
+package org.team100.lib.commands.drivetrain.tank;
 
 import java.util.function.DoubleSupplier;
 
@@ -7,6 +7,7 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.tank.TankDrive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -16,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Manual tank-drive control using a single joystick (if using an
  * xbox style control, this will be the right-hand stick).
  */
-public class DriveTank extends Command {
+public class TankManual extends Command {
     private final DoubleSupplier m_translation;
     private final DoubleSupplier m_rotation;
     private final double m_maxV;
@@ -24,7 +25,7 @@ public class DriveTank extends Command {
     private final SwerveLimiter m_limiter;
     private final TankDrive m_drive;
 
-    public DriveTank(
+    public TankManual(
             DoubleSupplier translation,
             DoubleSupplier rotation,
             double maxV,

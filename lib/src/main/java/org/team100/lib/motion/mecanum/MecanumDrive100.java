@@ -1,4 +1,4 @@
-package org.team100.lib.examples.mecanum;
+package org.team100.lib.motion.mecanum;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.gyro.Gyro;
@@ -23,12 +23,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Mecanum drive with optional gyro. */
 public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
-    private static final double TRACK_WIDTH_M = 0.4;
-    private static final double WHEELBASE_M = 0.4;
 
     private final DoubleArrayLogger m_log_field_robot;
     /** May be null. */
     private final Gyro m_gyro;
+    private final double m_trackWidthM;
+    private final double m_wheelbaseM;
     private final LinearMechanism m_frontLeft;
     private final LinearMechanism m_frontRight;
     private final LinearMechanism m_rearLeft;
@@ -46,21 +46,25 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
     public MecanumDrive100(
             LoggerFactory fieldLogger,
             Gyro gyro,
+            double trackWidthM,
+            double wheelbaseM,
             LinearMechanism frontLeft,
             LinearMechanism frontRight,
             LinearMechanism rearLeft,
             LinearMechanism rearRight) {
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
         m_gyro = gyro;
+        m_trackWidthM = trackWidthM;
+        m_wheelbaseM = wheelbaseM;
         m_frontLeft = frontLeft;
         m_frontRight = frontRight;
         m_rearLeft = rearLeft;
         m_rearRight = rearRight;
         m_kinematics = new MecanumDriveKinematics(
-                new Translation2d(WHEELBASE_M / 2, TRACK_WIDTH_M / 2),
-                new Translation2d(WHEELBASE_M / 2, -TRACK_WIDTH_M / 2),
-                new Translation2d(-WHEELBASE_M / 2, TRACK_WIDTH_M / 2),
-                new Translation2d(-WHEELBASE_M / 2, -TRACK_WIDTH_M / 2));
+                new Translation2d(m_wheelbaseM / 2, m_trackWidthM / 2),
+                new Translation2d(m_wheelbaseM / 2, -m_trackWidthM / 2),
+                new Translation2d(-m_wheelbaseM / 2, m_trackWidthM / 2),
+                new Translation2d(-m_wheelbaseM / 2, -m_trackWidthM / 2));
         m_positions = new MecanumDriveWheelPositions();
         m_input = new GlobalVelocityR3(0, 0, 0);
         m_pose = new Pose2d();

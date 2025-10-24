@@ -1,4 +1,4 @@
-package org.team100.lib.examples.tank;
+package org.team100.lib.motion.tank;
 
 import org.team100.lib.config.Identity;
 import org.team100.lib.logging.LoggerFactory;
@@ -14,12 +14,14 @@ public class TankDriveFactory {
             int supplyLimit,
             CanId left,
             CanId right,
+            double trackWidthM,
             double gearRatio,
             double wheelDiaM) {
         return switch (Identity.instance) {
             case BLANK -> sim(
                     fieldLogger,
                     parent,
+                    trackWidthM,
                     gearRatio,
                     wheelDiaM);
             default -> realRobot(
@@ -28,6 +30,7 @@ public class TankDriveFactory {
                     supplyLimit,
                     left,
                     right,
+                    trackWidthM,
                     gearRatio,
                     wheelDiaM);
         };
@@ -39,11 +42,13 @@ public class TankDriveFactory {
             int supplyLimit,
             CanId left,
             CanId right,
+            double trackWidthM,
             double gearRatio,
             double wheelDiaM) {
         LoggerFactory log = parent.name("Tank Drive");
         return new TankDrive(
                 fieldLogger,
+                trackWidthM,
                 LinearMechanismFactory.neo(
                         log.name("left"),
                         supplyLimit,
@@ -63,11 +68,13 @@ public class TankDriveFactory {
     private static TankDrive sim(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
+            double trackWidthM,
             double gearRatio,
             double wheelDiaM) {
         LoggerFactory log = parent.name("Tank Drive");
         return new TankDrive(
                 fieldLogger,
+                trackWidthM,
                 LinearMechanismFactory.sim(
                         log.name("left"),
                         gearRatio,

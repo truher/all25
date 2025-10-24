@@ -5,8 +5,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.commands.drivetrain.mecanum.ManualMecanum;
-import org.team100.lib.examples.mecanum.MecanumDrive100;
-import org.team100.lib.examples.mecanum.MecanumDriveFactory;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GlobalVelocityR3;
@@ -16,6 +14,8 @@ import org.team100.lib.logging.Logging;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.mecanum.MecanumDrive100;
+import org.team100.lib.motion.mecanum.MecanumDriveFactory;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 
@@ -51,6 +51,8 @@ public class Robot extends TimedRobot100 {
                 new CanId(1), // front right
                 new CanId(3), // rear left
                 new CanId(4), // rear right
+                0.4, // track width (m)
+                0.4, // wheelbase (m)
                 6.0, // gears
                 0.15); // wheel dia (m)
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum();

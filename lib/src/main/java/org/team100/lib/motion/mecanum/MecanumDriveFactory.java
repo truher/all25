@@ -1,4 +1,4 @@
-package org.team100.lib.examples.mecanum;
+package org.team100.lib.motion.mecanum;
 
 import org.team100.lib.config.Identity;
 import org.team100.lib.gyro.Gyro;
@@ -19,12 +19,16 @@ public class MecanumDriveFactory {
             CanId frontRight,
             CanId rearLeft,
             CanId rearRight,
+            double trackWidthM,
+            double wheelbaseM,
             double gearRatio,
             double wheelDiaM) {
         return switch (Identity.instance) {
             case BLANK -> sim(
                     fieldLogger,
                     parent,
+                    trackWidthM,
+                    wheelbaseM,
                     gearRatio,
                     wheelDiaM);
             default -> realRobot(
@@ -34,6 +38,8 @@ public class MecanumDriveFactory {
                     frontRight,
                     rearLeft,
                     rearRight,
+                    trackWidthM,
+                    wheelbaseM,
                     gearRatio,
                     wheelDiaM);
         };
@@ -48,16 +54,20 @@ public class MecanumDriveFactory {
             CanId frontRight,
             CanId rearLeft,
             CanId rearRight,
+            double trackWidthM,
+            double wheelbaseM,
             double gearRatio,
             double wheelDiaM) {
         LoggerFactory log = parent.name("Mecanum Drive");
-        
+
         // null gyro => use odometry for yaw.
         Gyro gyro = (gyroId == null) ? null : new ReduxGyro(log, gyroId);
 
         return new MecanumDrive100(
                 fieldLogger,
                 gyro,
+                trackWidthM,
+                wheelbaseM,
                 LinearMechanismFactory.neo(
                         log.name("frontLeft"),
                         supplyLimit,
@@ -91,6 +101,8 @@ public class MecanumDriveFactory {
     private static MecanumDrive100 sim(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
+            double trackWidthM,
+            double wheelbaseM,
             double gearRatio,
             double wheelDiaM) {
         LoggerFactory log = parent.name("Mecanum Drive");
@@ -99,6 +111,8 @@ public class MecanumDriveFactory {
         return new MecanumDrive100(
                 fieldLogger,
                 null,
+                trackWidthM,
+                wheelbaseM,
                 LinearMechanismFactory.sim(
                         log.name("frontLeft"),
                         gearRatio,

@@ -3,9 +3,9 @@ package org.team100.lib.commands.drivetrain.tank;
 import java.util.List;
 
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.motion.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;

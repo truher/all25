@@ -1,4 +1,4 @@
-package org.team100.lib.examples.tank;
+package org.team100.lib.motion.tank;
 
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -21,10 +21,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * odometry only.
  */
 public class TankDrive extends SubsystemBase {
-    private static final double TRACK_WIDTH_M = 0.4;
-    private static final double MAX_SPEED_M_S = 3.0;
-
     private final DoubleArrayLogger m_log_field_robot;
+    private final double m_trackWidthM;
     private final LinearMechanism m_left;
     private final LinearMechanism m_right;
     private final DifferentialDriveKinematics m_kinematics;
@@ -33,12 +31,14 @@ public class TankDrive extends SubsystemBase {
 
     public TankDrive(
             LoggerFactory fieldLogger,
+            double trackWidthM,
             LinearMechanism left,
             LinearMechanism right) {
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
+        m_trackWidthM = trackWidthM;
         m_left = left;
         m_right = right;
-        m_kinematics = new DifferentialDriveKinematics(TRACK_WIDTH_M);
+        m_kinematics = new DifferentialDriveKinematics(m_trackWidthM);
         m_positions = new DifferentialDriveWheelPositions(0, 0);
         m_pose = new Pose2d();
     }
@@ -55,7 +55,6 @@ public class TankDrive extends SubsystemBase {
     public void setVelocity(double translationM_S, double rotationRad_S) {
         ChassisSpeeds speed = new ChassisSpeeds(translationM_S, 0, rotationRad_S);
         DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(speed);
-        wheelSpeeds.desaturate(MAX_SPEED_M_S);
         m_left.setVelocity(wheelSpeeds.leftMetersPerSecond, 0, 0);
         m_right.setVelocity(wheelSpeeds.rightMetersPerSecond, 0, 0);
     }

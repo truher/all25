@@ -1,8 +1,8 @@
 package org.team100.lib.commands.drivetrain.tank;
 
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.motion.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.timing.TimedPose;
 
