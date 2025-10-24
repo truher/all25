@@ -181,15 +181,15 @@ public class Binder {
 
         // Drive to a scoring location at the reef and score.
         whileTrue(driver::a,
-        //TODO make this seperate/combined with scoring in general
+                // TODO make this seperate/combined with scoring in general
                 ScoreCoralSmartLuke.get(
                         coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
                         holonomicController, profile, m_machinery.m_drive,
                         m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
-//                 ScoreCoralSmart.get(
-//                         coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
-//                         holonomicController, profile, m_machinery.m_drive,
-//                         m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
+        // ScoreCoralSmart.get(
+        // coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
+        // holonomicController, profile, m_machinery.m_drive,
+        // m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
 
         ////////////////////////////////////////////////////////////
         //
@@ -248,8 +248,9 @@ public class Binder {
         //
         // TEST
         //
+        Tester tester = new Tester(m_machinery);
         whileTrue(() -> (RobotState.isTest() && driver.a() && driver.b()),
-                Tester.prematch(m_machinery));
+                tester.prematch());
     }
 
     private static Trigger whileTrue(BooleanSupplier condition, Command command) {
