@@ -1,5 +1,7 @@
 package org.team100.lib.motor;
 
+import java.util.function.Supplier;
+
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.DoubleCache;
 import org.team100.lib.coherence.Takt;
@@ -10,9 +12,9 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.util.CanId;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -32,12 +34,9 @@ import edu.wpi.first.units.measure.Voltage;
  * Robot.robotPeriodic().
  */
 public abstract class Talon6Motor implements BareMotor {
-    // speeding up the updates is a tradeoff between latency and CAN utilization.
-    // 254 seems to think that 100 is a good compromise?
-    // see
-    // https://github.com/Team254/FRC-2024-Public/blob/040f653744c9b18182be5f6bc51a7e505e346e59/src/main/java/com/team254/lib/ctre/swerve/SwerveDrivetrain.java#L382
-    private static final int SIGNAL_UPDATE_FREQ_HZ = 100;
+
     private final TalonFX m_motor;
+    private final PhoenixConfigurator m_configurator;
     private final Feedforward100 m_ff;
 
     // CACHES
@@ -64,8 +63,6 @@ public abstract class Talon6Motor implements BareMotor {
     private final DutyCycleOut m_dutyCycleOut;
     private final PositionVoltage m_positionVoltage;
     private final MusicTone m_music;
-
-    private final double m_supplyLimit;
 
     // LOGGERS
     private final DoubleLogger m_log_desired_duty;
@@ -117,20 +114,20 @@ public abstract class Talon6Motor implements BareMotor {
         LoggerFactory child = parent.type(this);
         m_motor = new TalonFX(canId.id);
         m_ff = ff;
-        m_supplyLimit = supplyLimit;
 
-        TalonFXConfigurator talonFXConfigurator = m_motor.getConfigurator();
-        Phoenix100.logCrashStatus();
-        Phoenix100.baseConfig(talonFXConfigurator);
-        Phoenix100.motorConfig(talonFXConfigurator, neutral, motorPhase);
-        Phoenix100.currentConfig(talonFXConfigurator, supplyLimit, statorLimit);
-        Phoenix100.pidConfig(talonFXConfigurator, lowLevelPIDConstants);
-        Phoenix100.audioConfig(talonFXConfigurator);
-
-        Phoenix100.crash(() -> m_motor.getPosition().setUpdateFrequency(SIGNAL_UPDATE_FREQ_HZ));
-        Phoenix100.crash(() -> m_motor.getVelocity().setUpdateFrequency(SIGNAL_UPDATE_FREQ_HZ));
-        Phoenix100.crash(() -> m_motor.getAcceleration().setUpdateFrequency(SIGNAL_UPDATE_FREQ_HZ));
-        Phoenix100.crash(() -> m_motor.getTorqueCurrent().setUpdateFrequency(SIGNAL_UPDATE_FREQ_HZ));
+        m_configurator = new PhoenixConfigurator(
+                m_motor,
+                neutral,
+                motorPhase,
+                supplyLimit,
+                statorLimit,
+                lowLevelPIDConstants);
+        m_configurator.logCrashStatus();
+        m_configurator.baseConfig();
+        m_configurator.motorConfig();
+        m_configurator.currentConfig();
+        m_configurator.pidConfig();
+        m_configurator.audioConfig();
 
         // Cache the status signal getters.
         final StatusSignal<Angle> motorPosition = m_motor.getPosition();
@@ -205,7 +202,7 @@ public abstract class Talon6Motor implements BareMotor {
     /** Set duty cycle immediately. */
     @Override
     public void setDutyCycle(double output) {
-        Phoenix100.warn(() -> m_motor.setControl(m_dutyCycleOut
+        warn(() -> m_motor.setControl(m_dutyCycleOut
                 .withOutput(output)));
         m_log_desired_duty.log(() -> output);
         log();
@@ -214,8 +211,7 @@ public abstract class Talon6Motor implements BareMotor {
     @Override
     public void setTorqueLimit(double torqueNm) {
         int currentA = (int) (torqueNm / kTNm_amp());
-        TalonFXConfigurator talonFXConfigurator = m_motor.getConfigurator();
-        Phoenix100.currentConfig(talonFXConfigurator, m_supplyLimit, currentA);
+        m_configurator.overrideStatorLimit(currentA);
     }
 
     @Override
@@ -244,7 +240,7 @@ public abstract class Talon6Motor implements BareMotor {
 
         // VelocityVoltage has an acceleration field for kA feedforward but we use
         // arbitrary feedforward for that.
-        Phoenix100.warn(() -> m_motor.setControl(
+        warn(() -> m_motor.setControl(
                 m_velocityVoltage
                         .withSlot(1)
                         .withVelocity(motorRev_S)
@@ -298,7 +294,7 @@ public abstract class Talon6Motor implements BareMotor {
 
         // PositionVoltage has a velocity field for kV feedforward but we use arbitrary
         // feedforward for that.
-        Phoenix100.warn(() -> m_motor.setControl(
+        warn(() -> m_motor.setControl(
                 m_positionVoltage
                         .withSlot(0)
                         .withPosition(motorRev)
@@ -346,7 +342,7 @@ public abstract class Talon6Motor implements BareMotor {
      */
     public void resetEncoderPosition() {
         System.out.println("WARNING: Setting CTRE encoder position is very slow!");
-        Phoenix100.warn(() -> m_motor.setPosition(0, 1));
+        warn(() -> m_motor.setPosition(0, 1));
         m_position.reset();
         m_velocity.reset();
     }
@@ -362,7 +358,7 @@ public abstract class Talon6Motor implements BareMotor {
      */
     private void setUnwrappedEncoderPosition(double motorPositionRev) {
         System.out.println("WARNING: Setting CTRE encoder position is very slow!");
-        Phoenix100.warn(() -> m_motor.setPosition(motorPositionRev, 1));
+        warn(() -> m_motor.setPosition(motorPositionRev, 1));
     }
 
     /**
@@ -440,5 +436,14 @@ public abstract class Talon6Motor implements BareMotor {
     @Override
     public void periodic() {
         log();
+    }
+
+    /////////////////////////////////////////////
+
+    private static void warn(Supplier<StatusCode> s) {
+        StatusCode statusCode = s.get();
+        if (statusCode.isError()) {
+            System.out.println("WARNING: " + statusCode.toString());
+        }
     }
 }

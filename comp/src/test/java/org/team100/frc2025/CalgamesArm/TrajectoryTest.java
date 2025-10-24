@@ -3,6 +3,9 @@ package org.team100.frc2025.CalgamesArm;
 import java.util.List;
 
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -17,6 +20,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * These pop up GUI windows, so leave them commented out when you check in.
  */
 public class TrajectoryTest {
+    LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /**
      * Yields a straight line.
@@ -27,8 +31,8 @@ public class TrajectoryTest {
     // @Test
     void testSimple() throws InterruptedException {
         List<TimingConstraint> c = List.of(
-                new ConstantConstraint(1, 0.1),
-                new YawRateConstraint(1, 1));
+                new ConstantConstraint(log, 1, 0.1),
+                new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
         Trajectory100 t = p.restToRest(
                 new Pose2d(0, 0, new Rotation2d()),
@@ -49,8 +53,8 @@ public class TrajectoryTest {
     // @Test
     void testCurved() throws InterruptedException {
         List<TimingConstraint> c = List.of(
-                new ConstantConstraint(2, 0.5),
-                new YawRateConstraint(1, 1));
+                new ConstantConstraint(log, 2, 0.5),
+                new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
         List<HolonomicPose2d> waypoints = List.of(
                 new HolonomicPose2d(new Translation2d(1, 1), new Rotation2d(), new Rotation2d()),
@@ -69,8 +73,8 @@ public class TrajectoryTest {
     // @Test
     void testMultipleWaypoints() throws InterruptedException {
         List<TimingConstraint> c = List.of(
-                new ConstantConstraint(2, 0.5),
-                new YawRateConstraint(1, 1));
+                new ConstantConstraint(log, 2, 0.5),
+                new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
         List<HolonomicPose2d> waypoints = List.of(
                 new HolonomicPose2d(
@@ -88,8 +92,8 @@ public class TrajectoryTest {
     // @Test
     void testPickupToPlace() {
         List<TimingConstraint> c = List.of(
-                new ConstantConstraint(2, 0.5),
-                new YawRateConstraint(1, 1));
+                new ConstantConstraint(log, 2, 0.5),
+                new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
         List<HolonomicPose2d> waypoints = List.of(
                 // pickup
@@ -108,8 +112,8 @@ public class TrajectoryTest {
     // @Test
     void testSingularityDemo() {
         List<TimingConstraint> c = List.of(
-                new ConstantConstraint(2, 0.5),
-                new YawRateConstraint(1, 1));
+                new ConstantConstraint(log, 2, 0.5),
+                new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
         List<HolonomicPose2d> waypoints = List.of(
                 // pickup

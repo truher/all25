@@ -29,6 +29,8 @@ public class Robot extends TimedRobot100 {
     private final Binder m_binder;
 
     public Robot() {
+        Banner.printBanner();
+
         // We want the CommandScheduler, not LiveWindow.
         enableLiveWindowInTest(false);
 
@@ -40,7 +42,7 @@ public class Robot extends TimedRobot100 {
         System.out.printf("Identity: %s\n", Identity.instance.name());
         RobotController.setBrownoutVoltage(5.5);
         DriverStation.silenceJoystickConnectionWarning(true);
-        Banner.printBanner();
+        Experiments.instance.show();
 
         // Log what the scheduler is doing. Use "withName()".
         SmartDashboard.putData(CommandScheduler.getInstance());

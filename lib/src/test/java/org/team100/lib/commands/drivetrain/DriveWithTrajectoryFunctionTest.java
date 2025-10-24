@@ -35,8 +35,8 @@ public class DriveWithTrajectoryFunctionTest implements Timeless {
     FullStateControllerR3 controller = ControllerFactoryR3.test(log);
     TrajectoryVisualization viz = new TrajectoryVisualization(log);
     List<TimingConstraint> constraints = List.of(
-            new ConstantConstraint(2, 2),
-            new YawRateConstraint(1, 1));
+            new ConstantConstraint(log, 2, 2),
+            new YawRateConstraint(log, 1, 1));
     TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
     /**

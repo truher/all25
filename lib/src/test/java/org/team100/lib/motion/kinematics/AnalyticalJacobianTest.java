@@ -7,6 +7,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.Config;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
@@ -22,6 +25,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class AnalyticalJacobianTest {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testForward() {
@@ -248,7 +252,7 @@ public class AnalyticalJacobianTest {
         final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         AnalyticalJacobian j = new AnalyticalJacobian(k);
 
-        TrajectoryPlanner planner = new TrajectoryPlanner(List.of(new ConstantConstraint(1, 1)));
+        TrajectoryPlanner planner = new TrajectoryPlanner(List.of(new ConstantConstraint(logger, 1, 1)));
         Pose2d start = new Pose2d(1, -1, Rotation2d.kZero);
         Pose2d end = new Pose2d(2, 1, Rotation2d.k180deg);
         Trajectory100 t = planner.restToRest(start, end);

@@ -1,6 +1,6 @@
 package org.team100.lib.motion.servo;
 
-import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -11,19 +11,23 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     private static final boolean DEBUG = false;
     private static final double VELOCITY_TOLERANCE = 1;
 
+    private final LoggerFactory m_log;
     private final LinearMechanism m_mechanism;
     private final DoubleLogger m_log_setpoint_v;
     private final DoubleLogger m_log_setpoint_a;
 
-    // for calculating acceleration
+    // For calculating acceleration
     private double m_prevGoal = 0;
+    // For calculating acceleration
+    private double m_prevT = 0;
+
     private double m_goal;
 
     public OutboardLinearVelocityServo(LoggerFactory parent, LinearMechanism mechanism) {
-        LoggerFactory child = parent.type(this);
+        m_log = parent.type(this);
         m_mechanism = mechanism;
-        m_log_setpoint_v = child.doubleLogger(Level.TRACE, "setpoint v (m_s)");
-        m_log_setpoint_a = child.doubleLogger(Level.TRACE, "setpoint a (m_s2)");
+        m_log_setpoint_v = m_log.doubleLogger(Level.TRACE, "setpoint v (m_s)");
+        m_log_setpoint_a = m_log.doubleLogger(Level.TRACE, "setpoint a (m_s2)");
     }
 
     @Override
@@ -90,14 +94,19 @@ public class OutboardLinearVelocityServo implements LinearVelocityServo {
     /**
      * Acceleration from trailing difference in velocity.
      * 
-     * To avoid injecting clock noise into the acceleration signal, this uses
-     * a constant dt, TimedRobot100.LOOP_PERIOD_S, so you'd better be calling this
-     * at about that rate.
+     * Note: in simulation, if you pull the setpoint directly from the simulated
+     * joystick input, acceleration will be choppy: zero acceleration every other
+     * cycle, because the simulated inputs seem to be polled at only 10 hz.
      * 
-     * @param setpoint desired velocity
+     * To avoid this problem, use the SwerveLimiter.
      */
     private double accel(double setpoint) {
-        double accel = (setpoint - m_prevGoal) / TimedRobot100.LOOP_PERIOD_S;
+        double t = Takt.get();
+        double dt = t - m_prevT;
+        m_prevT = t;
+        double accel = (setpoint - m_prevGoal) / dt;
+        if (DEBUG)
+            System.out.printf("dt %5.3f setpoint %5.3f accel %5.3f %s\n", dt, setpoint, accel, m_log.getRoot());
         m_prevGoal = setpoint;
         return accel;
     }

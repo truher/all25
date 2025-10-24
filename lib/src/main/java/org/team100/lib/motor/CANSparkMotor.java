@@ -22,11 +22,16 @@ import com.revrobotics.spark.SparkLimitSwitch;
 /**
  * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
  * Robot.robotPeriodic().
+ * 
+ * Current limit is stator current.
+ * 
+ * https://docs.revrobotics.com/brushless/spark-max/gs/make-it-spin#limiting-current
+ * https://www.chiefdelphi.com/t/rev-robotics-2024-2025/471083/26
  */
 public abstract class CANSparkMotor implements BareMotor {
     protected final Feedforward100 m_ff;
     protected final SparkBase m_motor;
-    private final Rev100 m_configurator;
+    private final RevConfigurator m_configurator;
     protected final SparkLimitSwitch m_forLimitSwitch;
     protected final SparkLimitSwitch m_revLimitSwitch;
     protected final RelativeEncoder m_encoder;
@@ -60,19 +65,25 @@ public abstract class CANSparkMotor implements BareMotor {
             SparkBase motor,
             NeutralMode neutral,
             MotorPhase motorPhase,
-            int currentLimit,
+            int statorCurrentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
         m_motor = motor;
         LoggerFactory child = parent.type(this);
         m_ff = ff;
 
-        m_configurator = new Rev100(m_motor);
+        m_configurator = new RevConfigurator(
+                child,
+                m_motor,
+                neutral,
+                motorPhase,
+                statorCurrentLimit,
+                pid);
         m_configurator.longCANTimeout();
         m_configurator.baseConfig();
-        m_configurator.motorConfig(neutral, motorPhase, 20);
-        m_configurator.currentConfig(currentLimit);
-        m_configurator.pidConfig(pid);
+        m_configurator.motorConfig();
+        m_configurator.currentConfig();
+        m_configurator.pidConfig();
         m_configurator.zeroCANTimeout();
 
         m_encoder = m_motor.getEncoder();
@@ -126,7 +137,7 @@ public abstract class CANSparkMotor implements BareMotor {
     @Override
     public void setTorqueLimit(double torqueNm) {
         int currentA = (int) (torqueNm / kTNm_amp());
-        m_configurator.currentConfig(currentA);
+        m_configurator.overrideStatorLimit(currentA);
     }
 
     /**

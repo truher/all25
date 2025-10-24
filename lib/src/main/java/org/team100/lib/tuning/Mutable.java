@@ -28,7 +28,8 @@ public class Mutable implements DoubleSupplier {
         inst.startServer();
         DoubleTopic topic = inst.getDoubleTopic(log.root(leaf));
         m_entry = topic.getEntry(defaultValue);
-        m_entry.setDefault(defaultValue);
+        // Makes sure we don't get a stale value.
+        m_entry.set(defaultValue);
         // You can't use "persistent" here, because then the key goes in the RoboRIO
         // networktables.json file and can never be deleted (except manually).
         topic.setRetained(true);

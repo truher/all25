@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
@@ -13,11 +16,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 class SwerveDriveDynamicsConstraintTest {
     private static final double DELTA = 0.001;
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testVelocity() {
-        SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest();
-        SwerveDriveDynamicsConstraint c = new SwerveDriveDynamicsConstraint(l, 1, 1);
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveDriveDynamicsConstraint c = new SwerveDriveDynamicsConstraint(logger, kinodynamics, 1, 1);
 
         // motionless
         double m = c.getMaxVelocity(new Pose2dWithMotion(
@@ -43,8 +47,8 @@ class SwerveDriveDynamicsConstraintTest {
 
     @Test
     void testAccel() {
-        SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest();
-        SwerveDriveDynamicsConstraint c = new SwerveDriveDynamicsConstraint(l, 1, 1);
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveDriveDynamicsConstraint c = new SwerveDriveDynamicsConstraint(logger, kinodynamics, 1, 1);
         // this is constant
         MinMaxAcceleration m = c.getMinMaxAcceleration(new Pose2dWithMotion(
                 Pose2d.kZero, new Pose2dWithMotion.MotionDirection(0, 0, 0), 0, 0), 0);

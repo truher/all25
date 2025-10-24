@@ -4,17 +4,23 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.examples.mecanum.MecanumDrive;
-import org.team100.lib.examples.mecanum.MecanumDriveFactory;
+import org.team100.lib.commands.drivetrain.mecanum.ManualMecanum;
+import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
+import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.mecanum.MecanumDrive100;
+import org.team100.lib.motion.mecanum.MecanumDriveFactory;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -24,12 +30,13 @@ public class Robot extends TimedRobot100 {
     private static final double MAX_SPEED_M_S = 3.0;
     private static final double MAX_OMEGA_RAD_S = 3.0;
 
-    private final MecanumDrive m_drive;
+    private final MecanumDrive100 m_drive;
     private final Autons m_autons;
 
     public Robot() {
         Banner.printBanner();
         DriverStation.silenceJoystickConnectionWarning(true);
+        Experiments.instance.show();
         SmartDashboard.putData(CommandScheduler.getInstance());
         Logging logging = Logging.instance();
         LoggerFactory fieldLogger = logging.fieldLogger;
@@ -38,16 +45,28 @@ public class Robot extends TimedRobot100 {
         m_drive = MecanumDriveFactory.make(
                 fieldLogger,
                 logger,
-                25, // supply limit -- current, in amps
-                  new CanId(60), // gyro
+                25, // stator current limit (a)
+                new CanId(60), // gyro
                 new CanId(2), // front left
                 new CanId(1), // front right
                 new CanId(3), // rear left
                 new CanId(4), // rear right
+                0.4, // track width (m)
+                0.4, // wheelbase (m)
                 6.0, // gears
                 0.15); // wheel dia (m)
-        m_drive.setDefaultCommand(m_drive.driveManual(
-                driverControl::velocity, MAX_SPEED_M_S, MAX_OMEGA_RAD_S));
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum();
+        SwerveLimiter limiter = new SwerveLimiter(
+                logger,
+                kinodynamics,
+                RobotController::getBatteryVoltage);
+        Command manual = new ManualMecanum(
+                driverControl::velocity,
+                MAX_SPEED_M_S,
+                MAX_OMEGA_RAD_S,
+                limiter,
+                m_drive);
+        m_drive.setDefaultCommand(manual);
 
         m_autons = new Autons(logger, fieldLogger, m_drive);
 

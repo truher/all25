@@ -17,20 +17,22 @@ public class Neo550Factory {
 
     public static LinearMechanism getNEO550LinearMechanism(
             LoggerFactory log,
-            int currentLimit,
+            int statorCurrentLimit,
             CanId canID,
             double gearRatio,
             NeutralMode neutral,
             MotorPhase motorPhase,
             double wheelDiameterM) {
+        Feedforward100 ff = Feedforward100.makeNeo550(log);
+        PIDConstants pid = PIDConstants.zero(log);
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 log,
                 canID,
                 neutral,
                 motorPhase,
-                currentLimit,
-                Feedforward100.makeNeo550(),
-                new PIDConstants());
+                statorCurrentLimit,
+                ff,
+                pid);
         CANSparkEncoder encoder = new CANSparkEncoder(log, motor);
         return new LinearMechanism(
                 log, motor, encoder, gearRatio, wheelDiameterM,
@@ -39,19 +41,21 @@ public class Neo550Factory {
 
     public static RotaryMechanism getNEO550RotaryMechanism(
             LoggerFactory log,
-            int currentLimit,
+            int statorCurrentLimit,
             CanId canID,
             double gearRatio,
             NeutralMode neutral,
             MotorPhase motorPhase) {
+        Feedforward100 ff = Feedforward100.makeNeo550(log);
+        PIDConstants pid = PIDConstants.makePositionPID(log, 1);
         Neo550CANSparkMotor motor = new Neo550CANSparkMotor(
                 log,
                 canID,
                 neutral,
                 motorPhase,
-                currentLimit,
-                Feedforward100.makeNeo550(),
-                PIDConstants.makePositionPID(1));
+                statorCurrentLimit,
+                ff,
+                pid);
         CANSparkEncoder encoder = new CANSparkEncoder(log, motor);
         ProxyRotaryPositionSensor sensor = new ProxyRotaryPositionSensor(encoder, gearRatio);
         return new RotaryMechanism(
@@ -64,7 +68,7 @@ public class Neo550Factory {
 
     public static LinearVelocityServo getNEO550VelocityServo(
             LoggerFactory log,
-            int currentLimit,
+            int statorCurrentLimit,
             CanId canID,
             double gearRatio,
             NeutralMode neutral,
@@ -73,7 +77,7 @@ public class Neo550Factory {
         return new OutboardLinearVelocityServo(log,
                 getNEO550LinearMechanism(
                         log,
-                        currentLimit,
+                        statorCurrentLimit,
                         canID,
                         gearRatio,
                         neutral,

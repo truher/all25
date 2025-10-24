@@ -135,6 +135,38 @@ public class SwerveKinodynamicsFactory {
         }
     }
 
+    /** This is for the Mecanum drive on Rookiebot 2 */
+    public static SwerveKinodynamics mecanum() {
+        return new SwerveKinodynamics(
+                5, // vel m/s
+                10, // stall m/s/s
+                10, // accel m/s/s
+                20, // decel m/s/s
+                20 * Math.PI,
+                20 * Math.PI, // steering accel rad/s/s
+                0.5, // track m
+                0.5, // track m
+                0.5, // wheelbase m
+                0.25, // front offset m
+                0.3); // vcg m
+    }
+
+    /** This is for the tank drive on Rookiebot 1 */
+    public static SwerveKinodynamics tank() {
+        return new SwerveKinodynamics(
+                5, // vel m/s
+                10, // stall m/s/s
+                10, // accel m/s/s
+                20, // decel m/s/s
+                20 * Math.PI,
+                20 * Math.PI, // steering accel rad/s/s
+                0.5, // track m
+                0.5, // track m
+                0.5, // wheelbase m
+                0.25, // front offset m
+                0.3); // vcg m
+    }
+
     /**
      * This contains garbage values, not for anything real.
      * 

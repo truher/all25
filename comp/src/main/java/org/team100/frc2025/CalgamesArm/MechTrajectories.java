@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.kinematics.AnalyticalJacobian;
 import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
 import org.team100.lib.motion.kinematics.JointAccelerations;
@@ -25,9 +26,11 @@ public class MechTrajectories extends Command {
     private final TrajectoryPlanner m_planner;
 
     public MechTrajectories(
+            LoggerFactory parent,
             CalgamesMech mech,
             ElevatorArmWristKinematics k,
             AnalyticalJacobian j) {
+        LoggerFactory log = parent.type(this);
         m_subsystem = mech;
         List<TimingConstraint> c = new ArrayList<>();
         if (USE_JOINT_CONSTRAINT) {
@@ -40,8 +43,8 @@ public class MechTrajectories extends Command {
 
         } else {
             // These are known to work, but suboptimal.
-            c.add(new ConstantConstraint(10, 5));
-            c.add(new YawRateConstraint(10, 5));
+            c.add(new ConstantConstraint(log, 10, 5));
+            c.add(new YawRateConstraint(log, 10, 5));
             // This is new
             c.add(new TorqueConstraint(20));
         }

@@ -16,17 +16,18 @@ import com.revrobotics.spark.SparkMax;
 public class NeoCANSparkMotor extends CANSparkMotor {
     /**
      * Note the PID values should be in duty cycle per RPM, so, like 3e-4.
+     * Current limit is stator current.
      */
     public NeoCANSparkMotor(
             LoggerFactory parent,
             CanId canId,
             NeutralMode neutral,
             MotorPhase motorPhase,
-            int currentLimit,
+            int statorCurrentLimit,
             Feedforward100 ff,
             PIDConstants pid) {
         super(parent, new SparkMax(canId.id, MotorType.kBrushless),
-                neutral, motorPhase, currentLimit, ff, pid);
+                neutral, motorPhase, statorCurrentLimit, ff, pid);
     }
 
     @Override

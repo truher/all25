@@ -10,10 +10,10 @@ import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.examples.mecanum.MecanumDrive;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.motion.mecanum.MecanumDrive100;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -32,7 +32,7 @@ public class Autons {
     private static final Pose2d FOUR = new Pose2d(4, 4, Rotation2d.kCCW_90deg);
 
     private final AutonChooser m_autonChooser;
-    private final MecanumDrive m_drive;
+    private final MecanumDrive100 m_drive;
     private final HolonomicProfile m_profile;
     private final TrajectoryPlanner m_planner;
     private final TrajectoryVisualization m_viz;
@@ -40,14 +40,14 @@ public class Autons {
     public Autons(
             LoggerFactory log,
             LoggerFactory fieldLogger,
-            MecanumDrive drive) {
+            MecanumDrive100 drive) {
         LoggerFactory autoLog = log.name("Auton");
         m_autonChooser = new AutonChooser();
         m_drive = drive;
         m_profile = HolonomicProfile.wpi(4, 8, 3, 6);
         List<TimingConstraint> constraints = List.of(
-                new ConstantConstraint(2, 2),
-                new YawRateConstraint(1, 1));
+                new ConstantConstraint(autoLog, 2, 2),
+                new YawRateConstraint(autoLog, 1, 1));
         m_planner = new TrajectoryPlanner(constraints);
         m_viz = new TrajectoryVisualization(fieldLogger);
 
@@ -69,12 +69,12 @@ public class Autons {
         MoveAndHold four = new DriveToPoseWithProfile(
                 autoLog, drive, controller, m_profile, () -> FOUR);
         m_autonChooser.add("four",
-                new AnnotatedCommand(four.withName("auto four"), null, null));
+                new AnnotatedCommand(four.until(four::isDone).withName("auto four"), null, null));
 
         MoveAndHold five = new DriveWithTrajectoryFunction(
                 drive, controller, m_viz, this::five);
         m_autonChooser.add("five",
-                new AnnotatedCommand(five.withName("auto five"), null, null));
+                new AnnotatedCommand(five.until(five::isDone).withName("auto five"), null, null));
     }
 
     public Command get() {

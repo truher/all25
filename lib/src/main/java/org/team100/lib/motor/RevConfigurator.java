@@ -3,6 +3,8 @@ package org.team100.lib.motor;
 import java.util.function.Supplier;
 
 import org.team100.lib.config.PIDConstants;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.tuning.Mutable;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -14,12 +16,38 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 /** Configuration for one SparkBase motor */
-public class Rev100 {
+public class RevConfigurator {
+    /**
+     * The CAN report period for the built-in encoder.
+     * This is longer than the equivalent CTRE number, maybe
+     * it should be 10?
+     */
+    private static final int ENCODER_REPORT_PERIOD_MS = 20;
 
     private final SparkBase m_motor;
+    private final NeutralMode m_neutral;
+    private final MotorPhase m_phase;
+    private final Mutable m_statorCurrentLimit;
+    private final PIDConstants m_pid;
 
-    public Rev100(SparkBase motor) {
+    /**
+     * statorCurrentLimit is mutable.
+     * pid has mutable parts.
+     */
+    public RevConfigurator(
+            LoggerFactory log,
+            SparkBase motor,
+            NeutralMode neutral,
+            MotorPhase phase,
+            int statorCurrentLimit,
+            PIDConstants pid) {
         m_motor = motor;
+        m_neutral = neutral;
+        m_phase = phase;
+        m_statorCurrentLimit = new Mutable(log, "stator current limit (a)", statorCurrentLimit, (x) -> currentConfig());
+        m_pid = pid;
+        // reapply the pid parameters if any change.
+        m_pid.register(this::pidConfig);
     }
 
     /**
@@ -46,22 +74,19 @@ public class Rev100 {
         crash(() -> m_motor.configure(conf, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
     }
 
-    public void motorConfig(
-            NeutralMode neutral,
-            MotorPhase phase,
-            int periodMs) {
+    public void motorConfig() {
         SparkMaxConfig conf = new SparkMaxConfig();
-        conf.idleMode(switch (neutral) {
+        conf.idleMode(switch (m_neutral) {
             case COAST -> IdleMode.kCoast;
             case BRAKE -> IdleMode.kBrake;
         });
-        conf.inverted(switch (phase) {
+        conf.inverted(switch (m_phase) {
             case FORWARD -> false;
             case REVERSE -> true;
         });
-        conf.signals.primaryEncoderVelocityPeriodMs(periodMs);
+        conf.signals.primaryEncoderVelocityPeriodMs(ENCODER_REPORT_PERIOD_MS);
         conf.signals.primaryEncoderVelocityAlwaysOn(true);
-        conf.signals.primaryEncoderPositionPeriodMs(periodMs);
+        conf.signals.primaryEncoderPositionPeriodMs(ENCODER_REPORT_PERIOD_MS);
         conf.signals.primaryEncoderPositionAlwaysOn(true);
         // slower than default of 10; also affects things like motor temperature and
         // applied output.
@@ -69,10 +94,22 @@ public class Rev100 {
         crash(() -> m_motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
     }
 
-    public void currentConfig(int currentLimit) {
+    public void currentConfig() {
         SparkMaxConfig conf = new SparkMaxConfig();
-        conf.smartCurrentLimit(currentLimit);
+        conf.smartCurrentLimit((int) m_statorCurrentLimit.getAsDouble());
         crash(() -> m_motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
+    }
+
+    /** TODO: don't allow a limit above the configuration */
+    public void overrideStatorLimit(int limit) {
+        SparkMaxConfig conf = new SparkMaxConfig();
+        conf.smartCurrentLimit(limit);
+        crash(() -> m_motor.configure(conf, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+    }
+
+    /** TODO: make sure clients call this when their need is done */
+    public void endCurrentLimitOverride() {
+        currentConfig();
     }
 
     /**
@@ -81,17 +118,17 @@ public class Rev100 {
      * a desired control output would be a duty cycle of 0.1 or so, which implies a
      * value of P like 3e-4.
      */
-    public void pidConfig(PIDConstants pid) {
+    public void pidConfig() {
         SparkMaxConfig conf = new SparkMaxConfig();
         conf.closedLoop.positionWrappingEnabled(false); // don't use position control
-        conf.closedLoop.p(pid.getPositionP(), ClosedLoopSlot.kSlot0);
-        conf.closedLoop.i(pid.getPositionI(), ClosedLoopSlot.kSlot0);
-        conf.closedLoop.d(pid.getPositionD(), ClosedLoopSlot.kSlot0);
-        conf.closedLoop.p(pid.getVelocityP(), ClosedLoopSlot.kSlot1);
-        conf.closedLoop.i(pid.getVelocityI(), ClosedLoopSlot.kSlot1);
-        conf.closedLoop.d(pid.getVelocityD(), ClosedLoopSlot.kSlot1);
-        conf.closedLoop.iZone(pid.getPositionIZone(), ClosedLoopSlot.kSlot0);
-        conf.closedLoop.iZone(pid.getVelocityIZone(), ClosedLoopSlot.kSlot1);
+        conf.closedLoop.p(m_pid.getPositionP(), ClosedLoopSlot.kSlot0);
+        conf.closedLoop.i(m_pid.getPositionI(), ClosedLoopSlot.kSlot0);
+        conf.closedLoop.d(m_pid.getPositionD(), ClosedLoopSlot.kSlot0);
+        conf.closedLoop.p(m_pid.getVelocityP(), ClosedLoopSlot.kSlot1);
+        conf.closedLoop.i(m_pid.getVelocityI(), ClosedLoopSlot.kSlot1);
+        conf.closedLoop.d(m_pid.getVelocityD(), ClosedLoopSlot.kSlot1);
+        conf.closedLoop.iZone(m_pid.getPositionIZone(), ClosedLoopSlot.kSlot0);
+        conf.closedLoop.iZone(m_pid.getVelocityIZone(), ClosedLoopSlot.kSlot1);
         conf.closedLoop.velocityFF(0, ClosedLoopSlot.kSlot0); // use arbitrary FF instead
         conf.closedLoop.velocityFF(0, ClosedLoopSlot.kSlot1); // use arbitrary FF instead
         conf.closedLoop.outputRange(-1, 1, ClosedLoopSlot.kSlot0);
