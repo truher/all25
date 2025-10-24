@@ -20,8 +20,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * -- per-identity: enabled for specific RoboRIO serial numbers
  * -- override: using a Sendable Chooser in a dashboard, e.g. glass.
  * -- test override: to force a config for unit tests.
+ * 
+ * If you want the experiment selectors to appear in glass, you'll need to
+ * reference the Experiments constructor (which invokes the chooser) at some
+ * point in robot construction, perhaps by referencing Experiments.instance.
  */
-public class Experiments  {
+public class Experiments {
     public static final Experiments instance = new Experiments(Identity.instance);
 
     /** These experiments are enabled on every robot type. */
@@ -59,6 +63,11 @@ public class Experiments  {
             m_overrides.put(e, override);
             SmartDashboard.putData(override);
         }
+    }
+
+    /** Load the experiments class and thus the chooser. */
+    public void show() {
+        System.out.println("Showing dashboard experiment selectors.");
     }
 
     /** overrides everything. for testing only. */
