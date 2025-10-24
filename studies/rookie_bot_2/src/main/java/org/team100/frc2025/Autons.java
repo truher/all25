@@ -10,7 +10,7 @@ import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.examples.mecanum.MecanumDrive;
+import org.team100.lib.examples.mecanum.MecanumDrive100;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
@@ -32,7 +32,7 @@ public class Autons {
     private static final Pose2d FOUR = new Pose2d(4, 4, Rotation2d.kCCW_90deg);
 
     private final AutonChooser m_autonChooser;
-    private final MecanumDrive m_drive;
+    private final MecanumDrive100 m_drive;
     private final HolonomicProfile m_profile;
     private final TrajectoryPlanner m_planner;
     private final TrajectoryVisualization m_viz;
@@ -40,7 +40,7 @@ public class Autons {
     public Autons(
             LoggerFactory log,
             LoggerFactory fieldLogger,
-            MecanumDrive drive) {
+            MecanumDrive100 drive) {
         LoggerFactory autoLog = log.name("Auton");
         m_autonChooser = new AutonChooser();
         m_drive = drive;

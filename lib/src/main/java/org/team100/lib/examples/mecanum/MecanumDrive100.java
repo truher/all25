@@ -1,11 +1,7 @@
 package org.team100.lib.examples.mecanum;
 
-import java.util.function.Supplier;
-
-import org.team100.lib.commands.drivetrain.manual.FieldRelativeDriver;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.gyro.Gyro;
-import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
@@ -26,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Mecanum drive with optional gyro. */
-public class MecanumDrive extends SubsystemBase implements SubsystemR3 {
+public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
     private static final double TRACK_WIDTH_M = 0.4;
     private static final double WHEELBASE_M = 0.4;
 
@@ -47,7 +43,7 @@ public class MecanumDrive extends SubsystemBase implements SubsystemR3 {
     /**
      * Gyro may be null, in which case we use (not very accurate) odometry for yaw.
      */
-    public MecanumDrive(
+    public MecanumDrive100(
             LoggerFactory fieldLogger,
             Gyro gyro,
             LinearMechanism frontLeft,
@@ -101,13 +97,6 @@ public class MecanumDrive extends SubsystemBase implements SubsystemR3 {
         m_frontRight.stop();
         m_rearLeft.stop();
         m_rearRight.stop();
-    }
-
-    /** Set the drive velocity with joystick input. */
-    public Command driveManual(Supplier<Velocity> v, double maxV, double maxOmega) {
-        return run(() -> setVelocity(
-                FieldRelativeDriver.scale(v.get(), maxV, maxOmega)))
-                .withName("drive manually");
     }
 
     /** Set the field-relative velocity. */

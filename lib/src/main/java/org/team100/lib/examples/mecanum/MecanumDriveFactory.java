@@ -10,7 +10,7 @@ import org.team100.lib.util.CanId;
 
 public class MecanumDriveFactory {
 
-    public static MecanumDrive make(
+    public static MecanumDrive100 make(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
             int supplyLimit,
@@ -39,7 +39,7 @@ public class MecanumDriveFactory {
         };
     }
 
-    private static MecanumDrive realRobot(
+    private static MecanumDrive100 realRobot(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
             int supplyLimit,
@@ -55,7 +55,7 @@ public class MecanumDriveFactory {
         // null gyro => use odometry for yaw.
         Gyro gyro = (gyroId == null) ? null : new ReduxGyro(log, gyroId);
 
-        return new MecanumDrive(
+        return new MecanumDrive100(
                 fieldLogger,
                 gyro,
                 LinearMechanismFactory.neo(
@@ -88,7 +88,7 @@ public class MecanumDriveFactory {
                         wheelDiaM));
     }
 
-    private static MecanumDrive sim(
+    private static MecanumDrive100 sim(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
             double gearRatio,
@@ -96,7 +96,7 @@ public class MecanumDriveFactory {
         LoggerFactory log = parent.name("Mecanum Drive");
 
         // null gyro => use odometry for yaw
-        return new MecanumDrive(
+        return new MecanumDrive100(
                 fieldLogger,
                 null,
                 LinearMechanismFactory.sim(

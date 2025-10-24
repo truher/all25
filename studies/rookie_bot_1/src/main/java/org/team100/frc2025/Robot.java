@@ -11,6 +11,7 @@ import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.examples.tank.DriveTank;
 import org.team100.lib.examples.tank.TankDrive;
 import org.team100.lib.examples.tank.TankDriveFactory;
+import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.hid.DriverXboxControl;
@@ -18,6 +19,9 @@ import org.team100.lib.indicator.Alerts;
 import org.team100.lib.indicator.SolidIndicator;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
+import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -30,6 +34,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,6 +42,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot100 {
+    private static final double MAX_SPEED_M_S = 3.0;
+    private static final double MAX_OMEGA_RAD_S = 3.0;
     private final TankDrive m_drive;
     private final Command m_auton;
     private final Autons m_autons;
@@ -46,14 +53,15 @@ public class Robot extends TimedRobot100 {
     private final Alert m_mismatchedAlliance;
 
     public Robot() {
+        Banner.printBanner();
+        DriverStation.silenceJoystickConnectionWarning(true);
+        Experiments.instance.show();
+        SmartDashboard.putData(CommandScheduler.getInstance());
         m_indicator = new SolidIndicator(new RoboRioChannel(0), 40);
         m_alerts = new Alerts();
         m_noStartingPosition = m_alerts.add("No starting position!", AlertType.kWarning);
         m_mismatchedAlliance = m_alerts.add("Wrong Alliance!", AlertType.kWarning);
         m_indicator.state(() -> m_alerts.any() ? Color.kRed : Color.kGreen);
-        Banner.printBanner();
-        DriverStation.silenceJoystickConnectionWarning(true);
-        SmartDashboard.putData(CommandScheduler.getInstance());
         Logging logging = Logging.instance();
         LoggerFactory fieldLogger = logging.fieldLogger;
         DriverXboxControl driverControl = new DriverXboxControl(0);
@@ -66,11 +74,20 @@ public class Robot extends TimedRobot100 {
                 new CanId(5), // right
                 6.0, // gear ratio
                 0.15); // wheel dia (m)
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.tank();
+        SwerveLimiter limiter = new SwerveLimiter(
+                logger,
+                kinodynamics,
+                RobotController::getBatteryVoltage);
+        DriveTank manual = new DriveTank(
+                () -> -1.0 * driverControl.rightY(),
+                () -> -1.0 * driverControl.rightX(),
+                MAX_SPEED_M_S,
+                MAX_OMEGA_RAD_S,
+                limiter,
+                m_drive);
         m_drive.setDefaultCommand(
-                new DriveTank(() -> -1.0 * driverControl.rightY(),
-                        () -> -1.0 * driverControl.rightX(),
-                        m_drive)
-                        .withName("drive default"));
+                manual);
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 List.of(new ConstantConstraint(1, 1)));
         List<HolonomicPose2d> waypoints = List.of(
