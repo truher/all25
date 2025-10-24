@@ -1,5 +1,6 @@
 package org.team100.frc2025.robot;
 
+import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
@@ -38,23 +39,36 @@ public class AllAutons {
         // WARNING! The glass widget will override the default, so check it!
         // Run the auto in pre-match testing!
         m_autonChooser.addAsDefault("Lollipop",
-                new LolipopAuto(logger, machinery, profile, controller, planner).get());
+                new AnnotatedCommand(
+                        new LolipopAuto(logger, machinery, profile, controller, planner).get(), null, null));
 
         DriveAndScore driveAndScore = new DriveAndScore(logger, machinery, profile, controller);
-        m_autonChooser.add("Coral 1 left", driveAndScore.get(ScoringLevel.L4, ReefPoint.J));
-        m_autonChooser.add("Coral 1 mid", driveAndScore.get(ScoringLevel.L4, ReefPoint.H));
-        m_autonChooser.add("Coral 1 right", driveAndScore.get(ScoringLevel.L4, ReefPoint.F));
+        m_autonChooser.add("Coral 1 left",
+                new AnnotatedCommand(driveAndScore.get(ScoringLevel.L4, ReefPoint.J), null, null));
+        m_autonChooser.add("Coral 1 mid",
+                new AnnotatedCommand(driveAndScore.get(ScoringLevel.L4, ReefPoint.H), null, null));
+        m_autonChooser.add("Coral 1 right",
+                new AnnotatedCommand(driveAndScore.get(ScoringLevel.L4, ReefPoint.F), null, null));
 
         Auton auton = new Auton(logger, machinery, profile, controller);
-        m_autonChooser.add("Left Preload Only", auton.leftPreloadOnly());
-        m_autonChooser.add("Center Preload Only", auton.centerPreloadOnly());
-        m_autonChooser.add("Right Preload Only", auton.rightPreloadOnly());
-        m_autonChooser.add("Left Three Coral", auton.left());
-        m_autonChooser.add("Right Three Coral", auton.right());
+        m_autonChooser.add("Left Preload Only", new AnnotatedCommand(
+                auton.leftPreloadOnly(), null, null));
+        m_autonChooser.add("Center Preload Only", new AnnotatedCommand(
+                auton.centerPreloadOnly(), null, null));
+        m_autonChooser.add("Right Preload Only", new AnnotatedCommand(
+                auton.rightPreloadOnly(), null, null));
+        m_autonChooser.add("Left Three Coral", new AnnotatedCommand(
+                auton.left(), null, null));
+        m_autonChooser.add("Right Three Coral", new AnnotatedCommand(
+                auton.right(), null, null));
     }
 
     public Command get() {
-        return m_autonChooser.get();
+        return m_autonChooser.get().command();
+    }
+
+    public void close() {
+        m_autonChooser.close();
     }
 
 }

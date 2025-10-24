@@ -1,5 +1,7 @@
 package org.team100.lib.motor;
 
+import java.util.function.Supplier;
+
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.DoubleCache;
 import org.team100.lib.config.Feedforward100;
@@ -8,6 +10,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
@@ -23,6 +26,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 public abstract class CANSparkMotor implements BareMotor {
     protected final Feedforward100 m_ff;
     protected final SparkBase m_motor;
+    private final Rev100 m_configurator;
     protected final SparkLimitSwitch m_forLimitSwitch;
     protected final SparkLimitSwitch m_revLimitSwitch;
     protected final RelativeEncoder m_encoder;
@@ -62,17 +66,17 @@ public abstract class CANSparkMotor implements BareMotor {
         m_motor = motor;
         LoggerFactory child = parent.type(this);
         m_ff = ff;
-        // make config synchronous so we can see the errors
-        Rev100.crash(() -> m_motor.setCANTimeout(500));
-        Rev100.baseConfig(m_motor);
-        Rev100.motorConfig(m_motor, neutral, motorPhase, 20);
-        Rev100.currentConfig(m_motor, currentLimit);
+
+        m_configurator = new Rev100(m_motor);
+        m_configurator.longCANTimeout();
+        m_configurator.baseConfig();
+        m_configurator.motorConfig(neutral, motorPhase, 20);
+        m_configurator.currentConfig(currentLimit);
+        m_configurator.pidConfig(pid);
+        m_configurator.zeroCANTimeout();
+
         m_encoder = m_motor.getEncoder();
         m_pidController = m_motor.getClosedLoopController();
-        Rev100.pidConfig(m_motor, pid);
-        // make everything after this asynchronous.
-        // NOTE: this makes error-checking not work at all.
-        Rev100.crash(() -> m_motor.setCANTimeout(0));
 
         // LIMIT SWITCHES
         m_forLimitSwitch = m_motor.getForwardLimitSwitch();
@@ -122,7 +126,7 @@ public abstract class CANSparkMotor implements BareMotor {
     @Override
     public void setTorqueLimit(double torqueNm) {
         int currentA = (int) (torqueNm / kTNm_amp());
-        Rev100.currentConfig(m_motor, currentA);
+        m_configurator.currentConfig(currentA);
     }
 
     /**
@@ -142,7 +146,7 @@ public abstract class CANSparkMotor implements BareMotor {
         final double FF = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
 
         final double motorRev_M = motorRev_S * 60;
-        Rev100.warn(() -> m_pidController.setReference(
+        warn(() -> m_pidController.setReference(
                 motorRev_M, ControlType.kVelocity, ClosedLoopSlot.kSlot1, FF, ArbFFUnits.kVoltage));
 
         m_log_desired_speed.log(() -> motorRev_S);
@@ -177,7 +181,7 @@ public abstract class CANSparkMotor implements BareMotor {
 
         final double FF = frictionFFVolts + velocityFFVolts + accelFFVolts + torqueFFVolts;
 
-        Rev100.warn(() -> m_pidController.setReference(
+        warn(() -> m_pidController.setReference(
                 motorRev, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF, ArbFFUnits.kVoltage));
 
         m_log_desired_position.log(() -> motorRev);
@@ -258,7 +262,7 @@ public abstract class CANSparkMotor implements BareMotor {
      * Sets integrated sensor position to zero.
      */
     public void resetEncoderPosition() {
-        Rev100.warn(() -> m_encoder.setPosition(0));
+        warn(() -> m_encoder.setPosition(0));
         m_encoder_position.reset();
         m_encoder_velocity.reset();
     }
@@ -267,7 +271,7 @@ public abstract class CANSparkMotor implements BareMotor {
      * Set integrated sensor position in rotations.
      */
     public void setEncoderPosition(double motorPositionRev) {
-        Rev100.warn(() -> m_encoder.setPosition(motorPositionRev));
+        warn(() -> m_encoder.setPosition(motorPositionRev));
     }
 
     protected void log() {
@@ -288,5 +292,12 @@ public abstract class CANSparkMotor implements BareMotor {
 
     @Override
     public void play(double freq) {
+    }
+
+    private static void warn(Supplier<REVLibError> s) {
+        REVLibError errorCode = s.get();
+        if (errorCode != REVLibError.kOk) {
+            System.out.println("WARNING: " + errorCode.name());
+        }
     }
 }

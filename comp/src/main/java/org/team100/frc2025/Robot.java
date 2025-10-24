@@ -93,6 +93,7 @@ public class Robot extends TimedRobot100 {
     public void close() {
         super.close();
         m_machinery.close();
+        m_allAutons.close();
     }
 
     ///////////////////////////////////////////////////////////////////////
