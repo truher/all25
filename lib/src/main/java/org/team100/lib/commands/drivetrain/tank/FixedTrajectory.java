@@ -1,5 +1,7 @@
 package org.team100.lib.commands.drivetrain.tank;
 
+import java.util.function.Supplier;
+
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.motion.tank.TankDrive;
@@ -23,17 +25,19 @@ import edu.wpi.first.wpilibj2.command.Command;
  * The rotation error has a greater effect at greater speeds.
  */
 public class FixedTrajectory extends Command {
-    private final Trajectory100 m_trajectory;
+    // a supplier so that, for example, constraints can be mutable.
+    private final Supplier<Trajectory100> m_trajectorySupplier;
     private final TankDrive m_drive;
     private final TrajectoryVisualization m_viz;
     private final LTVUnicycleController m_controller;
     private double m_startTimeS;
+    private Trajectory100 m_trajectory;
 
     public FixedTrajectory(
-            Trajectory100 trajectory,
+            Supplier<Trajectory100> trajectorySupplier,
             TankDrive drive,
             TrajectoryVisualization viz) {
-        m_trajectory = trajectory;
+        m_trajectorySupplier = trajectorySupplier;
         m_drive = drive;
         m_viz = viz;
         m_controller = new LTVUnicycleController(0.020);
@@ -43,11 +47,16 @@ public class FixedTrajectory extends Command {
     @Override
     public void initialize() {
         m_startTimeS = Takt.get();
+        m_trajectory = m_trajectorySupplier.get();
+        if (m_trajectory == null)
+            return;
         m_viz.setViz(m_trajectory);
     }
 
     @Override
     public void execute() {
+        if (m_trajectory == null)
+            return;
         // current for position error
         double t = progress();
         TimedPose current = m_trajectory.sample(t);
@@ -69,7 +78,7 @@ public class FixedTrajectory extends Command {
 
     /** Done when the timer expires. Ignores actual position */
     public boolean isDone() {
-        return m_trajectory.isDone(progress());
+        return m_trajectory != null && m_trajectory.isDone(progress());
     }
 
     /** Time since start */

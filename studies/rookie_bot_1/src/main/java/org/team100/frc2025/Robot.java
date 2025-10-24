@@ -92,16 +92,6 @@ public class Robot extends TimedRobot100 {
         m_drive.setDefaultCommand(
                 manual);
         m_trajectoryViz = new TrajectoryVisualization(fieldLogger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(
-                List.of(new ConstantConstraint(logger.name("c1"), 1, 1)));
-        List<HolonomicPose2d> waypoints = List.of(
-                HolonomicPose2d.tank(0, 0, 0),
-                HolonomicPose2d.tank(1, 1, Math.PI / 2),
-                HolonomicPose2d.tank(2, 2, 0));
-        Trajectory100 trajectory = planner.restToRest(waypoints);
-        FixedTrajectory c1 = new FixedTrajectory(trajectory, m_drive, m_trajectoryViz);
-
-        new Trigger(driverControl::a).whileTrue(c1.until(c1::isDone));
 
         m_autons = new Autons(logger, m_drive, m_trajectoryViz);
 

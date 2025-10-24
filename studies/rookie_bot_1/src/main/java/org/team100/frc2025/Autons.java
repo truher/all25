@@ -45,7 +45,6 @@ public class Autons {
     private final TankDrive m_drive;
     private final TrajectoryVisualization m_trajectoryViz;
     private final AutonChooser m_autonChooser;
-    private final TrajectoryPlanner m_planner;
 
     public Autons(
             LoggerFactory log,
@@ -54,8 +53,6 @@ public class Autons {
         m_log = log.type(this);
         m_drive = drive;
         m_trajectoryViz = trajectoryViz;
-        m_planner = new TrajectoryPlanner(
-                List.of(new ConstantConstraint(m_log, 1, 1)));
 
         m_autonChooser = new AutonChooser();
         m_autonChooser.add("red left",
@@ -80,19 +77,30 @@ public class Autons {
     }
 
     private Command redLeft() {
-        Trajectory100 trajectory = m_planner.restToRest(List.of(
+        LoggerFactory log = m_log.name("red left");
+        TrajectoryPlanner planner = new TrajectoryPlanner(
+                List.of(new ConstantConstraint(log, 1, 1)));
+        FixedTrajectory cmd = new FixedTrajectory(
+                () -> redLeftTrajectory(planner),
+                m_drive,
+                m_trajectoryViz);
+        return cmd.until(cmd::isDone).withName("red left");
+    }
+
+    private Trajectory100 redLeftTrajectory(TrajectoryPlanner planner) {
+        // delaying construction allows trajectory constraints to be mutable
+        return planner.restToRest(List.of(
                 HolonomicPose2d.tank(Field.START_RED_LEFT),
                 HolonomicPose2d.tank(Field.START_RED_LEFT
                         .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg))),
                 HolonomicPose2d.tank(Field.START_RED_LEFT
                         .plus(new Transform2d(2, 2, Rotation2d.kZero)))));
-        FixedTrajectory cmd = new FixedTrajectory(trajectory, m_drive, m_trajectoryViz);
-        return cmd.until(cmd::isDone).withName("red left");
     }
 
     private Command redRight() {
+        LoggerFactory log = m_log.name("red right");
         ToPoseWithTrajectory cmd = new ToPoseWithTrajectory(
-                m_log,
+                log,
                 Field.START_RED_RIGHT
                         .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg)),
                 m_drive,

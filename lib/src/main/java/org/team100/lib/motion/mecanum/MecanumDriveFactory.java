@@ -5,6 +5,7 @@ import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.ReduxGyro;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.LinearMechanismFactory;
+import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.util.CanId;
 
@@ -63,39 +64,51 @@ public class MecanumDriveFactory {
         // null gyro => use odometry for yaw.
         Gyro gyro = (gyroId == null) ? null : new ReduxGyro(log, gyroId);
 
+        LoggerFactory frontLeftLog = log.name("frontLeft");
+        LoggerFactory frontRightLog = log.name("frontRight");
+        LoggerFactory rearLeftLog = log.name("rearLeft");
+        LoggerFactory rearRightLog = log.name("rearRight");
         return new MecanumDrive100(
                 fieldLogger,
                 gyro,
                 trackWidthM,
                 wheelbaseM,
-                LinearMechanismFactory.neo(
-                        log.name("frontLeft"),
-                        statorCurrentLimit,
-                        frontLeft,
-                        MotorPhase.REVERSE,
-                        gearRatio,
-                        wheelDiaM),
-                LinearMechanismFactory.neo(
-                        log.name("frontRight"),
-                        statorCurrentLimit,
-                        frontRight,
-                        MotorPhase.FORWARD,
-                        gearRatio,
-                        wheelDiaM),
-                LinearMechanismFactory.neo(
-                        log.name("rearLeft"),
-                        statorCurrentLimit,
-                        rearLeft,
-                        MotorPhase.REVERSE,
-                        gearRatio,
-                        wheelDiaM),
-                LinearMechanismFactory.neo(
-                        log.name("rearRight"),
-                        statorCurrentLimit,
-                        rearRight,
-                        MotorPhase.FORWARD,
-                        gearRatio,
-                        wheelDiaM));
+                new OutboardLinearVelocityServo(
+                        frontLeftLog,
+                        LinearMechanismFactory.neo(
+                                frontLeftLog,
+                                statorCurrentLimit,
+                                frontLeft,
+                                MotorPhase.REVERSE,
+                                gearRatio,
+                                wheelDiaM)),
+                new OutboardLinearVelocityServo(
+                        frontRightLog,
+                        LinearMechanismFactory.neo(
+                                frontRightLog,
+                                statorCurrentLimit,
+                                frontRight,
+                                MotorPhase.FORWARD,
+                                gearRatio,
+                                wheelDiaM)),
+                new OutboardLinearVelocityServo(
+                        rearLeftLog,
+                        LinearMechanismFactory.neo(
+                                rearLeftLog,
+                                statorCurrentLimit,
+                                rearLeft,
+                                MotorPhase.REVERSE,
+                                gearRatio,
+                                wheelDiaM)),
+                new OutboardLinearVelocityServo(
+                        rearRightLog,
+                        LinearMechanismFactory.neo(
+                                rearRightLog,
+                                statorCurrentLimit,
+                                rearRight,
+                                MotorPhase.FORWARD,
+                                gearRatio,
+                                wheelDiaM)));
     }
 
     private static MecanumDrive100 sim(
@@ -106,6 +119,10 @@ public class MecanumDriveFactory {
             double gearRatio,
             double wheelDiaM) {
         LoggerFactory log = parent.name("Mecanum Drive");
+        LoggerFactory frontLeftLog = log.name("frontLeft");
+        LoggerFactory frontRightLog = log.name("frontRight");
+        LoggerFactory rearLeftLog = log.name("rearLeft");
+        LoggerFactory rearRightLog = log.name("rearRight");
 
         // null gyro => use odometry for yaw
         return new MecanumDrive100(
@@ -113,22 +130,30 @@ public class MecanumDriveFactory {
                 null,
                 trackWidthM,
                 wheelbaseM,
-                LinearMechanismFactory.sim(
-                        log.name("frontLeft"),
-                        gearRatio,
-                        wheelDiaM),
-                LinearMechanismFactory.sim(
-                        log.name("frontRight"),
-                        gearRatio,
-                        wheelDiaM),
-                LinearMechanismFactory.sim(
-                        log.name("rearLeft"),
-                        gearRatio,
-                        wheelDiaM),
-                LinearMechanismFactory.sim(
-                        log.name("rearRight"),
-                        gearRatio,
-                        wheelDiaM));
+                new OutboardLinearVelocityServo(
+                        frontLeftLog,
+                        LinearMechanismFactory.sim(
+                                frontLeftLog,
+                                gearRatio,
+                                wheelDiaM)),
+                new OutboardLinearVelocityServo(
+                        frontRightLog,
+                        LinearMechanismFactory.sim(
+                                frontRightLog,
+                                gearRatio,
+                                wheelDiaM)),
+                new OutboardLinearVelocityServo(
+                        rearLeftLog,
+                        LinearMechanismFactory.sim(
+                                rearLeftLog,
+                                gearRatio,
+                                wheelDiaM)),
+                new OutboardLinearVelocityServo(
+                        rearRightLog,
+                        LinearMechanismFactory.sim(
+                                rearRightLog,
+                                gearRatio,
+                                wheelDiaM)));
     }
 
 }

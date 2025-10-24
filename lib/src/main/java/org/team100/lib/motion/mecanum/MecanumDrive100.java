@@ -6,7 +6,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.mechanism.LinearMechanism;
+import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.SubsystemR3;
 
@@ -29,10 +29,11 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
     private final Gyro m_gyro;
     private final double m_trackWidthM;
     private final double m_wheelbaseM;
-    private final LinearMechanism m_frontLeft;
-    private final LinearMechanism m_frontRight;
-    private final LinearMechanism m_rearLeft;
-    private final LinearMechanism m_rearRight;
+    // using "servos" because they compute acceleration.
+    private final OutboardLinearVelocityServo m_frontLeft;
+    private final OutboardLinearVelocityServo m_frontRight;
+    private final OutboardLinearVelocityServo m_rearLeft;
+    private final OutboardLinearVelocityServo m_rearRight;
     private final MecanumDriveKinematics m_kinematics;
 
     private MecanumDriveWheelPositions m_positions;
@@ -48,10 +49,10 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
             Gyro gyro,
             double trackWidthM,
             double wheelbaseM,
-            LinearMechanism frontLeft,
-            LinearMechanism frontRight,
-            LinearMechanism rearLeft,
-            LinearMechanism rearRight) {
+            OutboardLinearVelocityServo frontLeft,
+            OutboardLinearVelocityServo frontRight,
+            OutboardLinearVelocityServo rearLeft,
+            OutboardLinearVelocityServo rearRight) {
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
         m_gyro = gyro;
         m_trackWidthM = trackWidthM;
@@ -84,10 +85,10 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
         ChassisSpeeds speed = SwerveKinodynamics.toInstantaneousChassisSpeeds(
                 input, yaw);
         MecanumDriveWheelSpeeds mSpeed = m_kinematics.toWheelSpeeds(speed);
-        m_frontLeft.setVelocity(mSpeed.frontLeftMetersPerSecond, 0, 0);
-        m_frontRight.setVelocity(mSpeed.frontRightMetersPerSecond, 0, 0);
-        m_rearLeft.setVelocity(mSpeed.rearLeftMetersPerSecond, 0, 0);
-        m_rearRight.setVelocity(mSpeed.rearRightMetersPerSecond, 0, 0);
+        m_frontLeft.setVelocity(mSpeed.frontLeftMetersPerSecond);
+        m_frontRight.setVelocity(mSpeed.frontRightMetersPerSecond);
+        m_rearLeft.setVelocity(mSpeed.rearLeftMetersPerSecond);
+        m_rearRight.setVelocity(mSpeed.rearRightMetersPerSecond);
     }
 
     private Rotation2d getYaw() {
@@ -141,10 +142,10 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
 
     private Twist2d twist() {
         MecanumDriveWheelPositions newPositions = new MecanumDriveWheelPositions(
-                m_frontLeft.getPositionM(),
-                m_frontRight.getPositionM(),
-                m_rearLeft.getPositionM(),
-                m_rearRight.getPositionM());
+                m_frontLeft.getDistance(),
+                m_frontRight.getDistance(),
+                m_rearLeft.getDistance(),
+                m_rearRight.getDistance());
         Twist2d twist = m_kinematics.toTwist2d(m_positions, newPositions);
         m_positions = newPositions;
         return twist;

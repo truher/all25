@@ -32,11 +32,13 @@ public class Experiments {
     private final Set<Experiment> globalExperiments = Set.of(
             Experiment.AvoidVisionJitter,
             Experiment.HeedVision,
-            Experiment.ReduceCrossTrackError);
+            Experiment.ReduceCrossTrackError,
+            Experiment.UseSetpointGenerator);
 
     /** These experiments are enabled on specific robot types. */
     private final Map<Identity, Set<Experiment>> experimentsByIdentity = Map.of(
-            Identity.COMP_BOT, Set.of());
+            Identity.COMP_BOT, Set.of(),
+            Identity.BLANK, Set.of(Experiment.UseSetpointGenerator));
 
     /** Computed for the actual identity used. */
     private final Set<Experiment> m_experiments;
