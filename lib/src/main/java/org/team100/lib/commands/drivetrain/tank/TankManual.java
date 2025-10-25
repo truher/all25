@@ -5,6 +5,9 @@ import java.util.function.DoubleSupplier;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.tank.TankDrive;
@@ -18,20 +21,27 @@ import edu.wpi.first.wpilibj2.command.Command;
  * xbox style control, this will be the right-hand stick).
  */
 public class TankManual extends Command {
+    private final LoggerFactory m_log;
     private final DoubleSupplier m_translation;
     private final DoubleSupplier m_rotation;
     private final double m_maxV;
     private final double m_maxOmega;
     private final SwerveLimiter m_limiter;
     private final TankDrive m_drive;
+    private final DoubleLogger m_logTranslation;
+    private final DoubleLogger m_logRotation;
 
     public TankManual(
+            LoggerFactory log,
             DoubleSupplier translation,
             DoubleSupplier rotation,
             double maxV,
             double maxOmega,
             SwerveLimiter limiter,
             TankDrive robotDrive) {
+        m_log = log;
+        m_logTranslation = log.doubleLogger(Level.TRACE, "translation");
+        m_logRotation = log.doubleLogger(Level.TRACE, "rotation");
         m_translation = translation;
         m_rotation = rotation;
         m_maxV = maxV;
@@ -46,6 +56,8 @@ public class TankManual extends Command {
         // double rotscale = 1 - 0.5 * Math.abs(m_translation.getAsDouble());
         double translationM_S = m_translation.getAsDouble() * m_maxV;
         double rotationRad_S = m_rotation.getAsDouble() * m_maxOmega;
+        m_logTranslation.log(() -> translationM_S);
+        m_logRotation.log(() -> rotationRad_S);
         Rotation2d currentRotation = m_drive.getPose().getRotation();
         GlobalVelocityR3 v = SwerveKinodynamics.fromInstantaneousChassisSpeeds(
                 new ChassisSpeeds(translationM_S, 0, rotationRad_S), currentRotation);
