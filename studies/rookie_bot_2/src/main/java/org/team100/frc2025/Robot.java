@@ -27,8 +27,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot100 {
-    private static final double MAX_SPEED_M_S = 3.0;
-    private static final double MAX_OMEGA_RAD_S = 3.0;
+    private static final double MAX_SPEED_M_S = 3.5;
+    private static final double MAX_OMEGA_RAD_S = 5.0;
 
     private final MecanumDrive100 m_drive;
     private final Autons m_autons;
@@ -51,8 +51,8 @@ public class Robot extends TimedRobot100 {
                 new CanId(1), // front right
                 new CanId(3), // rear left
                 new CanId(4), // rear right
-                0.4, // track width (m)
-                0.4, // wheelbase (m)
+                0.533, // track width (m)
+                0.406, // wheelbase (m)
                 6.0, // gears
                 0.15); // wheel dia (m)
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum();
