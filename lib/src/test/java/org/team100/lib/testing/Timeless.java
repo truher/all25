@@ -8,6 +8,7 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 
 /**
@@ -28,6 +29,9 @@ public interface Timeless {
     @BeforeAll
     static void clearCache() {
         Cache.clear();
+        // simulated motors don't move unless enabled.
+        DriverStationSim.setEnabled(true);
+        DriverStationSim.notifyNewData();
     }
 
     /** Do any time-related setup *in your test method* ! */

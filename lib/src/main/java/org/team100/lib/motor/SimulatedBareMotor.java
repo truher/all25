@@ -10,6 +10,7 @@ import org.team100.lib.state.Model100;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.RobotState;
 
 /**
  * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
@@ -51,6 +52,11 @@ public class SimulatedBareMotor implements BareMotor {
     }
 
     private Model100 update() {
+        // when disabled, motors don't keep moving.
+        if (RobotState.isDisabled()) {
+            m_velocityInput = 0.0;
+            m_positionInput = null;
+        }
         if (DEBUG) {
             System.out.printf("motor %s update\n", m_log.getRoot());
         }
