@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
+import org.team100.lib.motion.mecanum.MecanumKinematics100.Slip;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -110,7 +111,7 @@ public class MecanumKinematics100Test {
     void testUncorrected() {
         // all correction factors 1 => same as above.
         MecanumKinematics100 k = new MecanumKinematics100(
-                logger, 1, 1, 1,
+                logger, new Slip(1, 1, 1),
                 new Translation2d(0.5, 0.5),
                 new Translation2d(0.5, -0.5),
                 new Translation2d(-0.5, 0.5),
@@ -165,7 +166,7 @@ public class MecanumKinematics100Test {
     void testCorrected() {
         // most likely case: strafing corrected, others 1.
         MecanumKinematics100 k = new MecanumKinematics100(
-                logger, 1, 1.5, 1,
+                logger, new Slip(1, 1.5, 1),
                 new Translation2d(0.5, 0.5),
                 new Translation2d(0.5, -0.5),
                 new Translation2d(-0.5, 0.5),
@@ -227,7 +228,7 @@ public class MecanumKinematics100Test {
     @Test
     void testCorrectedEnvelope() {
         MecanumKinematics100 k = new MecanumKinematics100(
-                logger, 1, 1.5, 1,
+                logger, new Slip(1, 1.5, 1),
                 new Translation2d(0.5, 0.5),
                 new Translation2d(0.5, -0.5),
                 new Translation2d(-0.5, 0.5),

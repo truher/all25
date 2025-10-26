@@ -6,6 +6,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.mecanum.MecanumKinematics100.Slip;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.SubsystemR3;
@@ -49,6 +50,7 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
             Gyro gyro,
             double trackWidthM,
             double wheelbaseM,
+            Slip slip,
             OutboardLinearVelocityServo frontLeft,
             OutboardLinearVelocityServo frontRight,
             OutboardLinearVelocityServo rearLeft,
@@ -63,7 +65,7 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
         m_rearLeft = rearLeft;
         m_rearRight = rearRight;
         m_kinematics = new MecanumKinematics100(
-                log, 1, 1, 1,
+                log, slip,
                 new Translation2d(m_wheelbaseM / 2, m_trackWidthM / 2),
                 new Translation2d(m_wheelbaseM / 2, -m_trackWidthM / 2),
                 new Translation2d(-m_wheelbaseM / 2, m_trackWidthM / 2),
@@ -119,6 +121,13 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
     /** Set yaw to zero. */
     public Command resetYaw() {
         return runOnce(this::resetGyroOffset);
+    }
+
+    public void setPose(Pose2d p) {
+        m_pose = p;
+        if (m_gyro == null)
+            return;
+        m_gyroOffset = m_gyro.getYawNWU().minus(p.getRotation());
     }
 
     @Override

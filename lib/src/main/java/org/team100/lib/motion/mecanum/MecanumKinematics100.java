@@ -20,20 +20,22 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
  * the zero-slip case, in order to make the actual velocity what is requested.
  */
 public class MecanumKinematics100 {
+    public record Slip(double kx, double ky, double ktheta) {
+    }
+
     private final MecanumDriveKinematics m_kinematics;
     private final Mutable m_kx;
     private final Mutable m_ky;
     private final Mutable m_ktheta;
 
     public MecanumKinematics100(
-            LoggerFactory parent,
-            double kx, double ky, double ktheta,
+            LoggerFactory parent, Slip slip,
             Translation2d fl, Translation2d fr, Translation2d rl, Translation2d rr) {
         m_kinematics = new MecanumDriveKinematics(fl, fr, rl, rr);
         LoggerFactory log = parent.type(this);
-        m_kx = new Mutable(log, "kx", kx);
-        m_ky = new Mutable(log, "ky", ky);
-        m_ktheta = new Mutable(log, "ktheta", ktheta);
+        m_kx = new Mutable(log, "Slip kx", slip.kx);
+        m_ky = new Mutable(log, "Slip ky", slip.ky);
+        m_ktheta = new Mutable(log, "Slip ktheta", slip.ktheta);
     }
 
     public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds actual) {
