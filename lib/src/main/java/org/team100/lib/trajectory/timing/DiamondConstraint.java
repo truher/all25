@@ -9,9 +9,12 @@ import org.team100.lib.tuning.Mutable;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * TODO: this is completely wrong, the Mecanum envelope is a diamond shape.
+ * Mecanum drive has a diamond-shaped velocity envelope. If the x and y
+ * directions responded the same (they don't), it would be a square.
+ * 
+ * This ignores the interaction with rotation.
  */
-public class EllipticalConstraint implements TimingConstraint {
+public class DiamondConstraint implements TimingConstraint {
     /** Max velocity ahead */
     private final Mutable m_maxVelocityX;
     /** Max velocity to the side */
@@ -24,7 +27,7 @@ public class EllipticalConstraint implements TimingConstraint {
      * @param maxVY  max velocity sideways, typically lower
      * @param maxA   accel
      */
-    public EllipticalConstraint(LoggerFactory parent, double maxVX, double maxVY, double maxA) {
+    public DiamondConstraint(LoggerFactory parent, double maxVX, double maxVY, double maxA) {
         LoggerFactory log = parent.type(this);
         m_maxVelocityX = new Mutable(log, "maxVX", maxVX);
         m_maxVelocityY = new Mutable(log, "maxVY", maxVY);
@@ -41,12 +44,11 @@ public class EllipticalConstraint implements TimingConstraint {
         Rotation2d course = courseOpt.get();
         Rotation2d heading = state.getHeading();
         Rotation2d strafe = course.minus(heading);
-        // https://en.wikipedia.org/wiki/Ellipse#Polar_form_relative_to_center
+        // a rhombus is a superellipse with exponent 1
+        // https://en.wikipedia.org/wiki/Superellipse
         double a = m_maxVelocityX.getAsDouble();
         double b = m_maxVelocityY.getAsDouble();
-        double r = a * b /
-                (Math.sqrt(
-                        Math.pow(b * strafe.getCos(), 2) + Math.pow(a * strafe.getSin(), 2)));
+        double r = 1 / (Math.abs(strafe.getCos() / a) + Math.abs(strafe.getSin() / b));
         return new NonNegativeDouble(r);
     }
 

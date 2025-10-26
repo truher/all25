@@ -18,12 +18,14 @@ import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.trajectory.timing.DiamondConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class Autons {
@@ -46,6 +48,7 @@ public class Autons {
         m_drive = drive;
         m_profile = HolonomicProfile.wpi(4, 8, 3, 6);
         List<TimingConstraint> constraints = List.of(
+                new DiamondConstraint(autoLog, 2, 2, 2),
                 new ConstantConstraint(autoLog, 2, 2),
                 new YawRateConstraint(autoLog, 1, 1));
         m_planner = new TrajectoryPlanner(constraints);
@@ -74,11 +77,12 @@ public class Autons {
         MoveAndHold five = new DriveWithTrajectoryFunction(
                 drive, controller, m_viz, this::five);
         m_autonChooser.add("five",
-                new AnnotatedCommand(five.until(five::isDone).withName("auto five"), null, null));
+                new AnnotatedCommand(five.until(five::isDone).withName("auto five"),
+                        Alliance.Red, Field.START_RED_RIGHT));
     }
 
-    public Command get() {
-        return m_autonChooser.get().command();
+    public AnnotatedCommand get() {
+        return m_autonChooser.get();
     }
 
     private Trajectory100 five(Pose2d p) {
