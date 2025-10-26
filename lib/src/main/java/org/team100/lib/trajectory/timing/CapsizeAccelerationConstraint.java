@@ -27,8 +27,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
             double scale) {
         LoggerFactory log = parent.type(this);
         m_limits = limits;
-        m_scale = new Mutable(log, "scale", scale, (x) -> {
-        });
+        m_scale = new Mutable(log, "scale", scale);
     }
 
     /**
