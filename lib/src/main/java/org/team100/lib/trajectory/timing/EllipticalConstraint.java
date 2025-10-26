@@ -9,15 +9,7 @@ import org.team100.lib.tuning.Mutable;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * Similar to ConstantConstraint, but describes an elliptical velocity envelope.
- * This is useful for Mecanum drives, which are better at moving front-back (all
- * wheels moving the same way, roller friction is good) compared to side-to-side
- * (wheels moving opposite each other, roller friction is bad).
- * 
- * Currently acceleration is unaffected (which is probably wrong).
- * 
- * Note that the current Mecanum kinematics does not understand this issue, so
- * this class is not actually useful.
+ * TODO: this is completely wrong, the Mecanum envelope is a diamond shape.
  */
 public class EllipticalConstraint implements TimingConstraint {
     /** Max velocity ahead */
