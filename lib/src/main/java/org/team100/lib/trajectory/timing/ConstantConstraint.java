@@ -12,10 +12,8 @@ public class ConstantConstraint implements TimingConstraint {
 
     public ConstantConstraint(LoggerFactory parent, double maxV, double maxA) {
         LoggerFactory log = parent.type(this);
-        m_maxVelocity = new Mutable(log, "maxV", maxV, (x) -> {
-        });
-        m_maxAccel = new Mutable(log, "maxA", maxA, (x) -> {
-        });
+        m_maxVelocity = new Mutable(log, "maxV", maxV);
+        m_maxAccel = new Mutable(log, "maxA", maxA);
     }
 
     public ConstantConstraint(LoggerFactory log, double vScale, double aScale, SwerveKinodynamics limits) {

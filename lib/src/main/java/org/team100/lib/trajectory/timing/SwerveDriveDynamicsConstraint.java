@@ -34,10 +34,8 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
             double aScale) {
         LoggerFactory log = parent.type(this);
         m_limits = limits;
-        this.vScale = new Mutable(log, "vScale", vScale, (x) -> {
-        });
-        this.aScale = new Mutable(log, "aScale", aScale, (x) -> {
-        });
+        this.vScale = new Mutable(log, "vScale", vScale);
+        this.aScale = new Mutable(log, "aScale", aScale);
     }
 
     /**
@@ -70,7 +68,7 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
         return new NonNegativeDouble(max_vel);
     }
 
-    private double maxV() {
+    double maxV() {
         return vScale.getAsDouble() * m_limits.getMaxDriveVelocityM_S();
     }
 

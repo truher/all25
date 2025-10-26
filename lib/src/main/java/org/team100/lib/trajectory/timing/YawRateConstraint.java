@@ -23,10 +23,8 @@ public class YawRateConstraint implements TimingConstraint {
 
     public YawRateConstraint(LoggerFactory parent, double maxOmega, double maxAlpha) {
         LoggerFactory log = parent.type(this);
-        m_maxOmegaRad_S = new Mutable(log, "maxOmega", maxOmega, (x) -> {
-        });
-        m_maxAlphaRad_S2 = new Mutable(log, "maxAlpha", maxAlpha, (x) -> {
-        });
+        m_maxOmegaRad_S = new Mutable(log, "maxOmega", maxOmega);
+        m_maxAlphaRad_S2 = new Mutable(log, "maxAlpha", maxAlpha);
     }
 
     /**

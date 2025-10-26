@@ -69,6 +69,7 @@ public class MecanumDriveFactory {
         LoggerFactory rearLeftLog = log.name("rearLeft");
         LoggerFactory rearRightLog = log.name("rearRight");
         return new MecanumDrive100(
+                log,
                 fieldLogger,
                 gyro,
                 trackWidthM,
@@ -126,6 +127,7 @@ public class MecanumDriveFactory {
 
         // null gyro => use odometry for yaw
         return new MecanumDrive100(
+                log,
                 fieldLogger,
                 null,
                 trackWidthM,

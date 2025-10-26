@@ -38,6 +38,12 @@ public class Mutable implements DoubleSupplier {
         m_cache = Cache.ofDouble(this::update);
     }
 
+    /** if you don't care to subscribe to changes */
+    public Mutable(LoggerFactory log, String leaf, double defaultValue) {
+        this(log, leaf, defaultValue, (x) -> {
+        });
+    }
+
     /** Supply the current value. */
     @Override
     public double getAsDouble() {
