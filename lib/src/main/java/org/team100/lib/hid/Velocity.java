@@ -54,4 +54,20 @@ public record Velocity(double x, double y, double theta) {
         double ratio = clamped / hyp;
         return new Velocity(ratio * x, ratio * y, theta());
     }
+
+
+    public Velocity squashedDiamond(double maxX, double maxY, Rotation2d poseAngle) {
+        double x = x();
+        double y = y();
+        double hyp = Math.hypot(x, y);
+        if (hyp < 1e-12)
+            return this;
+        Rotation2d fieldRelative = new Rotation2d(x, y);
+        Rotation2d robotRelative = fieldRelative.minus(poseAngle);
+        // this is the maximum possible hyp
+        double r = 1 / (Math.abs(robotRelative.getCos() / maxX) + Math.abs(robotRelative.getSin() / maxY));
+        // assuming the max stick hyp is 1 (i.e. "round" stick response) then
+        // r is also the scaling factor.
+        return new Velocity(r * x, r * y, theta());
+    }
 }
