@@ -77,7 +77,6 @@ public class SimulatedDrivingTest implements Timeless {
         drive = new SwerveDriveSubsystem(
                 fieldLogger,
                 logger,
-                swerveKinodynamics,
                 odometryUpdater,
                 estimate,
                 swerveLocal,

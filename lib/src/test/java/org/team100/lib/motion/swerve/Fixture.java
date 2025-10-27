@@ -76,7 +76,6 @@ public class Fixture {
         drive = new SwerveDriveSubsystem(
                 fieldLogger,
                 logger,
-                swerveKinodynamics,
                 odometryUpdater,
                 estimate,
                 swerveLocal,

@@ -51,7 +51,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3, 
     public SwerveDriveSubsystem(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
-            SwerveKinodynamics kinodynamics,
             OdometryUpdater odometryUpdater,
             FreshSwerveEstimate estimate,
             SwerveLocal swerveLocal,
@@ -118,21 +117,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3, 
     public Command rightwardSlow() {
         return run(() -> setChassisSpeeds(new ChassisSpeeds(0, -1.0, 0)))
                 .finallyDo(() -> stop());
-    }
-
-    /** Make an X, stopped. */
-    public void defense() {
-        m_swerveLocal.defense();
-    }
-
-    /** Wheels ahead, stopped, for testing. */
-    public void steer0() {
-        m_swerveLocal.steer0();
-    }
-
-    /** Wheels at 90 degrees, stopped, for testing. */
-    public void steer90() {
-        m_swerveLocal.steer90();
     }
 
     @Override
