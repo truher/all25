@@ -2,21 +2,21 @@ package org.team100.frc2025.setups;
 
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
-import org.team100.lib.commands.drivetrain.manual.DriveManually;
-import org.team100.lib.commands.drivetrain.manual.ManualChassisSpeeds;
-import org.team100.lib.commands.drivetrain.manual.ManualFieldRelativeSpeeds;
-import org.team100.lib.commands.drivetrain.manual.ManualWithFullStateHeading;
-import org.team100.lib.commands.drivetrain.manual.ManualWithProfiledHeading;
-import org.team100.lib.commands.drivetrain.manual.ManualWithTargetLock;
-import org.team100.lib.commands.drivetrain.manual.SimpleManualModuleStates;
+import org.team100.lib.commands.swerve.manual.DriveManually;
+import org.team100.lib.commands.swerve.manual.ManualChassisSpeeds;
+import org.team100.lib.commands.swerve.manual.ManualFieldRelativeSpeeds;
+import org.team100.lib.commands.swerve.manual.ManualWithFullStateHeading;
+import org.team100.lib.commands.swerve.manual.ManualWithProfiledHeading;
+import org.team100.lib.commands.swerve.manual.ManualWithTargetLock;
+import org.team100.lib.commands.swerve.manual.SimpleManualModuleStates;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 
 import edu.wpi.first.math.geometry.Translation2d;
 

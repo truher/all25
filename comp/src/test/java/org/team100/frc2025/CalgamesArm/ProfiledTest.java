@@ -1,8 +1,8 @@
 package org.team100.frc2025.CalgamesArm;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.Config;
-import org.team100.lib.motion.kinematics.ElevatorArmWristKinematics;
+import org.team100.lib.motion.prr.Config;
+import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;

@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 /**
  * Use a profile with feedforward control only.
+ * 
+ * This is mainly useful for testing.
  */
 public class FeedforwardOnly extends MoveAndHold {
     private static final boolean DEBUG = false;

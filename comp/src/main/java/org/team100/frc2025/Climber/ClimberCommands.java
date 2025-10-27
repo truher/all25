@@ -5,7 +5,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.Swerve.DriveForwardSlowly;
-import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
+import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
 

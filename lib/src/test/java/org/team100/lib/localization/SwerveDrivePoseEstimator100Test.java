@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.MockGyro;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
-import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
-import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
-import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.swerve.module.state.SwerveModulePosition100;
+import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
+import org.team100.lib.motion.swerve.module.state.SwerveModuleState100;
+import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
 import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;

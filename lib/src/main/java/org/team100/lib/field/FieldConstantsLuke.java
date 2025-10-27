@@ -1,12 +1,11 @@
 package org.team100.lib.field;
 
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
+import org.team100.lib.field.FieldConstants.ReefPoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import org.team100.lib.field.FieldConstants.ReefPoint;
-import org.team100.lib.field.FieldConstants;
 
 public class FieldConstantsLuke {
     /** Staged coral ("lollipop") locations. */

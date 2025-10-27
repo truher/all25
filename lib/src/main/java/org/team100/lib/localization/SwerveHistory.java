@@ -5,8 +5,8 @@ import java.util.SortedMap;
 import java.util.function.DoubleFunction;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.util.TimeInterpolatableBuffer100;
 
