@@ -3,8 +3,8 @@ package org.team100.frc2025;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
-import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
+import org.team100.lib.commands.r3.DriveToPoseWithProfile;
+import org.team100.lib.commands.r3.DriveWithTrajectoryFunction;
 import org.team100.lib.commands.r3.FeedforwardOnly;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;

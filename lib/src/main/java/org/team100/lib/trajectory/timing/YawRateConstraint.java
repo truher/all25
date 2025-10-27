@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.tuning.Mutable;
 
 import edu.wpi.first.math.geometry.Rotation2d;

@@ -2,15 +2,15 @@ package org.team100.lib.motion.mechanism;
 
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.encoder.CANSparkEncoder;
-import org.team100.lib.encoder.SimulatedBareEncoder;
+import org.team100.lib.encoder.rev.CANSparkEncoder;
+import org.team100.lib.encoder.sim.SimulatedBareEncoder;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.Neo550CANSparkMotor;
-import org.team100.lib.motor.NeoCANSparkMotor;
 import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.motor.rev.Neo550CANSparkMotor;
+import org.team100.lib.motor.rev.NeoCANSparkMotor;
+import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.util.CanId;
 
 /**

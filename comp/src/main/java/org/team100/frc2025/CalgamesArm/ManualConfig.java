@@ -3,9 +3,9 @@ package org.team100.frc2025.CalgamesArm;
 import java.util.function.Supplier;
 
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.motion.Config;
-import org.team100.lib.motion.kinematics.JointAccelerations;
-import org.team100.lib.motion.kinematics.JointVelocities;
+import org.team100.lib.motion.prr.Config;
+import org.team100.lib.motion.prr.JointAccelerations;
+import org.team100.lib.motion.prr.JointVelocities;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
