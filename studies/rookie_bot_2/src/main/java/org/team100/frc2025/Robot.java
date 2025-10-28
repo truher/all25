@@ -73,7 +73,7 @@ public class Robot extends TimedRobot100 {
                 new CanId(4), // rear right
                 0.533, // track width (m)
                 0.406, // wheelbase (m)
-                new Slip(1, 1, 1), // wheel slip corrections
+                new Slip(1, 1.4, 1), // wheel slip corrections
                 6.0, // gears
                 0.15); // wheel dia (m)
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum();
