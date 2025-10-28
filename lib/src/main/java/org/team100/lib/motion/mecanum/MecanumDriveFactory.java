@@ -4,6 +4,7 @@ import org.team100.lib.config.Identity;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.ReduxGyro;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.motion.mecanum.MecanumKinematics100.Slip;
 import org.team100.lib.motion.mechanism.LinearMechanismFactory;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.MotorPhase;
@@ -22,6 +23,7 @@ public class MecanumDriveFactory {
             CanId rearRight,
             double trackWidthM,
             double wheelbaseM,
+            Slip slip,
             double gearRatio,
             double wheelDiaM) {
         return switch (Identity.instance) {
@@ -41,6 +43,7 @@ public class MecanumDriveFactory {
                     rearRight,
                     trackWidthM,
                     wheelbaseM,
+                    slip,
                     gearRatio,
                     wheelDiaM);
         };
@@ -57,6 +60,7 @@ public class MecanumDriveFactory {
             CanId rearRight,
             double trackWidthM,
             double wheelbaseM,
+            Slip slip,
             double gearRatio,
             double wheelDiaM) {
         LoggerFactory log = parent.name("Mecanum Drive");
@@ -69,10 +73,12 @@ public class MecanumDriveFactory {
         LoggerFactory rearLeftLog = log.name("rearLeft");
         LoggerFactory rearRightLog = log.name("rearRight");
         return new MecanumDrive100(
+                log,
                 fieldLogger,
                 gyro,
                 trackWidthM,
                 wheelbaseM,
+                slip,
                 new OutboardLinearVelocityServo(
                         frontLeftLog,
                         LinearMechanismFactory.neo(
@@ -126,10 +132,12 @@ public class MecanumDriveFactory {
 
         // null gyro => use odometry for yaw
         return new MecanumDrive100(
+                log,
                 fieldLogger,
                 null,
                 trackWidthM,
                 wheelbaseM,
+                new Slip(1, 1, 1),
                 new OutboardLinearVelocityServo(
                         frontLeftLog,
                         LinearMechanismFactory.sim(

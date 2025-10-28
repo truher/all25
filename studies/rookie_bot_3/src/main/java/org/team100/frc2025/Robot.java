@@ -4,15 +4,15 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.commands.drivetrain.tank.TankManual;
+import org.team100.lib.commands.tank.TankManual;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.tank.TankDrive;
 import org.team100.lib.motion.tank.TankDriveFactory;
 import org.team100.lib.util.Banner;
@@ -55,6 +55,7 @@ public class Robot extends TimedRobot100 {
                 kinodynamics,
                 RobotController::getBatteryVoltage);
         TankManual manual = new TankManual(
+                logger,
                 () -> -1.0 * driverControl.rightY(),
                 () -> -1.0 * driverControl.rightX(),
                 MAX_SPEED_M_S,

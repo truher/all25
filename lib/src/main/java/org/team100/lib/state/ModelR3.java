@@ -3,7 +3,7 @@ package org.team100.lib.state;
 import java.util.Optional;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Pose2d;

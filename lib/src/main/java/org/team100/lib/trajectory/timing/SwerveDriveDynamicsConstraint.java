@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveUtil;
-import org.team100.lib.motion.drivetrain.state.SwerveModuleState100;
-import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveUtil;
+import org.team100.lib.motion.swerve.module.state.SwerveModuleState100;
+import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
 import org.team100.lib.tuning.Mutable;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,10 +34,8 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
             double aScale) {
         LoggerFactory log = parent.type(this);
         m_limits = limits;
-        this.vScale = new Mutable(log, "vScale", vScale, (x) -> {
-        });
-        this.aScale = new Mutable(log, "aScale", aScale, (x) -> {
-        });
+        this.vScale = new Mutable(log, "vScale", vScale);
+        this.aScale = new Mutable(log, "aScale", aScale);
     }
 
     /**
@@ -70,7 +68,7 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
         return new NonNegativeDouble(max_vel);
     }
 
-    private double maxV() {
+    double maxV() {
         return vScale.getAsDouble() * m_limits.getMaxDriveVelocityM_S();
     }
 

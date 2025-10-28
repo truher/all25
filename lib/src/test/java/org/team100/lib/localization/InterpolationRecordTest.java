@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.state.SwerveModulePosition100;
-import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.swerve.module.state.SwerveModulePosition100;
+import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.state.Model100;
 import org.team100.lib.state.ModelR3;
 

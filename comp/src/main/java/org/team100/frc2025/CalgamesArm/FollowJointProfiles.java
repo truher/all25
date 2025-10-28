@@ -2,9 +2,9 @@ package org.team100.frc2025.CalgamesArm;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.motion.Config;
-import org.team100.lib.motion.kinematics.JointAccelerations;
-import org.team100.lib.motion.kinematics.JointVelocities;
+import org.team100.lib.motion.prr.Config;
+import org.team100.lib.motion.prr.JointAccelerations;
+import org.team100.lib.motion.prr.JointVelocities;
 import org.team100.lib.profile.incremental.CompleteProfile;
 import org.team100.lib.profile.incremental.CurrentLimitedExponentialProfile;
 import org.team100.lib.profile.incremental.IncrementalProfile;

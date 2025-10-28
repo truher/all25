@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.tuning.Mutable;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,10 +23,8 @@ public class YawRateConstraint implements TimingConstraint {
 
     public YawRateConstraint(LoggerFactory parent, double maxOmega, double maxAlpha) {
         LoggerFactory log = parent.type(this);
-        m_maxOmegaRad_S = new Mutable(log, "maxOmega", maxOmega, (x) -> {
-        });
-        m_maxAlphaRad_S2 = new Mutable(log, "maxAlpha", maxAlpha, (x) -> {
-        });
+        m_maxOmegaRad_S = new Mutable(log, "maxOmega", maxOmega);
+        m_maxAlphaRad_S2 = new Mutable(log, "maxAlpha", maxAlpha);
     }
 
     /**

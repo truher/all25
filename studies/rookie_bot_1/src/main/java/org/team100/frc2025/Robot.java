@@ -2,29 +2,22 @@ package org.team100.frc2025;
 
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
-import java.util.List;
-
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.commands.drivetrain.tank.FixedTrajectory;
-import org.team100.lib.commands.drivetrain.tank.TankManual;
+import org.team100.lib.commands.tank.TankManual;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.indicator.Alerts;
 import org.team100.lib.indicator.SolidIndicator;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.tank.TankDrive;
 import org.team100.lib.motion.tank.TankDriveFactory;
-import org.team100.lib.trajectory.Trajectory100;
-import org.team100.lib.trajectory.TrajectoryPlanner;
-import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
@@ -40,7 +33,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot100 {
     private static final double MAX_SPEED_M_S = 3.0;
@@ -83,6 +75,7 @@ public class Robot extends TimedRobot100 {
                 kinodynamics,
                 RobotController::getBatteryVoltage);
         TankManual manual = new TankManual(
+                logger,
                 () -> -1.0 * driverControl.rightY(),
                 () -> -1.0 * driverControl.rightX(),
                 MAX_SPEED_M_S,

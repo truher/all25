@@ -2,7 +2,7 @@ package org.team100.lib.trajectory.timing;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.tuning.Mutable;
 
 /**
@@ -27,8 +27,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
             double scale) {
         LoggerFactory log = parent.type(this);
         m_limits = limits;
-        m_scale = new Mutable(log, "scale", scale, (x) -> {
-        });
+        m_scale = new Mutable(log, "scale", scale);
     }
 
     /**

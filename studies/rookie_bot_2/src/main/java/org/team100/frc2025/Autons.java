@@ -3,8 +3,8 @@ package org.team100.frc2025;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
-import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
+import org.team100.lib.commands.r3.DriveToPoseWithProfile;
+import org.team100.lib.commands.r3.DriveWithTrajectoryFunction;
 import org.team100.lib.commands.r3.FeedforwardOnly;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
@@ -18,12 +18,14 @@ import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.trajectory.timing.DiamondConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class Autons {
@@ -48,7 +50,8 @@ public class Autons {
         m_drive = drive;
         m_profile = HolonomicProfile.wpi(4, 8, 3, 6);
         List<TimingConstraint> constraints = List.of(
-                new ConstantConstraint(autoLog, 1, 1), // original values: 2,2
+                new DiamondConstraint(autoLog, 2, 2, 2),
+                new ConstantConstraint(autoLog, 1, 1),
                 new YawRateConstraint(autoLog, 1, 1));
         m_planner = new TrajectoryPlanner(constraints);
         m_viz = new TrajectoryVisualization(fieldLogger);
@@ -86,10 +89,11 @@ public class Autons {
                 drive, controller, m_viz, this::knight_r);
         m_autonChooser.add("knight right",
                 new AnnotatedCommand(knight_r.until(knight_r::isDone).withName("auto knight_r"), null, null));
+
     }
 
-    public Command get() {
-        return m_autonChooser.get().command();
+    public AnnotatedCommand get() {
+        return m_autonChooser.get();
     }
 
     private Trajectory100 knight_l(Pose2d p) {

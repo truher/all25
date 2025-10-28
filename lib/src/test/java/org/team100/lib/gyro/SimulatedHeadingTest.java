@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
-import org.team100.lib.motion.drivetrain.state.SwerveModulePositions;
-import org.team100.lib.motion.drivetrain.state.SwerveModuleStates;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.motion.swerve.module.SwerveModuleCollection;
+import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
+import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;

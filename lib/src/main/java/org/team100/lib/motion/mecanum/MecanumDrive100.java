@@ -5,8 +5,9 @@ import org.team100.lib.gyro.Gyro;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
-import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.motion.mecanum.MecanumKinematics100.Slip;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
+import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.SubsystemR3;
 
@@ -15,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,7 +34,7 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
     private final OutboardLinearVelocityServo m_frontRight;
     private final OutboardLinearVelocityServo m_rearLeft;
     private final OutboardLinearVelocityServo m_rearRight;
-    private final MecanumDriveKinematics m_kinematics;
+    private final MecanumKinematics100 m_kinematics;
 
     private MecanumDriveWheelPositions m_positions;
     private GlobalVelocityR3 m_input;
@@ -45,14 +45,17 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
      * Gyro may be null, in which case we use (not very accurate) odometry for yaw.
      */
     public MecanumDrive100(
+            LoggerFactory parent,
             LoggerFactory fieldLogger,
             Gyro gyro,
             double trackWidthM,
             double wheelbaseM,
+            Slip slip,
             OutboardLinearVelocityServo frontLeft,
             OutboardLinearVelocityServo frontRight,
             OutboardLinearVelocityServo rearLeft,
             OutboardLinearVelocityServo rearRight) {
+        LoggerFactory log = parent.type(this);
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
         m_gyro = gyro;
         m_trackWidthM = trackWidthM;
@@ -61,7 +64,8 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
         m_frontRight = frontRight;
         m_rearLeft = rearLeft;
         m_rearRight = rearRight;
-        m_kinematics = new MecanumDriveKinematics(
+        m_kinematics = new MecanumKinematics100(
+                log, slip,
                 new Translation2d(m_wheelbaseM / 2, m_trackWidthM / 2),
                 new Translation2d(m_wheelbaseM / 2, -m_trackWidthM / 2),
                 new Translation2d(-m_wheelbaseM / 2, m_trackWidthM / 2),
@@ -111,12 +115,19 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
     }
 
     public Command resetPose() {
-        return runOnce(() -> m_pose = new Pose2d());
+        return runOnce(this::resetPoseAndGyro);
     }
 
     /** Set yaw to zero. */
     public Command resetYaw() {
         return runOnce(this::resetGyroOffset);
+    }
+
+    public void setPose(Pose2d p) {
+        m_pose = p;
+        if (m_gyro == null)
+            return;
+        m_gyroOffset = m_gyro.getYawNWU().minus(p.getRotation());
     }
 
     @Override
@@ -127,6 +138,13 @@ public class MecanumDrive100 extends SubsystemBase implements SubsystemR3 {
         m_frontRight.periodic();
         m_rearLeft.periodic();
         m_rearRight.periodic();
+    }
+
+    private void resetPoseAndGyro() {
+        m_pose = new Pose2d();
+        if (m_gyro == null)
+            return;
+        m_gyroOffset = m_gyro.getYawNWU();
     }
 
     private void resetGyroOffset() {

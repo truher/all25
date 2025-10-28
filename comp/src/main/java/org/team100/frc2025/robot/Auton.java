@@ -16,8 +16,8 @@ import static org.team100.lib.field.FieldConstants.ReefPoint.L;
 
 import org.team100.frc2025.Swerve.Auto.GoToCoralStation;
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
-import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
+import org.team100.lib.commands.r3.DriveToPoseWithProfile;
+import org.team100.lib.commands.r3.DriveWithTrajectoryFunction;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.field.FieldConstants;
