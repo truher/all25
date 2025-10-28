@@ -6,12 +6,12 @@ import org.team100.lib.state.ModelR3;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
- * A subsystem with three independent dimensions.
+ * A subsystem with three independent dimensions, controlled by velocity.
  * 
  * We use this interface for robot movement on the floor, where the three
  * dimensions are the dimensions of Pose2d: x, y, and theta.
  */
-public interface SubsystemR3 extends Subsystem {
+public interface VelocitySubsystemR3 extends Subsystem {
 
     /** No scaling or filtering. */
     void setVelocity(GlobalVelocityR3 setpoint);

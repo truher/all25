@@ -1,29 +1,38 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.controller.r3;
 
-import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.controller.r3.FeedforwardControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 
 /**
- * Like the drivetrain ReferenceController, but it does
- * outboard positional control, so it just passes through the "next" reference.
+ * Actuates a velocity subsystem based on a reference.
+ * 
+ * The lifespan of this object is intended to be a single "playback" of a
+ * trajectory, so create it in Command.initialize().
  */
-public class CalgamesReferenceController {
+public class VelocityReferenceControllerR3 {
     private static final boolean DEBUG = false;
 
-    private final CalgamesMech m_subsystem;
+    private final VelocitySubsystemR3 m_subsystem;
     private final ControllerR3 m_controller;
     private final ReferenceR3 m_reference;
 
-    public CalgamesReferenceController(
-            CalgamesMech subsystem, ReferenceR3 reference) {
+    /**
+     * Initializes the reference with the current measurement, so you should call
+     * this from, e.g. Command.initialize(), not in the constructor.
+     */
+    public VelocityReferenceControllerR3(
+            VelocitySubsystemR3 subsystem,
+            ControllerR3 controller,
+            ReferenceR3 reference) {
         m_subsystem = subsystem;
-        // very wide tolerance for now
-        m_controller = new FeedforwardControllerR3(1, 1, 1);
+        m_controller = controller;
         m_reference = reference;
+
+        m_controller.reset();
+        // initialize here so that the "done" state knows about the clock
         m_reference.initialize(m_subsystem.getState());
     }
 
@@ -32,14 +41,14 @@ public class CalgamesReferenceController {
             ModelR3 measurement = m_subsystem.getState();
             ModelR3 current = m_reference.current();
             ControlR3 next = m_reference.next();
-            ModelR3 error = current.minus(measurement);
             GlobalVelocityR3 fieldRelativeTarget = m_controller.calculate(
                     measurement, current, next);
             if (DEBUG) {
-                System.out.printf("CalgamesReferenceController.execute() error %s target %s\n",
-                        error, fieldRelativeTarget);
+                System.out.printf("ReferenceController.execute() measurement %s current %s next %s output %s\n",
+                        measurement, current, next, fieldRelativeTarget);
             }
-            m_subsystem.set(next);
+
+            m_subsystem.setVelocity(fieldRelativeTarget);
         } catch (IllegalStateException ex) {
             // System.out.println(ex);
             // This happens when the trajectory generator produces an empty trajectory.
@@ -47,11 +56,7 @@ public class CalgamesReferenceController {
         }
     }
 
-    /**
-     * Trajectory is complete and controller error is within tolerance.
-     * 
-     * Since positional feedback is outboard, the "at reference" thing is unknown.
-     */
+    /** Trajectory is complete and controller error is within tolerance. */
     public boolean isDone() {
         return m_reference.done() && m_controller.atReference();
     }
@@ -66,5 +71,4 @@ public class CalgamesReferenceController {
         ModelR3 measurement = m_subsystem.getState();
         return goal.minus(measurement).translation().getNorm();
     }
-
 }

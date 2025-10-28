@@ -5,7 +5,7 @@ import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.SubsystemR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -14,19 +14,19 @@ import edu.wpi.first.math.geometry.Pose2d;
  * 
  * This is mainly useful for testing.
  */
-public class FeedforwardOnly extends MoveAndHold {
+public class VelocityFeedforwardOnly extends MoveAndHold {
     private static final boolean DEBUG = false;
 
     private final HolonomicProfile m_profile;
     private final Pose2d m_goal;
-    private final SubsystemR3 m_drive;
+    private final VelocitySubsystemR3 m_drive;
 
     private ProfileReferenceR3 m_reference;
 
-    public FeedforwardOnly(
+    public VelocityFeedforwardOnly(
             HolonomicProfile profile,
             Pose2d goal,
-            SubsystemR3 drive) {
+            VelocitySubsystemR3 drive) {
         m_profile = profile;
         m_goal = goal;
         m_drive = drive;

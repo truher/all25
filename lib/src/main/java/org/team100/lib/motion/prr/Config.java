@@ -32,6 +32,7 @@ public record Config(double shoulderHeight, double shoulderAngle, double wristAn
                 (wristAngle - c.wristAngle) / dt);
     }
 
+    /** True if any of the axes are NaN */
     public boolean isNaN() {
         return Double.isNaN(shoulderHeight())
                 || Double.isNaN(shoulderAngle())

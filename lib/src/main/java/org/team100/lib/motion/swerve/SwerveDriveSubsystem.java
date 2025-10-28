@@ -20,7 +20,7 @@ import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
 import org.team100.lib.music.Music;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.SubsystemR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,7 +28,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3, Music {
+public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsystemR3, Music {
     // DEBUG produces a LOT of output, you should only enable it while you're
     // looking at it.
     private static final boolean DEBUG = false;
@@ -76,6 +76,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements SubsystemR3, 
     //
 
     /** Skip all scaling, limits generator, etc. */
+    @Override
     public void setVelocity(GlobalVelocityR3 input) {
         // keep the limiter up to date on what we're doing
         m_limiter.updateSetpoint(input);

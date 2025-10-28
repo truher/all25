@@ -1,27 +1,31 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.commands.r3;
 
 import java.util.function.Supplier;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.state.ControlR3;
+import org.team100.lib.subsystems.PositionSubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** Use the operator control to "fly" the arm around in config space. */
-public class ManualCartesian extends Command {
+/**
+ * Use the operator control to "fly" a positional planar subsystem around in
+ * cartesian space.
+ */
+public class ManualPosition extends Command {
     private static final boolean DEBUG = false;
 
     private final Supplier<Velocity> m_input;
-    private final CalgamesMech m_subsystem;
+    private final PositionSubsystemR3 m_subsystem;
 
     private Pose2d m_pose;
 
-    public ManualCartesian(
+    public ManualPosition(
             Supplier<Velocity> input,
-            CalgamesMech subsystem) {
+            PositionSubsystemR3 subsystem) {
         m_input = input;
         m_subsystem = subsystem;
         addRequirements(subsystem);

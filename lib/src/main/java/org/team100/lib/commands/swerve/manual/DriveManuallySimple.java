@@ -12,6 +12,7 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -30,7 +31,7 @@ public class DriveManuallySimple extends Command {
      */
     private final Supplier<Velocity> m_twistSupplier;
     private final DoubleConsumer m_heedRadiusM;
-    private final SwerveDriveSubsystem m_drive;
+    private final VelocitySubsystemR3 m_drive;
     private final SwerveLimiter m_limiter;
     private final FieldRelativeDriver m_defaultDriver;
     private final FieldRelativeDriver m_alternativeDriver;
@@ -61,7 +62,7 @@ public class DriveManuallySimple extends Command {
     public void initialize() {
         m_heedRadiusM.accept(HEED_RADIUS_M);
         // make sure the limiter knows what we're doing
-        m_limiter.updateSetpoint(m_drive.getVelocity());
+        m_limiter.updateSetpoint(m_drive.getState().velocity());
         m_defaultDriver.reset(m_drive.getState());
     }
 

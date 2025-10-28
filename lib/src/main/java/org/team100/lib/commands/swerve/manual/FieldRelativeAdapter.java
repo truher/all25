@@ -6,21 +6,21 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 
 /** Uses the limited drive subsystem since this is manual driving. */
 public class FieldRelativeAdapter implements DriverAdapter {
     private static final boolean DEBUG = false;
 
     private final SwerveLimiter m_limiter;
-    private final SwerveDriveSubsystem m_drive;
+    private final VelocitySubsystemR3 m_drive;
     private final FieldRelativeDriver m_driver;
 
     public FieldRelativeAdapter(
             SwerveLimiter limiter,
-            SwerveDriveSubsystem drive,
+            VelocitySubsystemR3 drive,
             FieldRelativeDriver driver) {
         m_limiter = limiter;
         m_drive = drive;
