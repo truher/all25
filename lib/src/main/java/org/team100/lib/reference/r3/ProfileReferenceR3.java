@@ -1,7 +1,7 @@
 package org.team100.lib.reference.r3;
 
 import org.team100.lib.coherence.Cache;
-import org.team100.lib.coherence.CotemporalCache;
+import org.team100.lib.coherence.ObjectCache;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
@@ -32,7 +32,7 @@ public class ProfileReferenceR3 implements ReferenceR3 {
     private final HolonomicProfile m_profile;
     /** The name is for debugging. */
     private final String m_name;
-    private final CotemporalCache<References> m_references;
+    private final ObjectCache<References> m_references;
 
     private ModelR3 m_goal;
     private boolean m_done;

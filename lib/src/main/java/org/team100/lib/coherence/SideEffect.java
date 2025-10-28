@@ -14,6 +14,7 @@ public class SideEffect implements Runnable {
     private final Runnable m_delegate;
     private boolean m_valid;
 
+    /** Do not use this, use Cache.ofSideEffect(). */
     SideEffect(Runnable delegate) {
         m_delegate = delegate;
         m_valid = false;

@@ -1,15 +1,15 @@
 package org.team100.lib.targeting;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleFunction;
-import java.util.function.Function;
 import java.util.stream.DoubleStream;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.SideEffect;
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.geometry.Centroid2d;
+import org.team100.lib.geometry.Near2d;
 import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -30,19 +30,6 @@ import edu.wpi.first.util.struct.StructBuffer;
  * awhile.
  */
 public class Targets extends CameraReader<Rotation3d> {
-    public static class Mean implements Function<Collection<Translation2d>, Translation2d> {
-        @Override
-        public Translation2d apply(Collection<Translation2d> c) {
-            Translation2d sum = new Translation2d();
-            int count = 0;
-            for (Translation2d t : c) {
-                sum = sum.plus(t);
-                count++;
-            }
-            return sum.div(count);
-        }
-    }
-
     private static final boolean DEBUG = false;
 
     /**
@@ -53,7 +40,7 @@ public class Targets extends CameraReader<Rotation3d> {
     /** Forget sights older than this. */
     private static final double HISTORY_DURATION = 1.0;
     /** Targets closer than this to each other are combined */
-    private static final double RESOLUTION = 0.15;
+    private static final double NEARNESS_THRESHOLD = 0.15;
 
     private final FieldLogger.Log m_field_log;
 
@@ -80,8 +67,8 @@ public class Targets extends CameraReader<Rotation3d> {
         // m_targets = new TrailingHistory<>(HISTORY_DURATION);
         m_targets = new CoalescingCollection<>(
                 new TrailingHistory<>(HISTORY_DURATION),
-                (a, b) -> a.getDistance(b) < RESOLUTION,
-                new Mean());
+                new Near2d(NEARNESS_THRESHOLD),
+                new Centroid2d());
         m_vision = Cache.ofSideEffect(this::update);
     }
 

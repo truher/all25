@@ -136,12 +136,12 @@ public class ControlR3 {
         Rotation2d motion_direction = course.isPresent() ? course.get() : Rotation2d.kZero;
         double xv = motion_direction.getCos() * velocityM_s;
         double yv = motion_direction.getSin() * velocityM_s;
-        double thetav = timedPose.state().getHeadingRate() * velocityM_s;
+        double thetav = timedPose.state().getHeadingRateRad_M() * velocityM_s;
 
         double accelM_s_s = timedPose.acceleration();
         double xa = motion_direction.getCos() * accelM_s_s;
         double ya = motion_direction.getSin() * accelM_s_s;
-        double thetaa = timedPose.state().getHeadingRate() * accelM_s_s;
+        double thetaa = timedPose.state().getHeadingRateRad_M() * accelM_s_s;
 
         // centripetal accel = v^2/r = v^2 * curvature
         double curvRad_M = timedPose.state().getCurvature();

@@ -89,37 +89,37 @@ class GeometryUtilTest {
     void testDistance() {
         // same pose => 0
         assertEquals(0,
-                GeometryUtil.distance(
+                GeometryUtil.distanceM(
                         new Pose2d(1, 0, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kZero)),
                 DELTA);
         // 1d distance
         assertEquals(1,
-                GeometryUtil.distance(
+                GeometryUtil.distanceM(
                         new Pose2d(0, 0, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kZero)),
                 DELTA);
         // 2d distance
         assertEquals(1.414,
-                GeometryUtil.distance(
+                GeometryUtil.distanceM(
                         new Pose2d(0, 1, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kZero)),
                 DELTA);
         // rotation means a little arc, so the path length is a little longer.
         assertEquals(1.111,
-                GeometryUtil.distance(
+                GeometryUtil.distanceM(
                         new Pose2d(0, 0, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
                 DELTA);
         // the arc in this case is the entire quarter circle
         assertEquals(1.571,
-                GeometryUtil.distance(
+                GeometryUtil.distanceM(
                         new Pose2d(0, 1, Rotation2d.kZero),
                         new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
                 DELTA);
         // order doesn't matter
         assertEquals(1.571,
-                GeometryUtil.distance(
+                GeometryUtil.distanceM(
                         new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
                         new Pose2d(0, 1, Rotation2d.kZero)),
                 DELTA);

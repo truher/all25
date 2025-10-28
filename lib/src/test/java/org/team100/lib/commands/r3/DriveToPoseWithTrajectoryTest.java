@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.logging.LoggerFactory;
@@ -53,8 +54,13 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
                 () -> goal,
                 drive,
                 (start, end) -> new Trajectory100(
-                        List.of(new TimedPose(new Pose2dWithMotion(
-                                Pose2d.kZero, new Pose2dWithMotion.MotionDirection(0, 0, 0), 0, 0), 0, 0, 0))),
+                        List.of(
+                                new TimedPose(
+                                        new Pose2dWithMotion(
+                                                Pose2d.kZero,
+                                                new MotionDirection(0, 0, 0),
+                                                0, 0),
+                                        0, 0, 0))),
                 controller,
                 viz);
         command.initialize();

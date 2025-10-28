@@ -27,7 +27,7 @@ public class Path100 {
         for (int i = 1; i < states.size(); ++i) {
             m_points.add(states.get(i));
             m_distances[i] = m_distances[i - 1]
-                    + getPoint(i - 1).distance(getPoint(i));
+                    + getPoint(i - 1).distanceM(getPoint(i));
         }
     }
 

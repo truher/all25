@@ -42,11 +42,11 @@ class HolonomicSplineTest {
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = s.getPose2dWithMotion(1);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
     @Test
@@ -61,11 +61,11 @@ class HolonomicSplineTest {
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = s.getPose2dWithMotion(1);
         assertEquals(1, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
     @Test
@@ -80,11 +80,11 @@ class HolonomicSplineTest {
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = s.getPose2dWithMotion(1);
         assertEquals(2, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
     @Test
@@ -102,17 +102,17 @@ class HolonomicSplineTest {
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
         // yay, heading rate is now not zero :-)
-        assertEquals(1, p.getHeadingRate(), DELTA);
+        assertEquals(1, p.getHeadingRateRad_M(), DELTA);
         p = s.getPose2dWithMotion(1);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(1, p.getPose().getRotation().getRadians(), DELTA);
         // yay, heading rate is now not zero :-)
-        assertEquals(1, p.getHeadingRate(), DELTA);
+        assertEquals(1, p.getHeadingRateRad_M(), DELTA);
         p = s.getPose2dWithMotion(0.5);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0.5, p.getPose().getRotation().getRadians(), DELTA);
         // this used to be 1.875 in the middle
-        assertEquals(1, p.getHeadingRate(), DELTA);
+        assertEquals(1, p.getHeadingRateRad_M(), DELTA);
     }
 
     @Test

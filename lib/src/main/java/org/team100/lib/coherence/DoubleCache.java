@@ -7,7 +7,7 @@ public class DoubleCache implements DoubleSupplier {
     private double m_value;
     private boolean m_valid;
 
-    /** Do not call this directly. */
+    /** Do not call this directly, use Cache.ofDouble() */
     DoubleCache(DoubleSupplier delegate) {
         m_delegate = delegate;
         m_valid = false;

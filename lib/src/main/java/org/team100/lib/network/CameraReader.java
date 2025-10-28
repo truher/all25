@@ -109,6 +109,7 @@ public abstract class CameraReader<T> {
             // using server time seems to break the tests, like server time ignores the test
             // clock, which makes me wonder if it's just the wrong thing to use all the
             // time, so this uses "local" time now.
+            // TODO: check that this is doing the right thing
             // double valueTimestamp = ((double)ntValue.getServerTime()) / 1000000.0;
             double valueTimestamp = ((double) ntValue.getTime()) / 1000000.0;
             if (DEBUG) {

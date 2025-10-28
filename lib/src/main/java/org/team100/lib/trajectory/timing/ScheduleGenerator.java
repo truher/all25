@@ -76,15 +76,16 @@ public class ScheduleGenerator {
      */
     private List<ConstrainedState> forwardPass(List<Pose2dWithMotion> samples, double start_vel) {
         ConstrainedState predecessor = new ConstrainedState(samples.get(0), 0);
-        predecessor.setVel(start_vel);
-        predecessor.setMin_acceleration(-HIGH_ACCEL);
-        predecessor.setMax_acceleration(HIGH_ACCEL);
+        predecessor.setVelocityM_S(start_vel);
+        predecessor.setMinAccel(-HIGH_ACCEL);
+        predecessor.setMaxAccel(HIGH_ACCEL);
 
         // work forward through the samples
         List<ConstrainedState> constrainedStates = new ArrayList<>(samples.size());
         for (Pose2dWithMotion sample : samples) {
-            double ds = sample.distance(predecessor.getState());
-            ConstrainedState constrainedState = new ConstrainedState(sample, ds + predecessor.getDistance());
+            double dsM = sample.distanceM(predecessor.getM_state());
+            ConstrainedState constrainedState = new ConstrainedState(
+                    sample, dsM + predecessor.getDistanceM());
             constrainedStates.add(constrainedState);
             forwardWork(predecessor, constrainedState);
             predecessor = constrainedState;
@@ -95,18 +96,18 @@ public class ScheduleGenerator {
     private void forwardWork(ConstrainedState s0, ConstrainedState s1) {
         // constant-twist path length between states
         // note this is zero for turn-in-place.
-        double ds = s1.getState().distance(s0.getState());
+        double dsM = s1.getM_state().distanceM(s0.getM_state());
 
         // We may need to iterate to find the maximum end velocity and common
         // acceleration, since acceleration limits may be a function of velocity.
         while (true) {
             // first try the previous state accel to get the new state velocity
-            double v1 = v1(s0.getVel(), s0.getMax_acceleration(), ds);
-            s1.setVel(v1);
+            double v1 = v1(s0.getVelocityM_S(), s0.getMaxAccel(), dsM);
+            s1.setVelocityM_S(v1);
 
             // also use max accels for the new state accels
-            s1.setMin_acceleration(-HIGH_ACCEL);
-            s1.setMax_acceleration(HIGH_ACCEL);
+            s1.setMinAccel(-HIGH_ACCEL);
+            s1.setMaxAccel(HIGH_ACCEL);
 
             // reduce velocity according to constraints
             s1.clampVelocity(m_constraints);
@@ -115,20 +116,20 @@ public class ScheduleGenerator {
             s1.clampAccel(m_constraints);
 
             // motionless
-            if (Math.abs(ds) < EPSILON) {
+            if (Math.abs(dsM) < EPSILON) {
                 return;
             }
 
-            double accel = accel(s0.getVel(), s1.getVel(), ds);
-            if (accel > s1.getMax_acceleration() + EPSILON) {
+            double accel = accel(s0.getVelocityM_S(), s1.getVelocityM_S(), dsM);
+            if (accel > s1.getMaxAccel() + EPSILON) {
                 // implied accel is too high because v1 is too high, perhaps because
                 // a0 was too high, try again with the (lower) constrained value
-                s0.setMax_acceleration(s1.getMax_acceleration());
+                s0.setMaxAccel(s1.getMaxAccel());
                 continue;
             }
-            if (accel > s0.getMin_acceleration() + EPSILON) {
+            if (accel > s0.getMinAccel() + EPSILON) {
                 // set the previous state accel to whatever the constrained velocity implies
-                s0.setMax_acceleration(accel);
+                s0.setMaxAccel(accel);
             }
             return;
         }
@@ -143,10 +144,10 @@ public class ScheduleGenerator {
             List<ConstrainedState> constrainedStates) {
         // "successor" comes before in the backwards walk. start with the last state.
         ConstrainedState endState = constrainedStates.get(constrainedStates.size() - 1);
-        ConstrainedState successor = new ConstrainedState(lastState, endState.getDistance());
-        successor.setVel(end_velocity);
-        successor.setMin_acceleration(-HIGH_ACCEL);
-        successor.setMax_acceleration(HIGH_ACCEL);
+        ConstrainedState successor = new ConstrainedState(lastState, endState.getDistanceM());
+        successor.setVelocityM_S(end_velocity);
+        successor.setMinAccel(-HIGH_ACCEL);
+        successor.setMaxAccel(HIGH_ACCEL);
 
         // work backwards through the states list
         for (int i = constrainedStates.size() - 1; i >= 0; --i) {
@@ -159,7 +160,7 @@ public class ScheduleGenerator {
     /** s0 is earlier, s1 is "successor", we're walking backwards. */
     private void backwardsWork(ConstrainedState s0, ConstrainedState s1) {
         // backwards (negative) distance from successor to initial state.
-        double ds = s0.getDistance() - s1.getDistance();
+        double ds = s0.getDistanceM() - s1.getDistanceM();
         if (ds > 0) {
             // must be negative if we're walking backwards.
             throw new IllegalStateException();
@@ -169,16 +170,16 @@ public class ScheduleGenerator {
             // s0 velocity can't be more than the accel implies
             // so this is actually an estimate for v0
             // min a is negative, ds is negative, so v0 is faster than v1
-            double v0 = v1(s1.getVel(), s1.getMin_acceleration(), ds);
+            double v0 = v1(s1.getVelocityM_S(), s1.getMinAccel(), ds);
 
-            if (s0.getVel() <= v0) {
+            if (s0.getVelocityM_S() <= v0) {
                 // s0 v is slower than implied v0, which means
                 // that actual accel is larger than the min, so we're fine
                 // No new limits to impose.
                 return;
             }
             // s0 v is too fast, turn it down to obey v1 min accel.
-            s0.setVel(v0);
+            s0.setVelocityM_S(v0);
 
             s0.clampAccel(m_constraints);
 
@@ -188,14 +189,14 @@ public class ScheduleGenerator {
             }
 
             // implied accel using the constrained v0
-            double accel = accel(s1.getVel(), s0.getVel(), ds);
-            if (accel < s0.getMin_acceleration() - EPSILON) {
+            double accel = accel(s1.getVelocityM_S(), s0.getVelocityM_S(), ds);
+            if (accel < s0.getMinAccel() - EPSILON) {
                 // accel is too low which implies that s1 accel is too low, try again
-                s1.setMin_acceleration(s0.getMin_acceleration());
+                s1.setMinAccel(s0.getMinAccel());
                 continue;
             }
             // set final accel to the implied value
-            s1.setMin_acceleration(accel);
+            s1.setMinAccel(accel);
             return;
         }
     }
@@ -212,8 +213,8 @@ public class ScheduleGenerator {
         double v0 = 0.0;
         for (int i = 0; i < states.size(); ++i) {
             ConstrainedState state = states.get(i);
-            final double ds = state.getDistance() - distance;
-            final double v1 = state.getVel();
+            final double ds = state.getDistanceM() - distance;
+            final double v1 = state.getVelocityM_S();
             double dt = 0.0;
             if (i > 0) {
                 double prevAccel = accel(v0, v1, ds);
@@ -224,9 +225,9 @@ public class ScheduleGenerator {
             if (Double.isNaN(time) || Double.isInfinite(time)) {
                 throw new TimingException();
             }
-            poses.add(new TimedPose(state.getState(), time, v1, 0));
+            poses.add(new TimedPose(state.getM_state(), time, v1, 0));
             v0 = v1;
-            distance = state.getDistance();
+            distance = state.getDistanceM();
         }
         return new Trajectory100(poses);
     }

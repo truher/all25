@@ -6,20 +6,6 @@ package org.team100.lib.coherence;
  * It should be updated in robotPeriodic and nowhere else (except maybe tests).
  */
 public class Takt {
-    /** Like the WPI Timer except it uses Takt time, and it is always "running." */
-    public static class Timer {
-        private double m_startTime;
-
-        public void reset() {
-            m_startTime = Takt.get();
-        }
-
-        public double get() {
-            return Takt.get() - m_startTime;
-        }
-
-    }
-
     /** Current Takt time in seconds. */
     private static double now = actual();
 

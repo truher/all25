@@ -31,7 +31,7 @@ public class Cache {
     /** How long it takes to update the cache. */
     private static final DoubleLogger m_log_update = Logging.instance().rootLogger.name("Cache")
             .doubleLogger(Level.COMP, "update time (s)");
-    static final List<CotemporalCache<?>> caches = new ArrayList<>();
+    private static final List<ObjectCache<?>> caches = new ArrayList<>();
     private static final List<DoubleCache> doubles = new ArrayList<>();
     private static final List<SideEffect> sideEffects = new ArrayList<>();
     private static final List<BaseStatusSignal> signals = new ArrayList<>();
@@ -42,10 +42,14 @@ public class Cache {
      * the hardware interrupt time as possible, all values of cached quantities are
      * consistent and constant through the whole cycle.
      */
-    public static <T> CotemporalCache<T> of(Supplier<T> delegate) {
-        CotemporalCache<T> cache = new CotemporalCache<>(delegate);
+    public static <T> ObjectCache<T> of(Supplier<T> delegate) {
+        ObjectCache<T> cache = new ObjectCache<>(delegate);
         caches.add(cache);
         return cache;
+    }
+
+    public static void removeObjectCache(ObjectCache<?> obj) {
+        caches.remove(obj);
     }
 
     public static DoubleCache ofDouble(DoubleSupplier delegate) {
@@ -97,7 +101,7 @@ public class Cache {
      * Forgets all the stored values.
      */
     private static void reset() {
-        for (CotemporalCache<?> r : caches) {
+        for (ObjectCache<?> r : caches) {
             r.reset();
         }
         for (DoubleCache r : doubles) {
@@ -120,7 +124,7 @@ public class Cache {
                         result.toString(), result.getDescription());
             }
         }
-        for (CotemporalCache<?> r : caches) {
+        for (ObjectCache<?> r : caches) {
             if (DEBUG) {
                 System.out.printf("update %s\n", r.get().getClass().getSimpleName());
             }

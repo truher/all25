@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
 import org.team100.lib.motion.prr.AnalyticalJacobian;
 import org.team100.lib.motion.prr.Config;
 import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
@@ -85,7 +85,7 @@ public class JointConstraint implements TimingConstraint {
 
         double c = course2.map(Rotation2d::getCos).orElse(0.0);
         double s = course2.map(Rotation2d::getSin).orElse(0.0);
-        double r = state.getHeadingRate();
+        double r = state.getHeadingRateRad_M();
         double vx = velocityM_S * s;
         double vy = velocityM_S * c;
         double omega = velocityM_S * r;

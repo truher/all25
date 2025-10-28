@@ -12,9 +12,12 @@ import edu.wpi.first.math.MathUtil;
  */
 public class TimedPose {
     private final Pose2dWithMotion m_state;
-    private final double m_timeS; // Time we achieve this state.
-    private final double m_velocityM_S; // ds/dt
-    private double m_accelM_S_S; // d^2s/dt^2
+    /** Time we achieve this state. */
+    private final double m_timeS;
+    /** ds/dt */
+    private final double m_velocityM_S;
+    /** d^2s/dt^2 */
+    private double m_accelM_S_S;
 
     public TimedPose(
             Pose2dWithMotion state,
@@ -69,7 +72,7 @@ public class TimedPose {
         final double new_s = (reversing ? -1.0 : 1.0)
                 * (velocityM_S() * delta_t + .5 * acceleration() * delta_t * delta_t);
 
-        double interpolant = new_s / state().distance(other.state());
+        double interpolant = new_s / state().distanceM(other.state());
         if (Double.isNaN(interpolant)) {
             interpolant = 1.0;
         }
@@ -82,7 +85,7 @@ public class TimedPose {
     }
 
     public double distance(TimedPose other) {
-        return state().distance(other.state());
+        return state().distanceM(other.state());
     }
 
     @Override

@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -64,8 +64,8 @@ public class HolonomicSpline {
      * SplineUtil.optimizeSpline() after creating these segments.
      */
     public HolonomicSpline(HolonomicPose2d p0, HolonomicPose2d p1, double mN0, double mN1) {
-        double scale0 = mN0 * GeometryUtil.distance(p0.translation(), p1.translation());
-        double scale1 = mN1 * GeometryUtil.distance(p0.translation(), p1.translation());
+        double scale0 = mN0 * GeometryUtil.distanceM(p0.translation(), p1.translation());
+        double scale1 = mN1 * GeometryUtil.distanceM(p0.translation(), p1.translation());
         if (DEBUG) {
             System.out.printf("scale %f %f\n",  scale0, scale1 );
         }

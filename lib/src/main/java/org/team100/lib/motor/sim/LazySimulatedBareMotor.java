@@ -1,19 +1,18 @@
 package org.team100.lib.motor.sim;
 
-import org.team100.lib.coherence.Takt.Timer;
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.motor.BareMotor;
 
 /** A simulated motor that runs for awhile, and then stops. */
 public class LazySimulatedBareMotor implements BareMotor {
     private final BareMotor m_delegate;
     private final double m_timeout;
-    private final Timer m_timer;
+    private double m_startTime;
     private boolean m_running;
 
     public LazySimulatedBareMotor(BareMotor delegate, double timeout) {
         m_delegate = delegate;
         m_timeout = timeout;
-        m_timer = new Timer();
     }
 
     @Override
@@ -27,7 +26,7 @@ public class LazySimulatedBareMotor implements BareMotor {
             m_running = false;
             m_delegate.setDutyCycle(output);
         } else if (m_running) {
-            if (m_timer.get() > m_timeout) {
+            if (getTime() > m_timeout) {
                 m_running = false;
                 m_delegate.setDutyCycle(0);
             } else {
@@ -35,7 +34,7 @@ public class LazySimulatedBareMotor implements BareMotor {
             }
         } else {
             m_running = true;
-            m_timer.reset();
+            resetTimer();
             m_delegate.setDutyCycle(output);
         }
     }
@@ -46,7 +45,7 @@ public class LazySimulatedBareMotor implements BareMotor {
             m_running = false;
             m_delegate.setVelocity(velocityRad_S, accelRad_S2, torqueNm);
         } else if (m_running) {
-            if (m_timer.get() > m_timeout) {
+            if (getTime() > m_timeout) {
                 m_running = false;
                 m_delegate.setVelocity(0, 0, 0);
             } else {
@@ -54,7 +53,7 @@ public class LazySimulatedBareMotor implements BareMotor {
             }
         } else {
             m_running = true;
-            m_timer.reset();
+            resetTimer();
             m_delegate.setVelocity(velocityRad_S, accelRad_S2, torqueNm);
         }
     }
@@ -122,5 +121,13 @@ public class LazySimulatedBareMotor implements BareMotor {
     @Override
     public void play(double freq) {
         m_delegate.play(freq);
+    }
+
+    private double getTime() {
+        return Takt.get() - m_startTime;
+    }
+
+    private void resetTimer() {
+        m_startTime = Takt.get();
     }
 }

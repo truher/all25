@@ -11,8 +11,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
 

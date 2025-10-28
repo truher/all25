@@ -138,6 +138,7 @@ public enum Camera {
     public static Camera get(String serialNumber) {
         if (cameras.containsKey(serialNumber))
             return cameras.get(serialNumber);
+        System.out.printf("*** Using Camera UNKNOWN for serial number %s\n", serialNumber);
         return UNKNOWN;
     }
 

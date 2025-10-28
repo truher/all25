@@ -251,11 +251,11 @@ public class GeometryUtil {
      * Distance along the arc between the two poses (in either order) produced by a
      * constant twist.
      */
-    public static double distance(Pose2d a, Pose2d b) {
+    public static double distanceM(Pose2d a, Pose2d b) {
         return norm(slog(transformBy(inverse(a), b)));
     }
 
-    public static double distance(Translation2d a, Translation2d b) {
+    public static double distanceM(Translation2d a, Translation2d b) {
         return inverse(a).plus(b).getNorm();
     }
 

@@ -1,7 +1,7 @@
 package org.team100.lib.motion.swerve;
 
 import org.team100.lib.coherence.Cache;
-import org.team100.lib.coherence.CotemporalCache;
+import org.team100.lib.coherence.ObjectCache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.DriverSkill;
 import org.team100.lib.geometry.GlobalVelocityR3;
@@ -38,7 +38,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
     private final SwerveLimiter m_limiter;
 
     // CACHES
-    private final CotemporalCache<ModelR3> m_stateCache;
+    private final ObjectCache<ModelR3> m_stateCache;
 
     // LOGGERS
     private final ModelR3Logger m_log_state;
