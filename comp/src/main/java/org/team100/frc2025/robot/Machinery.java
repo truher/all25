@@ -12,6 +12,7 @@ import org.team100.frc2025.indicator.LEDIndicator;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.GyroFactory;
+import org.team100.lib.indicator.Beeper;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.NudgingVisionUpdater;
@@ -162,7 +163,7 @@ public class Machinery {
                 m_localizer,
                 m_manipulator,
                 m_climberIntake);
-        m_beeper = new Beeper(this);
+        m_beeper = new Beeper(m_mech, m_manipulator, m_drive);
     }
 
     public void periodic() {

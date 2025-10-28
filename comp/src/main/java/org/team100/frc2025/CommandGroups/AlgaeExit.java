@@ -14,7 +14,6 @@ public class AlgaeExit {
             Supplier<ScoringLevel> level) {
 
         Command pick = mech.algaeReefExit(level);
-        return 
-                pick;
+        return pick;
     }
 }

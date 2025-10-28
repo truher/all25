@@ -24,10 +24,10 @@ public class ReferenceControllerR3 {
      * this from, e.g. Command.initialize(), not in the constructor.
      */
     public ReferenceControllerR3(
-            SubsystemR3 drive,
+            SubsystemR3 subsystem,
             ControllerR3 controller,
             ReferenceR3 reference) {
-        m_subsystem = drive;
+        m_subsystem = subsystem;
         m_controller = controller;
         m_reference = reference;
 

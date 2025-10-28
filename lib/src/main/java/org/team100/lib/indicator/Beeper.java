@@ -1,7 +1,11 @@
-package org.team100.frc2025.robot;
+package org.team100.lib.indicator;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+
+import java.util.Arrays;
+
+import org.team100.lib.music.Music;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -17,17 +21,14 @@ public class Beeper {
     private static final double A6 = 1670;
     private static final double Bflat6 = 1865;
 
-    private final Machinery m_machinery;
+    private final Music m_music[];
 
-    public Beeper(Machinery machinery) {
-        m_machinery = machinery;
+    public Beeper(Music... machinery) {
+        m_music = machinery;
     }
 
     public Command play(double freq) {
-        return parallel(
-                m_machinery.m_mech.play(freq),
-                m_machinery.m_manipulator.play(freq),
-                m_machinery.m_drive.play(freq));
+        return parallel(Arrays.stream(m_music).map((m) -> m.play(freq)).toArray(Command[]::new));
     }
 
     /**
