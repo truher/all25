@@ -77,6 +77,10 @@ public class SolidIndicator extends SubsystemBase {
         new Trigger(condition).onTrue(blink(color).withTimeout(EVENT_DURATION));
     }
 
+    public void close() {
+        m_led.close();
+    }
+
     /////////////////////////////////////////////////////////////
 
     private Command blink(Color color) {

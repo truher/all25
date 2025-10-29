@@ -14,7 +14,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-/** Simulated projectile. */
+/**
+ * Simulated projectile.
+ * 
+ * Provides Field2d visualization using the name "ball".
+ */
 public class Ball {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private static final double SPEED_M_S = 1;

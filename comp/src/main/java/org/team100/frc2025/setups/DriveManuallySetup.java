@@ -12,7 +12,6 @@ import org.team100.lib.commands.swerve.manual.SimpleManualModuleStates;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
-import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
@@ -28,7 +27,7 @@ public class DriveManuallySetup {
 
     public static void setup(
             LoggerFactory comLog,
-            FieldLogger.Log fieldLog,
+            LoggerFactory fieldLog,
             DriverXboxControl driverControl,
             AprilTagRobotLocalizer localizer,
             SwerveDriveSubsystem drive,

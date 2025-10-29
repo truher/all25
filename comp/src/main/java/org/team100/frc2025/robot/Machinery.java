@@ -19,7 +19,6 @@ import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveHistory;
-import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.motion.swerve.SwerveDriveFactory;
@@ -58,7 +57,6 @@ public class Machinery {
     private final Runnable m_targetSimulator;
     private final LEDIndicator m_leds;
 
-    final FieldLogger.Log m_fieldLog;
     final CalgamesMech m_mech;
     final Manipulator m_manipulator;
     final Climber m_climber;
@@ -74,8 +72,6 @@ public class Machinery {
         final LoggerFactory logger = Logging.instance().rootLogger;
         final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
         final LoggerFactory driveLog = logger.name("Drive");
-
-        m_fieldLog = new FieldLogger.Log(fieldLogger);
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
 
@@ -132,7 +128,7 @@ public class Machinery {
                 layout,
                 history,
                 visionUpdater);
-        m_targets = new Targets(driveLog, m_fieldLog, history);
+        m_targets = new Targets(driveLog, fieldLogger, history);
 
         ////////////////////////////////////////////////////////////
         //

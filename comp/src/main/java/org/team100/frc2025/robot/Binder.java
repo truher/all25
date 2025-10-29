@@ -45,6 +45,7 @@ public class Binder {
 
     public void bind() {
         final LoggerFactory logger = Logging.instance().rootLogger;
+        final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
         final LoggerFactory comLog = logger.name("Commands");
 
         /////////////////////////////////////////////////
@@ -143,18 +144,11 @@ public class Binder {
                 parallel(
                         m_machinery.m_mech.pickWithProfile(),
                         m_machinery.m_manipulator.centerIntake(),
-
                         FloorPickSequence.get(
-                                m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
+                                fieldLogger, m_machinery.m_drive, m_machinery.m_targets,
                                 ControllerFactoryR3.pick(comLog), coralPickProfile)
                                 .withName("Floor Pick"))
                         .until(m_machinery.m_manipulator::hasCoral));
-
-        FloorPickSequence.get(
-                m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
-                ControllerFactoryR3.pick(comLog), coralPickProfile)
-                .withName("Floor Pick")
-                .until(m_machinery.m_manipulator::hasCoral);
 
         // Sideways intake for L1
         whileTrue(buttons::red2,

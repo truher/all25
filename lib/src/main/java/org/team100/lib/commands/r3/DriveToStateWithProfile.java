@@ -5,7 +5,9 @@ import java.util.function.Supplier;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
-import org.team100.lib.logging.FieldLogger;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
@@ -16,7 +18,7 @@ import org.team100.lib.subsystems.VelocitySubsystemR3;
  * after initialization.
  */
 public class DriveToStateWithProfile extends MoveAndHold {
-    private final FieldLogger.Log m_field_log;
+    public final DoubleArrayLogger m_log_target;
     private final Supplier<ModelR3> m_goals;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
@@ -27,12 +29,12 @@ public class DriveToStateWithProfile extends MoveAndHold {
     private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveToStateWithProfile(
-            FieldLogger.Log fieldLogger,
+            LoggerFactory fieldLogger,
             Supplier<ModelR3> goal,
             VelocitySubsystemR3 drive,
             ControllerR3 controller,
             HolonomicProfile profile) {
-        m_field_log = fieldLogger;
+        m_log_target = fieldLogger.doubleArrayLogger(Level.TRACE, "target");
         m_goals = goal;
         m_drive = drive;
         m_controller = controller;
@@ -58,7 +60,7 @@ public class DriveToStateWithProfile extends MoveAndHold {
             return;
         m_reference.setGoal(m_goal);
         m_referenceController.execute();
-        m_field_log.m_log_target.log(() -> new double[] {
+        m_log_target.log(() -> new double[] {
                 m_goal.x().x(),
                 m_goal.y().x(),
                 m_goal.theta().x() });

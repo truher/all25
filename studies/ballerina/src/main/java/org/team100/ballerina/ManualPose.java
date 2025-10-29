@@ -3,7 +3,7 @@ package org.team100.ballerina;
 import java.util.function.Supplier;
 
 import org.team100.lib.coherence.Cache;
-import org.team100.lib.coherence.CotemporalCache;
+import org.team100.lib.coherence.ObjectCache;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;
@@ -15,14 +15,21 @@ import org.team100.lib.state.ModelR3;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-/** Provide a pose estimate with manual control. */
+/**
+ * Provide a pose estimate with manual control.
+ * 
+ * This is just for testing, a way to "drive around" in simulation without using
+ * a full simulated drivetrain.
+ * 
+ * It provides Field2d visualization of the robot using the name "robot".
+ */
 public class ManualPose {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private static final double MAX_V = 1.0;
     private static final double MAX_OMEGA = 1.0;
     private final DoubleArrayLogger m_log_field_robot;
     private final Supplier<Velocity> m_v;
-    private final CotemporalCache<ModelR3> m_stateCache;
+    private final ObjectCache<ModelR3> m_stateCache;
     /** Used only by update(). */
     private ModelR3 m_state;
 
@@ -36,12 +43,12 @@ public class ManualPose {
         m_stateCache = Cache.of(this::update);
     }
 
-    public Pose2d getPose() {
-        return getState().pose();
-    }
-
     public ModelR3 getState() {
         return m_stateCache.get();
+    }
+
+    public Pose2d getPose() {
+        return getState().pose();
     }
 
     public void periodic() {
@@ -49,7 +56,7 @@ public class ManualPose {
     }
 
     private double[] poseArray() {
-        Pose2d pose = m_stateCache.get().pose();
+        Pose2d pose = getPose();
         return new double[] {
                 pose.getX(),
                 pose.getY(),

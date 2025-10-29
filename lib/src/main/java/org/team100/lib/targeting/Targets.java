@@ -10,9 +10,9 @@ import org.team100.lib.coherence.SideEffect;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.geometry.Centroid2d;
 import org.team100.lib.geometry.Near2d;
-import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.state.ModelR3;
@@ -42,7 +42,7 @@ public class Targets extends CameraReader<Rotation3d> {
     /** Targets closer than this to each other are combined */
     private static final double NEARNESS_THRESHOLD = 0.15;
 
-    private final FieldLogger.Log m_field_log;
+    public final DoubleArrayLogger m_log_target;
 
     /** state = f(takt seconds) from history. */
     private final DoubleFunction<ModelR3> m_history;
@@ -55,14 +55,14 @@ public class Targets extends CameraReader<Rotation3d> {
 
     public Targets(
             LoggerFactory log,
-            FieldLogger.Log fieldLogger,
+            LoggerFactory fieldLogger,
             DoubleFunction<ModelR3> history) {
         super(
                 "objectVision",
                 "Rotation3d",
                 StructBuffer.create(Rotation3d.struct));
         m_log_historySize = log.type(this).intLogger(Level.TRACE, "history size");
-        m_field_log = fieldLogger;
+        m_log_target = log.doubleArrayLogger(Level.TRACE, "target");
         m_history = history;
         // m_targets = new TrailingHistory<>(HISTORY_DURATION);
         m_targets = new CoalescingCollection<>(
@@ -120,7 +120,7 @@ public class Targets extends CameraReader<Rotation3d> {
         // () -> new double[] { x.getX(), x.getY(), 0 }));
 
         // show *all* targets on the field2d widget.
-        m_field_log.m_log_target.log(
+        m_log_target.log(
                 () -> getTargets().stream().flatMapToDouble(
                         x -> DoubleStream.of(x.getX(), x.getY(), 0.0)).toArray());
 
