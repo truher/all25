@@ -7,19 +7,19 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.controller.drivetrain.SwerveController;
-import org.team100.lib.controller.drivetrain.SwerveControllerFactory;
+import org.team100.lib.controller.r3.ControllerFactoryR3;
+import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.drivetrain.Fixtured;
-import org.team100.lib.motion.drivetrain.MockDrive;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.MockSubsystemR3;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
@@ -48,11 +48,10 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
-        SwerveController controller = SwerveControllerFactory.test(logger);
+        ControllerR3 controller = ControllerFactoryR3.test(logger);
 
-        MockDrive d = new MockDrive();
         // initially at rest
-        d.m_state = new ModelR3();
+        MockSubsystemR3 d = new MockSubsystemR3(new ModelR3());
 
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
 
@@ -100,12 +99,11 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
         assertEquals(0, t.sample(0).velocityM_S(), DELTA);
-        SwerveController controller = SwerveControllerFactory.test(logger);
+        ControllerR3 controller = ControllerFactoryR3.test(logger);
 
-        MockDrive d = new MockDrive();
         // initially at rest
-        d.m_state = new ModelR3();
-
+        MockSubsystemR3 d = new MockSubsystemR3(new ModelR3());
+        
         DriveWithTrajectory c = new DriveWithTrajectory(d, controller, t, viz);
         c.initialize();
 
@@ -132,7 +130,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
         assertEquals(0, trajectory.sample(0).velocityM_S(), DELTA);
-        SwerveController controller = SwerveControllerFactory.test(logger);
+        ControllerR3 controller = ControllerFactoryR3.test(logger);
 
         SwerveDriveSubsystem drive = fixture.drive;
 
@@ -153,13 +151,13 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
         stepTime();
         command.execute();
         // this is the output from the previous takt
-        assertEquals(0.02, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(0.033, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
         assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
 
         // etc
         stepTime();
         command.execute();
-        assertEquals(0.04, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
+        assertEquals(0.064, fixture.collection.states().frontLeft().speedMetersPerSecond(), DELTA);
         assertEquals(0, fixture.collection.states().frontLeft().angle().get().getRadians(), DELTA);
     }
 

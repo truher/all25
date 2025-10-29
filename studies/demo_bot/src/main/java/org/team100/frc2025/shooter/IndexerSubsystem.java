@@ -4,7 +4,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.mechanism.LinearMechanism;
 import org.team100.lib.motion.servo.OutboardLinearPositionServo;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 

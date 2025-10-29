@@ -28,8 +28,6 @@ import org.team100.lib.motion.drivetrain.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.drivetrain.module.SwerveModuleCollection;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
-import org.team100.lib.trajectory.TrajectoryPlanner;
-import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.util.CanId;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -66,22 +64,19 @@ public class Machinery {
     final ClimberIntake m_climberIntake;
     final TrajectoryVisualization m_trajectoryViz;
     final SwerveKinodynamics m_swerveKinodynamics;
-    final TrajectoryPlanner m_planner;
     final AprilTagRobotLocalizer m_localizer;
     final Targets m_targets;
     final SwerveDriveSubsystem m_drive;
     final Beeper m_beeper;
 
-    public Machinery(LoggerFactory logger) {
-        LoggerFactory driveLog = logger.name("Drive");
-        Logging logging = Logging.instance();
-        LoggerFactory fieldLogger = logging.fieldLogger;
+    public Machinery() {
+        final LoggerFactory logger = Logging.instance().rootLogger;
+        final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
+        final LoggerFactory driveLog = logger.name("Drive");
 
         m_fieldLog = new FieldLogger.Log(fieldLogger);
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
-        m_planner = new TrajectoryPlanner(
-                new TimingConstraintFactory(m_swerveKinodynamics).medium());
 
         ////////////////////////////////////////////////////////////
         //

@@ -62,4 +62,8 @@ public class MockAngularPositionServo implements AngularPositionServo {
     public void periodic() {
     }
 
+    @Override
+    public void play(double freq) {
+    }
+
 }

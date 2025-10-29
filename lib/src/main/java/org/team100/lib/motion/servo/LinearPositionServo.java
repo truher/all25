@@ -1,6 +1,6 @@
 package org.team100.lib.motion.servo;
 
-import org.team100.lib.reference.SetpointsR1;
+import org.team100.lib.reference.r1.SetpointsR1;
 
 /**
  * Linear position control, e.g. for elevators.

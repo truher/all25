@@ -1,7 +1,7 @@
 package org.team100.lib.motion.drivetrain.module;
 
-import org.team100.lib.controller.simple.Feedback100;
-import org.team100.lib.controller.simple.PIDFeedback;
+import org.team100.lib.controller.r1.Feedback100;
+import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.encoder.CombinedRotaryPositionSensor;
 import org.team100.lib.encoder.ProxyRotaryPositionSensor;
 import org.team100.lib.encoder.SimulatedBareEncoder;
@@ -17,7 +17,7 @@ import org.team100.lib.motion.servo.OutboardAngularPositionServo;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
-import org.team100.lib.reference.IncrementalProfileReferenceR1;
+import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 
 /**
  * Uses simulated position sensors, must be used with clock control (e.g.
@@ -138,5 +138,4 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
         super(driveServo, turningServo, WHEEL_DIAMETER_M, DRIVE_GEAR_RATIO / 2);
         //
     }
-
 }

@@ -4,18 +4,12 @@ import org.team100.frc2025.robot.AllAutons;
 import org.team100.frc2025.robot.Binder;
 import org.team100.frc2025.robot.Machinery;
 import org.team100.frc2025.robot.Prewarmer;
-import org.team100.lib.async.Async;
-import org.team100.lib.async.AsyncFactory;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Identity;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.logging.Level;
-import org.team100.lib.logging.LevelPoller;
-import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.Logging;
 import org.team100.lib.logging.RobotLog;
 import org.team100.lib.util.Banner;
 
@@ -45,27 +39,20 @@ public class Robot extends TimedRobot100 {
         System.out.printf("RoboRIO serial number: %s\n", RobotController.getSerialNumber());
         System.out.printf("Identity: %s\n", Identity.instance.name());
         RobotController.setBrownoutVoltage(5.5);
+        DriverStation.silenceJoystickConnectionWarning(true);
         Banner.printBanner();
 
         // Log what the scheduler is doing. Use "withName()".
         SmartDashboard.putData(CommandScheduler.getInstance());
 
-        final Async async = new AsyncFactory(this).get();
-        final Logging logging = Logging.instance();
-        final LevelPoller poller = new LevelPoller(async, logging::setLevel, Level.TRACE);
-        System.out.printf("Using log level %s\n", poller.getLevel().name());
-        System.out.println("Do not use TRACE in comp, with NT logging, it will overrun");
+        m_robotLog = new RobotLog();
 
-        LoggerFactory logger = logging.rootLogger;
-        m_robotLog = new RobotLog(logger);
-
-        m_machinery = new Machinery(logger);
-        m_allAutons = new AllAutons(logger, m_machinery);
+        m_machinery = new Machinery();
+        m_allAutons = new AllAutons(m_machinery);
         m_binder = new Binder(m_machinery);
-        m_binder.bind(logger);
+        m_binder.bind();
 
         Prewarmer.init(m_machinery);
-        System.out.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
     }
 
     @Override
@@ -103,11 +90,6 @@ public class Robot extends TimedRobot100 {
     }
 
     @Override
-    public void simulationInit() {
-        DriverStation.silenceJoystickConnectionWarning(true);
-    }
-
-    @Override
     public void close() {
         super.close();
         m_machinery.close();
@@ -120,6 +102,10 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void robotInit() {
+    }
+
+    @Override
+    public void simulationInit() {
     }
 
     @Override

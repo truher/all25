@@ -12,12 +12,13 @@ import org.team100.lib.commands.drivetrain.DriveToPoseWithProfile;
 import org.team100.lib.commands.drivetrain.DriveToTranslationFacingWithProfile;
 import org.team100.lib.commands.drivetrain.DriveWithTrajectoryFunction;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
-import org.team100.lib.controller.drivetrain.FullStateSwerveController;
+import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.trajectory.TrajectoryPlanner;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,24 +30,27 @@ public class LolipopAuto {
     private final LoggerFactory m_logger;
     private final Machinery m_machinery;
     private final HolonomicProfile m_autoProfile;
-    private final FullStateSwerveController m_autoController;
+    private final FullStateControllerR3 m_autoController;
+    private final TrajectoryPlanner m_planner;
 
     public LolipopAuto(
             LoggerFactory logger,
             Machinery machinery,
             HolonomicProfile autoProfile,
-            FullStateSwerveController autoController) {
+            FullStateControllerR3 autoController,
+            TrajectoryPlanner planner) {
         m_logger = logger;
         m_machinery = machinery;
         m_autoProfile = autoProfile;
         m_autoController = autoController;
+        m_planner = planner;
     }
 
     public Command get() {
         // this one uses some curvature
         DriveWithTrajectoryFunction toReefTrajectory = new DriveWithTrajectoryFunction(
                 m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
-                (p) -> m_machinery.m_planner.restToRest(List.of(
+                (p) -> m_planner.restToRest(List.of(
                         HolonomicPose2d.make(m_machinery.m_drive.getPose(), Math.PI),
                         HolonomicPose2d.make(3, 5, 0, -2))));
 

@@ -81,6 +81,11 @@ public class BareMotorGroup implements BareMotor {
         apply((m) -> m.periodic());
     }
 
+    @Override
+    public void play(double freq) {
+        apply((m) -> m.play(freq));
+    }
+
     private void apply(Consumer<BareMotor> f) {
         for (BareMotor m : m_motors) {
             f.accept(m);

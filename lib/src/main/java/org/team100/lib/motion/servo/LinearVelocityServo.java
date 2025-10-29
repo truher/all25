@@ -1,5 +1,7 @@
 package org.team100.lib.motion.servo;
 
+import org.team100.lib.music.Player;
+
 /**
  * Represents a servo whose output is measured in linear units -- this is
  * usually relevant for wheeled mechanisms, where the surface speed of the wheel
@@ -10,7 +12,7 @@ package org.team100.lib.motion.servo;
  * 
  * A ball-shooter is a wheel, but the important thing is its surface speed.
  */
-public interface LinearVelocityServo {
+public interface LinearVelocityServo extends Player {
     void reset();
 
     void setDutyCycle(double dutyCycle);

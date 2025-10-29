@@ -6,6 +6,7 @@ import java.util.List;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.logging.Logging;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
@@ -37,7 +38,7 @@ public class Prewarmer {
         planner.restToRest(waypoints);
 
         // Exercise the drive motors.
-        machinery.m_drive.driveInFieldCoords(new GlobalVelocityR3(0, 0, 0));
+        machinery.m_drive.setVelocity(new GlobalVelocityR3(0, 0, 0));
 
         // Exercise some mechanism commands.
         Command c = machinery.m_mech.homeToL4();
@@ -85,8 +86,8 @@ public class Prewarmer {
             Thread.sleep(1000);
             System.out.println("Done!");
         } catch (InterruptedException e) {
-
         }
+        System.out.printf("Total Logger Keys: %d\n", Logging.instance().keyCount());
         System.out.printf("\n*** PREWARM END ET: %f\n", endS - startS);
     }
 
