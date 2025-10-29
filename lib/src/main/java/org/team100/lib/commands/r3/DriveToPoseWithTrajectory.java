@@ -5,10 +5,10 @@ import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.controller.r3.ReferenceControllerR3;
+import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.SubsystemR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -25,14 +25,14 @@ import edu.wpi.first.math.geometry.Pose2d;
  */
 public class DriveToPoseWithTrajectory extends MoveAndHold {
     private final Supplier<Pose2d> m_goal;
-    private final SubsystemR3 m_drive;
+    private final VelocitySubsystemR3 m_drive;
     private final BiFunction<ModelR3, Pose2d, Trajectory100> m_trajectories;
     private final ControllerR3 m_controller;
     private final TrajectoryVisualization m_viz;
 
     private Trajectory100 m_trajectory;
 
-    private ReferenceControllerR3 m_referenceController;
+    private VelocityReferenceControllerR3 m_referenceController;
 
     /**
      * @param trajectories function that takes a start and end pose and returns a
@@ -40,7 +40,7 @@ public class DriveToPoseWithTrajectory extends MoveAndHold {
      */
     public DriveToPoseWithTrajectory(
             Supplier<Pose2d> goal,
-            SubsystemR3 drive,
+            VelocitySubsystemR3 drive,
             BiFunction<ModelR3, Pose2d, Trajectory100> trajectories,
             ControllerR3 controller,
             TrajectoryVisualization viz) {
@@ -60,7 +60,7 @@ public class DriveToPoseWithTrajectory extends MoveAndHold {
             return;
         }
         TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(m_trajectory);
-        m_referenceController = new ReferenceControllerR3(
+        m_referenceController = new VelocityReferenceControllerR3(
                 m_drive, m_controller, reference);
         m_viz.setViz(m_trajectory);
     }

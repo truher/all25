@@ -1,4 +1,4 @@
-package org.team100.lib.wave;
+package org.team100.lib.util.wave;
 
 import java.util.function.DoubleUnaryOperator;
 

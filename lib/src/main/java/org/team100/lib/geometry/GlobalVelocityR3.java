@@ -48,7 +48,7 @@ public record GlobalVelocityR3(double x, double y, double theta) {
 
     /** Field-relative course, or empty if slower than 1 micron/sec. */
     public Optional<Rotation2d> angle() {
-        if (Math.abs(x) < 1e-6 && Math.abs(y) < 1e-6)
+        if (norm() < 1e-6)
             return Optional.empty();
         return Optional.of(new Rotation2d(x, y));
     }

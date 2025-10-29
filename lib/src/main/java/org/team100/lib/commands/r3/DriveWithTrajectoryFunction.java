@@ -4,9 +4,9 @@ import java.util.function.Function;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.controller.r3.ReferenceControllerR3;
+import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
-import org.team100.lib.subsystems.SubsystemR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -18,7 +18,7 @@ import edu.wpi.first.math.geometry.Pose2d;
  * probably the returned trajectory should start from rest.
  */
 public class DriveWithTrajectoryFunction extends MoveAndHold {
-    private final SubsystemR3 m_drive;
+    private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final TrajectoryVisualization m_viz;
     private final Function<Pose2d, Trajectory100> m_trajectoryFn;
@@ -27,10 +27,10 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
      * Non-null when the command is active (between initialize and end), null
      * otherwise.
      */
-    private ReferenceControllerR3 m_referenceController;
+    private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveWithTrajectoryFunction(
-            SubsystemR3 drive,
+            VelocitySubsystemR3 drive,
             ControllerR3 controller,
             TrajectoryVisualization viz,
             Function<Pose2d, Trajectory100> trajectoryFn) {
@@ -46,7 +46,7 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
         Trajectory100 trajectory = m_trajectoryFn.apply(m_drive.getState().pose());
         m_viz.setViz(trajectory);
         TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
-        m_referenceController = new ReferenceControllerR3(
+        m_referenceController = new VelocityReferenceControllerR3(
                 m_drive, m_controller, reference);
     }
 

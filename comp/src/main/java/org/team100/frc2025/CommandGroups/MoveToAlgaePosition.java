@@ -15,9 +15,9 @@ public class MoveToAlgaePosition {
             CalgamesMech mech,
             Supplier<ScoringLevel> level,
             Supplier<Boolean> buttons) {
-                Command pick = mech.algaeReefPick(level);
-                Command exit = mech.algaeReefExit(level);
-                return sequence(
+        Command pick = mech.algaeReefPick(level);
+        Command exit = mech.algaeReefExit(level);
+        return sequence(
                 pick.until(() -> !buttons.get()), exit);
     }
 }

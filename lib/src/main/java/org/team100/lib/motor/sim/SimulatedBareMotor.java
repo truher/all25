@@ -1,7 +1,7 @@
 package org.team100.lib.motor.sim;
 
 import org.team100.lib.coherence.Cache;
-import org.team100.lib.coherence.CotemporalCache;
+import org.team100.lib.coherence.ObjectCache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -28,7 +28,7 @@ public class SimulatedBareMotor implements BareMotor {
     private final DoubleLogger m_log_positionInput;
     private final DoubleLogger m_log_accelInput;
     private final DoubleLogger m_log_torqueInput;
-    private final CotemporalCache<Model100> m_stateCache;
+    private final ObjectCache<Model100> m_stateCache;
 
     // just like in a real motor, the inputs remain until zeroed by the watchdog.
     // nullable; only one (velocity or position) is used at a time.

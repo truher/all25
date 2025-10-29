@@ -4,12 +4,12 @@ import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.controller.r3.ReferenceControllerR3;
+import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
-import org.team100.lib.subsystems.SubsystemR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -24,18 +24,18 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     private final Pose2d m_goal;
     private final GlobalVelocityR3 m_endVelocity;
-    private final SubsystemR3 m_drive;
+    private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final TrajectoryVisualization m_viz;
     private final TrajectoryPlanner m_planner;
 
-    private ReferenceControllerR3 m_referenceController;
+    private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveToPoseWithTrajectoryAndExitVelocity(
             LoggerFactory log,
             Pose2d goal,
             GlobalVelocityR3 endVelocity,
-            SubsystemR3 drive,
+            VelocitySubsystemR3 drive,
             ControllerR3 controller,
             TrajectoryPlanner planner,
             TrajectoryVisualization viz) {
@@ -74,7 +74,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
         m_viz.setViz(trajectory);
 
         TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
-        m_referenceController = new ReferenceControllerR3(
+        m_referenceController = new VelocityReferenceControllerR3(
                 m_drive, m_controller, reference);
     }
 

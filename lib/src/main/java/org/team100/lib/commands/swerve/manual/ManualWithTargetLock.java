@@ -5,11 +5,10 @@ import java.util.function.Supplier;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.TargetUtil;
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.incremental.IncrementalProfile;
@@ -17,6 +16,7 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.targeting.TargetUtil;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -47,17 +47,17 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
     private final IncrementalProfile m_profile;
 
     private final DoubleLogger m_log_apparent_motion;
-    private final FieldLogger.Log m_field_log;
+    public final DoubleArrayLogger m_log_target;
 
     private Control100 m_thetaSetpoint;
 
     public ManualWithTargetLock(
-            FieldLogger.Log fieldLogger,
+            LoggerFactory fieldLogger,
             LoggerFactory parent,
             SwerveKinodynamics swerveKinodynamics,
             Supplier<Translation2d> target,
             Feedback100 thetaController) {
-        m_field_log = fieldLogger;
+        m_log_target = fieldLogger.doubleArrayLogger(Level.TRACE, "target");
         LoggerFactory child = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_target = target;
@@ -107,7 +107,7 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
         final double targetMotion = TargetUtil.targetMotion(state, target);
 
         final Translation2d currentTranslation = state.pose().getTranslation();
-        Rotation2d absoluteBearing = TargetUtil.bearing(currentTranslation, target);
+        Rotation2d absoluteBearing = TargetUtil.absoluteBearing(currentTranslation, target);
 
         final double yaw = state.theta().x();
         absoluteBearing = new Rotation2d(
@@ -135,7 +135,7 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
                 scaledInput.x(), scaledInput.y(), omega);
 
         m_log_apparent_motion.log(() -> targetMotion);
-        m_field_log.m_log_target.log(() -> new double[] {
+        m_log_target.log(() -> new double[] {
                 target.getX(),
                 target.getY(),
                 0 });

@@ -3,15 +3,15 @@ package org.team100.ballerina;
 import java.util.function.Supplier;
 
 import org.team100.lib.controller.r1.PIDFeedback;
-import org.team100.lib.encoder.SimulatedBareEncoder;
-import org.team100.lib.encoder.SimulatedRotaryPositionSensor;
+import org.team100.lib.encoder.sim.SimulatedBareEncoder;
+import org.team100.lib.encoder.sim.SimulatedRotaryPositionSensor;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.motion.mechanism.RotaryMechanism;
 import org.team100.lib.motion.servo.AngularPositionServo;
 import org.team100.lib.motion.servo.OnboardAngularPositionServo;
-import org.team100.lib.motor.SimulatedBareMotor;
+import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
@@ -23,7 +23,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** Attempts to maintain aim. Demonstrates "spotting". */
+/**
+ * Attempts to maintain aim. Demonstrates "spotting".
+ * 
+ * It provides Field2d visualization of the turret using the name "turret".
+ */
 public class Turret extends SubsystemBase {
     private static final double GEAR_RATIO = 100;
     private static final double MIN_POSITION = -3;

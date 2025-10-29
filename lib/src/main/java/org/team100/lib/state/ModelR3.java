@@ -135,7 +135,7 @@ public class ModelR3 {
             double velocityM_s = timedPose.velocityM_S();
             double xv = motion_direction.getCos() * velocityM_s;
             double yv = motion_direction.getSin() * velocityM_s;
-            double thetav = timedPose.state().getHeadingRate() * velocityM_s;
+            double thetav = timedPose.state().getHeadingRateRad_M() * velocityM_s;
             return new ModelR3(
                     new Model100(xx, xv),
                     new Model100(yx, yv),

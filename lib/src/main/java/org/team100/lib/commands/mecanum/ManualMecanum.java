@@ -16,8 +16,12 @@ import org.team100.lib.util.EnumChooser;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
+/**
+ * Map manual velocity input to the Mecanum drive, using some sort of input
+ * scaling to fit into its diamond-shaped velocity envelope.
+ */
 public class ManualMecanum extends Command {
-    public enum InputShaping {
+    public enum InputScaling {
         NONE,
         CLIP,
         SQUASH
@@ -29,7 +33,7 @@ public class ManualMecanum extends Command {
     private final Mutable m_maxOmega;
     private final SwerveLimiter m_limiter;
     private final MecanumDrive100 m_drive;
-    private final EnumChooser<InputShaping> m_chooser;
+    private final EnumChooser<InputScaling> m_chooser;
 
     public ManualMecanum(
             LoggerFactory parent,
@@ -48,7 +52,7 @@ public class ManualMecanum extends Command {
         m_maxOmega = new Mutable(log, "maxOmega", maxOmega);
         m_limiter = limiter;
         m_drive = drive;
-        m_chooser = new EnumChooser<>("Input Shaping", InputShaping.NONE);
+        m_chooser = new EnumChooser<>("Input Scaling", InputScaling.NONE);
         addRequirements(drive);
     }
 

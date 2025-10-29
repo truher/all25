@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
+import org.team100.lib.commands.r3.GoToPosePosition;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.prr.AnalyticalJacobian;
@@ -62,7 +63,7 @@ public class MechTrajectories extends Command {
     public Command terminal(String name, HolonomicPose2d start, HolonomicPose2d end) {
 
         /** Use the start course and ignore the start pose for now */
-        MoveAndHold f = new GoToPoseCalGamesMech(m_subsystem, start.course(), end, m_planner);
+        MoveAndHold f = new GoToPosePosition(m_subsystem, start.course(), end, m_planner);
         return f
                 .until(f::isDone)
                 .withName(name);
@@ -72,7 +73,7 @@ public class MechTrajectories extends Command {
     public MoveAndHold endless(String name, HolonomicPose2d start, HolonomicPose2d end) {
 
         /** Use the start course and ignore the start pose for now */
-        GoToPoseCalGamesMech c = new GoToPoseCalGamesMech(
+        GoToPosePosition c = new GoToPosePosition(
                 m_subsystem, start.course(), end, m_planner);
         c.setName(name);
         return c;

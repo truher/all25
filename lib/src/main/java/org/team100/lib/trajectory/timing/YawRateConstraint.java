@@ -48,7 +48,7 @@ public class YawRateConstraint implements TimingConstraint {
             return new NonNegativeDouble(Double.MAX_VALUE);
         }
         // Heading rate in rad/m
-        final double heading_rate = state.getHeadingRate();
+        final double heading_rate = state.getHeadingRateRad_M();
         // rad/s / rad/m => m/s.
         return new NonNegativeDouble(m_maxOmegaRad_S.getAsDouble() / Math.abs(heading_rate));
     }
@@ -61,7 +61,7 @@ public class YawRateConstraint implements TimingConstraint {
             return MinMaxAcceleration.NO_LIMITS;
         }
         // Heading rate in rad/m
-        final double heading_rate = state.getHeadingRate();
+        final double heading_rate = state.getHeadingRateRad_M();
         // rad/s^2 / rad/m => m/s^2
         double limitM_S = m_maxAlphaRad_S2.getAsDouble() / Math.abs(heading_rate);
         return new MinMaxAcceleration(-limitM_S, limitM_S);

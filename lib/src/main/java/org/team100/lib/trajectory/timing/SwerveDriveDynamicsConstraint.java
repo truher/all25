@@ -52,7 +52,7 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
         double vx = course_local.getCos();
         double vy = course_local.getSin();
         // rad/m
-        double vtheta = state.getHeadingRate();
+        double vtheta = state.getHeadingRateRad_M();
 
         // first compute the effect of heading rate
 

@@ -5,13 +5,13 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.function.BooleanSupplier;
 
-import org.team100.frc2025.CalgamesArm.FollowJointProfiles;
-import org.team100.frc2025.CalgamesArm.ManualCartesian;
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmartLuke;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
+import org.team100.lib.commands.prr.FollowJointProfiles;
+import org.team100.lib.commands.r3.ManualPosition;
 import org.team100.lib.commands.swerve.SetRotation;
 import org.team100.lib.commands.swerve.manual.DriveManuallySimple;
 import org.team100.lib.controller.r1.Feedback100;
@@ -45,6 +45,7 @@ public class Binder {
 
     public void bind() {
         final LoggerFactory logger = Logging.instance().rootLogger;
+        final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
         final LoggerFactory comLog = logger.name("Commands");
 
         /////////////////////////////////////////////////
@@ -110,7 +111,7 @@ public class Binder {
         //
         // "fly" the joints manually
         whileTrue(operator::leftBumper,
-                new ManualCartesian(operator::velocity, m_machinery.m_mech));
+                new ManualPosition(operator::velocity, m_machinery.m_mech));
         // new ManualConfig(operatorControl::velocity, mech));
 
         ////////////////////////////////////////////////////////////
@@ -143,18 +144,11 @@ public class Binder {
                 parallel(
                         m_machinery.m_mech.pickWithProfile(),
                         m_machinery.m_manipulator.centerIntake(),
-
                         FloorPickSequence.get(
-                                m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
+                                fieldLogger, m_machinery.m_drive, m_machinery.m_targets,
                                 ControllerFactoryR3.pick(comLog), coralPickProfile)
                                 .withName("Floor Pick"))
                         .until(m_machinery.m_manipulator::hasCoral));
-
-        FloorPickSequence.get(
-                m_machinery.m_fieldLog, m_machinery.m_drive, m_machinery.m_targets,
-                ControllerFactoryR3.pick(comLog), coralPickProfile)
-                .withName("Floor Pick")
-                .until(m_machinery.m_manipulator::hasCoral);
 
         // Sideways intake for L1
         whileTrue(buttons::red2,

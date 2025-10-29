@@ -20,11 +20,11 @@ public class SwerveDriveFactory {
     public static SwerveDriveSubsystem get(
             LoggerFactory fieldLogger,
             LoggerFactory driveLog,
-            SwerveKinodynamics m_swerveKinodynamics,
+            SwerveKinodynamics swerveKinodynamics,
             AprilTagRobotLocalizer localizer,
             OdometryUpdater odometryUpdater,
             SwerveHistory history,
-            SwerveModuleCollection m_modules) {
+            SwerveModuleCollection modules) {
 
         FreshSwerveEstimate estimate = new FreshSwerveEstimate(
                 localizer,
@@ -32,16 +32,15 @@ public class SwerveDriveFactory {
                 history);
         SwerveLocal swerveLocal = new SwerveLocal(
                 driveLog,
-                m_swerveKinodynamics,
-                m_modules);
+                swerveKinodynamics,
+                modules);
         SwerveLimiter limiter = new SwerveLimiter(
                 driveLog,
-                m_swerveKinodynamics,
+                swerveKinodynamics,
                 RobotController::getBatteryVoltage);
         return new SwerveDriveSubsystem(
                 fieldLogger,
                 driveLog,
-                m_swerveKinodynamics,
                 odometryUpdater,
                 estimate,
                 swerveLocal,

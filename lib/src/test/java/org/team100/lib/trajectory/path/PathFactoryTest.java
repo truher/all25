@@ -69,11 +69,11 @@ public class PathFactoryTest {
         Pose2dWithMotion p = path.getPoint(0);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = path.getPoint(1);
         assertEquals(0.3, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
     @Test
@@ -114,11 +114,11 @@ public class PathFactoryTest {
         Pose2dWithMotion p = path.getPoint(0);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = path.getPoint(1);
         assertEquals(1, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
     /**
@@ -144,11 +144,11 @@ public class PathFactoryTest {
         Pose2dWithMotion p = path.getPoint(0);
         assertEquals(0, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = path.getPoint(1);
         assertEquals(1, p.getPose().getX(), DELTA);
         assertEquals(0, p.getPose().getRotation().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
     @Test
@@ -242,7 +242,7 @@ public class PathFactoryTest {
         assertEquals(5, t.length());
         Pose2dWithMotion p = t.getPoint(1);
         assertEquals(0.417, p.getPose().getX(), DELTA);
-        assertEquals(0, p.getHeadingRate(), DELTA);
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
 }

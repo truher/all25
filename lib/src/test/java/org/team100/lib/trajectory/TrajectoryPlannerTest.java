@@ -57,7 +57,7 @@ class TrajectoryPlannerTest {
         assertEquals(12, t.length());
         TimedPose p = t.getPoint(6);
         assertEquals(0.6, p.state().getPose().getX(), DELTA);
-        assertEquals(0, p.state().getHeadingRate(), DELTA);
+        assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
     @Test
@@ -80,7 +80,7 @@ class TrajectoryPlannerTest {
                 waypoints, start_vel, end_vel);
         TimedPose p = t.getPoint(6);
         assertEquals(0.272, p.state().getPose().getX(), DELTA);
-        assertEquals(0, p.state().getHeadingRate(), DELTA);
+        assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 
     }
 
@@ -113,7 +113,7 @@ class TrajectoryPlannerTest {
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
         assertEquals(0.585, p.state().getPose().getX(), DELTA);
-        assertEquals(0, p.state().getHeadingRate(), DELTA);
+        assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
     /**

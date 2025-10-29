@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
-import org.team100.lib.logging.FieldLogger;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -29,13 +28,12 @@ public class TargetsTest implements Timeless {
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(
             new TestPrimitiveLogger());
-    private static final FieldLogger.Log fieldLog = new FieldLogger.Log(logger);
 
     @Test
     void testTargets() {
         stepTime();
         ModelR3 p = new ModelR3();
-        Targets t = new Targets(logger, fieldLog, (x) -> p);
+        Targets t = new Targets(logger, logger, (x) -> p);
         t.update();
         assertTrue(t.getTargets().isEmpty());
         // send some blips
@@ -73,7 +71,7 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(logger, fieldLog, (x) -> p);
+        Targets reader = new Targets(logger, logger, (x) -> p);
 
         stepTime();
         writer.update();
@@ -105,7 +103,7 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(logger, fieldLog, (x) -> p);
+        Targets reader = new Targets(logger, logger, (x) -> p);
 
         stepTime();
         writer.update();
@@ -140,7 +138,7 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(logger, fieldLog, x -> p);
+        Targets reader = new Targets(logger, logger, x -> p);
 
         stepTime();
         writer.update();
@@ -174,7 +172,7 @@ public class TargetsTest implements Timeless {
 
         // need to instantiate the reader prior to the writer update because the poller
         // ignores things that came before.
-        Targets reader = new Targets(logger, fieldLog, (x) -> p);
+        Targets reader = new Targets(logger, logger, (x) -> p);
 
         stepTime();
         writer.update();

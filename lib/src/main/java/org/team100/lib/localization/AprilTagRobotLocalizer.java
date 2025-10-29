@@ -418,7 +418,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     private static double distance(Pose2d a, Pose2d b) {
         // the translation distance is a little quicker to calculate and we don't care
         // about the "twist" curve measurement
-        return GeometryUtil.distance(
+        return GeometryUtil.distanceM(
                 a.getTranslation(),
                 b.getTranslation());
     }

@@ -3,12 +3,12 @@ package org.team100.lib.coherence;
 import java.util.function.Supplier;
 
 /** Cache an object supplier */
-public class CotemporalCache<T> implements Supplier<T> {
+public class ObjectCache<T> implements Supplier<T> {
     private final Supplier<T> m_delegate;
     private T m_value;
 
-    /** Do not call this directly. */
-    CotemporalCache(Supplier<T> delegate) {
+    /** Do not call this directly, use Cache.of(). */
+    ObjectCache(Supplier<T> delegate) {
         m_delegate = delegate;
         m_value = null;
     }
@@ -49,6 +49,6 @@ public class CotemporalCache<T> implements Supplier<T> {
      * should discard this object once you call end().
      */
     public void end() {
-        Cache.caches.remove(this);
+        Cache.removeObjectCache(this);
     }
 }

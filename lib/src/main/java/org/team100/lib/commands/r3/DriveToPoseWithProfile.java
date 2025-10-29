@@ -4,14 +4,14 @@ import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.controller.r3.ReferenceControllerR3;
+import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.SubsystemR3;
+import org.team100.lib.subsystems.VelocitySubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -19,18 +19,18 @@ import edu.wpi.first.math.geometry.Pose2d;
  * Drive to a pose supplied at initialization, using a profile.
  */
 public class DriveToPoseWithProfile extends MoveAndHold {
-    private final SubsystemR3 m_drive;
+    private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
     private final Pose2dLogger m_log_goal;
     private final Supplier<Pose2d> m_goal;
 
     private ProfileReferenceR3 m_reference;
-    private ReferenceControllerR3 m_referenceController;
+    private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveToPoseWithProfile(
             LoggerFactory logger,
-            SubsystemR3 drive,
+            VelocitySubsystemR3 drive,
             ControllerR3 controller,
             HolonomicProfile profile,
             Supplier<Pose2d> goal) {
@@ -49,7 +49,7 @@ public class DriveToPoseWithProfile extends MoveAndHold {
         m_log_goal.log(() -> goal);
         m_reference = new ProfileReferenceR3(m_profile, "embark");
         m_reference.setGoal(new ModelR3(goal));
-        m_referenceController = new ReferenceControllerR3(
+        m_referenceController = new VelocityReferenceControllerR3(
                 m_drive, m_controller, m_reference);
     }
 

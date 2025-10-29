@@ -59,38 +59,12 @@ public class SwerveLocal implements Player {
         m_log_chassis_speed.log(() -> speeds);
     }
 
-    /**
-     * Sets the wheels to make an "X" pattern.
-     */
-    void defense() {
-        // not optimizing makes it easier to test, not sure it's worth the slowness.
-        setRawModuleStates(SwerveModuleStates.statesX);
-    }
-
-    /**
-     * Sets wheel rotation to zero, for optimizing steering control.
-     */
-    void steer0() {
-        setRawModuleStates(SwerveModuleStates.states0);
-    }
-
-    /**
-     * Sets wheel rotation to 90 degrees, for optimizing steering control.
-     */
-    void steer90() {
-        setRawModuleStates(SwerveModuleStates.states90);
-    }
-
     void stop() {
         m_modules.stop();
     }
 
     /**
-     * Set the module states without desaturating.
-     * 
-     * Works fine with empty angles.
-     * 
-     * This "raw" mode is just for testing.
+     * Set the module states directly. This is just for testing.
      */
     void setRawModuleStates(SwerveModuleStates targetModuleStates) {
         m_modules.setRawDesiredStates(targetModuleStates);

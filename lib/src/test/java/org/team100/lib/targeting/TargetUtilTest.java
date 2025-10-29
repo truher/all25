@@ -1,10 +1,9 @@
-package org.team100.lib.util;
+package org.team100.lib.targeting;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.TargetUtil;
 import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,27 +17,27 @@ class TargetUtilTest {
     @Test
     void testBearing() {
         assertEquals(0,
-                TargetUtil.bearing(
+                TargetUtil.absoluteBearing(
                         new Translation2d(),
                         new Translation2d(1, 0)).getRadians(),
                 DELTA);
         assertEquals(Math.PI / 2,
-                TargetUtil.bearing(
+                TargetUtil.absoluteBearing(
                         new Translation2d(),
                         new Translation2d(0, 1)).getRadians(),
                 DELTA);
         assertEquals(Math.PI / 4,
-                TargetUtil.bearing(
+                TargetUtil.absoluteBearing(
                         new Translation2d(),
                         new Translation2d(1, 1)).getRadians(),
                 DELTA);
         assertEquals(3 * Math.PI / 4,
-                TargetUtil.bearing(
+                TargetUtil.absoluteBearing(
                         new Translation2d(),
                         new Translation2d(-1, 1)).getRadians(),
                 DELTA);
         assertEquals(-Math.PI / 4,
-                TargetUtil.bearing(
+                TargetUtil.absoluteBearing(
                         new Translation2d(),
                         new Translation2d(1, -1)).getRadians(),
                 DELTA);
@@ -124,5 +123,15 @@ class TargetUtilTest {
         Translation2d target = new Translation2d(0, 0);
         // target appears to move counterclockwise
         assertEquals(1, TargetUtil.targetMotion(state, target), DELTA);
+    }
+
+    @Test
+    void testTargetMotionZero() {
+        // not moving, no motion
+        ModelR3 state = new ModelR3(new Pose2d(), new GlobalVelocityR3(0, 0, 0));
+        // target is 1m to the left
+        Translation2d target = new Translation2d(0, 1);
+        // it should not move
+        assertEquals(0, TargetUtil.targetMotion(state, target), DELTA);
     }
 }

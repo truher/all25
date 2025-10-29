@@ -13,8 +13,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.geometry.Pose2dWithMotion.MotionDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -306,7 +306,7 @@ public class ScheduleGeneratorTest {
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
         assertEquals(0.575, p.state().getPose().getX(), DELTA);
-        assertEquals(0, p.state().getHeadingRate(), DELTA);
+        assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 
     }
 

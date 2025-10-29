@@ -4,24 +4,27 @@ import java.util.List;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.timing.TimingConstraint.NonNegativeDouble;
+import org.team100.lib.util.Math100;
 
 class ConstrainedState {
     // using MAX_VALUE tickles some bugs
-    private static final double maxV = 100;
-    private static final double maxA = 100;
-    private final Pose2dWithMotion state;
+    private static final double MAX_V = 100;
+    private static final double MAX_A = 100;
+
+    private final Pose2dWithMotion m_state;
     /** Cumulative distance along the path */
-    private final double distance;
-    private double vel;
-    private double min_acceleration;
-    private double max_acceleration;
+    private final double m_distanceM;
+
+    private double m_velocityM_S;
+    private double m_minAccelM_S2;
+    private double m_maxAccelM_S2;
 
     public ConstrainedState(Pose2dWithMotion state, double distance) {
-        this.state = state;
-        this.distance = distance;
-        setVel(maxV);
-        setMin_acceleration(-maxA);
-        setMax_acceleration(maxA);
+        m_state = state;
+        m_distanceM = distance;
+        setVelocityM_S(MAX_V);
+        setMinAccel(-MAX_A);
+        setMaxAccel(MAX_A);
     }
 
     /**
@@ -29,9 +32,9 @@ class ConstrainedState {
      */
     public void clampVelocity(List<TimingConstraint> constraints) {
         for (TimingConstraint constraint : constraints) {
-            NonNegativeDouble constraintVel = constraint.getMaxVelocity(state);
+            NonNegativeDouble constraintVel = constraint.getMaxVelocity(m_state);
             double value = constraintVel.getValue();
-            setVel(Math.min(getVel(), value));
+            setVelocityM_S(Math.min(getVelocityM_S(), value));
         }
     }
 
@@ -41,60 +44,52 @@ class ConstrainedState {
     public void clampAccel(List<TimingConstraint> constraints) {
         for (TimingConstraint constraint : constraints) {
             TimingConstraint.MinMaxAcceleration min_max_accel = constraint
-                    .getMinMaxAcceleration(state, getVel());
-            double minAccel = min_max_accel.getMinAccel();
-            if (Double.isNaN(minAccel))
-                throw new IllegalArgumentException();
-            min_acceleration = Math.max(
-                    min_acceleration,
-                    minAccel);
-            double maxAccel = min_max_accel.getMaxAccel();
-            if (Double.isNaN(maxAccel))
-                throw new IllegalArgumentException();
-            max_acceleration = Math.min(
-                    max_acceleration,
-                    maxAccel);
+                    .getMinMaxAcceleration(m_state, getVelocityM_S());
+            double minAccel = Math100.notNaN(min_max_accel.getMinAccel());
+            m_minAccelM_S2 = Math.max(m_minAccelM_S2, minAccel);
+            double maxAccel = Math100.notNaN(min_max_accel.getMaxAccel());
+            m_maxAccelM_S2 = Math.min(m_maxAccelM_S2, maxAccel);
         }
 
     }
 
-    public Pose2dWithMotion getState() {
-        return state;
+    public Pose2dWithMotion getM_state() {
+        return m_state;
     }
 
-    public double getDistance() {
-        return distance;
+    public double getDistanceM() {
+        return m_distanceM;
     }
 
-    public double getVel() {
-        return vel;
+    public double getVelocityM_S() {
+        return m_velocityM_S;
     }
 
-    public void setVel(double vel) {
-        if (Double.isNaN(vel))
+    public void setVelocityM_S(double velocityM_S) {
+        if (Double.isNaN(velocityM_S))
             throw new IllegalArgumentException();
-        this.vel = vel;
+        m_velocityM_S = velocityM_S;
     }
 
-    public double getMin_acceleration() {
-        return min_acceleration;
+    public double getMinAccel() {
+        return m_minAccelM_S2;
     }
 
-    public void setMin_acceleration(double min_acceleration) {
-        this.min_acceleration = min_acceleration;
+    public void setMinAccel(double minAccelM_S2) {
+        m_minAccelM_S2 = minAccelM_S2;
     }
 
-    public double getMax_acceleration() {
-        return max_acceleration;
+    public double getMaxAccel() {
+        return m_maxAccelM_S2;
     }
 
-    public void setMax_acceleration(double max_acceleration) {
-        this.max_acceleration = max_acceleration;
+    public void setMaxAccel(double maxAccelM_S2) {
+        m_maxAccelM_S2 = maxAccelM_S2;
     }
 
     @Override
     public String toString() {
-        return state.toString() + ", distance: " + distance + ", vel: " + getVel() + ", " +
-                "min_acceleration: " + min_acceleration + ", max_acceleration: " + max_acceleration;
+        return m_state.toString() + ", distance: " + m_distanceM + ", vel: " + getVelocityM_S() + ", " +
+                "min_acceleration: " + m_minAccelM_S2 + ", max_acceleration: " + m_maxAccelM_S2;
     }
 }

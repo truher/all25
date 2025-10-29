@@ -1,18 +1,19 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.commands.r3;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.PositionSubsystemR3;
 
 /**
  * Record the current pose at initialization time and hold that pose,
  * motionless, forever.
  */
 public class HoldPosition extends MoveAndHold {
-    private final CalgamesMech m_subsystem;
+    private final PositionSubsystemR3 m_subsystem;
 
     private ModelR3 m_state;
 
-    public HoldPosition(CalgamesMech subsystem) {
+    public HoldPosition(PositionSubsystemR3 subsystem) {
         m_subsystem = subsystem;
         addRequirements(subsystem);
     }

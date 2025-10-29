@@ -2,7 +2,7 @@ package org.team100.lib.commands.swerve.test;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.controller.r3.ReferenceControllerR3;
+import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
 import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.HolonomicProfile;
@@ -32,7 +32,7 @@ public class Rotate extends MoveAndHold {
     private final HolonomicProfile m_profile;
 
     private ProfileReferenceR3 m_reference;
-    private ReferenceControllerR3 m_referenceController;
+    private VelocityReferenceControllerR3 m_referenceController;
 
     public Rotate(
             SwerveDriveSubsystem drive,
@@ -66,7 +66,7 @@ public class Rotate extends MoveAndHold {
         Pose2d goal = new Pose2d(measurement.getX() + dx.getX(), measurement.getY() + dx.getY(), m_target);
         m_reference = new ProfileReferenceR3(m_profile, "rotate");
         m_reference.setGoal(new ModelR3(goal));
-        m_referenceController = new ReferenceControllerR3(
+        m_referenceController = new VelocityReferenceControllerR3(
                 m_drive, m_controller, m_reference);
     }
 

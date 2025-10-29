@@ -5,7 +5,7 @@ import java.util.List;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.commands.r3.DriveToPoseWithProfile;
 import org.team100.lib.commands.r3.DriveWithTrajectoryFunction;
-import org.team100.lib.commands.r3.FeedforwardOnly;
+import org.team100.lib.commands.r3.VelocityFeedforwardOnly;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
@@ -57,15 +57,15 @@ public class Autons {
 
         ControllerR3 controller = ControllerFactoryR3.byIdentity(autoLog);
 
-        MoveAndHold knight_move = new FeedforwardOnly(m_profile, KNIGHT_MOVE, m_drive);
+        MoveAndHold knight_move = new VelocityFeedforwardOnly(m_profile, KNIGHT_MOVE, m_drive);
         m_autonChooser.add("knight_move",
                 new AnnotatedCommand(knight_move.until(knight_move::isDone).withName("auto knight_move"), null, null));
 
-        MoveAndHold one = new FeedforwardOnly(m_profile, ONE, m_drive);
+        MoveAndHold one = new VelocityFeedforwardOnly(m_profile, ONE, m_drive);
         m_autonChooser.add("one",
                 new AnnotatedCommand(one.until(one::isDone).withName("auto one"), null, null));
 
-        MoveAndHold two = new FeedforwardOnly(m_profile, TWO, m_drive);
+        MoveAndHold two = new VelocityFeedforwardOnly(m_profile, TWO, m_drive);
         m_autonChooser.add("two",
                 new AnnotatedCommand(two.until(two::isDone).withName("auto two"), null, null));
 

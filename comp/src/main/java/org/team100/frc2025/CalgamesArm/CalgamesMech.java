@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
+import org.team100.lib.commands.prr.FollowJointProfiles;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
@@ -40,6 +41,7 @@ import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
 import org.team100.lib.motion.prr.JointAccelerations;
 import org.team100.lib.motion.prr.JointForce;
 import org.team100.lib.motion.prr.JointVelocities;
+import org.team100.lib.motion.prr.SubsystemPRR;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.ctre.Kraken6Motor;
@@ -47,7 +49,7 @@ import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.music.Music;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.SubsystemR3;
+import org.team100.lib.subsystems.PositionSubsystemR3;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.StrUtil;
@@ -57,7 +59,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
+public class CalgamesMech extends SubsystemBase implements Music, PositionSubsystemR3, SubsystemPRR {
     private static final boolean DEBUG = false;
     private boolean DISABLED = false;
     ////////////////////////////////////////////////////////
@@ -318,7 +320,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
         return new ModelR3(p, v);
     }
 
-    @Override
+    // for testing only
     public void setVelocity(GlobalVelocityR3 v) {
         Pose2d pose = getState().pose();
         GlobalAccelerationR3 a = new GlobalAccelerationR3(0, 0, 0);
@@ -339,6 +341,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
     }
 
     /** There are no profiles here, so this control needs to be feasible. */
+    @Override
     public void set(ControlR3 control) {
         Pose2d pose = control.pose();
         Config config = m_kinematics.inverse(pose);
@@ -380,14 +383,14 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
      * position (origin) at rest, and end when done.
      */
     public Command profileHomeTerminal() {
-        FollowJointProfiles f = FollowJointProfiles.slowFast(
+        FollowJointProfiles f = MechProfiles.slowFast(
                 this, HOME);
         return f.until(f::isDone)
                 .withName("profileHomeTerminal");
     }
 
     public Command profileHomeToL1() {
-        FollowJointProfiles f = FollowJointProfiles.fastSlow(
+        FollowJointProfiles f = MechProfiles.fastSlow(
                 this, L1);
         return f.until(f::isDone)
                 .withName("profileHomeTerminal");
@@ -398,7 +401,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
      * position (origin) at rest, and hold there forever.
      */
     public Command profileHomeEndless() {
-        return FollowJointProfiles.slowFast(
+        return MechProfiles.slowFast(
                 this, HOME)
                 .withName("profileHomeEndless");
     }
@@ -409,7 +412,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
      * to push against gravity (making that squealing noise).
      */
     public Command profileHomeAndThenRest() {
-        MoveAndHold f = FollowJointProfiles.slowFast(this, HOME);
+        MoveAndHold f = MechProfiles.slowFast(this, HOME);
         return sequence(
                 // f.until(f::isDone),
                 f.withTimeout(2),
@@ -428,7 +431,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
      * rest, and stay there forever.
      */
     public Command pickWithProfile() {
-        return FollowJointProfiles.fastSlow(
+        return MechProfiles.fastSlow(
                 this, CORAL_GROUND_PICK)
                 .withName("pickWithProfile");
     }
@@ -438,23 +441,23 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
      * rest, and stay there forever.
      */
     public Command algaePickGround() {
-        return FollowJointProfiles.algae(
+        return MechProfiles.algae(
                 this, ALGAE_GROUND)
                 .withName("pickWithProfile");
     }
 
     public FollowJointProfiles homeGentle() {
-        return FollowJointProfiles.gentle(
+        return MechProfiles.gentle(
                 this, HOME);
     }
 
     public FollowJointProfiles homeAlgae() {
-        return FollowJointProfiles.algaeUp(
+        return MechProfiles.algaeUp(
                 this, HOME);
     }
 
     public Command climbWithProfile() {
-        return FollowJointProfiles.gentle(
+        return MechProfiles.gentle(
                 this, CLIMB)
                 .withName("climbWithProfile");
     }
@@ -464,7 +467,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
      * station-pick location at rest, and stay there forever.
      */
     public Command stationWithProfile() {
-        return FollowJointProfiles.fastSlow(
+        return MechProfiles.fastSlow(
                 this, STATION)
                 .withName("stationWithProfile");
     }
@@ -474,7 +477,7 @@ public class CalgamesMech extends SubsystemBase implements Music, SubsystemR3 {
      * processor location at rest, and stay there forever.
      */
     public Command processorWithProfile() {
-        return FollowJointProfiles.algae(
+        return MechProfiles.algae(
                 this, PROCESSOR)
                 .withName("processorWithProfile");
     }

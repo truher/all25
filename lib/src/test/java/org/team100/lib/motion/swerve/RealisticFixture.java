@@ -73,7 +73,6 @@ public class RealisticFixture {
         drive = new SwerveDriveSubsystem(
                 fieldLogger,
                 logger,
-                swerveKinodynamics,
                 odometryUpdater,
                 estimate,
                 swerveLocal,

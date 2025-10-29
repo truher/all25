@@ -1,4 +1,4 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.commands.prr;
 
 import java.util.function.Supplier;
 
@@ -6,6 +6,7 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.prr.Config;
 import org.team100.lib.motion.prr.JointAccelerations;
 import org.team100.lib.motion.prr.JointVelocities;
+import org.team100.lib.motion.prr.SubsystemPRR;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -13,14 +14,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class ManualConfig extends Command {
 
     private final Supplier<Velocity> m_input;
-    private final CalgamesMech m_subsystem;
+    private final SubsystemPRR m_subsystem;
 
     private Config m_config;
     private JointVelocities m_prev;
 
     public ManualConfig(
             Supplier<Velocity> input,
-            CalgamesMech subsystem) {
+            SubsystemPRR subsystem) {
         m_input = input;
         m_subsystem = subsystem;
         addRequirements(subsystem);
