@@ -129,7 +129,7 @@ public class Binder {
                 5);
 
         // Pick a game piece from the floor, based on camera input.
-        whileTrue(operator::leftTrigger,
+        whileTrue(driver::x,
                 parallel(
                         m_machinery.m_mech.pickWithProfile(),
                         m_machinery.m_manipulator.centerIntake(),
@@ -171,6 +171,7 @@ public class Binder {
         final SwerveController holonomicController = SwerveControllerFactory.byIdentity(coralSequence);
 
         // Drive to a scoring location at the reef and score.
+        whileTrue(driver::b, m_machinery.m_manipulator.centerEject());
         whileTrue(driver::a,
                 ScoreCoralSmart.get(
                         coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,

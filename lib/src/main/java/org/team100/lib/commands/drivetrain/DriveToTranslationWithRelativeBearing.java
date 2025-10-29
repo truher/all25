@@ -32,8 +32,10 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     private final SwerveController m_controller;
     private final HolonomicProfile m_profile;
     private final Rotation2d m_relativeBearing;
+    private final Translation2d m_relativeTranslation;
 
     private Pose2d m_goal;
+    private Translation2d m_translation;
     private ProfileReferenceR3 m_reference;
     private ReferenceController m_referenceController;
 
@@ -43,13 +45,15 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
             SwerveDriveSubsystem drive,
             SwerveController controller,
             HolonomicProfile profile,
-            Rotation2d relativeBearing) {
+            Rotation2d relativeBearing,
+            Translation2d relativeTranslation) {
         m_field_log = fieldLogger;
         m_targets = targetes;
         m_drive = drive;
         m_controller = controller;
         m_profile = profile;
         m_relativeBearing = relativeBearing;
+        m_relativeTranslation = relativeTranslation;
         addRequirements(m_drive);
     }
 
@@ -64,7 +68,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     }
 
     @Override
-    public void execute() {
+    public void execute() {       
         if (m_goal == null || m_referenceController == null)
             return;
         m_reference.setGoal(new ModelR3(m_goal));
@@ -107,9 +111,13 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
 
     private void updateGoal() {
         m_targets.get().ifPresent(
-                (target) -> m_goal = new Pose2d(
-                        target,
-                        heading(target)));
+                (target) -> {
+                    m_translation = target;
+                    Rotation2d heading = heading(target);
+                    m_goal = new Pose2d(
+                            target.minus(m_relativeTranslation.rotateBy(m_drive.getPose().getRotation())),
+                            heading);
+                });
     }
 
     /** Robot heading to achieve the desired relative bearing to the target. */
