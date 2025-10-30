@@ -84,7 +84,7 @@ public class Targets extends CameraReader<Rotation3d> {
             }
             return;
         }
-        Pose2d robotPose = m_history.apply(valueTimestamp).pose();
+        Pose2d robotPose = m_history.apply(valueTimestamp-.05).pose();
         m_targets.addAll(
                 valueTimestamp,
                 TargetLocalizer.cameraRotsToFieldRelativeArray(
