@@ -4,7 +4,7 @@ How to hit a moving target from a moving shooter platform.
 
 In the global reference frame, the situation looks like this:
 
-<img src="global_diagram.png" width=600 />
+<img src="global_diagram.png" width=200 />
 
 The robot position over time is $R_G(t) = R_{0_G} + v_{R_G} t$. 
 
@@ -12,7 +12,7 @@ The target position over time is $T_G(t) = T_{0_G} + v_{T_G} t$.
 
 The math is easier if we use the robot reference frame:
 
-<img src="local_diagram.png" width=600 />
+<img src="local_diagram.png" width=300 />
 
 The robot's position is fixed at the origin.
 
@@ -52,9 +52,9 @@ This is quadratic in $t$:
 
 There are three possible solutions:
 
-* two solutions: target can be reached on approach, or later while receding
-* one solution: target can just barely be reached
-* no solution: target is moving away faster than the projectile can catch it
+* two solutions: target can be reached on approach, or later while receding.  One of the solutions may be negative, which means it is too late to achieve the approach solution.
+* one solution: target can just barely be reached.
+* no solution: target is moving away faster than the projectile can catch it.
 
 
 
