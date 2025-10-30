@@ -10,24 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
  * Static methods for targeting.
  */
 public class TargetUtil {
-
-    /**
-     * Find a turret rotation which will intercept the target.
-     * 
-     * See INTERCEPT.md for details.
-     */
-    public static Rotation2d intercept(
-            ModelR3 state, Translation2d target, double projectileSpeedM_S) {
-        Translation2d robot = state.pose().getTranslation();
-        Rotation2d absoluteBearing = absoluteBearing(robot, target);
-        GlobalVelocityR3 velocity = state.velocity();
-        if (velocity.angle().isEmpty()) {
-            // If there's no robot motion, then the solution is just the bearing.
-            return absoluteBearing;
-        }
-        return new Rotation2d();
-    }
-
     /**
      * Absolute bearing from the robot to the target.
      * 

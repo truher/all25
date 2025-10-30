@@ -4,15 +4,20 @@ How to hit a moving target from a moving shooter platform.
 
 In the global reference frame, the situation looks like this:
 
-<img src="global_diagram.png" width=200 />
+<img src="global_diagram.png" width=300 />
 
 The robot position over time is $R_G(t) = R_{0_G} + v_{R_G} t$. 
 
 The target position over time is $T_G(t) = T_{0_G} + v_{T_G} t$.
 
-The math is easier if we use the robot reference frame:
+The math is easier if we use the robot-local reference frame.
+Note this frame does not respect robot *rotation*, only robot *motion*.
 
-<img src="local_diagram.png" width=300 />
+<img src="local_diagram.png" width=400 />
+
+Our task is to determine $\theta$, the shooter azimuth.  This angle
+is a field-relative angle (i.e. relative to the global x axis),
+since the "robot reference frame" here does not affect rotation.
 
 The robot's position is fixed at the origin.
 
@@ -52,11 +57,96 @@ This is quadratic in $t$:
 
 There are three possible solutions:
 
-* two solutions: target can be reached on approach, or later while receding.  One of the solutions may be negative, which means it is too late to achieve the approach solution.
-* one solution: target can just barely be reached.
-* no solution: target is moving away faster than the projectile can catch it.
+* __Two solutions:__ target can be reached on approach, or later while receding.  One of the solutions may be negative, which means it is too late to achieve the approach solution.  If there's more than one positive solution, we generally want the
+smaller one.
+* __One solution:__ target can just barely be reached.
+* __No solution:__ target is moving away faster than the projectile can catch it.
 
 
+
+Once we have a solution for $t$, we can use it to find $I$ by
+following the target path:
+
+```math
+I = T_0 + v_r t
+```
+
+And finally use the $atan2$ function to get the angle we want,
+using the components of $I$.
+
+```math
+\theta = atan2(I_y, I_x)
+```
+
+## Implementation
+
+There is a prototype static method `Intercept.intercept()` suitable
+for this work:
+
+```java
+    /**
+     * Find a turret rotation which will intercept the target. If more than one
+     * solution is possible, choose the sooner one. If no solution is possible,
+     * return Optional.empty().
+     * 
+     * @param robotPosition  field-relative robot position, meters
+     * @param robotVelocity  field-relative robot velocity, meters/sec
+     * @param targetPosition field-relative target position, meters
+     * @param targetVelocity field-relative target velocity, meters/sec
+     * @param muzzleSpeed    speed of the projectile, meters/sec
+     * @return field-relative firing solution azimuth
+     */
+    public static Optional<Rotation2d> intercept(
+            Translation2d robotPosition,
+            GlobalVelocityR2 robotVelocity,
+            Translation2d targetPosition,
+            GlobalVelocityR2 targetVelocity,
+            double muzzleSpeed) {
+
+        return Optional.empty();
+    }
+
+```
+
+There are a few test cases you can do in your head in `InterceptTest`.
+You should add many more of these simple cases, including some that
+require a pencil to work out.
+
+There are some key library classes to use here:
+
+* `GlobalVelocityR2` is a good representation for the 2d
+velocities, and has a convenience method, `dot()` for the dot
+product with other velocities and also with translations.
+* `GeometryUtil.dot()` is also handy for the dot product between
+two translations.
+* `Math100.solveQuadratic()` will return a list of zero, one, or two solutions to the quadratic equation defined above.
+
+
+## Refinements
+
+Once the initial implementation is done, it would be good to go 
+back and add some refinements:
+
+__Offset__
+
+The shooter may not be at the robot position; it could be offset
+a little.
+
+__Delay__
+
+The analysis above assumes that there is no delay in shooter actuation.
+This assumption is false: every mechanism involves delay.  To
+correct for delay, use the robot and target velocities to determine
+robot and target positions after the delay period has elapsed.
+
+__Elevation__
+
+In addition to solving for azimuth, we should also solve for elevation.
+This is a more complex analysis, since the projectile path is definitely
+not a straight line (as it would be without any forces at all),
+but it's also not a parabola (as it would be with only gravity),
+it's a complex shape also affected by interaction with the air.
+In the past, we've handled elevation with a lookup table.
 
 ## Resources
 Some resources about this problem.
@@ -64,3 +154,5 @@ Some resources about this problem.
 * https://indyandyjones.wordpress.com/2010/04/08/intercepting-a-target-with-projectile/
 * https://playtechs.blogspot.com/2007/04/aiming-at-moving-target.html
 * https://stackoverflow.com/questions/17204513/how-to-find-the-interception-coordinates-of-a-moving-target-in-3d-space
+* [Geogebra global diagram](https://www.geogebra.org/m/hextbjj2)
+* [Geogebra local diagram](https://www.geogebra.org/m/guchqzvs)
