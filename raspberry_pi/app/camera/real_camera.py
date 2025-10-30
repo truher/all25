@@ -282,7 +282,7 @@ class RealCamera(Camera):
     @staticmethod
     def __get_exposure_time(identity: Identity) -> int:
         """exposure time in microseconds"""
-        return 500
+        return 1500
         # match identity:
         #     case Identity.GLOBAL_RIGHT | Identity.GLOBAL_LEFT:
         #         return 500  # from b5879a6, works with GS cameras

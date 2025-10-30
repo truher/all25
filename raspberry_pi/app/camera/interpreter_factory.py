@@ -23,8 +23,8 @@ class InterpreterFactory:
         # object_higher = np.array((70, 255, 255))
         # get these values from changing the range till the object is highlighted
         # WHITE TARGET VALUES
-        object_lower = np.array((0, 25, 150))
-        object_higher = np.array((255, 255, 255))
+        object_lower = np.array((0, 0, 200))
+        object_higher = np.array((255, 150, 255))
         size = cam.get_size()
         if identity == Identity.DIST_TEST:
             scale = 1.0

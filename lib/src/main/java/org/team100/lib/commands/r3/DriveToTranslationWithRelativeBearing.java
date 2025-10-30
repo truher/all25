@@ -35,8 +35,10 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
     private final Rotation2d m_relativeBearing;
+    private final Translation2d m_relativeTranslation;
 
     private Pose2d m_goal;
+    private Translation2d m_translation;
     private ProfileReferenceR3 m_reference;
     private VelocityReferenceControllerR3 m_referenceController;
 
@@ -46,13 +48,15 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
             VelocitySubsystemR3 drive,
             ControllerR3 controller,
             HolonomicProfile profile,
-            Rotation2d relativeBearing) {
+            Rotation2d relativeBearing,
+            Translation2d relativeTranslation) {
         m_log_field_ball = field.doubleArrayLogger(Level.COMP, "ball");
         m_targets = targetes;
         m_drive = drive;
         m_controller = controller;
         m_profile = profile;
         m_relativeBearing = relativeBearing;
+        m_relativeTranslation = relativeTranslation;
         addRequirements(m_drive);
     }
 
@@ -110,9 +114,13 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
 
     private void updateGoal() {
         m_targets.get().ifPresent(
-                (target) -> m_goal = new Pose2d(
-                        target,
-                        heading(target)));
+                (target) -> {
+                    m_translation = target;
+                    Rotation2d heading = heading(target);
+                    m_goal = new Pose2d(
+                            target.minus(m_relativeTranslation.rotateBy(m_drive.getState().pose().getRotation())),
+                            heading);
+                });
     }
 
     /** Robot heading to achieve the desired relative bearing to the target. */
