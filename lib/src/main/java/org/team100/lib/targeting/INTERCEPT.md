@@ -157,7 +157,8 @@ To address this issue, we might adjust the real-world shooter speed so
 that the resulting 2d speed really *is* constant, though that would
 create other issues (e.g. very high arcs for long shots).  Another
 option might be to replace the constant $s_m$ term above with something
-that involves $t$ (at $I$), e.g. $s_m = s_0 - s_1t$.  The resulting
+that involves $t$ (at $I$), e.g. $s_m = s_0 - s_1t$, speed is slower when
+trying to hit something far away (at a higher elevation).  The resulting
 equation would be quartic, so it could be solved using one of the
 solvers in `lib.optimization`, e.g. `Bisection1d` or `NewtonsMethod1d`.
 
