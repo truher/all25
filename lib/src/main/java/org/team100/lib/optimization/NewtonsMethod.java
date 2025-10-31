@@ -3,6 +3,8 @@ package org.team100.lib.optimization;
 import java.util.Random;
 import java.util.function.Function;
 
+import org.team100.lib.util.StrUtil;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -39,18 +41,18 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
 
     /**
      * 
-     * @param xdim
-     * @param ydim
+     * @param xdim       domain dimension
+     * @param ydim       codomain dimension
      * @param f          The f function should take euclidean (i.e. independent)
      *                   input and return an error estimate in the tangent manifold
      *                   of whatever space it's actually acting in (e.g. SE(3))
-     * @param xMin
-     * @param xMax
-     * @param tolerance
+     * @param xMin       minimum x
+     * @param xMax       minimum y
+     * @param tolerance  return when solution x yields f(x) this close to zero
      * @param iterations when Newton gets stuck, it only takes a few iterations, so
      *                   this doesn't need to be large. Specify a generous
      *                   random-restart limit instead of a large iteration limit.
-     * @param dxLimit
+     * @param dxLimit    maximum step size
      */
     public NewtonsMethod(
             Nat<X> xdim,
@@ -105,8 +107,8 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             // x is the solution estimate
             Vector<X> x = new Vector<>(initialX.getStorage().copy());
             for (iter = 0; iter < m_iterations; ++iter) {
-                // if (DEBUG)
-                // System.out.printf("x: %s\n", StrUtil.vecStr(x));
+                if (DEBUG)
+                    System.out.printf("iter: %d x: %s\n", iter, StrUtil.vecStr(x));
 
                 error = m_f.apply(x);
                 // if (DEBUG)
@@ -193,26 +195,16 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         return dx;
     }
 
+    /**
+     * Uses the uniform norm (maxabs), not the (perhaps expected) L2 norm.
+     */
     private boolean within(Vector<Y> error) {
         return error.maxAbs() < m_tolerance;
     }
 
     /**
-     * Clamp the guess vector x to the per-dimension limits.
-     * Mutates x to save allocations.
-     */
-    private void limit(Vector<X> x) {
-        for (int i = 0; i < x.getNumRows(); ++i) {
-            double xi = x.get(i);
-            double xMin = m_xMin.get(i);
-            double xMax = m_xMax.get(i);
-            xi = MathUtil.clamp(xi, xMin, xMax);
-            x.set(i, 0, xi);
-        }
-    }
-
-    /**
-     * Update: x = x + dx.
+     * Update: x = x - dx.
+     * Note the minus sign: negative slope means x should move to the right.
      * Mutates x to save allocations.
      * The "x" space is Euclidean, so using a simple sum is ok.
      */
@@ -224,7 +216,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     }
 
     /**
-     * Limit: dx = clamp(dx) using a fixed limit.
+     * Clamp abs(dx) using a fixed limit.
      * Mutates dx to save allocations.
      */
     private void clamp(Vector<X> dx) {
@@ -237,6 +229,20 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             double clampedDxI = MathUtil.clamp(dxI, -m_dxLimit, m_dxLimit);
             // System.out.printf("clamp %d %15.10f %15.10f\n", i, dxI, clampedDxI);
             dx.set(i, 0, clampedDxI);
+        }
+    }
+
+    /**
+     * Limit x to the per-dimension limits.
+     * Mutates x to save allocations.
+     */
+    private void limit(Vector<X> x) {
+        for (int i = 0; i < x.getNumRows(); ++i) {
+            double xi = x.get(i);
+            double xMin = m_xMin.get(i);
+            double xMax = m_xMax.get(i);
+            xi = MathUtil.clamp(xi, xMin, xMax);
+            x.set(i, 0, xi);
         }
     }
 }

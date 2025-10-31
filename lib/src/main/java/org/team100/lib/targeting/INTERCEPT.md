@@ -148,6 +148,23 @@ but it's also not a parabola (as it would be with only gravity),
 it's a complex shape also affected by interaction with the air.
 In the past, we've handled elevation with a lookup table.
 
+__Muzzle speed is not constant__
+
+The speed out of the shooter is constant, but the 2d projection of
+that speed depends on elevation.  (Imagine an elevation of 85 degrees:
+the projectile moves fast up and down but very slowly across the floor.)
+To address this issue, we might adjust the real-world shooter speed so
+that the resulting 2d speed really *is* constant, though that would
+create other issues (e.g. very high arcs for long shots).  Another
+option might be to replace the constant $s_m$ term above with something
+that involves $t$ (at $I$), e.g. $s_m = s_0 - s_1t$, speed is slower when
+trying to hit something far away (at a higher elevation).  Obviously
+this linear approximation is only valid for small changes in elevation.The resulting
+equation would be quartic, so it could be solved using one of the
+solvers in `lib.optimization`, e.g. `Bisection1d` or `NewtonsMethod1d`.
+
+
+
 ## Resources
 Some resources about this problem.
 

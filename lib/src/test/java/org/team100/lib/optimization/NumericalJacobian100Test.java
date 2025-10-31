@@ -2,6 +2,7 @@ package org.team100.lib.optimization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,15 @@ public class NumericalJacobian100Test {
         assertEquals(1, j.get(0, 0), 1e-9);
     }
 
+    /** Scalar function, f(x) = x. */
+    @Test
+    void test1_1d() {
+        DoubleUnaryOperator f = x -> x;
+        double x = 0;
+        double j = NumericalJacobian100.numericalJacobian1d(f, x);
+        assertEquals(1, j, 1e-9);
+    }
+
     /** Scalar function, f(x) = 2x. */
     @Test
     void test2() {
@@ -34,6 +44,15 @@ public class NumericalJacobian100Test {
         Vector<N1> x = VecBuilder.fill(1);
         Matrix<N1, N1> j = NumericalJacobian100.numericalJacobian(xdim, ydim, f, x);
         assertEquals(2, j.get(0, 0), 1e-9);
+    }
+
+    /** Scalar function, f(x) = 2x. */
+    @Test
+    void test2_1d() {
+        DoubleUnaryOperator f = x -> 2 * x;
+        double x = 1;
+        double j = NumericalJacobian100.numericalJacobian1d(f, x);
+        assertEquals(2, j, 1e-9);
     }
 
     /** Multivariate scalar function, f(x) = norm(x)^2 */
@@ -103,4 +122,5 @@ public class NumericalJacobian100Test {
         // dy/dq1
         assertEquals(0, j0.get(1, 1), 1e-5);
     }
+
 }

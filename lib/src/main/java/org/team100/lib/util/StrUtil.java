@@ -40,7 +40,7 @@ public class StrUtil {
         StringBuilder b = new StringBuilder();
         b.append("[");
         for (int i = 0; i < m.getNumRows(); ++i) {
-            b.append(String.format(" %.10e", m.get(i)));
+            b.append(String.format(" %6.3f", m.get(i)));
         }
         b.append("]");
         return b.toString();

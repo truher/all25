@@ -1,5 +1,6 @@
 package org.team100.lib.optimization;
 
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 
 import edu.wpi.first.math.Matrix;
@@ -36,6 +37,13 @@ public class NumericalJacobian100 {
     }
 
     /**
+     * 1d specialization of above that avoids vectors
+     */
+    public static double numericalJacobian1d(DoubleUnaryOperator f, double x) {
+        return (f.applyAsDouble(x + DX) - f.applyAsDouble(x - DX)) / (2 * DX);
+    }
+
+    /**
      * Estimates the Jacobian using a single-sided difference to the right of the
      * reference x.
      * 
@@ -54,7 +62,7 @@ public class NumericalJacobian100 {
             final double xi = x.get(colI);
             x.set(colI, 0, xi + DX);
             final Vector<Y> Y1 = f.apply(x);
-            // System.out.printf("x %s Y1 %s\n", StrUtil.vecStr(x),  StrUtil.vecStr(Y1));
+            // System.out.printf("x %s Y1 %s\n", StrUtil.vecStr(x), StrUtil.vecStr(Y1));
             for (int rowI = 0; rowI < ydim.getNum(); rowI++) {
                 double dy = Y1.get(rowI) - Y.get(rowI);
                 double dydx = dy / DX;
