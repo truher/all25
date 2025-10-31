@@ -163,6 +163,27 @@ this linear approximation is only valid for small changes in elevation.The resul
 equation would be quartic, so it could be solved using one of the
 solvers in `lib.optimization`, e.g. `Bisection1d` or `NewtonsMethod1d`.
 
+# Iterative Solution
+
+An alternative to the post-hoc elevation lookup and muzzle speed approximation above
+would be to cast the problem as a two-dimensional optimization, solving
+both azimuth and elevation to minimize the intercept error.
+
+With this method, instead of solving directly for $t$, you would use an iterative
+solver that guesses values for azimuth ($\theta$) and elevation ($\phi$).
+
+The function to be minimized would use a lookup table from experiment or precomputation
+to determine the range time of arrival, and then, using the azimuth, find the
+cartesian location.  Then compute the distance ("error") between that location and the
+target at the same time.  The solver would use that distance to guide its guesses.
+
+A useful lookup table for elevation would be `InterpolatingTreeMap`.
+
+There are a few options in `lib.optimization` for the optimizer, e.g.
+`GradientDescent` or `NewtonsMethod`.
+
+A good choice for the initial guesses would be pointing at the target's
+current location using the looked-up elevation for that location.
 
 
 ## Resources
@@ -173,3 +194,4 @@ Some resources about this problem.
 * https://stackoverflow.com/questions/17204513/how-to-find-the-interception-coordinates-of-a-moving-target-in-3d-space
 * [Geogebra global diagram](https://www.geogebra.org/m/hextbjj2)
 * [Geogebra local diagram](https://www.geogebra.org/m/guchqzvs)
+* [Trajectories in air](https://en.wikipedia.org/wiki/Projectile_motion#Trajectory_in_air)
