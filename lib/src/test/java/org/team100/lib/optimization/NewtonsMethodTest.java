@@ -59,7 +59,6 @@ public class NewtonsMethodTest {
             // assertEquals(-100, x2.get(0), 1e-9);
             // assertEquals(-100, x2.get(1), 1e-9);
         }
-
     }
 
     /** Multivariate vector function, f(x) = x */
@@ -131,7 +130,7 @@ public class NewtonsMethodTest {
         Matrix<N2, N2> j0 = NumericalJacobian100.numericalJacobian(
                 Nat.N2(), Nat.N2(), err, q0);
         if (DEBUG)
-        System.out.println(StrUtil.matStr(j0));
+            System.out.println(StrUtil.matStr(j0));
         // dx/dq0
         assertEquals(-1, j0.get(0, 0), 1e-9);
         // dx/dq1
@@ -348,6 +347,58 @@ public class NewtonsMethodTest {
     }
 
     @Test
+    void testLinear1d() {
+        // linear function: f(x) = x + 1
+        // exact answer in one iteration
+        // 2 microseconds on my desktop machine.
+        Function<Vector<N1>, Vector<N1>> f = x -> x.plus(VecBuilder.fill(1));
+        Vector<N1> q0 = VecBuilder.fill(0);
+        Vector<N1> minQ = VecBuilder.fill(-10);
+        Vector<N1> maxQ = VecBuilder.fill(10);
+        NewtonsMethod<N1, N1> s = new NewtonsMethod<>(Nat.N1(), Nat.N1(), f, minQ, maxQ, 1e-3, 10, 1);
+
+        // f(-1) = -1 + 1 = 0
+        Vector<N1> x = s.solve2(q0, 1);
+        assertEquals(-1, x.get(0), 1e-3);
+    }
+
+    @Test
+    void testLinear1dPerformance() {
+        // 2 microseconds on my desktop machine.
+        Function<Vector<N1>, Vector<N1>> f = x -> x.plus(VecBuilder.fill(1));
+        Vector<N1> q0 = VecBuilder.fill(0);
+        Vector<N1> minQ = VecBuilder.fill(-10);
+        Vector<N1> maxQ = VecBuilder.fill(10);
+        NewtonsMethod<N1, N1> s = new NewtonsMethod<>(Nat.N1(), Nat.N1(), f, minQ, maxQ, 1e-3, 10, 1);
+        long startTime = System.nanoTime();
+        int iter = 0;
+        int maxIter = 100000;
+        for (iter = 0; iter < maxIter; ++iter) {
+            s.solve2(q0, 1);
+        }
+        long finishTime = System.nanoTime();
+        if (DEBUG) {
+            double et = ((double) finishTime - startTime) / 1000000;
+            System.out.printf("iterations: %d ET (ms): %6.3f ET per iter (ms) %6.3f\n",
+                    iter, et, et / maxIter);
+        }
+    }
+
+    @Test
+    void testQuadratic1d() {
+        // quadratic function: f(x) = x^2 - 2
+        // good answer in 4 iterations
+        Function<Vector<N1>, Vector<N1>> f = x -> VecBuilder.fill(x.get(0) * x.get(0) - 2);
+        Vector<N1> q0 = VecBuilder.fill(0);
+        Vector<N1> minQ = VecBuilder.fill(-10);
+        Vector<N1> maxQ = VecBuilder.fill(10);
+        NewtonsMethod<N1, N1> s = new NewtonsMethod<>(Nat.N1(), Nat.N1(), f, minQ, maxQ, 1e-3, 10, 1);
+        Vector<N1> x = s.solve2(q0, 1);
+        // f(1.414) = 2 - 2 = 0
+        assertEquals(1.414, x.get(0), 1e-3);
+    }
+
+    @Test
     void test4Pose2Solver() {
         // case above but using the solver
         Pose2d XXd = new Pose2d(0, 1, new Rotation2d(2.618));
@@ -469,7 +520,7 @@ public class NewtonsMethodTest {
         // jacobian at q0
         Matrix<N3, N2> j0 = NumericalJacobian100.numericalJacobian(Nat.N2(), Nat.N3(), err, q0);
         if (DEBUG)
-        System.out.println(StrUtil.matStr(j0));
+            System.out.println(StrUtil.matStr(j0));
         assertEquals(0.715, j0.get(0, 0), 1e-3);
         assertEquals(-0.270, j0.get(0, 1), 1e-3);
         assertEquals(0.913, j0.get(1, 0), 1e-3);
