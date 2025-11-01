@@ -173,7 +173,7 @@ With this method, instead of solving directly for $t$, you would use an iterativ
 solver that guesses values for azimuth ($\theta$) and elevation ($\phi$).
 
 The function to be minimized would use a lookup table from experiment or precomputation
-to determine the range time of arrival, and then, using the azimuth, find the
+to determine the range and time of arrival, and then, using the azimuth, find the
 cartesian location.  Then compute the distance ("error") between that location and the
 target at the same time.  The solver would use that distance to guide its guesses.
 
@@ -195,3 +195,5 @@ Some resources about this problem.
 * [Geogebra global diagram](https://www.geogebra.org/m/hextbjj2)
 * [Geogebra local diagram](https://www.geogebra.org/m/guchqzvs)
 * [Trajectories in air](https://en.wikipedia.org/wiki/Projectile_motion#Trajectory_in_air)
+* [Rangekeeper](https://en.wikipedia.org/wiki/Rangekeeper)
+* [Rangekeeping math](https://en.wikipedia.org/wiki/Mathematical_discussion_of_rangekeeping)
