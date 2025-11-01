@@ -5,6 +5,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.commands.tank.TankManual;
+import org.team100.lib.examples.shooter.DualDrumShooter;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
@@ -25,11 +26,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+
 public class Robot extends TimedRobot100 {
     private static final double MAX_SPEED_M_S = 3.0;
     private static final double MAX_OMEGA_RAD_S = 3.0;
+    private final DualDrumShooter m_shooter;
     private final TankDrive m_drive;
     private final Command m_auton;
+    private final IndexerServo m_indexer;
+
 
     public Robot() {
         Banner.printBanner();
@@ -77,6 +82,16 @@ public class Robot extends TimedRobot100 {
 
         m_auton = m_drive.run(() -> m_drive.setDutyCycle(1.0, 0.0))
                 .withTimeout(1.0);
+
+
+        m_shooter = DrumShooterFactory.make(logger, 20);
+        m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
+
+        m_indexer = new IndexerServo(logger, 0);
+        m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
+
+        new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer));
+            
     }
 
     @Override
