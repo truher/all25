@@ -185,6 +185,12 @@ There are a few options in `lib.optimization` for the optimizer, e.g.
 A good choice for the initial guesses would be pointing at the target's
 current location using the looked-up elevation for that location.
 
+## Computing range and time of flight
+
+There is some code in `Drag` that describes the forces on a projectile,
+and some code in `Range` that uses the `Drag` model to precompute the range
+and TOF for various elevations.
+
 
 ## Resources
 Some resources about this problem.
