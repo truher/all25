@@ -24,6 +24,7 @@ import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.motion.swerve.module.state.SwerveModuleState100;
 import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,7 +37,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DataLogManager;
 
-class SwerveDrivePoseEstimator100Test {
+class SwerveDrivePoseEstimator100Test implements Timeless {
     private static final double DELTA = 0.001;
     private static final boolean DEBUG = false;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());

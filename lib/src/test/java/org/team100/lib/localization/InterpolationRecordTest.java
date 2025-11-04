@@ -14,10 +14,11 @@ import org.team100.lib.motion.swerve.module.state.SwerveModulePosition100;
 import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.state.Model100;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-class InterpolationRecordTest {
+class InterpolationRecordTest implements Timeless {
     private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     // this is a 0.5 m square.

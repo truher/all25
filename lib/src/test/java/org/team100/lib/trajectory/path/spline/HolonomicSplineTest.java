@@ -14,6 +14,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
@@ -25,7 +26,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-class HolonomicSplineTest {
+class HolonomicSplineTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());

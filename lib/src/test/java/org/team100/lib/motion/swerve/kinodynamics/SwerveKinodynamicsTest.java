@@ -8,11 +8,12 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
+import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-class SwerveKinodynamicsTest {
+class SwerveKinodynamicsTest implements Timeless {
     private static final double DELTA = 0.001;
     private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 

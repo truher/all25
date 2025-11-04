@@ -10,11 +10,12 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-class HolonomicProfileTest {
+class HolonomicProfileTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
     private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());

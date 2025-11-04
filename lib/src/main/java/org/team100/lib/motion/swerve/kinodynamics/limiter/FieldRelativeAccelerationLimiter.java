@@ -10,7 +10,7 @@ import org.team100.lib.logging.LoggerFactory.GlobalAccelerationR3Logger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 
 /**
- * Limits cartesian (a) and rotational (α) acceleration.
+ * Limits cartesian  and rotational acceleration.
  * 
  * The limit is applied to the entire holonomic acceleration together, not to
  * the individual components, so if you exceed the rotational limit, both
