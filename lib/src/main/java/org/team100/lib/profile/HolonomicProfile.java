@@ -74,7 +74,8 @@ public class HolonomicProfile {
             double aScale,
             double omegaScale,
             double alphaScale) {
-        logger.name("HolonomicProfile").stringLogger(Level.TRACE, "profile").log(() -> PROFILE.name());
+        LoggerFactory log = logger.name("HolonomicProfile");
+        log.stringLogger(Level.TRACE, "profile").log(() -> PROFILE.name());
         switch (PROFILE) {
             case EXP -> {
                 return currentLimitedExponential(
@@ -96,6 +97,7 @@ public class HolonomicProfile {
 
             case P100 -> {
                 return trapezoidal(
+                        log,
                         kinodynamics.getMaxDriveVelocityM_S() * vScale,
                         kinodynamics.getMaxDriveAccelerationM_S2() * aScale,
                         0.05,
@@ -122,6 +124,7 @@ public class HolonomicProfile {
     }
 
     public static HolonomicProfile trapezoidal(
+            LoggerFactory log,
             double maxXYVel,
             double maxXYAccel,
             double xyTolerance,
@@ -129,9 +132,9 @@ public class HolonomicProfile {
             double maxAngularAccel,
             double angularTolerance) {
         return new HolonomicProfile(
-                new TrapezoidIncrementalProfile(maxXYVel, maxXYAccel, xyTolerance),
-                new TrapezoidIncrementalProfile(maxXYVel, maxXYAccel, xyTolerance),
-                new TrapezoidIncrementalProfile(maxAngularVel, maxAngularAccel, angularTolerance));
+                new TrapezoidIncrementalProfile(log.name("x"), maxXYVel, maxXYAccel, xyTolerance),
+                new TrapezoidIncrementalProfile(log.name("y"), maxXYVel, maxXYAccel, xyTolerance),
+                new TrapezoidIncrementalProfile(log.name("theta"), maxAngularVel, maxAngularAccel, angularTolerance));
     }
 
     public static HolonomicProfile currentLimitedExponential(

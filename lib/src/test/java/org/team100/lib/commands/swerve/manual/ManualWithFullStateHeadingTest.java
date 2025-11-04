@@ -36,7 +36,7 @@ class ManualWithFullStateHeadingTest {
     @Test
     void testModeSwitching() {
         Experiments.instance.testOverride(Experiment.StickyHeading, false);
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Supplier<Rotation2d> rotationSupplier = () -> desiredRotation;
         ManualWithFullStateHeading m_manualWithHeading = new ManualWithFullStateHeading(
                 logger,
@@ -64,7 +64,7 @@ class ManualWithFullStateHeadingTest {
     @Test
     void testNotSnapMode() {
         Experiments.instance.testOverride(Experiment.StickyHeading, false);
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Supplier<Rotation2d> rotationSupplier = () -> desiredRotation;
         ManualWithFullStateHeading m_manualWithHeading = new ManualWithFullStateHeading(
                 logger,
@@ -97,7 +97,7 @@ class ManualWithFullStateHeadingTest {
     @Test
     void testSnapMode() {
         Experiments.instance.testOverride(Experiment.StickyHeading, false);
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Supplier<Rotation2d> rotationSupplier = () -> desiredRotation;
         ManualWithFullStateHeading m_manualWithHeading = new ManualWithFullStateHeading(
                 logger,
@@ -152,8 +152,8 @@ class ManualWithFullStateHeadingTest {
         // setpoint is the goal
         assertEquals(0.0, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
-        // 
-        verify(0, 0,-0.091, twistM_S);
+        //
+        verify(0, 0, -0.091, twistM_S);
 
         // done
         currentPose = new Pose2d(0, 0, new Rotation2d(Math.PI / 2));
@@ -170,7 +170,7 @@ class ManualWithFullStateHeadingTest {
     @Test
     void testSnapHeld() {
         Experiments.instance.testOverride(Experiment.StickyHeading, false);
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Supplier<Rotation2d> rotationSupplier = () -> desiredRotation;
         ManualWithFullStateHeading m_manualWithHeading = new ManualWithFullStateHeading(
                 logger,
@@ -234,7 +234,7 @@ class ManualWithFullStateHeadingTest {
     void testStickyHeading() {
         Experiments.instance.testOverride(Experiment.StickyHeading, true);
         MockGyro gyro = new MockGyro();
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         assertEquals(2.828, swerveKinodynamics.getMaxAngleSpeedRad_S(), DELTA);
         Supplier<Rotation2d> rotationSupplier = () -> desiredRotation;
         ManualWithFullStateHeading m_manualWithHeading = new ManualWithFullStateHeading(
@@ -290,7 +290,7 @@ class ManualWithFullStateHeadingTest {
     void testStickyHeading2() {
         Experiments.instance.testOverride(Experiment.StickyHeading, true);
         MockGyro gyro = new MockGyro();
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         assertEquals(2.828, swerveKinodynamics.getMaxAngleSpeedRad_S(), DELTA);
         Supplier<Rotation2d> rotationSupplier = () -> desiredRotation;
         ManualWithFullStateHeading m_manualWithHeading = new ManualWithFullStateHeading(
@@ -347,12 +347,13 @@ class ManualWithFullStateHeadingTest {
      */
     @Test
     void testProfile() {
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         // trapezoid adapts to max actual speed
         double kRotationSpeed = 0.5;
         assertEquals(1.414, swerveKinodynamics.getMaxAngleSpeedRad_S() * kRotationSpeed, DELTA);
         assertEquals(4.243, swerveKinodynamics.getMaxAngleAccelRad_S2() * kRotationSpeed, DELTA);
         IncrementalProfile m_profile = new TrapezoidIncrementalProfile(
+                logger,
                 2.829,
                 4.2,
                 0.01);

@@ -1,6 +1,9 @@
 package org.team100.frc2025.CalgamesArm;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.prr.Config;
 import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
 import org.team100.lib.profile.incremental.IncrementalProfile;
@@ -14,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class ProfiledTest {
     private static final boolean DEBUG = false;
     private static final double DT = 0.02;
+    private static final LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /**
      * This shows that home-to-pick works fine as a profile, because it's almost
@@ -38,9 +42,9 @@ public class ProfiledTest {
         Model100 g1 = new Model100(goal.shoulderHeight(), 0);
         Model100 g2 = new Model100(goal.shoulderAngle(), 0);
         Model100 g3 = new Model100(goal.wristAngle(), 0);
-        IncrementalProfile p1 = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        IncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        IncrementalProfile p3 = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        IncrementalProfile p1 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
+        IncrementalProfile p2 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
+        IncrementalProfile p3 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
 
         Control100 i1 = new Control100(start.shoulderHeight(), 0);
         Control100 i2 = new Control100(start.shoulderAngle(), 0);
@@ -96,9 +100,9 @@ public class ProfiledTest {
         Model100 g1 = new Model100(goal.shoulderHeight(), 0);
         Model100 g2 = new Model100(goal.shoulderAngle(), 0);
         Model100 g3 = new Model100(goal.wristAngle(), 0);
-        IncrementalProfile p1 = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        IncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        IncrementalProfile p3 = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        IncrementalProfile p1 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
+        IncrementalProfile p2 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
+        IncrementalProfile p3 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
 
         Control100 i1 = new Control100(start.shoulderHeight(), 0);
         Control100 i2 = new Control100(start.shoulderAngle(), 0);
@@ -147,9 +151,9 @@ public class ProfiledTest {
         Model100 g1 = new Model100(goal.shoulderHeight(), 0);
         Model100 g2 = new Model100(goal.shoulderAngle(), 0);
         Model100 g3 = new Model100(goal.wristAngle(), 0);
-        IncrementalProfile p1 = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        IncrementalProfile p2 = new TrapezoidIncrementalProfile(1, 1, 0.05);
-        IncrementalProfile p3 = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        IncrementalProfile p1 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
+        IncrementalProfile p2 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
+        IncrementalProfile p3 = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
 
         Control100 i1 = new Control100(start.shoulderHeight(), 0);
         Control100 i2 = new Control100(start.shoulderAngle(), 0);

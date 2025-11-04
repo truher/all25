@@ -3,6 +3,9 @@ package org.team100.lib.reference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ControlR3;
@@ -14,12 +17,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class ProfileReferenceTest implements Timeless {
     private static final double DELTA = 0.001;
+    private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testSimple() {
         ModelR3 measurement = new ModelR3(new Pose2d(0, 0, Rotation2d.kZero));
         ModelR3 goal = new ModelR3(new Pose2d(1, 0, Rotation2d.kZero));
-        HolonomicProfile hp = HolonomicProfile.trapezoidal(1, 1, 0.01, 1, 1, 0.01);
+        HolonomicProfile hp = HolonomicProfile.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
         ProfileReferenceR3 r = new ProfileReferenceR3(hp, "test");
         r.setGoal(goal);
         r.initialize(measurement);

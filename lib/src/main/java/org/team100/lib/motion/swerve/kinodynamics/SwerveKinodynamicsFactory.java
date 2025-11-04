@@ -1,6 +1,7 @@
 package org.team100.lib.motion.swerve.kinodynamics;
 
 import org.team100.lib.config.Identity;
+import org.team100.lib.logging.LoggerFactory;
 
 /**
  * Each drivetrain should be tuned, and the values here should be the physical
@@ -26,7 +27,7 @@ public class SwerveKinodynamicsFactory {
      * Tests should try to avoid calling get(). Use one of the test-specific methods
      * below instead.
      */
-    public static SwerveKinodynamics get() {
+    public static SwerveKinodynamics get(LoggerFactory log) {
         System.out.printf("Swerve Kinodynamics Factory using Identity %s\n", Identity.instance);
         switch (Identity.instance) {
             case COMP_BOT:
@@ -36,6 +37,7 @@ public class SwerveKinodynamicsFactory {
                 // note these measurements were updated jun 24.
                 // 9/24/04, raised steering rate from 20 to 40, accel from 60 to 120.
                 return new SwerveKinodynamics(
+                        log,
                         4.5, // max vel m/s
                         10, // stall m/s/s
                         5, // max accel m/s/s
@@ -49,6 +51,7 @@ public class SwerveKinodynamicsFactory {
                         0.5); // vcg m NOTE VERY HIGH
             case SWERVE_TWO:
                 return new SwerveKinodynamics(
+                        log,
                         4, // vel m/s
                         10, // stall m/s/s
                         2, // accel m/s/s
@@ -62,6 +65,7 @@ public class SwerveKinodynamicsFactory {
                         0.5); // vcg m HIGH LIKE COMP
             case SWERVE_ONE:
                 return new SwerveKinodynamics(
+                        log,
                         5, // vel m/s
                         10, // stall m/s/s
                         10, // max accel m/s/s
@@ -80,6 +84,7 @@ public class SwerveKinodynamicsFactory {
                 // a whole lots of tests, which you'll have to touch every time you
                 // change it. :-(
                 return new SwerveKinodynamics(
+                        log,
                         3, // vel m/s
                         10, // stall m/s/s
                         5, // accel m/s/s
@@ -105,6 +110,7 @@ public class SwerveKinodynamicsFactory {
                 // also i observed the steering speed and reduced it a bit.
                 // the beta bot has very low VCG.
                 return new SwerveKinodynamics(
+                        log,
                         5, // max vel m/s
                         10, // stall m/s/s
                         20, // max accel m/s/s
@@ -121,6 +127,7 @@ public class SwerveKinodynamicsFactory {
                 System.out.println("WARNING: *** Using default kinodynamics, this should never happen.");
                 System.out.println("WARNING: ***");
                 return new SwerveKinodynamics(
+                        log,
                         5, // vel m/s
                         20, // stall m/s/s
                         5, // accel m/s/s
@@ -136,8 +143,9 @@ public class SwerveKinodynamicsFactory {
     }
 
     /** This is for the Mecanum drive on Rookiebot 2 */
-    public static SwerveKinodynamics mecanum() {
+    public static SwerveKinodynamics mecanum(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 5, // vel m/s
                 10, // stall m/s/s
                 10, // accel m/s/s
@@ -152,8 +160,9 @@ public class SwerveKinodynamicsFactory {
     }
 
     /** This is for the tank drive on Rookiebot 1 */
-    public static SwerveKinodynamics tank() {
+    public static SwerveKinodynamics tank(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 5, // vel m/s
                 10, // stall m/s/s
                 10, // accel m/s/s
@@ -173,8 +182,9 @@ public class SwerveKinodynamicsFactory {
      * In particular, the steering rate is *very* slow, which might be useful if
      * you're wanting to allow for steering delay.
      */
-    public static SwerveKinodynamics forTest() {
+    public static SwerveKinodynamics forTest(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 1, // vel m/s
                 10, // stall m/s/s
                 1, // accel m/s/s
@@ -188,8 +198,9 @@ public class SwerveKinodynamicsFactory {
                 0.3); // vcg m
     }
 
-    public static SwerveKinodynamics forRealisticTest() {
+    public static SwerveKinodynamics forRealisticTest(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 5, // vel m/s
                 10, // stall m/s/s
                 10, // accel m/s/s
@@ -203,8 +214,9 @@ public class SwerveKinodynamicsFactory {
                 0.3); // vcg m
     }
 
-    public static SwerveKinodynamics forTrajectoryTimingTest() {
+    public static SwerveKinodynamics forTrajectoryTimingTest(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 3.5, // vel m/s
                 20, // stall m/s/s
                 10, // accel m/s/s
@@ -218,8 +230,9 @@ public class SwerveKinodynamicsFactory {
                 0.3); // vcg m
     }
 
-    public static SwerveKinodynamics likeComp25() {
+    public static SwerveKinodynamics likeComp25(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 3, // max vel m/s
                 10, // stall m/s/s
                 5, // max accel m/s/s
@@ -233,8 +246,9 @@ public class SwerveKinodynamicsFactory {
                 0.5); // m NOTE VERY HIGH
     }
 
-    public static SwerveKinodynamics forTest2() {
+    public static SwerveKinodynamics forTest2(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 2, // vel m/s
                 5, // stall m/s/s
                 1, // accel m/s/s
@@ -248,8 +262,9 @@ public class SwerveKinodynamicsFactory {
                 0.6); // vcg m
     }
 
-    public static SwerveKinodynamics forTest3() {
+    public static SwerveKinodynamics forTest3(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 2, // vel m/s
                 5, // stall m/s/s
                 2, // accel m/s/s
@@ -263,8 +278,9 @@ public class SwerveKinodynamicsFactory {
                 0.6); // vcg m
     }
 
-    public static SwerveKinodynamics forWPITest() {
+    public static SwerveKinodynamics forWPITest(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 1, // vel m/s
                 5, // stall m/s/s
                 1, // accel m/s/s
@@ -281,8 +297,9 @@ public class SwerveKinodynamicsFactory {
     //
     // below are specific test cases. try to minimize their number
 
-    public static SwerveKinodynamics highDecelAndCapsize() {
+    public static SwerveKinodynamics highDecelAndCapsize(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 5, // vel m/s
                 10, // stall m/s/s
                 2, // accel m/s/s
@@ -296,8 +313,9 @@ public class SwerveKinodynamicsFactory {
                 0.001); // vcg m
     }
 
-    public static SwerveKinodynamics decelCase() {
+    public static SwerveKinodynamics decelCase(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 1, // vel m/s
                 10, // stall m/s/s
                 1, // accel m/s/s
@@ -311,8 +329,9 @@ public class SwerveKinodynamicsFactory {
                 0.3); // vcg m
     }
 
-    public static SwerveKinodynamics highCapsize() {
+    public static SwerveKinodynamics highCapsize(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 5, // vel m/s
                 20, // stall m/s/s
                 10, // accel m/s/s
@@ -326,8 +345,9 @@ public class SwerveKinodynamicsFactory {
                 0.1); // vcg m
     }
 
-    public static SwerveKinodynamics lowCapsize() {
+    public static SwerveKinodynamics lowCapsize(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 5, // vel m/s
                 20, // stall m/s/s
                 10, // accel m/s/s
@@ -341,8 +361,9 @@ public class SwerveKinodynamicsFactory {
                 2); // vcg m (very high vcg)
     }
 
-    public static SwerveKinodynamics limiting() {
+    public static SwerveKinodynamics limiting(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 5, // vel m/s
                 30, // stall m/s/s
                 10, // accel m/s/s
@@ -357,8 +378,9 @@ public class SwerveKinodynamicsFactory {
     }
 
     /** Large difference in accel and decel, to make asymmetry obvious. */
-    public static SwerveKinodynamics lowAccelHighDecel() {
+    public static SwerveKinodynamics lowAccelHighDecel(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 4, // vel m/s
                 10, // stall m/s/s
                 1, // accel m/s/s
@@ -379,8 +401,9 @@ public class SwerveKinodynamicsFactory {
      * the distance is reachable in one time step, i.e. high accel and velocity
      * limits.
      */
-    public static SwerveKinodynamics unlimited() {
+    public static SwerveKinodynamics unlimited(LoggerFactory log) {
         return new SwerveKinodynamics(
+                log,
                 10000, // vel m/s
                 10000, // stall m/s/s
                 10000, // accel m/s/s

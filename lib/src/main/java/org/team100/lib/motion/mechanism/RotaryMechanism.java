@@ -1,5 +1,7 @@
 package org.team100.lib.motion.mechanism;
 
+import org.team100.lib.encoder.IncrementalBareEncoder;
+import org.team100.lib.encoder.ProxyRotaryPositionSensor;
 import org.team100.lib.encoder.RotaryPositionSensor;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -46,6 +48,20 @@ public class RotaryMechanism implements Player {
         m_maxPositionRad = maxPositionRad;
         m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");
         m_log_position = child.doubleLogger(Level.DEBUG, "position (rad)");
+    }
+
+    /** There is no absolute position sensor in this case. */
+    public RotaryMechanism(
+            LoggerFactory parent,
+            BareMotor motor,
+            IncrementalBareEncoder encoder,
+            double initialPosition,
+            double gearRatio,
+            double minPositionRad,
+            double maxPositionRad) {
+        this(parent, motor,
+                new ProxyRotaryPositionSensor(encoder, gearRatio, initialPosition),
+                gearRatio, minPositionRad, maxPositionRad);
     }
 
     /** Use for homing. */

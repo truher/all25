@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.gyro.Gyro;
 import org.team100.lib.gyro.MockGyro;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.swerve.module.state.SwerveModulePosition100;
@@ -36,6 +39,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 class SwerveDrivePoseEstimator100Test {
     private static final double DELTA = 0.001;
     private static final boolean DEBUG = false;
+    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     private final SwerveModulePosition100 p0 = new SwerveModulePosition100(0, Optional.of(Rotation2d.kZero));
     private final SwerveModulePositions positionZero = new SwerveModulePositions(p0, p0, p0, p0);
@@ -65,7 +69,7 @@ class SwerveDrivePoseEstimator100Test {
 
     @Test
     void testGyroOffset() {
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
         SwerveHistory history = new SwerveHistory(
                 kinodynamics,
@@ -95,7 +99,7 @@ class SwerveDrivePoseEstimator100Test {
 
     @Test
     void odo1() {
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         SwerveHistory history = new SwerveHistory(
@@ -137,7 +141,7 @@ class SwerveDrivePoseEstimator100Test {
 
     @Test
     void odo2() {
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
@@ -181,7 +185,7 @@ class SwerveDrivePoseEstimator100Test {
 
     @Test
     void odo3() {
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
@@ -230,7 +234,7 @@ class SwerveDrivePoseEstimator100Test {
     @Test
     void outOfOrder() {
         // out of order vision updates
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
@@ -349,7 +353,7 @@ class SwerveDrivePoseEstimator100Test {
     void minorWeirdness() {
         // weirdness with out-of-order vision updates
 
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
@@ -469,7 +473,7 @@ class SwerveDrivePoseEstimator100Test {
     void test0105() {
         // this is the current (post-comp 2024) base case.
         // within a few frames, the estimate converges on the vision input.
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
@@ -527,7 +531,7 @@ class SwerveDrivePoseEstimator100Test {
     @Test
     void test0110() {
         // double vision stdev (r) -> slower convergence
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
@@ -584,7 +588,7 @@ class SwerveDrivePoseEstimator100Test {
     void test00505() {
         // half odo stdev (q) -> slower convergence
         // the K is q/(q+qr) so it's q compared to r that matters.
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         double[] stateStdDevs = new double[] { 0.05, 0.05, 0.05 };
@@ -643,7 +647,7 @@ class SwerveDrivePoseEstimator100Test {
         // actual odometry error is very low
         // measured camera error is something under 10 cm
         // these yield much slower convergence, maybe too slow? try and see.
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
 
         double[] stateStdDevs = new double[] { 0.001, 0.001, 0.01 };
@@ -738,7 +742,7 @@ class SwerveDrivePoseEstimator100Test {
             public void periodic() {
             }
         };
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest(logger);
 
         var fl = new SwerveModulePosition100();
         var fr = new SwerveModulePosition100();
@@ -891,7 +895,7 @@ class SwerveDrivePoseEstimator100Test {
         // If that were the case, after 1000 measurements, the estimated pose would
         // converge to that measurement.
 
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest(logger);
         Gyro gyro = new MockGyro();
 
         final SwerveModulePosition100 fl = new SwerveModulePosition100();
@@ -942,7 +946,7 @@ class SwerveDrivePoseEstimator100Test {
 
     @Test
     void testDiscardsOldVisionMeasurements() {
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forWPITest(logger);
         Gyro gyro = new MockGyro();
 
         var estimator = new SwerveHistory(

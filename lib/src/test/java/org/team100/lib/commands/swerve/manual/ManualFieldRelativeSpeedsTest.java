@@ -18,7 +18,7 @@ class ManualFieldRelativeSpeedsTest {
 
     @Test
     void testTwistZero() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         ManualFieldRelativeSpeeds manual = new ManualFieldRelativeSpeeds(logger, limits);
         Velocity input = new Velocity(0, 0, 0);
         ModelR3 s = new ModelR3();
@@ -30,7 +30,7 @@ class ManualFieldRelativeSpeedsTest {
 
     @Test
     void testTwistNonzero() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         ManualFieldRelativeSpeeds manual = new ManualFieldRelativeSpeeds(logger, limits);
         // these inputs are clipped
         Velocity input = new Velocity(1, 2, 3);

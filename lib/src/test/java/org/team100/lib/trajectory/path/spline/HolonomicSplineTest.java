@@ -342,7 +342,7 @@ class HolonomicSplineTest {
 
         // if we enter a circle at the capsize velocity, we should continue at that same
         // speed.
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         // centripetal accel is 8.166 m/s^2
         assertEquals(8.166666, limits.getMaxCapsizeAccelM_S2(), 1e-6);
         List<TimingConstraint> constraints = List.of(

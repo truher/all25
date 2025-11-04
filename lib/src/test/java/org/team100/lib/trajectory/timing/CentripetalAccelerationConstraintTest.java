@@ -9,22 +9,23 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
-class CentripetalAccelerationConstraintTest {
+class CentripetalAccelerationConstraintTest implements Timeless {
     private static final double DELTA = 0.001;
     private static final double CENTRIPETAL_SCALE = 1.0;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testSimple() {
-        assertEquals(8.166, SwerveKinodynamicsFactory.forTest().getMaxCapsizeAccelM_S2(), DELTA);
+        assertEquals(8.166, SwerveKinodynamicsFactory.forTest(logger).getMaxCapsizeAccelM_S2(), DELTA);
 
         // 1 rad/m curve, 8 m/s^2 limit => 2.8 m/s
         CapsizeAccelerationConstraint c = new CapsizeAccelerationConstraint(
                 logger,
-                SwerveKinodynamicsFactory.forTest(),
+                SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(), new MotionDirection(0, 0, 0), 1, 0);
@@ -36,12 +37,12 @@ class CentripetalAccelerationConstraintTest {
 
     @Test
     void testSimpleMoving() {
-        assertEquals(8.166, SwerveKinodynamicsFactory.forTest().getMaxCapsizeAccelM_S2(), DELTA);
+        assertEquals(8.166, SwerveKinodynamicsFactory.forTest(logger).getMaxCapsizeAccelM_S2(), DELTA);
 
         // 1 rad/m curve, 8 m/s^2 limit => 2.8 m/s
         CapsizeAccelerationConstraint c = new CapsizeAccelerationConstraint(
                 logger,
-                SwerveKinodynamicsFactory.forTest(),
+                SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(), new MotionDirection(1, 0, 0), 1, 0);
@@ -53,12 +54,12 @@ class CentripetalAccelerationConstraintTest {
 
     @Test
     void testSimpleOverspeed() {
-        assertEquals(8.166, SwerveKinodynamicsFactory.forTest().getMaxCapsizeAccelM_S2(), DELTA);
+        assertEquals(8.166, SwerveKinodynamicsFactory.forTest(logger).getMaxCapsizeAccelM_S2(), DELTA);
 
         // 1 rad/m curve, 8 m/s^2 limit => 2.8 m/s
         CapsizeAccelerationConstraint c = new CapsizeAccelerationConstraint(
                 logger,
-                SwerveKinodynamicsFactory.forTest(),
+                SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(), new MotionDirection(1, 0, 0), 1, 0);
@@ -70,11 +71,11 @@ class CentripetalAccelerationConstraintTest {
 
     @Test
     void testSimple2() {
-        assertEquals(4.083, SwerveKinodynamicsFactory.forTest2().getMaxCapsizeAccelM_S2(), DELTA);
+        assertEquals(4.083, SwerveKinodynamicsFactory.forTest2(logger).getMaxCapsizeAccelM_S2(), DELTA);
         // 1 rad/m curve, 4 m/s^2 limit => 2 m/s
         CapsizeAccelerationConstraint c = new CapsizeAccelerationConstraint(
                 logger,
-                SwerveKinodynamicsFactory.forTest2(),
+                SwerveKinodynamicsFactory.forTest2(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(), new MotionDirection(0, 0, 0), 1, 0);
@@ -85,11 +86,11 @@ class CentripetalAccelerationConstraintTest {
 
     @Test
     void testStraightLine() {
-        assertEquals(4.083, SwerveKinodynamicsFactory.forTest2().getMaxCapsizeAccelM_S2(), DELTA);
+        assertEquals(4.083, SwerveKinodynamicsFactory.forTest2(logger).getMaxCapsizeAccelM_S2(), DELTA);
         // no curvature
         CapsizeAccelerationConstraint c = new CapsizeAccelerationConstraint(
                 logger,
-                SwerveKinodynamicsFactory.forTest2(),
+                SwerveKinodynamicsFactory.forTest2(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(), new MotionDirection(1, 0, 0), 0, 0);

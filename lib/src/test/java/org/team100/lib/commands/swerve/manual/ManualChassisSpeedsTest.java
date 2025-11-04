@@ -19,7 +19,7 @@ class ManualChassisSpeedsTest {
 
     @Test
     void testChassisSpeedsZero() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         ManualChassisSpeeds manual = new ManualChassisSpeeds(logger, limits);
         Velocity input = new Velocity(0, 0, 0);
         ChassisSpeeds speeds = manual.apply(new ModelR3(), input);
@@ -30,7 +30,7 @@ class ManualChassisSpeedsTest {
 
     @Test
     void testChassisSpeedsNonzero() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         assertEquals(1, limits.getMaxDriveVelocityM_S(), DELTA);
         assertEquals(2.828, limits.getMaxAngleSpeedRad_S(), DELTA);
         ManualChassisSpeeds manual = new ManualChassisSpeeds(logger, limits);

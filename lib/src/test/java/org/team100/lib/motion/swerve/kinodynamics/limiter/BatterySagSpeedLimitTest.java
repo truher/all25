@@ -17,7 +17,7 @@ public class BatterySagSpeedLimitTest {
 
     @Test
     void testLimit() {
-        SwerveKinodynamics k = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics k = SwerveKinodynamicsFactory.forRealisticTest(logger);
         BatterySagSpeedLimit s = new BatterySagSpeedLimit(logger, k, () -> volts);
         volts = 0;
         assertEquals(0, s.getMaxDriveVelocityM_S(), DELTA);

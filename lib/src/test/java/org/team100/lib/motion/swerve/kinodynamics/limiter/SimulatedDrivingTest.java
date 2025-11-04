@@ -41,7 +41,7 @@ public class SimulatedDrivingTest implements Timeless {
     private static final boolean DEBUG = false;
     final LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
     LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
-    SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+    SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
     SwerveModuleCollection collection = SwerveModuleCollection.forTest(
             logger, swerveKinodynamics);
 

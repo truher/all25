@@ -8,6 +8,9 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.Fixture;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
@@ -15,6 +18,7 @@ import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
 class SwerveUtilTest {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
+    private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testIsAccel() {
@@ -38,7 +42,7 @@ class SwerveUtilTest {
 
     @Test
     void testAccelLimit1() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         assertEquals(10, limits.getMaxDriveAccelerationM_S2(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
                 new GlobalVelocityR3(0, 0, 0),
@@ -49,7 +53,7 @@ class SwerveUtilTest {
 
     @Test
     void testAccelLimit2() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         assertEquals(10, limits.getMaxDriveAccelerationM_S2(), DELTA);
         assertEquals(5, limits.getMaxDriveVelocityM_S(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
@@ -92,7 +96,7 @@ class SwerveUtilTest {
     void simMinAccel() {
         // simulate full-throttle to see the exponential curve.
         // https://docs.google.com/spreadsheets/d/1k-g8_blQP3X1RNtjFQgk1CJXyzzvNLNuUbWhaNLduvw
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         double v = 0;
         final double dt = 0.02;
         for (double t = 0; t < 3; t += dt) {

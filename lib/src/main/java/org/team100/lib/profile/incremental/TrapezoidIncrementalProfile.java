@@ -1,7 +1,9 @@
 package org.team100.lib.profile.incremental;
 
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.tuning.Mutable;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -57,24 +59,48 @@ import edu.wpi.first.math.MathUtil;
  * note: both the wpi and 100 profiles fail to produce useful feedforward when
  * the distance is reachable in one time step, i.e. high accel and velocity
  * limits.
+ * 
+ * Nov 4 2025: constraints are Mutables.
  */
 public class TrapezoidIncrementalProfile implements IncrementalProfile {
     private static final boolean DEBUG = false;
 
-    private final double m_maxVelocity;
-    private final double m_maxAcceleration;
-    private final double m_tolerance;
+    private final LoggerFactory m_log;
+    private final Mutable m_maxVelocity;
+    private final Mutable m_maxAccelerationUnscaled;
+    private final double m_scale;
+    private final Mutable m_tolerance;
 
-    public TrapezoidIncrementalProfile(double maxVel, double maxAccel, double tolerance) {
+    public TrapezoidIncrementalProfile(
+            LoggerFactory log, double maxVel, double maxAccel, double tolerance) {
+        m_log = log;
+        m_scale = 1;
+        m_maxVelocity = new Mutable(log, "maxVel", maxVel);
+        m_maxAccelerationUnscaled = new Mutable(log, "maxAccel", maxAccel);
+        m_tolerance = new Mutable(log, "tolerance", tolerance);
+    }
+
+    public TrapezoidIncrementalProfile(
+            LoggerFactory log, Mutable maxVel, Mutable maxAccel, double scale, Mutable tolerance) {
+        m_log = log;
         m_maxVelocity = maxVel;
-        m_maxAcceleration = maxAccel;
+        m_maxAccelerationUnscaled = maxAccel;
+        m_scale = scale;
         m_tolerance = tolerance;
     }
 
     @Override
     public TrapezoidIncrementalProfile scale(double s) {
         return new TrapezoidIncrementalProfile(
-                m_maxVelocity, s * m_maxAcceleration, m_tolerance);
+                m_log,
+                m_maxVelocity,
+                m_maxAccelerationUnscaled,
+                s,
+                m_tolerance);
+    }
+
+    private double getScaledAccel() {
+        return m_scale * m_maxAccelerationUnscaled.getAsDouble();
     }
 
     /**
@@ -104,13 +130,13 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
             System.out.printf("calculateWithETA %5.3f %s %s\n", dt, initialRaw, goalRaw);
         }
         // Too-high initial speed is handled with braking
-        if (initialRaw.v() > m_maxVelocity) {
+        if (initialRaw.v() > m_maxVelocity.getAsDouble()) {
             if (DEBUG) {
                 System.out.printf("positive entry speed too fast, braking %s\n", initialRaw.toString());
             }
             return full(dt, initialRaw, -1);
         }
-        if (initialRaw.v() < -m_maxVelocity) {
+        if (initialRaw.v() < -m_maxVelocity.getAsDouble()) {
             if (DEBUG) {
                 System.out.printf("negative entry speed too fast, braking %s\n", initialRaw.toString());
             }
@@ -118,12 +144,12 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         }
         Control100 initial = initialRaw;
         // Too-high goal speed is not allowed
-        if (goalRaw.v() > m_maxVelocity || goalRaw.v() < -m_maxVelocity) {
+        if (goalRaw.v() > m_maxVelocity.getAsDouble() || goalRaw.v() < -m_maxVelocity.getAsDouble()) {
             System.out.println("WARNING: Goal velocity is higher than profile velocity");
         }
         Model100 goal = limitVelocity(goalRaw);
 
-        if (goal.control().near(initial, m_tolerance)) {
+        if (goal.control().near(initial, m_tolerance.getAsDouble())) {
             if (DEBUG) {
                 System.out.print("at goal\n");
             }
@@ -195,7 +221,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
     private Model100 limitVelocity(final Model100 s) {
         return new Model100(
                 s.x(),
-                MathUtil.clamp(s.v(), -m_maxVelocity, m_maxVelocity));
+                MathUtil.clamp(s.v(), -m_maxVelocity.getAsDouble(), m_maxVelocity.getAsDouble()));
     }
 
     private Control100 handleIplus(double dt, Control100 initial, Model100 goal, double timeToSwitch) {
@@ -207,7 +233,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
             return full(truncateDt(dt, initial, goal), initial, -1);
         }
         // how much time to get to cruise? (remember initial v is positive)
-        double timeToCruise = (m_maxVelocity - initial.v()) / m_maxAcceleration;
+        double timeToCruise = (m_maxVelocity.getAsDouble() - initial.v()) / getScaledAccel();
 
         if (timeToSwitch < dt && timeToSwitch < timeToCruise) {
             // We Encounter G- during dt, before cruise, so switch.
@@ -222,8 +248,8 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
             // what's the switching position?
             double x = initial.x()
                     + initial.v() * timeToCruise
-                    + 0.5 * m_maxAcceleration * Math.pow(timeToCruise, 2);
-            Control100 nextState = new Control100(x, m_maxVelocity);
+                    + 0.5 * getScaledAccel() * Math.pow(timeToCruise, 2);
+            Control100 nextState = new Control100(x, m_maxVelocity.getAsDouble());
             return keepCruising(dt - timeToCruise, nextState, goal);
         }
         // We will not encounter any boundary during dt
@@ -258,7 +284,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
             return full(truncateDt(dt, initial, goal), initial, 1);
         }
         // how much time to get to cruise? (remember initial v is negative)
-        double timeToCruise = (m_maxVelocity + initial.v()) / m_maxAcceleration;
+        double timeToCruise = (m_maxVelocity.getAsDouble() + initial.v()) / getScaledAccel();
 
         if (timeToSwitch < dt && timeToSwitch < timeToCruise) {
             // We encounter G+ during dt, so switch.
@@ -269,8 +295,8 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
             // what's the switching position?
             double x = initial.x()
                     + initial.v() * timeToCruise
-                    - 0.5 * m_maxAcceleration * Math.pow(timeToCruise, 2);
-            Control100 nextState = new Control100(x, -m_maxVelocity);
+                    - 0.5 * getScaledAccel() * Math.pow(timeToCruise, 2);
+            Control100 nextState = new Control100(x, -m_maxVelocity.getAsDouble());
             return keepCruisingMinus(dt - timeToCruise, nextState, goal);
         }
         // We will not encounter any boundary during dt, so the resulting state is just
@@ -302,11 +328,11 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
             System.out.printf("c_minus %6.3f\n", c_minus);
         }
         // the G- value at current velocity (vmax)
-        double gminus = c_minus - Math.pow(m_maxVelocity, 2) / (2 * m_maxAcceleration);
+        double gminus = c_minus - Math.pow(m_maxVelocity.getAsDouble(), 2) / (2 * getScaledAccel());
         // distance to go to the G- intersection
         double dc = gminus - initial.x();
         // time to go to the G- intersection
-        double durationToGMinus = dc / m_maxVelocity;
+        double durationToGMinus = dc / m_maxVelocity.getAsDouble();
         if (MathUtil.isNear(0, durationToGMinus, 1e-12)) {
             // we are at the intersection of vmax and G-, so head down G-
             return full(truncateDt(dt, initial, goal), initial, -1);
@@ -319,12 +345,12 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
             if (DEBUG) {
                 System.out.printf("tremaining %6.3f\n", tremaining);
             }
-            return calculate(tremaining, new Control100(gminus, m_maxVelocity), goal);
+            return calculate(tremaining, new Control100(gminus, m_maxVelocity.getAsDouble()), goal);
         }
         // we won't reach G-, so cruise for all of dt.
         return new Control100(
-                initial.x() + m_maxVelocity * dt,
-                m_maxVelocity,
+                initial.x() + m_maxVelocity.getAsDouble() * dt,
+                m_maxVelocity.getAsDouble(),
                 0);
     }
 
@@ -332,23 +358,23 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         // We're already at negative cruising speed, which means G+ is next.
         // will we reach it during dt?
         double c_plus = c_plus(goal.control());
-        double gplus = c_plus + Math.pow(m_maxVelocity, 2) / (2 * m_maxAcceleration);
+        double gplus = c_plus + Math.pow(m_maxVelocity.getAsDouble(), 2) / (2 * getScaledAccel());
         // negative
         double dc = gplus - initial.x();
         // time to go to the G+ intersection
-        double durationToGPlus = dc / -m_maxVelocity;
+        double durationToGPlus = dc / -m_maxVelocity.getAsDouble();
         if (MathUtil.isNear(0, durationToGPlus, 1e-12)) {
             // We're at the intersection of -vmax and G+, so head up G+
             return full(truncateDt(dt, initial, goal), initial, 1);
         }
         if (durationToGPlus < dt) {
             double tremaining = dt - durationToGPlus;
-            return calculate(tremaining, new Control100(gplus, -m_maxVelocity), goal);
+            return calculate(tremaining, new Control100(gplus, -m_maxVelocity.getAsDouble()), goal);
         }
         // we won't reach G+, so cruise for all of dt
         return new Control100(
-                initial.x() - m_maxVelocity * dt,
-                -m_maxVelocity,
+                initial.x() - m_maxVelocity.getAsDouble() * dt,
+                -m_maxVelocity.getAsDouble(),
                 0);
     }
 
@@ -376,8 +402,8 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
 
         // first get to the switching point
         double x = in_initial.x() + in_initial.v() * t1
-                + 0.5 * direction * m_maxAcceleration * Math.pow(t1, 2);
-        double v = in_initial.v() + direction * m_maxAcceleration * t1;
+                + 0.5 * direction * getScaledAccel() * Math.pow(t1, 2);
+        double v = in_initial.v() + direction * getScaledAccel() * t1;
 
         // just use the same method for the second part
         // note this is slower than the code below so maybe put it back
@@ -401,7 +427,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
      * they lie on the same constant-acceleration parabola.
      */
     private double durationAtMaxA(double v_i, double v_g) {
-        return Math.abs((v_i - v_g) / m_maxAcceleration);
+        return Math.abs((v_i - v_g) / getScaledAccel());
     }
 
     /**
@@ -415,9 +441,9 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
             System.out.printf("full x_i %s\n", in_initial);
         }
         double x = in_initial.x() + in_initial.v() * dt
-                + 0.5 * direction * m_maxAcceleration * Math.pow(dt, 2);
-        double v = in_initial.v() + direction * m_maxAcceleration * dt;
-        double a = direction * m_maxAcceleration;
+                + 0.5 * direction * getScaledAccel() * Math.pow(dt, 2);
+        double v = in_initial.v() + direction * getScaledAccel() * dt;
+        double a = direction * getScaledAccel();
         return new Control100(x, v, a);
     }
 
@@ -431,7 +457,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         // this fixes rounding errors
         if (MathUtil.isNear(initial.v(), q_dot_switch, 1e-6))
             return 0;
-        double t1 = (q_dot_switch - initial.v()) / m_maxAcceleration;
+        double t1 = (q_dot_switch - initial.v()) / getScaledAccel();
         if (t1 < 0) {
             return Double.NaN;
         }
@@ -449,7 +475,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         if (MathUtil.isNear(initial.v(), q_dot_switch, 1e-6))
             return 0;
 
-        double t1 = (q_dot_switch - initial.v()) / (-1.0 * m_maxAcceleration);
+        double t1 = (q_dot_switch - initial.v()) / (-1.0 * getScaledAccel());
         if (t1 < 0) {
             return Double.NaN;
         }
@@ -471,8 +497,8 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         // intercept of I+
         double c_plus = c_plus(initial);
         // position of I- at the velocity of goal
-        double p_minus = c_minus - Math.pow(goal.v(), 2) / (2 * m_maxAcceleration);
-        double p_plus = c_plus + Math.pow(goal.v(), 2) / (2 * m_maxAcceleration);
+        double p_minus = c_minus - Math.pow(goal.v(), 2) / (2 * getScaledAccel());
+        double p_plus = c_plus + Math.pow(goal.v(), 2) / (2 * getScaledAccel());
 
         // "limit" path we don't want.
         if (goal.v() <= initial.v() && goal.x() < p_minus)
@@ -485,7 +511,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         // prevent rounding errors
         if (d < 0)
             d = 0;
-        return Math.sqrt(2 * m_maxAcceleration * d);
+        return Math.sqrt(2 * getScaledAccel() * d);
     }
 
     /**
@@ -503,8 +529,8 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         // intercept of I+
         double c_plus = c_plus(initial);
         // position of I- at the velocity of goal
-        double p_minus = c_minus - Math.pow(goal.v(), 2) / (2 * m_maxAcceleration);
-        double p_plus = c_plus + Math.pow(goal.v(), 2) / (2 * m_maxAcceleration);
+        double p_minus = c_minus - Math.pow(goal.v(), 2) / (2 * getScaledAccel());
+        double p_plus = c_plus + Math.pow(goal.v(), 2) / (2 * getScaledAccel());
 
         // "limit" path we don't want.
 
@@ -519,7 +545,7 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
         if (d < 0)
             d = 0;
 
-        return -1.0 * Math.sqrt(2 * m_maxAcceleration * d);
+        return -1.0 * Math.sqrt(2 * getScaledAccel() * d);
     }
 
     /**
@@ -540,12 +566,12 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
 
     /** Intercept of negative-acceleration path intersecting s */
     double c_minus(Control100 s) {
-        return s.x() - Math.pow(s.v(), 2) / (-2.0 * m_maxAcceleration);
+        return s.x() - Math.pow(s.v(), 2) / (-2.0 * getScaledAccel());
     }
 
     /** Intercept of positive-acceleration path intersecting s */
     double c_plus(Control100 s) {
-        return s.x() - Math.pow(s.v(), 2) / (2.0 * m_maxAcceleration);
+        return s.x() - Math.pow(s.v(), 2) / (2.0 * getScaledAccel());
     }
 
     // for testing
@@ -565,14 +591,14 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
     }
 
     public double getMaxVelocity() {
-        return m_maxVelocity;
+        return m_maxVelocity.getAsDouble();
     }
 
     public double getMaxAcceleration() {
-        return m_maxAcceleration;
+        return getScaledAccel();
     }
 
     public double getTolerance() {
-        return m_tolerance;
+        return m_tolerance.getAsDouble();
     }
 }
