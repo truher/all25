@@ -15,8 +15,9 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.testing.Timeless;
 
-public class SwerveLimiterTest {
+public class SwerveLimiterTest implements Timeless {
     private static final double DELTA = 0.001;
     private static final boolean DEBUG = false;
     private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());

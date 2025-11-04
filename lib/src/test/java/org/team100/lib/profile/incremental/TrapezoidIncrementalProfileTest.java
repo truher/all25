@@ -13,12 +13,13 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.testing.Timeless;
 
 /**
  * Note many of these cases were adjusted slightly to accommodate the treatment
  * of max velocity.
  */
-class TrapezoidIncrementalProfileTest {
+class TrapezoidIncrementalProfileTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final double TEN_MS = 0.01;
     private static final double DELTA = 0.001;
