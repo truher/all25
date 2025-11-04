@@ -49,7 +49,7 @@ public class Robot extends TimedRobot100 {
                 fieldLogger,
                 logger,
                 80, // stator current limit (a)
-                new CanId(3), // left
+                new CanId(25), // left
                 new CanId(27), // right
                 0.4, // track width
                 6.0, // gear ratio
