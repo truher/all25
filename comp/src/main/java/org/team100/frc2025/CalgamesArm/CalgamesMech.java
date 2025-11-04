@@ -115,11 +115,14 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
     /** Home pose is Config(0,0,0), from forward kinematics. */
     private final Pose2d m_home;
 
+    private final LoggerFactory m_profileLog;
+
     public CalgamesMech(
             LoggerFactory log,
             double armLength,
             double wristLength) {
         LoggerFactory parent = log.type(this);
+        m_profileLog = parent.name("profiles");
         m_armLengthM = armLength;
         m_wristLengthM = wristLength;
 
@@ -230,13 +233,10 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                 Talon6Encoder wristEncoder = new Talon6Encoder(
                         wristLog, wristMotor);
                 final double wristGearRatio = 55.710;
-                ProxyRotaryPositionSensor wristProxySensor = new ProxyRotaryPositionSensor(
-                        wristEncoder,
-                        wristGearRatio);
                 double wristEncoderOffset = 2.06818; // 2+0.06818
-                wristProxySensor.setEncoderPosition(wristEncoderOffset);
                 m_wrist = new RotaryMechanism(
-                        wristLog, wristMotor, wristProxySensor, wristGearRatio,
+                        wristLog, wristMotor,
+                        wristEncoder, wristEncoderOffset, wristGearRatio,
                         -1.5, // min
                         2.1); // max
             }
@@ -383,14 +383,14 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      * position (origin) at rest, and end when done.
      */
     public Command profileHomeTerminal() {
-        FollowJointProfiles f = MechProfiles.slowFast(
+        FollowJointProfiles f = MechProfiles.slowFast(m_profileLog,
                 this, HOME);
         return f.until(f::isDone)
                 .withName("profileHomeTerminal");
     }
 
     public Command profileHomeToL1() {
-        FollowJointProfiles f = MechProfiles.fastSlow(
+        FollowJointProfiles f = MechProfiles.fastSlow(m_profileLog,
                 this, L1);
         return f.until(f::isDone)
                 .withName("profileHomeTerminal");
@@ -401,7 +401,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      * position (origin) at rest, and hold there forever.
      */
     public Command profileHomeEndless() {
-        return MechProfiles.slowFast(
+        return MechProfiles.slowFast(m_profileLog,
                 this, HOME)
                 .withName("profileHomeEndless");
     }
@@ -412,7 +412,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      * to push against gravity (making that squealing noise).
      */
     public Command profileHomeAndThenRest() {
-        MoveAndHold f = MechProfiles.slowFast(this, HOME);
+        MoveAndHold f = MechProfiles.slowFast(m_profileLog, this, HOME);
         return sequence(
                 // f.until(f::isDone),
                 f.withTimeout(2),
@@ -431,7 +431,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      * rest, and stay there forever.
      */
     public Command pickWithProfile() {
-        return MechProfiles.fastSlow(
+        return MechProfiles.fastSlow(m_profileLog,
                 this, CORAL_GROUND_PICK)
                 .withName("pickWithProfile");
     }
@@ -441,23 +441,23 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      * rest, and stay there forever.
      */
     public Command algaePickGround() {
-        return MechProfiles.algae(
+        return MechProfiles.algae(m_profileLog,
                 this, ALGAE_GROUND)
                 .withName("pickWithProfile");
     }
 
     public FollowJointProfiles homeGentle() {
-        return MechProfiles.gentle(
+        return MechProfiles.gentle(m_profileLog,
                 this, HOME);
     }
 
     public FollowJointProfiles homeAlgae() {
-        return MechProfiles.algaeUp(
+        return MechProfiles.algaeUp(m_profileLog,
                 this, HOME);
     }
 
     public Command climbWithProfile() {
-        return MechProfiles.gentle(
+        return MechProfiles.gentle(m_profileLog,
                 this, CLIMB)
                 .withName("climbWithProfile");
     }
@@ -467,7 +467,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      * station-pick location at rest, and stay there forever.
      */
     public Command stationWithProfile() {
-        return MechProfiles.fastSlow(
+        return MechProfiles.fastSlow(m_profileLog,
                 this, STATION)
                 .withName("stationWithProfile");
     }
@@ -477,7 +477,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      * processor location at rest, and stay there forever.
      */
     public Command processorWithProfile() {
-        return MechProfiles.algae(
+        return MechProfiles.algae(m_profileLog,
                 this, PROCESSOR)
                 .withName("processorWithProfile");
     }

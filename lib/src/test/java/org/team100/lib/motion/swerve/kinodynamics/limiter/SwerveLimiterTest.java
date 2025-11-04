@@ -19,8 +19,9 @@ import org.team100.lib.state.Model100;
 public class SwerveLimiterTest {
     private static final double DELTA = 0.001;
     private static final boolean DEBUG = false;
-    private static final SwerveKinodynamics KINEMATIC_LIMITS = SwerveKinodynamicsFactory.limiting();
     private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
+    private static final SwerveKinodynamics KINEMATIC_LIMITS = SwerveKinodynamicsFactory
+            .limiting(new TestLoggerFactory(new TestPrimitiveLogger()));
 
     /** The setpoint generator never changes the field-relative course. */
     @Test
@@ -90,7 +91,7 @@ public class SwerveLimiterTest {
 
     @Test
     void motionlessNoOp() {
-        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
+        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited(logger);
         SwerveLimiter limiter = new SwerveLimiter(logger, unlimited, () -> 12);
 
         GlobalVelocityR3 target = new GlobalVelocityR3(0, 0, 0);
@@ -110,7 +111,7 @@ public class SwerveLimiterTest {
 
     @Test
     void driveNoOp() {
-        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
+        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited(logger);
         SwerveLimiter limiter = new SwerveLimiter(logger, unlimited, () -> 12);
 
         GlobalVelocityR3 target = new GlobalVelocityR3(1, 0, 0);
@@ -130,7 +131,7 @@ public class SwerveLimiterTest {
 
     @Test
     void spinNoOp() {
-        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
+        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited(logger);
         SwerveLimiter limiter = new SwerveLimiter(logger, unlimited, () -> 12);
 
         GlobalVelocityR3 target = new GlobalVelocityR3(0, 0, 1);
@@ -149,7 +150,7 @@ public class SwerveLimiterTest {
 
     @Test
     void driveAndSpin() {
-        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
+        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited(logger);
         SwerveLimiter limiter = new SwerveLimiter(logger, unlimited, () -> 12);
 
         // spin fast to make the discretization effect larger
@@ -174,7 +175,7 @@ public class SwerveLimiterTest {
     void testAccel() {
         // limit accel is 10 m/s^2
         // capsize limit is 24.5 m/s^2
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.highCapsize();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.highCapsize(logger);
         assertEquals(24.5, limits.getMaxCapsizeAccelM_S2(), DELTA);
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
@@ -209,7 +210,7 @@ public class SwerveLimiterTest {
     @Test
     void testNotLimiting() {
         // high centripetal limit to stay out of the way
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.highCapsize();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.highCapsize(logger);
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         // initially at rest.
@@ -228,7 +229,7 @@ public class SwerveLimiterTest {
     @Test
     void testLimitingALittle() {
         // high centripetal limit to stay out of the way
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.highCapsize();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.highCapsize(logger);
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         // initially at rest.
@@ -252,7 +253,7 @@ public class SwerveLimiterTest {
 
     @Test
     void testCase4() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.decelCase();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.decelCase(logger);
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         // initially moving 0.5 +y
@@ -284,7 +285,7 @@ public class SwerveLimiterTest {
      */
     @Test
     void testSweep() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.likeComp25();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.likeComp25(logger);
         SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
         // target is infeasible and constant
         final GlobalVelocityR3 target = new GlobalVelocityR3(5, 0, 0);
@@ -327,11 +328,11 @@ public class SwerveLimiterTest {
     @Test
     void testProfile() {
         // profile v and a constraints match the limits
-        IncrementalProfile profile = new TrapezoidIncrementalProfile(3, 5, 0.01);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 3, 5, 0.01);
         final Model100 goal = new Model100(5, 0);
         final Model100 initial = new Model100(0, 0);
 
-        final SwerveKinodynamics limits = SwerveKinodynamicsFactory.likeComp25();
+        final SwerveKinodynamics limits = SwerveKinodynamicsFactory.likeComp25(logger);
         final SwerveLimiter limiter = new SwerveLimiter(logger, limits, () -> 12);
 
         Control100 profileTarget = initial.control();

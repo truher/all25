@@ -4,11 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.testing.Timeless;
 
-public class IncrementalProfileTest {
+public class IncrementalProfileTest implements Timeless {
     private static final boolean DEBUG = false;
+    private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     // 70 ns to get the ETA
     @Test
@@ -17,7 +22,7 @@ public class IncrementalProfileTest {
         Model100 goal = new Model100(1, 0);
         double expectedEta = 2.0;
         double s = 1.0;
-        IncrementalProfile p = new TrapezoidIncrementalProfile(1, 1, 0.01);
+        IncrementalProfile p = new TrapezoidIncrementalProfile(logger, 1, 1, 0.01);
         double diff = p.scale(s).simulateForETA(0.02, initial, goal) - expectedEta;
         // eta is indeed 2, it's a triangle path
         assertEquals(0, diff, 0.001);
@@ -43,7 +48,7 @@ public class IncrementalProfileTest {
     void testETA2() {
         Control100 initial = new Control100();
         Model100 goal = new Model100(1, 0);
-        IncrementalProfile p = new TrapezoidIncrementalProfile(1, 1, 0.01);
+        IncrementalProfile p = new TrapezoidIncrementalProfile(logger, 1, 1, 0.01);
         double eta = p.simulateForETA(0.02, initial, goal);
         assertEquals(2.000, eta, 0.001);
         // same answer at 10x the step size since the step happens to line up with the

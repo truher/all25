@@ -34,7 +34,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
                 Double.POSITIVE_INFINITY);
         final Feedback100 turningFeedback2 = new PIDFeedback(
                 logger, 1, 0, 0, false, 0.05, 1);
-        final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 1, 1, 0.05);
         final IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         final OnboardAngularPositionServo servo = new OnboardAngularPositionServo(
                 logger, mech, ref, turningFeedback2);
@@ -67,7 +67,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
                 Double.POSITIVE_INFINITY);
         Feedback100 turningFeedback2 = new PIDFeedback(
                 logger, 10, 0, 0, false, 0.05, 1);
-        IncrementalProfile profile = new TrapezoidIncrementalProfile(2, 2, 0.05);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 2, 2, 0.05);
         IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         OnboardAngularPositionServo servo = new OnboardAngularPositionServo(
                 logger, mech, ref, turningFeedback2);
@@ -131,7 +131,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
                 logger, motor, sensor, 1, -3.1, 3.1);
         Feedback100 turningFeedback2 = new PIDFeedback(
                 logger, 10, 0, 0, false, 0.05, 1);
-        IncrementalProfile profile = new TrapezoidIncrementalProfile(2, 2, 0.05);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 2, 2, 0.05);
         // IncrementalProfile profile = new TrapezoidProfileWPI(2, 2);
         IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         OnboardAngularPositionServo servo = new OnboardAngularPositionServo(
@@ -189,7 +189,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 1, 1, 0.05);
         final IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         final Feedback100 turningFeedback2 = new PIDFeedback(
                 logger, 10, 0, 0, false, 0.05, 1);
@@ -227,7 +227,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        final IncrementalProfile profile = new TrapezoidIncrementalProfile(1, 1, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 1, 1, 0.05);
         final IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         // lots of feedback here since there's no setpoint velocity.
         final Feedback100 turningFeedback2 = new PIDFeedback(
@@ -296,7 +296,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, -3.1, 3.1);
-        final IncrementalProfile profile = new TrapezoidIncrementalProfile(2, 2, 0.05);
+        final IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 2, 2, 0.05);
         final IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
         // lots of feedback here since control velocity is zero
         // note that we don't use "continuous" feedback here

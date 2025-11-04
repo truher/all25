@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
+import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
@@ -13,7 +14,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
  * Notice the difference between the naive feedforward and the more-correct
  * discretized one.
  */
-class FeedforwardTest {
+class FeedforwardTest implements Timeless {
     private static final double DELTA = 0.001;
     private static final LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 

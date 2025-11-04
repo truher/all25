@@ -3,8 +3,12 @@ package org.team100.lib.profile.incremental;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.testing.Timeless;
 
 /**
  * Illustrates how to coordinate multiple profiles to take the same amount of
@@ -20,12 +24,13 @@ import org.team100.lib.state.Model100;
  * The WPI profile keeps the timing data around after the "calculate" method, so
  * we can look there; our own profile does not, so we need to modify it.
  */
-class CoordinatedProfileTest {
+class CoordinatedProfileTest implements Timeless {
     private static final boolean PRINT = false;
 
     private static final double PROFILE_TOLERANCE = 0.01;
     private static final double DELTA = 0.001;
     private static final double DT = 0.02;
+    private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /**
      * Verify that the profile times are what we think they should be:
@@ -39,8 +44,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // two profiles with the same parameters
-        TrapezoidIncrementalProfile p1 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
-        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p1 = new TrapezoidIncrementalProfile(logger, maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(logger, maxVel, maxAccel, tolerance);
         // initial state at the origin at rest
         Model100 i1 = new Model100(0, 0);
         Model100 i2 = new Model100(0, 0);
@@ -122,14 +127,14 @@ class CoordinatedProfileTest {
             max_v = Math.max(max_v, s1.v());
             if (s1.model().near(g1, 0.01)) {
                 if (PRINT)
-                System.out.println("at goal at t " + total_time);
+                    System.out.println("at goal at t " + total_time);
                 break;
             }
             if (PRINT)
-            System.out.printf("%f %s\n", total_time, s1);
+                System.out.printf("%f %s\n", total_time, s1);
         }
         if (PRINT)
-        System.out.println("max v " + max_v);
+            System.out.println("max v " + max_v);
         // this is a triangle profile
         assertEquals(2.0, total_time, DELTA);
 
@@ -163,8 +168,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // two profiles with the same parameters
-        TrapezoidIncrementalProfile p1 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
-        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p1 = new TrapezoidIncrementalProfile(logger, maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(logger, maxVel, maxAccel, tolerance);
         // initial state at the origin at rest
         Model100 i1 = new Model100(0, 0);
         Model100 i2 = new Model100(0, 0);
@@ -175,7 +180,7 @@ class CoordinatedProfileTest {
         double total_time = p1.simulateForETA(0.2, i1.control(), g1);
         assertEquals(2.0, total_time, DELTA);
 
-        total_time  = p2.simulateForETA(0.2, i2.control(), g2);
+        total_time = p2.simulateForETA(0.2, i2.control(), g2);
         assertEquals(3.0, total_time, DELTA);
     }
 
@@ -194,7 +199,7 @@ class CoordinatedProfileTest {
         Model100 g1 = new Model100(1, 0);
         Model100 g2 = new Model100(2, 0);
 
-        double total_time  = p1.simulateForETA(0.2, i1.control(), g1);
+        double total_time = p1.simulateForETA(0.2, i1.control(), g1);
         assertEquals(2.0, total_time, DELTA);
 
         total_time = p2.simulateForETA(0.2, i2.control(), g2);
@@ -207,8 +212,8 @@ class CoordinatedProfileTest {
         final int maxAccel = 1;
         final double tolerance = 0.01;
         // default x and y profiles
-        TrapezoidIncrementalProfile px = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
-        TrapezoidIncrementalProfile py = new TrapezoidIncrementalProfile(maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile px = new TrapezoidIncrementalProfile(logger, maxVel, maxAccel, tolerance);
+        TrapezoidIncrementalProfile py = new TrapezoidIncrementalProfile(logger, maxVel, maxAccel, tolerance);
         // initial x state is moving fast
         Control100 ix = new Control100(0, 1);
         // initial y state is stationary

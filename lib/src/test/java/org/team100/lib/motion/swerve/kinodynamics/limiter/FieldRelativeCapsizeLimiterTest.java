@@ -16,7 +16,7 @@ public class FieldRelativeCapsizeLimiterTest {
 
     @Test
     void testScale() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
         assertEquals(8.166, limits.getMaxCapsizeAccelM_S2(), DELTA);
         // below the limit, scale = 1
@@ -32,7 +32,7 @@ public class FieldRelativeCapsizeLimiterTest {
      */
     @Test
     void testUnconstrained() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
         GlobalVelocityR3 result = limiter.apply(
                 new GlobalVelocityR3(0, 0, 0),
@@ -44,7 +44,7 @@ public class FieldRelativeCapsizeLimiterTest {
 
     @Test
     void testInline() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         assertEquals(8.166, limits.getMaxCapsizeAccelM_S2(), DELTA);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
         GlobalVelocityR3 result = limiter.apply(
@@ -64,7 +64,7 @@ public class FieldRelativeCapsizeLimiterTest {
      */
     @Test
     void testConstrained() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         assertEquals(8.166, limits.getMaxCapsizeAccelM_S2(), DELTA);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
         GlobalVelocityR3 result = limiter.apply(
@@ -77,7 +77,7 @@ public class FieldRelativeCapsizeLimiterTest {
 
     @Test
     void testLowCentripetal() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.lowCapsize();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.lowCapsize(logger);
         assertEquals(1.225, limits.getMaxCapsizeAccelM_S2(), DELTA);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
         GlobalVelocityR3 result = limiter.apply(
@@ -90,7 +90,7 @@ public class FieldRelativeCapsizeLimiterTest {
 
     @Test
     void testOverspeedCentripetal() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         assertEquals(8.166, limits.getMaxCapsizeAccelM_S2(), DELTA);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
         GlobalVelocityR3 result = limiter.apply(

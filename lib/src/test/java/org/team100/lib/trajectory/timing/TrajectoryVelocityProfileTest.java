@@ -64,7 +64,7 @@ public class TrajectoryVelocityProfileTest {
     void testConstantConstraint() {
         Path100 path = new Path100(WAYPOINTS);
         // somewhat realistic numbers
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         List<TimingConstraint> constraints = List.of(new ConstantConstraint(logger, 1, 1, limits));
         ScheduleGenerator u = new ScheduleGenerator(constraints);
         Trajectory100 traj = u.timeParameterizeTrajectory(
@@ -76,7 +76,7 @@ public class TrajectoryVelocityProfileTest {
     @Test
     void testSwerveConstraint() {
         Path100 path = new Path100(WAYPOINTS);
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         List<TimingConstraint> constraints = List.of(new SwerveDriveDynamicsConstraint(logger, limits, 1, 1));
         ScheduleGenerator u = new ScheduleGenerator(constraints);
         Trajectory100 traj = u.timeParameterizeTrajectory(
@@ -88,7 +88,7 @@ public class TrajectoryVelocityProfileTest {
     @Test
     void testAuto() {
         Path100 path = new Path100(WAYPOINTS);
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         TimingConstraintFactory timing = new TimingConstraintFactory(limits);
         List<TimingConstraint> constraints = timing.testAuto(logger);
         ScheduleGenerator u = new ScheduleGenerator(constraints);

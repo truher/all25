@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.swerve.module.state.SwerveModulePosition100;
@@ -15,8 +18,10 @@ import org.team100.lib.state.ModelR3;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 class InterpolationRecordTest {
+    private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
+
     // this is a 0.5 m square.
-    SwerveKinodynamics l = SwerveKinodynamicsFactory.forTest();
+    SwerveKinodynamics l = SwerveKinodynamicsFactory.forTest(logger);
 
     @Test
     void testInterp0() {

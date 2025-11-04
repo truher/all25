@@ -11,6 +11,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.timing.TimedPose;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
@@ -20,14 +21,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-class Trajectory100Test {
+class Trajectory100Test implements Timeless{
     private static final double DELTA = 0.001;
     private static final boolean DEBUG = false;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testPreviewAndAdvance() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         Pose2d start = Pose2d.kZero;
         Pose2d end = start.plus(new Transform2d(1, 0, Rotation2d.kZero));
 
@@ -59,7 +60,7 @@ class Trajectory100Test {
 
     @Test
     void testSample() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         Pose2d start = Pose2d.kZero;
         Pose2d end = start.plus(new Transform2d(1, 0, Rotation2d.kZero));
 
@@ -95,7 +96,7 @@ class Trajectory100Test {
                 new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
 
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
@@ -126,7 +127,7 @@ class Trajectory100Test {
                 new HolonomicPose2d(new Translation2d(), Rotation2d.kZero, Rotation2d.kZero),
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kCCW_Pi_2, Rotation2d.kZero));
 
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
@@ -164,7 +165,7 @@ class Trajectory100Test {
                 new HolonomicPose2d(new Translation2d(10, 0), Rotation2d.kCCW_Pi_2, Rotation2d.kZero),
                 new HolonomicPose2d(new Translation2d(10, 10), Rotation2d.kPi, Rotation2d.kZero));
 
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 

@@ -69,6 +69,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
         m_target = target;
         m_controller = controller;
         m_profile = new TrapezoidIncrementalProfile(
+                child,
                 swerveKinodynamics.getMaxAngleSpeedRad_S() * ROTATION_SPEED,
                 swerveKinodynamics.getMaxAngleAccelRad_S2() * ROTATION_SPEED,
                 0.01);

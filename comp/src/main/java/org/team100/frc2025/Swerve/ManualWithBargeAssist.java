@@ -52,6 +52,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
     private final DoubleLogger m_log_theta_FF;
     private final DoubleLogger m_log_theta_FB;
     private final DoubleLogger m_log_output_omega;
+    private final LoggerFactory m_log;
 
     // package private for testing
     Rotation2d m_goal = null;
@@ -72,20 +73,20 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
             Supplier<Rotation2d> desiredRotation,
             Feedback100 thetaController,
             Supplier<Pose2d> pose) {
-        LoggerFactory child = parent.type(this);
+        m_log = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_desiredRotation = desiredRotation;
         m_thetaFeedback = thetaController;
         m_latch = new HeadingLatch();
         m_pose = pose;
-        m_log_mode = child.stringLogger(Level.TRACE, "mode");
-        m_log_max_speed = child.doubleLogger(Level.TRACE, "maxSpeedRad_S");
-        m_log_max_accel = child.doubleLogger(Level.TRACE, "maxAccelRad_S2");
-        m_log_goal_theta = child.doubleLogger(Level.TRACE, "goal/theta");
-        m_log_setpoint_theta = child.control100Logger(Level.TRACE, "setpoint/theta");
-        m_log_theta_FF = child.doubleLogger(Level.TRACE, "thetaFF");
-        m_log_theta_FB = child.doubleLogger(Level.TRACE, "thetaFB");
-        m_log_output_omega = child.doubleLogger(Level.TRACE, "output/omega");
+        m_log_mode = m_log.stringLogger(Level.TRACE, "mode");
+        m_log_max_speed = m_log.doubleLogger(Level.TRACE, "maxSpeedRad_S");
+        m_log_max_accel = m_log.doubleLogger(Level.TRACE, "maxAccelRad_S2");
+        m_log_goal_theta = m_log.doubleLogger(Level.TRACE, "goal/theta");
+        m_log_setpoint_theta = m_log.control100Logger(Level.TRACE, "setpoint/theta");
+        m_log_theta_FF = m_log.doubleLogger(Level.TRACE, "thetaFF");
+        m_log_theta_FB = m_log.doubleLogger(Level.TRACE, "thetaFB");
+        m_log_output_omega = m_log.doubleLogger(Level.TRACE, "output/omega");
     }
 
     @Override
@@ -228,6 +229,8 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
     /**
      * Note that the max speed and accel are inversely proportional to the current
      * velocity.
+     * 
+     * TODO: get rid of this
      */
     public TrapezoidIncrementalProfile makeProfile(double currentVelocity) {
         // fraction of the maximum speed
@@ -245,6 +248,7 @@ public class ManualWithBargeAssist implements FieldRelativeDriver {
         m_log_max_accel.log(() -> maxAccelRad_S2);
 
         return new TrapezoidIncrementalProfile(
+                m_log,
                 maxSpeedRad_S,
                 maxAccelRad_S2,
                 0.01);

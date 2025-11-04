@@ -48,7 +48,7 @@ public class PathFactoryTest {
         }
         // schedule it so we can see it
         // no constraints
-        TimingConstraintFactory f = new TimingConstraintFactory(SwerveKinodynamicsFactory.forTest());
+        TimingConstraintFactory f = new TimingConstraintFactory(SwerveKinodynamicsFactory.forTest(logger));
         List<TimingConstraint> constraints = f.forTest(logger);
         ScheduleGenerator scheduler = new ScheduleGenerator(constraints);
         Trajectory100 trajectory = scheduler.timeParameterizeTrajectory(

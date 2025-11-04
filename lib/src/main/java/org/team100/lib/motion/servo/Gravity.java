@@ -18,6 +18,11 @@ public class Gravity implements DoubleUnaryOperator {
     private final DoubleLogger m_log_gravityTorque;
     private final DoubleLogger m_log_correctedPosition;
 
+    /**
+     * @param parent    log
+     * @param gravityNm maximum torque
+     * @param offsetRad position offset
+     */
     public Gravity(LoggerFactory parent, double gravityNm, double offsetRad) {
         m_gravityNm = gravityNm;
         m_offsetRad = offsetRad;
