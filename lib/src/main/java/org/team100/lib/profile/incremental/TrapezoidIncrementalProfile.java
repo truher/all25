@@ -71,6 +71,10 @@ public class TrapezoidIncrementalProfile implements IncrementalProfile {
     private final double m_scale;
     private final Mutable m_tolerance;
 
+    /**
+     * Note the logger name here selects the Mutable values, so be sure it's unique,
+     * if you want unique values.
+     */
     public TrapezoidIncrementalProfile(
             LoggerFactory log, double maxVel, double maxAccel, double tolerance) {
         m_log = log;

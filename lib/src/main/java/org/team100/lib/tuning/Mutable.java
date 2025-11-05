@@ -37,6 +37,7 @@ public class Mutable implements DoubleSupplier {
 
     private static DoubleEntry getEntry(NetworkTableInstance inst, String name, double defaultValue) {
         if (ALL_ENTRIES.containsKey(name)) {
+            // TODO: make this fatal
             System.out.printf("** WARNING: duplicate Mutable name %s\n", name);
             return ALL_ENTRIES.get(name);
         }

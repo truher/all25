@@ -567,20 +567,20 @@ class TrapezoidIncrementalProfileTest implements Timeless {
 
     @Test
     void testIntercepts() {
-        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(logger, 5, 0.5, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(logger.name("one"), 5, 0.5, 0.01);
         Control100 s = new Control100(1, 1);
         assertEquals(0, p.c_plus(s), DELTA);
         assertEquals(2, p.c_minus(s), DELTA);
 
         // more accel
-        p = new TrapezoidIncrementalProfile(logger, 5, 1, 0.01);
+        p = new TrapezoidIncrementalProfile(logger.name("two"), 5, 1, 0.01);
         s = new Control100(1, 1);
         // means less offset
         assertEquals(0.5, p.c_plus(s), DELTA);
         assertEquals(1.5, p.c_minus(s), DELTA);
 
         // negative velocity, result should be the same.
-        p = new TrapezoidIncrementalProfile(logger, 5, 1, 0.01);
+        p = new TrapezoidIncrementalProfile(logger.name("three"), 5, 1, 0.01);
         s = new Control100(1, -1);
         // means less offset
         assertEquals(0.5, p.c_plus(s), DELTA);
@@ -590,9 +590,9 @@ class TrapezoidIncrementalProfileTest implements Timeless {
     // see studies/rrts TestRRTStar7
     @Test
     void testInterceptsFromRRT() {
-        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(logger, 5, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(logger.name("one"), 5, 1, 0.01);
 
-        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(logger, 5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(logger.name("two"), 5, 2, 0.01);
 
         assertEquals(0, p.c_minus(new Control100(0, 0)), 0.001);
         assertEquals(0, p.c_plus(new Control100(0, 0)), 0.001);
@@ -631,9 +631,9 @@ class TrapezoidIncrementalProfileTest implements Timeless {
 
     @Test
     void testQSwitch() {
-        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(logger, 5, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(logger.name("one"), 5, 1, 0.01);
 
-        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(logger, 5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(logger.name("two"), 5, 2, 0.01);
 
         assertEquals(0.375, p2.qSwitchIplusGminus(new Control100(0, 0), new Model100(0.5, 1.0)), 0.001);
         assertEquals(0.125, p2.qSwitchIminusGplus(new Control100(0, 0), new Model100(0.5, 1.0)), 0.001);
@@ -1268,9 +1268,9 @@ class TrapezoidIncrementalProfileTest implements Timeless {
 
     @Test
     void testQDotSwitch() {
-        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(logger, 5, 1, 0.01);
+        TrapezoidIncrementalProfile p = new TrapezoidIncrementalProfile(logger.name("one"), 5, 1, 0.01);
 
-        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(logger, 5, 2, 0.01);
+        TrapezoidIncrementalProfile p2 = new TrapezoidIncrementalProfile(logger.name("two"), 5, 2, 0.01);
 
         assertEquals(1.224, p2.qDotSwitchIplusGminus(new Control100(0, 0), new Model100(0.5, 1.0)), 0.001);
         assertEquals(Double.NaN, p2.qDotSwitchIminusGplus(new Control100(0, 0), new Model100(0.5, 1.0)), 0.001);
@@ -1798,14 +1798,14 @@ class TrapezoidIncrementalProfileTest implements Timeless {
     void posContinuousUnderVelChange() {
         Model100 goal = new Model100(12, 0);
 
-        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 1.75, 0.75, 0.01);
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(logger.name("one"), 1.75, 0.75, 0.01);
         Control100 state = profile.calculate(TEN_MS, new Control100(0, 0), goal);
 
         double lastPos = state.x();
         for (int i = 0; i < 1600; ++i) {
             if (i == 400) {
                 // impose new slower limit
-                profile = new TrapezoidIncrementalProfile(logger, 0.75, 0.75, 0.01);
+                profile = new TrapezoidIncrementalProfile(logger.name("two"), 0.75, 0.75, 0.01);
             }
 
             state = profile.calculate(TEN_MS, state, goal);
