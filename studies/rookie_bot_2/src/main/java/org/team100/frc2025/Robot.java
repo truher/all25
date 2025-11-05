@@ -62,6 +62,9 @@ public class Robot extends TimedRobot100 {
         LoggerFactory fieldLogger = logging.fieldLogger;
         DriverXboxControl driverControl = new DriverXboxControl(0);
         LoggerFactory logger = logging.rootLogger;
+        Pivot rotary = new Pivot(logger);
+        rotary.setDefaultCommand(rotary.home());
+        new Trigger(driverControl::a).whileTrue(rotary.extend()); // change to be triggers
         m_drive = MecanumDriveFactory.make(
                 fieldLogger,
                 logger,
@@ -76,7 +79,7 @@ public class Robot extends TimedRobot100 {
                 new Slip(1, 1.4, 1), // wheel slip corrections
                 6.0, // gears
                 0.15); // wheel dia (m)
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum(logger);
         SwerveLimiter limiter = new SwerveLimiter(
                 logger,
                 kinodynamics,
