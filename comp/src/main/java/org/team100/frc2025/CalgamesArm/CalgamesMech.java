@@ -3,6 +3,7 @@ package org.team100.frc2025.CalgamesArm;
 import static edu.wpi.first.wpilibj2.command.Commands.select;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -47,6 +48,7 @@ import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.ctre.Kraken6Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.music.Music;
+import org.team100.lib.music.Player;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.PositionSubsystemR3;
@@ -116,6 +118,8 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
     private final Pose2d m_home;
 
     private final LoggerFactory m_profileLog;
+
+    private final List<Player> m_players;
 
     public CalgamesMech(
             LoggerFactory log,
@@ -277,6 +281,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                         wristLog, wristMotor, wristSensor, 58, -3, 3);
             }
         }
+        m_players = List.of(m_elevatorBack, m_elevatorFront, m_shoulder, m_wrist);
     }
 
     @Override
@@ -287,6 +292,11 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
             m_shoulder.play(freq);
             m_wrist.play(freq);
         });
+    }
+
+    @Override
+    public List<Player> players() {
+        return m_players;
     }
 
     public double getArmLength() {

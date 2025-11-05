@@ -1,5 +1,7 @@
 package org.team100.lib.motion.swerve;
 
+import java.util.List;
+
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.ObjectCache;
 import org.team100.lib.coherence.Takt;
@@ -19,6 +21,7 @@ import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
 import org.team100.lib.music.Music;
+import org.team100.lib.music.Player;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.VelocitySubsystemR3;
 
@@ -48,6 +51,8 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
     private final EnumLogger m_log_skill;
     private final GlobalVelocityR3Logger m_log_input;
 
+    private final List<Player> m_players;
+
     public SwerveDriveSubsystem(
             LoggerFactory fieldLogger,
             LoggerFactory parent,
@@ -68,6 +73,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
         m_log_skill = child.enumLogger(Level.TRACE, "skill level");
         m_log_input = child.globalVelocityR3Logger(Level.TRACE, "drive input");
+        m_players = m_swerveLocal.players();
     }
 
     ////////////////
@@ -226,6 +232,11 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
         return run(() -> {
             m_swerveLocal.play(freq);
         });
+    }
+
+    @Override
+    public List<Player> players() {
+        return m_players;
     }
 
 }

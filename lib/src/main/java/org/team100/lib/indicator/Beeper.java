@@ -23,8 +23,8 @@ public class Beeper {
 
     private final Music m_music[];
 
-    public Beeper(Music... machinery) {
-        m_music = machinery;
+    public Beeper(Music... music) {
+        m_music = music;
     }
 
     public Command play(double freq) {
