@@ -73,7 +73,7 @@ public class Machinery {
         final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
         final LoggerFactory driveLog = logger.name("Drive");
 
-        m_swerveKinodynamics = SwerveKinodynamicsFactory.get();
+        m_swerveKinodynamics = SwerveKinodynamicsFactory.get(driveLog);
 
         ////////////////////////////////////////////////////////////
         //

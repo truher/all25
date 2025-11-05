@@ -12,6 +12,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.Path100;
 
@@ -25,7 +26,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * see
  * https://docs.google.com/spreadsheets/d/16UUCCz-qcPz_YZMnsJnVkVO1KGp5zHCOVo7EoJct2nA/edit?gid=0#gid=0
  */
-public class TrajectoryVelocityProfileTest {
+public class TrajectoryVelocityProfileTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
@@ -64,7 +65,7 @@ public class TrajectoryVelocityProfileTest {
     void testConstantConstraint() {
         Path100 path = new Path100(WAYPOINTS);
         // somewhat realistic numbers
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         List<TimingConstraint> constraints = List.of(new ConstantConstraint(logger, 1, 1, limits));
         ScheduleGenerator u = new ScheduleGenerator(constraints);
         Trajectory100 traj = u.timeParameterizeTrajectory(
@@ -76,7 +77,7 @@ public class TrajectoryVelocityProfileTest {
     @Test
     void testSwerveConstraint() {
         Path100 path = new Path100(WAYPOINTS);
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         List<TimingConstraint> constraints = List.of(new SwerveDriveDynamicsConstraint(logger, limits, 1, 1));
         ScheduleGenerator u = new ScheduleGenerator(constraints);
         Trajectory100 traj = u.timeParameterizeTrajectory(
@@ -88,7 +89,7 @@ public class TrajectoryVelocityProfileTest {
     @Test
     void testAuto() {
         Path100 path = new Path100(WAYPOINTS);
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         TimingConstraintFactory timing = new TimingConstraintFactory(limits);
         List<TimingConstraint> constraints = timing.testAuto(logger);
         ScheduleGenerator u = new ScheduleGenerator(constraints);

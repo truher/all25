@@ -4,18 +4,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
+import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-class SwerveKinodynamicsTest {
+class SwerveKinodynamicsTest implements Timeless {
     private static final double DELTA = 0.001;
+    private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /** From field relative speed to robot relative speed to modules and back. */
     @Test
     void testRoundTripMotionless() {
-        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
+        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited(logger);
         GlobalVelocityR3 v = new GlobalVelocityR3(0, 0, 0);
         Rotation2d theta = new Rotation2d();
         ChassisSpeeds instantaneous = SwerveKinodynamics.toInstantaneousChassisSpeeds(v, theta);
@@ -30,7 +35,7 @@ class SwerveKinodynamicsTest {
     /** From field relative speed to robot relative speed to modules and back. */
     @Test
     void testRoundTripDriveAndSpin() {
-        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited();
+        SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited(logger);
         GlobalVelocityR3 v = new GlobalVelocityR3(5, 0, 25);
         Rotation2d theta = new Rotation2d();
         ChassisSpeeds instantaneous = SwerveKinodynamics.toInstantaneousChassisSpeeds(v, theta);
@@ -47,7 +52,7 @@ class SwerveKinodynamicsTest {
         double track = 0.5;
         double wheelbase = 0.5;
         double driveV = 1;
-        SwerveKinodynamics k = new SwerveKinodynamics(
+        SwerveKinodynamics k = new SwerveKinodynamics(logger,
                 driveV, 1, 1, 1, 1, 20 * Math.PI, track, track, wheelbase, wheelbase / 2, 1);
         assertEquals(1, k.getMaxDriveVelocityM_S(), DELTA);
 
@@ -64,7 +69,7 @@ class SwerveKinodynamicsTest {
         double track = 0.5;
         double wheelbase = 0.5;
         double driveV = 4;
-        SwerveKinodynamics k = new SwerveKinodynamics(
+        SwerveKinodynamics k = new SwerveKinodynamics(logger,
                 driveV, 1, 1, 1, 1, 20 * Math.PI, track, track, wheelbase, wheelbase / 2, 1);
         assertEquals(4, k.getMaxDriveVelocityM_S(), DELTA);
 
@@ -82,6 +87,7 @@ class SwerveKinodynamicsTest {
         double wheelbase = 1;
         double driveV = 4;
         SwerveKinodynamics k = new SwerveKinodynamics(
+                logger,
                 driveV, 1, 1, 1, 1, 20 * Math.PI, track, track, wheelbase,
                 wheelbase / 2, 1);
         assertEquals(4, k.getMaxDriveVelocityM_S(), DELTA);
@@ -99,7 +105,7 @@ class SwerveKinodynamicsTest {
         double track = 0.5;
         double wheelbase = 0.5;
         double driveA = 1;
-        SwerveKinodynamics k = new SwerveKinodynamics(
+        SwerveKinodynamics k = new SwerveKinodynamics(logger,
                 1, 1, driveA, 1, 1, 20 * Math.PI, track, track, wheelbase, wheelbase / 2, 1);
         assertEquals(1, k.getMaxDriveAccelerationM_S2(), DELTA);
 
@@ -117,7 +123,7 @@ class SwerveKinodynamicsTest {
         double track = 1;
         double wheelbase = 1;
         double driveA = 1;
-        SwerveKinodynamics k = new SwerveKinodynamics(
+        SwerveKinodynamics k = new SwerveKinodynamics(logger,
                 1, 1, driveA, 1, 1, 20 * Math.PI, track, track, wheelbase, wheelbase / 2, 1);
         assertEquals(1, k.getMaxDriveAccelerationM_S2(), DELTA);
 
@@ -136,7 +142,7 @@ class SwerveKinodynamicsTest {
         double track = 1;
         double wheelbase = 1;
         double vcg = 0.3;
-        SwerveKinodynamics k = new SwerveKinodynamics(
+        SwerveKinodynamics k = new SwerveKinodynamics(logger,
                 1, 1, 1, 1, 1, 20 * Math.PI, track, track, wheelbase, wheelbase / 2, vcg);
         assertEquals(1, k.getMaxDriveAccelerationM_S2(), DELTA);
 
@@ -151,7 +157,7 @@ class SwerveKinodynamicsTest {
 
     @Test
     void testAFewCases() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         double maxV = limits.getMaxDriveVelocityM_S();
         double maxOmega = limits.getMaxAngleSpeedRad_S();
         assertEquals(5, maxV, DELTA);
@@ -189,7 +195,7 @@ class SwerveKinodynamicsTest {
 
     @Test
     void testDiscretizationNoEffect() {
-        SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest(logger);
         // for this test the gyro rate and the commanded omega are the same,
         // though this is definitely not true in general
         {
@@ -214,7 +220,7 @@ class SwerveKinodynamicsTest {
 
     @Test
     void testDiscretizationWithEffect() {
-        SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics l = SwerveKinodynamicsFactory.forRealisticTest(logger);
         // for this test the gyro rate and the commanded omega are the same,
         // though this is definitely not true in general
         {

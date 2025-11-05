@@ -24,7 +24,7 @@ public class Range {
         }
     }
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private final InterpolatingTreeMap<Double, Solution> m_map;
 
     /**

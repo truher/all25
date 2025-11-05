@@ -47,7 +47,7 @@ public class RealisticFixture {
     public RealisticFixture() throws IOException {
         logger = new TestLoggerFactory(new TestPrimitiveLogger());
         fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
-        swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+        swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         collection = SwerveModuleCollection.get(logger, 10, 20, swerveKinodynamics);
         gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);

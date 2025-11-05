@@ -3,6 +3,7 @@ package org.team100.lib.motion.swerve.kinodynamics;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.swerve.VeeringCorrection;
 import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
 import org.team100.lib.profile.incremental.IncrementalProfile;
@@ -27,7 +28,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * In particular, the maximum spin rate is likely to seem quite high. Do not
  * lower it here.
  */
-public class SwerveKinodynamics  {
+public class SwerveKinodynamics {
     // geometry
     private final double m_fronttrack;
     private final double m_backtrack;
@@ -38,6 +39,7 @@ public class SwerveKinodynamics  {
     private final SwerveDriveKinematics100 m_kinematics;
 
     // configured inputs
+    // TODO: make this Mutable
     private final double m_maxDriveVelocityM_S;
     private final double m_stallAccelerationM_S2;
     private final double m_maxDriveAccelerationM_S2;
@@ -75,6 +77,7 @@ public class SwerveKinodynamics  {
      * @param vcg                     vertical center of gravity, meters
      */
     SwerveKinodynamics(
+            LoggerFactory log,
             double maxDriveVelocity,
             double stallAcceleration,
             double maxDriveAcceleration,
@@ -122,6 +125,7 @@ public class SwerveKinodynamics  {
                 / (m_fronttrack * m_backtrack + m_wheelbase * m_wheelbase);
 
         m_steeringProfile = new TrapezoidIncrementalProfile(
+                log.type(this).name("steering"),
                 m_maxSteeringVelocityRad_S,
                 maxSteeringAcceleration,
                 0.02); // one degree
