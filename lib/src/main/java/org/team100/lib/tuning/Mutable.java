@@ -1,5 +1,7 @@
 package org.team100.lib.tuning;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -19,6 +21,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * Values do not survive restarts.
  */
 public class Mutable implements DoubleSupplier {
+    private static final Map<String, DoubleEntry> ALL_ENTRIES = new HashMap<>();
     private final DoubleEntry m_entry;
     private final DoubleConsumer m_onChange;
     private final DoubleCache m_cache;
@@ -26,16 +29,37 @@ public class Mutable implements DoubleSupplier {
     public Mutable(LoggerFactory log, String leaf, double defaultValue, DoubleConsumer onChange) {
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         inst.startServer();
-        DoubleTopic topic = inst.getDoubleTopic(log.root(leaf));
-        m_entry = topic.getEntry(defaultValue);
+        String name = log.root(leaf);
+        m_entry = getEntry(inst, name, defaultValue);
+        m_onChange = onChange;
+        m_cache = Cache.ofDouble(this::update);
+    }
+
+    private static DoubleEntry getEntry(NetworkTableInstance inst, String name, double defaultValue) {
+        if (ALL_ENTRIES.containsKey(name)) {
+            // TODO: make this fatal
+            System.out.printf("** WARNING: duplicate Mutable name %s\n", name);
+            return ALL_ENTRIES.get(name);
+        }
+        DoubleTopic topic = inst.getDoubleTopic(name);
+        DoubleEntry entry = topic.getEntry(defaultValue);
         // Makes sure we don't get a stale value.
-        m_entry.set(defaultValue);
+        entry.set(defaultValue);
         // You can't use "persistent" here, because then the key goes in the RoboRIO
         // networktables.json file and can never be deleted (except manually).
         topic.setRetained(true);
-        m_entry.readQueue();
-        m_onChange = onChange;
-        m_cache = Cache.ofDouble(this::update);
+        // make sure the queue is empty
+        entry.readQueue();
+        ALL_ENTRIES.put(name, entry);
+        return entry;
+    }
+
+    /** Use this in tests to avoid mixing values */
+    public static void unpublishAll() {
+        for (DoubleEntry e : ALL_ENTRIES.values()) {
+            e.unpublish();
+        }
+        ALL_ENTRIES.clear();
     }
 
     /** if you don't care to subscribe to changes */

@@ -541,8 +541,8 @@ class SwerveDriveKinematics100Test {
                 SwerveKinodynamics.discretize(speeds, 0.02));
 
         /*
-         * The circumference of the wheels about the COR is π * diameter, or 2π * radius
-         * the radius is the √(12²in + 12²in), or 16.9706in, so the circumference the
+         * The circumference of the wheels about the COR is pi * diameter, or 2pi * radius
+         * the radius is the sqrt(12*12in + 12*12in), or 16.9706in, so the circumference the
          * wheels
          * trace out is 106.629190516in. since we want our robot to rotate at 1 rotation
          * per second,

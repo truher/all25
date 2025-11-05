@@ -3,6 +3,7 @@ package org.team100.lib.commands.swerve.test;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.HolonomicProfile;
@@ -35,6 +36,7 @@ public class Rotate extends MoveAndHold {
     private VelocityReferenceControllerR3 m_referenceController;
 
     public Rotate(
+            LoggerFactory log,
             SwerveDriveSubsystem drive,
             ControllerR3 controller,
             SwerveKinodynamics swerveKinodynamics,
@@ -44,6 +46,7 @@ public class Rotate extends MoveAndHold {
         m_swerveKinodynamics = swerveKinodynamics;
         m_target = new Rotation2d(targetAngleRadians);
         m_profile = HolonomicProfile.trapezoidal(
+                log.type(this).name("profile"),
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxDriveAccelerationM_S2(),
                 0.01,

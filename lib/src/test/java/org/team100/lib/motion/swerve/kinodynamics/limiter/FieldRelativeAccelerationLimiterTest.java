@@ -18,7 +18,7 @@ public class FieldRelativeAccelerationLimiterTest {
 
     @Test
     void testMotionless() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeAccelerationLimiter limiter = new FieldRelativeAccelerationLimiter(logger, limits, 1, 1);
         GlobalVelocityR3 result = limiter.apply(
                 new GlobalVelocityR3(0, 0, 0),
@@ -30,7 +30,7 @@ public class FieldRelativeAccelerationLimiterTest {
 
     @Test
     void testConstrained() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeAccelerationLimiter limiter = new FieldRelativeAccelerationLimiter(logger, limits, 1, 1);
         GlobalVelocityR3 result = limiter.apply(
                 new GlobalVelocityR3(0, 0, 0),
@@ -42,7 +42,7 @@ public class FieldRelativeAccelerationLimiterTest {
 
     @Test
     void testCartesianScale() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeAccelerationLimiter limiter = new FieldRelativeAccelerationLimiter(logger, limits, 1, 1);
         GlobalVelocityR3 prev = new GlobalVelocityR3(0, 0, 0);
         GlobalVelocityR3 target = new GlobalVelocityR3(1, 0, 0);
@@ -57,7 +57,7 @@ public class FieldRelativeAccelerationLimiterTest {
 
     @Test
     void testAlpha() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeAccelerationLimiter limiter = new FieldRelativeAccelerationLimiter(logger, limits, 1, 1);
         GlobalVelocityR3 result = limiter.apply(
                 new GlobalVelocityR3(0, 0, 0),
@@ -69,7 +69,7 @@ public class FieldRelativeAccelerationLimiterTest {
 
     @Test
     void testAlphaRatio() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeAccelerationLimiter limiter = new FieldRelativeAccelerationLimiter(logger, limits, 1, 1);
         GlobalVelocityR3 result = limiter.apply(
                 new GlobalVelocityR3(0, 0, 0),
@@ -81,7 +81,7 @@ public class FieldRelativeAccelerationLimiterTest {
 
     @Test
     void testPureAlpha() {
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeAccelerationLimiter limiter = new FieldRelativeAccelerationLimiter(logger, limits, 1, 1);
         GlobalVelocityR3 result = limiter.apply(
                 new GlobalVelocityR3(0, 0, 0),

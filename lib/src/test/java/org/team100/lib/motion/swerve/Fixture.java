@@ -48,7 +48,7 @@ public class Fixture {
     public Fixture() throws IOException {
         logger = new TestLoggerFactory(new TestPrimitiveLogger());
         fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
-        swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         // uses simulated modules
         collection = SwerveModuleCollection.get(logger, 10, 20, swerveKinodynamics);
         gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);

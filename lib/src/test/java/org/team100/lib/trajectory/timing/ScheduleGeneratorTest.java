@@ -170,7 +170,7 @@ public class ScheduleGeneratorTest {
     @Test
     void testCentripetalConstraint() {
         Path100 path = new Path100(WAYPOINTS);
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
 
         // Triangle profile.
         Trajectory100 timed_traj = buildAndCheckTrajectory(path,

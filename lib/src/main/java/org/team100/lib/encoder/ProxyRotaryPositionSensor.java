@@ -17,6 +17,12 @@ public class ProxyRotaryPositionSensor implements RotaryPositionSensor {
         m_gearRatio = gearRatio;
     }
 
+    public ProxyRotaryPositionSensor(
+            IncrementalBareEncoder encoder, double gearRatio, double initialPosition) {
+        this(encoder, gearRatio);
+        setEncoderPosition(initialPosition);
+    }
+
     /**
      * Sets the incremental encoder position. This is only used to "zero" it, and
      * only done by the CombinedRotaryPositionSensor.

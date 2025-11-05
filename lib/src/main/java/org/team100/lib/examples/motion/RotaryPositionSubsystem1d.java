@@ -36,9 +36,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * * a single-jointed arm
  * * an elevator
  * * the angle of a shooter
- * 
- * This class extends SubsystemBase, to be compatible with the scheduler, and it
- * , so that the logger will use the class name.
  */
 public class RotaryPositionSubsystem1d extends SubsystemBase {
     /**

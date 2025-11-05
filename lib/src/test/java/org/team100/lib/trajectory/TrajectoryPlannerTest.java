@@ -15,6 +15,7 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.SwerveDriveDynamicsConstraint;
@@ -27,7 +28,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-class TrajectoryPlannerTest {
+class TrajectoryPlannerTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
@@ -65,7 +66,7 @@ class TrajectoryPlannerTest {
         List<HolonomicPose2d> waypoints = List.of(
                 new HolonomicPose2d(new Translation2d(0, 0), Rotation2d.kZero, new Rotation2d(Math.PI)),
                 new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
 
         // these are the same as StraightLineTrajectoryTest.
         List<TimingConstraint> constraints = List.of(
@@ -132,7 +133,7 @@ class TrajectoryPlannerTest {
 
     @Test
     void testRestToRest() {
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(0, 0, 0));
@@ -160,7 +161,7 @@ class TrajectoryPlannerTest {
 
     @Test
     void testMovingToRest() {
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(1, 0, 0));
@@ -171,7 +172,7 @@ class TrajectoryPlannerTest {
 
     @Test
     void testBackingUp2() {
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(-1, 0, 0));
@@ -182,7 +183,7 @@ class TrajectoryPlannerTest {
 
     @Test
     void test2d() {
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(0, 1, 0));

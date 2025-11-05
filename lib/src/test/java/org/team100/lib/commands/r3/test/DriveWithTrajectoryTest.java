@@ -37,7 +37,7 @@ public class DriveWithTrajectoryTest extends Fixtured implements Timeless {
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);
-    SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
+    SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
     List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
     TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 

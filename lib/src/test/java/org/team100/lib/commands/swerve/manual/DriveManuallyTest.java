@@ -34,7 +34,7 @@ class DriveManuallyTest extends Fixtured implements Timeless {
         SwerveDriveSubsystem drive = fixture.drive;
         fixture.collection.reset();
         stepTime();
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest();
+        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         SwerveLimiter limiter = new SwerveLimiter(
                 logger,
                 swerveKinodynamics,

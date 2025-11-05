@@ -25,8 +25,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class TrajectoryReferenceTest implements Timeless {
     private static final double DELTA = 0.001;
-    SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest();
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
+
+    SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
     List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
     TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 

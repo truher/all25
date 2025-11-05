@@ -14,6 +14,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
@@ -26,7 +27,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
-public class PathFactoryTest {
+public class PathFactoryTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
@@ -48,7 +49,7 @@ public class PathFactoryTest {
         }
         // schedule it so we can see it
         // no constraints
-        TimingConstraintFactory f = new TimingConstraintFactory(SwerveKinodynamicsFactory.forTest());
+        TimingConstraintFactory f = new TimingConstraintFactory(SwerveKinodynamicsFactory.forTest(logger));
         List<TimingConstraint> constraints = f.forTest(logger);
         ScheduleGenerator scheduler = new ScheduleGenerator(constraints);
         Trajectory100 trajectory = scheduler.timeParameterizeTrajectory(

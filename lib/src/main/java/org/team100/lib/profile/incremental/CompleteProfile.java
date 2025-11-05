@@ -1,7 +1,9 @@
 package org.team100.lib.profile.incremental;
 
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.tuning.Mutable;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
@@ -38,17 +40,20 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 public class CompleteProfile implements IncrementalProfile {
     private static final boolean DEBUG = false;
 
+    /** Time step for initializing the (fixed) goal path */
     private static final double DT = 0.01;
     // Extends maxV far away.
     private static final double FAR_AWAY = 1000;
 
-    private final double m_maxV;
-    private final double m_maxA;
-    private final double m_maxD;
-    private final double m_stallA;
-    private final double m_takeoffJ;
-    private final double m_landingJ;
-    private final double m_tolerance;
+    private final LoggerFactory m_log;
+    private final Mutable m_maxV;
+    private final Mutable m_maxAUnscaled;
+    private final Mutable m_maxDUnscaled;
+    private final Mutable m_stallAUnscaled;
+    private final Mutable m_takeoffJ;
+    private final Mutable m_landingJ;
+    private final double m_scale;
+    private final Mutable m_tolerance;
     final InterpolatingTreeMap<Double, Control100> m_byDistance;
 
     /**
@@ -68,7 +73,7 @@ public class CompleteProfile implements IncrementalProfile {
      *                  also used to sense "at goal"
      */
     public CompleteProfile(
-            double maxV, double maxA, double maxD, double stallA,
+            LoggerFactory log, double maxV, double maxA, double maxD, double stallA,
             double takeoffJ, double landingJ, double tolerance) {
         if (maxV <= 0)
             throw new IllegalArgumentException("max V must be positive");
@@ -82,59 +87,82 @@ public class CompleteProfile implements IncrementalProfile {
             throw new IllegalArgumentException("takeoff J may not be negative");
         if (landingJ < 0)
             throw new IllegalArgumentException("landing J may not be positive");
+        m_log = log;
+        m_maxV = new Mutable(log, "maxV", maxV, this::update);
+        m_maxAUnscaled = new Mutable(log, "maxA", maxA, this::update);
+        m_maxDUnscaled = new Mutable(log, "maxD", maxD, this::update);
+        m_stallAUnscaled = new Mutable(log, "stallA", stallA, this::update);
+        m_takeoffJ = new Mutable(log, "takeoffJ", takeoffJ, this::update);
+        m_landingJ = new Mutable(log, "landingJ", landingJ, this::update);
+        m_scale = 1.0;
+        m_tolerance = new Mutable(log, "tolerance", tolerance, this::update);
+        m_byDistance = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Control100::interpolate);
+        init();
+    }
 
+    public CompleteProfile(
+            LoggerFactory log, Mutable maxV, Mutable maxA, Mutable maxD, Mutable stallA,
+            Mutable takeoffJ, Mutable landingJ, double scale, Mutable tolerance) {
+        m_log = log;
         m_maxV = maxV;
-        m_maxA = maxA;
-        m_maxD = maxD;
-        m_stallA = stallA;
+        m_maxAUnscaled = maxA;
+        m_maxDUnscaled = maxD;
+        m_stallAUnscaled = stallA;
         m_takeoffJ = takeoffJ;
         m_landingJ = landingJ;
+        m_scale = scale;
         m_tolerance = tolerance;
         m_byDistance = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Control100::interpolate);
         init();
     }
 
+    void update(double ignored) {
+        init();
+    }
+
     /**
-     * Initialize the goal path.
+     * Compute the goal path. This is done on instantiation and also anytime that
+     * any of the Mutables change.
      */
     void init() {
+        m_byDistance.clear();
         // This is the goal state, zero control here.
         Control100 control = new Control100();
         put(0.0, control);
         // Far-away points so that the interpolator always yields maxV.
-        put(0.0, new Control100(-FAR_AWAY, m_maxV, 0));
-        put(0.0, new Control100(FAR_AWAY, -m_maxV, 0));
+        put(0.0, new Control100(-FAR_AWAY, m_maxV.getAsDouble(), 0));
+        put(0.0, new Control100(FAR_AWAY, -m_maxV.getAsDouble(), 0));
         // control from the left, so deceleration, walking back in time
         // t is just for debugging
         double t = 0;
         for (int i = 1; i < 1000; ++i) {
-            if (MathUtil.isNear(control.v(), m_maxV, m_tolerance)) {
+            if (MathUtil.isNear(control.v(), m_maxV.getAsDouble(), m_tolerance.getAsDouble())) {
                 // we're already cruising. keep cruising.
                 control = new Control100(
-                        control.x() - m_maxV * DT,
-                        m_maxV,
+                        control.x() - m_maxV.getAsDouble() * DT,
+                        m_maxV.getAsDouble(),
                         0);
                 t += DT;
                 put(t, control);
             } else {
                 double jerkLimitedA = jerkLimitedAccel(control);
                 double nextV = control.v() - jerkLimitedA * DT;
-                if (nextV > m_maxV) {
+                if (nextV > m_maxV.getAsDouble()) {
                     // maxV is achieved within DT
                     // how long does it take to get there?
-                    double dt = -1.0 * (m_maxV - control.v()) / jerkLimitedA;
+                    double dt = -1.0 * (m_maxV.getAsDouble() - control.v()) / jerkLimitedA;
                     t += dt;
                     // this should be exactly at the corner.
                     control = new Control100(
                             control.x() - control.v() * dt + 0.5 * jerkLimitedA * dt * dt,
-                            m_maxV,
+                            m_maxV.getAsDouble(),
                             jerkLimitedA);
                     put(t, control);
                     // this is zero accel, epsilon away, so that the interpolator doesn't try to
                     // match the full-accel at the corner.
                     Control100 corner = new Control100(
                             control.x() - 1e-3,
-                            m_maxV,
+                            m_maxV.getAsDouble(),
                             0);
                     put(t, corner);
                     // the "far away" points should take care of the rest.
@@ -159,7 +187,7 @@ public class CompleteProfile implements IncrementalProfile {
 
         // Negative togo => setpoint is to the left.
         final double togo = setpoint.x() - goal.x();
-        if (MathUtil.isNear(0, togo, m_tolerance)) {
+        if (MathUtil.isNear(0, togo, m_tolerance.getAsDouble())) {
             // Within tolerance of goal
             return goal.control();
         }
@@ -178,35 +206,35 @@ public class CompleteProfile implements IncrementalProfile {
             if (setpoint.v() < 0) {
                 if (DEBUG)
                     System.out.println("We're moving the wrong way (left), so brake.");
-                return control(dt, setpoint, goal, togo, 1.0, m_maxD);
+                return control(dt, setpoint, goal, togo, 1.0, getScaledD());
             }
-            if (setpoint.v() + m_tolerance < lerp.v()) {
+            if (setpoint.v() + m_tolerance.getAsDouble() < lerp.v()) {
                 if (DEBUG)
                     System.out.println("Setpoint is below the goal path, so push right.");
                 return control(dt, setpoint, goal, togo, 1.0, maxA);
             }
-            if (setpoint.v() - m_tolerance < lerp.v()) {
+            if (setpoint.v() - m_tolerance.getAsDouble() < lerp.v()) {
                 if (DEBUG)
                     System.out.println("Setpoint is within tolerance of the goal path.");
                 return goalPath(dt, setpoint, goal, togo, lerp.a());
             }
             if (DEBUG)
                 System.out.println("Setpoint is above the goal path, so brake.");
-            return control(dt, setpoint, goal, togo, -1.0, m_maxD);
+            return control(dt, setpoint, goal, togo, -1.0, getScaledD());
         } else {
             if (DEBUG)
                 System.out.println("goal is to the left");
             if (setpoint.v() > 0) {
                 if (DEBUG)
                     System.out.println("We're moving the wrong way (right), so brake.");
-                return control(dt, setpoint, goal, togo, -1.0, m_maxD);
+                return control(dt, setpoint, goal, togo, -1.0, getScaledD());
             }
-            if (setpoint.v() - m_tolerance > lerp.v()) {
+            if (setpoint.v() - m_tolerance.getAsDouble() > lerp.v()) {
                 if (DEBUG)
                     System.out.println("Setpoint is above the goal path, so push left.");
                 return control(dt, setpoint, goal, togo, -1.0, maxA);
             }
-            if (setpoint.v() + m_tolerance > lerp.v()) {
+            if (setpoint.v() + m_tolerance.getAsDouble() > lerp.v()) {
                 if (DEBUG)
                     System.out.println("Setpoint is within tolerance of the goal path.");
                 return goalPath(dt, setpoint, goal, togo, lerp.a());
@@ -214,15 +242,27 @@ public class CompleteProfile implements IncrementalProfile {
             if (DEBUG)
                 System.out.println("Setpoint is below the goal path, so brake.");
 
-            return control(dt, setpoint, goal, togo, 1.0, m_maxD);
+            return control(dt, setpoint, goal, togo, 1.0, getScaledD());
         }
     }
 
     @Override
     public IncrementalProfile scale(double s) {
-        return new CompleteProfile(
-                m_maxV, s * m_maxA, s * m_maxD, s * m_stallA,
-                m_takeoffJ, m_landingJ, m_tolerance);
+        return new CompleteProfile(m_log,
+                m_maxV, m_maxAUnscaled, m_maxDUnscaled, m_stallAUnscaled,
+                m_takeoffJ, m_landingJ, s, m_tolerance);
+    }
+
+    private double getScaledA() {
+        return m_scale * m_maxAUnscaled.getAsDouble();
+    }
+
+    private double getScaledD() {
+        return m_scale * m_maxDUnscaled.getAsDouble();
+    }
+
+    private double getScaledStall() {
+        return m_scale * m_stallAUnscaled.getAsDouble();
     }
 
     ///////////////////////////////////////
@@ -265,11 +305,11 @@ public class CompleteProfile implements IncrementalProfile {
      * Returns a positive number.
      */
     double accel(double dt, Control100 setpoint) {
-        double speedFraction = Math100.limit(Math.abs(setpoint.v()) / m_maxV, 0, 1);
+        double speedFraction = Math100.limit(Math.abs(setpoint.v()) / m_maxV.getAsDouble(), 0, 1);
         double backEmfLimit = 1 - speedFraction;
-        double backEmfLimitedAcceleration = backEmfLimit * m_stallA;
-        double currentLimitedAcceleration = m_maxA;
-        double jerkLimitedAcceleration = Math.abs(setpoint.a()) + m_takeoffJ * dt;
+        double backEmfLimitedAcceleration = backEmfLimit * getScaledStall();
+        double currentLimitedAcceleration = getScaledA();
+        double jerkLimitedAcceleration = Math.abs(setpoint.a()) + m_takeoffJ.getAsDouble() * dt;
 
         if (DEBUG) {
             System.out.printf("fraction %5.2f backEmfLimited %5.2f currentLimited %5.2f jerklimited %5.2f\n",
@@ -300,10 +340,10 @@ public class CompleteProfile implements IncrementalProfile {
      * decel. The jerk limit affects the "landing".
      */
     private double jerkLimitedAccel(Control100 control) {
-        if (m_landingJ < 1e-6) {
+        if (m_landingJ.getAsDouble() < 1e-6) {
             // zero endJ means no jerk limit
-            return -m_maxD;
+            return -getScaledD();
         }
-        return Math.max(-m_maxD, control.a() - m_landingJ * DT);
+        return Math.max(-getScaledD(), control.a() - m_landingJ.getAsDouble() * DT);
     }
 }
