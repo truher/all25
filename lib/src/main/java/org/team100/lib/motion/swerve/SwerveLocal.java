@@ -1,5 +1,7 @@
 package org.team100.lib.motion.swerve;
 
+import java.util.List;
+
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ChassisSpeedsLogger;
@@ -28,6 +30,8 @@ public class SwerveLocal implements Player {
     private final SwerveModulePositionsLogger m_logPositions;
     private final ChassisSpeedsLogger m_log_chassis_speed;
 
+    private final List<Player> m_players;
+
     public SwerveLocal(
             LoggerFactory parent,
             SwerveKinodynamics swerveKinodynamics,
@@ -37,11 +41,17 @@ public class SwerveLocal implements Player {
         m_logPositions = child.swerveModulePositionsLogger(Level.TRACE, "positions");
         m_swerveKinodynamics = swerveKinodynamics;
         m_modules = modules;
+        m_players = m_modules.players();
     }
 
     @Override
     public void play(double freq) {
         m_modules.play(freq);
+    }
+
+    @Override
+    public List<Player> players() {
+        return m_players;
     }
 
     //////////////////////////////////////////////////////////

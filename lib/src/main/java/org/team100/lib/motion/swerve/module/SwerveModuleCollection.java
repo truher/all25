@@ -1,5 +1,7 @@
 package org.team100.lib.motion.swerve.module;
 
+import java.util.List;
+
 import org.team100.lib.config.Identity;
 import org.team100.lib.encoder.EncoderDrive;
 import org.team100.lib.logging.LoggerFactory;
@@ -30,6 +32,8 @@ public class SwerveModuleCollection implements Player {
     private final SwerveModule100 m_rearLeft;
     private final SwerveModule100 m_rearRight;
 
+    private final List<Player> m_players;
+
     SwerveModuleCollection(
             SwerveModule100 frontLeft,
             SwerveModule100 frontRight,
@@ -39,6 +43,17 @@ public class SwerveModuleCollection implements Player {
         m_frontRight = frontRight;
         m_rearLeft = rearLeft;
         m_rearRight = rearRight;
+        m_players = List.of(
+                m_frontLeft.players(),
+                m_frontRight.players(),
+                m_rearLeft.players(),
+                m_rearRight.players())
+                .stream().flatMap(List::stream).toList();
+    }
+
+    @Override
+    public List<Player> players() {
+        return m_players;
     }
 
     /**

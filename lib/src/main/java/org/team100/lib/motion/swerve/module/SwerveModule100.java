@@ -1,5 +1,6 @@
 package org.team100.lib.motion.swerve.module;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.team100.lib.coherence.Takt;
@@ -53,6 +54,8 @@ public abstract class SwerveModule100 implements Player {
     private Rotation2d m_previousDesiredWrappedAngle;
     private double m_previousTime;
 
+    private final List<Player> m_players;
+
     protected SwerveModule100(
             LinearVelocityServo driveServo,
             AngularPositionServo turningServo,
@@ -65,12 +68,18 @@ public abstract class SwerveModule100 implements Player {
         m_previousDesiredWrappedAngle = new Rotation2d(m_turningServo.getWrappedPositionRad());
         m_previousTime = Takt.get();
         m_finalDriveRatio = finalDriveRatio;
+        m_players = List.of(m_driveServo, m_turningServo);
     }
 
     @Override
     public void play(double freq) {
         m_driveServo.play(freq);
         m_turningServo.play(freq);
+    }
+
+    @Override
+    public List<Player> players() {
+        return m_players;
     }
 
     /**
