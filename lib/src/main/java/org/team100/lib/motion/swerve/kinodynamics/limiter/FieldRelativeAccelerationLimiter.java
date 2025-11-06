@@ -36,9 +36,9 @@ public class FieldRelativeAccelerationLimiter {
             SwerveKinodynamics limits,
             double cartesianScale,
             double alphaScale) {
-        LoggerFactory child = parent.type(this);
-        m_log_scale = child.doubleLogger(Level.TRACE, "scale");
-        m_log_accel = child.globalAccelerationR3Logger(Level.TRACE, "accel");
+        LoggerFactory log = parent.type(this);
+        m_log_scale = log.doubleLogger(Level.TRACE, "scale");
+        m_log_accel = log.globalAccelerationR3Logger(Level.TRACE, "accel");
         m_limits = limits;
         m_cartesianScale = cartesianScale;
         m_alphaScale = alphaScale;

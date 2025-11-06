@@ -3,6 +3,9 @@ package org.team100.lib.reference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.profile.timed.JerkLimitedTimedProfile;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.reference.r1.SetpointsR1;
@@ -12,12 +15,13 @@ import org.team100.lib.testing.Timeless;
 
 public class TimedProfileReference1dTest implements Timeless {
     private static final double DELTA = 0.001;
+    private static final LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testSimple() {
         JerkLimitedTimedProfile p = new JerkLimitedTimedProfile(2, 6, 25, false);
         Model100 goal = new Model100(1, 0);
-        ProfileReferenceR1 ref = new TimedProfileReferenceR1(p);
+        ProfileReferenceR1 ref = new TimedProfileReferenceR1(log, p);
         ref.setGoal(goal);
         Model100 measurement = new Model100();
         ref.init(measurement);

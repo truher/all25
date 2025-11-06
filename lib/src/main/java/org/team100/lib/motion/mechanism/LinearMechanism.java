@@ -40,9 +40,9 @@ public class LinearMechanism implements Player {
         m_wheelRadiusM = wheelDiameterM / 2;
         m_minPositionM = minPositionM;
         m_maxPositionM = maxPositionM;
-        LoggerFactory child = parent.type(this);
-        m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (m_s)");
-        m_log_position = child.doubleLogger(Level.DEBUG, "position (m)");
+        LoggerFactory log = parent.type(this);
+        m_log_velocity = log.doubleLogger(Level.DEBUG, "velocity (m_s)");
+        m_log_position = log.doubleLogger(Level.DEBUG, "position (m)");
     }
 
     /** Should actuate immediately. Use for homing. */

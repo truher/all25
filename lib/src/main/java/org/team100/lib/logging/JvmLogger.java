@@ -13,7 +13,7 @@ import org.team100.lib.logging.LoggerFactory.LongLogger;
  * LoggedRobot.GcStatsCollector().
  */
 public class JvmLogger  {
-    private final LoggerFactory child;
+    private final LoggerFactory m_log;
     private final LongLogger m_log_heap;
     private final LongLogger m_log_nonheap;
     private final Map<String, LongLogger> m_log_gc_times = new HashMap<>();
@@ -21,9 +21,9 @@ public class JvmLogger  {
     private final Map<String, LongLogger> m_log_memory = new HashMap<>();
 
     public JvmLogger(LoggerFactory parent) {
-        child = parent.type(this);
-        m_log_heap = child.longLogger(Level.DEBUG, "MemoryUsage/heap");
-        m_log_nonheap = child.longLogger(Level.TRACE, "MemoryUsage/non-heap");
+        m_log = parent.type(this);
+        m_log_heap = m_log.longLogger(Level.DEBUG, "MemoryUsage/heap");
+        m_log_nonheap = m_log.longLogger(Level.TRACE, "MemoryUsage/non-heap");
     }
 
     public void logGarbageCollectors() {
@@ -34,11 +34,11 @@ public class JvmLogger  {
         for (GarbageCollectorMXBean bean : ManagementFactory.getGarbageCollectorMXBeans()) {
             m_log_gc_counts.computeIfAbsent(
                     bean.getName(),
-                    (x) -> child.longLogger(Level.TRACE, "GCCount/" + x))
+                    (x) -> m_log.longLogger(Level.TRACE, "GCCount/" + x))
                     .log(() -> bean.getCollectionCount());
             m_log_gc_times.computeIfAbsent(
                     bean.getName(),
-                    (x) -> child.longLogger(Level.TRACE, "GCTime_ms/" + x))
+                    (x) -> m_log.longLogger(Level.TRACE, "GCTime_ms/" + x))
                     .log(() -> bean.getCollectionTime());
         }
     }
@@ -51,7 +51,7 @@ public class JvmLogger  {
         for (MemoryPoolMXBean bean : ManagementFactory.getMemoryPoolMXBeans()) {
             m_log_memory.computeIfAbsent(
                     bean.getName(),
-                    (x) -> child.longLogger(Level.TRACE, "Memory/" + x))
+                    (x) -> m_log.longLogger(Level.TRACE, "Memory/" + x))
                     .log(() -> bean.getUsage().getUsed());
         }
     }

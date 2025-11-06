@@ -31,11 +31,11 @@ public class SimulatedRotaryPositionSensor implements RotaryPositionSensor {
             LoggerFactory parent,
             IncrementalBareEncoder encoder,
             double gearRatio) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_encoder = encoder;
         m_gearRatio = gearRatio;
-        m_log_position = child.doubleLogger(Level.TRACE, "position");
-        m_log_rate = child.doubleLogger(Level.TRACE, "rate");
+        m_log_position = log.doubleLogger(Level.TRACE, "position");
+        m_log_rate = log.doubleLogger(Level.TRACE, "rate");
     }
 
     @Override

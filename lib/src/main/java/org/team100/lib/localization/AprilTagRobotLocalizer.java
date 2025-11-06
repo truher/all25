@@ -143,7 +143,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             DoubleFunction<ModelR3> history,
             VisionUpdater visionUpdater) {
         super("vision", "blips", StructBuffer.create(Blip24.struct));
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_layout = layout;
         m_history = history;
         m_visionUpdater = visionUpdater;
@@ -155,13 +155,13 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         m_pub_used_tags = inst.getStructArrayTopic("used tags", Pose3d.struct).publish();
         m_pub_pose = inst.getStructTopic("pose", Pose2d.struct).publish();
 
-        m_log_alliance = child.enumLogger(Level.TRACE, "alliance");
-        m_log_heedRadius = child.doubleLogger(Level.TRACE, "heed radius");
-        m_log_using_gyro = child.booleanLogger(Level.TRACE, "rotation source");
-        m_log_tag_error = child.doubleLogger(Level.TRACE, "tag error");
-        m_log_pose = child.pose2dLogger(Level.TRACE, "pose");
-        m_log_tag_in_camera = child.transform3dLogger(Level.TRACE, "tag in camera");
-        m_log_lag = child.doubleLogger(Level.TRACE, "lag");
+        m_log_alliance = log.enumLogger(Level.TRACE, "alliance");
+        m_log_heedRadius = log.doubleLogger(Level.TRACE, "heed radius");
+        m_log_using_gyro = log.booleanLogger(Level.TRACE, "rotation source");
+        m_log_tag_error = log.doubleLogger(Level.TRACE, "tag error");
+        m_log_pose = log.pose2dLogger(Level.TRACE, "pose");
+        m_log_tag_in_camera = log.transform3dLogger(Level.TRACE, "tag in camera");
+        m_log_lag = log.doubleLogger(Level.TRACE, "lag");
     }
 
     /**

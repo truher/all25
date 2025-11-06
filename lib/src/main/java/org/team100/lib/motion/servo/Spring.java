@@ -20,8 +20,8 @@ public class Spring implements DoubleUnaryOperator {
     private final DoubleLogger m_log_springTorque;
 
     public Spring(LoggerFactory parent) {
-        LoggerFactory child = parent.type(this);
-        m_log_springTorque = child.doubleLogger(Level.TRACE, "spring torque (Nm)");
+        LoggerFactory log = parent.type(this);
+        m_log_springTorque = log.doubleLogger(Level.TRACE, "spring torque (Nm)");
         table.put(-0.113302, -10.0);
         table.put(0.34, -6.2);
         table.put(0.677192, -5.0);

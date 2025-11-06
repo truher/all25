@@ -28,7 +28,8 @@ public class IndexerSubsystem extends SubsystemBase {
                 m_logger,
                 linearMechanism,
                 new IncrementalProfileReferenceR1(
-                        new TrapezoidIncrementalProfile(indexVelocityM_S, maxAccel, 0.02),
+                        m_logger,
+                        new TrapezoidIncrementalProfile(m_logger, indexVelocityM_S, maxAccel, 0.02),
                         0.02,
                         0.02),
                 0.02, 0.02);

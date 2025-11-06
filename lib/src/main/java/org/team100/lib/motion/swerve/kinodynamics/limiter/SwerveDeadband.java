@@ -25,8 +25,8 @@ public class SwerveDeadband  {
     private final DoubleLogger m_log_scale;
 
     public SwerveDeadband(LoggerFactory parent) {
-        LoggerFactory child = parent.type(this);
-        m_log_scale = child.doubleLogger(Level.TRACE, "scale");
+        LoggerFactory log = parent.type(this);
+        m_log_scale = log.doubleLogger(Level.TRACE, "scale");
     }
 
     public GlobalVelocityR3 apply(GlobalVelocityR3 target) {

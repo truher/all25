@@ -5,6 +5,7 @@ import org.team100.lib.gyro.Gyro;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
+import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
 import org.team100.lib.motion.mecanum.MecanumKinematics100.Slip;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class MecanumDrive100 extends SubsystemBase implements VelocitySubsystemR3 {
 
     private final DoubleArrayLogger m_log_field_robot;
+    private final GlobalVelocityR3Logger m_log_input;
     /** May be null. */
     private final Gyro m_gyro;
     private final double m_trackWidthM;
@@ -57,6 +59,7 @@ public class MecanumDrive100 extends SubsystemBase implements VelocitySubsystemR
             OutboardLinearVelocityServo rearRight) {
         LoggerFactory log = parent.type(this);
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
+        m_log_input = log.globalVelocityR3Logger(Level.TRACE, "drive input");
         m_gyro = gyro;
         m_trackWidthM = trackWidthM;
         m_wheelbaseM = wheelbaseM;
@@ -93,6 +96,7 @@ public class MecanumDrive100 extends SubsystemBase implements VelocitySubsystemR
         m_frontRight.setVelocity(mSpeed.frontRightMetersPerSecond);
         m_rearLeft.setVelocity(mSpeed.rearLeftMetersPerSecond);
         m_rearRight.setVelocity(mSpeed.rearRightMetersPerSecond);
+        m_log_input.log(() -> input);
     }
 
     private Rotation2d getYaw() {

@@ -33,7 +33,7 @@ public class ReduxGyro implements Gyro {
     private final Rotation2dLogger m_log_roll;
 
     public ReduxGyro(LoggerFactory parent, CanId canID) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_gyro = new Canandgyro(canID.id);
         m_gyro.clearStickyFaults();
 
@@ -52,11 +52,11 @@ public class ReduxGyro implements Gyro {
         m_gyro.clearStickyFaults();
         m_gyro.setYaw(0);
 
-        m_log_age = child.doubleLogger(Level.TRACE, "position frame age (s)");
-        m_log_yaw = child.rotation2dLogger(Level.TRACE, "Yaw NWU (rad)");
-        m_log_yaw_rate = child.doubleLogger(Level.TRACE, "Yaw Rate NWU (rad_s)");
-        m_log_pitch = child.rotation2dLogger(Level.TRACE, "Pitch NWU (rad)");
-        m_log_roll = child.rotation2dLogger(Level.TRACE, "Roll NWU (rad)");
+        m_log_age = log.doubleLogger(Level.TRACE, "position frame age (s)");
+        m_log_yaw = log.rotation2dLogger(Level.TRACE, "Yaw NWU (rad)");
+        m_log_yaw_rate = log.doubleLogger(Level.TRACE, "Yaw Rate NWU (rad_s)");
+        m_log_pitch = log.rotation2dLogger(Level.TRACE, "Pitch NWU (rad)");
+        m_log_roll = log.rotation2dLogger(Level.TRACE, "Roll NWU (rad)");
     }
 
     /** This is latency-compensated to the current Takt time. */

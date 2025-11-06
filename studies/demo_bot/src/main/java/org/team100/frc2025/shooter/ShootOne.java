@@ -19,7 +19,7 @@ public class ShootOne extends Command {
 
     @Override
     public void initialize() {
-        m_shooter.spinUp();
+        m_shooter.spinUp(10);
     }
 
     @Override
@@ -28,9 +28,4 @@ public class ShootOne extends Command {
             m_indexer.set(angle + distanceDeg);
         }
     }
-
-    // @Override
-    // public boolean isFinished() {
-    // return Math.abs(m_indexer.getAngle() - (angle + distanceDeg)) < 0.05;
-    // }
 }

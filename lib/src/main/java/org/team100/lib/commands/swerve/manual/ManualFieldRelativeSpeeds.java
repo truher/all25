@@ -19,8 +19,8 @@ public class ManualFieldRelativeSpeeds implements FieldRelativeDriver {
     private final GlobalVelocityR3Logger m_log_scaled;
 
     public ManualFieldRelativeSpeeds(LoggerFactory parent, SwerveKinodynamics swerveKinodynamics) {
-        LoggerFactory child = parent.type(this);
-        m_log_scaled = child.globalVelocityR3Logger(Level.TRACE, "scaled");
+        LoggerFactory log = parent.type(this);
+        m_log_scaled = log.globalVelocityR3Logger(Level.TRACE, "scaled");
         m_swerveKinodynamics = swerveKinodynamics;
     }
 

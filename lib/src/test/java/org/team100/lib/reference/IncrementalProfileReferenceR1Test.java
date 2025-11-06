@@ -3,6 +3,9 @@ package org.team100.lib.reference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.profile.incremental.TrapezoidProfileWPI;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
@@ -12,12 +15,13 @@ import org.team100.lib.testing.Timeless;
 
 public class IncrementalProfileReferenceR1Test implements Timeless {
     private static final double DELTA = 0.001;
+    private static final LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testSimple() {
         TrapezoidProfileWPI p = new TrapezoidProfileWPI(2, 6);
         Model100 goal = new Model100(1, 0);
-        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(p, 0.05, 0.05);
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, p, 0.05, 0.05);
         ref.setGoal(goal);
         Model100 measurement = new Model100();
         ref.init(measurement);
@@ -51,7 +55,6 @@ public class IncrementalProfileReferenceR1Test implements Timeless {
         assertEquals(0.0048, s.next().x(), DELTA);
         assertEquals(0.240, s.next().v(), DELTA);
         assertEquals(6.000, s.next().a(), DELTA);
-
 
     }
 }

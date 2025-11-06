@@ -70,22 +70,22 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
             SwerveKinodynamics swerveKinodynamics,
             Supplier<Rotation2d> desiredRotation,
             double[] k) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
         m_desiredRotation = desiredRotation;
         m_K = k;
         m_latch = new HeadingLatch();
         m_outputFilter = LinearFilter.singlePoleIIR(0.01, TimedRobot100.LOOP_PERIOD_S);
-        m_log_snap_mode = child.booleanLogger(Level.TRACE, "snap mode");
-        m_log_goal_theta = child.doubleLogger(Level.DEBUG, "goal/theta");
-        m_log_setpoint_theta = child.control100Logger(Level.DEBUG, "setpoint/theta");
-        m_log_measurement_theta = child.doubleLogger(Level.DEBUG, "measurement/theta");
-        m_log_measurement_omega = child.doubleLogger(Level.DEBUG, "measurement/omega");
-        m_log_error_theta = child.doubleLogger(Level.TRACE, "error/theta");
-        m_log_error_omega = child.doubleLogger(Level.TRACE, "error/omega");
-        m_log_theta_FB = child.doubleLogger(Level.TRACE, "thetaFB");
-        m_log_omega_FB = child.doubleLogger(Level.TRACE, "omegaFB");
-        m_log_output_omega = child.doubleLogger(Level.TRACE, "output/omega");
+        m_log_snap_mode = log.booleanLogger(Level.TRACE, "snap mode");
+        m_log_goal_theta = log.doubleLogger(Level.DEBUG, "goal/theta");
+        m_log_setpoint_theta = log.control100Logger(Level.DEBUG, "setpoint/theta");
+        m_log_measurement_theta = log.doubleLogger(Level.DEBUG, "measurement/theta");
+        m_log_measurement_omega = log.doubleLogger(Level.DEBUG, "measurement/omega");
+        m_log_error_theta = log.doubleLogger(Level.TRACE, "error/theta");
+        m_log_error_omega = log.doubleLogger(Level.TRACE, "error/omega");
+        m_log_theta_FB = log.doubleLogger(Level.TRACE, "thetaFB");
+        m_log_omega_FB = log.doubleLogger(Level.TRACE, "omegaFB");
+        m_log_output_omega = log.doubleLogger(Level.TRACE, "output/omega");
     }
 
     @Override

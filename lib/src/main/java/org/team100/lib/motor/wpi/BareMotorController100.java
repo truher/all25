@@ -22,9 +22,9 @@ public class BareMotorController100 implements BareMotor {
             MotorController motorController) {
         m_motor = motorController;
         m_motor.setInverted(true);
-        LoggerFactory child = parent.type(this);
-        m_log_duty = child.doubleLogger(Level.TRACE, "duty cycle");
-        m_log_reported = child.doubleLogger(Level.TRACE, "duty cycle reported");
+        LoggerFactory log = parent.type(this);
+        m_log_duty = log.doubleLogger(Level.TRACE, "duty cycle");
+        m_log_reported = log.doubleLogger(Level.TRACE, "duty cycle reported");
     }
 
     @Override

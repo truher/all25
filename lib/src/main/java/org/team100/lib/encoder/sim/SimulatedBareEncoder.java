@@ -16,10 +16,10 @@ public class SimulatedBareEncoder implements IncrementalBareEncoder {
     public SimulatedBareEncoder(
             LoggerFactory parent,
             BareMotor motor) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_motor = motor;
-        m_log_position = child.doubleLogger(Level.TRACE, "position (rad)");
-        m_log_velocity = child.doubleLogger(Level.TRACE, "velocity (rad_s)");
+        m_log_position = log.doubleLogger(Level.TRACE, "position (rad)");
+        m_log_velocity = log.doubleLogger(Level.TRACE, "velocity (rad_s)");
     }
 
     /** Value should be updated in Robot.robotPeriodic(). */

@@ -43,21 +43,21 @@ public class OnboardLinearDutyCyclePositionServo implements LinearPositionServo 
             ProfileReferenceR1 ref,
             Feedback100 feedback,
             double kV) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_mechanism = mechanism;
         m_ref = ref;
         m_feedback = feedback;
         m_kV = kV;
 
-        m_log_goal = child.doubleLogger(Level.TRACE, "goal (m)");
-        m_log_position = child.doubleLogger(Level.TRACE, "position (m)");
-        m_log_velocity = child.doubleLogger(Level.TRACE, "velocity (m_s)");
-        m_log_setpoint = child.control100Logger(Level.TRACE, "setpoint (m)");
-        m_log_u_FB = child.doubleLogger(Level.TRACE, "u_FB (duty cycle)");
-        m_log_u_FF = child.doubleLogger(Level.TRACE, "u_FF (duty cycle)");
-        m_log_u_TOTAL = child.doubleLogger(Level.TRACE, "u_TOTAL (duty cycle)");
-        m_log_error = child.doubleLogger(Level.TRACE, "Controller Position Error (m)");
-        m_log_velocity_error = child.doubleLogger(Level.TRACE, "Controller Velocity Error (m_s)");
+        m_log_goal = log.doubleLogger(Level.TRACE, "goal (m)");
+        m_log_position = log.doubleLogger(Level.TRACE, "position (m)");
+        m_log_velocity = log.doubleLogger(Level.TRACE, "velocity (m_s)");
+        m_log_setpoint = log.control100Logger(Level.TRACE, "setpoint (m)");
+        m_log_u_FB = log.doubleLogger(Level.TRACE, "u_FB (duty cycle)");
+        m_log_u_FF = log.doubleLogger(Level.TRACE, "u_FF (duty cycle)");
+        m_log_u_TOTAL = log.doubleLogger(Level.TRACE, "u_TOTAL (duty cycle)");
+        m_log_error = log.doubleLogger(Level.TRACE, "Controller Position Error (m)");
+        m_log_velocity_error = log.doubleLogger(Level.TRACE, "Controller Velocity Error (m_s)");
     }
 
     @Override

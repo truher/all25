@@ -33,23 +33,23 @@ public class SwerveLimiter {
     private GlobalVelocityR3 m_current;
 
     public SwerveLimiter(LoggerFactory parent, SwerveKinodynamics dynamics, DoubleSupplier voltage) {
-        LoggerFactory child = parent.type(this);
-        m_log_norm = child.doubleLogger(Level.TRACE, "norm");
-        m_log_normIn = child.doubleLogger(Level.TRACE, "norm in");
-        m_log_next = child.globalVelocityR3Logger(Level.TRACE, "next");
+        LoggerFactory log = parent.type(this);
+        m_log_norm = log.doubleLogger(Level.TRACE, "norm");
+        m_log_normIn = log.doubleLogger(Level.TRACE, "norm in");
+        m_log_next = log.globalVelocityR3Logger(Level.TRACE, "next");
 
-        BatterySagSpeedLimit limit = new BatterySagSpeedLimit(child, dynamics, voltage);
-        m_velocityLimiter = new FieldRelativeVelocityLimiter(child, limit);
-        m_capsizeLimiter = new FieldRelativeCapsizeLimiter(child, dynamics);
+        BatterySagSpeedLimit limit = new BatterySagSpeedLimit(log, dynamics, voltage);
+        m_velocityLimiter = new FieldRelativeVelocityLimiter(log, limit);
+        m_capsizeLimiter = new FieldRelativeCapsizeLimiter(log, dynamics);
 
         // Use the absolute maximum acceleration.
         final double cartesianScale = 1.0;
         // Use much less than the maximum rotational acceleration.
         // Rotating fast can be upsetting.
         final double alphaScale = 0.2;
-        m_accelerationLimiter = new FieldRelativeAccelerationLimiter(child, dynamics, cartesianScale, alphaScale);
+        m_accelerationLimiter = new FieldRelativeAccelerationLimiter(log, dynamics, cartesianScale, alphaScale);
 
-        m_deadband = new SwerveDeadband(child);
+        m_deadband = new SwerveDeadband(log);
     }
 
     /**
