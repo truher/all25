@@ -22,7 +22,7 @@ public class DrumShooterFactory {
                 new CanId(13),
                 GEAR_RATIO,
                 NeutralMode.BRAKE,
-                MotorPhase.FORWARD,
+                MotorPhase.REVERSE,
                 WHEEL_DIA_M);
         LinearVelocityServo m_right = NeoVortexFactory.getNeoVortexVelocityServo(
                 log.name("right"),
@@ -30,7 +30,7 @@ public class DrumShooterFactory {
                 new CanId(40),
                 GEAR_RATIO,
                 NeutralMode.BRAKE,
-                MotorPhase.REVERSE,
+                MotorPhase.FORWARD,
                 WHEEL_DIA_M);
 
         return new DualDrumShooter(parent, m_left, m_right);

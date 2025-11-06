@@ -26,90 +26,90 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-
 public class Robot extends TimedRobot100 {
-    private static final double MAX_SPEED_M_S = 3.0;
-    private static final double MAX_OMEGA_RAD_S = 3.0;
-    private final DualDrumShooter m_shooter;
-    private final TankDrive m_drive;
-    private final Command m_auton;
-    private final IndexerServo m_indexer;
+        private static final double MAX_SPEED_M_S = 3.0;
+        private static final double MAX_OMEGA_RAD_S = 5.0;
+        private final DualDrumShooter m_shooter;
+        private final TankDrive m_drive;
+        private final Command m_auton;
+        private final IndexerServo m_indexer;
 
+        public Robot() {
+                Banner.printBanner();
+                DriverStation.silenceJoystickConnectionWarning(true);
+                Experiments.instance.show();
+                SmartDashboard.putData(CommandScheduler.getInstance());
+                Logging logging = Logging.instance();
+                LoggerFactory fieldLogger = logging.fieldLogger;
+                DriverXboxControl driverControl = new DriverXboxControl(0);
+                LoggerFactory logger = logging.rootLogger;
+                m_drive = TankDriveFactory.make(
+                                fieldLogger,
+                                logger,
+                                80, // stator current limit (a)
+                                new CanId(25), // left
+                                new CanId(27), // right
+                                0.4, // track width
+                                6.0, // gear ratio
+                                0.15); // wheel dia (m)
+                SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.tank(logger);
+                SwerveLimiter limiter = new SwerveLimiter(
+                                logger,
+                                kinodynamics,
+                                RobotController::getBatteryVoltage);
+                TankManual manual = new TankManual(
+                                logger,
+                                () -> -1.0 * driverControl.rightY(),
+                                () -> -1.0 * driverControl.rightX(),
+                                MAX_SPEED_M_S,
+                                MAX_OMEGA_RAD_S,
+                                limiter,
+                                m_drive);
+                m_drive.setDefaultCommand(
+                                manual);
 
-    public Robot() {
-        Banner.printBanner();
-        DriverStation.silenceJoystickConnectionWarning(true);
-        Experiments.instance.show();
-        SmartDashboard.putData(CommandScheduler.getInstance());
-        Logging logging = Logging.instance();
-        LoggerFactory fieldLogger = logging.fieldLogger;
-        DriverXboxControl driverControl = new DriverXboxControl(0);
-        LoggerFactory logger = logging.rootLogger;
-        m_drive = TankDriveFactory.make(
-                fieldLogger,
-                logger,
-                80, // stator current limit (a)
-                new CanId(3), // left
-                new CanId(27), // right
-                0.4, // track width
-                6.0, // gear ratio
-                0.15); // wheel dia (m)
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.tank();
-        SwerveLimiter limiter = new SwerveLimiter(
-                logger,
-                kinodynamics,
-                RobotController::getBatteryVoltage);
-        TankManual manual = new TankManual(
-                logger,
-                () -> -1.0 * driverControl.rightY(),
-                () -> -1.0 * driverControl.rightX(),
-                MAX_SPEED_M_S,
-                MAX_OMEGA_RAD_S,
-                limiter,
-                m_drive);
-        m_drive.setDefaultCommand(
-                manual);
+                // new Trigger(driverControl::x).whileTrue(
+                // m_drive.run(() -> m_drive.setDutyCycle(1.0, 0.0))
+                // .withTimeout(1.0));
 
-        new Trigger(driverControl::x).whileTrue(
-                m_drive.run(() -> m_drive.setDutyCycle(1.0, 0.0))
-                        .withTimeout(1.0));
+                // // make a sort of S-shape, as an example of sequential commands.
+                // new Trigger(driverControl::y).whileTrue(
+                // sequence(
+                // m_drive.driveWithVelocity(1.5, 2.5).withTimeout(1.0),
+                // m_drive.driveWithVelocity(1.5, -2.5).withTimeout(1.0)));
 
-        // make a sort of S-shape, as an example of sequential commands.
-        new Trigger(driverControl::y).whileTrue(
-                sequence(
-                        m_drive.driveWithVelocity(1.5, 2.5).withTimeout(1.0),
-                        m_drive.driveWithVelocity(1.5, -2.5).withTimeout(1.0)));
+                m_auton = m_drive.run(() -> m_drive.setDutyCycle(1.0, 0.0))
+                                .withTimeout(1.0);
 
-        m_auton = m_drive.run(() -> m_drive.setDutyCycle(1.0, 0.0))
-                .withTimeout(1.0);
+                m_shooter = DrumShooterFactory.make(logger, 40);
+                m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
 
+                m_indexer = new IndexerServo(logger, 0);
+                m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
 
-        m_shooter = DrumShooterFactory.make(logger, 20);
-        m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
+                new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer, 9)); //////////////////////////////////////////
+                new Trigger(driverControl::b).whileTrue(new Shoot(m_shooter, m_indexer, 8));
+                new Trigger(driverControl::x).whileTrue(new Shoot(m_shooter, m_indexer, 10));
+                new Trigger(driverControl::y).whileTrue(m_indexer.run(() -> m_indexer.set(-1)));
 
-        m_indexer = new IndexerServo(logger, 0);
-        m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
+        }
 
-        new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer));
-            
-    }
+        @Override
+        public void robotPeriodic() {
+                Takt.update();
+                Cache.refresh();
+                CommandScheduler.getInstance().run();
+        }
 
-    @Override
-    public void robotPeriodic() {
-        Takt.update();
-        Cache.refresh();
-        CommandScheduler.getInstance().run();
-    }
+        @Override
+        public void autonomousInit() {
+                if (m_auton == null)
+                        return;
+                m_auton.schedule();
+        }
 
-    @Override
-    public void autonomousInit() {
-        if (m_auton == null)
-            return;
-        m_auton.schedule();
-    }
-
-    @Override
-    public void teleopInit() {
-        CommandScheduler.getInstance().cancelAll();
-    }
+        @Override
+        public void teleopInit() {
+                CommandScheduler.getInstance().cancelAll();
+        }
 }
