@@ -34,7 +34,7 @@ public class Pivot extends SubsystemBase {
     /** Home position, rad */
     private static final double HOME = 0.1;
     /** Extended position, rad */
-    private static final double EXTEND = 2;
+    private static final double EXTEND = 1.4;
 
     private final Gravity m_gravity;
     private final AngularPositionServo m_servo;
@@ -42,12 +42,12 @@ public class Pivot extends SubsystemBase {
     public Pivot(LoggerFactory parent) {
         LoggerFactory log = parent.type(this);
         m_gravity = new Gravity(log,
-                5, // Max gravity torque, Nm
-                0); // Gravity torque position offset, rad
+                3, // Max gravity torque, Nm
+                3 * Math.PI/4); // Gravity torque position offset, rad
         IncrementalProfile profile = new TrapezoidIncrementalProfile(
                 log,
-                1, // max velocity rad/s
-                1, // max accel rad/s^2
+                5, // max velocity rad/s
+                10, // max accel rad/s^2 origin 1
                 0.01); // tolerance
         ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile,
                 0.01, // position tolerance, rad
@@ -71,9 +71,10 @@ public class Pivot extends SubsystemBase {
                         new CanId(5),
                         NeutralMode.BRAKE,
                         MotorPhase.FORWARD,
-                        10, // Stator current limit, amps
-                        Feedforward100.makeNeo(log),
-                        PIDConstants.makePositionPID(log, 0.0003) // duty-cycle/RPM
+                        40, // Stator current limit, amps
+                        Feedforward100.makeNeo2(log),
+                        // Feedforward100.zero(log),
+                        PIDConstants.makePositionPID(log, 0.5) // duty-cycle/rot -- originally 0.5
                 );
                 CANSparkEncoder encoder = new CANSparkEncoder(log, motor);
                 return getMech(log, motor, encoder);
@@ -86,9 +87,9 @@ public class Pivot extends SubsystemBase {
         RotaryMechanism mech = new RotaryMechanism(log, motor,
                 encoder,
                 0, // initial position, rad
-                25, // gear ratio
+                15, // gear ratio
                 0, // min position, rad
-                3); // max position, rad
+                1.5); // max position, rad
         return mech;
     }
 
@@ -111,9 +112,14 @@ public class Pivot extends SubsystemBase {
         return run(() -> m_servo.setPositionProfiled(EXTEND, gravityTorque()));
     }
 
+    @Override
+    public void periodic() {
+        m_servo.periodic();
+    }
+
     /////////////////////////////////////////////////////////////////
 
     private double gravityTorque() {
-        return m_gravity.applyAsDouble(m_servo.getWrappedPositionRad());
+        return -1 * m_gravity.applyAsDouble(m_servo.getWrappedPositionRad());
     }
 }

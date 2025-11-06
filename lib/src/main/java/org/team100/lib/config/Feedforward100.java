@@ -65,6 +65,10 @@ public class Feedforward100 {
         return new Feedforward100(log, 0.122, 0.000, 0.000, 0.100, 0.065, 0.5);
     }
 
+    public static Feedforward100 makeNeo2(LoggerFactory log) {
+        return new Feedforward100(log, 0.122, 0.05, 0.0250, 0.100, 0.065, 0.5);
+    }
+
     public static Feedforward100 makeNeoArm(LoggerFactory log) {
         return new Feedforward100(log, 0.22, 1, 1, 0, 0, 0);
     }

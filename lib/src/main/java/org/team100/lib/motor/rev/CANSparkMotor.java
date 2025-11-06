@@ -200,8 +200,10 @@ public abstract class CANSparkMotor implements BareMotor {
 
         m_log_desired_position.log(() -> motorRev);
         m_log_desired_speed.log(() -> motorRev_S);
+        m_log_desired_accel.log(() -> motorRev_S2);
         m_log_friction_FF.log(() -> frictionFFVolts);
         m_log_velocity_FF.log(() -> velocityFFVolts);
+        m_log_accel_FF.log(() -> accelFFVolts);
         m_log_torque_FF.log(() -> torqueFFVolts);
         log();
     }
