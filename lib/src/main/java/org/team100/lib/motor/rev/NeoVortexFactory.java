@@ -27,7 +27,7 @@ public class NeoVortexFactory {
             MotorPhase motorPhase,
             double wheelDiameterM) {
         Feedforward100 ff = Feedforward100.makeNeoVortex(log);
-        PIDConstants pid = PIDConstants.zero(log);
+        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.00025, 0, 0.0001);
         NeoVortexCANSparkMotor motor = new NeoVortexCANSparkMotor(
                 log,
                 canID,

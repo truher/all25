@@ -27,7 +27,7 @@ public class IndexerServo extends SubsystemBase {
             new CanId(14),
             NeutralMode.BRAKE,
             MotorPhase.FORWARD,
-            5,
+            10,
             Feedforward100.makeNeo550(logger),
              PIDConstants.zero(logger));
     }

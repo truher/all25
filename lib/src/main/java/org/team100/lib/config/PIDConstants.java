@@ -1,5 +1,7 @@
 package org.team100.lib.config;
 
+import static edu.wpi.first.wpilibj2.command.Commands.deadline;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +36,11 @@ public class PIDConstants {
 
     public static PIDConstants makeVelocityPID(LoggerFactory log, double p) {
         return new PIDConstants(log, 0, p);
+    }
+
+    public static PIDConstants makeVelocityPID(
+            LoggerFactory log, double p, double i, double d) {
+        return new PIDConstants(log, 0, 0, 0, p, i, d);
     }
 
     public static PIDConstants makePositionPID(LoggerFactory log, double p) {

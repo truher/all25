@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class Shoot extends Command {
     private final DualDrumShooter m_shooter;
     private final IndexerServo m_indexer;
-    private double m_speed;
+    private final double m_speed;
 
     public Shoot(DualDrumShooter shooter, IndexerServo indexer, double speed) {
         m_shooter = shooter;
@@ -22,7 +22,7 @@ public class Shoot extends Command {
 
     @Override
     public void initialize() {
-        m_shooter.spinUp(7);
+        m_shooter.spinUp(m_speed);
     }
 
     @Override

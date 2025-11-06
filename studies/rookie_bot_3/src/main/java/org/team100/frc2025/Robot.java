@@ -81,14 +81,14 @@ public class Robot extends TimedRobot100 {
                 m_auton = m_drive.run(() -> m_drive.setDutyCycle(1.0, 0.0))
                                 .withTimeout(1.0);
 
-                m_shooter = DrumShooterFactory.make(logger, 20);
+                m_shooter = DrumShooterFactory.make(logger, 40);
                 m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
 
                 m_indexer = new IndexerServo(logger, 0);
                 m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
 
-                new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer, 7));
-                new Trigger(driverControl::b).whileTrue(new Shoot(m_shooter, m_indexer, 4));
+                new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer, 9)); //////////////////////////////////////////
+                new Trigger(driverControl::b).whileTrue(new Shoot(m_shooter, m_indexer, 8));
                 new Trigger(driverControl::x).whileTrue(new Shoot(m_shooter, m_indexer, 10));
                 new Trigger(driverControl::y).whileTrue(m_indexer.run(() -> m_indexer.set(-1)));
 
