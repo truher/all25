@@ -29,7 +29,7 @@ public class GlobalDeltaR3 {
         m_rotation = rotation;
     }
 
-    /** Return a delta from start to end. */
+    /** Return a delta from start to end.  Wraps heading. */
     public static GlobalDeltaR3 delta(Pose2d start, Pose2d end) {
         Translation2d t = end.getTranslation().minus(start.getTranslation());
         Rotation2d r = end.getRotation().minus(start.getRotation());

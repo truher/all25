@@ -13,18 +13,34 @@ public class ControllerFactoryR3 {
         switch (Identity.instance) {
             case COMP_BOT -> {
                 return new FullStateControllerR3(log, 2.9, 3.5, 0.025, 0.01, 0.02, 0.3, 1, 1);
-                // return new FullStateSwerveController(log, 0, 0, 0, 0, 0, 0, 0, 0);
             }
             case SWERVE_ONE -> {
                 return new FullStateControllerR3(log, 3, 3.5, 0.05, 0, 0.01, 0.01, 1, 1);
             }
             case SWERVE_TWO -> {
-                return new FullStateControllerR3(log, 4, 4, 0.25, 0.25, 0.01, 0.02, 0.01, 0.02);
+                return new FullStateControllerR3(log,
+                        4, // P for x/y
+                        4, // P for theta
+                        0.25, // P for v
+                        0.25, // P for omega
+                        0.01, // x tolerance
+                        0.02, // theta tolerance
+                        0.01, // v tolerance
+                        0.02); // omega tolerance
             }
             case ROOKIE_BOT -> {
-                return new FullStateControllerR3(log, 3, 3.5, 0.05, 0, 0.01, 0.01, 1, 1);
+                return new FullStateControllerR3(log,
+                        3, // P for x/y
+                        3.5, // P for theta
+                        0.05, // P for v
+                        0, // P for omega
+                        0.01, // x tolerance
+                        0.01, // theta tolerance
+                        1, // v tolerance
+                        1); // omega tolerance
             }
             default -> {
+                // this is for simulation, don't use these values
                 return new FullStateControllerR3(log, 3.0, 3.5, 0, 0, 0.01, 0.01, 0.01, 0.01);
             }
         }
@@ -51,7 +67,7 @@ public class ControllerFactoryR3 {
                 7.2, // p cartesian
                 3.5, // p theta
                 0.055, // p cartesian v
-                0.01, // ptheta v
+                0.01, // p theta v
                 0.035, // x tol
                 0.1, // theta tol
                 1, // xdot tol
@@ -64,7 +80,7 @@ public class ControllerFactoryR3 {
                 7.2, // p cartesian
                 3.5, // p theta
                 0.055, // p cartesian v
-                0.01, // ptheta v
+                0.01, // p theta v
                 0.15, // x tol
                 0.4, // theta tol
                 4, // xdot tol

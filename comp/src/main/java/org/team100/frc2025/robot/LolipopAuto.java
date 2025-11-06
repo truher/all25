@@ -27,19 +27,19 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 
 public class LolipopAuto {
     private static final double HEED_RADIUS_M = 3;
-    private final LoggerFactory m_logger;
+    private final LoggerFactory m_log;
     private final Machinery m_machinery;
     private final HolonomicProfile m_autoProfile;
     private final FullStateControllerR3 m_autoController;
     private final TrajectoryPlanner m_planner;
 
     public LolipopAuto(
-            LoggerFactory logger,
+            LoggerFactory parent,
             Machinery machinery,
             HolonomicProfile autoProfile,
             FullStateControllerR3 autoController,
             TrajectoryPlanner planner) {
-        m_logger = logger;
+        m_log = parent.type(this);
         m_machinery = machinery;
         m_autoProfile = autoProfile;
         m_autoController = autoController;
@@ -49,33 +49,33 @@ public class LolipopAuto {
     public Command get() {
         // this one uses some curvature
         DriveWithTrajectoryFunction toReefTrajectory = new DriveWithTrajectoryFunction(
-                m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
+                m_log, m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
                 (p) -> m_planner.restToRest(List.of(
                         HolonomicPose2d.make(m_machinery.m_drive.getPose(), Math.PI),
                         HolonomicPose2d.make(3, 5, 0, -2))));
 
         DriveToPoseWithProfile toReefA = new DriveToPoseWithProfile(
-                m_logger, m_machinery.m_drive, m_autoController, m_autoProfile,
+                m_log, m_machinery.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.A));
 
         DriveToTranslationFacingWithProfile toCenterCoral = new DriveToTranslationFacingWithProfile(
-                m_logger, m_machinery.m_drive, m_autoController, m_autoProfile,
+                m_log, m_machinery.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.CoralMark.CENTER.value
                         .plus(new Translation2d(0.7, 0)),
                 new Rotation2d(Math.PI));
 
         DriveToPoseWithProfile toReefB = new DriveToPoseWithProfile(
-                m_logger, m_machinery.m_drive, m_autoController, m_autoProfile,
+                m_log, m_machinery.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.B));
 
         DriveToTranslationFacingWithProfile toCoralRight = new DriveToTranslationFacingWithProfile(
-                m_logger, m_machinery.m_drive, m_autoController, m_autoProfile,
+                m_log, m_machinery.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.CoralMark.RIGHT.value
                         .plus(new Translation2d(0.7, 0).rotateBy(new Rotation2d(Math.PI / 4))),
                 new Rotation2d(Math.PI));
 
         DriveToPoseWithProfile toReefC = new DriveToPoseWithProfile(
-                m_logger, m_machinery.m_drive, m_autoController, m_autoProfile,
+                m_log, m_machinery.m_drive, m_autoController, m_autoProfile,
                 () -> FieldConstants.makeGoal(ScoringLevel.L4, ReefPoint.C));
 
         MoveAndHold toL4 = m_machinery.m_mech.homeToL4();

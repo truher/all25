@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * at initialization time.
  */
 public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
+    private final LoggerFactory m_log;
     private final Pose2d m_goal;
     private final GlobalVelocityR3 m_endVelocity;
     private final VelocitySubsystemR3 m_drive;
@@ -32,13 +33,14 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveToPoseWithTrajectoryAndExitVelocity(
-            LoggerFactory log,
+            LoggerFactory parent,
             Pose2d goal,
             GlobalVelocityR3 endVelocity,
             VelocitySubsystemR3 drive,
             ControllerR3 controller,
             TrajectoryPlanner planner,
             TrajectoryVisualization viz) {
+        m_log = parent.type(this);
         m_goal = goal;
         m_endVelocity = endVelocity;
         m_drive = drive;
@@ -73,9 +75,9 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
 
         m_viz.setViz(trajectory);
 
-        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
+        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(m_log, trajectory);
         m_referenceController = new VelocityReferenceControllerR3(
-                m_drive, m_controller, reference);
+                m_log, m_drive, m_controller, reference);
     }
 
     @Override

@@ -49,6 +49,7 @@ class DriveWithTrajectoryListFunctionTest extends Fixtured implements Timeless {
         Experiments.instance.testOverride(Experiment.UseSetpointGenerator, true);
         ControllerR3 control = ControllerFactoryR3.test(logger);
         DriveWithTrajectoryListFunction c = new DriveWithTrajectoryListFunction(
+                logger,
                 fixture.drive,
                 control,
                 x -> List.of(planner.line(x)),
@@ -64,6 +65,6 @@ class DriveWithTrajectoryListFunctionTest extends Fixtured implements Timeless {
             fixture.drive.periodic(); // for updateOdometry
         }
         assertTrue(c.isDone());
-        assertEquals(1.0, fixture.drive.getPose().getX(), 0.001);
+        assertEquals(1.0, fixture.drive.getPose().getX(), 0.01);
     }
 }

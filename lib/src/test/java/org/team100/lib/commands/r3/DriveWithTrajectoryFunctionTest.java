@@ -52,7 +52,8 @@ public class DriveWithTrajectoryFunctionTest implements Timeless {
 
     @Test
     void testDemo() {
-        Command drive = new DriveWithTrajectoryFunction(subsystem, controller, viz, this::makeTrajectory);
+        Command drive = new DriveWithTrajectoryFunction(
+                log, subsystem, controller, viz, this::makeTrajectory);
         drive.initialize();
         stepTime();
         System.out.println("x, y, theta");

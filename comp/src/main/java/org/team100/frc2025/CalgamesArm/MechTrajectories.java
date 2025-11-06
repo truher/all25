@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 /** Make a trajectory from the start to the end and follow it. */
 public class MechTrajectories extends Command {
     private static final boolean USE_JOINT_CONSTRAINT = false;
+
+    private final LoggerFactory m_log;
     private final CalgamesMech m_subsystem;
     private final TrajectoryPlanner m_planner;
 
@@ -31,7 +33,7 @@ public class MechTrajectories extends Command {
             CalgamesMech mech,
             ElevatorArmWristKinematics k,
             AnalyticalJacobian j) {
-        LoggerFactory log = parent.type(this);
+        m_log = parent.type(this);
         m_subsystem = mech;
         List<TimingConstraint> c = new ArrayList<>();
         if (USE_JOINT_CONSTRAINT) {
@@ -44,8 +46,8 @@ public class MechTrajectories extends Command {
 
         } else {
             // These are known to work, but suboptimal.
-            c.add(new ConstantConstraint(log, 10, 5));
-            c.add(new YawRateConstraint(log, 10, 5));
+            c.add(new ConstantConstraint(m_log, 10, 5));
+            c.add(new YawRateConstraint(m_log, 10, 5));
             // This is new
             c.add(new TorqueConstraint(20));
         }
@@ -63,7 +65,8 @@ public class MechTrajectories extends Command {
     public Command terminal(String name, HolonomicPose2d start, HolonomicPose2d end) {
 
         /** Use the start course and ignore the start pose for now */
-        MoveAndHold f = new GoToPosePosition(m_subsystem, start.course(), end, m_planner);
+        MoveAndHold f = new GoToPosePosition(
+                m_log, m_subsystem, start.course(), end, m_planner);
         return f
                 .until(f::isDone)
                 .withName(name);
@@ -74,7 +77,7 @@ public class MechTrajectories extends Command {
 
         /** Use the start course and ignore the start pose for now */
         GoToPosePosition c = new GoToPosePosition(
-                m_subsystem, start.course(), end, m_planner);
+                m_log, m_subsystem, start.course(), end, m_planner);
         c.setName(name);
         return c;
 

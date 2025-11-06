@@ -24,7 +24,7 @@ public class ProfileReferenceTest implements Timeless {
         ModelR3 measurement = new ModelR3(new Pose2d(0, 0, Rotation2d.kZero));
         ModelR3 goal = new ModelR3(new Pose2d(1, 0, Rotation2d.kZero));
         HolonomicProfile hp = HolonomicProfile.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
-        ProfileReferenceR3 r = new ProfileReferenceR3(hp, "test");
+        ProfileReferenceR3 r = new ProfileReferenceR3(logger, hp, "test");
         r.setGoal(goal);
         r.initialize(measurement);
         {

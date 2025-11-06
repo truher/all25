@@ -7,6 +7,7 @@ import java.util.function.Function;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.subsystems.VelocitySubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.geometry.Pose2d;
  * testing.
  */
 public class DriveWithTrajectoryListFunction extends MoveAndHold {
+    private final LoggerFactory m_log;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final Function<Pose2d, List<Trajectory100>> m_trajectories;
@@ -33,10 +35,12 @@ public class DriveWithTrajectoryListFunction extends MoveAndHold {
     private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveWithTrajectoryListFunction(
+            LoggerFactory parent,
             VelocitySubsystemR3 swerve,
             ControllerR3 controller,
             Function<Pose2d, List<Trajectory100>> trajectories,
             TrajectoryVisualization viz) {
+        m_log = parent.type(this);
         m_drive = swerve;
         m_controller = controller;
         m_trajectories = trajectories;
@@ -56,9 +60,9 @@ public class DriveWithTrajectoryListFunction extends MoveAndHold {
             // get the next trajectory
             if (m_trajectoryIter.hasNext()) {
                 Trajectory100 m_trajectory = m_trajectoryIter.next();
-                TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(m_trajectory);
+                TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(m_log, m_trajectory);
                 m_referenceController = new VelocityReferenceControllerR3(
-                        m_drive, m_controller, reference);
+                        m_log, m_drive, m_controller, reference);
                 m_viz.setViz(m_trajectory);
             } else {
                 return;

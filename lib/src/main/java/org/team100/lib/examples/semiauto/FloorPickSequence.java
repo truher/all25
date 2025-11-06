@@ -27,11 +27,13 @@ public class FloorPickSequence {
     private static final Rotation2d RELATIVE_BEARING = Rotation2d.k180deg;
 
     public static Command get(
+            LoggerFactory parent,
             LoggerFactory fieldLog,
             SwerveDriveSubsystem drive,
             Targets targets,
             ControllerR3 controller,
             HolonomicProfile profile) {
+        LoggerFactory log = parent.type(FloorPickSequence.class);
         Supplier<Optional<Translation2d>> target = targets::getClosestTarget;
         Supplier<Optional<Translation2d>> runway = () -> {
             Optional<Translation2d> t = target.get();
@@ -44,7 +46,8 @@ public class FloorPickSequence {
         };
 
         DriveToTranslationWithRelativeBearing toRunway = new DriveToTranslationWithRelativeBearing(
-                fieldLog, runway, drive, controller, profile, RELATIVE_BEARING, PICKOFFSET);
+                log, fieldLog, runway, drive,
+                controller, profile, RELATIVE_BEARING, PICKOFFSET);
 
         return sequence(
                 toRunway.until(toRunway::isDone));

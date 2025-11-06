@@ -35,6 +35,7 @@ public record GlobalVelocityR3(double x, double y, double theta) {
         return new GlobalVelocityR3(d.getX(), d.getY(), d.getRotation().getRadians()).div(dt);
     }
 
+    /** The cartesian part only */
     public double norm() {
         return Math.hypot(x, y);
     }
