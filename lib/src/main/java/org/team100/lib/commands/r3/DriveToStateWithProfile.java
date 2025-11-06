@@ -18,7 +18,8 @@ import org.team100.lib.subsystems.VelocitySubsystemR3;
  * after initialization.
  */
 public class DriveToStateWithProfile extends MoveAndHold {
-    public final DoubleArrayLogger m_log_target;
+    private final LoggerFactory m_log;
+    private final DoubleArrayLogger m_log_target;
     private final Supplier<ModelR3> m_goals;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
@@ -29,11 +30,13 @@ public class DriveToStateWithProfile extends MoveAndHold {
     private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveToStateWithProfile(
+            LoggerFactory parent,
             LoggerFactory fieldLogger,
             Supplier<ModelR3> goal,
             VelocitySubsystemR3 drive,
             ControllerR3 controller,
             HolonomicProfile profile) {
+        m_log = parent.type(this);
         m_log_target = fieldLogger.doubleArrayLogger(Level.TRACE, "target");
         m_goals = goal;
         m_drive = drive;
@@ -47,10 +50,10 @@ public class DriveToStateWithProfile extends MoveAndHold {
         m_goal = m_goals.get();
         if (m_goal == null)
             return;
-        m_reference = new ProfileReferenceR3(m_profile, "Drive to pose with profile");
+        m_reference = new ProfileReferenceR3(m_log, m_profile, "Drive to pose with profile");
         m_reference.setGoal(m_goal);
         m_referenceController = new VelocityReferenceControllerR3(
-                m_drive, m_controller, m_reference);
+                m_log, m_drive, m_controller, m_reference);
     }
 
     @Override

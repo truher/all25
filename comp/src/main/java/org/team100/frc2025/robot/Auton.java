@@ -31,17 +31,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class Auton {
     private static final boolean AUTON_FIXED = false;
 
-    private final LoggerFactory m_logger;
+    private final LoggerFactory m_log;
     private final Machinery m_machinery;
     private final HolonomicProfile m_autoProfile;
     private final FullStateControllerR3 m_autoController;
 
     public Auton(
-            LoggerFactory logger,
+            LoggerFactory parent,
             Machinery machinery,
             HolonomicProfile autoProfile,
             FullStateControllerR3 autoController) {
-        m_logger = logger.type(this);
+        m_log = parent.type(this);
         m_machinery = machinery;
         m_autoProfile = autoProfile;
         m_autoController = autoController;
@@ -100,7 +100,7 @@ public class Auton {
     /** Drive to the reef and go up. */
     private Command embarkAndPreplace(ScoringLevel position, ReefPoint point) {
         DriveToPoseWithProfile toReef = new DriveToPoseWithProfile(
-                m_logger, m_machinery.m_drive, m_autoController,
+                m_log, m_machinery.m_drive, m_autoController,
                 m_autoProfile,
                 () -> FieldConstants.makeGoal(position, point));
         MoveAndHold toL4 = m_machinery.m_mech.homeToL4();
@@ -114,9 +114,9 @@ public class Auton {
 
     /** Score, drive to the station, and pause briefly. */
     private Command scoreAndReload(CoralStation station) {
-        GoToCoralStation toStation = new GoToCoralStation(m_logger, m_machinery.m_swerveKinodynamics, station, 0.5);
+        GoToCoralStation toStation = new GoToCoralStation(m_log, m_machinery.m_swerveKinodynamics, station, 0.5);
         DriveWithTrajectoryFunction navigator = new DriveWithTrajectoryFunction(
-                m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
+                m_log, m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
                 toStation);
         return sequence(
                 // first fire the coral at the peg

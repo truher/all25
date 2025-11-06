@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
  * Drive to a pose supplied at initialization, using a profile.
  */
 public class DriveToPoseWithProfile extends MoveAndHold {
+    private final LoggerFactory m_log;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final HolonomicProfile m_profile;
@@ -34,8 +35,8 @@ public class DriveToPoseWithProfile extends MoveAndHold {
             ControllerR3 controller,
             HolonomicProfile profile,
             Supplier<Pose2d> goal) {
-        LoggerFactory child = logger.type(this);
-        m_log_goal = child.pose2dLogger(Level.TRACE, "goal");
+        m_log = logger.type(this);
+        m_log_goal = m_log.pose2dLogger(Level.TRACE, "goal");
         m_drive = drive;
         m_controller = controller;
         m_profile = profile;
@@ -47,10 +48,10 @@ public class DriveToPoseWithProfile extends MoveAndHold {
     public void initialize() {
         Pose2d goal = m_goal.get();
         m_log_goal.log(() -> goal);
-        m_reference = new ProfileReferenceR3(m_profile, "embark");
+        m_reference = new ProfileReferenceR3(m_log, m_profile, "embark");
         m_reference.setGoal(new ModelR3(goal));
         m_referenceController = new VelocityReferenceControllerR3(
-                m_drive, m_controller, m_reference);
+                m_log, m_drive, m_controller, m_reference);
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.util.function.Function;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.subsystems.VelocitySubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
  * probably the returned trajectory should start from rest.
  */
 public class DriveWithTrajectoryFunction extends MoveAndHold {
+    private final LoggerFactory m_log;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final TrajectoryVisualization m_viz;
@@ -30,10 +32,12 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
     private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveWithTrajectoryFunction(
+            LoggerFactory parent,
             VelocitySubsystemR3 drive,
             ControllerR3 controller,
             TrajectoryVisualization viz,
             Function<Pose2d, Trajectory100> trajectoryFn) {
+        m_log = parent.type(this);
         m_drive = drive;
         m_controller = controller;
         m_viz = viz;
@@ -45,9 +49,9 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
     public void initialize() {
         Trajectory100 trajectory = m_trajectoryFn.apply(m_drive.getState().pose());
         m_viz.setViz(trajectory);
-        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
+        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(m_log, trajectory);
         m_referenceController = new VelocityReferenceControllerR3(
-                m_drive, m_controller, reference);
+                m_log, m_drive, m_controller, reference);
     }
 
     @Override

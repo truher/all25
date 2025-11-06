@@ -2,6 +2,11 @@ package org.team100.lib.reference.r3;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.ObjectCache;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.BooleanLogger;
+import org.team100.lib.logging.LoggerFactory.ControlR3Logger;
+import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
@@ -29,10 +34,16 @@ public class ProfileReferenceR3 implements ReferenceR3 {
     private record References(ModelR3 m_current, ControlR3 m_next) {
     }
 
+    private final LoggerFactory m_log;
+
     private final HolonomicProfile m_profile;
     /** The name is for debugging. */
     private final String m_name;
     private final ObjectCache<References> m_references;
+    private final ModelR3Logger m_log_current;
+    private final ControlR3Logger m_log_next;
+    private final BooleanLogger m_log_done;
+    private final ModelR3Logger m_log_goal;
 
     private ModelR3 m_goal;
     private boolean m_done;
@@ -43,11 +54,20 @@ public class ProfileReferenceR3 implements ReferenceR3 {
      */
     private ControlR3 m_next;
 
-    public ProfileReferenceR3(HolonomicProfile profile, String name) {
+    public ProfileReferenceR3(
+            LoggerFactory parent,
+            HolonomicProfile profile,
+            String name) {
+        m_log = parent.type(this);
         m_profile = profile;
         m_name = name;
         // this will keep polling until we stop it.
         m_references = Cache.of(() -> refresh(m_next == null ? null : m_next.model()));
+
+        m_log_current = m_log.modelR3Logger(Level.TRACE, "current");
+        m_log_next = m_log.controlR3Logger(Level.TRACE, "next");
+        m_log_done = m_log.booleanLogger(Level.TRACE, "done");
+        m_log_goal = m_log.modelR3Logger(Level.TRACE, "goal");
     }
 
     /**
@@ -69,21 +89,27 @@ public class ProfileReferenceR3 implements ReferenceR3 {
 
     @Override
     public ModelR3 current() {
-        return m_references.get().m_current;
+        ModelR3 current = m_references.get().m_current;
+        m_log_current.log(() -> current);
+        return current;
     }
 
     @Override
     public ControlR3 next() {
-        return m_references.get().m_next;
+        ControlR3 next = m_references.get().m_next;
+        m_log_next.log(() -> next);
+        return next;
     }
 
     @Override
     public boolean done() {
+        m_log_done.log(() -> m_done);
         return m_done;
     }
 
     @Override
     public ModelR3 goal() {
+        m_log_goal.log(() -> m_goal);
         return m_goal;
     }
 

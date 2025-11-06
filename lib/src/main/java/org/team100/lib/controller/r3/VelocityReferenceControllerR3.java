@@ -1,6 +1,10 @@
 package org.team100.lib.controller.r3;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.ControlR3Logger;
+import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
@@ -18,18 +22,28 @@ public class VelocityReferenceControllerR3 {
     private final VelocitySubsystemR3 m_subsystem;
     private final ControllerR3 m_controller;
     private final ReferenceR3 m_reference;
+    private final ModelR3Logger m_log_measurement;
+    private final ModelR3Logger m_log_current;
+    private final ControlR3Logger m_log_next;
+    private final ModelR3Logger m_log_error;
 
     /**
      * Initializes the reference with the current measurement, so you should call
      * this from, e.g. Command.initialize(), not in the constructor.
      */
     public VelocityReferenceControllerR3(
+            LoggerFactory parent,
             VelocitySubsystemR3 subsystem,
             ControllerR3 controller,
             ReferenceR3 reference) {
+        LoggerFactory log = parent.type(this);
         m_subsystem = subsystem;
         m_controller = controller;
         m_reference = reference;
+        m_log_measurement = log.modelR3Logger(Level.TRACE, "measurement");
+        m_log_current = log.modelR3Logger(Level.TRACE, "current");
+        m_log_next = log.controlR3Logger(Level.TRACE, "next");
+        m_log_error = log.modelR3Logger(Level.TRACE, "error");
 
         m_controller.reset();
         // initialize here so that the "done" state knows about the clock
@@ -41,6 +55,7 @@ public class VelocityReferenceControllerR3 {
             ModelR3 measurement = m_subsystem.getState();
             ModelR3 current = m_reference.current();
             ControlR3 next = m_reference.next();
+            ModelR3 error = current.minus(measurement);
             GlobalVelocityR3 fieldRelativeTarget = m_controller.calculate(
                     measurement, current, next);
             if (DEBUG) {
@@ -49,6 +64,10 @@ public class VelocityReferenceControllerR3 {
             }
 
             m_subsystem.setVelocity(fieldRelativeTarget);
+            m_log_measurement.log(() -> measurement);
+            m_log_current.log(() -> current);
+            m_log_next.log(() -> next);
+            m_log_error.log(() -> error);
         } catch (IllegalStateException ex) {
             // System.out.println(ex);
             // This happens when the trajectory generator produces an empty trajectory.

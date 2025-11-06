@@ -1,6 +1,10 @@
 package org.team100.lib.controller.r3;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.ControlR3Logger;
+import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
@@ -16,13 +20,24 @@ public class PositionReferenceControllerR3 {
     private final PositionSubsystemR3 m_subsystem;
     private final ControllerR3 m_controller;
     private final ReferenceR3 m_reference;
+    private final ModelR3Logger m_log_measurement;
+    private final ModelR3Logger m_log_current;
+    private final ControlR3Logger m_log_next;
+    private final ModelR3Logger m_log_error;
 
     public PositionReferenceControllerR3(
-            PositionSubsystemR3 subsystem, ReferenceR3 reference) {
+            LoggerFactory parent,
+            PositionSubsystemR3 subsystem,
+            ReferenceR3 reference) {
+        LoggerFactory log = parent.type(this);
         m_subsystem = subsystem;
-        // very wide tolerance for now
-        m_controller = new FeedforwardControllerR3(1, 1, 1);
         m_reference = reference;
+        m_log_measurement = log.modelR3Logger(Level.TRACE, "measurement");
+        m_log_current = log.modelR3Logger(Level.TRACE, "current");
+        m_log_next = log.controlR3Logger(Level.TRACE, "next");
+        m_log_error = log.modelR3Logger(Level.TRACE, "error");
+        // very wide tolerance for now
+        m_controller = new FeedforwardControllerR3(log, 1, 1, 1, 1);
         m_reference.initialize(m_subsystem.getState());
     }
 
@@ -39,6 +54,10 @@ public class PositionReferenceControllerR3 {
                         error, fieldRelativeTarget);
             }
             m_subsystem.set(next);
+            m_log_measurement.log(() -> measurement);
+            m_log_current.log(() -> current);
+            m_log_next.log(() -> next);
+            m_log_error.log(() -> error);
         } catch (IllegalStateException ex) {
             // System.out.println(ex);
             // This happens when the trajectory generator produces an empty trajectory.

@@ -3,6 +3,7 @@ package org.team100.lib.commands.r3.test;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.ConstantReferenceR3;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ModelR3;
@@ -20,6 +21,7 @@ import org.team100.lib.subsystems.VelocitySubsystemR3;
  * This is really only intended for testing.
  */
 public class DriveToStateSimple extends MoveAndHold {
+    private final LoggerFactory m_log;
     private final ControllerR3 m_controller;
     private final VelocitySubsystemR3 m_drive;
     private final ReferenceR3 m_reference;
@@ -27,9 +29,11 @@ public class DriveToStateSimple extends MoveAndHold {
     private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveToStateSimple(
+            LoggerFactory parent,
             ControllerR3 controller,
             VelocitySubsystemR3 drive,
             ModelR3 goal) {
+        m_log = parent.type(this);
         m_controller = controller;
         m_drive = drive;
         m_reference = new ConstantReferenceR3(goal);
@@ -39,7 +43,7 @@ public class DriveToStateSimple extends MoveAndHold {
     @Override
     public void initialize() {
         m_referenceController = new VelocityReferenceControllerR3(
-                m_drive, m_controller, m_reference);
+                m_log, m_drive, m_controller, m_reference);
     }
 
     @Override

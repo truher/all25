@@ -51,7 +51,7 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
 
         ControllerR3 controller = ControllerFactoryR3.test(logger);
         DriveToPoseWithTrajectory command = new DriveToPoseWithTrajectory(
-                () -> goal,
+                logger, () -> goal,
                 drive,
                 (start, end) -> new Trajectory100(
                         List.of(
@@ -86,7 +86,7 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
 
         ControllerR3 m_controller = ControllerFactoryR3.test(logger);
         DriveToPoseWithTrajectory command = new DriveToPoseWithTrajectory(
-                () -> goal, drive,
+                logger, () -> goal, drive,
                 (start, end) -> planner.movingToRest(start, end),
                 m_controller, viz);
         command.initialize();

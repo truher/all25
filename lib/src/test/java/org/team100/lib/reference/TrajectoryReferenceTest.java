@@ -37,7 +37,7 @@ public class TrajectoryReferenceTest implements Timeless {
         Trajectory100 t = planner.restToRest(
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
-        TrajectoryReferenceR3 r = new TrajectoryReferenceR3(t);
+        TrajectoryReferenceR3 r = new TrajectoryReferenceR3(logger, t);
         // measurement is irrelevant
         r.initialize(new ModelR3());
         {

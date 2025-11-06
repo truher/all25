@@ -29,6 +29,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     /** verrrrrry loose. */
     private static final double THETA_TOLERANCE = 0.1;
+    private final LoggerFactory m_log;
     private final DoubleArrayLogger m_log_field_ball;
     private final Supplier<Optional<Translation2d>> m_targets;
     private final VelocitySubsystemR3 m_drive;
@@ -43,6 +44,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     private VelocityReferenceControllerR3 m_referenceController;
 
     public DriveToTranslationWithRelativeBearing(
+            LoggerFactory parent,
             LoggerFactory field,
             Supplier<Optional<Translation2d>> targetes,
             VelocitySubsystemR3 drive,
@@ -50,6 +52,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
             HolonomicProfile profile,
             Rotation2d relativeBearing,
             Translation2d relativeTranslation) {
+        m_log = parent.type(this);
         m_log_field_ball = field.doubleArrayLogger(Level.COMP, "ball");
         m_targets = targetes;
         m_drive = drive;
@@ -65,10 +68,10 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
         updateGoal();
         if (m_goal == null)
             return;
-        m_reference = new ProfileReferenceR3(m_profile, "DriveToTranslationWithRelativeBearing");
+        m_reference = new ProfileReferenceR3(m_log, m_profile, "DriveToTranslationWithRelativeBearing");
         m_reference.setGoal(new ModelR3(m_goal));
         m_referenceController = new VelocityReferenceControllerR3(
-                m_drive, m_controller, m_reference);
+                m_log, m_drive, m_controller, m_reference);
     }
 
     @Override

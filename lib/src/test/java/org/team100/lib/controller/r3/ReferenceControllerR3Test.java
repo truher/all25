@@ -58,9 +58,9 @@ public class ReferenceControllerR3Test extends Fixtured implements Timeless {
         // initially at rest
         MockSubsystemR3 drive = new MockSubsystemR3(new ModelR3());
 
-        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(t);
+        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(logger, t);
         VelocityReferenceControllerR3 c = new VelocityReferenceControllerR3(
-                drive, controller, reference);
+                logger, drive, controller, reference);
 
         stepTime();
         c.execute();
@@ -107,9 +107,9 @@ public class ReferenceControllerR3Test extends Fixtured implements Timeless {
         // initially at rest
         MockSubsystemR3 drive = new MockSubsystemR3(new ModelR3());
 
-        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(t);
+        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(logger, t);
         VelocityReferenceControllerR3 c = new VelocityReferenceControllerR3(
-                drive, controller, reference);
+                logger, drive, controller, reference);
 
         // the measurement never changes but that doesn't affect "done" as far as the
         // trajectory is concerned.
@@ -157,9 +157,9 @@ public class ReferenceControllerR3Test extends Fixtured implements Timeless {
                 0.01, 0.02);
 
         MockSubsystemR3 drive = new MockSubsystemR3(new ModelR3());
-        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(trajectory);
+        TrajectoryReferenceR3 reference = new TrajectoryReferenceR3(logger, trajectory);
         VelocityReferenceControllerR3 referenceController = new VelocityReferenceControllerR3(
-                drive, swerveController, reference);
+                logger, drive, swerveController, reference);
 
         Pose2d pose = trajectory.sample(0).state().getPose();
         GlobalVelocityR3 velocity = GlobalVelocityR3.zero();
