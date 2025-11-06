@@ -249,7 +249,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             CombinedRotaryPositionSensor combinedEncoder) {
         IncrementalProfile profile = kinodynamics.getSteeringProfile();
         ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(
-                profile, STEERING_POSITION_TOLERANCE_RAD, STEERING_VELOCITY_TOLERANCE_RAD_S);
+                parent, profile, STEERING_POSITION_TOLERANCE_RAD, STEERING_VELOCITY_TOLERANCE_RAD_S);
         return new OutboardAngularPositionServo(parent, mech, ref);
     }
 

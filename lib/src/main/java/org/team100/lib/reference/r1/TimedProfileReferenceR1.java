@@ -2,6 +2,10 @@ package org.team100.lib.reference.r1;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.BooleanLogger;
+import org.team100.lib.logging.LoggerFactory.SetpointsR1Logger;
 import org.team100.lib.profile.timed.TimedProfile;
 import org.team100.lib.state.Model100;
 
@@ -9,12 +13,16 @@ import org.team100.lib.state.Model100;
  * Extracts current and next references from a timed profile.
  */
 public class TimedProfileReferenceR1 implements ProfileReferenceR1 {
-
+    private final SetpointsR1Logger m_log_setpoints;
+    private final BooleanLogger m_log_done;
     private final TimedProfile m_profile;
     private Model100 m_goal;
     private double m_startTimeS;
 
-    public TimedProfileReferenceR1(TimedProfile profile) {
+    public TimedProfileReferenceR1(LoggerFactory parent, TimedProfile profile) {
+        LoggerFactory log = parent.type(this);
+        m_log_setpoints = log.setpointsR1Logger(Level.TRACE, "setpoints");
+        m_log_done = log.booleanLogger(Level.TRACE, "done");
         m_profile = profile;
     }
 
@@ -34,14 +42,18 @@ public class TimedProfileReferenceR1 implements ProfileReferenceR1 {
     @Override
     public SetpointsR1 get() {
         double progress = progress();
-        return new SetpointsR1(
+        SetpointsR1 setpoints = new SetpointsR1(
                 m_profile.sample(progress),
                 m_profile.sample(progress + TimedRobot100.LOOP_PERIOD_S));
+        m_log_setpoints.log(() -> setpoints);
+        return setpoints;
     }
 
     @Override
     public boolean profileDone() {
-        return progress() >= duration();
+        boolean done = progress() >= duration();
+        m_log_done.log(() -> done);
+        return done;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////

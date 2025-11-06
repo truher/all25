@@ -44,11 +44,11 @@ public class Manipulator extends SubsystemBase implements Music {
     private final List<Player> m_players;
 
     public Manipulator(LoggerFactory parent) {
-        LoggerFactory log = parent.name("Manipulator");
+        LoggerFactory log = parent.type(this);
 
-        LoggerFactory algaeMotorLog = log.name("Algae");
-        LoggerFactory leftMotorLog = log.name("leftMotor");
-        LoggerFactory rightMotorLog = log.name("rightMotor");
+        LoggerFactory algaeMotorLog = log.name("algae");
+        LoggerFactory leftMotorLog = log.name("left");
+        LoggerFactory rightMotorLog = log.name("right");
         coralLogger = log.booleanLogger(Level.TRACE, "Coral Detection");
         switch (Identity.instance) {
             case COMP_BOT -> {

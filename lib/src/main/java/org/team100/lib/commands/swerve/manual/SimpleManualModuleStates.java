@@ -28,10 +28,10 @@ public class SimpleManualModuleStates implements ModuleStateDriver {
     private final Rotation2dLogger m_log_angle;
 
     public SimpleManualModuleStates(LoggerFactory parent, SwerveKinodynamics swerveKinodynamics) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_swerveKinodynamics = swerveKinodynamics;
-        m_log_speed = child.doubleLogger(Level.TRACE, "speed m_s");
-        m_log_angle = child.rotation2dLogger(Level.TRACE, "angle rad");
+        m_log_speed = log.doubleLogger(Level.TRACE, "speed m_s");
+        m_log_angle = log.rotation2dLogger(Level.TRACE, "angle rad");
     }
 
     /**

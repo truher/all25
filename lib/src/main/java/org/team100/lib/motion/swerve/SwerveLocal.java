@@ -36,9 +36,9 @@ public class SwerveLocal implements Player {
             LoggerFactory parent,
             SwerveKinodynamics swerveKinodynamics,
             SwerveModuleCollection modules) {
-        LoggerFactory child = parent.type(this);
-        m_log_chassis_speed = child.chassisSpeedsLogger(Level.TRACE, "chassis speed");
-        m_logPositions = child.swerveModulePositionsLogger(Level.TRACE, "positions");
+        LoggerFactory log = parent.type(this);
+        m_log_chassis_speed = log.chassisSpeedsLogger(Level.TRACE, "chassis speed");
+        m_logPositions = log.swerveModulePositionsLogger(Level.TRACE, "positions");
         m_swerveKinodynamics = swerveKinodynamics;
         m_modules = modules;
         m_players = m_modules.players();

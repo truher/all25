@@ -73,7 +73,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
         double maxAccel = 40;
         double maxJerk = 70;
         JerkLimitedTimedProfile profile = new JerkLimitedTimedProfile(maxVel, maxAccel, maxJerk, true);
-        ProfileReferenceR1 ref = new TimedProfileReferenceR1(profile);
+        ProfileReferenceR1 ref = new TimedProfileReferenceR1(log, profile);
 
         /*
          * Here we use the Team 100 "Identity" mechanism to allow different

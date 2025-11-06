@@ -32,9 +32,9 @@ public class SimulatedGyro implements Gyro {
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics,
             SwerveModuleCollection collection) {
-        LoggerFactory child = parent.type(this);
-        m_log_yaw = child.rotation2dLogger(Level.TRACE, "Yaw NWU (rad)");
-        m_log_yaw_rate = child.doubleLogger(Level.TRACE, "Yaw Rate NWU (rad_s)");
+        LoggerFactory log = parent.type(this);
+        m_log_yaw = log.rotation2dLogger(Level.TRACE, "Yaw NWU (rad)");
+        m_log_yaw_rate = log.doubleLogger(Level.TRACE, "Yaw Rate NWU (rad_s)");
         m_kinodynamics = kinodynamics;
         m_moduleCollection = collection;
         m_headingCache = Cache.ofDouble(() -> {

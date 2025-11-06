@@ -40,14 +40,14 @@ public class RotaryMechanism implements Player {
             double gearRatio,
             double minPositionRad,
             double maxPositionRad) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_motor = motor;
         m_sensor = sensor;
         m_gearRatio = gearRatio;
         m_minPositionRad = minPositionRad;
         m_maxPositionRad = maxPositionRad;
-        m_log_velocity = child.doubleLogger(Level.DEBUG, "velocity (rad_s)");
-        m_log_position = child.doubleLogger(Level.DEBUG, "position (rad)");
+        m_log_velocity = log.doubleLogger(Level.DEBUG, "velocity (rad_s)");
+        m_log_position = log.doubleLogger(Level.DEBUG, "position (rad)");
     }
 
     /** There is no absolute position sensor in this case. */

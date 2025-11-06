@@ -62,14 +62,14 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
             Supplier<Optional<Translation2d>> target,
             Feedback100 controller) {
         m_log_target = fieldLogger.doubleArrayLogger(Level.TRACE, "target");
-        LoggerFactory child = parent.type(this);
-        m_log_apparent_motion = child.doubleLogger(Level.TRACE, "apparent motion");
+        LoggerFactory log = parent.type(this);
+        m_log_apparent_motion = log.doubleLogger(Level.TRACE, "apparent motion");
 
         m_swerveKinodynamics = swerveKinodynamics;
         m_target = target;
         m_controller = controller;
         m_profile = new TrapezoidIncrementalProfile(
-                child,
+                log,
                 swerveKinodynamics.getMaxAngleSpeedRad_S() * ROTATION_SPEED,
                 swerveKinodynamics.getMaxAngleAccelRad_S2() * ROTATION_SPEED,
                 0.01);

@@ -29,9 +29,9 @@ public class OutboardAngularPositionServo extends AngularPositionServoImpl {
             RotaryMechanism mech,
             ProfileReferenceR1 ref) {
         super(parent, mech, ref);
-        LoggerFactory child = parent.type(this);
-        m_log_ff_torque = child.doubleLogger(Level.TRACE, "Feedforward Torque (Nm)");
-        m_log_control = child.control100Logger(Level.TRACE, "setpoint (rad)");
+        LoggerFactory log = parent.type(this);
+        m_log_ff_torque = log.doubleLogger(Level.TRACE, "Feedforward Torque (Nm)");
+        m_log_control = log.control100Logger(Level.TRACE, "setpoint (rad)");
     }
 
     /**

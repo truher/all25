@@ -36,13 +36,13 @@ public class AnalogRotaryPositionSensor extends RoboRioRotaryPositionSensor {
             double inputOffset,
             EncoderDrive drive) {
         super(parent, inputOffset, drive);
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_input = new AnalogInput(channel.channel);
         m_voltage = Cache.ofDouble(m_input::getVoltage);
         m_rail = Cache.ofDouble(RobotController::getVoltage5V);
-        m_log_voltage = child.doubleLogger(Level.TRACE, "voltage");
-        m_log_ratio = child.doubleLogger(Level.TRACE, "ratio");
-        child.intLogger(Level.COMP, "channel").log(m_input::getChannel);
+        m_log_voltage = log.doubleLogger(Level.TRACE, "voltage");
+        m_log_ratio = log.doubleLogger(Level.TRACE, "ratio");
+        log.intLogger(Level.COMP, "channel").log(m_input::getChannel);
     }
 
     @Override

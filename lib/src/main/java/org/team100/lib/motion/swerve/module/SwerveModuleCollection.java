@@ -21,12 +21,6 @@ import org.team100.lib.util.RoboRioChannel;
  */
 public class SwerveModuleCollection implements Player {
     private static final boolean DEBUG = false;
-    private static final String SWERVE_MODULES = "Swerve Modules";
-    private static final String FRONT_LEFT = "Front Left";
-    private static final String FRONT_RIGHT = "Front Right";
-    private static final String REAR_LEFT = "Rear Left";
-    private static final String REAR_RIGHT = "Rear Right";
-
     private final SwerveModule100 m_frontLeft;
     private final SwerveModule100 m_frontRight;
     private final SwerveModule100 m_rearLeft;
@@ -64,11 +58,11 @@ public class SwerveModuleCollection implements Player {
             double supplyLimit,
             double statorLimit,
             SwerveKinodynamics kinodynamics) {
-        LoggerFactory collectionLogger = parent.name(SWERVE_MODULES);
-        LoggerFactory frontLeftLogger = collectionLogger.name(FRONT_LEFT);
-        LoggerFactory frontRightLogger = collectionLogger.name(FRONT_RIGHT);
-        LoggerFactory rearLeftLogger = collectionLogger.name(REAR_LEFT);
-        LoggerFactory rearRightLogger = collectionLogger.name(REAR_RIGHT);
+        LoggerFactory collectionLogger = parent.name("Swerve Modules");
+        LoggerFactory frontLeftLogger = collectionLogger.name("Front Left");
+        LoggerFactory frontRightLogger = collectionLogger.name("Front Right");
+        LoggerFactory rearLeftLogger = collectionLogger.name("Rear Left");
+        LoggerFactory rearRightLogger = collectionLogger.name("Rear Right");
 
         switch (Identity.instance) {
             case COMP_BOT:

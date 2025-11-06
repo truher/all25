@@ -51,13 +51,13 @@ public class CombinedRotaryPositionSensor implements RotaryPositionSensor {
             LoggerFactory parent,
             RotaryPositionSensor absolute,
             ProxyRotaryPositionSensor incremental) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_absolute = absolute;
         m_incremental = incremental;
-        m_log_absolute = child.doubleLogger(Level.DEBUG, "absolute (rad))");
-        m_log_incremental = child.doubleLogger(Level.TRACE, "incremental (rad)");
-        m_log_incremental_wrapped = child.doubleLogger(Level.TRACE, "incremental wrapped (rad)");
-        m_log_combined = child.doubleLogger(Level.DEBUG, "combined (rad)");
+        m_log_absolute = log.doubleLogger(Level.DEBUG, "absolute (rad))");
+        m_log_incremental = log.doubleLogger(Level.TRACE, "incremental (rad)");
+        m_log_incremental_wrapped = log.doubleLogger(Level.TRACE, "incremental wrapped (rad)");
+        m_log_combined = log.doubleLogger(Level.DEBUG, "combined (rad)");
         // the duty cycle encoder seems to produce slightly-wrong values immediately
         // upon startup, so wait a bit before doing the synchronization
         m_synchronized = false;

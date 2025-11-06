@@ -60,19 +60,19 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
             FreshSwerveEstimate estimate,
             SwerveLocal swerveLocal,
             SwerveLimiter limiter) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_estimate = estimate;
         m_odometryUpdater = odometryUpdater;
         m_swerveLocal = swerveLocal;
         m_limiter = limiter;
         m_stateCache = Cache.of(this::update);
         stop();
-        m_log_state = child.modelR3Logger(Level.COMP, "state");
-        m_log_turning = child.doubleLogger(Level.TRACE, "Tur Deg");
-        m_log_pose_array = child.doubleArrayLogger(Level.COMP, "pose array");
+        m_log_state = log.modelR3Logger(Level.COMP, "state");
+        m_log_turning = log.doubleLogger(Level.TRACE, "Tur Deg");
+        m_log_pose_array = log.doubleArrayLogger(Level.COMP, "pose array");
         m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
-        m_log_skill = child.enumLogger(Level.TRACE, "skill level");
-        m_log_input = child.globalVelocityR3Logger(Level.TRACE, "drive input");
+        m_log_skill = log.enumLogger(Level.TRACE, "skill level");
+        m_log_input = log.globalVelocityR3Logger(Level.TRACE, "drive input");
         m_players = m_swerveLocal.players();
     }
 

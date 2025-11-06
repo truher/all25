@@ -50,8 +50,8 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
             ProfileReferenceR1 ref) {
         m_mechanism = mechanism;
         m_ref = ref;
-        LoggerFactory child = parent.type(this);
-        m_log_goal = child.doubleLogger(Level.TRACE, "goal (rad)");
+        LoggerFactory log = parent.type(this);
+        m_log_goal = log.doubleLogger(Level.TRACE, "goal (rad)");
 
     }
 

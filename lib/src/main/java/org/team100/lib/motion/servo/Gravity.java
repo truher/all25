@@ -26,9 +26,9 @@ public class Gravity implements DoubleUnaryOperator {
     public Gravity(LoggerFactory parent, double gravityNm, double offsetRad) {
         m_gravityNm = gravityNm;
         m_offsetRad = offsetRad;
-        LoggerFactory child = parent.type(this);
-        m_log_gravityTorque = child.doubleLogger(Level.TRACE, "gravity torque (Nm)");
-        m_log_correctedPosition = child.doubleLogger(Level.TRACE, "corrected position (rad)");
+        LoggerFactory log = parent.type(this);
+        m_log_gravityTorque = log.doubleLogger(Level.TRACE, "gravity torque (Nm)");
+        m_log_correctedPosition = log.doubleLogger(Level.TRACE, "corrected position (rad)");
     }
 
     @Override

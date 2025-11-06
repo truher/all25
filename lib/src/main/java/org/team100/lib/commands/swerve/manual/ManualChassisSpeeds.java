@@ -22,8 +22,8 @@ public class ManualChassisSpeeds implements ChassisSpeedDriver {
     private final ChassisSpeedsLogger m_log_chassis_speeds;
 
     public ManualChassisSpeeds(LoggerFactory parent, SwerveKinodynamics swerveKinodynamics) {
-        LoggerFactory child = parent.type(this);
-        m_log_chassis_speeds = child.chassisSpeedsLogger(Level.TRACE, "chassis speeds");
+        LoggerFactory log = parent.type(this);
+        m_log_chassis_speeds = log.chassisSpeedsLogger(Level.TRACE, "chassis speeds");
         m_swerveKinodynamics = swerveKinodynamics;
     }
 

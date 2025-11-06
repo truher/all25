@@ -49,6 +49,8 @@ public class Machinery {
     // acceleration) to keep from browning out.
     private static final double DRIVE_SUPPLY_LIMIT = 90;
     private static final double DRIVE_STATOR_LIMIT = 110;
+    private static final LoggerFactory logger = Logging.instance().rootLogger;
+    private static final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
 
     private final Runnable m_combinedViz;
     private final Runnable m_climberViz;
@@ -69,8 +71,7 @@ public class Machinery {
     final Beeper m_beeper;
 
     public Machinery() {
-        final LoggerFactory logger = Logging.instance().rootLogger;
-        final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
+
         final LoggerFactory driveLog = logger.name("Drive");
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get(driveLog);

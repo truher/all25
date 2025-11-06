@@ -20,7 +20,7 @@ public class Shoot extends Command {
 
     @Override
     public void initialize() {
-        m_shooter.spinUp();
+        m_shooter.spinUp(10);
     }
 
     @Override

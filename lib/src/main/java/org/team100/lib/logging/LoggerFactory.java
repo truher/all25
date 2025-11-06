@@ -20,6 +20,7 @@ import org.team100.lib.motion.prr.JointForce;
 import org.team100.lib.motion.prr.JointVelocities;
 import org.team100.lib.motion.swerve.module.state.SwerveModulePosition100;
 import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
+import org.team100.lib.reference.r1.SetpointsR1;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.Model100;
@@ -100,7 +101,7 @@ public class LoggerFactory {
     public String join(String a, String b) {
         return a + "/" + b;
     }
-    
+
     //////////////////////////////////////////////////////
 
     private boolean allow(Level level) {
@@ -706,6 +707,30 @@ public class LoggerFactory {
 
     public Control100Logger control100Logger(Level level, String leaf) {
         return new Control100Logger(level, leaf);
+    }
+
+    public class SetpointsR1Logger {
+        private final Level m_level;
+        private final Control100Logger m_current;
+        private final Control100Logger m_next;
+
+        SetpointsR1Logger(Level level, String leaf) {
+            m_level = level;
+            m_current = control100Logger(level, join(leaf, "current"));
+            m_next = control100Logger(level, join(leaf, "next"));
+        }
+
+        public void log(Supplier<SetpointsR1> vals) {
+            if (!allow(m_level))
+                return;
+            SetpointsR1 val = vals.get();
+            m_current.log(val::current);
+            m_next.log(val::next);
+        }
+    }
+
+    public SetpointsR1Logger setpointsR1Logger(Level level, String leaf) {
+        return new SetpointsR1Logger(level, leaf);
     }
 
     public class ControlR3Logger {

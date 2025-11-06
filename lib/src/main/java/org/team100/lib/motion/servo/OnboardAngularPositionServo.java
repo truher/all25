@@ -40,18 +40,18 @@ public class OnboardAngularPositionServo extends AngularPositionServoImpl {
         super(parent, mech, ref);
         if (feedback.handlesWrapping())
             throw new IllegalArgumentException("Do not supply wrapping feedback");
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_feedback = feedback;
 
-        m_log_feedforward_torque = child.doubleLogger(Level.TRACE, "Feedforward Torque (Nm)");
-        m_log_measurement = child.model100Logger(Level.COMP, "measurement (rad)");
-        m_log_control = child.control100Logger(Level.COMP, "control (rad)");
-        m_log_u_FB = child.doubleLogger(Level.TRACE, "u_FB (rad_s)");
-        m_log_u_FF = child.doubleLogger(Level.TRACE, "u_FF (rad_s)");
+        m_log_feedforward_torque = log.doubleLogger(Level.TRACE, "Feedforward Torque (Nm)");
+        m_log_measurement = log.model100Logger(Level.COMP, "measurement (rad)");
+        m_log_control = log.control100Logger(Level.COMP, "control (rad)");
+        m_log_u_FB = log.doubleLogger(Level.TRACE, "u_FB (rad_s)");
+        m_log_u_FF = log.doubleLogger(Level.TRACE, "u_FF (rad_s)");
 
-        m_log_u_TOTAL = child.doubleLogger(Level.COMP, "u_TOTAL (rad_s)");
-        m_log_error = child.doubleLogger(Level.TRACE, "Controller Position Error (rad)");
-        m_log_velocity_error = child.doubleLogger(Level.TRACE, "Controller Velocity Error (rad_s)");
+        m_log_u_TOTAL = log.doubleLogger(Level.COMP, "u_TOTAL (rad_s)");
+        m_log_error = log.doubleLogger(Level.TRACE, "Controller Position Error (rad)");
+        m_log_velocity_error = log.doubleLogger(Level.TRACE, "Controller Velocity Error (rad_s)");
     }
 
     @Override

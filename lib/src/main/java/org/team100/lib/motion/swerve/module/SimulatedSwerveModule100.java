@@ -91,7 +91,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
                 1);
         IncrementalProfile profile = kinodynamics.getSteeringProfile();
         // without a profile, there's no velocity feedforward. Hm.
-        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(parent, profile, 0.05, 0.05);
         OnboardAngularPositionServo turningServo = new OnboardAngularPositionServo(
                 parent,
                 turningMech,
@@ -123,7 +123,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
                 parent, motor, combinedEncoder, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         IncrementalProfile profile = kinodynamics.getSteeringProfile();
-        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(parent, profile, 0.05, 0.05);
 
         OutboardAngularPositionServo turningServo = new OutboardAngularPositionServo(
                 parent, turningMech, ref);

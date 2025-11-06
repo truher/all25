@@ -36,16 +36,16 @@ public class OutboardLinearPositionServo implements LinearPositionServo {
             ProfileReferenceR1 ref,
             double positionTolerance,
             double velocityTolerance) {
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_mechanism = mechanism;
         m_ref = ref;
         m_positionTolerance = positionTolerance;
         m_velocityTolerance = velocityTolerance;
-        m_log_goal = child.doubleLogger(Level.COMP, "goal (m)");
-        m_log_ff_torque = child.doubleLogger(Level.TRACE, "Feedforward Torque (Nm)");
-        m_log_control = child.control100Logger(Level.COMP, "control (m)");
-        m_log_position = child.doubleLogger(Level.COMP, "position (m)");
-        m_log_velocity = child.doubleLogger(Level.COMP, "velocity (m_s)");
+        m_log_goal = log.doubleLogger(Level.COMP, "goal (m)");
+        m_log_ff_torque = log.doubleLogger(Level.TRACE, "Feedforward Torque (Nm)");
+        m_log_control = log.control100Logger(Level.COMP, "control (m)");
+        m_log_position = log.doubleLogger(Level.COMP, "position (m)");
+        m_log_velocity = log.doubleLogger(Level.COMP, "velocity (m_s)");
     }
 
     @Override

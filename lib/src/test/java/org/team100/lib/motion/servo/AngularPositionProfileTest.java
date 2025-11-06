@@ -46,7 +46,7 @@ class AngularPositionProfileTest implements Timeless {
     @Test
     void testTrapezoid() {
         final IncrementalProfile profile = new TrapezoidProfileWPI(1, 1);
-        ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
+        ref = new IncrementalProfileReferenceR1(logger, profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(
                 logger,
                 mech,
@@ -60,7 +60,7 @@ class AngularPositionProfileTest implements Timeless {
     @Test
     void testProfile() {
         final IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 1, 1, 0.05);
-        ref = new IncrementalProfileReferenceR1(profile, 0.05, 0.05);
+        ref = new IncrementalProfileReferenceR1(logger, profile, 0.05, 0.05);
         servo = new OnboardAngularPositionServo(
                 logger,
                 mech,
