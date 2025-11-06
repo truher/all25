@@ -43,7 +43,8 @@ public class Autons {
     public Autons(
             LoggerFactory log,
             LoggerFactory fieldLogger,
-            MecanumDrive100 drive) {
+            MecanumDrive100 drive,
+            Pivot pivot) {
         LoggerFactory autoLog = log.name("Auton");
         m_autonChooser = new AutonChooser();
         m_drive = drive;
@@ -84,10 +85,16 @@ public class Autons {
         m_autonChooser.add("knight left",
                 new AnnotatedCommand(knight_l.until(knight_l::isDone).withName("auto knight_l"), null, null));
 
-        MoveAndHold knight_r = new DriveWithTrajectoryFunction(
-                drive, controller, m_viz, this::knight_r);
-        m_autonChooser.add("knight right",
-                new AnnotatedCommand(knight_r.until(knight_r::isDone).withName("auto knight_r"), null, null));
+        MoveAndHold calib = new DriveWithTrajectoryFunction(
+                drive, controller, m_viz, this::calib);
+        m_autonChooser.add("calibration",
+                new AnnotatedCommand(calib.until(calib::isDone).withName("auto calib"), null, null));
+
+        MoveAndHold autolow = new DriveWithTrajectoryFunction(
+                drive, controller, m_viz, this::autolow);
+        m_autonChooser.add("straight low auto",
+                new AnnotatedCommand(autolow.until(autolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto autolow"), null, null));
+                // new AnnotatedCommand(pivot.extend().withTimeout(1).withName("auto autolow"), null, null));
 
     }
 
@@ -102,8 +109,15 @@ public class Autons {
                 HolonomicPose2d.make(end, Math.PI / 2)));
     }
 
-    private Trajectory100 knight_r(Pose2d p) {
-        Pose2d end = new Pose2d(p.getX(), p.getY() - 1, p.getRotation());
+    private Trajectory100 calib(Pose2d p) {
+        Pose2d end = new Pose2d(p.getX(), p.getY() + 1, p.getRotation());
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(end, Math.PI / 2)));
+    }
+
+    private Trajectory100 autolow(Pose2d p) {
+        Pose2d end = new Pose2d(p.getX() + 2.5, p.getY(), p.getRotation());
         return m_planner.restToRest(List.of(
                 HolonomicPose2d.make(p, 0),
                 HolonomicPose2d.make(end, Math.PI / 2)));
