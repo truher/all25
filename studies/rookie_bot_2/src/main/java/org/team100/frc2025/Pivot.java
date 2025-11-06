@@ -46,8 +46,8 @@ public class Pivot extends SubsystemBase {
                 3 * Math.PI/4); // Gravity torque position offset, rad
         IncrementalProfile profile = new TrapezoidIncrementalProfile(
                 log,
-                5, // max velocity rad/s
-                10, // max accel rad/s^2 origin 1
+                8, // max velocity rad/s
+                13, // max accel rad/s^2 origin 1
                 0.01); // tolerance
         ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile,
                 0.01, // position tolerance, rad

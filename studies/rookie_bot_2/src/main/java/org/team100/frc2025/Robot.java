@@ -64,11 +64,11 @@ public class Robot extends TimedRobot100 {
         LoggerFactory logger = logging.rootLogger;
         Pivot rotary = new Pivot(logger);
         rotary.setDefaultCommand(rotary.home());
-        new Trigger(driverControl::a).whileTrue(rotary.extend()); // change to be triggers
+        new Trigger(driverControl::rightTrigger).whileTrue(rotary.extend()); // change to be triggers
         m_drive = MecanumDriveFactory.make(
                 fieldLogger,
                 logger,
-                25, // stator current limit (a)
+                45, // stator current limit (a)
                 new CanId(60), // gyro
                 new CanId(2), // front left
                 new CanId(1), // front right
@@ -76,7 +76,7 @@ public class Robot extends TimedRobot100 {
                 new CanId(4), // rear right
                 0.533, // track width (m)
                 0.406, // wheelbase (m)
-                new Slip(1, 1.4, 1), // wheel slip corrections
+                new Slip(1, 1.32, 1), // wheel slip corrections 1,1.4,1
                 6.0, // gears
                 0.15); // wheel dia (m)
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum(logger);
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot100 {
                 m_drive);
         m_drive.setDefaultCommand(manual);
 
-        m_autons = new Autons(logger, fieldLogger, m_drive);
+        m_autons = new Autons(logger, fieldLogger, m_drive, rotary);
 
         new Trigger(driverControl::back).onTrue(
                 m_drive.resetPose());
@@ -108,7 +108,7 @@ public class Robot extends TimedRobot100 {
         new Trigger(driverControl::y).whileTrue(
                 sequence(
                         m_drive.driveWithGlobalVelocity(
-                                new GlobalVelocityR3(1.5, 0, 0))
+                                new GlobalVelocityR3(2, 0, 0))
                                 .withTimeout(1.0),
                         m_drive.driveWithGlobalVelocity(
                                 new GlobalVelocityR3(0, 1.5, 0))
