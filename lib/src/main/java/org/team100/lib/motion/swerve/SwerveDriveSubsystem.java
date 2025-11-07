@@ -23,7 +23,7 @@ import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
 import org.team100.lib.music.Music;
 import org.team100.lib.music.Player;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.VelocitySubsystemR3;
+import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

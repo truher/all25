@@ -2,7 +2,7 @@ package org.team100.lib.commands.r3;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.PositionSubsystemR3;
+import org.team100.lib.subsystems.r3.PositionSubsystemR3;
 
 /**
  * Record the current pose at initialization time and hold that pose,

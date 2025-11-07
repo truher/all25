@@ -1,15 +1,14 @@
-package org.team100.lib.examples.semiauto;
+package org.team100.lib.commands.r3;
 
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.team100.lib.commands.r3.DriveToTranslationWithRelativeBearing;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 import org.team100.lib.targeting.Targets;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,7 +28,7 @@ public class FloorPickSequence {
     public static Command get(
             LoggerFactory parent,
             LoggerFactory fieldLog,
-            SwerveDriveSubsystem drive,
+            VelocitySubsystemR3 drive,
             Targets targets,
             ControllerR3 controller,
             HolonomicProfile profile) {
@@ -40,7 +39,7 @@ public class FloorPickSequence {
             if (t.isEmpty())
                 return t;
             Translation2d goal = t.get();
-            Rotation2d course = goal.minus(drive.getPose().getTranslation()).getAngle();
+            Rotation2d course = goal.minus(drive.getState().pose().getTranslation()).getAngle();
             Translation2d landing = goal.minus(new Translation2d(DISTANCE, course));
             return Optional.of(landing);
         };

@@ -12,7 +12,7 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.VelocitySubsystemR3;
+import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 import edu.wpi.first.wpilibj2.command.Command;
 

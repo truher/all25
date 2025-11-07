@@ -1,4 +1,4 @@
-package org.team100.lib.subsystems;
+package org.team100.lib.subsystems.r3;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.state.ModelR3;

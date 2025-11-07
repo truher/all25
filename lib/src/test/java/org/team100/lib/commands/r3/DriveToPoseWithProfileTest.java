@@ -8,7 +8,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.MockSubsystemR3;
+import org.team100.lib.subsystems.r3.MockSubsystemR3;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Pose2d;

@@ -1,6 +1,6 @@
 package org.team100.frc2025;
 
-import org.team100.lib.examples.shooter.DualDrumShooter;
+import org.team100.lib.subsystems.shooter.DualDrumShooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 

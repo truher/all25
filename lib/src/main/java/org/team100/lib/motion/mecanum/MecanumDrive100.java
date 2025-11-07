@@ -10,7 +10,7 @@ import org.team100.lib.motion.mecanum.MecanumKinematics100.Slip;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.VelocitySubsystemR3;
+import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

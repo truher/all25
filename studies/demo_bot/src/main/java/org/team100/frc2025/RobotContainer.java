@@ -13,7 +13,6 @@ import org.team100.frc2025.shooter.PivotDefault;
 import org.team100.frc2025.shooter.PivotSubsystem;
 import org.team100.frc2025.shooter.Shoot;
 import org.team100.lib.commands.tank.TankManual;
-import org.team100.lib.examples.shooter.DualDrumShooter;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.logging.LoggerFactory;
@@ -23,6 +22,7 @@ import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.motion.tank.TankDrive;
 import org.team100.lib.motion.tank.TankDriveFactory;
+import org.team100.lib.subsystems.shooter.DualDrumShooter;
 import org.team100.lib.util.CanId;
 
 import edu.wpi.first.wpilibj.RobotController;

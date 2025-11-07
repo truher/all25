@@ -8,7 +8,7 @@ import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.VelocitySubsystemR3;
+import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 /** Uses the limited drive subsystem since this is manual driving. */
 public class FieldRelativeAdapter implements DriverAdapter {

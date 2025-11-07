@@ -51,7 +51,7 @@ import org.team100.lib.music.Music;
 import org.team100.lib.music.Player;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.PositionSubsystemR3;
+import org.team100.lib.subsystems.r3.PositionSubsystemR3;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.StrUtil;

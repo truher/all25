@@ -7,7 +7,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.ConstantReferenceR3;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.VelocitySubsystemR3;
+import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 /**
  * Given a swerve state, drive there using only the feedback in the holonomic

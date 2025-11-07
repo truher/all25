@@ -8,7 +8,7 @@ import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.PositionSubsystemR3;
+import org.team100.lib.subsystems.r3.PositionSubsystemR3;
 
 /**
  * Like the drivetrain ReferenceController, but it does

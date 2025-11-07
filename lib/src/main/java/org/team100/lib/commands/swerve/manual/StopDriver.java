@@ -2,7 +2,7 @@ package org.team100.lib.commands.swerve.manual;
 
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.VelocitySubsystemR3;
+import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 public class StopDriver implements DriverAdapter {
 
