@@ -1,11 +1,11 @@
 package org.team100.lib.motion.mechanism;
 
-import org.team100.lib.encoder.IncrementalBareEncoder;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.music.Player;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 
 /**
  * Uses a motor, gears, and a wheel to produce linear output, e.g. a drive wheel

@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.motion.tank.TankDrive;
+import org.team100.lib.subsystems.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.timing.TimedPose;
 import org.team100.lib.visualization.TrajectoryVisualization;

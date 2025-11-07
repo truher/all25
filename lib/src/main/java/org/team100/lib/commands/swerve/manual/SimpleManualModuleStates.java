@@ -7,9 +7,9 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.Rotation2dLogger;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.module.state.SwerveModuleState100;
-import org.team100.lib.motion.swerve.module.state.SwerveModuleStates;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModuleState100;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModuleStates;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 

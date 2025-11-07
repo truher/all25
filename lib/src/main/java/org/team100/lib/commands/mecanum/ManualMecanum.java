@@ -8,8 +8,8 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.mecanum.MecanumDrive100;
-import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.subsystems.mecanum.MecanumDrive100;
+import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.tuning.Mutable;
 import org.team100.lib.util.EnumChooser;
 

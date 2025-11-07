@@ -49,6 +49,21 @@ wpi.java.debugJni = false
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
 
+repositories {
+    maven {
+        url "https://css4j.github.io/maven/"
+        mavenContent {
+            releasesOnly()
+        }
+        content {
+            includeGroup 'io.sf.carte'
+            includeGroup 'io.sf.jclf'
+            includeGroup 'io.sf.graphics'
+            includeGroup 'io.sf.w3'
+        }
+    }
+}
+
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
@@ -72,6 +87,10 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'io.sf.carte:echosvg-all:2.2'
+    implementation "org.ejml:ejml-simple:0.42"
+    implementation "org.jfree:jfreechart:1.5.3"
 }
 
 test {

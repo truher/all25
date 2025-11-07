@@ -10,11 +10,11 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.swerve.Fixtured;
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.subsystems.swerve.Fixtured;
+import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.wpilibj.RobotController;

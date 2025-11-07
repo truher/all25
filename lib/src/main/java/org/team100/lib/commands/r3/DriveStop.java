@@ -1,6 +1,6 @@
 package org.team100.lib.commands.r3;
 
-import org.team100.lib.subsystems.VelocitySubsystemR3;
+import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 import edu.wpi.first.wpilibj2.command.Command;
 

@@ -1,18 +1,19 @@
 package frc.robot;
 
+import org.team100.lib.subsystems.led.DemoLED;
+import org.team100.lib.subsystems.lynxmotion_arm.LynxArmSetup;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
-    private final RobotContainer m_robotContainer;
     private final DemoLED m_led;
     private final XboxController m_controller;
     private final Runnable m_setup;
 
     public Robot() {
-        m_robotContainer = new RobotContainer();
         m_led = new DemoLED();
         m_controller = new XboxController(0);
         // m_led.setDefaultCommand(m_led.sweep());

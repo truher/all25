@@ -18,13 +18,13 @@ import org.team100.lib.motion.prr.Config;
 import org.team100.lib.motion.prr.JointAccelerations;
 import org.team100.lib.motion.prr.JointForce;
 import org.team100.lib.motion.prr.JointVelocities;
-import org.team100.lib.motion.swerve.module.state.SwerveModulePosition100;
-import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.reference.r1.SetpointsR1;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.Model100;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModulePosition100;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Pose2d;

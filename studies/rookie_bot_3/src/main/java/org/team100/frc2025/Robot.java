@@ -1,22 +1,20 @@
 package org.team100.frc2025;
 
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.commands.tank.TankManual;
-import org.team100.lib.examples.shooter.DualDrumShooter;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
-import org.team100.lib.motion.tank.TankDrive;
-import org.team100.lib.motion.tank.TankDriveFactory;
+import org.team100.lib.subsystems.shooter.DualDrumShooter;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.subsystems.tank.TankDrive;
+import org.team100.lib.subsystems.tank.TankDriveFactory;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 

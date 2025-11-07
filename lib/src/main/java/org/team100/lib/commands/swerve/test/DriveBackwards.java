@@ -1,6 +1,6 @@
 package org.team100.lib.commands.swerve.test;
 
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
+import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;

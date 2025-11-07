@@ -1,8 +1,8 @@
 package org.team100.lib.commands.swerve.manual;
 
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 
 public class ChassisSpeedAdapter implements DriverAdapter {
     private static final boolean DEBUG = false;

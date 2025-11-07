@@ -4,9 +4,13 @@ import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.indicator.SolidIndicator;
+import org.team100.lib.localization.ManualPose;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
+import org.team100.lib.subsystems.turret.Turret;
+import org.team100.lib.targeting.TargetDesignator;
 import org.team100.lib.util.RoboRioChannel;
+import org.team100.lib.visualization.Ball;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.state.ControlR3;
-import org.team100.lib.subsystems.PositionSubsystemR3;
+import org.team100.lib.subsystems.r3.PositionSubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

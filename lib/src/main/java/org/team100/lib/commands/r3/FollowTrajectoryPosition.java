@@ -4,7 +4,7 @@ import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.PositionReferenceControllerR3;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
-import org.team100.lib.subsystems.PositionSubsystemR3;
+import org.team100.lib.subsystems.r3.PositionSubsystemR3;
 import org.team100.lib.trajectory.Trajectory100;
 
 /** Analogous to DriveWithTrajectory, but for R3 positional control. */

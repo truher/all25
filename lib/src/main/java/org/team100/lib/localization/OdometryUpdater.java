@@ -7,11 +7,11 @@ import java.util.function.Supplier;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.geometry.GlobalDeltaR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.gyro.Gyro;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.module.state.SwerveModuleDeltas;
-import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
+import org.team100.lib.sensor.gyro.Gyro;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModuleDeltas;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

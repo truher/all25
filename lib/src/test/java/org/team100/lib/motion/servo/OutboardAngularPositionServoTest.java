@@ -5,12 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.config.Feedforward100;
-import org.team100.lib.encoder.CombinedRotaryPositionSensor;
-import org.team100.lib.encoder.MockIncrementalBareEncoder;
-import org.team100.lib.encoder.MockRotaryPositionSensor;
-import org.team100.lib.encoder.ProxyRotaryPositionSensor;
-import org.team100.lib.encoder.sim.SimulatedBareEncoder;
-import org.team100.lib.encoder.sim.SimulatedRotaryPositionSensor;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -22,6 +16,12 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.MockProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
+import org.team100.lib.sensor.position.absolute.CombinedRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.MockRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
+import org.team100.lib.sensor.position.incremental.MockIncrementalBareEncoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.testing.Timeless;
 
 public class OutboardAngularPositionServoTest implements Timeless {

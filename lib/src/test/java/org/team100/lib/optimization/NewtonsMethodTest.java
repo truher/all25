@@ -6,8 +6,8 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.motion.urdf.URDFAL5D;
+import org.team100.lib.subsystems.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.util.StrUtil;
 
 import edu.wpi.first.math.Matrix;
