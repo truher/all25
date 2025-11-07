@@ -2,7 +2,9 @@
 
 This is the Chemnitz revolute-revolute (RR) example that begins on slide 79.
 
-<img src="image_rr.png">
+Note gravity direction is wrong in this picture, ours is along x.
+
+<img src="image_rr.png"/>
 
 The setup is:
 
