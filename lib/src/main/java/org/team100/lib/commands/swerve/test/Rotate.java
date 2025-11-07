@@ -4,11 +4,11 @@ import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

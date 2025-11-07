@@ -17,7 +17,7 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.swerve.Fixtured;
+import org.team100.lib.subsystems.swerve.Fixtured;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraint;

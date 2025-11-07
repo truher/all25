@@ -2,7 +2,7 @@ package org.team100.lib.trajectory.timing;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.tuning.Mutable;
 
 /** Trivial constraint for testing. */

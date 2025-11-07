@@ -6,9 +6,9 @@ import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
-import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
+import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.util.NamedChooser;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;

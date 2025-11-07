@@ -1,6 +1,6 @@
 package org.team100.frc2025.Swerve;
 
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
+import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;

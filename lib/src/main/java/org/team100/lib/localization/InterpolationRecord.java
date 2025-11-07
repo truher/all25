@@ -3,10 +3,10 @@ package org.team100.lib.localization;
 import java.util.Objects;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveDriveKinematics100;
-import org.team100.lib.motion.swerve.module.state.SwerveModuleDeltas;
-import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveDriveKinematics100;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModuleDeltas;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;

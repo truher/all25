@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.controller.r1.PIDFeedback;
-import org.team100.lib.encoder.MockRotaryPositionSensor;
-import org.team100.lib.encoder.sim.SimulatedBareEncoder;
-import org.team100.lib.encoder.sim.SimulatedRotaryPositionSensor;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -18,6 +15,9 @@ import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
+import org.team100.lib.sensor.position.absolute.MockRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.testing.Timeless;
 
 public class OnboardAngularPositionServoTest implements Timeless {

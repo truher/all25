@@ -8,9 +8,9 @@ import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
-import org.team100.lib.motion.tank.TankDrive;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.subsystems.tank.TankDrive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;

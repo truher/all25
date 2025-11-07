@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.swerve.module.state.SwerveModulePosition100;
-import org.team100.lib.motion.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.state.Model100;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModulePosition100;
+import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Rotation2d;

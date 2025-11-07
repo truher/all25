@@ -1,13 +1,13 @@
 package org.team100.lib.motion.mechanism;
 
-import org.team100.lib.encoder.IncrementalBareEncoder;
-import org.team100.lib.encoder.ProxyRotaryPositionSensor;
-import org.team100.lib.encoder.RotaryPositionSensor;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.music.Player;
+import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.RotaryPositionSensor;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.state.Model100;
 
 /**

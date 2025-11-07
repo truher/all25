@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
+import org.team100.lib.subsystems.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.testing.TestUtil;
 
 import edu.wpi.first.math.VecBuilder;

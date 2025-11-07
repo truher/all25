@@ -10,7 +10,7 @@ import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.tank.TankDrive;
+import org.team100.lib.subsystems.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;

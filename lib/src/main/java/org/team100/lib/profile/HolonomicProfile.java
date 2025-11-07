@@ -3,7 +3,6 @@ package org.team100.lib.profile;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.incremental.CurrentLimitedExponentialProfile;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
@@ -12,6 +11,7 @@ import org.team100.lib.state.Control100;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.Model100;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 import edu.wpi.first.math.MathUtil;
 
