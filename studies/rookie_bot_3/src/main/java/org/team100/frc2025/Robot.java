@@ -2,6 +2,7 @@ package org.team100.frc2025;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.commands.mecanum.ManualMecanum;
 import org.team100.lib.commands.tank.TankManual;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
@@ -9,6 +10,9 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
+import org.team100.lib.subsystems.mecanum.MecanumDrive100;
+import org.team100.lib.subsystems.mecanum.MecanumDriveFactory;
+import org.team100.lib.subsystems.mecanum.MecanumKinematics100.Slip;
 import org.team100.lib.subsystems.shooter.DualDrumShooter;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
@@ -28,9 +32,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot100 {
     private static final double MAX_SPEED_M_S = 3.0;
+    private static final double MAX_SPEED_X_M_S = 3.5;
+    private static final double MAX_SPEED_Y_M_S = 3.5;
     private static final double MAX_OMEGA_RAD_S = 5.0;
     private final DualDrumShooter m_shooter;
-    private final TankDrive m_drive;
+    private final MecanumDrive100 m_drive;
     private final Command m_auton;
     private final IndexerServo m_indexer;
 
@@ -43,25 +49,30 @@ public class Robot extends TimedRobot100 {
         LoggerFactory fieldLogger = logging.fieldLogger;
         DriverXboxControl driverControl = new DriverXboxControl(0);
         LoggerFactory logger = logging.rootLogger;
-        m_drive = TankDriveFactory.make(
+        m_drive = MecanumDriveFactory.make(
                 fieldLogger,
                 logger,
-                80, // stator current limit (a)
-                new CanId(25), // left
-                new CanId(27), // right
-                0.4, // track width
-                6.0, // gear ratio
+                45, // stator current limit (a)
+                new CanId(60), // gyro
+                new CanId(24), // front left
+                new CanId(26), // front right
+                new CanId(25), // rear left
+                new CanId(27), // rear right
+                0.533, // track width (m)
+                0.406, // wheelbase (m)
+                new Slip(1, 1.32, 1), // wheel slip corrections 1,1.4,1
+                6.0, // gears
                 0.15); // wheel dia (m)
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.tank(logger);
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum(logger);
         SwerveLimiter limiter = new SwerveLimiter(
                 logger,
                 kinodynamics,
                 RobotController::getBatteryVoltage);
-        TankManual manual = new TankManual(
+        Command manual = new ManualMecanum(
                 logger,
-                () -> -1.0 * driverControl.rightY(),
-                () -> -1.0 * driverControl.rightX(),
-                MAX_SPEED_M_S,
+                driverControl::velocity,
+                MAX_SPEED_X_M_S,
+                MAX_SPEED_Y_M_S,
                 MAX_OMEGA_RAD_S,
                 limiter,
                 m_drive);
@@ -78,7 +89,7 @@ public class Robot extends TimedRobot100 {
         // m_drive.driveWithVelocity(1.5, 2.5).withTimeout(1.0),
         // m_drive.driveWithVelocity(1.5, -2.5).withTimeout(1.0)));
 
-        m_auton = m_drive.run(() -> m_drive.setDutyCycle(1.0, 0.0))
+        m_auton = m_drive.run(() -> m_drive.stop())
                 .withTimeout(1.0);
 
         m_shooter = DrumShooterFactory.make(logger, 40);
