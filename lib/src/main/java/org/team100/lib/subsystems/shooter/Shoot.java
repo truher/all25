@@ -1,17 +1,16 @@
-package org.team100.frc2025.shooter;
-
-import org.team100.lib.subsystems.shooter.DualDrumShooter;
+package org.team100.lib.subsystems.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ShootOne extends Command {
+/**
+ * Illustrates a command with a condition. This can also be done using the
+ * "fluent" method shown in RobotContainer.
+ */
+public class Shoot extends Command {
     private final DualDrumShooter m_shooter;
-    private final IndexerSubsystem m_indexer;
-    private final double distanceDeg = 90;
+    private final IndexerServo m_indexer;
 
-    private double angle;
-
-    public ShootOne(DualDrumShooter shooter, IndexerSubsystem indexer) {
+    public Shoot(DualDrumShooter shooter, IndexerServo indexer) {
         m_shooter = shooter;
         m_indexer = indexer;
         addRequirements(m_shooter, m_indexer);
@@ -25,7 +24,7 @@ public class ShootOne extends Command {
     @Override
     public void execute() {
         if (m_shooter.atGoal()) {
-            m_indexer.set(angle + distanceDeg);
+            m_indexer.set(1);
         }
     }
 }

@@ -1,4 +1,4 @@
-package org.team100.frc2025.shooter;
+package org.team100.lib.subsystems.shooter;
 
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
