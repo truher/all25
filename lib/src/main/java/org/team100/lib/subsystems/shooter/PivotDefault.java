@@ -1,4 +1,4 @@
-package org.team100.frc2025.shooter;
+package org.team100.lib.subsystems.shooter;
 
 import java.util.function.Supplier;
 

@@ -3,20 +3,12 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir "../lib/src/main/java"
-        }
-    }
-}
-
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-def ROBOT_MAIN_CLASS = "org.team100.frc2025.Main"
+def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -31,50 +23,10 @@ deploy {
             debug = project.frc.getDebugOrDefault(false)
 
             artifacts {
+                // First part is artifact name, 2nd is artifact type
+                // getTargetTypeClass is a shortcut to get the class type using a string
+
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-                    ////////////////////////////////////////
-                    //
-                    // for more on jvm args, see https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html
-                    //
-                    // PROFILING with VisualVM JMX
-                    //
-                    // COMMENT THIS OUT FOR COMP
-                    //
-                    jvmArgs.add("-Dcom.sun.management.jmxremote=true")
-                    jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
-                    jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
-                    jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
-                    jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
-                    // for ethernet
-                    jvmArgs.add("-Djava.rmi.server.hostname=10.1.0.2")
-                    // for USB
-                    // jvmArgs.add("-Djava.rmi.server.hostname=172.22.11.2")
-                    //
-                    // end profiling
-                    ////////////////////////////////////////
-                    //
-                    // PERFORMANCE
-                    //
-                    // see https://github.com/Mechanical-Advantage/AdvantageKit/blob/b81ea6295dc903fc0688ecc6dd278c771c9bce7a/template_projects/template/build.gradle#L32
-                    //
-                    // jvmArgs.add("-XX:+UnlockExperimentalVMOptions")
-                    // jvmArgs.add("-XX:GCTimeRatio=5")
-                    // This is actually the default
-                    // jvmArgs.add("-XX:+UseSerialGC")
-                    // jvmArgs.add("-XX:MaxGCPauseMillis=50")
-                    //
-                    // We want everything compiled, as early as possible.  Not sure which of these will work
-                    // jvmArgs.add("-XX:CompileThreshold=1") // JVM 8
-                    // jvmArgs.add("-XX:CompileThresholdScaling=0.01") // JVM 17
-                    // Don't compile in the background, since we have few threads, and want this done fast.
-                    // This doesn't seem to help
-                    // jvmArgs.add("-XX:-BackgroundCompilation")
-                    // Spam the console.
-                    // This makes an intolerable amount of output.
-                    // jvmArgs.add("-XX:+PrintCompilation")
-                    //
-                    // end performance
-                    ////////////////////////////////////////
                 }
 
                 // Static files artifact
@@ -96,6 +48,21 @@ wpi.java.debugJni = false
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
+
+repositories {
+    maven {
+        url "https://css4j.github.io/maven/"
+        mavenContent {
+            releasesOnly()
+        }
+        content {
+            includeGroup 'io.sf.carte'
+            includeGroup 'io.sf.jclf'
+            includeGroup 'io.sf.graphics'
+            includeGroup 'io.sf.w3'
+        }
+    }
+}
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
@@ -121,7 +88,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    testImplementation "org.jfree:jfreechart:1.5.3"
+    implementation 'io.sf.carte:echosvg-all:2.2'
+    implementation "org.ejml:ejml-simple:0.42"
+    implementation "org.jfree:jfreechart:1.5.3"
 }
 
 test {

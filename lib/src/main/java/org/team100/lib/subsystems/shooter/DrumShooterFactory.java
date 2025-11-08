@@ -1,11 +1,10 @@
-package org.team100.frc2025.shooter;
+package org.team100.lib.subsystems.shooter;
 
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.rev.Neo550Factory;
-import org.team100.lib.subsystems.shooter.DualDrumShooter;
 import org.team100.lib.util.CanId;
 
 /** Configuration of motors on the demobot shooter. */
