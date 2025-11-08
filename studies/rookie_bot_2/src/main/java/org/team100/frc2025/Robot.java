@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot100 {
-    private static final double MAX_SPEED_X_M_S = 3.5;
+    private static final double MAX_SPEED_X_M_S = 5.0;
     private static final double MAX_SPEED_Y_M_S = 3.5;
     private static final double MAX_OMEGA_RAD_S = 5.0;
 
@@ -68,7 +68,7 @@ public class Robot extends TimedRobot100 {
         m_drive = MecanumDriveFactory.make(
                 fieldLogger,
                 logger,
-                45, // stator current limit (a)
+                65, // stator current limit (a)
                 new CanId(60), // gyro
                 new CanId(2), // front left
                 new CanId(1), // front right
@@ -76,7 +76,7 @@ public class Robot extends TimedRobot100 {
                 new CanId(4), // rear right
                 0.533, // track width (m)
                 0.406, // wheelbase (m)
-                new Slip(1, 1.32, 1), // wheel slip corrections 1,1.4,1
+                new Slip(1, 1.35, 1), // wheel slip corrections 1,1.4,1
                 6.0, // gears
                 0.15); // wheel dia (m)
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum(logger);

@@ -22,7 +22,7 @@ public class ControllerFactoryR3 {
                 return new FullStateControllerR3(log, 4, 4, 0.25, 0.25, 0.01, 0.02, 0.01, 0.02);
             }
             case ROOKIE_BOT -> {
-                return new FullStateControllerR3(log, 3, 3.5, 0.05, 0, 0.01, 0.01, 1, 1);
+                return new FullStateControllerR3(log, 3, 0.5, 0.05, 0, 0.01, 0.01, 1, 1);
             }
             default -> {
                 return new FullStateControllerR3(log, 3.0, 3.5, 0, 0, 0.01, 0.01, 0.01, 0.01);
