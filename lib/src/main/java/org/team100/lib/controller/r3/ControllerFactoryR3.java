@@ -38,6 +38,8 @@ public class ControllerFactoryR3 {
                         0.01, // theta tolerance
                         1, // v tolerance
                         1); // omega tolerance
+                // I think this is what @anay was doing on 7/8/25.
+                // return new FullStateControllerR3(log, 3, 0.5, 0.05, 0, 0.01, 0.01, 1, 1);
             }
             default -> {
                 // this is for simulation, don't use these values

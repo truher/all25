@@ -32,7 +32,7 @@ public class LinearMechanismFactory {
     public LinearMechanism neo(LoggerFactory log, CanId id, MotorPhase phase) {
         Feedforward100 ff = Feedforward100.makeNeo(log);
         // 10/22/25: Anay found this value worked well
-        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.00005);
+        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.00005);//0.00005
         // 10/22/25: Lincoln used this value
         // PIDConstants.makeVelocityPID(0.0003));
         NeoCANSparkMotor motor = new NeoCANSparkMotor(

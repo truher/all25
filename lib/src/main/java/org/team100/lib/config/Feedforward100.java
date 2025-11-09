@@ -62,7 +62,7 @@ public class Feedforward100 {
     }
 
     public static Feedforward100 makeNeo(LoggerFactory log) {
-        return new Feedforward100(log, 0.122, 0.000, 0.000, 0.100, 0.065, 0.5);
+        return new Feedforward100(log, 0.122, 0.000, 0.000, 0.5, 0.5, 0.5); //0.122, 0.000, 0.000, 0.1, 0.065, 0.5
     }
 
     public static Feedforward100 makeNeo2(LoggerFactory log) {
