@@ -4,8 +4,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
+import org.team100.lib.commands.r3.helper.VelocityReferenceControllerR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.controller.r3.VelocityReferenceControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;

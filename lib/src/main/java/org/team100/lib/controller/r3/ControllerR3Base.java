@@ -104,11 +104,6 @@ public abstract class ControllerR3Base implements ControllerR3 {
         return atReference1;
     }
 
-    @Override
-    public void reset() {
-        //
-    }
-
     /** True if cartesian and rotation position errors are within tolerance. */
     boolean positionOK(GlobalDeltaR3 positionError) {
         double cartesian = positionError.getTranslation().getNorm();

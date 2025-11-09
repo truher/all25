@@ -1,7 +1,7 @@
 package org.team100.lib.commands.r3;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.r3.PositionReferenceControllerR3;
+import org.team100.lib.commands.r3.helper.PositionReferenceControllerR3;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.subsystems.r3.PositionSubsystemR3;
