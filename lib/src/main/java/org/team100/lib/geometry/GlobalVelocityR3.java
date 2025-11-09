@@ -26,10 +26,6 @@ public record GlobalVelocityR3(double x, double y, double theta) {
 
     public static final GlobalVelocityR3 ZERO = new GlobalVelocityR3(0, 0, 0);
 
-    public static GlobalVelocityR3 zero() {
-        return ZERO;
-    }
-
     public static GlobalVelocityR3 velocity(Pose2d start, Pose2d end, double dt) {
         GlobalDeltaR3 d = GlobalDeltaR3.delta(start, end);
         return new GlobalVelocityR3(d.getX(), d.getY(), d.getRotation().getRadians()).div(dt);
@@ -43,7 +39,7 @@ public record GlobalVelocityR3(double x, double y, double theta) {
     public GlobalVelocityR3 normalize() {
         double norm = norm();
         if (norm < 1e-6)
-            return zero();
+            return ZERO;
         return new GlobalVelocityR3(x, y, theta).times(1.0 / norm);
     }
 

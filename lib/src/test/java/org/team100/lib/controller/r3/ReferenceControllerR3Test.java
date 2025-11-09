@@ -163,7 +163,7 @@ public class ReferenceControllerR3Test extends Fixtured implements Timeless {
                 logger, drive, swerveController, reference);
 
         Pose2d pose = trajectory.sample(0).state().getPose();
-        GlobalVelocityR3 velocity = GlobalVelocityR3.zero();
+        GlobalVelocityR3 velocity = GlobalVelocityR3.ZERO;
 
         double mDt = 0.02;
         int i = 0;

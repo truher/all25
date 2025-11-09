@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalDeltaR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -232,12 +231,11 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is at the origin, facing ahead
         ModelR3 measurement = new ModelR3(new Pose2d());
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
 
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(),
-                motionDirection,
+                1, 0, 0,
                 0, // no curvature
                 0); // no change in curvature
         double t = 0;
@@ -260,11 +258,10 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is at the origin, facing down y
         ModelR3 measurement = new ModelR3(new Pose2d(0, 0, Rotation2d.kCCW_Pi_2));
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // setpoint is +x, facing down y
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-                motionDirection,
+                1, 0, 0,
                 0, // no curvature
                 0); // no change in curvature
         double t = 0;
@@ -288,11 +285,10 @@ class FullStateControllerR3Test implements Timeless {
                 new Pose2d(1, 2, new Rotation2d(Math.PI)),
                 new GlobalVelocityR3(1, 0, 0));
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(),
-                motionDirection,
+                1, 0, 0,
                 0, // no curvature
                 0); // no change in curvature
         double t = 0;
@@ -318,11 +314,10 @@ class FullStateControllerR3Test implements Timeless {
                 new Pose2d(),
                 new GlobalVelocityR3(0, 1, 0));
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(),
-                motionDirection,
+                1, 0, 0,
                 0, // no curvature
                 0); // no change in curvature
         double t = 0;
@@ -344,11 +339,10 @@ class FullStateControllerR3Test implements Timeless {
         FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(),
-                motionDirection,
+                1, 0, 0,
                 0, // no curvature
                 0);// no change in curvature
         double t = 0;
@@ -370,11 +364,10 @@ class FullStateControllerR3Test implements Timeless {
         FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // setpoint is the same
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(0, 0, Rotation2d.kCCW_Pi_2),
-                motionDirection,
+                1, 0, 0,
                 0, // no curvature
                 0); // no change in curvature
         double t = 0;
@@ -396,11 +389,10 @@ class FullStateControllerR3Test implements Timeless {
         FullStateControllerR3 controller = new FullStateControllerR3(logger, 1, 1, 0, 0, 0.01, 0.02, 0.01,
                 0.02);
         // motion is tangential to the x axis but turning left
-        MotionDirection motionDirection = new MotionDirection(1, 0, 1);
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
                 new Pose2d(),
-                motionDirection,
+                1, 0, 1,
                 1, // driving and turning
                 0); // no change in curvature
         double t = 0;
@@ -425,14 +417,13 @@ class FullStateControllerR3Test implements Timeless {
         // setpoint is also at the origin
         Pose2d setpointPose = new Pose2d();
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // no curvature
         double curvatureRad_M = 0;
         // no change in curvature
         double dCurvatureDsRad_M2 = 0;
         Pose2dWithMotion state = new Pose2dWithMotion(
                 setpointPose,
-                motionDirection,
+                1, 0, 0,
                 curvatureRad_M,
                 dCurvatureDsRad_M2);
         double t = 0;
@@ -462,14 +453,13 @@ class FullStateControllerR3Test implements Timeless {
         // setpoint is at the origin
         Pose2d setpointPose = new Pose2d();
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // no curvature
         double curvatureRad_M = 0;
         // no change in curvature
         double dCurvatureDsRad_M2 = 0;
         Pose2dWithMotion state = new Pose2dWithMotion(
                 setpointPose,
-                motionDirection,
+                1, 0, 0,
                 curvatureRad_M,
                 dCurvatureDsRad_M2);
         double t = 0;
@@ -499,14 +489,13 @@ class FullStateControllerR3Test implements Timeless {
         // setpoint is also at the origin
         Pose2d setpointPose = new Pose2d();
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // no curvature
         double curvatureRad_M = 0;
         // no change in curvature
         double dCurvatureDsRad_M2 = 0;
         Pose2dWithMotion state = new Pose2dWithMotion(
                 setpointPose,
-                motionDirection,
+                1, 0, 0,
                 curvatureRad_M,
                 dCurvatureDsRad_M2);
         double t = 0;
@@ -539,14 +528,13 @@ class FullStateControllerR3Test implements Timeless {
         // setpoint is the same
         Pose2d setpointPose = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // no curvature
         double curvatureRad_M = 0;
         // no change in curvature
         double dCurvatureDsRad_M2 = 0;
         Pose2dWithMotion state = new Pose2dWithMotion(
                 setpointPose,
-                motionDirection,
+                1, 0, 0,
                 curvatureRad_M,
                 dCurvatureDsRad_M2);
         double t = 0;
@@ -575,14 +563,13 @@ class FullStateControllerR3Test implements Timeless {
         // setpoint is parallel at the origin
         Pose2d setpointPose = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
         // motion is in a straight line, down the x axis
-        MotionDirection motionDirection = new MotionDirection(1, 0, 0);
         // no curvature
         double curvatureRad_M = 0;
         // no change in curvature
         double dCurvatureDsRad_M2 = 0;
         Pose2dWithMotion state = new Pose2dWithMotion(
                 setpointPose,
-                motionDirection,
+                1, 0, 0,
                 curvatureRad_M,
                 dCurvatureDsRad_M2);
         double t = 0;
@@ -611,14 +598,13 @@ class FullStateControllerR3Test implements Timeless {
         // setpoint is also at the origin
         Pose2d setpointPose = new Pose2d();
         // motion is in a straight line, down the x axis
-        MotionDirection fieldRelativeMotionDirection = new MotionDirection(1, 0, 0);
         // no curvature
         double curvatureRad_M = 0;
         // no change in curvature
         double dCurvatureDsRad_M2 = 0;
         Pose2dWithMotion state = new Pose2dWithMotion(
                 setpointPose,
-                fieldRelativeMotionDirection,
+                1, 0, 0,
                 curvatureRad_M,
                 dCurvatureDsRad_M2);
         double t = 0;
@@ -650,14 +636,13 @@ class FullStateControllerR3Test implements Timeless {
         // setpoint postion is the same
         Pose2d setpointPose = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
         // motion is in a straight line, down the x axis
-        MotionDirection fieldRelativeMotionDirection = new MotionDirection(1, 0, 0);
         // no curvature
         double curvatureRad_M = 0;
         // no change in curvature
         double dCurvatureDsRad_M2 = 0;
         Pose2dWithMotion state = new Pose2dWithMotion(
                 setpointPose,
-                fieldRelativeMotionDirection,
+                1, 0, 0,
                 curvatureRad_M,
                 dCurvatureDsRad_M2);
         double t = 0;
@@ -694,14 +679,13 @@ class FullStateControllerR3Test implements Timeless {
         // setpoint postion is ahead in x and y and theta
         Pose2d setpointPose = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
         // motion is in a straight line, down the x axis
-        MotionDirection fieldRelativeMotionDirection = new MotionDirection(1, 0, 0);
         // no curvature
         double curvatureRad_M = 0;
         // no change in curvature
         double dCurvatureDsRad_M2 = 0;
         Pose2dWithMotion state = new Pose2dWithMotion(
                 setpointPose,
-                fieldRelativeMotionDirection,
+                1, 0, 0,
                 curvatureRad_M,
                 dCurvatureDsRad_M2);
         double t = 0;

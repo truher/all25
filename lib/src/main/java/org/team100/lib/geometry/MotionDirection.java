@@ -52,13 +52,6 @@ public class MotionDirection {
         return Optional.empty();
     }
 
-    MotionDirection interpolate(MotionDirection other, double x) {
-        return new MotionDirection(
-                MathUtil.interpolate(m_dx, other.m_dx, x),
-                MathUtil.interpolate(m_dy, other.m_dy, x),
-                MathUtil.interpolate(m_dtheta, other.m_dtheta, x));
-    }
-
     /** You probably don't want this. */
     public double dx() {
         return m_dx;

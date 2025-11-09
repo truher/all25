@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.team100.lib.util.Math100;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,27 +38,27 @@ public class Pose2dWithMotion {
      * @param pose
      */
     public Pose2dWithMotion(Pose2d pose) {
-        this(pose, new MotionDirection(0, 0, 0), 0, 0);
+        this(pose, 0, 0, 0, 0, 0);
     }
 
     /**
      * 
-     * @param pose                         location and heading of
-     *                                     the robot
-     * @param fieldRelativeMotionDirection change in location and
-     *                                     heading, per meter traveled.
-     * @param curvatureRad_M               change in course per meter
-     *                                     traveled.
-     * @param dCurvatureDsRad_M2           acceleration in course per
-     *                                     meter traveled squared.
+     * @param pose               location and heading of the robot
+     * @param dx                 x component of direction
+     * @param dy                 y component of direction
+     * @param dtheta             change in heading, per meter traveled
+     * @param curvatureRad_M     change in course per meter traveled.
+     * @param dCurvatureDsRad_M2 acceleration in course per meter traveled squared.
      */
     public Pose2dWithMotion(
             Pose2d pose,
-            MotionDirection fieldRelativeMotionDirection,
+            double dx,
+            double dy,
+            double dtheta,
             double curvatureRad_M,
             double dCurvatureDsRad_M2) {
         m_pose = pose;
-        m_motionDirection = fieldRelativeMotionDirection;
+        m_motionDirection = new MotionDirection(dx, dy, dtheta);
         m_curvatureRad_M = curvatureRad_M;
         m_dCurvatureDsRad_M2 = dCurvatureDsRad_M2;
     }
@@ -66,9 +67,12 @@ public class Pose2dWithMotion {
         return m_pose;
     }
 
-    /** You probably don't want this. */
-    public MotionDirection getMotionDirection() {
-        return m_motionDirection;
+    /** The R3 velocity at the given speed. */
+    public GlobalVelocityR3 velocity(double speed) {
+        return new GlobalVelocityR3(
+                speed * m_motionDirection.dx(),
+                speed * m_motionDirection.dy(),
+                speed * m_motionDirection.dtheta());
     }
 
     /** Radians per meter, which is the reciprocal of the radius. */
@@ -94,7 +98,9 @@ public class Pose2dWithMotion {
     // motion direction always derive the angle anyway?
     public Pose2dWithMotion interpolate(final Pose2dWithMotion other, double x) {
         return new Pose2dWithMotion(getPose().interpolate(other.getPose(), x),
-                m_motionDirection.interpolate(other.m_motionDirection, x),
+                MathUtil.interpolate(m_motionDirection.dx(), other.m_motionDirection.dx(), x),
+                MathUtil.interpolate(m_motionDirection.dy(), other.m_motionDirection.dy(), x),
+                MathUtil.interpolate(m_motionDirection.dtheta(), other.m_motionDirection.dtheta(), x),
                 Math100.interpolate(getCurvature(), other.getCurvature(), x),
                 Math100.interpolate(getDCurvatureDs(), other.getDCurvatureDs(), x));
     }

@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.util.Math100;
 
@@ -67,7 +66,7 @@ public class HolonomicSpline {
         double scale0 = mN0 * GeometryUtil.distanceM(p0.translation(), p1.translation());
         double scale1 = mN1 * GeometryUtil.distanceM(p0.translation(), p1.translation());
         if (DEBUG) {
-            System.out.printf("scale %f %f\n",  scale0, scale1 );
+            System.out.printf("scale %f %f\n", scale0, scale1);
         }
         double x0 = p0.translation().getX();
         double x1 = p1.translation().getX();
@@ -133,7 +132,7 @@ public class HolonomicSpline {
 
         return new Pose2dWithMotion(
                 getPose2d(p),
-                new MotionDirection(dx, dy, dtheta),
+                dx, dy, dtheta,
                 getCurvature(p),
                 getDCurvatureDs(p));
     }
@@ -262,13 +261,13 @@ public class HolonomicSpline {
     }
 
     /**
-     * Cartesian coordinate in meters at p.
+     * Cartesian coordinate in meters.
      * 
      * @param t ranges from 0 to 1
      * @return the point on the spline for that t value
      */
     protected Translation2d getPoint(double t) {
-        return new Translation2d(m_x.getPosition(t), m_y.getPosition(t));
+        return new Translation2d(x(t), y(t));
     }
 
     double x(double t) {

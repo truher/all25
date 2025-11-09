@@ -9,4 +9,4 @@ i.e. `isFinished()` always returns false, so that the scheduler
 never stops the command.  The reason is that it
 is easier to compose commands in parallel that way: one command
 can hold a "finished" position while a parallel command is still
-running.  The indicator to use is `isDone()`.
+running.  To facilitate this style, use the `MoveAndHold` interface.

@@ -3,7 +3,6 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -26,7 +25,7 @@ class YawRateConstraintTest implements Timeless {
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forTest(logger),
                 YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                new Pose2d(), new MotionDirection(0, 0, 1), 0, 0);
+                new Pose2d(), 0, 0, 1, 0, 0);
         // the limiter is in the scheduler which only thinks about the along-the-path
         // dimension.
         assertEquals(Double.NEGATIVE_INFINITY,
@@ -44,7 +43,7 @@ class YawRateConstraintTest implements Timeless {
                 YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(),
-                new MotionDirection(1, 0, 1), // spatial, so rad/m
+                1, 0, 1, // spatial, so rad/m
                 0, 0);
         assertEquals(2.828, c.getMaxVelocity(p).getValue(), DELTA);
     }
@@ -56,7 +55,7 @@ class YawRateConstraintTest implements Timeless {
                 YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(),
-                new MotionDirection(1, 0, 1), // spatial, so rad/m
+                1, 0, 1, // spatial, so rad/m
                 0, 0);
         assertEquals(5.656, c.getMaxVelocity(p).getValue(), DELTA);
     }
@@ -70,7 +69,7 @@ class YawRateConstraintTest implements Timeless {
         // driving and spinning
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(),
-                new MotionDirection(1, 0, 1),
+                1, 0, 1,
                 0, 0);
         // there is an accel limit.
         assertEquals(-8.485,
@@ -87,7 +86,7 @@ class YawRateConstraintTest implements Timeless {
                 scale);
         Pose2dWithMotion p = new Pose2dWithMotion(
                 new Pose2d(),
-                new MotionDirection(1, 0, 1), // spatial, so rad/m
+                1, 0, 1, // spatial, so rad/m
                 0, 0);
         // this number is still quite high even with a low scale.
         assertEquals(-16.971,

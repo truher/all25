@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.motion.prr.AnalyticalJacobian;
 import org.team100.lib.motion.prr.Config;
@@ -49,10 +48,8 @@ public class JointConstraint implements TimingConstraint {
     @Override
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
         Pose2d pose = state.getPose();
-        MotionDirection motion = state.getMotionDirection();
-        // unit vector in cartesian space
-        GlobalVelocityR3 v = new GlobalVelocityR3(
-                motion.dx(), motion.dy(), motion.dtheta());
+        // Velocity if translation speed were 1.0 m/s.
+        GlobalVelocityR3 v = state.velocity(1);
         ModelR3 m = new ModelR3(pose, v);
 
         // corresponding vector in joint space

@@ -26,7 +26,7 @@ public class NullControllerR3 extends ControllerR3Base {
             GlobalDeltaR3 positionError,
             GlobalVelocityR3 velocityError,
             ControlR3 nextReference) {
-        return ZERO;
+        return GlobalVelocityR3.ZERO;
     }
 
 }

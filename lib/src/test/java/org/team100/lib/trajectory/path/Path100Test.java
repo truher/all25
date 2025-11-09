@@ -11,7 +11,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
@@ -129,19 +128,19 @@ class Path100Test {
         List<Pose2dWithMotion> waypoints = Arrays.asList(
                 new Pose2dWithMotion(
                         new Pose2d(new Translation2d(0.0, 0.0), GeometryUtil.fromDegrees(0)),
-                        new MotionDirection(1, 0, 0.1), 0, 0),
+                        1, 0, 0.1, 0, 0),
                 new Pose2dWithMotion(
                         new Pose2d(new Translation2d(24.0, 0.0), GeometryUtil.fromDegrees(30)),
-                        new MotionDirection(1, 0, 0.1), 0, 0),
+                        1, 0, 0.1, 0, 0),
                 new Pose2dWithMotion(
                         new Pose2d(new Translation2d(36.0, 0.0), GeometryUtil.fromDegrees(60)),
-                        new MotionDirection(0, 1, 1e6), 0, 0),
+                        0, 1, 1e6, 0, 0),
                 new Pose2dWithMotion(
                         new Pose2d(new Translation2d(36.0, 24.0), GeometryUtil.fromDegrees(60)),
-                        new MotionDirection(1, 0, 0.1), 0, 0),
+                        1, 0, 0.1, 0, 0),
                 new Pose2dWithMotion(
                         new Pose2d(new Translation2d(60.0, 24.0), GeometryUtil.fromDegrees(180)),
-                        new MotionDirection(1, 0, 0.1), 0, 0));
+                        1, 0, 0.1, 0, 0));
 
         // Create the reference trajectory (straight line motion between waypoints).
         Path100 path = new Path100(waypoints);
