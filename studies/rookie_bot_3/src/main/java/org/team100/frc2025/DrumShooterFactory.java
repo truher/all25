@@ -1,10 +1,10 @@
 package org.team100.frc2025;
 
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.rev.NeoVortexFactory;
+import org.team100.lib.servo.LinearVelocityServo;
 import org.team100.lib.subsystems.shooter.DualDrumShooter;
 import org.team100.lib.util.CanId;
 

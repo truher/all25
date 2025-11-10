@@ -2,8 +2,8 @@ package org.team100.lib.subsystems.lynxmotion_arm;
 
 import java.util.Map;
 
-import org.team100.lib.motion.urdf.URDFAL5D;
-import org.team100.lib.motion.urdf.URDFRobot;
+import org.team100.lib.kinematics.urdf.URDFAL5D;
+import org.team100.lib.kinematics.urdf.URDFRobot;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
