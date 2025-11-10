@@ -1,7 +1,5 @@
 package org.team100.lib.trajectory.timing;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
@@ -46,9 +44,9 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
         // First check instantaneous velocity and compute a limit based on drive
         // velocity.
-        Optional<Rotation2d> course = state.getCourse();
-        Rotation2d course_local = state.getHeading().unaryMinus()
-                .rotateBy(course.isPresent() ? course.get() : Rotation2d.kZero);
+        Rotation2d course = state.getCourse();
+
+        Rotation2d course_local = course.minus(state.getPose().heading());
         double vx = course_local.getCos();
         double vy = course_local.getSin();
         // rad/m

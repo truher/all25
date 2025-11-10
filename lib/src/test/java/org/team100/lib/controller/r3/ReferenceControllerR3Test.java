@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.commands.r3.helper.VelocityReferenceControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
@@ -161,8 +162,8 @@ public class ReferenceControllerR3Test extends Fixtured implements Timeless {
         VelocityReferenceControllerR3 referenceController = new VelocityReferenceControllerR3(
                 logger, drive, swerveController, reference);
 
-        Pose2d pose = trajectory.sample(0).state().getPose();
-        GlobalVelocityR3 velocity = GlobalVelocityR3.zero();
+        Pose2d pose = trajectory.sample(0).state().getPose().pose();
+        GlobalVelocityR3 velocity = GlobalVelocityR3.ZERO;
 
         double mDt = 0.02;
         int i = 0;

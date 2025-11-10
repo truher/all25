@@ -33,10 +33,4 @@ public interface ControllerR3  {
      * "error" and "tolerance" here are implementation-specific.
      */
     boolean atReference();
-
-    /**
-     * Reset controller state, e.g. velocity error.
-     */
-    void reset();
-
 }

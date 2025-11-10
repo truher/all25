@@ -55,37 +55,37 @@ public class TimedPose {
     @Override
     public String toString() {
         return String.format("state %s, time %5.3f, vel %5.3f, acc %5.3f",
-                state(),
-                getTimeS(),
-                velocityM_S(),
-                acceleration());
+                m_state,
+                m_timeS,
+                m_velocityM_S,
+                m_accelM_S_S);
     }
 
     public TimedPose interpolate2(TimedPose other, double x) {
-        final double new_t = MathUtil.interpolate(getTimeS(), other.getTimeS(), x);
+        final double new_t = MathUtil.interpolate(m_timeS, other.m_timeS, x);
         final double delta_t = new_t - getTimeS();
         if (delta_t < 0.0) {
             return other.interpolate2(this, 1.0 - x);
         }
-        boolean reversing = velocityM_S() < 0.0 || (Math.abs(velocityM_S() - 0.0) <= 1e-12 && acceleration() < 0.0);
-        final double new_v = velocityM_S() + acceleration() * delta_t;
+        boolean reversing = m_velocityM_S < 0.0 || (Math.abs(m_velocityM_S - 0.0) <= 1e-12 && acceleration() < 0.0);
+        final double new_v = m_velocityM_S + m_accelM_S_S * delta_t;
         final double new_s = (reversing ? -1.0 : 1.0)
-                * (velocityM_S() * delta_t + .5 * acceleration() * delta_t * delta_t);
+                * (m_velocityM_S * delta_t + .5 * m_accelM_S_S * delta_t * delta_t);
 
-        double interpolant = new_s / state().distanceM(other.state());
+        double interpolant = new_s / m_state.distanceM(other.m_state);
         if (Double.isNaN(interpolant)) {
             interpolant = 1.0;
         }
 
         return new TimedPose(
-                state().interpolate(other.state(), interpolant),
+                m_state.interpolate(other.m_state, interpolant),
                 new_t,
                 new_v,
-                acceleration());
+                m_accelM_S_S);
     }
 
     public double distance(TimedPose other) {
-        return state().distanceM(other.state());
+        return m_state.distanceM(other.m_state);
     }
 
     @Override
@@ -94,10 +94,10 @@ public class TimedPose {
             return false;
         }
         TimedPose ts = (TimedPose) other;
-        boolean stateEqual = state().equals(ts.state());
+        boolean stateEqual = m_state.equals(ts.m_state);
         if (!stateEqual) {
             return false;
         }
-        return Math.abs(getTimeS() - ts.getTimeS()) <= 1e-12;
+        return Math.abs(m_timeS - ts.m_timeS) <= 1e-12;
     }
 }
