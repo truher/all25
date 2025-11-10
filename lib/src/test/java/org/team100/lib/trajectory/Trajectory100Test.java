@@ -46,16 +46,16 @@ class Trajectory100Test implements Timeless{
         Trajectory100 trajectory = planner.restToRest(waypoints);
 
         TimedPose sample = trajectory.sample(0);
-        assertEquals(0, sample.state().getPose().getX(), DELTA);
+        assertEquals(0, sample.state().getPose().translation().getX(), DELTA);
 
         sample = trajectory.sample(1);
-        assertEquals(1, sample.state().getPose().getX(), DELTA);
+        assertEquals(1, sample.state().getPose().translation().getX(), DELTA);
 
         sample = trajectory.sample(2);
-        assertEquals(1, sample.state().getPose().getX(), DELTA);
+        assertEquals(1, sample.state().getPose().translation().getX(), DELTA);
 
         sample = trajectory.sample(3);
-        assertEquals(1, sample.state().getPose().getX(), DELTA);
+        assertEquals(1, sample.state().getPose().translation().getX(), DELTA);
     }
 
     @Test
@@ -79,11 +79,11 @@ class Trajectory100Test implements Timeless{
 
         assertEquals(1.417, trajectory.duration(), DELTA);
         TimedPose sample = trajectory.sample(0);
-        assertEquals(0, sample.state().getPose().getX(), DELTA);
+        assertEquals(0, sample.state().getPose().translation().getX(), DELTA);
         sample = trajectory.sample(1);
-        assertEquals(0.825, sample.state().getPose().getX(), DELTA);
+        assertEquals(0.825, sample.state().getPose().translation().getX(), DELTA);
         sample = trajectory.sample(2);
-        assertEquals(1, sample.state().getPose().getX(), DELTA);
+        assertEquals(1, sample.state().getPose().translation().getX(), DELTA);
     }
 
     /**
@@ -103,22 +103,22 @@ class Trajectory100Test implements Timeless{
         Trajectory100 trajectory = planner.restToRest(waypoints);
 
         assertEquals(1.417, trajectory.duration(), DELTA);
-        assertEquals(0.000, trajectory.sample(0).state().getPose().getX(), DELTA);
-        assertEquals(0.010, trajectory.sample(0.1).state().getPose().getX(), DELTA);
-        assertEquals(0.040, trajectory.sample(0.2).state().getPose().getX(), DELTA);
-        assertEquals(0.090, trajectory.sample(0.3).state().getPose().getX(), DELTA);
-        assertEquals(0.160, trajectory.sample(0.4).state().getPose().getX(), DELTA);
-        assertEquals(0.250, trajectory.sample(0.5).state().getPose().getX(), DELTA);
-        assertEquals(0.360, trajectory.sample(0.6).state().getPose().getX(), DELTA);
-        assertEquals(0.487, trajectory.sample(0.7).state().getPose().getX(), DELTA);
-        assertEquals(0.618, trajectory.sample(0.8).state().getPose().getX(), DELTA);
-        assertEquals(0.732, trajectory.sample(0.9).state().getPose().getX(), DELTA);
-        assertEquals(0.825, trajectory.sample(1).state().getPose().getX(), DELTA);
-        assertEquals(0.899, trajectory.sample(1.1).state().getPose().getX(), DELTA);
-        assertEquals(0.953, trajectory.sample(1.2).state().getPose().getX(), DELTA);
-        assertEquals(0.987, trajectory.sample(1.3).state().getPose().getX(), DELTA);
-        assertEquals(1.000, trajectory.sample(1.4).state().getPose().getX(), DELTA);
-        assertEquals(1.000, trajectory.sample(1.5).state().getPose().getX(), DELTA);
+        assertEquals(0.000, trajectory.sample(0).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.010, trajectory.sample(0.1).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.040, trajectory.sample(0.2).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.090, trajectory.sample(0.3).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.160, trajectory.sample(0.4).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.250, trajectory.sample(0.5).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.360, trajectory.sample(0.6).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.487, trajectory.sample(0.7).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.618, trajectory.sample(0.8).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.732, trajectory.sample(0.9).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.825, trajectory.sample(1).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.899, trajectory.sample(1.1).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.953, trajectory.sample(1.2).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.987, trajectory.sample(1.3).state().getPose().translation().getX(), DELTA);
+        assertEquals(1.000, trajectory.sample(1.4).state().getPose().translation().getX(), DELTA);
+        assertEquals(1.000, trajectory.sample(1.5).state().getPose().translation().getX(), DELTA);
     }
 
     @Test
@@ -134,25 +134,25 @@ class Trajectory100Test implements Timeless{
         Trajectory100 trajectory = planner.restToRest(waypoints);
 
         // these numbers are sensitive to the "faceting" of the trajectory into poses.
-        assertEquals(1.622, trajectory.duration(), DELTA);
-        assertEquals(0.000, trajectory.sample(0).state().getPose().getX(), DELTA);
-        assertEquals(0.010, trajectory.sample(0.1).state().getPose().getX(), DELTA);
-        assertEquals(0.039, trajectory.sample(0.2).state().getPose().getX(), DELTA);
-        assertEquals(0.089, trajectory.sample(0.3).state().getPose().getX(), DELTA);
-        assertEquals(0.159, trajectory.sample(0.4).state().getPose().getX(), DELTA);
-        assertEquals(0.246, trajectory.sample(0.5).state().getPose().getX(), DELTA);
-        assertEquals(0.333, trajectory.sample(0.6).state().getPose().getX(), DELTA);
-        assertEquals(0.414, trajectory.sample(0.7).state().getPose().getX(), DELTA);
-        assertEquals(0.491, trajectory.sample(0.8).state().getPose().getX(), DELTA);
-        assertEquals(0.567, trajectory.sample(0.9).state().getPose().getX(), DELTA);
-        assertEquals(0.648, trajectory.sample(1).state().getPose().getX(), DELTA);
-        assertEquals(0.734, trajectory.sample(1.1).state().getPose().getX(), DELTA);
-        assertEquals(0.823, trajectory.sample(1.2).state().getPose().getX(), DELTA);
-        assertEquals(0.897, trajectory.sample(1.3).state().getPose().getX(), DELTA);
-        assertEquals(0.951, trajectory.sample(1.4).state().getPose().getX(), DELTA);
-        assertEquals(0.985, trajectory.sample(1.5).state().getPose().getX(), DELTA);
-        assertEquals(0.999, trajectory.sample(1.6).state().getPose().getX(), DELTA);
-        assertEquals(1.000, trajectory.sample(1.7).state().getPose().getX(), DELTA);
+        assertEquals(1.561, trajectory.duration(), DELTA);
+        assertEquals(0.000, trajectory.sample(0).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.010, trajectory.sample(0.1).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.04, trajectory.sample(0.2).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.09, trajectory.sample(0.3).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.16, trajectory.sample(0.4).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.247, trajectory.sample(0.5).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.337, trajectory.sample(0.6).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.427, trajectory.sample(0.7).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.517, trajectory.sample(0.8).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.607, trajectory.sample(0.9).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.697, trajectory.sample(1).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.787, trajectory.sample(1.1).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.869, trajectory.sample(1.2).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.931, trajectory.sample(1.3).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.973, trajectory.sample(1.4).state().getPose().translation().getX(), DELTA);
+        assertEquals(0.996, trajectory.sample(1.5).state().getPose().translation().getX(), DELTA);
+        assertEquals(1.000, trajectory.sample(1.6).state().getPose().translation().getX(), DELTA);
+        assertEquals(1.000, trajectory.sample(1.7).state().getPose().translation().getX(), DELTA);
 
     }
 

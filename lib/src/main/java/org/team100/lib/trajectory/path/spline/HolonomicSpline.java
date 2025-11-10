@@ -59,8 +59,18 @@ public class HolonomicSpline {
      * The theta endpoint derivative is just the average theta rate, which is new,
      * it used to be zero.
      * 
+     * Maybe the theta rate should be specified instead of taking the average.
+     * 
      * You'll probably want to call SplineUtil.forceC1() and
      * SplineUtil.optimizeSpline() after creating these segments.
+     * 
+     * Magic numbers also scale theta endpoints, so that the translation and
+     * rotation splines track together.
+     * 
+     * @param p0  starting pose
+     * @param p1  ending pose
+     * @param mN0 starting magic number
+     * @param mN1 ending magic number
      */
     public HolonomicSpline(HolonomicPose2d p0, HolonomicPose2d p1, double mN0, double mN1) {
         double scale0 = mN0 * GeometryUtil.distanceM(p0.translation(), p1.translation());
@@ -99,8 +109,8 @@ public class HolonomicSpline {
         // the preceding point to the following point)
         // this will produce a "corner" in theta, which you may want to fix with
         // SplineUtil.forceC1().
-        double dtheta0 = delta;
-        double dtheta1 = delta;
+        double dtheta0 = delta * mN0;
+        double dtheta1 = delta * mN1;
         // second derivatives are zero at the ends
         double ddtheta0 = 0;
         double ddtheta1 = 0;
@@ -125,14 +135,12 @@ public class HolonomicSpline {
     }
 
     public Pose2dWithMotion getPose2dWithMotion(double p) {
-        Optional<Rotation2d> course = getCourse(p);
-        double dx = course.isPresent() ? course.get().getCos() : 0.0;
-        double dy = course.isPresent() ? course.get().getSin() : 0.0;
-        double dtheta = course.isPresent() ? getDHeadingDs(p) : getDHeading(p);
-
         return new Pose2dWithMotion(
-                getPose2d(p),
-                dx, dy, dtheta,
+                new HolonomicPose2d(
+                        getPoint(p),
+                        getHeading(p),
+                        getCourse(p).orElseThrow()),
+                getDHeadingDs(p),
                 getCurvature(p),
                 getDCurvatureDs(p));
     }

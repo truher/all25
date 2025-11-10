@@ -33,19 +33,7 @@ class TrajectoryPlannerTest implements Timeless {
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
-    /**
-     * Stationary trajectories do not work.
-     */
-    @Test
-    void testStationary() {
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(new Translation2d(), new Rotation2d(), new Rotation2d()),
-                new HolonomicPose2d(new Translation2d(), new Rotation2d(), new Rotation2d()));
-        List<TimingConstraint> constraints = new ArrayList<>();
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        Trajectory100 t = planner.restToRest(waypoints);
-        assertTrue(t.isEmpty());
-    }
+
 
     @Test
     void testLinear() {
@@ -57,7 +45,7 @@ class TrajectoryPlannerTest implements Timeless {
         Trajectory100 t = planner.restToRest(waypoints);
         assertEquals(12, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.6, p.state().getPose().getX(), DELTA);
+        assertEquals(0.6, p.state().getPose().translation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
@@ -80,7 +68,7 @@ class TrajectoryPlannerTest implements Timeless {
         Trajectory100 t = planner.generateTrajectory(
                 waypoints, start_vel, end_vel);
         TimedPose p = t.getPoint(6);
-        assertEquals(0.272, p.state().getPose().getX(), DELTA);
+        assertEquals(0.272, p.state().getPose().translation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 
     }
@@ -113,23 +101,11 @@ class TrajectoryPlannerTest implements Timeless {
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.585, p.state().getPose().getX(), DELTA);
+        assertEquals(0.585, p.state().getPose().translation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
-    /**
-     * Pure rotation does not work.
-     */
-    @Test
-    void testRotation() {
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(new Translation2d(), new Rotation2d(), new Rotation2d()),
-                new HolonomicPose2d(new Translation2d(), new Rotation2d(1), new Rotation2d()));
-        List<TimingConstraint> constraints = new ArrayList<>();
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        Trajectory100 t = planner.restToRest(waypoints);
-        assertTrue(t.isEmpty());
-    }
+
 
     @Test
     void testRestToRest() {

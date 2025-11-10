@@ -24,7 +24,6 @@ import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -35,10 +34,10 @@ public class ScheduleGeneratorTest {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
-            new Pose2dWithMotion(new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.kZero)),
-            new Pose2dWithMotion(new Pose2d(new Translation2d(24.0, 0.0), Rotation2d.kZero)),
-            new Pose2dWithMotion(new Pose2d(new Translation2d(36.0, 12.0), Rotation2d.kZero)),
-            new Pose2dWithMotion(new Pose2d(new Translation2d(60.0, 12.0), Rotation2d.kZero)));
+            new Pose2dWithMotion(HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
+            new Pose2dWithMotion(HolonomicPose2d.make(24.0, 0.0, 0, 0), 0, 0, 0),
+            new Pose2dWithMotion(HolonomicPose2d.make(36, 12, 0, 0), 0, 0, 0),
+            new Pose2dWithMotion(HolonomicPose2d.make(60, 12, 0, 0), 0, 0, 0));
 
     public static final List<Rotation2d> HEADINGS = List.of(
             GeometryUtil.fromDegrees(0),
@@ -104,16 +103,8 @@ public class ScheduleGeneratorTest {
     @Test
     void testJustTurningInPlace() {
         Path100 path = new Path100(Arrays.asList(
-                new Pose2dWithMotion(
-                        new Pose2d(
-                                new Translation2d(0.0, 0.0),
-                                Rotation2d.kZero),
-                        0, 0, 1, 0, 0),
-                new Pose2dWithMotion(
-                        new Pose2d(
-                                new Translation2d(0.0, 0.0),
-                                Rotation2d.kPi),
-                        0, 0, 1, 0, 0)));
+                new Pose2dWithMotion(HolonomicPose2d.make(0, 0, 0, 0), 1, 0, 0),
+                new Pose2dWithMotion(HolonomicPose2d.make(0, 0, Math.PI, 0), 1, 0, 0)));
 
         // Triangle profile.
         assertThrows(IllegalArgumentException.class,
@@ -196,7 +187,7 @@ public class ScheduleGeneratorTest {
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
             public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-                if (state.getTranslation().getX() >= 24.0) {
+                if (state.getPose().translation().getX() >= 24.0) {
                     return new NonNegativeDouble(5.0);
                 } else {
                     return new NonNegativeDouble(Double.POSITIVE_INFINITY);
@@ -304,7 +295,7 @@ public class ScheduleGeneratorTest {
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.575, p.state().getPose().getX(), DELTA);
+        assertEquals(0.575, p.state().getPose().translation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 
     }

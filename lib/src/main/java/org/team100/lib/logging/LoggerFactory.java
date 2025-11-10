@@ -1,6 +1,5 @@
 package org.team100.lib.logging;
 
-import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -11,6 +10,7 @@ import java.util.function.Supplier;
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalDeltaR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.primitive.PrimitiveLogger;
@@ -514,12 +514,9 @@ public class LoggerFactory {
         public void log(Supplier<Pose2dWithMotion> vals) {
             if (!allow(m_level))
                 return;
-            Pose2dWithMotion val = vals.get();
-            m_pose2dLogger.log(val::getPose);
-            Optional<Rotation2d> course = val.getCourse();
-            if (course.isPresent()) {
-                m_rotation2dLogger.log(course::get);
-            }
+            HolonomicPose2d val = vals.get().getPose();
+            m_pose2dLogger.log(val::pose);
+            m_rotation2dLogger.log(val::course);
         }
     }
 

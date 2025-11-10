@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.trajectory.timing.TimedPose;
@@ -29,8 +30,7 @@ class SwerveControlTest {
         ControlR3 s = ControlR3.fromTimedPose(
                 new TimedPose(
                         new Pose2dWithMotion(
-                                new Pose2d(0, 0, new Rotation2d()),
-                                0, 0, 0, 0, 0),
+                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
                         0, 0, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
@@ -45,8 +45,7 @@ class SwerveControlTest {
         ControlR3 s = ControlR3.fromTimedPose(
                 new TimedPose(
                         new Pose2dWithMotion(
-                                new Pose2d(0, 0, new Rotation2d()),
-                                0, 0, 0, 0, 0),
+                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
                         0, 0, 1));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
@@ -61,8 +60,7 @@ class SwerveControlTest {
         ControlR3 s = ControlR3.fromTimedPose(
                 new TimedPose(
                         new Pose2dWithMotion(
-                                new Pose2d(0, 0, new Rotation2d()),
-                                1, 0, 0, 0, 0),
+                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
                         0, 1, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);
@@ -78,8 +76,8 @@ class SwerveControlTest {
         ControlR3 s = ControlR3.fromTimedPose(
                 new TimedPose(
                         new Pose2dWithMotion(
-                                new Pose2d(0, 0, new Rotation2d()),
-                                1, 0, 0, 1, 0),
+                                HolonomicPose2d.make(0, 0, 0, 0),
+                                0, 1, 0),
                         0, 1, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);
