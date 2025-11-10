@@ -1,6 +1,6 @@
-# timing
+# lib.trajectory.timing
 
-The `lib.trajectory.timing` package helps to create trajectory schedules.
+This package helps to create trajectory schedules.
 
 It is similar to the WPI package `math.trajectory.constraint`.
 

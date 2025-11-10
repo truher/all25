@@ -1,6 +1,6 @@
-# optimization
+# lib.optimization
 
-The `lib.optimization` package contains iterative solvers used in applications
+This package contains iterative solvers used in applications
 like inverse kinematics and profile coordination, notably `NewtonsMethod`
 for finding the zero of a function.  Since these solvers are iterative,
 you'll want to be careful with how long they take.

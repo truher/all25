@@ -1,4 +1,4 @@
-# servo
+# lib.motion.servo
 
 A Team 100 "servo" is a composition of
 

@@ -12,8 +12,6 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
 
-import edu.wpi.first.math.geometry.Pose2d;
-
 class SwerveDriveDynamicsConstraintTest {
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());

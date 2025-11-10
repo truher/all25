@@ -10,7 +10,6 @@ import org.team100.lib.state.ControlR3;
  * "atReference" works.
  */
 public class NullControllerR3 extends ControllerR3Base {
-    private static final GlobalVelocityR3 ZERO = new GlobalVelocityR3(0, 0, 0);
 
     public NullControllerR3(
             LoggerFactory parent,

@@ -9,10 +9,10 @@ import java.util.function.Supplier;
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.commands.r3.DriveToPoseWithProfile;
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.subsystems.r3.commands.DriveToPoseWithProfile;
 import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;

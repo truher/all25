@@ -8,7 +8,8 @@ import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
 import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.sensor.gyro.Gyro;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.mecanum.MecanumKinematics100.Slip;
+import org.team100.lib.subsystems.mecanum.kinematics.MecanumKinematics100;
+import org.team100.lib.subsystems.mecanum.kinematics.MecanumKinematics100.Slip;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 

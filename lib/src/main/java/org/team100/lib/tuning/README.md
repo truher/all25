@@ -1,4 +1,4 @@
-# tuning
+# lib.tuning
 
 In the past, Team 100 has made all adjustable constants *really constant*
 in the code.  The benefit is that there's just one way to adjust something.

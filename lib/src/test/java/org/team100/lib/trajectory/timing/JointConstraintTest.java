@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.motion.prr.AnalyticalJacobian;
-import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
-import org.team100.lib.motion.prr.JointAccelerations;
-import org.team100.lib.motion.prr.JointVelocities;
+import org.team100.lib.subsystems.prr.AnalyticalJacobian;
+import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
+import org.team100.lib.subsystems.prr.JointAccelerations;
+import org.team100.lib.subsystems.prr.JointVelocities;
 
 public class JointConstraintTest {
     private static final double DELTA = 0.001;

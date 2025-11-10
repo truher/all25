@@ -1,6 +1,6 @@
-# localization
+# lib.localization
 
-The `lib.localization` package uses two sources of position data
+This package uses two sources of position data
 to determine the robot's global pose:
 
 ## Odometry
@@ -43,3 +43,10 @@ be off by 10 cm due to gyro noise alone, which is a large error!  This is one
 of the reasons we use a weighted average for vision updates: it acts as a
 low-pass filter.
 
+## Global vs Local Localizers
+
+Some other teams (6328) use different methods for "local" localization (relative
+to a specific tag for a specific task), and "global" localization (combining
+inputs from multiple tags).  We don't do that, but we do allow the parameters
+in the pose estimator to be changed by commands, so when you want the estimator
+to ignore far-away tags, use `AprilTagRobotLocalizer.setHeedRadiusM()`. 

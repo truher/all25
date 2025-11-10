@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.motion.five_bar.FiveBarKinematics;
-import org.team100.lib.motion.five_bar.JointPositions;
-import org.team100.lib.motion.five_bar.Point;
-import org.team100.lib.motion.five_bar.Scenario;
+import org.team100.lib.subsystems.five_bar.kinematics.FiveBarKinematics;
+import org.team100.lib.subsystems.five_bar.kinematics.JointPositions;
+import org.team100.lib.subsystems.five_bar.kinematics.Point;
+import org.team100.lib.subsystems.five_bar.kinematics.Scenario;
 
 public class FiveBarVisualizationTest {
     private static final double kDelta = 0.001;

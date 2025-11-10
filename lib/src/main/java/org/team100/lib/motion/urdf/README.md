@@ -1,4 +1,4 @@
-# URDF
+# lib.motion.urdf
 
 We partially support Unified Robot Description Format (URDF), which is a
 standard way to describe robot architectures that use "links" and "joints."

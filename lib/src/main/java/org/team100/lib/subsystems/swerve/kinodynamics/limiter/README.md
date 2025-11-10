@@ -1,4 +1,4 @@
-# limiter
+# lib.subsystems.swerve.kinodynamics.limiter
 
 The limiter package is concerned with making the drivetrain inputs feasible.
 

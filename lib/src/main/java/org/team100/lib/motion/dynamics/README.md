@@ -1,4 +1,4 @@
-# Dynamics
+# lib.motion.dynamics
 
 Most of our control problems sense and control position and velocity,
 and involve "kinematics," which is about geometry.

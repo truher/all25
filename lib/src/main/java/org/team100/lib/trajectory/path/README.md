@@ -1,6 +1,6 @@
-# path
+# lib.trajectory.path
 
-The `lib.trajectory.path` package includes `Path100`, which describes a 2d holonomic path
+This package includes `Path100`, which describes a 2d holonomic path
 with a list of samples of a spline.
 
 The `PathFactory` samples a spline so that the straight parts don't have too

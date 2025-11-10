@@ -8,9 +8,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.commands.r3.DriveToPoseWithProfile;
-import org.team100.lib.commands.r3.DriveToTranslationFacingWithProfile;
-import org.team100.lib.commands.r3.DriveWithTrajectoryFunction;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.field.FieldConstants;
@@ -18,6 +15,9 @@ import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.subsystems.r3.commands.DriveToPoseWithProfile;
+import org.team100.lib.subsystems.r3.commands.DriveToTranslationFacingWithProfile;
+import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 
 import edu.wpi.first.math.geometry.Rotation2d;

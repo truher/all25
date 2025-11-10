@@ -1,6 +1,6 @@
 # lib
 
-The `lib` package contains library code we can use every year.
+This package contains library code we can use every year.
 
 Everything in here needs to be reviewed and covered with tests.
 
@@ -18,8 +18,6 @@ __Packages of note__
   a single code-base.
 * [controller](controller/README.md)
   * Feedback controllers for one dimension and three independent dimensions.  We use the latter for 2d-with-heading poses.  Some controllers do feedforward, some do feedback, some do both.
-* [encoder](encoder/README.md)
-  * Support for various ways to measure the position of a joint, including via combination of multiple sensors, e.g. an integrated incremental motor encoder and an external absolute position sensor.
 * [examples](examples/README.md) 
   * A few illustrations of using library features.
 * [experiments](experiments/README.md) 
@@ -41,6 +39,8 @@ for finding the zero of a function.
   * Constrained motion in 1d and 2d-with-heading.  These should be used for all motion where a trajectory would be too expensive to compute on the fly.
 * [reference](reference/README.md)
   * Team 100 reference generators.  These use any sort of reference source, e.g. profile or trajectory, and produce "current" and "next" setpoints.  The reason for these classes is to make sure the time-alignment of observation and control are done correctly.  They use the `coherence` machinery mentioned above.
+* [sensor](sensor/README.md)
+  * Wrappers for measurement of position (via absolute rotary encoders), distance (via TOF sensors like the LaserCAN), orientation (via the Redux gyro), and the state of switches or photo-interruptors.
 * [targeting](targeting/README.md)
   * A fundamental robot navigation task is to identify targets to drive to.  The `lib.targeting` package turns camera observations into field-relative targets.
 * [trajectory](trajectory/README.md)

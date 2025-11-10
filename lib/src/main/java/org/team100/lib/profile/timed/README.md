@@ -1,4 +1,7 @@
-# timed
+# lib.profile.timed
 
-The package, `lib.profiles.timed` includes profiles that require
+This package includes profiles that require
 significant precomputation, kinda like a trajectory.
+
+At the moment, the only implementations are wrappers of roadrunner
+profiles.

@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.prr.Config;
-import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
+import org.team100.lib.subsystems.prr.EAWConfig;
+import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,9 +35,9 @@ public class ProfiledTest {
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(0.5, 0.343);
 
         // home position
-        Config start = new Config(0, 0, 0);
+        EAWConfig start = new EAWConfig(0, 0, 0);
         // floor pick position
-        Config goal = new Config(0, -3 * Math.PI / 4, Math.PI / 4);
+        EAWConfig goal = new EAWConfig(0, -3 * Math.PI / 4, Math.PI / 4);
 
         Model100 g1 = new Model100(goal.shoulderHeight(), 0);
         Model100 g2 = new Model100(goal.shoulderAngle(), 0);
@@ -62,7 +62,7 @@ public class ProfiledTest {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
             i3 = p3.calculate(DT, i3, g3);
-            Config c = new Config(i1.x(), i2.x(), i3.x());
+            EAWConfig c = new EAWConfig(i1.x(), i2.x(), i3.x());
             Pose2d p = k.forward(c);
 
             if (DEBUG) {
@@ -91,11 +91,11 @@ public class ProfiledTest {
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(0.5, 0.343);
 
         // home position
-        Config start = new Config(0, 0, 0);
+        EAWConfig start = new EAWConfig(0, 0, 0);
 
         Pose2d pL4 = new Pose2d(1.9, 0.5, new Rotation2d(150));
         // floor pick position
-        Config goal = k.inverse(pL4);
+        EAWConfig goal = k.inverse(pL4);
 
         Model100 g1 = new Model100(goal.shoulderHeight(), 0);
         Model100 g2 = new Model100(goal.shoulderAngle(), 0);
@@ -120,7 +120,7 @@ public class ProfiledTest {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
             i3 = p3.calculate(DT, i3, g3);
-            Config c = new Config(i1.x(), i2.x(), i3.x());
+            EAWConfig c = new EAWConfig(i1.x(), i2.x(), i3.x());
             Pose2d p = k.forward(c);
 
             if (DEBUG) {
@@ -143,10 +143,10 @@ public class ProfiledTest {
         Pose2d pL4 = new Pose2d(1.9, 0.5, new Rotation2d(150));
 
         // home position
-        Config start = k.inverse(pL4);
+        EAWConfig start = k.inverse(pL4);
 
         // floor pick position
-        Config goal = new Config(0, 0, 0);
+        EAWConfig goal = new EAWConfig(0, 0, 0);
 
         Model100 g1 = new Model100(goal.shoulderHeight(), 0);
         Model100 g2 = new Model100(goal.shoulderAngle(), 0);
@@ -171,7 +171,7 @@ public class ProfiledTest {
             i1 = p1.calculate(DT, i1, g1);
             i2 = p2.calculate(DT, i2, g2);
             i3 = p3.calculate(DT, i3, g3);
-            Config c = new Config(i1.x(), i2.x(), i3.x());
+            EAWConfig c = new EAWConfig(i1.x(), i2.x(), i3.x());
             Pose2d p = k.forward(c);
 
             if (DEBUG) {

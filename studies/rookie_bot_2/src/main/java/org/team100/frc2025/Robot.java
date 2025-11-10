@@ -4,7 +4,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.commands.mecanum.ManualMecanum;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
@@ -17,7 +16,8 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.subsystems.mecanum.MecanumDrive100;
 import org.team100.lib.subsystems.mecanum.MecanumDriveFactory;
-import org.team100.lib.subsystems.mecanum.MecanumKinematics100.Slip;
+import org.team100.lib.subsystems.mecanum.commands.ManualMecanum;
+import org.team100.lib.subsystems.mecanum.kinematics.MecanumKinematics100.Slip;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;

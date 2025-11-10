@@ -8,7 +8,7 @@ import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.sensor.gyro.Gyro;
 import org.team100.lib.sensor.gyro.ReduxGyro;
-import org.team100.lib.subsystems.mecanum.MecanumKinematics100.Slip;
+import org.team100.lib.subsystems.mecanum.kinematics.MecanumKinematics100.Slip;
 import org.team100.lib.util.CanId;
 
 public class MecanumDriveFactory {
