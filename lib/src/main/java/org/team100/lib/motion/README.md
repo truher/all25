@@ -1,6 +1,6 @@
-# motion
+# lib.motion
 
-The `lib.motion` package supports actuation.
+This package supports actuation.
 
 A Team 100 simple motion control consists of several components:
 

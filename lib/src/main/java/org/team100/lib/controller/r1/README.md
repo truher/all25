@@ -1,4 +1,4 @@
-# r1
+# lib.controller.r1
 
 Controllers with a single dimension. These are similar in
 purpose to WPILib PIDController.  The `Feedback100` interface uses

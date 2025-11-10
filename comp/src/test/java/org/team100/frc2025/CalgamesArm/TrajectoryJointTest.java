@@ -9,12 +9,12 @@ import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.prr.AnalyticalJacobian;
-import org.team100.lib.motion.prr.Config;
-import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
-import org.team100.lib.motion.prr.JointAccelerations;
-import org.team100.lib.motion.prr.JointVelocities;
 import org.team100.lib.state.ControlR3;
+import org.team100.lib.subsystems.prr.AnalyticalJacobian;
+import org.team100.lib.subsystems.prr.EAWConfig;
+import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
+import org.team100.lib.subsystems.prr.JointAccelerations;
+import org.team100.lib.subsystems.prr.JointVelocities;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -64,7 +64,7 @@ public class TrajectoryJointTest {
             Pose2d p = m.pose();
             GlobalVelocityR3 v = m.velocity();
             GlobalAccelerationR3 a = m.acceleration();
-            Config q = k.inverse(p);
+            EAWConfig q = k.inverse(p);
             JointVelocities jv = J.inverse(m.model());
             JointAccelerations ja = J.inverseA(m);
             if (DEBUG) {

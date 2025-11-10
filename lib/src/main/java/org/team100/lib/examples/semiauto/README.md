@@ -1,4 +1,4 @@
-# semiauto
+# lib.examples.semiauto
 
 Team 100 robots do as much as possible automatically.
 

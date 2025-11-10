@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.commands.r3.helper.VelocityReferenceControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
@@ -19,6 +18,7 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.MockSubsystemR3;
+import org.team100.lib.subsystems.r3.commands.helper.VelocityReferenceControllerR3;
 import org.team100.lib.subsystems.swerve.Fixtured;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;

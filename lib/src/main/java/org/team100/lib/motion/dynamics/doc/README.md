@@ -3,6 +3,7 @@
 This is a study of second-order dynamics applied to three different
 mechanisms:
 
+* [Revolute (R)](README_R.md) -- a very simple single-jointed arm
 * [Prismatic-Revolute (PR)](README_PR.md) -- an elevator an simple arm
 * [Revolute-Revolute (RR)](README_RR.md) -- a two-jointed arm
 * [Prismatic-Revolute-Revolute (PRR)](README_PRR.md) -- what we actually have

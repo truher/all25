@@ -4,13 +4,13 @@ import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.motion.prr.AnalyticalJacobian;
-import org.team100.lib.motion.prr.Config;
-import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
-import org.team100.lib.motion.prr.JointAccelerations;
-import org.team100.lib.motion.prr.JointVelocities;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.prr.AnalyticalJacobian;
+import org.team100.lib.subsystems.prr.EAWConfig;
+import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
+import org.team100.lib.subsystems.prr.JointAccelerations;
+import org.team100.lib.subsystems.prr.JointVelocities;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -67,7 +67,7 @@ public class JointConstraint implements TimingConstraint {
         // scale qdot to the nearest maximum
         JointVelocities maxQdotInMotionDirection = qdot.times(1 / maxScale);
 
-        Config q = m_k.inverse(pose.pose());
+        EAWConfig q = m_k.inverse(pose.pose());
 
         GlobalVelocityR3 maxV = m_j.forward(q, maxQdotInMotionDirection);
         double norm = maxV.norm();
@@ -92,7 +92,7 @@ public class JointConstraint implements TimingConstraint {
         // actual cartesian velocity
         GlobalVelocityR3 v = new GlobalVelocityR3(vx, vy, omega);
 
-        Config q = m_k.inverse(pose);
+        EAWConfig q = m_k.inverse(pose);
         // actual qdot
         JointVelocities qdot = m_j.inverse(new ModelR3(pose, v));
 

@@ -1,6 +1,6 @@
-# coherence
+# lib.coherence
 
-The `lib.coherence` package implements Team 100's approach to discretizing
+This package implements Team 100's approach to discretizing
 time and making observations consistent within time steps.
 
 Without special attention:

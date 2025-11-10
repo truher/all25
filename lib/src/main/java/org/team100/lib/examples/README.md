@@ -1,6 +1,6 @@
-# Examples
+# lib.examples
 
-The `lib.examples` package contains common subsystem and
+This package contains common subsystem and
 command setups can use in a real robot.
 
 The "setup" can just be added to the RobotContainer constructor.

@@ -1,6 +1,6 @@
-# Logging
+# lib.ogging
 
-The `lib.logging` package is what we use to put stuff on the dashboard
+This package is what we use to put stuff on the dashboard
 and in the log file.
 
 The notable features of Team 100 logging are

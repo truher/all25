@@ -1,4 +1,4 @@
-# mechanism
+# lib.motion.mechanism
 
 A Team 100 "mechanism" is comprised of
 

@@ -3,18 +3,16 @@ package org.team100.frc2025;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.commands.r3.DriveToPoseWithProfile;
-import org.team100.lib.commands.r3.DriveWithTrajectoryFunction;
-import org.team100.lib.commands.r3.VelocityFeedforwardOnly;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.subsystems.mecanum.MecanumDrive100;
+import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
+import org.team100.lib.subsystems.r3.commands.VelocityFeedforwardOnly;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -25,7 +23,6 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class Autons {
     private static final Pose2d KNIGHT_MOVE = new Pose2d(2, 1, Rotation2d.kZero);

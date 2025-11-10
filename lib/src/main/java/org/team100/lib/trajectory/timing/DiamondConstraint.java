@@ -1,7 +1,5 @@
 package org.team100.lib.trajectory.timing;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.tuning.Mutable;
