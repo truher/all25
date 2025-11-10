@@ -7,7 +7,7 @@ import org.team100.lib.config.Feedforward100;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.motion.mechanism.RotaryMechanism;
+import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MockBareMotor;
 import org.team100.lib.sensor.position.incremental.MockIncrementalBareEncoder;
 import org.team100.lib.testing.Timeless;

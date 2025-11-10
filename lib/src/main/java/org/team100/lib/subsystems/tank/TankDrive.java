@@ -3,7 +3,7 @@ package org.team100.lib.subsystems.tank;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
-import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
+import org.team100.lib.servo.OutboardLinearVelocityServo;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;

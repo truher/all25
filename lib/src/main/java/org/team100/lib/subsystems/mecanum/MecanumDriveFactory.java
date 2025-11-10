@@ -2,12 +2,12 @@ package org.team100.lib.subsystems.mecanum;
 
 import org.team100.lib.config.Identity;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.mechanism.LinearMechanism;
-import org.team100.lib.motion.mechanism.LinearMechanismFactory;
-import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
+import org.team100.lib.mechanism.LinearMechanism;
+import org.team100.lib.mechanism.LinearMechanismFactory;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.sensor.gyro.Gyro;
 import org.team100.lib.sensor.gyro.ReduxGyro;
+import org.team100.lib.servo.OutboardLinearVelocityServo;
 import org.team100.lib.subsystems.mecanum.kinematics.MecanumKinematics100.Slip;
 import org.team100.lib.util.CanId;
 

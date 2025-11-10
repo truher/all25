@@ -3,7 +3,7 @@ package org.team100.lib.subsystems.shooter;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
-import org.team100.lib.motion.servo.LinearVelocityServo;
+import org.team100.lib.servo.LinearVelocityServo;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;

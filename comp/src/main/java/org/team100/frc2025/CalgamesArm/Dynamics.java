@@ -1,10 +1,10 @@
 package org.team100.frc2025.CalgamesArm;
 
-import org.team100.lib.motion.dynamics.prr.PRRAcceleration;
-import org.team100.lib.motion.dynamics.prr.PRRConfig;
-import org.team100.lib.motion.dynamics.prr.PRRDynamics;
-import org.team100.lib.motion.dynamics.prr.PRRTorque;
-import org.team100.lib.motion.dynamics.prr.PRRVelocity;
+import org.team100.lib.dynamics.prr.PRRAcceleration;
+import org.team100.lib.dynamics.prr.PRRConfig;
+import org.team100.lib.dynamics.prr.PRRDynamics;
+import org.team100.lib.dynamics.prr.PRRTorque;
+import org.team100.lib.dynamics.prr.PRRVelocity;
 import org.team100.lib.subsystems.prr.EAWConfig;
 import org.team100.lib.subsystems.prr.JointAccelerations;
 import org.team100.lib.subsystems.prr.JointForce;

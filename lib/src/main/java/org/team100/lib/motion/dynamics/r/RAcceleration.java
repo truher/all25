@@ -1,8 +1,0 @@
-package org.team100.lib.motion.dynamics.r;
-
-/**
- * Joint acceleration for the R example
- */
-public record RAcceleration(double q1ddot) {
-
-}

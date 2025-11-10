@@ -7,9 +7,9 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Identity;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
-import org.team100.lib.motion.servo.AngularPositionServo;
-import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.music.Player;
+import org.team100.lib.servo.AngularPositionServo;
+import org.team100.lib.servo.LinearVelocityServo;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePosition100;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModuleState100;
 
