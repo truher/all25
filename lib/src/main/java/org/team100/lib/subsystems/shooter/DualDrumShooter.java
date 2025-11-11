@@ -52,7 +52,7 @@ public class DualDrumShooter extends SubsystemBase {
     }
 
     public Command spin(double x) {
-        return run(()-> spinUp(x));
+        return run(() -> spinUp(x));
     }
 
     @Override
