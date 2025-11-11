@@ -14,8 +14,6 @@ import org.team100.lib.motor.ctre.Falcon6Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.sensor.position.absolute.HomingRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
-import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.subsystems.five_bar.kinematics.FiveBarKinematics;
 import org.team100.lib.subsystems.five_bar.kinematics.JointPositions;
 import org.team100.lib.subsystems.five_bar.kinematics.Scenario;
@@ -76,11 +74,9 @@ public class FiveBarMech extends SubsystemBase {
                 m_motorP5 = motorP5;
 
                 m_sensorP1 = new HomingRotaryPositionSensor(
-                        new ProxyRotaryPositionSensor(
-                                new Talon6Encoder(loggerP1, motorP1), 1.0));
+                        new ProxyRotaryPositionSensor(motorP1.encoder(), 1.0));
                 m_sensorP5 = new HomingRotaryPositionSensor(
-                        new ProxyRotaryPositionSensor(
-                                new Talon6Encoder(loggerP5, motorP5), 1.0));
+                        new ProxyRotaryPositionSensor(motorP5.encoder(), 1.0));
 
                 m_mechP1 = new RotaryMechanism(
                         loggerP1,
@@ -105,10 +101,10 @@ public class FiveBarMech extends SubsystemBase {
 
                 m_sensorP1 = new HomingRotaryPositionSensor(
                         new ProxyRotaryPositionSensor(
-                                new SimulatedBareEncoder(logger, motorP1), 1.0));
+                                motorP1.encoder(), 1.0));
                 m_sensorP5 = new HomingRotaryPositionSensor(
                         new ProxyRotaryPositionSensor(
-                                new SimulatedBareEncoder(logger, motorP5), 1.0));
+                                motorP5.encoder(), 1.0));
 
                 m_mechP1 = new RotaryMechanism(
                         loggerP1,

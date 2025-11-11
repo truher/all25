@@ -17,7 +17,7 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.sensor.position.absolute.MockRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.testing.Timeless;
 
 public class OnboardAngularPositionServoTest implements Timeless {
@@ -60,7 +60,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
     @Test
     void testShortWayOnboardProfiled() {
         SimulatedBareMotor motor = new SimulatedBareMotor(logger, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, motor);
+        IncrementalBareEncoder encoder = motor.encoder();
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, Double.NEGATIVE_INFINITY,
@@ -125,7 +125,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
     @Test
     void testLongWayOnboardProfiled() {
         SimulatedBareMotor motor = new SimulatedBareMotor(logger, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, motor);
+        IncrementalBareEncoder encoder = motor.encoder();
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, -3.1, 3.1);
@@ -185,7 +185,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
     @Test
     void testDirect() {
         SimulatedBareMotor motor = new SimulatedBareMotor(logger, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, motor);
+        IncrementalBareEncoder encoder = motor.encoder();
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
@@ -223,7 +223,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
     @Test
     void testShortWayOnboardDirect() {
         SimulatedBareMotor motor = new SimulatedBareMotor(logger, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, motor);
+        IncrementalBareEncoder encoder = motor.encoder();
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
@@ -292,7 +292,7 @@ public class OnboardAngularPositionServoTest implements Timeless {
     @Test
     void testLongWayOnboardDirect() {
         SimulatedBareMotor motor = new SimulatedBareMotor(logger, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, motor);
+        IncrementalBareEncoder encoder = motor.encoder();
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(logger, encoder, 1);
         RotaryMechanism mech = new RotaryMechanism(
                 logger, motor, sensor, 1, -3.1, 3.1);

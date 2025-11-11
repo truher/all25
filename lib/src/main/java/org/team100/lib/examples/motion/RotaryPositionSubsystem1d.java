@@ -18,7 +18,7 @@ import org.team100.lib.sensor.position.absolute.EncoderDrive;
 import org.team100.lib.sensor.position.absolute.RotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.wpi.AS5048RotaryPositionSensor;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.OnboardAngularPositionServo;
 import org.team100.lib.util.CanId;
@@ -103,7 +103,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
             }
             default -> {
                 SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
-                SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
+                IncrementalBareEncoder encoder = motor.encoder();
                 SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(
                         log, encoder, GEAR_RATIO);
                 RotaryMechanism mech = new RotaryMechanism(

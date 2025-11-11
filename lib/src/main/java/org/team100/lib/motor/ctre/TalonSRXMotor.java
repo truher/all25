@@ -6,6 +6,8 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.util.CanId;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -15,6 +17,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 public class TalonSRXMotor implements BareMotor {
     private static final double FF_DUTY_RAD_S = 0.0016;
 
+    private final LoggerFactory m_log;
     private final TalonSRX m_motor;
     private final DoubleLogger m_log_supply;
     private final DoubleLogger m_log_stator;
@@ -43,10 +46,10 @@ public class TalonSRXMotor implements BareMotor {
         // varies with RPM.
         m_motor.configContinuousCurrentLimit((int) supplyLimit);
         m_motor.enableCurrentLimit(true);
-        LoggerFactory log = parent.type(this);
-        m_log_supply = log.doubleLogger(Level.TRACE, "supply current (A)");
-        m_log_stator = log.doubleLogger(Level.TRACE, "stator current (A)");
-        m_log_duty = log.doubleLogger(Level.TRACE, "duty cycle");
+        m_log = parent.type(this);
+        m_log_supply = m_log.doubleLogger(Level.TRACE, "supply current (A)");
+        m_log_stator = m_log.doubleLogger(Level.TRACE, "stator current (A)");
+        m_log_duty = m_log.doubleLogger(Level.TRACE, "duty cycle");
     }
 
     @Override
@@ -72,6 +75,12 @@ public class TalonSRXMotor implements BareMotor {
         // this is the number for a CIM; if you use this for any other motor, you should
         // adjust it.
         return 0.018;
+    }
+
+    @Override
+    public IncrementalBareEncoder encoder() {
+        // TODO: does this work?
+        return new SimulatedBareEncoder(m_log, this);
     }
 
     @Override
@@ -110,23 +119,26 @@ public class TalonSRXMotor implements BareMotor {
 
     @Override
     public double getVelocityRad_S() {
-        throw new UnsupportedOperationException("TalonSRX cannot report velocity.");
+        // TODO: does this work at all?
+        return m_motor.getSelectedSensorVelocity();
     }
 
     @Override
     public double getUnwrappedPositionRad() {
-        throw new UnsupportedOperationException();
+        // TODO: does this work at all?
+        return m_motor.getSelectedSensorPosition();
     }
 
     @Override
     public void setUnwrappedEncoderPositionRad(double positionRad) {
-        // there actually is an encoder interface but it sucks
-        throw new UnsupportedOperationException("TalonSRX has no encoder");
+        // TODO: does this work at all?
+        m_motor.setSelectedSensorPosition(positionRad);
     }
 
     @Override
     public void setUnwrappedPosition(double positionRad, double velocityRad_S, double accelRad_S2, double torqueNm) {
-        throw new UnsupportedOperationException("TalonSRX cannot control position.");
+        // TODO: does this work at all?
+        m_motor.setSelectedSensorPosition(positionRad);
     }
 
     @Override

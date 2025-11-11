@@ -4,15 +4,19 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
+/** Wrapoer for RoboRIO-connected PWM speed control */
 public class BareMotorController100 implements BareMotor {
     /**
      * Very much not calibrated.
      * Say 600 rad/s max so 0.0016?
      */
     private static final double velocityFFDutyCycle_Rad_S = 0.0016;
+    private final LoggerFactory m_log;
     private final MotorController m_motor;
     private final DoubleLogger m_log_duty;
     private final DoubleLogger m_log_reported;
@@ -20,11 +24,11 @@ public class BareMotorController100 implements BareMotor {
     public BareMotorController100(
             LoggerFactory parent,
             MotorController motorController) {
+        m_log = parent.type(this);
+        m_log_duty = m_log.doubleLogger(Level.TRACE, "duty cycle");
+        m_log_reported = m_log.doubleLogger(Level.TRACE, "duty cycle reported");
         m_motor = motorController;
         m_motor.setInverted(true);
-        LoggerFactory log = parent.type(this);
-        m_log_duty = log.doubleLogger(Level.TRACE, "duty cycle");
-        m_log_reported = log.doubleLogger(Level.TRACE, "duty cycle reported");
     }
 
     @Override
@@ -59,6 +63,10 @@ public class BareMotorController100 implements BareMotor {
     @Override
     public double kTNm_amp() {
         return 0.02;
+    }
+
+    public IncrementalBareEncoder encoder() {
+        return new SimulatedBareEncoder(m_log, this);
     }
 
     @Override

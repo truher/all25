@@ -1,8 +1,9 @@
 package org.team100.lib.motor;
 
 import org.team100.lib.config.Feedforward100;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 
-public class MockBareMotor implements BareMotor {
+public class MockBareMotor implements BareMotor, IncrementalBareEncoder {
     public double output = 0;
     public double velocity = 0;
     public double position = 0;
@@ -63,6 +64,11 @@ public class MockBareMotor implements BareMotor {
     @Override
     public double kTNm_amp() {
         return 0.02;
+    }
+
+    @Override
+    public IncrementalBareEncoder encoder() {
+        return this;
     }
 
     @Override

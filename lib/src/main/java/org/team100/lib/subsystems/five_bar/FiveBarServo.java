@@ -15,7 +15,6 @@ import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
-import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.OutboardAngularPositionServo;
 import org.team100.lib.subsystems.five_bar.kinematics.FiveBarKinematics;
@@ -83,7 +82,7 @@ public class FiveBarServo extends SubsystemBase {
                 STATOR_LIMIT,
                 pid,
                 ff);
-        IncrementalBareEncoder encoderP1 = new Talon6Encoder(loggerP1, motorP1);
+        IncrementalBareEncoder encoderP1 = motorP1.encoder();
         m_sensorP1 = new ProxyRotaryPositionSensor(encoderP1, 1.0);
         RotaryMechanism mechP1 = new RotaryMechanism(
                 loggerP1,
@@ -110,7 +109,7 @@ public class FiveBarServo extends SubsystemBase {
                 STATOR_LIMIT,
                 pid,
                 ff);
-        IncrementalBareEncoder encoderP5 = new Talon6Encoder(loggerP5, motorP5);
+        IncrementalBareEncoder encoderP5 = motorP5.encoder();
         m_sensorP5 = new ProxyRotaryPositionSensor(encoderP5, 1.0);
         RotaryMechanism m_mechP5 = new RotaryMechanism(
                 loggerP5,

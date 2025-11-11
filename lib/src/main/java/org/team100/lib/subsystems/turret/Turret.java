@@ -13,7 +13,7 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.OnboardAngularPositionServo;
 
@@ -57,7 +57,7 @@ public class Turret extends SubsystemBase {
         ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, profile, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
         SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
+        IncrementalBareEncoder encoder = motor.encoder();
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(
                 log, encoder, GEAR_RATIO);
         RotaryMechanism mech = new RotaryMechanism(

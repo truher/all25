@@ -1,23 +1,15 @@
 package org.team100.frc2025;
 
 import org.team100.lib.config.Feedforward100;
-import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.rev.CANSparkMotor;
 import org.team100.lib.motor.rev.NeoCANSparkMotor;
-import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
-import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
-import org.team100.lib.sensor.position.incremental.rev.CANSparkEncoder;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.Gravity;
 import org.team100.lib.servo.OutboardAngularPositionServo;
@@ -54,45 +46,17 @@ public class Pivot extends SubsystemBase {
                 profile,
                 0.01, // position tolerance, rad
                 0.01); // velocity tolerance, rad/s
-        m_servo = new OutboardAngularPositionServo(log, mech(log), ref);
+        Feedforward100 ff = Feedforward100.makeNeo2(log);
+        PIDConstants pid = PIDConstants.makePositionPID(log, 0.5);
+        CanId canId = new CanId(5);
+        BareMotor motor = NeoCANSparkMotor.get(log, canId, MotorPhase.FORWARD, 40, ff, pid);
+        double initialPositionRad = 0;
+        double gearRatio = 15;
+        double minPositionRad = 0;
+        double maxPositionRad = 1.5;
+        m_servo = OutboardAngularPositionServo.make(
+                log, motor, ref, initialPositionRad, gearRatio, minPositionRad, maxPositionRad);
         m_servo.reset();
-    }
-
-    private RotaryMechanism mech(LoggerFactory log) {
-        switch (Identity.instance) {
-            case BLANK -> {
-                // simulation
-                SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
-                SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
-                return getMech(log, motor, encoder);
-            }
-            default -> {
-                // real robot
-                CANSparkMotor motor = new NeoCANSparkMotor(
-                        log,
-                        new CanId(5),
-                        NeutralMode.BRAKE,
-                        MotorPhase.FORWARD,
-                        40, // Stator current limit, amps
-                        Feedforward100.makeNeo2(log),
-                        // Feedforward100.zero(log),
-                        PIDConstants.makePositionPID(log, 0.5) // duty-cycle/rot -- originally 0.5
-                );
-                CANSparkEncoder encoder = new CANSparkEncoder(log, motor);
-                return getMech(log, motor, encoder);
-            }
-        }
-
-    }
-
-    private RotaryMechanism getMech(LoggerFactory log, BareMotor motor, IncrementalBareEncoder encoder) {
-        RotaryMechanism mech = new RotaryMechanism(log, motor,
-                encoder,
-                0, // initial position, rad
-                15, // gear ratio
-                0, // min position, rad
-                1.5); // max position, rad
-        return mech;
     }
 
     public double getWrappedPositionRad() {

@@ -7,7 +7,6 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 
 public class SimulatedBareEncoderTest {
     private static final double DELTA = 0.001;
@@ -18,7 +17,7 @@ public class SimulatedBareEncoderTest {
         // changing the encoder position should not produce a velocity signal.
 
         SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
+        IncrementalBareEncoder encoder = motor.encoder();
         assertEquals(0, encoder.getUnwrappedPositionRad(), DELTA);
         assertEquals(0, encoder.getVelocityRad_S(), DELTA);
         assertEquals(0, motor.getUnwrappedPositionRad(), DELTA);

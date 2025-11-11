@@ -1,6 +1,7 @@
 package org.team100.lib.motor;
 
 import org.team100.lib.music.Player;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 
 /**
  * Methods pertain only to the output shaft, not the motion of the attached
@@ -109,6 +110,9 @@ public interface BareMotor extends Player {
         double torqueFFAmps = torqueNm / kTNm_amp();
         return torqueFFAmps * kROhms();
     }
+
+    /** Return encoder for this motor, if possible */
+    IncrementalBareEncoder encoder();
 
     /** This is not "hold position" this is "torque off". */
     void stop();

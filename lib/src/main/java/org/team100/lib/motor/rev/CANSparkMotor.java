@@ -12,6 +12,7 @@ import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.sensor.position.incremental.rev.CANSparkEncoder;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
@@ -23,6 +24,12 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLimitSwitch;
 
 /**
+ * PID units for outboard positional control are duty cycle per revolution, so
+ * if you want to control to 0.1 revolutions, P should be something like 2.
+ * 
+ * PID units for outboard velocity control are duty cycle per RPM, so if you
+ * want to control to a few hundred RPM, P should be something like 0.0002.
+ * 
  * Relies on Memo and Takt, so you must put Memo.resetAll() and Takt.update() in
  * Robot.robotPeriodic().
  * 
@@ -32,6 +39,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
  * https://www.chiefdelphi.com/t/rev-robotics-2024-2025/471083/26
  */
 public abstract class CANSparkMotor implements BareMotor {
+    private final LoggerFactory m_log;
     protected final Feedforward100 m_ff;
     protected final SparkBase m_motor;
     private final RevConfigurator m_configurator;
@@ -72,11 +80,11 @@ public abstract class CANSparkMotor implements BareMotor {
             Feedforward100 ff,
             PIDConstants pid) {
         m_motor = motor;
-        LoggerFactory log = parent.type(this);
+        m_log = parent.type(this);
         m_ff = ff;
 
         m_configurator = new RevConfigurator(
-                log,
+                m_log,
                 m_motor,
                 neutral,
                 motorPhase,
@@ -104,22 +112,22 @@ public abstract class CANSparkMotor implements BareMotor {
         m_output = Cache.ofDouble(m_motor::getAppliedOutput);
         // m_temp = Memo.ofDouble(m_motor::getMotorTemperature);
         // LOGGERS
-        log.intLogger(Level.TRACE, "Device ID").log(m_motor::getDeviceId);
-        m_log_desired_position = log.doubleLogger(Level.DEBUG, "desired position (rev)");
-        m_log_desired_speed = log.doubleLogger(Level.DEBUG, "desired speed (rev_s)");
-        m_log_desired_accel = log.doubleLogger(Level.TRACE, "desired accel (rev_s2)");
-        m_log_friction_FF = log.doubleLogger(Level.TRACE, "friction feedforward (v)");
-        m_log_velocity_FF = log.doubleLogger(Level.TRACE, "velocity feedforward (v)");
-        m_log_accel_FF = log.doubleLogger(Level.TRACE, "accel feedforward (v)");
-        m_log_torque_FF = log.doubleLogger(Level.TRACE, "torque feedforward (v)");
-        m_log_duty = log.doubleLogger(Level.DEBUG, "Duty Cycle");
-        m_log_position = log.doubleLogger(Level.DEBUG, "position (rev)");
-        m_log_velocity = log.doubleLogger(Level.DEBUG, "velocity (rev_s)");
-        m_log_rpm = log.doubleLogger(Level.TRACE, "velocity (RPM)");
-        m_log_current = log.doubleLogger(Level.DEBUG, "current (A)");
-        m_log_supplyVoltage = log.doubleLogger(Level.DEBUG, "voltage (V)");
-        // m_log_torque = log.doubleLogger(Level.TRACE, "torque (Nm)");
-        // m_log_temp = log.doubleLogger(Level.TRACE, "temperature (C)");
+        m_log.intLogger(Level.TRACE, "Device ID").log(m_motor::getDeviceId);
+        m_log_desired_position = m_log.doubleLogger(Level.DEBUG, "desired position (rev)");
+        m_log_desired_speed = m_log.doubleLogger(Level.DEBUG, "desired speed (rev_s)");
+        m_log_desired_accel = m_log.doubleLogger(Level.TRACE, "desired accel (rev_s2)");
+        m_log_friction_FF = m_log.doubleLogger(Level.TRACE, "friction feedforward (v)");
+        m_log_velocity_FF = m_log.doubleLogger(Level.TRACE, "velocity feedforward (v)");
+        m_log_accel_FF = m_log.doubleLogger(Level.TRACE, "accel feedforward (v)");
+        m_log_torque_FF = m_log.doubleLogger(Level.TRACE, "torque feedforward (v)");
+        m_log_duty = m_log.doubleLogger(Level.DEBUG, "Duty Cycle");
+        m_log_position = m_log.doubleLogger(Level.DEBUG, "position (rev)");
+        m_log_velocity = m_log.doubleLogger(Level.DEBUG, "velocity (rev_s)");
+        m_log_rpm = m_log.doubleLogger(Level.TRACE, "velocity (RPM)");
+        m_log_current = m_log.doubleLogger(Level.DEBUG, "current (A)");
+        m_log_supplyVoltage = m_log.doubleLogger(Level.DEBUG, "voltage (V)");
+        // m_log_torque = m_log.doubleLogger(Level.TRACE, "torque (Nm)");
+        // m_log_temp = m_log.doubleLogger(Level.TRACE, "temperature (C)");
     }
 
     @Override
@@ -222,6 +230,11 @@ public abstract class CANSparkMotor implements BareMotor {
     @Override
     public void setUnwrappedEncoderPositionRad(double positionRad) {
         setEncoderPosition(positionRad / (2 * Math.PI));
+    }
+
+    @Override
+    public CANSparkEncoder encoder() {
+        return new CANSparkEncoder(m_log, this);
     }
 
     @Override

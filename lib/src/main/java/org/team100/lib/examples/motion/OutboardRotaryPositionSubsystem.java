@@ -16,8 +16,6 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
-import org.team100.lib.sensor.position.incremental.rev.CANSparkEncoder;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.Gravity;
 import org.team100.lib.servo.OutboardAngularPositionServo;
@@ -61,7 +59,7 @@ public class OutboardRotaryPositionSubsystem extends SubsystemBase {
             case BLANK -> {
                 // simulation
                 SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
-                SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, motor);
+                IncrementalBareEncoder encoder = motor.encoder();
                 return getMech(log, motor, encoder);
             }
             default -> {
@@ -75,7 +73,7 @@ public class OutboardRotaryPositionSubsystem extends SubsystemBase {
                         Feedforward100.makeNeo(log),
                         PIDConstants.makePositionPID(log, 0.0003) // duty-cycle/RPM
                 );
-                CANSparkEncoder encoder = new CANSparkEncoder(log, motor);
+                IncrementalBareEncoder encoder = motor.encoder();
                 return getMech(log, motor, encoder);
             }
         }

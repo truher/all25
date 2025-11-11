@@ -34,7 +34,7 @@ public class ClimberIntake extends SubsystemBase {
             }
             default -> {
                 m_motor = new LazySimulatedBareMotor(
-                        new SimulatedBareMotor(log, 600), 1.5);
+                        log, new SimulatedBareMotor(log, 600), 1.5);
             }
         }
     }
