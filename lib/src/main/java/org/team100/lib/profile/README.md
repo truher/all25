@@ -1,6 +1,6 @@
-# profile
+# lib.profile
 
-The `lib.profile` package supports "profiled" motion.
+This package supports "profiled" motion.
 
 There are two types, "timed" and "incremental."
 

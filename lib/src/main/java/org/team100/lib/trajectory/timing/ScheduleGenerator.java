@@ -83,7 +83,7 @@ public class ScheduleGenerator {
         // work forward through the samples
         List<ConstrainedState> constrainedStates = new ArrayList<>(samples.size());
         for (Pose2dWithMotion sample : samples) {
-            double dsM = sample.distanceM(predecessor.getM_state());
+            double dsM = sample.distanceM(predecessor.getState());
             ConstrainedState constrainedState = new ConstrainedState(
                     sample, dsM + predecessor.getDistanceM());
             constrainedStates.add(constrainedState);
@@ -95,8 +95,7 @@ public class ScheduleGenerator {
 
     private void forwardWork(ConstrainedState s0, ConstrainedState s1) {
         // constant-twist path length between states
-        // note this is zero for turn-in-place.
-        double dsM = s1.getM_state().distanceM(s0.getM_state());
+        double dsM = s1.getState().distanceM(s0.getState());
 
         // We may need to iterate to find the maximum end velocity and common
         // acceleration, since acceleration limits may be a function of velocity.
@@ -225,13 +224,17 @@ public class ScheduleGenerator {
             if (Double.isNaN(time) || Double.isInfinite(time)) {
                 throw new TimingException();
             }
-            poses.add(new TimedPose(state.getM_state(), time, v1, 0));
+            poses.add(new TimedPose(state.getState(), time, v1, 0));
             v0 = v1;
             distance = state.getDistanceM();
         }
         return new Trajectory100(poses);
     }
 
+    /**
+     * If accelerating, find the time to go from v0 to v1. Otherwise find the time
+     * to go distance ds at speed v0.
+     */
     private static double dt(
             double v0,
             double v1,
@@ -255,6 +258,11 @@ public class ScheduleGenerator {
      * note a can be negative.
      * 
      * note ds can be negative, which implies backwards time
+     * 
+     * @param v0 initial velocity
+     * @param a  acceleration
+     * @param ds distance
+     * @return final velocity
      */
     static double v1(double v0, double a, double ds) {
         /*
@@ -269,9 +277,7 @@ public class ScheduleGenerator {
          * 2*a*ds = v1^2 - v0^2
          * v1 = sqrt(v0^2 + 2*a*ds)
          */
-        double d = v0 * v0 + 2.0 * a * ds;
-        double sqrt = Math.sqrt(d);
-        return sqrt;
+        return Math.sqrt(v0 * v0 + 2.0 * a * ds);
     }
 
     /**
@@ -281,6 +287,10 @@ public class ScheduleGenerator {
      * a = (v1^2 - v0^2) / 2ds
      * 
      * note ds can be negative, which implies negative time.
+     * 
+     * @param v0 initial velocity
+     * @param v1 final velocity
+     * @param ds distance
      */
     static double accel(double v0, double v1, double ds) {
         /*

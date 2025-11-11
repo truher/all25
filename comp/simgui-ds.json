@@ -1,10 +1,10 @@
 {
-  "Keyboard 0 Settings": {
+  "Joysticks": {
     "window": {
-      "visible": true
+      "visible": false
     }
   },
-  "Keyboard 1 Settings": {
+  "Keyboard 0 Settings": {
     "window": {
       "visible": true
     }

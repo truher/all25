@@ -1,9 +1,20 @@
-# reference
+# lib.reference
 
-The `lib.reference` package supplies "references" (i.e. controller setpoints)
-with various dimensionalities and sources, e.g. pre-planned trajectories or
-on-the-fly constrained profiles.  This decouples the controller code from
-the reference source.
+Classes here supply "references" (controller setpoints).
+
+There are two dimensionalities:
+
+* R1: one-dimensional, used for single-DOF mechanisms.
+* R3: three-dimensional, i.e. `Pose2d`, used for drivetrain and planar mechanism.
+
+The reference sources can wrap two different suppliers:
+
+* Profiles (either timed or incremental)
+* Trajectories
+
+The reason for this layer is to decouple the controller code from
+the reference source, so the same controller can be used for, say, a profile
+or a trajectory.
 
 An important trait of Team 100 reference generators is that they produce two
 setpoints: one for the "current time step" and one for the "next time step."

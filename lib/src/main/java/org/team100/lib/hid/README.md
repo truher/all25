@@ -1,6 +1,6 @@
-# hid
+# lib.hid
 
-The `lib.hid` package is for human interface devices like joysticks, button boards, etc.
+This package is for human interface devices like joysticks, button boards, etc.
 
 The control classes used to be "semantic" controls, i.e. they'd have methods like
 `climb()`, but the extra layer there didn't seem that helpful; comments would appear

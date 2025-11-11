@@ -53,7 +53,7 @@ class ConstrainedState {
 
     }
 
-    public Pose2dWithMotion getM_state() {
+    public Pose2dWithMotion getState() {
         return m_state;
     }
 

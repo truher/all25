@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
-import org.team100.lib.geometry.MotionDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.util.Math100;
 
@@ -60,14 +59,24 @@ public class HolonomicSpline {
      * The theta endpoint derivative is just the average theta rate, which is new,
      * it used to be zero.
      * 
+     * Maybe the theta rate should be specified instead of taking the average.
+     * 
      * You'll probably want to call SplineUtil.forceC1() and
      * SplineUtil.optimizeSpline() after creating these segments.
+     * 
+     * Magic numbers also scale theta endpoints, so that the translation and
+     * rotation splines track together.
+     * 
+     * @param p0  starting pose
+     * @param p1  ending pose
+     * @param mN0 starting magic number
+     * @param mN1 ending magic number
      */
     public HolonomicSpline(HolonomicPose2d p0, HolonomicPose2d p1, double mN0, double mN1) {
         double scale0 = mN0 * GeometryUtil.distanceM(p0.translation(), p1.translation());
         double scale1 = mN1 * GeometryUtil.distanceM(p0.translation(), p1.translation());
         if (DEBUG) {
-            System.out.printf("scale %f %f\n",  scale0, scale1 );
+            System.out.printf("scale %f %f\n", scale0, scale1);
         }
         double x0 = p0.translation().getX();
         double x1 = p1.translation().getX();
@@ -100,8 +109,8 @@ public class HolonomicSpline {
         // the preceding point to the following point)
         // this will produce a "corner" in theta, which you may want to fix with
         // SplineUtil.forceC1().
-        double dtheta0 = delta;
-        double dtheta1 = delta;
+        double dtheta0 = delta * mN0;
+        double dtheta1 = delta * mN1;
         // second derivatives are zero at the ends
         double ddtheta0 = 0;
         double ddtheta1 = 0;
@@ -126,14 +135,12 @@ public class HolonomicSpline {
     }
 
     public Pose2dWithMotion getPose2dWithMotion(double p) {
-        Optional<Rotation2d> course = getCourse(p);
-        double dx = course.isPresent() ? course.get().getCos() : 0.0;
-        double dy = course.isPresent() ? course.get().getSin() : 0.0;
-        double dtheta = course.isPresent() ? getDHeadingDs(p) : getDHeading(p);
-
         return new Pose2dWithMotion(
-                getPose2d(p),
-                new MotionDirection(dx, dy, dtheta),
+                new HolonomicPose2d(
+                        getPoint(p),
+                        getHeading(p),
+                        getCourse(p).orElseThrow()),
+                getDHeadingDs(p),
                 getCurvature(p),
                 getDCurvatureDs(p));
     }
@@ -262,13 +269,13 @@ public class HolonomicSpline {
     }
 
     /**
-     * Cartesian coordinate in meters at p.
+     * Cartesian coordinate in meters.
      * 
      * @param t ranges from 0 to 1
      * @return the point on the spline for that t value
      */
     protected Translation2d getPoint(double t) {
-        return new Translation2d(m_x.getPosition(t), m_y.getPosition(t));
+        return new Translation2d(x(t), y(t));
     }
 
     double x(double t) {

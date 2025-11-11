@@ -38,7 +38,7 @@ public class GeometryUtil {
         }
         double scale = dot(a, b) / (norm * norm);
         if (DEBUG) {
-            System.out.printf("project() scale %.8f\n", scale );
+            System.out.printf("project() scale %.8f\n", scale);
         }
         return new ChassisSpeeds(
                 b.vxMetersPerSecond * scale,
@@ -200,7 +200,14 @@ public class GeometryUtil {
         Translation2d lerpT = aT.interpolate(bT, x);
         // Rotation2d lerpR = aR.interpolate(bR, x);
         Rotation2d lerpR = interpolate2(aR, bR, x);
-        return new Pose2d(lerpT, lerpR);        
+        return new Pose2d(lerpT, lerpR);
+    }
+
+    public static HolonomicPose2d interpolate(HolonomicPose2d a, HolonomicPose2d b, double x) {
+        return new HolonomicPose2d(
+                a.translation().interpolate(b.translation(), x),
+                interpolate2(a.heading(), b.heading(), x),
+                interpolate2(a.course(), b.course(), x));
     }
 
     /**
@@ -261,12 +268,6 @@ public class GeometryUtil {
 
     public static Translation2d inverse(Translation2d a) {
         return new Translation2d(-a.getX(), -a.getY());
-    }
-
-    public static PoseWithCurvature interpolate2(PoseWithCurvature a, final PoseWithCurvature other, double x) {
-        Pose2d interpolatedPose = a.poseMeters.interpolate(other.poseMeters, x);
-        double interpolatedCurvature = MathUtil.interpolate(a.curvatureRadPerMeter, other.curvatureRadPerMeter, x);
-        return new PoseWithCurvature(interpolatedPose, interpolatedCurvature);
     }
 
     public static Twist2d interpolate(Twist2d a, Twist2d b, double x) {

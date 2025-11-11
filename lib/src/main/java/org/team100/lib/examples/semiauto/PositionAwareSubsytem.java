@@ -2,8 +2,8 @@ package org.team100.lib.examples.semiauto;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.motion.servo.AngularPositionServo;
-import org.team100.lib.motion.servo.MockAngularPositionServo;
+import org.team100.lib.servo.AngularPositionServo;
+import org.team100.lib.servo.MockAngularPositionServo;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;

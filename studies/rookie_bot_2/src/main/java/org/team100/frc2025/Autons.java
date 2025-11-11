@@ -3,18 +3,16 @@ package org.team100.frc2025;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.commands.r3.DriveToPoseWithProfile;
-import org.team100.lib.commands.r3.DriveWithTrajectoryFunction;
-import org.team100.lib.commands.r3.VelocityFeedforwardOnly;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.mecanum.MecanumDrive100;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.subsystems.mecanum.MecanumDrive100;
+import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
+import org.team100.lib.subsystems.r3.commands.VelocityFeedforwardOnly;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -25,7 +23,6 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class Autons {
     private static final Pose2d KNIGHT_MOVE = new Pose2d(2, 1, Rotation2d.kZero);
@@ -41,69 +38,72 @@ public class Autons {
     private final TrajectoryVisualization m_viz;
 
     public Autons(
-            LoggerFactory log,
+            LoggerFactory parent,
             LoggerFactory fieldLogger,
             MecanumDrive100 drive,
             Pivot pivot) {
-        LoggerFactory autoLog = log.name("Auton");
+        LoggerFactory log = parent.name("Auton");
         m_autonChooser = new AutonChooser();
         m_drive = drive;
         m_profile = HolonomicProfile.wpi(4, 8, 3, 6);
         List<TimingConstraint> constraints = List.of(
-                new DiamondConstraint(autoLog, 2, 2, 2),
-                new ConstantConstraint(autoLog, 1, 1),
-                new YawRateConstraint(autoLog, 1, 1));
+                new DiamondConstraint(log, 2, 2, 2),
+                new ConstantConstraint(log, 1, 1),
+                new YawRateConstraint(log, 1, 1));
         m_planner = new TrajectoryPlanner(constraints);
         m_viz = new TrajectoryVisualization(fieldLogger);
 
-        ControllerR3 controller = ControllerFactoryR3.byIdentity(autoLog);
+        ControllerR3 controller = ControllerFactoryR3.byIdentity(log);
 
-        MoveAndHold knight_move = new VelocityFeedforwardOnly(m_profile, KNIGHT_MOVE, m_drive);
+        MoveAndHold knight_move = new VelocityFeedforwardOnly(log, m_profile, KNIGHT_MOVE, m_drive);
         m_autonChooser.add("knight_move",
                 new AnnotatedCommand(knight_move.until(knight_move::isDone).withName("auto knight_move"), null, null));
 
-
-
         /*
-        MoveAndHold one = new VelocityFeedforwardOnly(m_profile, ONE, m_drive);
-        m_autonChooser.add("one",
-                new AnnotatedCommand(one.until(one::isDone).withName("auto one"), null, null));
-
-        MoveAndHold two = new VelocityFeedforwardOnly(m_profile, TWO, m_drive);
-        m_autonChooser.add("two",
-                new AnnotatedCommand(two.until(two::isDone).withName("auto two"), null, null));
-
-        Command three = m_drive.driveWithGlobalVelocity(
-                new GlobalVelocityR3(1.5, 0, 0)).withTimeout(1.0);
-        m_autonChooser.add("three",
-                new AnnotatedCommand(three.withName("auto three"), null, null));
-
-        MoveAndHold four = new DriveToPoseWithProfile(
-                autoLog, drive, controller, m_profile, () -> FOUR);
-        m_autonChooser.add("four",
-                new AnnotatedCommand(four.until(four::isDone).withName("auto four"), null, null)); */
-
+         * MoveAndHold one = new VelocityFeedforwardOnly(m_profile, ONE, m_drive);
+         * m_autonChooser.add("one",
+         * new AnnotatedCommand(one.until(one::isDone).withName("auto one"), null,
+         * null));
+         * 
+         * MoveAndHold two = new VelocityFeedforwardOnly(log, m_profile, TWO, m_drive);
+         * m_autonChooser.add("two",
+         * new AnnotatedCommand(two.until(two::isDone).withName("auto two"), null,
+         * null));
+         * 
+         * Command three = m_drive.driveWithGlobalVelocity(
+         * new GlobalVelocityR3(1.5, 0, 0)).withTimeout(1.0);
+         * m_autonChooser.add("three",
+         * new AnnotatedCommand(three.withName("auto three"), null, null));
+         * 
+         * MoveAndHold four = new DriveToPoseWithProfile(
+         * log, drive, controller, m_profile, () -> FOUR);
+         * m_autonChooser.add("four",
+         * new AnnotatedCommand(four.until(four::isDone).withName("auto four"), null,
+         * null));
+         */
 
         MoveAndHold knight_l = new DriveWithTrajectoryFunction(
-                drive, controller, m_viz, this::knight_l);
+                log, drive, controller, m_viz, this::knight_l);
         m_autonChooser.add("knight left",
                 new AnnotatedCommand(knight_l.until(knight_l::isDone).withName("auto knight_l"), null, null));
 
         MoveAndHold calib = new DriveWithTrajectoryFunction(
-                drive, controller, m_viz, this::calib);
+                log, drive, controller, m_viz, this::calib);
         m_autonChooser.add("calibration",
                 new AnnotatedCommand(calib.until(calib::isDone).withName("auto calib"), null, null));
 
         MoveAndHold autolow = new DriveWithTrajectoryFunction(
-                drive, controller, m_viz, this::autolow);
+                log, drive, controller, m_viz, this::autolow);
         m_autonChooser.add("straight low auto",
-                new AnnotatedCommand(autolow.until(autolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto autolow"), null, null));
-                // new AnnotatedCommand(pivot.extend().withTimeout(1).withName("auto autolow"), null, null));
-        
-        MoveAndHold swerve_auto = new DriveWithTrajectoryFunction(
-                drive, controller, m_viz, this::side_auto);
+                new AnnotatedCommand(
+                        autolow.until(autolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto autolow"),
+                        null, null));
+
+        MoveAndHold side_auto = new DriveWithTrajectoryFunction(
+                log, drive, controller, m_viz, this::side_auto);
         m_autonChooser.add("swerve auto",
-                new AnnotatedCommand(side_auto.until(side_auto::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto sideauto"), null, null));
+                new AnnotatedCommand(side_auto.until(side_auto::isDone).andThen(pivot.extend().withTimeout(1))
+                        .withName("auto sideauto"), null, null));
 
     }
 
@@ -129,24 +129,25 @@ public class Autons {
         Pose2d end = new Pose2d(p.getX() + 2.2, p.getY(), p.getRotation());
         return m_planner.restToRest(List.of(
                 HolonomicPose2d.make(p, 0),
-                HolonomicPose2d.make(end, 0))); //Math.PI / 2
+                HolonomicPose2d.make(end, 0))); // Math.PI / 2
     }
 
     private Trajectory100 side_auto(Pose2d p) {
         Pose2d point_1 = new Pose2d(p.getX() + 1, p.getY(), p.getRotation());
-        Pose2d point_2 = new Pose2d(point_1.getX(), point_1.getY() +  3.0, point_1.getRotation());
+        Pose2d point_2 = new Pose2d(point_1.getX(), point_1.getY() + 3.0, point_1.getRotation());
         return m_planner.restToRest(List.of(
-            HolonomicPose2d.make(p,0),
-            HolonomicPose2d.make(point_1,Math.PI/2),
-            HolonomicPose2d.make(point_2,0)));
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(point_1, Math.PI / 2),
+                HolonomicPose2d.make(point_2, 0)));
     }
 
     /*
-    private Trajectory100 swerve(Pose2d p) {
-        Pose2d end = new Pose2d(p.getX(), p.getY() - 1, p.getRotation());
-        return m_planner.restToRest(List.of(
-                HolonomicPose2d.make(p, 0),
-                HolonomicPose2d.make(end, Math.PI / 2)));
-    }*/
+     * private Trajectory100 swerve(Pose2d p) {
+     * Pose2d end = new Pose2d(p.getX(), p.getY() - 1, p.getRotation());
+     * return m_planner.restToRest(List.of(
+     * HolonomicPose2d.make(p, 0),
+     * HolonomicPose2d.make(end, Math.PI / 2)));
+     * }
+     */
 
 }

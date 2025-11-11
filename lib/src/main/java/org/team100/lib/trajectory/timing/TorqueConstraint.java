@@ -53,11 +53,10 @@ public class TorqueConstraint implements TimingConstraint {
     @Override
     public MinMaxAcceleration getMinMaxAcceleration(
             Pose2dWithMotion state, double velocityM_S) {
-        // If there's no course, assume the worst case.
-        Rotation2d course = state.getCourse().orElse(Rotation2d.kCCW_90deg);
+        Rotation2d course = state.getCourse();
         // acceleration unit vector
         Translation2d u = new Translation2d(1.0, course);
-        Translation2d r = state.getPose().getTranslation();
+        Translation2d r = state.getPose().translation();
         double cross = r.getX() * u.getY() - r.getY() * u.getX();
         double a = Math.abs(m_maxTorque / (M * cross));
         if (DEBUG) {

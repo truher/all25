@@ -1,0 +1,32 @@
+package org.team100.lib.sensor.gyro;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+
+/**
+ * Three-axis gyro, NWU.
+ */
+public interface Gyro  {
+    /**
+     * Yaw in radians, NWU, counterclockwise positive.
+     * Implementations should extrapolate using the yaw rate,
+     * to get the yaw at the current Takt time.
+     */
+    Rotation2d getYawNWU();
+
+    /**
+     * Yaw rate in rad/s, NWU, counterclockwise positive.
+     * Not cached, may be inconsistent with the yaw value, and not constant during
+     * the cycle.
+     */
+    double getYawRateNWU();
+
+    /** Pitch in radians, NWU, positive-down. */
+    Rotation2d getPitchNWU();
+
+    /** Roll in radians, NWU, positive-right. */
+    Rotation2d getRollNWU();
+
+    /** For computing rate. */
+    void periodic();
+
+}

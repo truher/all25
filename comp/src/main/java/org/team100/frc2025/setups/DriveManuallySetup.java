@@ -2,20 +2,20 @@ package org.team100.frc2025.setups;
 
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
-import org.team100.lib.commands.swerve.manual.DriveManually;
-import org.team100.lib.commands.swerve.manual.ManualChassisSpeeds;
-import org.team100.lib.commands.swerve.manual.ManualFieldRelativeSpeeds;
-import org.team100.lib.commands.swerve.manual.ManualWithFullStateHeading;
-import org.team100.lib.commands.swerve.manual.ManualWithProfiledHeading;
-import org.team100.lib.commands.swerve.manual.ManualWithTargetLock;
-import org.team100.lib.commands.swerve.manual.SimpleManualModuleStates;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
+import org.team100.lib.subsystems.swerve.commands.manual.DriveManually;
+import org.team100.lib.subsystems.swerve.commands.manual.ManualChassisSpeeds;
+import org.team100.lib.subsystems.swerve.commands.manual.ManualFieldRelativeSpeeds;
+import org.team100.lib.subsystems.swerve.commands.manual.ManualWithFullStateHeading;
+import org.team100.lib.subsystems.swerve.commands.manual.ManualWithProfiledHeading;
+import org.team100.lib.subsystems.swerve.commands.manual.ManualWithTargetLock;
+import org.team100.lib.subsystems.swerve.commands.manual.SimpleManualModuleStates;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 
 import edu.wpi.first.math.geometry.Translation2d;
 

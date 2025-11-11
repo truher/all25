@@ -6,7 +6,30 @@ of abstraction, as a supplement to WPILib.
 To get started, it would be good to look through the code from 2025,
 starting with `Robot`, but there's a lot there.
 
-Here are some of the highlights for a simple mechanism:
+## Background
+
+First, a bit of background on Team 100 actuation.
+A Team 100 simple motion control consists of several components:
+
+- a _motor_:  may support closed-loop positional or velocity control, or not.
+- a _sensor_: usually the Team 100 magnetic absolute rotary sensor.
+- a _mechanism_: combines the motor and sensor, and includes the gear ratio. 
+- a _profile_: plans motion to limit velocity or acceleration
+- _feedback_: tries to keep the mechanism on the profile
+- a _servo_: a container for all of the above
+- a _subsystem_: a configuration for all of the above, used by the scheduler
+- some set of _commands_ that manipulates the subsystem
+
+One thing that's notable for its absence is any sort of high-level
+cleverness about measurement, e.g. a Kalman filter, or anything
+else that simulates mechanism dynamics.
+
+We do expect __low-level__ cleverness about measurement: all measures
+are expected to represent the current instant, which means that the
+measuring classes should extrapolate, if possible, to account for
+delay.
+
+With that, we can create a simple mechanism.
 
 ## Create a subsystem
 

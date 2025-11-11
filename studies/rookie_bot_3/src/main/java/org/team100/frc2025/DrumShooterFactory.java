@@ -1,13 +1,12 @@
 package org.team100.frc2025;
 
-import org.team100.lib.examples.shooter.DualDrumShooter;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.servo.LinearVelocityServo;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.rev.NeoVortexCANSparkMotor;
 import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.util.CanId;
 import org.team100.lib.motor.rev.NeoVortexFactory;
+import org.team100.lib.servo.LinearVelocityServo;
+import org.team100.lib.subsystems.shooter.DualDrumShooter;
+import org.team100.lib.util.CanId;
 
 /** Configuration of motors on the demobot shooter. */
 public class DrumShooterFactory {
@@ -22,7 +21,7 @@ public class DrumShooterFactory {
                 new CanId(13),
                 GEAR_RATIO,
                 NeutralMode.BRAKE,
-                MotorPhase.FORWARD,
+                MotorPhase.REVERSE,
                 WHEEL_DIA_M);
         LinearVelocityServo m_right = NeoVortexFactory.getNeoVortexVelocityServo(
                 log.name("right"),
@@ -30,7 +29,7 @@ public class DrumShooterFactory {
                 new CanId(40),
                 GEAR_RATIO,
                 NeutralMode.BRAKE,
-                MotorPhase.REVERSE,
+                MotorPhase.FORWARD,
                 WHEEL_DIA_M);
 
         return new DualDrumShooter(parent, m_left, m_right);

@@ -1,14 +1,14 @@
 package org.team100.frc2025.grip;
 
+import java.util.List;
+
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.encoder.ctre.Talon6Encoder;
-import org.team100.lib.encoder.sim.SimulatedBareEncoder;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
-import org.team100.lib.motion.mechanism.LinearMechanism;
+import org.team100.lib.mechanism.LinearMechanism;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
@@ -16,7 +16,10 @@ import org.team100.lib.motor.ctre.Kraken6Motor;
 import org.team100.lib.motor.sim.LazySimulatedBareMotor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.music.Music;
-import org.team100.lib.sensor.LaserCan100;
+import org.team100.lib.music.Player;
+import org.team100.lib.sensor.distance.LaserCan100;
+import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.util.CanId;
 
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
@@ -38,12 +41,14 @@ public class Manipulator extends SubsystemBase implements Music {
     private final LaserCan100 m_backLaser;
     private final LaserCan100 m_leftLaser;
 
-    public Manipulator(LoggerFactory parent) {
-        LoggerFactory log = parent.name("Manipulator");
+    private final List<Player> m_players;
 
-        LoggerFactory algaeMotorLog = log.name("Algae");
-        LoggerFactory leftMotorLog = log.name("leftMotor");
-        LoggerFactory rightMotorLog = log.name("rightMotor");
+    public Manipulator(LoggerFactory parent) {
+        LoggerFactory log = parent.type(this);
+
+        LoggerFactory algaeMotorLog = log.name("algae");
+        LoggerFactory leftMotorLog = log.name("left");
+        LoggerFactory rightMotorLog = log.name("right");
         coralLogger = log.booleanLogger(Level.TRACE, "Coral Detection");
         switch (Identity.instance) {
             case COMP_BOT -> {
@@ -101,6 +106,8 @@ public class Manipulator extends SubsystemBase implements Music {
                 m_leftLaser = new LaserCan100();
             }
         }
+        m_players = List.of(m_leftMech, m_rightMech, m_algaeMech);
+
     }
 
     @Override
@@ -110,6 +117,11 @@ public class Manipulator extends SubsystemBase implements Music {
             m_rightMech.play(freq);
             m_algaeMech.play(freq);
         });
+    }
+
+    @Override
+    public List<Player> players() {
+        return m_players;
     }
 
     /** Intake and hold. */

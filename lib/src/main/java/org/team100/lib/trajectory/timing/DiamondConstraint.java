@@ -1,7 +1,5 @@
 package org.team100.lib.trajectory.timing;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.tuning.Mutable;
@@ -36,13 +34,8 @@ public class DiamondConstraint implements TimingConstraint {
 
     @Override
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-        Optional<Rotation2d> courseOpt = state.getCourse();
-        if (courseOpt.isEmpty()) {
-            // robot is stationary. turning in place?
-            return new NonNegativeDouble(m_maxVelocityY.getAsDouble());
-        }
-        Rotation2d course = courseOpt.get();
-        Rotation2d heading = state.getHeading();
+        Rotation2d course = state.getPose().course();
+        Rotation2d heading = state.getPose().heading();
         Rotation2d strafe = course.minus(heading);
         // a rhombus is a superellipse with exponent 1
         // https://en.wikipedia.org/wiki/Superellipse

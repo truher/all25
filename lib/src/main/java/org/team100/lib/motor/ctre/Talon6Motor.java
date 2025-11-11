@@ -114,7 +114,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_dutyCycleOut.UpdateFreqHz = 0;
         m_positionVoltage.UpdateFreqHz = 0;
 
-        LoggerFactory child = parent.type(this);
+        LoggerFactory log = parent.type(this);
         m_motor = new TalonFX(canId.id);
         m_ff = ff;
 
@@ -178,28 +178,28 @@ public abstract class Talon6Motor implements BareMotor {
         m_temp = Cache.ofDouble(() -> motorDeviceTemp.getValueAsDouble());
         // m_torque = Memo.ofDouble(() -> motorTorqueCurrent.getValueAsDouble());
 
-        m_log_desired_duty = child.doubleLogger(Level.DEBUG, "desired duty cycle [-1,1]");
-        m_log_desired_position = child.doubleLogger(Level.DEBUG, "desired position (rev)");
-        m_log_desired_speed = child.doubleLogger(Level.DEBUG, "desired speed (rev_s)");
-        m_log_desired_accel = child.doubleLogger(Level.TRACE, "desired accel (rev_s2)");
-        m_log_friction_FF = child.doubleLogger(Level.TRACE, "friction feedforward (v)");
-        m_log_velocity_FF = child.doubleLogger(Level.TRACE, "velocity feedforward (v)");
-        m_log_accel_FF = child.doubleLogger(Level.TRACE, "accel feedforward (v)");
-        m_log_torque_FF = child.doubleLogger(Level.TRACE, "torque feedforward (v)");
-        m_totalFeedForward = child.doubleLogger(Level.TRACE, "total feedforward (v)");
+        m_log_desired_duty = log.doubleLogger(Level.DEBUG, "desired duty cycle [-1,1]");
+        m_log_desired_position = log.doubleLogger(Level.DEBUG, "desired position (rev)");
+        m_log_desired_speed = log.doubleLogger(Level.DEBUG, "desired speed (rev_s)");
+        m_log_desired_accel = log.doubleLogger(Level.TRACE, "desired accel (rev_s2)");
+        m_log_friction_FF = log.doubleLogger(Level.TRACE, "friction feedforward (v)");
+        m_log_velocity_FF = log.doubleLogger(Level.TRACE, "velocity feedforward (v)");
+        m_log_accel_FF = log.doubleLogger(Level.TRACE, "accel feedforward (v)");
+        m_log_torque_FF = log.doubleLogger(Level.TRACE, "torque feedforward (v)");
+        m_totalFeedForward = log.doubleLogger(Level.TRACE, "total feedforward (v)");
 
-        m_log_position = child.doubleLogger(Level.DEBUG, "position (rev)");
-        m_log_velocity = child.doubleLogger(Level.COMP, "velocity (rev_s)");
-        // m_log_accel = child.doubleLogger(Level.TRACE, "accel (rev_s2)");
-        m_log_output = child.doubleLogger(Level.COMP, "output [-1,1]");
-        m_log_error = child.doubleLogger(Level.TRACE, "error (rev_s)");
-        m_log_supply = child.doubleLogger(Level.DEBUG, "supply current (A)");
-        m_log_supplyVoltage = child.doubleLogger(Level.DEBUG, "supply voltage (V)");
-        m_log_stator = child.doubleLogger(Level.DEBUG, "stator current (A)");
-        // m_log_torque = child.doubleLogger(Level.TRACE, "torque (Nm)");
-        m_log_temp = child.doubleLogger(Level.DEBUG, "temperature (C)");
+        m_log_position = log.doubleLogger(Level.DEBUG, "position (rev)");
+        m_log_velocity = log.doubleLogger(Level.COMP, "velocity (rev_s)");
+        // m_log_accel = log.doubleLogger(Level.TRACE, "accel (rev_s2)");
+        m_log_output = log.doubleLogger(Level.COMP, "output [-1,1]");
+        m_log_error = log.doubleLogger(Level.TRACE, "error (rev_s)");
+        m_log_supply = log.doubleLogger(Level.DEBUG, "supply current (A)");
+        m_log_supplyVoltage = log.doubleLogger(Level.DEBUG, "supply voltage (V)");
+        m_log_stator = log.doubleLogger(Level.DEBUG, "stator current (A)");
+        // m_log_torque = log.doubleLogger(Level.TRACE, "torque (Nm)");
+        m_log_temp = log.doubleLogger(Level.DEBUG, "temperature (C)");
 
-        child.intLogger(Level.TRACE, "Device ID").log(() -> canId.id);
+        log.intLogger(Level.TRACE, "Device ID").log(() -> canId.id);
     }
 
     /** Set duty cycle immediately. */

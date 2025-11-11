@@ -1,6 +1,6 @@
-# experiments
+# lib.experiments
 
-The `lib.experiments` package supports changes in behavior that can be
+This package supports changes in behavior that can be
 triggered at runtime.  Each experiment gets its own dashboard widget.
 The expectation is that experiments will live for awhile, and then be
 removed, as we learn what the "best" behavior is.  For example, you

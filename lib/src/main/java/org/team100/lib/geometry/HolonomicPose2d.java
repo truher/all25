@@ -16,6 +16,10 @@ public record HolonomicPose2d(
         Rotation2d heading,
         Rotation2d course) {
 
+    public Pose2d pose() {
+        return new Pose2d(translation, heading);
+    }
+
     public static HolonomicPose2d make(Pose2d p, Rotation2d course) {
         return new HolonomicPose2d(p.getTranslation(), p.getRotation(), course);
     }

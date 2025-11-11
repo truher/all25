@@ -36,6 +36,11 @@ public class PIDConstants {
         return new PIDConstants(log, 0, p);
     }
 
+    public static PIDConstants makeVelocityPID(
+            LoggerFactory log, double p, double i, double d) {
+        return new PIDConstants(log, 0, 0, 0, p, i, d);
+    }
+
     public static PIDConstants makePositionPID(LoggerFactory log, double p) {
         return new PIDConstants(log, p, 0);
     }

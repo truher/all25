@@ -1,9 +1,7 @@
 package org.team100.lib.state;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -125,29 +123,18 @@ public class ModelR3 {
      * Transform timed pose into swerve state.
      */
     public static ModelR3 fromTimedPose(TimedPose timedPose) {
-        double xx = timedPose.state().getPose().getX();
-        double yx = timedPose.state().getPose().getY();
-        double thetax = timedPose.state().getHeading().getRadians();
-
-        Optional<Rotation2d> course = timedPose.state().getCourse();
-        if (course.isPresent()) {
-            Rotation2d motion_direction = course.get();
-            double velocityM_s = timedPose.velocityM_S();
-            double xv = motion_direction.getCos() * velocityM_s;
-            double yv = motion_direction.getSin() * velocityM_s;
-            double thetav = timedPose.state().getHeadingRateRad_M() * velocityM_s;
-            return new ModelR3(
-                    new Model100(xx, xv),
-                    new Model100(yx, yv),
-                    new Model100(thetax, thetav));
-        }
-
-        // no course means no velocity.
-        // this is one of the reasons that pure rotations don't work.
+        double xx = timedPose.state().getPose().translation().getX();
+        double yx = timedPose.state().getPose().translation().getY();
+        double thetax = timedPose.state().getPose().heading().getRadians();
+        Rotation2d course = timedPose.state().getCourse();
+        double velocityM_s = timedPose.velocityM_S();
+        double xv = course.getCos() * velocityM_s;
+        double yv = course.getSin() * velocityM_s;
+        double thetav = timedPose.state().getHeadingRateRad_M() * velocityM_s;
         return new ModelR3(
-                new Model100(xx, 0),
-                new Model100(yx, 0),
-                new Model100(thetax, 0));
+                new Model100(xx, xv),
+                new Model100(yx, yv),
+                new Model100(thetax, thetav));
     }
 
     public String toString() {

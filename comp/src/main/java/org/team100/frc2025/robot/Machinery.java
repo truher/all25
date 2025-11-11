@@ -10,8 +10,6 @@ import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.grip.Manipulator;
 import org.team100.frc2025.indicator.LEDIndicator;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.gyro.Gyro;
-import org.team100.lib.gyro.GyroFactory;
 import org.team100.lib.indicator.Beeper;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
@@ -21,11 +19,13 @@ import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveHistory;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.motion.swerve.SwerveDriveFactory;
-import org.team100.lib.motion.swerve.SwerveDriveSubsystem;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.swerve.module.SwerveModuleCollection;
+import org.team100.lib.sensor.gyro.Gyro;
+import org.team100.lib.sensor.gyro.GyroFactory;
+import org.team100.lib.subsystems.swerve.SwerveDriveFactory;
+import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.subsystems.swerve.module.SwerveModuleCollection;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
 import org.team100.lib.util.CanId;
@@ -49,6 +49,8 @@ public class Machinery {
     // acceleration) to keep from browning out.
     private static final double DRIVE_SUPPLY_LIMIT = 90;
     private static final double DRIVE_STATOR_LIMIT = 110;
+    private static final LoggerFactory logger = Logging.instance().rootLogger;
+    private static final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
 
     private final Runnable m_combinedViz;
     private final Runnable m_climberViz;
@@ -69,8 +71,7 @@ public class Machinery {
     final Beeper m_beeper;
 
     public Machinery() {
-        final LoggerFactory logger = Logging.instance().rootLogger;
-        final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
+
         final LoggerFactory driveLog = logger.name("Drive");
 
         m_swerveKinodynamics = SwerveKinodynamicsFactory.get(driveLog);

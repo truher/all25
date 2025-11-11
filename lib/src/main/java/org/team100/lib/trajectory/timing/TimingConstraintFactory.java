@@ -3,7 +3,7 @@ package org.team100.lib.trajectory.timing;
 import java.util.List;
 
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 public class TimingConstraintFactory {
     private final SwerveKinodynamics m_limits;

@@ -3,24 +3,15 @@ package org.team100.frc2025.CalgamesArm;
 import static edu.wpi.first.wpilibj2.command.Commands.select;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.commands.prr.FollowJointProfiles;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.encoder.CombinedRotaryPositionSensor;
-import org.team100.lib.encoder.EncoderDrive;
-import org.team100.lib.encoder.GearedRotaryPositionSensor;
-import org.team100.lib.encoder.ProxyRotaryPositionSensor;
-import org.team100.lib.encoder.RotaryPositionSensor;
-import org.team100.lib.encoder.ctre.Talon6Encoder;
-import org.team100.lib.encoder.sim.SimulatedBareEncoder;
-import org.team100.lib.encoder.sim.SimulatedRotaryPositionSensor;
-import org.team100.lib.encoder.wpi.AS5048RotaryPositionSensor;
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
@@ -33,23 +24,34 @@ import org.team100.lib.logging.LoggerFactory.JointAccelerationsLogger;
 import org.team100.lib.logging.LoggerFactory.JointForceLogger;
 import org.team100.lib.logging.LoggerFactory.JointVelocitiesLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
-import org.team100.lib.motion.mechanism.LinearMechanism;
-import org.team100.lib.motion.mechanism.RotaryMechanism;
-import org.team100.lib.motion.prr.AnalyticalJacobian;
-import org.team100.lib.motion.prr.Config;
-import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
-import org.team100.lib.motion.prr.JointAccelerations;
-import org.team100.lib.motion.prr.JointForce;
-import org.team100.lib.motion.prr.JointVelocities;
-import org.team100.lib.motion.prr.SubsystemPRR;
+import org.team100.lib.mechanism.LinearMechanism;
+import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.ctre.Kraken6Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.music.Music;
+import org.team100.lib.music.Player;
+import org.team100.lib.sensor.position.absolute.CombinedRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.EncoderDrive;
+import org.team100.lib.sensor.position.absolute.GearedRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.RotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.wpi.AS5048RotaryPositionSensor;
+import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.PositionSubsystemR3;
+import org.team100.lib.subsystems.prr.AnalyticalJacobian;
+import org.team100.lib.subsystems.prr.EAWConfig;
+import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
+import org.team100.lib.subsystems.prr.JointAccelerations;
+import org.team100.lib.subsystems.prr.JointForce;
+import org.team100.lib.subsystems.prr.JointVelocities;
+import org.team100.lib.subsystems.prr.SubsystemPRR;
+import org.team100.lib.subsystems.prr.commands.FollowJointProfiles;
+import org.team100.lib.subsystems.r3.PositionSubsystemR3;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.StrUtil;
@@ -67,13 +69,13 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
     /// CANONICAL CONFIGS
     /// These are used with profiles.
     ///
-    private static final Config HOME = new Config(0, 0, 0);
-    private static final Config CORAL_GROUND_PICK = new Config(0, -1.83, -0.12);
-    private static final Config CLIMB = new Config(0, -1.83, 2);
-    private static final Config STATION = new Config(0, -1, 0);
-    private static final Config PROCESSOR = new Config(0, 1.2, 0);
-    private static final Config ALGAE_GROUND = new Config(0, 1.43, 0);
-    private static final Config L1 = new Config(0, -.95, -.5);
+    private static final EAWConfig HOME = new EAWConfig(0, 0, 0);
+    private static final EAWConfig CORAL_GROUND_PICK = new EAWConfig(0, -1.83, -0.12);
+    private static final EAWConfig CLIMB = new EAWConfig(0, -1.83, 2);
+    private static final EAWConfig STATION = new EAWConfig(0, -1, 0);
+    private static final EAWConfig PROCESSOR = new EAWConfig(0, 1.2, 0);
+    private static final EAWConfig ALGAE_GROUND = new EAWConfig(0, 1.43, 0);
+    private static final EAWConfig L1 = new EAWConfig(0, -.95, -.5);
 
     ////////////////////////////////////////////////////////
     ///
@@ -116,6 +118,8 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
     private final Pose2d m_home;
 
     private final LoggerFactory m_profileLog;
+
+    private final List<Player> m_players;
 
     public CalgamesMech(
             LoggerFactory log,
@@ -277,6 +281,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                         wristLog, wristMotor, wristSensor, 58, -3, 3);
             }
         }
+        m_players = List.of(m_elevatorBack, m_elevatorFront, m_shoulder, m_wrist);
     }
 
     @Override
@@ -289,6 +294,11 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
         });
     }
 
+    @Override
+    public List<Player> players() {
+        return m_players;
+    }
+
     public double getArmLength() {
         return m_armLengthM;
     }
@@ -297,8 +307,8 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
         return m_wristLengthM;
     }
 
-    public Config getConfig() {
-        return new Config(
+    public EAWConfig getConfig() {
+        return new EAWConfig(
                 m_elevatorBack.getPositionM(),
                 m_shoulder.getWrappedPositionRad(),
                 m_wrist.getWrappedPositionRad());
@@ -313,7 +323,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
 
     @Override
     public ModelR3 getState() {
-        Config c = getConfig();
+        EAWConfig c = getConfig();
         JointVelocities jv = getJointVelocity();
         Pose2d p = m_kinematics.forward(c);
         GlobalVelocityR3 v = m_jacobian.forward(c, jv);
@@ -344,7 +354,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
     @Override
     public void set(ControlR3 control) {
         Pose2d pose = control.pose();
-        Config config = m_kinematics.inverse(pose);
+        EAWConfig config = m_kinematics.inverse(pose);
         if (DEBUG) {
             System.out.printf("pose %s config %s\n", StrUtil.pose2Str(pose), config);
         }
@@ -359,7 +369,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
         set(config, jv, ja);
     }
 
-    public void set(Config c, JointVelocities jv, JointAccelerations ja) {
+    public void set(EAWConfig c, JointVelocities jv, JointAccelerations ja) {
         JointForce jf = m_dynamics.forward(c, jv, ja);
         set(c, jv, ja, jf);
     }
@@ -647,7 +657,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
         m_shoulder.setUnwrappedPosition(0, 0, 0, 0);
     }
 
-    private void set(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
+    private void set(EAWConfig c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
         logConfig(c, jv, ja, jf);
         m_elevatorFront.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
         m_elevatorBack.setPosition(c.shoulderHeight(), jv.elevator(), 0, jf.elevator());
@@ -665,7 +675,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
         });
     }
 
-    private void logConfig(Config c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
+    private void logConfig(EAWConfig c, JointVelocities jv, JointAccelerations ja, JointForce jf) {
         m_log_config.log(() -> c);
         m_log_jointV.log(() -> jv);
         m_log_jointA.log(() -> ja);

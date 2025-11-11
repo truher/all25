@@ -1,18 +1,16 @@
 package org.team100.lib.trajectory.timing;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.MotionDirection;
+import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.motion.prr.AnalyticalJacobian;
-import org.team100.lib.motion.prr.Config;
-import org.team100.lib.motion.prr.ElevatorArmWristKinematics;
-import org.team100.lib.motion.prr.JointAccelerations;
-import org.team100.lib.motion.prr.JointVelocities;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.prr.AnalyticalJacobian;
+import org.team100.lib.subsystems.prr.EAWConfig;
+import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
+import org.team100.lib.subsystems.prr.JointAccelerations;
+import org.team100.lib.subsystems.prr.JointVelocities;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -48,12 +46,13 @@ public class JointConstraint implements TimingConstraint {
 
     @Override
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-        Pose2d pose = state.getPose();
-        MotionDirection motion = state.getMotionDirection();
-        // unit vector in cartesian space
+        HolonomicPose2d pose = state.getPose();
+        // Velocity if translation speed were 1.0 m/s.
         GlobalVelocityR3 v = new GlobalVelocityR3(
-                motion.dx(), motion.dy(), motion.dtheta());
-        ModelR3 m = new ModelR3(pose, v);
+                state.getCourse().getCos(),
+                state.getCourse().getSin(),
+                state.getHeadingRateRad_M());
+        ModelR3 m = new ModelR3(pose.pose(), v);
 
         // corresponding vector in joint space
         JointVelocities qdot = m_j.inverse(m);
@@ -68,7 +67,7 @@ public class JointConstraint implements TimingConstraint {
         // scale qdot to the nearest maximum
         JointVelocities maxQdotInMotionDirection = qdot.times(1 / maxScale);
 
-        Config q = m_k.inverse(pose);
+        EAWConfig q = m_k.inverse(pose.pose());
 
         GlobalVelocityR3 maxV = m_j.forward(q, maxQdotInMotionDirection);
         double norm = maxV.norm();
@@ -80,11 +79,11 @@ public class JointConstraint implements TimingConstraint {
     @Override
     public MinMaxAcceleration getMinMaxAcceleration(
             Pose2dWithMotion state, double velocityM_S) {
-        Pose2d pose = state.getPose();
-        Optional<Rotation2d> course2 = state.getCourse();
+        Pose2d pose = state.getPose().pose();
+        Rotation2d course2 = state.getPose().course();
 
-        double c = course2.map(Rotation2d::getCos).orElse(0.0);
-        double s = course2.map(Rotation2d::getSin).orElse(0.0);
+        double c = course2.getCos();
+        double s = course2.getSin();
         double r = state.getHeadingRateRad_M();
         double vx = velocityM_S * s;
         double vy = velocityM_S * c;
@@ -93,7 +92,7 @@ public class JointConstraint implements TimingConstraint {
         // actual cartesian velocity
         GlobalVelocityR3 v = new GlobalVelocityR3(vx, vy, omega);
 
-        Config q = m_k.inverse(pose);
+        EAWConfig q = m_k.inverse(pose);
         // actual qdot
         JointVelocities qdot = m_j.inverse(new ModelR3(pose, v));
 

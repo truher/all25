@@ -4,8 +4,8 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.commands.tank.TankManual;
 import org.team100.lib.config.AnnotatedCommand;
+import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
@@ -13,17 +13,19 @@ import org.team100.lib.indicator.Alerts;
 import org.team100.lib.indicator.SolidIndicator;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
-import org.team100.lib.motion.tank.TankDrive;
-import org.team100.lib.motion.tank.TankDriveFactory;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
+import org.team100.lib.subsystems.tank.TankDrive;
+import org.team100.lib.subsystems.tank.TankDriveFactory;
+import org.team100.lib.subsystems.tank.commands.TankManual;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -69,7 +71,7 @@ public class Robot extends TimedRobot100 {
                 0.4, // track width
                 6.0, // gear ratio
                 0.15); // wheel dia (m)
-        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.tank();
+        SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.tank(logger);
         SwerveLimiter limiter = new SwerveLimiter(
                 logger,
                 kinodynamics,
@@ -99,6 +101,9 @@ public class Robot extends TimedRobot100 {
         Takt.update();
         Cache.refresh();
         CommandScheduler.getInstance().run();
+        if (Experiments.instance.enabled(Experiment.FlushOften)) {
+            NetworkTableInstance.getDefault().flush();
+        }
     }
 
     @Override

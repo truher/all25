@@ -2,18 +2,18 @@ package org.team100.lib.motor.rev;
 
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.encoder.ProxyRotaryPositionSensor;
-import org.team100.lib.encoder.rev.CANSparkEncoder;
-import org.team100.lib.encoder.sim.SimulatedBareEncoder;
-import org.team100.lib.encoder.sim.SimulatedRotaryPositionSensor;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.mechanism.LinearMechanism;
-import org.team100.lib.motion.mechanism.RotaryMechanism;
-import org.team100.lib.motion.servo.LinearVelocityServo;
-import org.team100.lib.motion.servo.OutboardLinearVelocityServo;
+import org.team100.lib.mechanism.LinearMechanism;
+import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
+import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
+import org.team100.lib.sensor.position.incremental.rev.CANSparkEncoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.servo.LinearVelocityServo;
+import org.team100.lib.servo.OutboardLinearVelocityServo;
 import org.team100.lib.util.CanId;
 
 public class NeoVortexFactory {
@@ -27,7 +27,7 @@ public class NeoVortexFactory {
             MotorPhase motorPhase,
             double wheelDiameterM) {
         Feedforward100 ff = Feedforward100.makeNeoVortex(log);
-        PIDConstants pid = PIDConstants.zero(log);
+        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.00025, 0, 0.0001);
         NeoVortexCANSparkMotor motor = new NeoVortexCANSparkMotor(
                 log,
                 canID,

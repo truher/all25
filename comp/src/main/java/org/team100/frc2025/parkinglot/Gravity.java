@@ -1,7 +1,7 @@
 package org.team100.frc2025.parkinglot;
 
-import org.team100.lib.motion.prr.Config;
-import org.team100.lib.motion.prr.JointForce;
+import org.team100.lib.subsystems.prr.EAWConfig;
+import org.team100.lib.subsystems.prr.JointForce;
 /** Models the force of gravity on each joint. */
 public class Gravity {
     /** making g variable means i can make it 10 in tests. */
@@ -37,7 +37,7 @@ public class Gravity {
                 0.5); // guess about shoulder-to-wrist dimension
     }
 
-    public JointForce get(Config c) {
+    public JointForce get(EAWConfig c) {
         // work backwards along the chain
         double globalWristAngle = c.shoulderAngle() + c.wristAngle();
 

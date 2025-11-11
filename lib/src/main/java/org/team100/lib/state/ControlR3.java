@@ -1,10 +1,8 @@
 package org.team100.lib.state;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -127,27 +125,26 @@ public class ControlR3 {
      * Correctly accounts for centripetal acceleration.
      */
     public static ControlR3 fromTimedPose(TimedPose timedPose) {
-        double xx = timedPose.state().getPose().getX();
-        double yx = timedPose.state().getPose().getY();
-        double thetax = timedPose.state().getHeading().getRadians();
+        double xx = timedPose.state().getPose().translation().getX();
+        double yx = timedPose.state().getPose().translation().getY();
+        double thetax = timedPose.state().getPose().heading().getRadians();
 
         double velocityM_s = timedPose.velocityM_S();
-        Optional<Rotation2d> course = timedPose.state().getCourse();
-        Rotation2d motion_direction = course.isPresent() ? course.get() : Rotation2d.kZero;
-        double xv = motion_direction.getCos() * velocityM_s;
-        double yv = motion_direction.getSin() * velocityM_s;
+        Rotation2d course = timedPose.state().getPose().course();
+        double xv = course.getCos() * velocityM_s;
+        double yv = course.getSin() * velocityM_s;
         double thetav = timedPose.state().getHeadingRateRad_M() * velocityM_s;
 
         double accelM_s_s = timedPose.acceleration();
-        double xa = motion_direction.getCos() * accelM_s_s;
-        double ya = motion_direction.getSin() * accelM_s_s;
+        double xa = course.getCos() * accelM_s_s;
+        double ya = course.getSin() * accelM_s_s;
         double thetaa = timedPose.state().getHeadingRateRad_M() * accelM_s_s;
 
         // centripetal accel = v^2/r = v^2 * curvature
         double curvRad_M = timedPose.state().getCurvature();
         double centripetalAccelM_s_s = velocityM_s * velocityM_s * curvRad_M;
-        double xCa = -1.0 * motion_direction.getSin() * centripetalAccelM_s_s;
-        double yCa = motion_direction.getCos() * centripetalAccelM_s_s;
+        double xCa = -1.0 * course.getSin() * centripetalAccelM_s_s;
+        double yCa = course.getCos() * centripetalAccelM_s_s;
 
         return new ControlR3(
                 new Control100(xx, xv, xa + xCa),

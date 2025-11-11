@@ -1,6 +1,6 @@
-# trajectory
+# lib.trajectory
 
-The `lib.trajectory` package represents an path in SE(2) and a schedule.
+This package represents an path in SE(2) and a schedule.
 
 `Trajectory100` is adapted from 254.  Trajectories are holonomic,
 i.e. handle course and heading separately, so they have four dimensions (x, y, heading, course), and "point" below means four-dimensional holonomic state.

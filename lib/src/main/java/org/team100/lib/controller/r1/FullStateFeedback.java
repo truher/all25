@@ -45,11 +45,11 @@ public class FullStateFeedback implements Feedback100 {
             boolean rotation,
             double xtol,
             double vtol) {
-        LoggerFactory child = parent.name("FullStateController");
-        m_log_reference = child.model100Logger(Level.DEBUG, "reference");
-        m_log_measurement = child.model100Logger(Level.DEBUG, "measurement");
-        m_log_error = child.model100Logger(Level.DEBUG, "error");
-        m_log_u_FB = child.doubleLogger(Level.DEBUG, "u_FB");
+        LoggerFactory log = parent.type(this);
+        m_log_reference = log.model100Logger(Level.DEBUG, "reference");
+        m_log_measurement = log.model100Logger(Level.DEBUG, "measurement");
+        m_log_error = log.model100Logger(Level.DEBUG, "error");
+        m_log_u_FB = log.doubleLogger(Level.DEBUG, "u_FB");
         m_K1 = k1;
         m_K2 = k2;
         m_rotation = rotation;

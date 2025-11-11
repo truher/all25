@@ -1,13 +1,9 @@
 package org.team100.lib.trajectory.timing;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.tuning.Mutable;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * Linear velocity limit based on spatial yaw rate, drivetrain omega limit
@@ -41,12 +37,7 @@ public class YawRateConstraint implements TimingConstraint {
     }
 
     @Override
-    public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-        Optional<Rotation2d> course = state.getCourse();
-        if (course.isEmpty()) {
-            // This is turn in place.
-            return new NonNegativeDouble(Double.MAX_VALUE);
-        }
+    public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {       
         // Heading rate in rad/m
         final double heading_rate = state.getHeadingRateRad_M();
         // rad/s / rad/m => m/s.
@@ -55,11 +46,6 @@ public class YawRateConstraint implements TimingConstraint {
 
     @Override
     public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocity) {
-        Optional<Rotation2d> course = state.getCourse();
-        if (course.isEmpty()) {
-            // This is turn in place, which doesn't really work anyway.
-            return MinMaxAcceleration.NO_LIMITS;
-        }
         // Heading rate in rad/m
         final double heading_rate = state.getHeadingRateRad_M();
         // rad/s^2 / rad/m => m/s^2

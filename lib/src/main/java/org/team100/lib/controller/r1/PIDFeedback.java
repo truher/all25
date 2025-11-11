@@ -33,9 +33,9 @@ public class PIDFeedback implements Feedback100 {
 
         if (rotation)
             m_controller.enableContinuousInput(-Math.PI, Math.PI);
-        LoggerFactory child = parent.type(this);
-        m_log_error = child.doubleLogger(Level.TRACE, "error");
-        m_log_errorD = child.doubleLogger(Level.TRACE, "errorD");
+        LoggerFactory log = parent.type(this);
+        m_log_error = log.doubleLogger(Level.TRACE, "error");
+        m_log_errorD = log.doubleLogger(Level.TRACE, "errorD");
 
     }
 

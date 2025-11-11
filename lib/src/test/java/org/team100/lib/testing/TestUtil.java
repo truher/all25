@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
-import org.team100.lib.motion.lynxmotion_arm.LynxArmConfig;
+import org.team100.lib.subsystems.lynxmotion_arm.LynxArmConfig;
 import org.team100.lib.util.StrUtil;
 
 import edu.wpi.first.math.geometry.Pose3d;

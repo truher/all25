@@ -10,22 +10,22 @@ import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmartLuke;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
-import org.team100.lib.commands.prr.FollowJointProfiles;
-import org.team100.lib.commands.r3.ManualPosition;
-import org.team100.lib.commands.swerve.SetRotation;
-import org.team100.lib.commands.swerve.manual.DriveManuallySimple;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.examples.semiauto.FloorPickSequence;
 import org.team100.lib.hid.Buttons2025;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.hid.OperatorXboxControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.motion.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.subsystems.prr.commands.FollowJointProfiles;
+import org.team100.lib.subsystems.r3.commands.FloorPickSequence;
+import org.team100.lib.subsystems.r3.commands.ManualPosition;
+import org.team100.lib.subsystems.swerve.commands.SetRotation;
+import org.team100.lib.subsystems.swerve.commands.manual.DriveManuallySimple;
+import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotController;
@@ -37,6 +37,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * Binds buttons to commands. Also creates default commands.
  */
 public class Binder {
+    private static final LoggerFactory rootLogger = Logging.instance().rootLogger;
+    private static final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
     private final Machinery m_machinery;
 
     public Binder(Machinery machinery) {
@@ -44,9 +46,7 @@ public class Binder {
     }
 
     public void bind() {
-        final LoggerFactory logger = Logging.instance().rootLogger;
-        final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
-        final LoggerFactory comLog = logger.name("Commands");
+        final LoggerFactory log = rootLogger.name("Commands");
 
         /////////////////////////////////////////////////
         ///
@@ -61,10 +61,10 @@ public class Binder {
         // DEFAULT COMMANDS
         //
         final Feedback100 thetaFeedback = new PIDFeedback(
-                comLog, 3.2, 0, 0, true, 0.05, 1);
+                log, 3.2, 0, 0, true, 0.05, 1);
 
         SwerveLimiter limiter = new SwerveLimiter(
-                comLog,
+                log,
                 m_machinery.m_swerveKinodynamics,
                 RobotController::getBatteryVoltage);
         limiter.updateSetpoint(m_machinery.m_drive.getVelocity());
@@ -79,10 +79,10 @@ public class Binder {
                 m_machinery.m_drive,
                 limiter,
                 new ManualWithProfiledReefLock(
-                        comLog, m_machinery.m_swerveKinodynamics, driver::leftTrigger,
+                        log, m_machinery.m_swerveKinodynamics, driver::leftTrigger,
                         thetaFeedback, () -> m_machinery.m_drive.getPose().getTranslation()),
                 new ManualWithBargeAssist(
-                        comLog, m_machinery.m_swerveKinodynamics, driver::pov,
+                        log, m_machinery.m_swerveKinodynamics, driver::pov,
                         thetaFeedback, m_machinery.m_drive::getPose),
                 driver::leftBumper);
         m_machinery.m_drive.setDefaultCommand(driveDefault.withName("drive default"));
@@ -145,8 +145,8 @@ public class Binder {
                         m_machinery.m_mech.pickWithProfile(),
                         m_machinery.m_manipulator.centerIntake(),
                         FloorPickSequence.get(
-                                fieldLogger, m_machinery.m_drive, m_machinery.m_targets,
-                                ControllerFactoryR3.pick(comLog), coralPickProfile)
+                                log, fieldLogger, m_machinery.m_drive, m_machinery.m_targets,
+                                ControllerFactoryR3.pick(log), coralPickProfile)
                                 .withName("Floor Pick"))
                         .until(m_machinery.m_manipulator::hasCoral));
 
@@ -168,7 +168,7 @@ public class Binder {
         // whileTrue(buttons::l4, mech.homeToL4()).onFalse(mech.l4ToHome());
         // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
 
-        final LoggerFactory coralSequence = logger.name("Coral Sequence");
+        final LoggerFactory coralSequence = rootLogger.name("Coral Sequence");
         final HolonomicProfile profile = HolonomicProfile.get(
                 coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5, 1, 0.2);
         final ControllerR3 holonomicController = ControllerFactoryR3.byIdentity(coralSequence);

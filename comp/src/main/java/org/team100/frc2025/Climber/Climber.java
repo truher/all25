@@ -6,15 +6,8 @@ import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.controller.r1.PIDFeedback;
-import org.team100.lib.encoder.EncoderDrive;
-import org.team100.lib.encoder.RotaryPositionSensor;
-import org.team100.lib.encoder.sim.SimulatedBareEncoder;
-import org.team100.lib.encoder.sim.SimulatedRotaryPositionSensor;
-import org.team100.lib.encoder.wpi.AS5048RotaryPositionSensor;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.mechanism.RotaryMechanism;
-import org.team100.lib.motion.servo.AngularPositionServo;
-import org.team100.lib.motion.servo.OnboardAngularPositionServo;
+import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.ctre.Falcon6Motor;
@@ -23,6 +16,13 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
+import org.team100.lib.sensor.position.absolute.EncoderDrive;
+import org.team100.lib.sensor.position.absolute.RotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
+import org.team100.lib.sensor.position.absolute.wpi.AS5048RotaryPositionSensor;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.servo.AngularPositionServo;
+import org.team100.lib.servo.OnboardAngularPositionServo;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 
@@ -34,10 +34,10 @@ public class Climber extends SubsystemBase {
     private final AngularPositionServo m_servo;
 
     public Climber(LoggerFactory parent, CanId canID) {
-        LoggerFactory log = parent.name("Climber");
+        LoggerFactory log = parent.type(this);
 
         IncrementalProfile profile100 = new TrapezoidIncrementalProfile(log, 1, 2, 0.05);
-        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile100, 0.05, 0.05);
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, profile100, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
 
         switch (Identity.instance) {

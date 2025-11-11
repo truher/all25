@@ -4,13 +4,13 @@ import static edu.wpi.first.wpilibj2.command.Commands.print;
 
 import java.util.List;
 
-import org.team100.lib.commands.tank.FixedTrajectory;
-import org.team100.lib.commands.tank.ToPoseWithTrajectory;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.tank.TankDrive;
+import org.team100.lib.subsystems.tank.TankDrive;
+import org.team100.lib.subsystems.tank.commands.FixedTrajectory;
+import org.team100.lib.subsystems.tank.commands.ToPoseWithTrajectory;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;

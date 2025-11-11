@@ -3,14 +3,8 @@ package org.team100.frc2025;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.encoder.IncrementalBareEncoder;
-import org.team100.lib.encoder.rev.CANSparkEncoder;
-import org.team100.lib.encoder.sim.SimulatedBareEncoder;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.motion.mechanism.RotaryMechanism;
-import org.team100.lib.motion.servo.AngularPositionServo;
-import org.team100.lib.motion.servo.Gravity;
-import org.team100.lib.motion.servo.OutboardAngularPositionServo;
+import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
@@ -21,6 +15,12 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
+import org.team100.lib.sensor.position.incremental.rev.CANSparkEncoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.servo.AngularPositionServo;
+import org.team100.lib.servo.Gravity;
+import org.team100.lib.servo.OutboardAngularPositionServo;
 import org.team100.lib.util.CanId;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -43,13 +43,15 @@ public class Pivot extends SubsystemBase {
         LoggerFactory log = parent.type(this);
         m_gravity = new Gravity(log,
                 3, // Max gravity torque, Nm
-                3 * Math.PI/4); // Gravity torque position offset, rad
+                3 * Math.PI / 4); // Gravity torque position offset, rad
         IncrementalProfile profile = new TrapezoidIncrementalProfile(
                 log,
                 8, // max velocity rad/s
                 13, // max accel rad/s^2 origin 1
                 0.01); // tolerance
-        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(profile,
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(
+                log,
+                profile,
                 0.01, // position tolerance, rad
                 0.01); // velocity tolerance, rad/s
         m_servo = new OutboardAngularPositionServo(log, mech(log), ref);

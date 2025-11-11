@@ -2,8 +2,6 @@ package org.team100.frc2025.Swerve;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.commands.swerve.manual.FieldRelativeDriver;
-import org.team100.lib.commands.swerve.manual.HeadingLatch;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GlobalVelocityR3;
@@ -13,11 +11,13 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.StringLogger;
-import org.team100.lib.motion.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
 import org.team100.lib.state.ModelR3;
+import org.team100.lib.subsystems.swerve.commands.manual.FieldRelativeDriver;
+import org.team100.lib.subsystems.swerve.commands.manual.HeadingLatch;
+import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
