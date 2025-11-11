@@ -4,7 +4,9 @@ import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.ControlR3Logger;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ControlR3;
@@ -12,6 +14,8 @@ import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.SubsystemR3;
 
 public abstract class ReferenceControllerR3Base {
+    private final BooleanLogger m_logDone;
+    private final DoubleLogger m_logToGo;
     private final SubsystemR3 m_subsystem;
     private final ControllerR3 m_controller;
     private final ReferenceR3 m_reference;
@@ -28,10 +32,12 @@ public abstract class ReferenceControllerR3Base {
             SubsystemR3 subsystem,
             ControllerR3 controller,
             ReferenceR3 reference) {
+        LoggerFactory log = parent.type(this);
+        m_logDone = log.booleanLogger(Level.TRACE, "done");
+        m_logToGo = log.doubleLogger(Level.TRACE, "to go");
         m_subsystem = subsystem;
         m_controller = controller;
         m_reference = reference;
-        LoggerFactory log = parent.type(this);
         m_log_measurement = log.modelR3Logger(Level.TRACE, "measurement");
         m_log_current = log.modelR3Logger(Level.TRACE, "current");
         m_log_next = log.controlR3Logger(Level.TRACE, "next");
@@ -74,7 +80,9 @@ public abstract class ReferenceControllerR3Base {
      * Use this with "until()" to end the command.
      */
     public boolean isDone() {
-        return m_reference.done() && m_controller.atReference();
+        boolean done = m_reference.done() && m_controller.atReference();
+        m_logDone.log(() -> done);
+        return done;
     }
 
     /**
@@ -86,7 +94,9 @@ public abstract class ReferenceControllerR3Base {
     public double toGo() {
         ModelR3 goal = m_reference.goal();
         ModelR3 measurement = m_subsystem.getState();
-        return goal.minus(measurement).translation().getNorm();
+        double togo = goal.minus(measurement).translation().getNorm();
+        m_logToGo.log(() -> togo);
+        return togo;
     }
 
 }
