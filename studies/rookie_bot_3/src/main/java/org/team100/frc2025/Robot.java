@@ -36,6 +36,7 @@ public class Robot extends TimedRobot100 {
     private final MecanumDrive100 m_drive;
     private final Command m_auton;
     private final IndexerServo m_indexer;
+    private final Autons m_autons;
 
     public Robot() {
         Banner.printBanner();
@@ -57,7 +58,7 @@ public class Robot extends TimedRobot100 {
                 new CanId(27), // rear right
                 0.533, // track width (m)
                 0.406, // wheelbase (m)
-                new Slip(1, 1.32, 1), // wheel slip corrections 1,1.4,1
+                new Slip(1, 1.35, 1), // wheel slip corrections 1,1.4,1
                 6.0, // gears
                 0.15); // wheel dia (m)
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.mecanum(logger);
@@ -95,10 +96,14 @@ public class Robot extends TimedRobot100 {
         m_indexer = new IndexerServo(logger, 0);
         m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
 
+        m_autons = new Autons(logger, fieldLogger, m_drive, m_indexer, m_shooter);
+
+
         new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer, 9)); //////////////////////////////////////////
         new Trigger(driverControl::b).whileTrue(new Shoot(m_shooter, m_indexer, 8));
         new Trigger(driverControl::x).whileTrue(new Shoot(m_shooter, m_indexer, 10));
         new Trigger(driverControl::y).whileTrue(m_indexer.run(() -> m_indexer.set(-1)));
+        new Trigger(driverControl::back).whileTrue(m_drive.resetPose());
 
     }
 
@@ -112,11 +117,13 @@ public class Robot extends TimedRobot100 {
         }
     }
 
+  
     @Override
     public void autonomousInit() {
-        if (m_auton == null)
+        Command auton = m_autons.get().command();
+        if (auton == null)
             return;
-        m_auton.schedule();
+        auton.schedule();
     }
 
     @Override
