@@ -18,6 +18,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
+import org.team100.lib.visualization.SpinnyVisualization;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -33,6 +34,8 @@ public class Robot extends TimedRobot100 {
     private static final double MAX_SPEED_Y_M_S = 3.5;
     private static final double MAX_OMEGA_RAD_S = 5.0;
     private final DualDrumShooter m_shooter;
+    private final SpinnyVisualization m_shooterViz;
+    private final SpinnyVisualization m_indexerViz;
     private final MecanumDrive100 m_drive;
     private final Command m_auton;
     private final IndexerServo m_indexer;
@@ -91,13 +94,14 @@ public class Robot extends TimedRobot100 {
                 .withTimeout(1.0);
 
         m_shooter = DrumShooterFactory.make(logger, 40);
+        m_shooterViz = new SpinnyVisualization(m_shooter::get, "shooter", 5);
         m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
 
         m_indexer = new IndexerServo(logger, 0);
+        m_indexerViz = new SpinnyVisualization(m_indexer::get, "indexer", 0.05);
         m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
 
         m_autons = new Autons(logger, fieldLogger, m_drive, m_indexer, m_shooter);
-
 
         new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer, 9)); //////////////////////////////////////////
         new Trigger(driverControl::b).whileTrue(new Shoot(m_shooter, m_indexer, 8));
@@ -112,12 +116,13 @@ public class Robot extends TimedRobot100 {
         Takt.update();
         Cache.refresh();
         CommandScheduler.getInstance().run();
+        m_shooterViz.run();
+        m_indexerViz.run();
         if (Experiments.instance.enabled(Experiment.FlushOften)) {
             NetworkTableInstance.getDefault().flush();
         }
     }
 
-  
     @Override
     public void autonomousInit() {
         Command auton = m_autons.get().command();
