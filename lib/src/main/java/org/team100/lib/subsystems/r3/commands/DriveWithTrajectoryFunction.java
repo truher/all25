@@ -4,7 +4,10 @@ import java.util.function.Function;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.BooleanLogger;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 import org.team100.lib.subsystems.r3.commands.helper.VelocityReferenceControllerR3;
@@ -20,6 +23,8 @@ import edu.wpi.first.math.geometry.Pose2d;
  */
 public class DriveWithTrajectoryFunction extends MoveAndHold {
     private final LoggerFactory m_log;
+    private final BooleanLogger m_logDone;
+    private final DoubleLogger m_logToGo;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final TrajectoryVisualization m_viz;
@@ -38,6 +43,8 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
             TrajectoryVisualization viz,
             Function<Pose2d, Trajectory100> trajectoryFn) {
         m_log = parent.type(this);
+        m_logDone = m_log.booleanLogger(Level.TRACE, "done");
+        m_logToGo = m_log.doubleLogger(Level.TRACE, "to go");
         m_drive = drive;
         m_controller = controller;
         m_viz = viz;
@@ -68,12 +75,16 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
 
     @Override
     public boolean isDone() {
-        return m_referenceController != null && m_referenceController.isDone();
+        boolean done = m_referenceController != null && m_referenceController.isDone();
+        m_logDone.log(() -> done);
+        return done;
     }
 
     @Override
     public double toGo() {
-        return (m_referenceController == null) ? 0 : m_referenceController.toGo();
+        double togo = (m_referenceController == null) ? 0 : m_referenceController.toGo();
+        m_logToGo.log(() -> togo);
+        return togo;
     }
 
 }
