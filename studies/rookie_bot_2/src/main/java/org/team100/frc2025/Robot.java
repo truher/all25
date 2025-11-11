@@ -99,7 +99,7 @@ public class Robot extends TimedRobot100 {
         m_autons = new Autons(logger, fieldLogger, m_drive, rotary);
 
         new Trigger(driverControl::back).onTrue(
-                m_drive.resetPose());
+                m_drive.resetPose());  
 
         new Trigger(driverControl::x).whileTrue(
                 m_drive.run(
