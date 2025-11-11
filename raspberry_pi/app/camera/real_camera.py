@@ -268,7 +268,7 @@ class RealCamera(Camera):
                 "AwbEnable": False,
                 "ExposureTime": RealCamera.__get_exposure_time(identity),
                 # The first argument is the red gain, second is blue gain, values are from testing in the new gym lighting(1.2,2.2)
-                "ColourGains": (1.2,2.0),
+                #"ColourGains": (1.2,2.0),
                 # limit auto: go as fast as possible but no slower than 30fps
                 # without a duration limit, we slow down in the dark, which is fine
                 # "FrameDurationLimits": (5000, 33333),  # 41 fps

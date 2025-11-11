@@ -29,7 +29,7 @@ __Packages__
 * [geometry](geometry/README.md)
   * Utility code for geometric computations, particularly useful in 3d, and to keep "robot relative" and "field relative" straight.
 * [hid](hid/README.md) 
-  * We push the "control domain" (what each button *means*) into the controller API, and allow hot-swapping controllers.
+  * Human interfaces, mostly simple wrappers.
 * [indicator](indicator/README.md)
   * Ways to get the drive team's attention.
 * [kinematics](kinematics/README.md)
