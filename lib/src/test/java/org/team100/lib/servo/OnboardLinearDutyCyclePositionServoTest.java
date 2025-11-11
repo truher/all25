@@ -11,7 +11,7 @@ import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.testing.Timeless;
 
 public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
@@ -22,7 +22,7 @@ public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
     void test1() {
 
         SimulatedBareMotor driveMotor = new SimulatedBareMotor(logger, 600);
-        SimulatedBareEncoder driveEncoder = new SimulatedBareEncoder(logger, driveMotor);
+        IncrementalBareEncoder driveEncoder = driveMotor.encoder();
         LinearMechanism mech = new LinearMechanism(logger,
                 driveMotor, driveEncoder, 1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 

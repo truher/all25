@@ -1,16 +1,21 @@
 package org.team100.lib.motor.sim;
 
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motor.BareMotor;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 
 /** A simulated motor that runs for awhile, and then stops. */
 public class LazySimulatedBareMotor implements BareMotor {
+    private final LoggerFactory m_log;
     private final BareMotor m_delegate;
     private final double m_timeout;
     private double m_startTime;
     private boolean m_running;
 
-    public LazySimulatedBareMotor(BareMotor delegate, double timeout) {
+    public LazySimulatedBareMotor(LoggerFactory parent, BareMotor delegate, double timeout) {
+        m_log = parent.type(this);
         m_delegate = delegate;
         m_timeout = timeout;
     }
@@ -95,6 +100,11 @@ public class LazySimulatedBareMotor implements BareMotor {
     @Override
     public double kTNm_amp() {
         return m_delegate.kTNm_amp();
+    }
+
+    @Override
+    public IncrementalBareEncoder encoder() {
+        return new SimulatedBareEncoder(m_log, this);
     }
 
     @Override

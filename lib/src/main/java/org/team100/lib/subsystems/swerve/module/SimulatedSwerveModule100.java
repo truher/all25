@@ -11,7 +11,7 @@ import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.sensor.position.absolute.CombinedRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.LinearVelocityServo;
 import org.team100.lib.servo.OnboardAngularPositionServo;
@@ -55,7 +55,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
 
     private static LinearVelocityServo simulatedDriveServo(LoggerFactory parent) {
         SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, driveMotor);
+        IncrementalBareEncoder encoder = driveMotor.encoder();
         LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor,
                 encoder,
@@ -75,7 +75,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
             SwerveKinodynamics kinodynamics) {
         // simulated turning motor free speed is 20 rad/s
         SimulatedBareMotor turningMotor = new SimulatedBareMotor(parent, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, turningMotor);
+        IncrementalBareEncoder encoder = turningMotor.encoder();
         SimulatedRotaryPositionSensor turningSensor = new SimulatedRotaryPositionSensor(
                 parent, encoder, 1);
         RotaryMechanism turningMech = new RotaryMechanism(
@@ -111,7 +111,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
             SwerveKinodynamics kinodynamics) {
         // simulated turning motor free speed is 20 rad/s
         SimulatedBareMotor motor = new SimulatedBareMotor(parent, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(parent, motor);
+        IncrementalBareEncoder encoder = motor.encoder();
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(
                 parent, encoder, 1);
 

@@ -3,11 +3,17 @@ package org.team100.lib.motor;
 import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
 
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+
 /** Treat a group of motors as a single motor. */
 public class BareMotorGroup implements BareMotor {
-    BareMotor[] m_motors;
+    private final LoggerFactory m_log;
+    private final BareMotor[] m_motors;
 
-    public BareMotorGroup(BareMotor... motors) {
+    public BareMotorGroup(LoggerFactory parent, BareMotor... motors) {
+        m_log = parent.type(this);
         m_motors = motors;
     }
 
@@ -59,6 +65,12 @@ public class BareMotorGroup implements BareMotor {
     @Override
     public double kTNm_amp() {
         return mean((m) -> m.kTNm_amp());
+    }
+
+    @Override
+    public IncrementalBareEncoder encoder() {
+        // TODO: does this work?
+        return new SimulatedBareEncoder(m_log, this);
     }
 
     @Override

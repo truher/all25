@@ -39,8 +39,8 @@ import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.RotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.wpi.AS5048RotaryPositionSensor;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.prr.AnalyticalJacobian;
@@ -170,8 +170,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                         100,
                         PIDConstants.makePositionPID(elevatorfrontLog, 5),
                         Feedforward100.makeWCPSwerveTurningFalcon6(elevatorfrontLog));
-                Talon6Encoder elevatorFrontEncoder = new Talon6Encoder(
-                        elevatorfrontLog, elevatorFrontMotor);
+                IncrementalBareEncoder elevatorFrontEncoder = elevatorFrontMotor.encoder();
 
                 m_elevatorFront = new LinearMechanism(
                         elevatorfrontLog, elevatorFrontMotor, elevatorFrontEncoder,
@@ -186,8 +185,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                         100, // originally 90
                         PIDConstants.makePositionPID(elevatorbackLog, 5),
                         Feedforward100.makeWCPSwerveTurningFalcon6(elevatorbackLog));
-                Talon6Encoder elevatorBackEncoder = new Talon6Encoder(
-                        elevatorbackLog, elevatorBackMotor);
+                Talon6Encoder elevatorBackEncoder = elevatorBackMotor.encoder();
                 m_elevatorBack = new LinearMechanism(
                         elevatorbackLog, elevatorBackMotor, elevatorBackEncoder,
                         elevatorGearRatio, elevatorDrivePulleyDiameterM,
@@ -202,8 +200,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                         100, // og 90
                         PIDConstants.makePositionPID(shoulderLog, 5),
                         Feedforward100.makeWCPSwerveTurningFalcon6(shoulderLog));
-                Talon6Encoder shoulderEncoder = new Talon6Encoder(
-                        shoulderLog, shoulderMotor);
+                Talon6Encoder shoulderEncoder = shoulderMotor.encoder();
                 // The shoulder has a 5048 on the intermediate shaft
                 AS5048RotaryPositionSensor shoulderSensor = new AS5048RotaryPositionSensor(
                         shoulderLog,
@@ -234,8 +231,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                         PIDConstants.makePositionPID(wristLog, 8), // og 10
                         Feedforward100.makeWCPSwerveTurningFalcon6(wristLog));
                 // the wrist has no angle sensor, so it needs to start in the "zero" position.
-                Talon6Encoder wristEncoder = new Talon6Encoder(
-                        wristLog, wristMotor);
+                Talon6Encoder wristEncoder = wristMotor.encoder();
                 final double wristGearRatio = 55.710;
                 double wristEncoderOffset = 2.06818; // 2+0.06818
                 m_wrist = new RotaryMechanism(
@@ -247,25 +243,21 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
             default -> {
                 SimulatedBareMotor elevatorMotorFront = new SimulatedBareMotor(
                         elevatorfrontLog, 600);
-                SimulatedBareEncoder elevatorEncoderFront = new SimulatedBareEncoder(
-                        elevatorfrontLog,
-                        elevatorMotorFront);
+                IncrementalBareEncoder elevatorEncoderFront = elevatorMotorFront.encoder();
                 m_elevatorFront = new LinearMechanism(
                         elevatorfrontLog, elevatorMotorFront, elevatorEncoderFront,
                         2, 0.05, 0, 2.2);
 
                 SimulatedBareMotor elevatorMotorBack = new SimulatedBareMotor(
                         elevatorbackLog, 600);
-                SimulatedBareEncoder elevatorEncoderBack = new SimulatedBareEncoder(
-                        elevatorbackLog, elevatorMotorBack);
+                IncrementalBareEncoder elevatorEncoderBack = elevatorMotorBack.encoder();
                 m_elevatorBack = new LinearMechanism(
                         elevatorbackLog, elevatorMotorBack, elevatorEncoderBack,
                         2, 0.05, 0, 2.2);
 
                 SimulatedBareMotor shoulderMotor = new SimulatedBareMotor(
                         shoulderLog, 600);
-                SimulatedBareEncoder shoulderEncoder = new SimulatedBareEncoder(
-                        shoulderLog, shoulderMotor);
+                IncrementalBareEncoder shoulderEncoder = shoulderMotor.encoder();
                 RotaryPositionSensor shoulderSensor = new SimulatedRotaryPositionSensor(
                         shoulderLog, shoulderEncoder, 100);
                 m_shoulder = new RotaryMechanism(
@@ -273,8 +265,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
 
                 SimulatedBareMotor wristMotor = new SimulatedBareMotor(
                         wristLog, 600);
-                SimulatedBareEncoder wristEncoder = new SimulatedBareEncoder(
-                        wristLog, wristMotor);
+                IncrementalBareEncoder wristEncoder = wristMotor.encoder();
                 RotaryPositionSensor wristSensor = new SimulatedRotaryPositionSensor(
                         wristLog, wristEncoder, 58);
                 m_wrist = new RotaryMechanism(

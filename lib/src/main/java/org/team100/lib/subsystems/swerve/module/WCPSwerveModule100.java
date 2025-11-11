@@ -154,7 +154,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 statorLimit,
                 pid,
                 ff);
-        Talon6Encoder encoder = new Talon6Encoder(parent, driveMotor);
+        Talon6Encoder encoder = driveMotor.encoder();
         LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor,
                 encoder,
@@ -182,7 +182,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 statorLimit,
                 pid,
                 ff);
-        Talon6Encoder encoder = new Talon6Encoder(parent, driveMotor);
+        Talon6Encoder encoder = driveMotor.encoder();
         LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor, encoder, ratio.m_ratio, WHEEL_DIAMETER_M, Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
@@ -227,7 +227,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
                 turningOffset,
                 drive);
 
-        Talon6Encoder builtInEncoder = new Talon6Encoder(parent, turningMotor);
+        Talon6Encoder builtInEncoder = turningMotor.encoder();
 
         ProxyRotaryPositionSensor proxy = new ProxyRotaryPositionSensor(builtInEncoder, gearRatio);
         CombinedRotaryPositionSensor combined = new CombinedRotaryPositionSensor(parent, turningSensor, proxy);

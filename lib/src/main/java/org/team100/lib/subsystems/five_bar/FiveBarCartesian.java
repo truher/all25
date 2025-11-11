@@ -11,7 +11,6 @@ import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.ctre.Falcon6Motor;
 import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
-import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
 import org.team100.lib.subsystems.five_bar.commands.Move;
 import org.team100.lib.subsystems.five_bar.kinematics.ActuatorAngles;
 import org.team100.lib.subsystems.five_bar.kinematics.FiveBarKinematics;
@@ -71,7 +70,7 @@ public class FiveBarCartesian extends SubsystemBase {
                 STATOR_LIMIT,
                 pid,
                 ff);
-        IncrementalBareEncoder encoderP1 = new Talon6Encoder(loggerP1, motorP1);
+        IncrementalBareEncoder encoderP1 = motorP1.encoder();
         m_sensorP1 = new ProxyRotaryPositionSensor(encoderP1, 1.0);
         m_mechP1 = new RotaryMechanism(
                 loggerP1,
@@ -91,7 +90,7 @@ public class FiveBarCartesian extends SubsystemBase {
                 STATOR_LIMIT,
                 pid,
                 ff);
-        IncrementalBareEncoder encoderP5 = new Talon6Encoder(loggerP5, motorP5);
+        IncrementalBareEncoder encoderP5 = motorP5.encoder();
         m_sensorP5 = new ProxyRotaryPositionSensor(encoderP5, 1.0);
         m_mechP5 = new RotaryMechanism(
                 loggerP5,

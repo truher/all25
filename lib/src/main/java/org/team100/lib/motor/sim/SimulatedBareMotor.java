@@ -7,6 +7,8 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
+import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.state.Model100;
 import org.team100.lib.util.Math100;
 
@@ -145,6 +147,11 @@ public class SimulatedBareMotor implements BareMotor {
     @Override
     public double kTNm_amp() {
         return 0.02;
+    }
+
+    @Override
+    public IncrementalBareEncoder encoder() {
+        return new SimulatedBareEncoder(m_log, this);
     }
 
     @Override
