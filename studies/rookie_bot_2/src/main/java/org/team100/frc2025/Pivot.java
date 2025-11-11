@@ -42,7 +42,7 @@ public class Pivot extends SubsystemBase {
     public Pivot(LoggerFactory parent) {
         LoggerFactory log = parent.type(this);
         m_gravity = new Gravity(log,
-                3, // Max gravity torque, Nm
+                2.5, // Max gravity torque, Nm
                 3 * Math.PI / 4); // Gravity torque position offset, rad
         IncrementalProfile profile = new TrapezoidIncrementalProfile(
                 log,
