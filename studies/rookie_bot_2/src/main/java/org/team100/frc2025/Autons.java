@@ -35,9 +35,7 @@ public class Autons {
     private static final Pose2d FOUR = new Pose2d(4, 4, Rotation2d.kCCW_90deg);
 
     private final AutonChooser m_autonChooser;
-    private final Mecan
-    
-    mDrive100 m_drive;
+    private final MecanumDrive100 m_drive;
     private final HolonomicProfile m_profile;
     private final TrajectoryPlanner m_planner;
     private final TrajectoryVisualization m_viz;
@@ -84,8 +82,6 @@ public class Autons {
                 autoLog, drive, controller, m_profile, () -> FOUR);
         m_autonChooser.add("four",
                 new AnnotatedCommand(four.until(four::isDone).withName("auto four"), null, null)); */
-
-
 
 
         MoveAndHold knight_l = new DriveWithTrajectoryFunction(
