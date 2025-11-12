@@ -35,7 +35,7 @@ class GravityServoTest implements Timeless {
         Feedback100 pivotFeedback = new PIDFeedback(
                 logger, 4.5, 0.0, 0.000, false, 0.05, 1);
         IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 8, 8, 0.001);
-        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(logger, profile, 0.05, 0.05);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(logger,() ->  profile, 0.05, 0.05);
         // motor speed is rad/s
         SimulatedBareMotor simMotor = new SimulatedBareMotor(logger, 600);
         IncrementalBareEncoder encoder = simMotor.encoder();

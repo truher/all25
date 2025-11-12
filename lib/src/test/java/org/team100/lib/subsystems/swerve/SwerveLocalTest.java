@@ -13,14 +13,14 @@ import org.team100.lib.testing.Timeless;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-class SwerveLocalTest extends Fixtured implements Timeless {
-    public SwerveLocalTest() throws IOException {
-    }
+class SwerveLocalTest implements Timeless {
+
 
     private static final double DELTA = 0.001;
 
     @Test
-    void testSimple() {
+    void testSimple() throws IOException {
+        Fixture fixture = new Fixture();
         SwerveLocal local = fixture.swerveLocal;
         local.setChassisSpeeds(new ChassisSpeeds());
         local.stop();

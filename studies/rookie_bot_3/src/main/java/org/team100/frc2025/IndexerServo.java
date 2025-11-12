@@ -7,7 +7,6 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
 import org.team100.lib.motor.rev.Neo550CANSparkMotor;
 import org.team100.lib.util.CanId;
 

@@ -23,18 +23,20 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
  */
 public interface Timeless {
 
-    /**
-     * Make sure the cache doesn't try to update stale things. This runs before the
-     * constructor so it is safe with the Fixtured tests.
-     */
-    @BeforeAll
-    static void clearCache() {
+    /** Make sure the cache doesn't try to update stale things. */
+    @BeforeEach
+    default void clearCache() {
         Cache.clear();
-        // simulated motors don't move unless enabled.
+    }
+
+    /* Simulated motors don't move unless enabled, so enable them. */
+    @BeforeEach
+    default void enableMotors() {
         DriverStationSim.setEnabled(true);
         DriverStationSim.notifyNewData();
     }
 
+    /** Avoid mixing mutable values between tests. */
     @BeforeEach
     default void unpublish() {
         Mutable.unpublishAll();

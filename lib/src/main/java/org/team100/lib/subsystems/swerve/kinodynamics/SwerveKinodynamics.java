@@ -1,5 +1,7 @@
 package org.team100.lib.subsystems.swerve.kinodynamics;
 
+import java.util.function.Supplier;
+
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.GlobalVelocityR3;
@@ -8,6 +10,7 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.subsystems.swerve.VeeringCorrection;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModuleStates;
+import org.team100.lib.tuning.Mutable;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,30 +32,29 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * lower it here.
  */
 public class SwerveKinodynamics {
-    // geometry
+    private final LoggerFactory m_log;
+    // Geometry; these should be measured with a tape measure, not tuned.
     private final double m_fronttrack;
     private final double m_backtrack;
     private final double m_wheelbase;
     private final double m_frontoffset;
-    private final double m_radius;
     private final double m_vcg;
+    /** Diagonal distance from center to wheel. */
+    private final double m_radius;
+    /** Distance from the center to the nearest edge. */
+    private final double m_fulcrum;
     private final SwerveDriveKinematics100 m_kinematics;
 
-    // configured inputs
-    // TODO: make this Mutable
-    private final double m_maxDriveVelocityM_S;
-    private final double m_stallAccelerationM_S2;
-    private final double m_maxDriveAccelerationM_S2;
-    private final double m_maxDriveDecelerationM_S2;
-    private final double m_maxSteeringVelocityRad_S;
+    // Configured (mutable) inputs.
+    private final Mutable m_maxDriveVelocityM_S;
+    private final Mutable m_stallAccelerationM_S2;
+    private final Mutable m_maxDriveAccelerationM_S2;
+    private final Mutable m_maxDriveDecelerationM_S2;
+    private final Mutable m_maxSteeringVelocityRad_S;
+    private final Mutable m_maxSteeringAccelerationRad_S2;
 
-    // calculated
-    private final double m_maxAngleSpeedRad_S;
-    private final double m_maxAngleAccelRad_S2;
-    private final double m_maxAngleStallAccelRad_S2;
-    private final IncrementalProfile m_steeringProfile;
-    // fulcrum is the distance from the center to the nearest edge.
-    private final double m_fulcrum;
+    // Updated when input Mutables change.
+    private IncrementalProfile m_steeringProfile;
 
     /**
      * @param maxDriveVelocity        module drive speed m/s
@@ -77,7 +79,7 @@ public class SwerveKinodynamics {
      * @param vcg                     vertical center of gravity, meters
      */
     SwerveKinodynamics(
-            LoggerFactory log,
+            LoggerFactory parent,
             double maxDriveVelocity,
             double stallAcceleration,
             double maxDriveAcceleration,
@@ -89,19 +91,15 @@ public class SwerveKinodynamics {
             double wheelbase,
             double frontoffset,
             double vcg) {
-        if (fronttrack < 0.1 || backtrack < 0.1)
-            throw new IllegalArgumentException();
-        if (wheelbase < 0.1)
-            throw new IllegalArgumentException();
+        m_log = parent.type(this);
 
+        // Measured quantities...
         m_fronttrack = fronttrack;
         m_backtrack = backtrack;
         m_wheelbase = wheelbase;
         m_frontoffset = frontoffset;
-        // fulcrum is the distance from the center to the nearest edge.
-        m_fulcrum = Math.min(Math.min(m_fronttrack, m_backtrack) / 2, m_wheelbase / 2);
         m_vcg = vcg;
-        // distance from center to wheel
+        m_fulcrum = Math.min(Math.min(m_fronttrack, m_backtrack) / 2, m_wheelbase / 2);
         m_radius = Math.hypot((fronttrack + backtrack) / 4, m_wheelbase / 2);
         m_kinematics = new SwerveDriveKinematics100(
                 new Translation2d(m_frontoffset, m_fronttrack / 2),
@@ -109,35 +107,30 @@ public class SwerveKinodynamics {
                 new Translation2d(m_frontoffset - m_wheelbase, m_backtrack / 2),
                 new Translation2d(m_frontoffset - m_wheelbase, -m_backtrack / 2));
 
-        m_maxDriveVelocityM_S = maxDriveVelocity;
+        m_maxDriveVelocityM_S = new Mutable(m_log, "maxDriveVelocity", maxDriveVelocity);
+        m_stallAccelerationM_S2 = new Mutable(m_log, "stallAcceleration", stallAcceleration);
+        m_maxDriveAccelerationM_S2 = new Mutable(m_log, "maxDriveAcceleration", maxDriveAcceleration);
+        m_maxDriveDecelerationM_S2 = new Mutable(m_log, "maxDriveDeceleration", maxDriveDeceleration);
+        m_maxSteeringVelocityRad_S = new Mutable(m_log, "maxSteeringVelocity", maxSteeringVelocity, this::update);
+        m_maxSteeringAccelerationRad_S2 = new Mutable(m_log, "maxSteeringAccel", maxSteeringAcceleration, this::update);
+        update(0);
+    }
 
-        m_stallAccelerationM_S2 = stallAcceleration;
-        m_maxDriveAccelerationM_S2 = maxDriveAcceleration;
-        m_maxDriveDecelerationM_S2 = maxDriveDeceleration;
-        m_maxSteeringVelocityRad_S = maxSteeringVelocity;
-        m_maxAngleSpeedRad_S = m_maxDriveVelocityM_S / m_radius;
-
-        double accel = Math.max(m_maxDriveAccelerationM_S2, m_maxDriveDecelerationM_S2);
-        m_maxAngleAccelRad_S2 = 12 * accel * m_radius
-                / (m_fronttrack * m_backtrack + m_wheelbase * m_wheelbase);
-
-        m_maxAngleStallAccelRad_S2 = 12 * m_stallAccelerationM_S2 * m_radius
-                / (m_fronttrack * m_backtrack + m_wheelbase * m_wheelbase);
-
+    private void update(double x) {
         m_steeringProfile = new TrapezoidIncrementalProfile(
-                log.type(this).name("steering"),
-                m_maxSteeringVelocityRad_S,
-                maxSteeringAcceleration,
+                m_log.name("steering"),
+                m_maxSteeringVelocityRad_S.getAsDouble(),
+                m_maxSteeringAccelerationRad_S2.getAsDouble(),
                 0.02); // one degree
     }
 
-    public IncrementalProfile getSteeringProfile() {
-        return m_steeringProfile;
+    public Supplier<IncrementalProfile> getSteeringProfile() {
+        return () -> m_steeringProfile;
     }
 
     /** Cruise speed, m/s. */
     public double getMaxDriveVelocityM_S() {
-        return m_maxDriveVelocityM_S;
+        return m_maxDriveVelocityM_S.getAsDouble();
     }
 
     /**
@@ -145,11 +138,12 @@ public class SwerveKinodynamics {
      * back-EMF-limited torque available at higher RPMs.
      */
     public double getStallAccelerationM_S2() {
-        return m_stallAccelerationM_S2;
+        return m_stallAccelerationM_S2.getAsDouble();
     }
 
     public double getMaxAngleStallAccelRad_S2() {
-        return m_maxAngleStallAccelRad_S2;
+        return 12 * m_stallAccelerationM_S2.getAsDouble() * m_radius
+                / (m_fronttrack * m_backtrack + m_wheelbase * m_wheelbase);
     }
 
     /**
@@ -157,7 +151,7 @@ public class SwerveKinodynamics {
      * profiles.
      */
     public double getMaxDriveAccelerationM_S2() {
-        return m_maxDriveAccelerationM_S2;
+        return m_maxDriveAccelerationM_S2.getAsDouble();
     }
 
     /**
@@ -165,17 +159,17 @@ public class SwerveKinodynamics {
      * slowing down than speeding up, so this should be larger than the accel rate.
      */
     public double getMaxDriveDecelerationM_S2() {
-        return m_maxDriveDecelerationM_S2;
+        return m_maxDriveDecelerationM_S2.getAsDouble();
     }
 
     /** Cruise speed of the swerve steering axes, rad/s. */
     public double getMaxSteeringVelocityRad_S() {
-        return m_maxSteeringVelocityRad_S;
+        return m_maxSteeringVelocityRad_S.getAsDouble();
     }
 
     /** Spin cruise speed, rad/s. Computed from drive and frame size. */
     public double getMaxAngleSpeedRad_S() {
-        return m_maxAngleSpeedRad_S;
+        return m_maxDriveVelocityM_S.getAsDouble() / m_radius;
     }
 
     /**
@@ -183,7 +177,11 @@ public class SwerveKinodynamics {
      * size.
      */
     public double getMaxAngleAccelRad_S2() {
-        return m_maxAngleAccelRad_S2;
+        return 12 * Math.max(
+                m_maxDriveAccelerationM_S2.getAsDouble(),
+                m_maxDriveDecelerationM_S2.getAsDouble())
+                * m_radius
+                / (m_fronttrack * m_backtrack + m_wheelbase * m_wheelbase);
     }
 
     /**

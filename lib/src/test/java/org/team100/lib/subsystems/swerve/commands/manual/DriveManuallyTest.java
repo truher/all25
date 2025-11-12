@@ -10,7 +10,7 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.subsystems.swerve.Fixtured;
+import org.team100.lib.subsystems.swerve.Fixture;
 import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
@@ -19,9 +19,7 @@ import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.wpilibj.RobotController;
 
-class DriveManuallyTest extends Fixtured implements Timeless {
-    public DriveManuallyTest() throws IOException {
-    }
+class DriveManuallyTest implements Timeless {
 
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
@@ -29,7 +27,8 @@ class DriveManuallyTest extends Fixtured implements Timeless {
     Velocity desiredTwist = new Velocity(1, 0, 0);
 
     @Test
-    void testSimple() {
+    void testSimple() throws IOException {
+        Fixture fixture = new Fixture();
         Supplier<Velocity> twistSupplier = () -> desiredTwist;
         SwerveDriveSubsystem drive = fixture.drive;
         fixture.collection.reset();

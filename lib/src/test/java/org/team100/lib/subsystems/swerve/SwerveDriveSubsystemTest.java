@@ -12,14 +12,14 @@ import org.team100.lib.testing.Timeless;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-class SwerveDriveSubsystemTest extends Fixtured implements Timeless {
-    public SwerveDriveSubsystemTest() throws IOException {
-    }
+class SwerveDriveSubsystemTest implements Timeless {
 
     private static final double DELTA = 0.01;
 
     @Test
-    void testWithSetpointGenerator() {
+    void testWithSetpointGenerator() throws IOException {
+        Fixture fixture = new Fixture();
+
         Experiments.instance.testOverride(Experiment.UseSetpointGenerator, true);
 
         SwerveDriveSubsystem drive = fixture.drive;
@@ -63,7 +63,9 @@ class SwerveDriveSubsystemTest extends Fixtured implements Timeless {
     }
 
     @Test
-    void testWithoutSetpointGenerator() {
+    void testWithoutSetpointGenerator() throws IOException {
+        Fixture fixture = new Fixture();
+
         Experiments.instance.testOverride(Experiment.UseSetpointGenerator, false);
         SwerveDriveSubsystem drive = fixture.drive;
         fixture.collection.reset();
@@ -87,7 +89,7 @@ class SwerveDriveSubsystemTest extends Fixtured implements Timeless {
 
         // it took 0.02 s to go from 0 m/s to 1 m/s, so we accelerated 50 m/s/s.
         verify(drive, 0.02, 1.00, 50.0);
-        
+
         drive.setChassisSpeeds(new ChassisSpeeds(1, 0, 0));
 
         stepTime();
