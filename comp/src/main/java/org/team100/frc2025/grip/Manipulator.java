@@ -18,7 +18,6 @@ import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.music.Music;
 import org.team100.lib.music.Player;
 import org.team100.lib.sensor.distance.LaserCan100;
-import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.util.CanId;
 
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;

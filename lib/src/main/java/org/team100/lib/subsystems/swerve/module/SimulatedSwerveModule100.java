@@ -3,7 +3,6 @@ package org.team100.lib.subsystems.swerve.module;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.mechanism.LinearMechanism;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
@@ -54,16 +53,9 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
     }
 
     private static LinearVelocityServo simulatedDriveServo(LoggerFactory parent) {
-        SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 600);
-        IncrementalBareEncoder encoder = driveMotor.encoder();
-        LinearMechanism mech = new LinearMechanism(parent,
-                driveMotor,
-                encoder,
-                DRIVE_GEAR_RATIO,
-                WHEEL_DIAMETER_M,
-                Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY);
-        return new OutboardLinearVelocityServo(parent, mech);
+        SimulatedBareMotor motor = new SimulatedBareMotor(parent, 600);
+        return OutboardLinearVelocityServo.make(
+                parent, motor, DRIVE_GEAR_RATIO, WHEEL_DIAMETER_M);
     }
 
     /**
