@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class InterceptTest {
     private static final double DELTA = 0.001;
 
-    // @Test
+    @Test
     void testBothStationary() {
         // robot at the origin, stationary
         // target direction +x, stationary
@@ -91,7 +91,7 @@ public class InterceptTest {
         // B = 2(10*0 + 5*-1) = -10.
         // C = 10^2 + 5^2 = 125.
         // Equation: -99t^2 - 10t + 125 = 0.
-        // Solution t ≈ 1.077s.
+        // Solution t ~ 1.077s.
         // Interception point I ≈ (10, 3.923).
         // Azimuth should be atan2(3.923, 10) ≈ 0.373 radians.
         
