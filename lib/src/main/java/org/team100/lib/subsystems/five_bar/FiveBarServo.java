@@ -15,7 +15,6 @@ import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
-import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.OutboardAngularPositionServo;
 import org.team100.lib.subsystems.five_bar.kinematics.FiveBarKinematics;
@@ -37,9 +36,8 @@ public class FiveBarServo extends SubsystemBase {
     /** Low current limits */
     private static final double SUPPLY_LIMIT = 5;
     private static final double STATOR_LIMIT = 5;
-    private static final double maxVel = 190;
-    private static final double maxAccel = 210;
-    private static final double kPositionTolerance = 0.01;
+    private static final double MAX_VELOCITY = 190;
+    private static final double MAX_ACCEL = 210;
     private static final Scenario SCENARIO;
     static {
         // origin is P1
@@ -71,7 +69,7 @@ public class FiveBarServo extends SubsystemBase {
         PIDConstants pid = PIDConstants.zero(logger);
         Feedforward100 ff = Feedforward100.zero(logger);
         IncrementalProfile profile = new TrapezoidIncrementalProfile(
-                logger, maxVel, maxAccel, kPositionTolerance);
+                logger, MAX_VELOCITY, MAX_ACCEL, POSITION_TOLERANCE);
 
         LoggerFactory loggerP1 = logger.name("p1");
         Falcon6Motor motorP1 = new Falcon6Motor(
@@ -83,7 +81,7 @@ public class FiveBarServo extends SubsystemBase {
                 STATOR_LIMIT,
                 pid,
                 ff);
-        IncrementalBareEncoder encoderP1 = new Talon6Encoder(loggerP1, motorP1);
+        IncrementalBareEncoder encoderP1 = motorP1.encoder();
         m_sensorP1 = new ProxyRotaryPositionSensor(encoderP1, 1.0);
         RotaryMechanism mechP1 = new RotaryMechanism(
                 loggerP1,
@@ -94,7 +92,7 @@ public class FiveBarServo extends SubsystemBase {
                 1.0);
 
         ProfileReferenceR1 refP1 = new IncrementalProfileReferenceR1(
-                loggerP1, profile, POSITION_TOLERANCE, VELOCITY_TOLERANCE);
+                loggerP1, () -> profile, POSITION_TOLERANCE, VELOCITY_TOLERANCE);
         m_servoP1 = new OutboardAngularPositionServo(
                 loggerP1,
                 mechP1,
@@ -110,7 +108,7 @@ public class FiveBarServo extends SubsystemBase {
                 STATOR_LIMIT,
                 pid,
                 ff);
-        IncrementalBareEncoder encoderP5 = new Talon6Encoder(loggerP5, motorP5);
+        IncrementalBareEncoder encoderP5 = motorP5.encoder();
         m_sensorP5 = new ProxyRotaryPositionSensor(encoderP5, 1.0);
         RotaryMechanism m_mechP5 = new RotaryMechanism(
                 loggerP5,
@@ -120,7 +118,7 @@ public class FiveBarServo extends SubsystemBase {
                 0.0,
                 1.0);
         ProfileReferenceR1 refP5 = new IncrementalProfileReferenceR1(
-                loggerP5, profile, POSITION_TOLERANCE, VELOCITY_TOLERANCE);
+                loggerP5, () -> profile, POSITION_TOLERANCE, VELOCITY_TOLERANCE);
         m_servoP5 = new OutboardAngularPositionServo(
                 loggerP5,
                 m_mechP5,

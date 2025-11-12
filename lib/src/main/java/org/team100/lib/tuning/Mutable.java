@@ -21,12 +21,15 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * Values do not survive restarts.
  */
 public class Mutable implements DoubleSupplier {
+    private static final boolean FATAL = false;
     private static final Map<String, DoubleEntry> ALL_ENTRIES = new HashMap<>();
     private final DoubleEntry m_entry;
     private final DoubleConsumer m_onChange;
     private final DoubleCache m_cache;
 
     public Mutable(LoggerFactory log, String leaf, double defaultValue, DoubleConsumer onChange) {
+        if (onChange == null)
+            throw new IllegalArgumentException();
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         inst.startServer();
         String name = log.root(leaf);
@@ -37,10 +40,12 @@ public class Mutable implements DoubleSupplier {
 
     private static DoubleEntry getEntry(NetworkTableInstance inst, String name, double defaultValue) {
         if (ALL_ENTRIES.containsKey(name)) {
-            // TODO: make this fatal
+            if (FATAL)
+                throw new IllegalArgumentException(name);
             System.out.printf("** WARNING: duplicate Mutable name %s\n", name);
             return ALL_ENTRIES.get(name);
         }
+        System.out.printf("name %s\n", name);
         DoubleTopic topic = inst.getDoubleTopic(name);
         DoubleEntry entry = topic.getEntry(defaultValue);
         // Makes sure we don't get a stale value.

@@ -14,8 +14,9 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.Fixture;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.testing.Timeless;
 
-class SwerveUtilTest {
+class SwerveUtilTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
     private final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());

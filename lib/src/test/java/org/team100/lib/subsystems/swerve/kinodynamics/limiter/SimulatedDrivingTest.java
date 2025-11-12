@@ -40,11 +40,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 public class SimulatedDrivingTest implements Timeless {
     private static final boolean DEBUG = false;
     final LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
-    LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
-    SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
-    SwerveModuleCollection collection = SwerveModuleCollection.forTest(
-            logger, swerveKinodynamics);
 
+    final SwerveKinodynamics swerveKinodynamics;
+    final SwerveModuleCollection collection;
     final Gyro gyro;
     final SwerveHistory history;
     final SwerveLocal swerveLocal;
@@ -53,6 +51,10 @@ public class SimulatedDrivingTest implements Timeless {
     final SwerveDriveSubsystem drive;
 
     SimulatedDrivingTest() throws IOException {
+        LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
+        swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
+        collection = SwerveModuleCollection.forTest(
+                logger, swerveKinodynamics);
         gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
         history = new SwerveHistory(

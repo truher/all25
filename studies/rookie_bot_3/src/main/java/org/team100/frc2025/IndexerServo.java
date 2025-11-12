@@ -5,9 +5,8 @@ import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
+import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.rev.CANSparkMotor;
 import org.team100.lib.motor.rev.Neo550CANSparkMotor;
 import org.team100.lib.util.CanId;
 
@@ -16,25 +15,28 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IndexerServo extends SubsystemBase {
 
-    private final CANSparkMotor m_servo;
-    private final DoubleLogger m_doubleLogger;
+    private final BareMotor m_servo;
+    private final DoubleLogger m_logDutyCycle;
 
     public IndexerServo(LoggerFactory parent, int channel) {
         LoggerFactory logger = parent.type(this);
-        m_doubleLogger = logger.doubleLogger(Level.TRACE, "Angle (deg)");
-        m_servo = new Neo550CANSparkMotor(
-            logger,
-            new CanId(14),
-            NeutralMode.BRAKE,
-            MotorPhase.FORWARD,
-            10,
-            Feedforward100.makeNeo550(logger),
-             PIDConstants.zero(logger));
+        m_logDutyCycle = logger.doubleLogger(Level.TRACE, "duty cycle");
+        m_servo =  Neo550CANSparkMotor.get(
+                logger,
+                new CanId(14),
+                MotorPhase.FORWARD,
+                10,
+                Feedforward100.makeNeo550(logger),
+                PIDConstants.zero(logger));
     }
 
     public void set(double value) {
         m_servo.setDutyCycle(-1.0 * value);
-        m_doubleLogger.log(() -> value);
+        m_logDutyCycle.log(() -> value);
+    }
+
+    public double get() {
+        return m_servo.getVelocityRad_S();
     }
 
     public void stop() {

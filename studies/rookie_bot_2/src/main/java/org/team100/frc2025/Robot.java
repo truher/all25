@@ -24,6 +24,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
+import org.team100.lib.visualization.ArmVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -44,6 +45,7 @@ public class Robot extends TimedRobot100 {
     private static final double MAX_OMEGA_RAD_S = 5.0;
 
     private final MecanumDrive100 m_drive;
+    private final ArmVisualization m_pivotViz;
     private final Autons m_autons;
     private final SolidIndicator m_indicator;
     private final Alerts m_alerts;
@@ -65,6 +67,7 @@ public class Robot extends TimedRobot100 {
         DriverXboxControl driverControl = new DriverXboxControl(0);
         LoggerFactory logger = logging.rootLogger;
         Pivot rotary = new Pivot(logger);
+        m_pivotViz = new ArmVisualization(rotary::getWrappedPositionRad, "pivot", 0);
         rotary.setDefaultCommand(rotary.home());
         new Trigger(driverControl::rightTrigger).whileTrue(rotary.extend()); // change to be triggers
         m_drive = MecanumDriveFactory.make(
@@ -122,6 +125,7 @@ public class Robot extends TimedRobot100 {
         Takt.update();
         Cache.refresh();
         CommandScheduler.getInstance().run();
+        m_pivotViz.run();
         if (Experiments.instance.enabled(Experiment.FlushOften)) {
             NetworkTableInstance.getDefault().flush();
         }

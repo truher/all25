@@ -39,6 +39,10 @@ public class DualDrumShooter extends SubsystemBase {
         m_right.setVelocity(velocityM_S);
     }
 
+    public double get() {
+        return (m_left.getVelocity() + m_right.getVelocity()) / 2;
+    }
+
     public void stop() {
         set(0);
     }

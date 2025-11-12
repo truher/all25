@@ -1,10 +1,13 @@
 package org.team100.lib.motor.rev;
 
 import org.team100.lib.config.Feedforward100;
+import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
 import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.util.CanId;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -16,10 +19,6 @@ import com.revrobotics.spark.SparkMax;
  * @see https://www.revrobotics.com/rev-21-1650/
  */
 public class NeoCANSparkMotor extends CANSparkMotor {
-    /**
-     * Note the PID values should be in duty cycle per RPM, so, like 3e-4.
-     * Current limit is stator current.
-     */
     public NeoCANSparkMotor(
             LoggerFactory parent,
             CanId canId,
@@ -30,6 +29,17 @@ public class NeoCANSparkMotor extends CANSparkMotor {
             PIDConstants pid) {
         super(parent, new SparkMax(canId.id, MotorType.kBrushless),
                 neutral, motorPhase, statorCurrentLimit, ff, pid);
+    }
+
+    /** Real or simulated depending on identity */
+    public static BareMotor get(
+            LoggerFactory log, CanId can, MotorPhase phase, int statorLimit,
+            Feedforward100 ff, PIDConstants pid) {
+        return switch (Identity.instance) {
+            case BLANK -> new SimulatedBareMotor(log, 600);
+            default -> new NeoCANSparkMotor(
+                    log, can, NeutralMode.BRAKE, phase, statorLimit, ff, pid);
+        };
     }
 
     @Override

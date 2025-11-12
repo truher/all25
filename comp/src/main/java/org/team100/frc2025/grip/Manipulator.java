@@ -18,8 +18,6 @@ import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.music.Music;
 import org.team100.lib.music.Player;
 import org.team100.lib.sensor.distance.LaserCan100;
-import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
 import org.team100.lib.util.CanId;
 
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
@@ -77,28 +75,25 @@ public class Manipulator extends SubsystemBase implements Music {
                 m_frontLaser = new LaserCan100(new CanId(16));
                 m_backLaser = new LaserCan100(new CanId(18));
                 m_leftLaser = new LaserCan100(new CanId(15));
-                m_leftMech = new LinearMechanism(leftMotorLog, leftMotor, new Talon6Encoder(log, leftMotor),
+                m_leftMech = new LinearMechanism(leftMotorLog, leftMotor, leftMotor.encoder(),
                         16, 0.1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_rightMech = new LinearMechanism(rightMotorLog, rightMotor, new Talon6Encoder(log, rightMotor),
+                m_rightMech = new LinearMechanism(rightMotorLog, rightMotor, rightMotor.encoder(),
                         16, 0.1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_algaeMech = new LinearMechanism(algaeMotorLog, algaeMotor, new Talon6Encoder(log, algaeMotor),
+                m_algaeMech = new LinearMechanism(algaeMotorLog, algaeMotor, algaeMotor.encoder(),
                         16, 0.1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
             }
             default -> {
-                BareMotor leftMotor = new SimulatedBareMotor(log, 600);
-                SimulatedBareEncoder leftEncoder = new SimulatedBareEncoder(log, leftMotor);
-                BareMotor rightMotor = new SimulatedBareMotor(log, 600);
-                SimulatedBareEncoder rightEncoder = new SimulatedBareEncoder(log, rightMotor);
+                SimulatedBareMotor leftMotor = new SimulatedBareMotor(log, 600);
+                SimulatedBareMotor rightMotor = new SimulatedBareMotor(log, 600);
                 // simulated algae motor gets overloaded 2 sec after starting
-                BareMotor algaeMotor = new LazySimulatedBareMotor(
-                        new SimulatedBareMotor(log, 600), 2);
-                SimulatedBareEncoder algaeEncoder = new SimulatedBareEncoder(log, algaeMotor);
+                LazySimulatedBareMotor algaeMotor = new LazySimulatedBareMotor(
+                        log, new SimulatedBareMotor(log, 600), 2);
                 m_algaeMotor = algaeMotor;
-                m_leftMech = new LinearMechanism(log, leftMotor, leftEncoder,
+                m_leftMech = new LinearMechanism(log, leftMotor, leftMotor.encoder(),
                         1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_rightMech = new LinearMechanism(log, rightMotor, rightEncoder,
+                m_rightMech = new LinearMechanism(log, rightMotor, rightMotor.encoder(),
                         1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-                m_algaeMech = new LinearMechanism(log, algaeMotor, algaeEncoder,
+                m_algaeMech = new LinearMechanism(log, algaeMotor, algaeMotor.encoder(),
                         1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 m_rightLaser = new LaserCan100();
                 m_frontLaser = new LaserCan100();

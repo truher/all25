@@ -22,7 +22,7 @@ import org.team100.lib.reference.r1.MockProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.sensor.position.absolute.MockRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.state.Model100;
 import org.team100.lib.testing.Timeless;
 
@@ -35,10 +35,10 @@ class GravityServoTest implements Timeless {
         Feedback100 pivotFeedback = new PIDFeedback(
                 logger, 4.5, 0.0, 0.000, false, 0.05, 1);
         IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 8, 8, 0.001);
-        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(logger, profile, 0.05, 0.05);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(logger,() ->  profile, 0.05, 0.05);
         // motor speed is rad/s
         SimulatedBareMotor simMotor = new SimulatedBareMotor(logger, 600);
-        SimulatedBareEncoder encoder = new SimulatedBareEncoder(logger, simMotor);
+        IncrementalBareEncoder encoder = simMotor.encoder();
         SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(
                 logger, encoder, 165);
         RotaryMechanism simMech = new RotaryMechanism(

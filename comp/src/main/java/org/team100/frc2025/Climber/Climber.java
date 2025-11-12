@@ -20,7 +20,7 @@ import org.team100.lib.sensor.position.absolute.EncoderDrive;
 import org.team100.lib.sensor.position.absolute.RotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.wpi.AS5048RotaryPositionSensor;
-import org.team100.lib.sensor.position.incremental.sim.SimulatedBareEncoder;
+import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.OnboardAngularPositionServo;
 import org.team100.lib.util.CanId;
@@ -36,8 +36,8 @@ public class Climber extends SubsystemBase {
     public Climber(LoggerFactory parent, CanId canID) {
         LoggerFactory log = parent.type(this);
 
-        IncrementalProfile profile100 = new TrapezoidIncrementalProfile(log, 1, 2, 0.05);
-        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, profile100, 0.05, 0.05);
+        IncrementalProfile profile = new TrapezoidIncrementalProfile(log, 1, 2, 0.05);
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
 
         switch (Identity.instance) {
@@ -62,7 +62,7 @@ public class Climber extends SubsystemBase {
             default -> {
                 SimulatedBareMotor climberMotor = new SimulatedBareMotor(log, 600);
 
-                SimulatedBareEncoder encoder = new SimulatedBareEncoder(log, climberMotor);
+                IncrementalBareEncoder encoder = climberMotor.encoder();
                 SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
 
                 RotaryMechanism climberMech = new RotaryMechanism(
