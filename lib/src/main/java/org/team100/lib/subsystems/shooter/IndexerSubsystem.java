@@ -24,12 +24,14 @@ public class IndexerSubsystem extends SubsystemBase {
         m_objectLength = objectLengthM;
         m_IndexerVelocityM_S = indexVelocityM_S;
         m_linearMechanism = linearMechanism;
+        TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(
+                m_logger, indexVelocityM_S, maxAccel, 0.02);
         m_indexer = new OutboardLinearPositionServo(
                 m_logger,
                 linearMechanism,
                 new IncrementalProfileReferenceR1(
                         m_logger,
-                        new TrapezoidIncrementalProfile(m_logger, indexVelocityM_S, maxAccel, 0.02),
+                        () -> profile,
                         0.02,
                         0.02),
                 0.02, 0.02);

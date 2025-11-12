@@ -54,7 +54,7 @@ public class Turret extends SubsystemBase {
         m_pose = pose;
         m_target = target;
         IncrementalProfile profile = new TrapezoidIncrementalProfile(log, 5, 10, 0.05);
-        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, profile, 0.05, 0.05);
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile, 0.05, 0.05);
         PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
         SimulatedBareMotor motor = new SimulatedBareMotor(log, 600);
         IncrementalBareEncoder encoder = motor.encoder();

@@ -11,8 +11,9 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
+import org.team100.lib.testing.Timeless;
 
-public class FieldRelativeAccelerationLimiterTest {
+public class FieldRelativeAccelerationLimiterTest implements Timeless {
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 

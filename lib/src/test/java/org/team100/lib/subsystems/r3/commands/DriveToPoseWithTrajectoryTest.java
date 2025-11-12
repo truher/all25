@@ -14,7 +14,7 @@ import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.subsystems.swerve.Fixtured;
+import org.team100.lib.subsystems.swerve.Fixture;
 import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
@@ -32,9 +32,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
-    public DriveToPoseWithTrajectoryTest() throws IOException {
-    }
+class DriveToPoseWithTrajectoryTest implements Timeless {
 
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
@@ -45,7 +43,9 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
     TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
     @Test
-    void testSimple() {
+    void testSimple() throws IOException {
+        Fixture fixture = new Fixture();
+
         Pose2d goal = Pose2d.kZero;
         SwerveDriveSubsystem drive = fixture.drive;
 
@@ -70,6 +70,7 @@ class DriveToPoseWithTrajectoryTest extends Fixtured implements Timeless {
     /** Demonstrate how to use DriveToWaypoint to go to apriltags. */
     @Test
     void testAprilTag() throws IOException {
+        Fixture fixture = new Fixture();
         SwerveDriveSubsystem drive = fixture.drive;
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 

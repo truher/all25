@@ -27,7 +27,7 @@ public class OnboardLinearDutyCyclePositionServoTest implements Timeless {
                 driveMotor, driveEncoder, 1, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         IncrementalProfile profile = new TrapezoidIncrementalProfile(logger, 2, 1, 0.01);
-        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(logger, profile, 0.05, 0.05);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(logger, () -> profile, 0.05, 0.05);
 
         final double k1 = 1.0;
         final double k2 = 0.01;

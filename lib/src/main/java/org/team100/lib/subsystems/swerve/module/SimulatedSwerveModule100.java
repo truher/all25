@@ -1,9 +1,10 @@
 package org.team100.lib.subsystems.swerve.module;
 
+import java.util.function.Supplier;
+
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.mechanism.LinearMechanism;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.profile.incremental.IncrementalProfile;
@@ -54,16 +55,9 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
     }
 
     private static LinearVelocityServo simulatedDriveServo(LoggerFactory parent) {
-        SimulatedBareMotor driveMotor = new SimulatedBareMotor(parent, 600);
-        IncrementalBareEncoder encoder = driveMotor.encoder();
-        LinearMechanism mech = new LinearMechanism(parent,
-                driveMotor,
-                encoder,
-                DRIVE_GEAR_RATIO,
-                WHEEL_DIAMETER_M,
-                Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY);
-        return new OutboardLinearVelocityServo(parent, mech);
+        SimulatedBareMotor motor = new SimulatedBareMotor(parent, 600);
+        return OutboardLinearVelocityServo.make(
+                parent, motor, DRIVE_GEAR_RATIO, WHEEL_DIAMETER_M);
     }
 
     /**
@@ -89,7 +83,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
                 false,
                 0.05, // note low tolerance
                 1);
-        IncrementalProfile profile = kinodynamics.getSteeringProfile();
+        Supplier<IncrementalProfile> profile = kinodynamics.getSteeringProfile();
         // without a profile, there's no velocity feedforward. Hm.
         IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(parent, profile, 0.05, 0.05);
         OnboardAngularPositionServo turningServo = new OnboardAngularPositionServo(
@@ -122,7 +116,7 @@ public class SimulatedSwerveModule100 extends SwerveModule100 {
         RotaryMechanism turningMech = new RotaryMechanism(
                 parent, motor, combinedEncoder, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
-        IncrementalProfile profile = kinodynamics.getSteeringProfile();
+        Supplier<IncrementalProfile> profile = kinodynamics.getSteeringProfile();
         IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(parent, profile, 0.05, 0.05);
 
         OutboardAngularPositionServo turningServo = new OutboardAngularPositionServo(

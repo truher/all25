@@ -1,5 +1,7 @@
 package org.team100.lib.reference.r1;
 
+import java.util.function.Supplier;
+
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.logging.Level;
@@ -12,11 +14,13 @@ import org.team100.lib.state.Model100;
 
 /**
  * Extracts current and next references from an incremental profile.
+ * 
+ * Uses a profile supplier so it can be updated on the fly.
  */
 public class IncrementalProfileReferenceR1 implements ProfileReferenceR1 {
     private final SetpointsR1Logger m_log_setpoints;
     private final BooleanLogger m_log_done;
-    private final IncrementalProfile m_profile;
+    private final Supplier<IncrementalProfile> m_profile;
     private final double m_positionTolerance;
     private final double m_velocityTolerance;
     private Model100 m_goal;
@@ -25,7 +29,7 @@ public class IncrementalProfileReferenceR1 implements ProfileReferenceR1 {
 
     public IncrementalProfileReferenceR1(
             LoggerFactory parent,
-            IncrementalProfile profile,
+            Supplier<IncrementalProfile> profile,
             double positionTolerance,
             double velocityTolerance) {
         LoggerFactory log = parent.type(this);
@@ -76,7 +80,7 @@ public class IncrementalProfileReferenceR1 implements ProfileReferenceR1 {
     private SetpointsR1 advance(Control100 newCurrent) {
         if (m_goal == null)
             throw new IllegalStateException("goal must be set");
-        Control100 next = m_profile.calculate(TimedRobot100.LOOP_PERIOD_S, newCurrent, m_goal);
+        Control100 next = m_profile.get().calculate(TimedRobot100.LOOP_PERIOD_S, newCurrent, m_goal);
         return new SetpointsR1(newCurrent, next);
     }
 }

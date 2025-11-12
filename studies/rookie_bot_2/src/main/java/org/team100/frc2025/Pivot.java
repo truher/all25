@@ -43,7 +43,7 @@ public class Pivot extends SubsystemBase {
                 0.01); // tolerance
         ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(
                 log,
-                profile,
+                () -> profile,
                 0.01, // position tolerance, rad
                 0.01); // velocity tolerance, rad/s
         Feedforward100 ff = Feedforward100.makeNeo2(log);

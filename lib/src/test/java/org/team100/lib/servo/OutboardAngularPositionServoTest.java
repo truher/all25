@@ -44,7 +44,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
                 log, motor, combinedEncoder, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         final IncrementalProfile profile = new TrapezoidIncrementalProfile(log, 1, 1, 0.05);
-        final IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, profile, 0.01, 0.01);
+        final IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile, 0.01, 0.01);
         final OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);
         servo.reset();
@@ -325,7 +325,7 @@ public class OutboardAngularPositionServoTest implements Timeless {
         // very fast profile so we can see it; this is used for the "go around"
         // even though we're trying to use "direct" mode.
         IncrementalProfile profile = new TrapezoidIncrementalProfile(log, 200, 10000, 0.05);
-        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, profile, 0.01, 0.01);
+        IncrementalProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile, 0.01, 0.01);
         OutboardAngularPositionServo servo = new OutboardAngularPositionServo(
                 log, mech, ref);
 

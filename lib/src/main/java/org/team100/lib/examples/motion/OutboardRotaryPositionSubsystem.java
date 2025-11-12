@@ -47,7 +47,7 @@ public class OutboardRotaryPositionSubsystem extends SubsystemBase {
                 1, // max velocity rad/s
                 1, // max accel rad/s^2
                 0.01); // tolerance
-        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, profile,
+        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile,
                 0.01, // position tolerance, rad
                 0.01); // velocity tolerance, rad/s
         m_servo = new OutboardAngularPositionServo(log, mech(log), ref);
