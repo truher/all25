@@ -45,7 +45,6 @@ public class Mutable implements DoubleSupplier {
             System.out.printf("** WARNING: duplicate Mutable name %s\n", name);
             return ALL_ENTRIES.get(name);
         }
-        System.out.printf("name %s\n", name);
         DoubleTopic topic = inst.getDoubleTopic(name);
         DoubleEntry entry = topic.getEntry(defaultValue);
         // Makes sure we don't get a stale value.
