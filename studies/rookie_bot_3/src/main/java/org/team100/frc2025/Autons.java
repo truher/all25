@@ -7,6 +7,7 @@ import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.field.MechanicalMayhem2025;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
@@ -26,6 +27,8 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class Autons {
@@ -35,11 +38,13 @@ public class Autons {
     private static final Pose2d TWO = new Pose2d(1, 4, Rotation2d.k180deg);
     private static final Pose2d FOUR = new Pose2d(4, 4, Rotation2d.kCCW_90deg);
 
+    private final LoggerFactory m_log;
     private final AutonChooser m_autonChooser;
     private final MecanumDrive100 m_drive;
     private final HolonomicProfile m_profile;
     private final TrajectoryPlanner m_planner;
     private final TrajectoryVisualization m_viz;
+    private final ControllerR3 m_controller;
     private final DualDrumShooter m_shooter;
     private final IndexerServo m_indexer;
 
@@ -49,30 +54,30 @@ public class Autons {
             MecanumDrive100 drive,
             IndexerServo indexer,
             DualDrumShooter shooter) {
-        LoggerFactory log = parent.name("Auton");
+        m_log = parent.name("Auton");
         m_autonChooser = new AutonChooser();
         m_drive = drive;
         m_indexer = indexer;
         m_shooter = shooter;
         m_profile = HolonomicProfile.wpi(4, 8, 3, 6);
         List<TimingConstraint> constraints = List.of(
-                new DiamondConstraint(log, 2, 2, 2),
-                new ConstantConstraint(log, 1, 1),
-                new YawRateConstraint(log, 1, 1));
+                new DiamondConstraint(m_log, 2, 2, 2),
+                new ConstantConstraint(m_log, 1, 1),
+                new YawRateConstraint(m_log, 1, 1));
         m_planner = new TrajectoryPlanner(constraints);
         m_viz = new TrajectoryVisualization(fieldLogger);
 
-        ControllerR3 controller = ControllerFactoryR3.byIdentity(log);
+        m_controller = ControllerFactoryR3.byIdentity(m_log);
 
-        MoveAndHold knight_move = new VelocityFeedforwardOnly(log, m_profile, KNIGHT_MOVE, m_drive);
+        MoveAndHold knight_move = new VelocityFeedforwardOnly(m_log, m_profile, KNIGHT_MOVE, m_drive);
         m_autonChooser.add("knight_move",
                 new AnnotatedCommand(knight_move.until(knight_move::isDone).withName("auto knight_move"), null, null));
 
-        MoveAndHold one = new VelocityFeedforwardOnly(log, m_profile, ONE, m_drive);
+        MoveAndHold one = new VelocityFeedforwardOnly(m_log, m_profile, ONE, m_drive);
         m_autonChooser.add("one",
                 new AnnotatedCommand(one.until(one::isDone).withName("auto one"), null, null));
 
-        MoveAndHold two = new VelocityFeedforwardOnly(log, m_profile, TWO, m_drive);
+        MoveAndHold two = new VelocityFeedforwardOnly(m_log, m_profile, TWO, m_drive);
         m_autonChooser.add("two",
                 new AnnotatedCommand(two.until(two::isDone).withName("auto two"), null, null));
 
@@ -82,12 +87,12 @@ public class Autons {
                 new AnnotatedCommand(three.withName("auto three"), null, null));
 
         MoveAndHold four = new DriveToPoseWithProfile(
-                log, drive, controller, m_profile, () -> FOUR);
+                m_log, drive, m_controller, m_profile, () -> FOUR);
         m_autonChooser.add("four",
                 new AnnotatedCommand(four.until(four::isDone).withName("auto four"), null, null));
 
         MoveAndHold standard = new DriveWithTrajectoryFunction(
-                log, drive, controller, m_viz, this::standard);
+                m_log, drive, m_controller, m_viz, this::standard);
         m_autonChooser.add("standard",
                 new AnnotatedCommand(
                         standard.until(standard::isDone)
@@ -97,7 +102,7 @@ public class Autons {
                         null, null));
 
         MoveAndHold standard2 = new DriveWithTrajectoryFunction(
-                log, drive, controller, m_viz, this::standard2);
+                m_log, drive, m_controller, m_viz, this::standard2);
         m_autonChooser.add("standard2",
                 new AnnotatedCommand(
                         standard2.until(standard2::isDone)
@@ -108,9 +113,12 @@ public class Autons {
         //
 
         MoveAndHold calib = new DriveWithTrajectoryFunction(
-                log, drive, controller, m_viz, this::calib);
+                m_log, drive, m_controller, m_viz, this::calib);
         m_autonChooser.add("calibration",
                 new AnnotatedCommand(calib.until(calib::isDone).withName("auto calib"), null, null));
+
+        m_autonChooser.add("red right",
+                new AnnotatedCommand(redRight(), Alliance.Red, MechanicalMayhem2025.START_RED_RIGHT));
 
         /*
          * MoveAndHold autolow = new DriveWithTrajectoryFunction(
@@ -138,7 +146,7 @@ public class Autons {
     }
 
     private Trajectory100 standard2(Pose2d p) {
-        Pose2d end = new Pose2d(p.getX() + 1.4, p.getY() + 0, p.getRotation().plus(Rotation2d.fromDegrees(  5)));
+        Pose2d end = new Pose2d(p.getX() + 1.4, p.getY() + 0, p.getRotation().plus(Rotation2d.fromDegrees(5)));
         return m_planner.restToRest(List.of(
                 HolonomicPose2d.make(p, 0),
                 HolonomicPose2d.make(end, Math.toRadians(0))));
@@ -158,5 +166,19 @@ public class Autons {
      * HolonomicPose2d.make(end, Math.PI / 2)));
      * }
      */
+
+    private Command redRight() {
+        LoggerFactory log = m_log.name("red right");
+        DriveWithTrajectoryFunction cmd = new DriveWithTrajectoryFunction(
+                log,
+                m_drive,
+                m_controller,
+                m_viz,
+                (p) -> m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(MechanicalMayhem2025.START_RED_RIGHT, 0),
+                        HolonomicPose2d.make(MechanicalMayhem2025.START_RED_RIGHT
+                                .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg)), 0))));
+        return cmd.until(cmd::isDone).withName("red right");
+    }
 
 }

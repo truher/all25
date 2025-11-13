@@ -109,7 +109,10 @@ public class Robot extends TimedRobot100 {
     @Override
     public void autonomousInit() {
         // choose a command at auton init time
-        Command auton = m_autons.get().command();
+        AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null)
+            return;
+        Command auton = cmd.command();
         if (auton == null)
             return;
         auton.schedule();
@@ -128,6 +131,8 @@ public class Robot extends TimedRobot100 {
 
     private void checkStart() {
         AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null)
+            return;
         Pose2d start = cmd.start();
         if (start == null) {
             m_noStartingPosition.set(true);
@@ -139,6 +144,8 @@ public class Robot extends TimedRobot100 {
 
     private void checkAlliance() {
         AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null)
+            return;
         Alliance alliance = cmd.alliance();
         if (alliance == null) {
             // works for either

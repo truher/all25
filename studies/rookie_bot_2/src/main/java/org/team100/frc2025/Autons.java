@@ -7,6 +7,7 @@ import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.field.MechanicalMayhem2025;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.HolonomicProfile;
@@ -23,6 +24,9 @@ import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class Autons {
     private static final Pose2d KNIGHT_MOVE = new Pose2d(2, 1, Rotation2d.kZero);
@@ -31,31 +35,33 @@ public class Autons {
     private static final Pose2d TWO = new Pose2d(1, 4, Rotation2d.k180deg);
     private static final Pose2d FOUR = new Pose2d(4, 4, Rotation2d.kCCW_90deg);
 
+    private final LoggerFactory m_log;
     private final AutonChooser m_autonChooser;
     private final MecanumDrive100 m_drive;
     private final HolonomicProfile m_profile;
     private final TrajectoryPlanner m_planner;
     private final TrajectoryVisualization m_viz;
+    private final ControllerR3 m_controller;
 
     public Autons(
             LoggerFactory parent,
             LoggerFactory fieldLogger,
             MecanumDrive100 drive,
             Pivot pivot) {
-        LoggerFactory log = parent.name("Auton");
+        m_log = parent.name("Auton");
         m_autonChooser = new AutonChooser();
         m_drive = drive;
         m_profile = HolonomicProfile.wpi(4, 8, 3, 6);
         List<TimingConstraint> constraints = List.of(
-                new DiamondConstraint(log, 2, 2, 2),
-                new ConstantConstraint(log, 1, 1),
-                new YawRateConstraint(log, 1, 1));
+                new DiamondConstraint(m_log, 2, 2, 2),
+                new ConstantConstraint(m_log, 1, 1),
+                new YawRateConstraint(m_log, 1, 1));
         m_planner = new TrajectoryPlanner(constraints);
         m_viz = new TrajectoryVisualization(fieldLogger);
 
-        ControllerR3 controller = ControllerFactoryR3.byIdentity(log);
+        m_controller = ControllerFactoryR3.byIdentity(m_log);
 
-        MoveAndHold knight_move = new VelocityFeedforwardOnly(log, m_profile, KNIGHT_MOVE, m_drive);
+        MoveAndHold knight_move = new VelocityFeedforwardOnly(m_log, m_profile, KNIGHT_MOVE, m_drive);
         m_autonChooser.add("knight_move",
                 new AnnotatedCommand(knight_move.until(knight_move::isDone).withName("auto knight_move"), null, null));
 
@@ -83,27 +89,30 @@ public class Autons {
          */
 
         MoveAndHold knight_l = new DriveWithTrajectoryFunction(
-                log, drive, controller, m_viz, this::knight_l);
+                m_log, drive, m_controller, m_viz, this::knight_l);
         m_autonChooser.add("knight left",
                 new AnnotatedCommand(knight_l.until(knight_l::isDone).withName("auto knight_l"), null, null));
 
         MoveAndHold calib = new DriveWithTrajectoryFunction(
-                log, drive, controller, m_viz, this::calib);
+                m_log, drive, m_controller, m_viz, this::calib);
         m_autonChooser.add("calibration",
                 new AnnotatedCommand(calib.until(calib::isDone).withName("auto calib"), null, null));
 
         MoveAndHold autolow = new DriveWithTrajectoryFunction(
-                log, drive, controller, m_viz, this::autolow);
+                m_log, drive, m_controller, m_viz, this::autolow);
         m_autonChooser.add("straight low auto",
                 new AnnotatedCommand(
                         autolow.until(autolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto autolow"),
                         null, null));
 
         MoveAndHold side_auto = new DriveWithTrajectoryFunction(
-                log, drive, controller, m_viz, this::side_auto);
+                m_log, drive, m_controller, m_viz, this::side_auto);
         m_autonChooser.add("swerve auto",
                 new AnnotatedCommand(side_auto.until(side_auto::isDone).andThen(pivot.extend().withTimeout(1))
                         .withName("auto sideauto"), null, null));
+
+        m_autonChooser.add("red right",
+                new AnnotatedCommand(redRight(), Alliance.Red, MechanicalMayhem2025.START_RED_RIGHT));
 
     }
 
@@ -149,5 +158,19 @@ public class Autons {
      * HolonomicPose2d.make(end, Math.PI / 2)));
      * }
      */
+
+    private Command redRight() {
+        LoggerFactory log = m_log.name("red right");
+        DriveWithTrajectoryFunction cmd = new DriveWithTrajectoryFunction(
+                log,
+                m_drive,
+                m_controller,
+                m_viz,
+                (p) -> m_planner.restToRest(List.of(
+                        HolonomicPose2d.make(MechanicalMayhem2025.START_RED_RIGHT, 0),
+                        HolonomicPose2d.make(MechanicalMayhem2025.START_RED_RIGHT
+                                .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg)), 0))));
+        return cmd.until(cmd::isDone).withName("red right");
+    }
 
 }
