@@ -91,10 +91,20 @@ public class Autons {
         m_autonChooser.add("standard",
                 new AnnotatedCommand(
                         standard.until(standard::isDone)
-                                .andThen(
-                                        new Shoot(m_shooter, m_indexer, 9))
+                                .andThen(new Shoot(m_shooter, m_indexer, 9))
+                                .withTimeout(2)
                                 .withName("auto standard"),
                         null, null));
+
+        MoveAndHold standard2 = new DriveWithTrajectoryFunction(
+                log, drive, controller, m_viz, this::standard2);
+        m_autonChooser.add("standard2",
+                new AnnotatedCommand(
+                        standard2.until(standard2::isDone)
+                                .andThen(
+                                        new Shoot(m_shooter, m_indexer, 8).withTimeout(2))
+                                .withName("auto standard"),
+                        null, new Pose2d(.48, 0.53, Rotation2d.kZero)));
         //
 
         MoveAndHold calib = new DriveWithTrajectoryFunction(
@@ -124,7 +134,14 @@ public class Autons {
         Pose2d end = new Pose2d(p.getX() + 1, p.getY() + 0, p.getRotation());
         return m_planner.restToRest(List.of(
                 HolonomicPose2d.make(p, 0),
-                HolonomicPose2d.make(end, Math.toRadians(30))));
+                HolonomicPose2d.make(end, Math.toRadians(0))));
+    }
+
+    private Trajectory100 standard2(Pose2d p) {
+        Pose2d end = new Pose2d(p.getX() + 1.4, p.getY() + 0, p.getRotation().plus(Rotation2d.fromDegrees(  5)));
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(end, Math.toRadians(0))));
     }
 
     private Trajectory100 calib(Pose2d p) {
