@@ -41,6 +41,19 @@ public class ControllerFactoryR3 {
                 // I think this is what @anay was doing on 7/8/25.
                 // return new FullStateControllerR3(log, 3, 0.5, 0.05, 0, 0.01, 0.01, 1, 1);
             }
+            case BETA_BOT -> {
+                return new FullStateControllerR3(log,
+                        3, // P for x/y
+                        3.5, // P for theta
+                        0.05, // P for v
+                        0, // P for omega
+                        0.01, // x tolerance
+                        0.01, // theta tolerance
+                        1, // v tolerance
+                        1); // omega tolerance
+                // I think this is what @anay was doing on 7/8/25.
+                // return new FullStateControllerR3(log, 3, 0.5, 0.05, 0, 0.01, 0.01, 1, 1);
+            }
             default -> {
                 // this is for simulation, don't use these values
                 return new FullStateControllerR3(log, 3.0, 3.5, 0, 0, 0.01, 0.01, 0.01, 0.01);
