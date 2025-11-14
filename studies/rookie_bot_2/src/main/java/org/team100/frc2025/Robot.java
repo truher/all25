@@ -102,7 +102,7 @@ public class Robot extends TimedRobot100 {
         m_autons = new Autons(logger, fieldLogger, m_drive, rotary);
 
         new Trigger(driverControl::back).onTrue(
-                m_drive.resetPose());  
+                m_drive.resetPose());
 
         new Trigger(driverControl::x).whileTrue(
                 m_drive.run(
@@ -133,7 +133,11 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void autonomousInit() {
-        Command auton = m_autons.get().command();
+        AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null) {
+            return;
+        }
+        Command auton = cmd.command();
         if (auton == null)
             return;
         auton.schedule();
@@ -152,6 +156,9 @@ public class Robot extends TimedRobot100 {
 
     private void checkStart() {
         AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null) {
+            return;
+        }
         Pose2d start = cmd.start();
         if (start == null) {
             m_noStartingPosition.set(true);
@@ -163,6 +170,9 @@ public class Robot extends TimedRobot100 {
 
     private void checkAlliance() {
         AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null) {
+            return;
+        }
         Alliance alliance = cmd.alliance();
         if (alliance == null) {
             // works for either
