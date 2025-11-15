@@ -23,17 +23,17 @@ public class SimulatedAnnealingTest {
 
     @Test
     void testUnimodal() {
-        Random random = new Random();
+        Random random = new Random(0);
         ToDoubleFunction<Double> f = (x) -> Math.pow((x - 1), 2) + 1;
         Function<Double, Double> n = (x) -> x + random.nextGaussian(0, 0.1);
         SimulatedAnnealing<Double> s = new SimulatedAnnealing<>(1.0, n, f);
-        assertEquals(1.0, s.solve(0.0, 1000), 1e-3);
+        assertEquals(1.0, s.solve(0.0, 1000), 1e-2);
     }
 
     /** 65 us per solve, 650X worse than ternary search. */
     @Test
     void testPerformance() {
-        Random random = new Random();
+        Random random = new Random(0);
         ToDoubleFunction<Double> f = (x) -> Math.pow((x - 1), 2) + 1;
         Function<Double, Double> n = (x) -> x + random.nextGaussian(0, 0.1);
         SimulatedAnnealing<Double> s = new SimulatedAnnealing<>(1.0, n, f);

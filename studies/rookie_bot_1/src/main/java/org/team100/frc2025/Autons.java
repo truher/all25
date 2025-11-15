@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
+import org.team100.lib.field.MechanicalMayhem2025;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.tank.TankDrive;
@@ -85,10 +86,10 @@ public class Autons {
     private Trajectory100 redLeftTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
-                HolonomicPose2d.tank(Field.START_RED_LEFT),
-                HolonomicPose2d.tank(Field.START_RED_LEFT
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT),
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT
                         .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg))),
-                HolonomicPose2d.tank(Field.START_RED_LEFT
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT
                         .plus(new Transform2d(2, 2, Rotation2d.kZero)))));
     }
 
