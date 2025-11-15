@@ -56,20 +56,23 @@ public class ToPoseWithTrajectory extends Command {
 
     @Override
     public void execute() {
-        if (m_trajectory == null)
-            return;
-        // current for position error
-        double t = progress();
-        TimedPose current = m_trajectory.sample(t);
-        // next for feedforward (and selecting K)
-        TimedPose next = m_trajectory.sample(t + TimedRobot100.LOOP_PERIOD_S);
-        Pose2d currentPose = m_drive.getPose();
-        Pose2d poseReference = current.state().getPose().pose();
-        double velocityReference = next.velocityM_S();
-        double omegaReference = next.velocityM_S() * next.state().getCurvature();
-        ChassisSpeeds speeds = m_controller.calculate(
-                currentPose, poseReference, velocityReference, omegaReference);
-        m_drive.setVelocity(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
+        try {
+            if (m_trajectory == null)
+                return;
+            // current for position error
+            double t = progress();
+            TimedPose current = m_trajectory.sample(t);
+            // next for feedforward (and selecting K)
+            TimedPose next = m_trajectory.sample(t + TimedRobot100.LOOP_PERIOD_S);
+            Pose2d currentPose = m_drive.getPose();
+            Pose2d poseReference = current.state().getPose().pose();
+            double velocityReference = next.velocityM_S();
+            double omegaReference = next.velocityM_S() * next.state().getCurvature();
+            ChassisSpeeds speeds = m_controller.calculate(
+                    currentPose, poseReference, velocityReference, omegaReference);
+            m_drive.setVelocity(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
+        } catch (IllegalStateException e) {
+        }
     }
 
     @Override
