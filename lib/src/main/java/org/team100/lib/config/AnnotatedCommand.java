@@ -10,6 +10,10 @@ import edu.wpi.first.wpilibj2.command.Command;
  * 
  * If you don't care about the annotations at all, e.g. because the same command
  * works on both sides from anywhere, use null.
+ * 
+ * @param command  command to run
+ * @param alliance red or blue
+ * @param start    starting pose
  */
 public record AnnotatedCommand(Command command, Alliance alliance, Pose2d start) {
 }
