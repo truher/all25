@@ -105,15 +105,23 @@ public class Autons {
                         autolow.until(autolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto autolow"),
                         null, null));
 
-        MoveAndHold side_auto = new DriveWithTrajectoryFunction(
-                m_log, drive, m_controller, m_viz, this::side_auto);
-        m_autonChooser.add("swerve auto",
-                new AnnotatedCommand(side_auto.until(side_auto::isDone).andThen(pivot.extend().withTimeout(1))
-                        .withName("auto sideauto"), null, null));
+        MoveAndHold blue_side_auto_long = new DriveWithTrajectoryFunction(
+                m_log, drive, m_controller, m_viz, this::blue_side_auto_long);
+        m_autonChooser.add("swerve auto (long)",
+                new AnnotatedCommand(
+                        blue_side_auto_long.until(blue_side_auto_long::isDone)
+                                .andThen(pivot.extend().withTimeout(1))
+                                .withName("auto sideautolong"),
+                        Alliance.Blue, null));
 
-        m_autonChooser.add("red right",
-                new AnnotatedCommand(redRight(), Alliance.Red, MechanicalMayhem2025.START_RED_RIGHT));
-
+        MoveAndHold blue_side_auto_short = new DriveWithTrajectoryFunction(
+                m_log, drive, m_controller, m_viz, this::blue_side_auto_short);
+        m_autonChooser.add("swerve auto (short)",
+                new AnnotatedCommand(
+                        blue_side_auto_short.until(blue_side_auto_short::isDone)
+                                .andThen(pivot.extend().withTimeout(1))
+                                .withName("auto sideautoshort"),
+                        Alliance.Blue, null));
     }
 
     public AnnotatedCommand get() {
@@ -141,13 +149,26 @@ public class Autons {
                 HolonomicPose2d.make(end, 0))); // Math.PI / 2
     }
 
-    private Trajectory100 side_auto(Pose2d p) {
-        Pose2d point_1 = new Pose2d(p.getX() + 1, p.getY(), p.getRotation());
-        Pose2d point_2 = new Pose2d(point_1.getX(), point_1.getY() + 3.0, point_1.getRotation());
+    private Trajectory100 blue_side_auto_long(Pose2d p) {
+        Pose2d point_1 = new Pose2d(p.getX() + 0.50, p.getY(), p.getRotation());
+        Pose2d point_2 = new Pose2d(point_1.getX() + 0.5, point_1.getY() + 2.2, point_1.getRotation());
+        Pose2d point_3 = new Pose2d(point_2.getX() + 3.0, point_2.getY(), point_2.getRotation());
         return m_planner.restToRest(List.of(
                 HolonomicPose2d.make(p, 0),
-                HolonomicPose2d.make(point_1, Math.PI / 2),
-                HolonomicPose2d.make(point_2, 0)));
+                HolonomicPose2d.make(point_1, 0),
+                HolonomicPose2d.make(point_2, Math.PI / 2),
+                HolonomicPose2d.make(point_3, 0)));
+    }
+
+    private Trajectory100 blue_side_auto_short(Pose2d p) {
+        Pose2d point_1 = new Pose2d(p.getX() + 0.50, p.getY(), p.getRotation());
+        Pose2d point_2 = new Pose2d(point_1.getX() + 0.5, point_1.getY() + 0.5, point_1.getRotation());
+        Pose2d point_3 = new Pose2d(point_2.getX() + 3.0, point_2.getY(), point_2.getRotation());
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(point_1, 0),
+                HolonomicPose2d.make(point_2, Math.PI / 2),
+                HolonomicPose2d.make(point_3, 0)));
     }
 
     /*
