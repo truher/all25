@@ -91,11 +91,11 @@ public class Autons {
         m_autonChooser.add("four",
                 new AnnotatedCommand(four.until(four::isDone).withName("auto four"), null, null));
 
-        MoveAndHold standard = new DriveWithTrajectoryFunction(
-                m_log, drive, m_controller, m_viz, this::standard);
-        m_autonChooser.add("standard",
+        MoveAndHold middle = new DriveWithTrajectoryFunction(
+                m_log, drive, m_controller, m_viz, this::middle);
+        m_autonChooser.add("middle",
                 new AnnotatedCommand(
-                        standard.until(standard::isDone)
+                        middle.until(middle::isDone)
                                 .andThen(new Shoot(m_shooter, m_indexer, 9))
                                 .withTimeout(2)
                                 .withName("auto standard"),
@@ -110,6 +110,19 @@ public class Autons {
                                         new Shoot(m_shooter, m_indexer, 8).withTimeout(2))
                                 .withName("auto standard"),
                         null, new Pose2d(.48, 0.53, Rotation2d.kZero)));
+        
+
+
+         MoveAndHold standard3 = new DriveWithTrajectoryFunction(
+                m_log, drive, m_controller, m_viz, this::standard3);
+                    m_autonChooser.add("standard3",
+                            new AnnotatedCommand(
+                                    standard3.until(standard3::isDone)
+                                            .andThen(
+                                                    new Shoot(m_shooter, m_indexer, 8).withTimeout(2))
+                                            .withName("auto standard"),
+                                    null, new Pose2d(.48, 0.53, Rotation2d.kZero)));
+        
         //
 
         MoveAndHold calib = new DriveWithTrajectoryFunction(
@@ -119,7 +132,7 @@ public class Autons {
 
         m_autonChooser.add("red right",
                 new AnnotatedCommand(redRight(), Alliance.Red, MechanicalMayhem2025.START_RED_RIGHT));
-
+ 
         /*
          * MoveAndHold autolow = new DriveWithTrajectoryFunction(
          * log, drive, controller, m_viz, this::autolow);
@@ -138,7 +151,7 @@ public class Autons {
         return m_autonChooser.get();
     }
 
-    private Trajectory100 standard(Pose2d p) {
+    private Trajectory100 middle(Pose2d p) {
         Pose2d end = new Pose2d(p.getX() + 1, p.getY() + 0, p.getRotation());
         return m_planner.restToRest(List.of(
                 HolonomicPose2d.make(p, 0),
@@ -147,6 +160,13 @@ public class Autons {
 
     private Trajectory100 standard2(Pose2d p) {
         Pose2d end = new Pose2d(p.getX() + 1.4, p.getY() + 0, p.getRotation().plus(Rotation2d.fromDegrees(5)));
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(end, Math.toRadians(0))));
+    }
+
+    private Trajectory100 standard3(Pose2d p) {
+        Pose2d end = new Pose2d(p.getX() + 1.5, p.getY() + 0, p.getRotation().plus(Rotation2d.fromDegrees(-30)));
         return m_planner.restToRest(List.of(
                 HolonomicPose2d.make(p, 0),
                 HolonomicPose2d.make(end, Math.toRadians(0))));
