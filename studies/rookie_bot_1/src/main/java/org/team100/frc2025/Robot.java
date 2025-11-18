@@ -13,6 +13,7 @@ import org.team100.lib.indicator.Alerts;
 import org.team100.lib.indicator.SolidIndicator;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
+import org.team100.lib.subsystems.shooter.IndexerServo;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
@@ -35,6 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot100 {
     private static final double MAX_SPEED_M_S = 3.0;
@@ -46,6 +48,7 @@ public class Robot extends TimedRobot100 {
     private final Alerts m_alerts;
     private final Alert m_noStartingPosition;
     private final Alert m_mismatchedAlliance;
+    private final IndexerServo m_indexer;
 
     public Robot() {
         Banner.printBanner();
@@ -89,6 +92,14 @@ public class Robot extends TimedRobot100 {
 
         m_autons = new Autons(logger, m_drive, m_trajectoryViz);
 
+        m_indexer = new IndexerServo(logger, 9);
+        m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
+
+        new Trigger(driverControl::a).onTrue(
+            sequence(
+                m_indexer.servoOut().withTimeout(0.5),
+                m_indexer.servoIn().withTimeout(0.5))
+        );
 
     }
 
