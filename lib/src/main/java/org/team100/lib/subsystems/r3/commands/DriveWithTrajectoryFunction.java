@@ -64,6 +64,7 @@ public class DriveWithTrajectoryFunction extends MoveAndHold {
     @Override
     public void execute() {
         m_referenceController.execute();
+        toGo();
     }
 
     @Override
