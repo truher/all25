@@ -2,10 +2,13 @@ package org.team100.frc2025;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.hid.DriverXboxControl;
+import org.team100.lib.indicator.Alerts;
+import org.team100.lib.indicator.SolidIndicator;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.subsystems.mecanum.MecanumDrive100;
@@ -18,12 +21,18 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.CanId;
+import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.visualization.SpinnyVisualization;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -37,15 +46,23 @@ public class Robot extends TimedRobot100 {
     private final SpinnyVisualization m_shooterViz;
     private final SpinnyVisualization m_indexerViz;
     private final MecanumDrive100 m_drive;
-    private final Command m_auton;
     private final IndexerServo m_indexer;
     private final Autons m_autons;
+    private final SolidIndicator m_indicator;
+    private final Alerts m_alerts;
+    private final Alert m_noStartingPosition;
+    private final Alert m_mismatchedAlliance;
 
     public Robot() {
         Banner.printBanner();
         DriverStation.silenceJoystickConnectionWarning(true);
         Experiments.instance.show();
         SmartDashboard.putData(CommandScheduler.getInstance());
+        m_indicator = new SolidIndicator(new RoboRioChannel(0), 40);
+        m_alerts = new Alerts();
+        m_noStartingPosition = m_alerts.add("No starting position!", AlertType.kWarning);
+        m_mismatchedAlliance = m_alerts.add("Wrong Alliance!", AlertType.kWarning);
+        m_indicator.state(() -> m_alerts.any() ? Color.kRed : Color.kGreen);
         Logging logging = Logging.instance();
         LoggerFactory fieldLogger = logging.fieldLogger;
         DriverXboxControl driverControl = new DriverXboxControl(0);
@@ -90,9 +107,6 @@ public class Robot extends TimedRobot100 {
         // m_drive.driveWithVelocity(1.5, 2.5).withTimeout(1.0),
         // m_drive.driveWithVelocity(1.5, -2.5).withTimeout(1.0)));
 
-        m_auton = m_drive.run(() -> m_drive.stop())
-                .withTimeout(1.0);
-
         m_shooter = DrumShooterFactory.make(logger, 40);
         m_shooterViz = new SpinnyVisualization(m_shooter::get, "shooter", 5);
         m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
@@ -103,9 +117,9 @@ public class Robot extends TimedRobot100 {
 
         m_autons = new Autons(logger, fieldLogger, m_drive, m_indexer, m_shooter);
 
-        new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer, 9)); //////////////////////////////////////////
-        new Trigger(driverControl::b).whileTrue(new Shoot(m_shooter, m_indexer, 8));
-        new Trigger(driverControl::x).whileTrue(new Shoot(m_shooter, m_indexer, 10));
+        new Trigger(driverControl::a).whileTrue(new Shoot(m_shooter, m_indexer, 7.5)); //////////////////////////////////////////
+        new Trigger(driverControl::b).whileTrue(new Shoot(m_shooter, m_indexer, 5));
+        new Trigger(driverControl::x).whileTrue(new Shoot(m_shooter, m_indexer, 11));
         new Trigger(driverControl::y).whileTrue(m_indexer.run(() -> m_indexer.set(-1)));
         new Trigger(driverControl::back).whileTrue(m_drive.resetPose());
 
@@ -125,7 +139,10 @@ public class Robot extends TimedRobot100 {
 
     @Override
     public void autonomousInit() {
-        Command auton = m_autons.get().command();
+        AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null)
+            return;
+        Command auton = cmd.command();
         if (auton == null)
             return;
         auton.schedule();
@@ -134,5 +151,45 @@ public class Robot extends TimedRobot100 {
     @Override
     public void teleopInit() {
         CommandScheduler.getInstance().cancelAll();
+    }
+
+    @Override
+    public void disabledPeriodic() {
+        checkStart();
+        checkAlliance();
+    }
+
+    private void checkStart() {
+        AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null)
+            return;
+        Pose2d start = cmd.start();
+        if (start == null) {
+            m_noStartingPosition.set(true);
+        } else {
+            m_noStartingPosition.set(false);
+            m_drive.setPose(start);
+        }
+    }
+
+    private void checkAlliance() {
+        AnnotatedCommand cmd = m_autons.get();
+        if (cmd == null)
+            return;
+        Alliance alliance = cmd.alliance();
+        if (alliance == null) {
+            // works for either
+            return;
+        }
+        Alliance dsAlliance = DriverStation.getAlliance().orElse(null);
+        if (dsAlliance == null) {
+            // not set yet
+            return;
+        }
+        if (alliance != dsAlliance) {
+            m_mismatchedAlliance.set(true);
+        } else {
+            m_mismatchedAlliance.set(false);
+        }
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
+import org.team100.lib.field.MechanicalMayhem2025;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.tank.TankDrive;
@@ -56,19 +57,19 @@ public class Autons {
 
         m_autonChooser = new AutonChooser();
         m_autonChooser.add("red left",
-                new AnnotatedCommand(redLeft(), Alliance.Red, Field.START_RED_LEFT));
+                new AnnotatedCommand(redLeft(), Alliance.Red, MechanicalMayhem2025.START_RED_LEFT));
         m_autonChooser.add("blue left",
-                new AnnotatedCommand(print("blue left"), Alliance.Blue, Field.START_BLUE_LEFT));
+                new AnnotatedCommand(print("blue left"), Alliance.Blue, MechanicalMayhem2025.START_BLUE_LEFT));
 
         m_autonChooser.add("red center",
-                new AnnotatedCommand(print("red center"), Alliance.Red, Field.START_RED_CENTER));
+                new AnnotatedCommand(print("red center"), Alliance.Red, MechanicalMayhem2025.START_RED_CENTER));
         m_autonChooser.add("blue center",
-                new AnnotatedCommand(print("blue center"), Alliance.Blue, Field.START_BLUE_CENTER));
+                new AnnotatedCommand(print("blue center"), Alliance.Blue, MechanicalMayhem2025.START_BLUE_CENTER));
 
         m_autonChooser.add("red right",
-                new AnnotatedCommand(redRight(), Alliance.Red, Field.START_RED_RIGHT));
+                new AnnotatedCommand(redRight(), Alliance.Red, MechanicalMayhem2025.START_RED_RIGHT));
         m_autonChooser.add("blue right",
-                new AnnotatedCommand(print("blue right"), Alliance.Blue, Field.START_BLUE_RIGHT));
+                new AnnotatedCommand(print("blue right"), Alliance.Blue, MechanicalMayhem2025.START_BLUE_RIGHT));
 
     }
 
@@ -90,10 +91,10 @@ public class Autons {
     private Trajectory100 redLeftTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
-                HolonomicPose2d.tank(Field.START_RED_LEFT),
-                HolonomicPose2d.tank(Field.START_RED_LEFT
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT),
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT
                         .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg))),
-                HolonomicPose2d.tank(Field.START_RED_LEFT
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT
                         .plus(new Transform2d(2, 2, Rotation2d.kZero)))));
     }
 
@@ -101,7 +102,7 @@ public class Autons {
         LoggerFactory log = m_log.name("red right");
         ToPoseWithTrajectory cmd = new ToPoseWithTrajectory(
                 log,
-                Field.START_RED_RIGHT
+                MechanicalMayhem2025.START_RED_RIGHT
                         .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg)),
                 m_drive,
                 m_trajectoryViz);

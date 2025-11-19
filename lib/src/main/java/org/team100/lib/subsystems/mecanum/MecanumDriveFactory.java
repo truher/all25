@@ -38,7 +38,9 @@ public class MecanumDriveFactory {
         // all wheels need the same ff/pid values
         Feedforward100 ff = Feedforward100.makeNeo(log);
         // 10/22/25: Anay found this value worked well
-        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.00005);
+        // PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.00005);
+// Doubled the value for auton 
+        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.0001);
         // 10/22/25: Lincoln used this value
         // PIDConstants.makeVelocityPID(0.0003));
 
