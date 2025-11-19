@@ -93,7 +93,7 @@ public class Robot extends TimedRobot100 {
         m_autons = new Autons(logger, m_drive, m_trajectoryViz);
 
         m_indexer = new IndexerServo(logger, 9);
-        m_indexer.setDefaultCommand(m_indexer.run(m_indexer::stop));
+        m_indexer.setDefaultCommand(m_indexer.run(m_indexer::defaultPosition));
 
         new Trigger(driverControl::a).onTrue(
             sequence(

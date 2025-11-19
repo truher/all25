@@ -31,16 +31,20 @@ public class IndexerServo extends SubsystemBase {
         m_servo.setSpeed(0);
     }
 
+    public void defaultPosition() {
+        m_servo.setPosition(0.2);
+    }
+
     public void setPosition(double value){
         m_servo.setPosition(value);
     }
 
     public Command servoOut(){
-        return run(() -> setPosition(0.3));
+        return run(() -> setPosition(0.7));
     }
 
     public Command servoIn(){
-        return run(() -> setPosition(0.25));
+        return run(() -> setPosition(0.2));
     }
 
     public Command feed() {
