@@ -104,6 +104,13 @@ public class Autons {
                 new AnnotatedCommand(
                         autolow.until(autolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto autolow"),
                         null, null));
+        
+        MoveAndHold musterAutolow = new DriveWithTrajectoryFunction(
+            log, drive, controller, m_viz, this::musterAutolowPart1);
+        m_autonChooser.add("musterLine low auto",
+            new AnnotatedCommand(
+                    musterAutolow.until(musterAutolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto musterAutolow"),
+                    null, null));
 
         MoveAndHold blue_side_auto_long = new DriveWithTrajectoryFunction(
                 m_log, drive, m_controller, m_viz, this::blue_side_auto_long);
@@ -148,6 +155,21 @@ public class Autons {
                 HolonomicPose2d.make(p, 0),
                 HolonomicPose2d.make(end, 0))); // Math.PI / 2
     }
+    private Trajectory100 musterAutolowPart1(Pose2d p) {
+        Pose2d point_1 = new Pose2d(p.getX() + 2.2, p.getY(), p.getRotation());
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(point_1, 0)));
+    }
+
+/*    
+    private Trajectory100 musterAutolowPart2(Pose2d p) {
+        Pose2d point_1 = new Pose2d(p.getX() - 0.125, p.getY(), p.getRotation());
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(point_1, 0)));
+    }
+*/
 
     private Trajectory100 blue_side_auto_long(Pose2d p) {
         Pose2d point_1 = new Pose2d(p.getX() + 0.50, p.getY(), p.getRotation());
