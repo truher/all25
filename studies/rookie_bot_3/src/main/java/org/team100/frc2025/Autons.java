@@ -96,8 +96,7 @@ public class Autons {
         m_autonChooser.add("middle",
                 new AnnotatedCommand(
                         middle.until(middle::isDone)
-                                .andThen(new Shoot(m_shooter, m_indexer, 9))
-                                .withTimeout(2)
+                                .andThen(new Shoot(m_shooter, m_indexer, 9).withTimeout(2))
                                 .withName("auto standard"),
                         null, null));
 
@@ -110,19 +109,36 @@ public class Autons {
                                         new Shoot(m_shooter, m_indexer, 8).withTimeout(2))
                                 .withName("auto standard"),
                         null, new Pose2d(.48, 0.53, Rotation2d.kZero)));
-        
 
-
-         MoveAndHold standard3 = new DriveWithTrajectoryFunction(
+        MoveAndHold standard3 = new DriveWithTrajectoryFunction(
                 m_log, drive, m_controller, m_viz, this::standard3);
-                    m_autonChooser.add("standard3",
+        m_autonChooser.add("standard3",
+                new AnnotatedCommand(
+                        standard3.until(standard3::isDone)
+                                .andThen(
+                                        new Shoot(m_shooter, m_indexer, 8).withTimeout(2))
+                                .withName("auto standard"),
+                        null, new Pose2d(.48, 0.53, Rotation2d.kZero)));
+
+    MoveAndHold standard4 = new DriveWithTrajectoryFunction(
+                m_log, drive, m_controller, m_viz, this::standard4);
+        m_autonChooser.add("standard4",
                             new AnnotatedCommand(
-                                    standard3.until(standard3::isDone)
+                                    standard4.until(standard4::isDone)
                                             .andThen(
                                                     new Shoot(m_shooter, m_indexer, 8).withTimeout(2))
                                             .withName("auto standard"),
                                     null, new Pose2d(.48, 0.53, Rotation2d.kZero)));
-        
+
+    MoveAndHold standard5 = new DriveWithTrajectoryFunction(
+                m_log, drive, m_controller, m_viz, this::standard5);
+        m_autonChooser.add("standard5",
+                            new AnnotatedCommand(
+                                    standard5.until(standard5::isDone)
+                     .andThen(
+                                         new Shoot(m_shooter, m_indexer, 8).withTimeout(2))
+                                        .withName("auto standard"),
+                                        null, new Pose2d(.48, 0.53, Rotation2d.kZero)));
         //
 
         MoveAndHold calib = new DriveWithTrajectoryFunction(
@@ -132,7 +148,7 @@ public class Autons {
 
         m_autonChooser.add("red right",
                 new AnnotatedCommand(redRight(), Alliance.Red, MechanicalMayhem2025.START_RED_RIGHT));
- 
+
         /*
          * MoveAndHold autolow = new DriveWithTrajectoryFunction(
          * log, drive, controller, m_viz, this::autolow);
@@ -172,6 +188,20 @@ public class Autons {
                 HolonomicPose2d.make(end, Math.toRadians(0))));
     }
 
+    private Trajectory100 standard4(Pose2d p) {
+        Pose2d end = new Pose2d(p.getX() + 1.5, p.getY() + 0, p.getRotation().plus(Rotation2d.fromDegrees(-5)));
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(end, Math.toRadians(0))));
+    }
+
+    private Trajectory100 standard5(Pose2d p) {
+        Pose2d end = new Pose2d(p.getX() + 1.5, p.getY() + 0, p.getRotation().plus(Rotation2d.fromDegrees(30)));
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(end, Math.toRadians(0))));
+    }
+
     private Trajectory100 calib(Pose2d p) {
         Pose2d end = new Pose2d(p.getX(), p.getY() + 1, p.getRotation());
         return m_planner.restToRest(List.of(
@@ -197,7 +227,7 @@ public class Autons {
                 (p) -> m_planner.restToRest(List.of(
                         HolonomicPose2d.make(MechanicalMayhem2025.START_RED_RIGHT, 0),
                         HolonomicPose2d.make(MechanicalMayhem2025.START_RED_RIGHT
-                                .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg)), 0))));
+                                .plus(new Transform2d(1, 3, Rotation2d.kCCW_90deg)), 0))));
         return cmd.until(cmd::isDone).withName("red right");
     }
 
