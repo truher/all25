@@ -43,6 +43,10 @@ public class SingleDrumShooter extends SubsystemBase {
         set(TARGET_VELOCITY_M_S);
     }
 
+    public void spinUp(double x) {
+        set(x);
+    }
+
     public boolean atGoal() {
         return m_drum.atGoal();
     }
