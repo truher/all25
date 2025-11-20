@@ -105,11 +105,14 @@ public class Autons {
                         autolow.until(autolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto autolow"),
                         null, null));
         
+        MoveAndHold musterAutolow2 = new DriveWithTrajectoryFunction(
+            m_log, drive, m_controller, m_viz, this::musterAutolowPart2);
+
         MoveAndHold musterAutolow = new DriveWithTrajectoryFunction(
-            log, drive, controller, m_viz, this::musterAutolowPart1);
+            m_log, drive, m_controller, m_viz, this::musterAutolowPart1);
         m_autonChooser.add("musterLine low auto",
             new AnnotatedCommand(
-                    musterAutolow.until(musterAutolow::isDone).andThen(pivot.extend().withTimeout(1)).withName("auto musterAutolow"),
+                    musterAutolow.until(musterAutolow::isDone).andThen(pivot.extend().withTimeout(1)).andThen(pivot.retract().withTimeout(1)).andThen(musterAutolow2).withName("auto musterAutolow"),
                     null, null));
 
         MoveAndHold blue_side_auto_long = new DriveWithTrajectoryFunction(
@@ -157,19 +160,19 @@ public class Autons {
     }
     private Trajectory100 musterAutolowPart1(Pose2d p) {
         Pose2d point_1 = new Pose2d(p.getX() + 2.2, p.getY(), p.getRotation());
+        Pose2d point_2 = new Pose2d(point_1.getX() - 0.5, point_1.getY(), point_1.getRotation());
         return m_planner.restToRest(List.of(
                 HolonomicPose2d.make(p, 0),
                 HolonomicPose2d.make(point_1, 0)));
+    }
+   
+    private Trajectory100 musterAutolowPart2(Pose2d p) {
+        Pose2d point_2 = new Pose2d(p.getX() - 0.5, p.getY(), p.getRotation());
+        return m_planner.restToRest(List.of(
+                HolonomicPose2d.make(p, 0),
+                HolonomicPose2d.make(point_2, 0)));
     }
 
-/*    
-    private Trajectory100 musterAutolowPart2(Pose2d p) {
-        Pose2d point_1 = new Pose2d(p.getX() - 0.125, p.getY(), p.getRotation());
-        return m_planner.restToRest(List.of(
-                HolonomicPose2d.make(p, 0),
-                HolonomicPose2d.make(point_1, 0)));
-    }
-*/
 
     private Trajectory100 blue_side_auto_long(Pose2d p) {
         Pose2d point_1 = new Pose2d(p.getX() + 0.50, p.getY(), p.getRotation());
