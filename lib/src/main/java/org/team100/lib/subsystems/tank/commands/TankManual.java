@@ -12,6 +12,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.subsystems.tank.TankDrive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -53,8 +54,8 @@ public class TankManual extends Command {
     @Override
     public void execute() {
         // double rotscale = 1 - 0.5 * Math.abs(m_translation.getAsDouble());
-        double translationM_S = m_translation.getAsDouble() * m_maxV;
-        double rotationRad_S = m_rotation.getAsDouble() * m_maxOmega;
+        double translationM_S = MathUtil.applyDeadband(m_translation.getAsDouble(), 0.1) * m_maxV;
+        double rotationRad_S = MathUtil.applyDeadband( m_rotation.getAsDouble(), 0.1)* m_maxOmega;
         m_logTranslation.log(() -> translationM_S);
         m_logRotation.log(() -> rotationRad_S);
         Rotation2d currentRotation = m_drive.getPose().getRotation();

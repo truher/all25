@@ -95,19 +95,22 @@ public class Robot extends TimedRobot100 {
                 manual);
         m_trajectoryViz = new TrajectoryVisualization(fieldLogger);
 
-        m_autons = new Autons(logger, m_drive, m_trajectoryViz);
-
         m_indexer = new IndexerServo(logger, 9);
         m_indexer.setDefaultCommand(m_indexer.run(m_indexer::defaultPosition));
 
-         m_shooter = SingleShooterFactory.make(logger, 40);
+        m_shooter = SingleShooterFactory.make(logger, 40);
         m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
 
-        new Trigger(driverControl::rightTrigger).whileTrue(new SingleShoot(m_shooter, m_indexer));
+        m_autons = new Autons(
+                logger, m_drive, m_indexer, m_shooter, m_trajectoryViz);
 
+        new Trigger(driverControl::rightTrigger).whileTrue(
+                new SingleShoot(m_shooter, m_indexer));
+
+                new Trigger(driverControl::leftTrigger).whileTrue(
+                    new SingleShoot(m_shooter, m_indexer));
 
         new Trigger(driverControl::y).whileTrue(new SingleIntake(m_shooter));
-        
 
     }
 
