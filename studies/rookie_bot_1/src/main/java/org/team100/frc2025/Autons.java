@@ -1,6 +1,5 @@
 package org.team100.frc2025;
 
-
 import java.util.List;
 
 import org.team100.lib.config.AnnotatedCommand;
@@ -8,6 +7,8 @@ import org.team100.lib.config.AutonChooser;
 import org.team100.lib.field.MechanicalMayhem2025;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.subsystems.shooter.IndexerServo;
+import org.team100.lib.subsystems.shooter.SingleDrumShooter;
 import org.team100.lib.subsystems.tank.TankDrive;
 import org.team100.lib.subsystems.tank.commands.FixedTrajectory;
 import org.team100.lib.subsystems.tank.commands.ToPoseWithTrajectory;
@@ -43,15 +44,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class Autons {
     private final LoggerFactory m_log;
     private final TankDrive m_drive;
+    private final IndexerServo m_indexer;
+    private final SingleDrumShooter m_shooter;
     private final TrajectoryVisualization m_trajectoryViz;
     private final AutonChooser m_autonChooser;
 
     public Autons(
             LoggerFactory log,
             TankDrive drive,
+            IndexerServo indexer,
+            SingleDrumShooter shooter,
             TrajectoryVisualization trajectoryViz) {
         m_log = log.type(this);
         m_drive = drive;
+        m_indexer = indexer;
+        m_shooter = shooter;
         m_trajectoryViz = trajectoryViz;
 
         m_autonChooser = new AutonChooser();
@@ -80,29 +87,53 @@ public class Autons {
         return m_autonChooser.get();
     }
 
-
-
     private Trajectory100 redLeftTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
                 HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT),
                 HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT
-                        .plus(new Transform2d(1, 1, Rotation2d.kCCW_90deg))),
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT
-                        .plus(new Transform2d(2, 2, Rotation2d.kZero)))));
+                        .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
     }
 
-    private Command redRight() {
-        LoggerFactory log = m_log.name("red right");
-        ToPoseWithTrajectory cmd = new ToPoseWithTrajectory(
-                log,
-                MechanicalMayhem2025.START_RED_RIGHT
-                        .plus(new Transform2d(1, 1, Rotation2d.kCW_90deg)),
-                m_drive,
-                m_trajectoryViz);
-        return cmd.until(cmd::isDone).withName("red right");
+    private Trajectory100 redRightTrajectory(TrajectoryPlanner planner) {
+        // delaying construction allows trajectory constraints to be mutable
+        return planner.restToRest(List.of(
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_RIGHT),
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_RIGHT
+                        .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
     }
 
+    private Trajectory100 redCenterTrajectory(TrajectoryPlanner planner) {
+        // delaying construction allows trajectory constraints to be mutable
+        return planner.restToRest(List.of(
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_CENTER),
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_CENTER
+                        .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
+    }
+
+    private Trajectory100 blueLeftTrajectory(TrajectoryPlanner planner) {
+        // delaying construction allows trajectory constraints to be mutable
+        return planner.restToRest(List.of(
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_LEFT),
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_LEFT
+                        .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
+    }
+
+    private Trajectory100 blueRightTrajectory(TrajectoryPlanner planner) {
+        // delaying construction allows trajectory constraints to be mutable
+        return planner.restToRest(List.of(
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_RIGHT),
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_RIGHT
+                        .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
+    }
+
+    private Trajectory100 blueCenterTrajectory(TrajectoryPlanner planner) {
+        // delaying construction allows trajectory constraints to be mutable
+        return planner.restToRest(List.of(
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_CENTER),
+                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_CENTER
+                        .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
+    }
 
     private Command redLeft() {
         LoggerFactory log = m_log.name("red left");
@@ -112,50 +143,85 @@ public class Autons {
                 () -> redLeftTrajectory(planner),
                 m_drive,
                 m_trajectoryViz);
-        return cmd.until(cmd::isDone).withName("red left");
+        return cmd
+                .until(cmd::isDone)
+                .andThen(
+                        new SingleShoot(m_shooter, m_indexer)
+                                .withTimeout(1));
     }
 
-    private Command blueLeft() {
-        LoggerFactory log = m_log.name("red left");
+    private Command redRight() {
+        LoggerFactory log = m_log.name("red right");
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 List.of(new ConstantConstraint(log, 1, 1)));
         FixedTrajectory cmd = new FixedTrajectory(
-                () -> redLeftTrajectory(planner),
+                () -> redRightTrajectory(planner),
                 m_drive,
                 m_trajectoryViz);
-        return cmd.until(cmd::isDone).withName("red left");
+        return cmd
+                .until(cmd::isDone)
+                .andThen(
+                        new SingleShoot(m_shooter, m_indexer)
+                                .withTimeout(1));
     }
 
     private Command redCenter() {
-        LoggerFactory log = m_log.name("red left");
+        LoggerFactory log = m_log.name("red center");
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 List.of(new ConstantConstraint(log, 1, 1)));
         FixedTrajectory cmd = new FixedTrajectory(
-                () -> redLeftTrajectory(planner),
+                () -> redCenterTrajectory(planner),
                 m_drive,
                 m_trajectoryViz);
-        return cmd.until(cmd::isDone).withName("red left");
+        return cmd
+                .until(cmd::isDone)
+                .andThen(
+                        new SingleShoot(m_shooter, m_indexer)
+                                .withTimeout(1));
     }
 
     private Command blueRight() {
-        LoggerFactory log = m_log.name("red left");
+        LoggerFactory log = m_log.name("blue right");
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 List.of(new ConstantConstraint(log, 1, 1)));
         FixedTrajectory cmd = new FixedTrajectory(
-                () -> redLeftTrajectory(planner),
+                () -> blueRightTrajectory(planner),
                 m_drive,
                 m_trajectoryViz);
-        return cmd.until(cmd::isDone).withName("red left");
+        return cmd
+                .until(cmd::isDone)
+                .andThen(
+                        new SingleShoot(m_shooter, m_indexer)
+                                .withTimeout(1));
+    }
+
+    private Command blueLeft() {
+        LoggerFactory log = m_log.name("blue left");
+        TrajectoryPlanner planner = new TrajectoryPlanner(
+                List.of(new ConstantConstraint(log, 1, 1)));
+        FixedTrajectory cmd = new FixedTrajectory(
+                () -> blueLeftTrajectory(planner),
+                m_drive,
+                m_trajectoryViz);
+        return cmd
+                .until(cmd::isDone)
+                .andThen(
+                        new SingleShoot(m_shooter, m_indexer)
+                                .withTimeout(1));
     }
 
     private Command blueCenter() {
-        LoggerFactory log = m_log.name("red left");
+        LoggerFactory log = m_log.name("blue center");
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 List.of(new ConstantConstraint(log, 1, 1)));
         FixedTrajectory cmd = new FixedTrajectory(
-                () -> redLeftTrajectory(planner),
+                () -> blueCenterTrajectory(planner),
                 m_drive,
                 m_trajectoryViz);
-        return cmd.until(cmd::isDone).withName("red left");
+        return cmd
+                .until(cmd::isDone)
+                .andThen(
+                        new SingleShoot(m_shooter, m_indexer)
+                                .withTimeout(1));
     }
 }

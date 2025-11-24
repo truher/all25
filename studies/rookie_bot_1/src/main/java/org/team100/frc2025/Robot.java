@@ -13,7 +13,11 @@ import org.team100.lib.indicator.Alerts;
 import org.team100.lib.indicator.SolidIndicator;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
+import org.team100.lib.subsystems.shooter.DrumShooterFactory;
+import org.team100.lib.subsystems.shooter.DualDrumShooter;
 import org.team100.lib.subsystems.shooter.IndexerServo;
+import org.team100.lib.subsystems.shooter.Shoot;
+import org.team100.lib.subsystems.shooter.SingleDrumShooter;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
@@ -49,6 +53,7 @@ public class Robot extends TimedRobot100 {
     private final Alert m_noStartingPosition;
     private final Alert m_mismatchedAlliance;
     private final IndexerServo m_indexer;
+    private final SingleDrumShooter m_shooter;
 
     public Robot() {
         Banner.printBanner();
@@ -90,16 +95,22 @@ public class Robot extends TimedRobot100 {
                 manual);
         m_trajectoryViz = new TrajectoryVisualization(fieldLogger);
 
-        m_autons = new Autons(logger, m_drive, m_trajectoryViz);
-
         m_indexer = new IndexerServo(logger, 9);
         m_indexer.setDefaultCommand(m_indexer.run(m_indexer::defaultPosition));
 
-        new Trigger(driverControl::a).onTrue(
-            sequence(
-                m_indexer.servoOut().withTimeout(0.5),
-                m_indexer.servoIn().withTimeout(0.5))
-        );
+        m_shooter = SingleShooterFactory.make(logger, 40);
+        m_shooter.setDefaultCommand(m_shooter.run(m_shooter::stop));
+
+        m_autons = new Autons(
+                logger, m_drive, m_indexer, m_shooter, m_trajectoryViz);
+
+        new Trigger(driverControl::rightTrigger).whileTrue(
+                new SingleShoot(m_shooter, m_indexer));
+
+                new Trigger(driverControl::leftTrigger).whileTrue(
+                    new SingleShoot(m_shooter, m_indexer));
+
+        new Trigger(driverControl::y).whileTrue(new SingleIntake(m_shooter));
 
     }
 

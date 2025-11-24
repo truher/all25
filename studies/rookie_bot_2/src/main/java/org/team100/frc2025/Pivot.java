@@ -34,7 +34,7 @@ public class Pivot extends SubsystemBase {
     public Pivot(LoggerFactory parent) {
         LoggerFactory log = parent.type(this);
         m_gravity = new Gravity(log,
-                2.5, // Max gravity torque, Nm
+                3, // Max gravity torque, Nm
                 3 * Math.PI / 4); // Gravity torque position offset, rad
         IncrementalProfile profile = new TrapezoidIncrementalProfile(
                 log,
@@ -76,8 +76,12 @@ public class Pivot extends SubsystemBase {
     /** Go to the extended position, and hold there forever. */
     public Command extend() {
         return run(() -> m_servo.setPositionProfiled(EXTEND, gravityTorque()));
+        
     }
-
+    public Command retract() {
+        return run(() -> m_servo.setPositionProfiled(HOME, gravityTorque()));
+        
+    }
     @Override
     public void periodic() {
         m_servo.periodic();
