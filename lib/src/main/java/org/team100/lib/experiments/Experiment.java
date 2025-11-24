@@ -71,4 +71,9 @@ public enum Experiment {
      * TODO: make this the default?
      */
     UnprofiledSteering,
+    /**
+     * Compensate for moving shooter and moving target when computing turret
+     * solution.
+     */
+    TurretIntercept
 }

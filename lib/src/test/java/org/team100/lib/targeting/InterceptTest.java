@@ -7,18 +7,23 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GlobalVelocityR2;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.TestLoggerFactory;
+import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class InterceptTest {
     private static final double DELTA = 0.001;
+    private static final LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
     void testBothStationary() {
         // robot at the origin, stationary
         // target direction +x, stationary
-        Optional<Rotation2d> azimuth = Intercept.intercept(
+        Intercept intercept = new Intercept(log);
+        Optional<Rotation2d> azimuth = intercept.intercept(
                 new Translation2d(0, 0),
                 new GlobalVelocityR2(0, 0),
                 new Translation2d(1, 0),
@@ -34,38 +39,41 @@ public class InterceptTest {
         // target direction +x,-y, moving +y
         // projectile at 1 m/s, target at 1 m/s,
         // should intercept at y = 0
-        Optional<Rotation2d> azimuth = Intercept.intercept(
+        Intercept intercept = new Intercept(log);
+        Optional<Rotation2d> azimuth = intercept.intercept(
                 new Translation2d(0, 0),
                 new GlobalVelocityR2(0, 0),
                 new Translation2d(1, -1),
                 new GlobalVelocityR2(0, 1),
                 1);
         assertTrue(azimuth.isEmpty());
-        //assertEquals(0, azimuth.get().getRadians(), DELTA);
+        // assertEquals(0, azimuth.get().getRadians(), DELTA);
     }
 
-     @Test
+    @Test
     void testRobotMovingTargetStationary() {
         // robot at the origin, moving +y
         // target direction +x,+y, stationary
         // projectile at 1 m/s in x, with robot at 1 m/s,
         // should intercept at y = 1
-        Optional<Rotation2d> azimuth = Intercept.intercept(
+        Intercept intercept = new Intercept(log);
+        Optional<Rotation2d> azimuth = intercept.intercept(
                 new Translation2d(0, 0),
                 new GlobalVelocityR2(0, 1),
                 new Translation2d(1, 1),
                 new GlobalVelocityR2(0, 0),
                 1);
         assertTrue(azimuth.isEmpty());
-        //assertEquals(0, azimuth.get().getRadians(), DELTA);
+        // assertEquals(0, azimuth.get().getRadians(), DELTA);
     }
 
-     @Test
+    @Test
     void testTargetRecedingTooFast() {
         // robot at the origin, stationary
         // target direction +x, moving fast +x
         // projectile at 1 m/s in x, can't catch it.
-        Optional<Rotation2d> azimuth = Intercept.intercept(
+        Intercept intercept = new Intercept(log);
+        Optional<Rotation2d> azimuth = intercept.intercept(
                 new Translation2d(0, 0),
                 new GlobalVelocityR2(0, 0),
                 new Translation2d(1, 0),
@@ -73,7 +81,8 @@ public class InterceptTest {
                 1);
         assertTrue(azimuth.isEmpty());
     }
-   @Test
+
+    @Test
     void testTargetCrossingPath() {
         // R0G: Robot at origin
         var robotPos = new Translation2d(0, 0);
@@ -85,8 +94,8 @@ public class InterceptTest {
         var targetVel = new GlobalVelocityR2(0, -1);
 
         // Muzzle speed is fast enough
-        double muzzleSpeed = 10.0; 
-        
+        double muzzleSpeed = 10.0;
+
         // vT = (0, -1). A = 1^2 - 10^2 = -99. (A != 0)
         // B = 2(10*0 + 5*-1) = -10.
         // C = 10^2 + 5^2 = 125.
@@ -94,16 +103,17 @@ public class InterceptTest {
         // Solution t ~ 1.077s.
         // Interception point I ≈ (10, 3.923).
         // Azimuth should be atan2(3.923, 10) ≈ 0.373 radians.
-        
+
         double expectedTheta = 0.374;
 
-        Optional<Rotation2d> azimuth = Intercept.intercept(
+        Intercept intercept = new Intercept(log);
+        Optional<Rotation2d> azimuth = intercept.intercept(
                 robotPos,
                 robotVel,
                 targetPos,
                 targetVel,
                 muzzleSpeed);
-        
+
         assertTrue(azimuth.isPresent());
         assertEquals(expectedTheta, azimuth.get().getRadians(), DELTA);
     }

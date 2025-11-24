@@ -1,8 +1,12 @@
 package org.team100.lib.subsystems.turret;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.team100.lib.controller.r1.PIDFeedback;
+import org.team100.lib.experiments.Experiment;
+import org.team100.lib.experiments.Experiments;
+import org.team100.lib.geometry.GlobalVelocityR2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
@@ -16,6 +20,8 @@ import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSenso
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.OnboardAngularPositionServo;
+import org.team100.lib.state.ModelR3;
+import org.team100.lib.targeting.Intercept;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,26 +38,36 @@ public class Turret extends SubsystemBase {
     private static final double GEAR_RATIO = 100;
     private static final double MIN_POSITION = -3;
     private static final double MAX_POSITION = 3;
+    /**
+     * accounts for firing delay and actuation delay
+     * TODO: make this a parameter
+     * TODO: why is this so long?
+     */
+    private static final double DELAY = 0.2;
     private final DoubleArrayLogger m_log_field_turret;
-    private final Supplier<Pose2d> m_pose;
+    private final Supplier<ModelR3> m_state;
     private final Supplier<Translation2d> m_target;
     private final AngularPositionServo m_pivot;
+    /** Projectile speed m/s */
+    private final double m_speed;
+    private final Intercept m_intercept;
     private boolean m_aiming;
 
     /**
      * @param parent Log
      * @param field  Field2d log
-     * @param pose   Current robot pose, from the pose estimator.
+     * @param state  Current robot pose, from the pose estimator.
      * @param target From the target designator; can change at any time.
      */
     public Turret(
             LoggerFactory parent,
             LoggerFactory field,
-            Supplier<Pose2d> pose,
-            Supplier<Translation2d> target) {
+            Supplier<ModelR3> state,
+            Supplier<Translation2d> target,
+            double speed) {
         LoggerFactory log = parent.type(this);
         m_log_field_turret = field.doubleArrayLogger(Level.COMP, "turret");
-        m_pose = pose;
+        m_state = state;
         m_target = target;
         IncrementalProfile profile = new TrapezoidIncrementalProfile(log, 5, 10, 0.05);
         ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile, 0.05, 0.05);
@@ -65,6 +81,8 @@ public class Turret extends SubsystemBase {
         m_pivot = new OnboardAngularPositionServo(
                 log, mech, ref, feedback);
         m_pivot.reset();
+        m_speed = speed;
+        m_intercept = new Intercept(log);
         m_aiming = false;
     }
 
@@ -75,16 +93,63 @@ public class Turret extends SubsystemBase {
     /** Absolute turret rotation */
     public Rotation2d getAzimuth() {
         Rotation2d relative = new Rotation2d(m_pivot.getWrappedPositionRad());
-        return m_pose.get().getRotation().plus(relative);
+        return m_state.get().rotation().plus(relative);
     }
 
     private void moveToAim() {
         m_aiming = true;
-        Pose2d pose = m_pose.get();
-        Translation2d target = m_target.get();
-        Rotation2d absoluteBearing = target.minus(pose.getTranslation()).getAngle();
-        Rotation2d relativeBearing = absoluteBearing.minus(pose.getRotation());
+        Optional<Rotation2d> soln = getSolution();
+        if (soln.isEmpty()) {
+            // no solution is possible, don't do anything
+            m_pivot.stop();
+            return;
+        }
+        Rotation2d absoluteBearing = soln.get();
+        Rotation2d relativeBearing = absoluteBearing.minus(m_state.get().rotation());
         m_pivot.setPositionProfiled(relativeBearing.getRadians(), 0);
+    }
+
+    private Optional<Rotation2d> getSolution() {
+        if (Experiments.instance.enabled(Experiment.TurretIntercept)) {
+            return getAbsoluteBearingForIntercept();
+        }
+        return getAbsoluteBearingInstantaneous();
+    }
+
+    /**
+     * Compute absolute bearing from robot to target without compensating for the
+     * motion of either one.
+     */
+    private Optional<Rotation2d> getAbsoluteBearingInstantaneous() {
+        ModelR3 state = m_state.get();
+        Translation2d target = m_target.get();
+        return Optional.of(target.minus(state.translation()).getAngle());
+    }
+
+    /**
+     * Compute absolute bearing to the intercept point, given moving target and
+     * moving robot.
+     */
+    private Optional<Rotation2d> getAbsoluteBearingForIntercept() {
+        ModelR3 state = m_state.get();
+
+        Translation2d robotPosition = state.translation();
+        GlobalVelocityR2 robotVelocity = state.velocityR2();
+        /**
+         * account for firing delay
+         */
+        robotPosition = robotVelocity.integrate(robotPosition, DELAY);
+        // GlobalVelocityR2 robotVelocity = GlobalVelocityR2.ZERO;
+        Translation2d targetPosition = m_target.get();
+        // for now, the target is assumed to be motionless
+        // TODO: target tracking to derive velocity.
+        GlobalVelocityR2 targetVelocity = GlobalVelocityR2.ZERO;
+        return m_intercept.intercept(
+                robotPosition,
+                robotVelocity,
+                targetPosition,
+                targetVelocity,
+                m_speed);
     }
 
     private void stopAiming() {
@@ -111,7 +176,7 @@ public class Turret extends SubsystemBase {
     }
 
     private double[] poseArray() {
-        Pose2d pose = m_pose.get();
+        Pose2d pose = m_state.get().pose();
         return new double[] {
                 pose.getX(),
                 pose.getY(),

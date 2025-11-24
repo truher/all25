@@ -238,6 +238,8 @@ public abstract class AngularPositionServoImpl implements AngularPositionServo {
     public boolean atSetpoint() {
         if (!m_validSetpoint)
             return false;
+        if (m_nextUnwrappedSetpoint == null)
+            return false;
         double positionError = MathUtil.angleModulus(m_nextUnwrappedSetpoint.x() - m_mechanism.getWrappedPositionRad());
         double velocityError = m_nextUnwrappedSetpoint.v() - m_mechanism.getVelocityRad_S();
         return Math.abs(positionError) < POSITION_TOLERANCE

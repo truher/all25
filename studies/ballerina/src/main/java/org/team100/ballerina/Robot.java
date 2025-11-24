@@ -2,6 +2,7 @@ package org.team100.ballerina;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
+import org.team100.lib.experiments.Experiments;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.indicator.SolidIndicator;
 import org.team100.lib.localization.ManualPose;
@@ -9,6 +10,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.subsystems.turret.Turret;
 import org.team100.lib.targeting.TargetDesignator;
+import org.team100.lib.util.Banner;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.visualization.Ball;
 
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot {
+    private final double SPEED = 3;
     private final DriverXboxControl m_controller;
     private final Turret m_turret;
     private final ManualPose m_pose;
@@ -29,16 +32,18 @@ public class Robot extends TimedRobot {
     private final Ball m_ball;
 
     public Robot() {
+        Banner.printBanner();
+        Experiments.instance.show();
         Logging log = Logging.instance();
         LoggerFactory fieldLogger = log.fieldLogger;
         LoggerFactory rootLogger = log.rootLogger;
         m_controller = new DriverXboxControl(0);
         m_pose = new ManualPose(fieldLogger, m_controller::velocity, new Pose2d(6, 4, Rotation2d.kZero));
         m_target = new TargetDesignator(fieldLogger, TargetDesignator.A);
-        m_turret = new Turret(rootLogger, fieldLogger, m_pose::getPose, m_target::getTarget);
+        m_turret = new Turret(rootLogger, fieldLogger, m_pose::getState, m_target::getTarget, SPEED);
         m_indicator = new SolidIndicator(new RoboRioChannel(0), 40);
         m_indicator.state(this::indicatorState);
-        m_ball = new Ball(fieldLogger, m_pose::getState, m_turret::getAzimuth);
+        m_ball = new Ball(fieldLogger, m_pose::getState, m_turret::getAzimuth, SPEED);
 
         // button 1
         new Trigger(m_controller::a).onTrue(m_target.a());
