@@ -13,6 +13,7 @@ import org.team100.lib.targeting.TargetDesignator;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.visualization.Ball;
+import org.team100.lib.visualization.BallFactory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,7 +24,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot {
-    private final double SPEED = 3;
+    private static final boolean BALL_2D = false;
+    private final double SPEED = 10;
     private final DriverXboxControl m_controller;
     private final Turret m_turret;
     private final ManualPose m_pose;
@@ -43,8 +45,20 @@ public class Robot extends TimedRobot {
         m_turret = new Turret(rootLogger, fieldLogger, m_pose::getState, m_target::getTarget, SPEED);
         m_indicator = new SolidIndicator(new RoboRioChannel(0), 40);
         m_indicator.state(this::indicatorState);
-        m_ball = new Ball(fieldLogger, m_pose::getState, m_turret::getAzimuth, SPEED);
-
+        if (BALL_2D) {
+            m_ball = BallFactory.get2d(
+                    fieldLogger, m_pose::getState, m_turret::getAzimuth, SPEED);
+        } else {
+            // Always throws knuckleballs
+            // TODO: adjustable spin.
+            m_ball = BallFactory.get3d(
+                    fieldLogger,
+                    m_pose::getState,
+                    m_turret::getAzimuth,
+                    m_turret::getElevation,
+                    SPEED,
+                    0);
+        }
         // button 1
         new Trigger(m_controller::a).onTrue(m_target.a());
         // button 2

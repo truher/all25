@@ -47,7 +47,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      *                   input and return an error estimate in the tangent manifold
      *                   of whatever space it's actually acting in (e.g. SE(3))
      * @param xMin       minimum x
-     * @param xMax       minimum y
+     * @param xMax       maximum x
      * @param tolerance  return when solution x yields f(x) this close to zero
      * @param iterations when Newton gets stuck, it only takes a few iterations, so
      *                   this doesn't need to be large. Specify a generous
@@ -89,16 +89,19 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             // Keep the x estimate within bounds.
             limit(x);
         }
+        System.out.println("exceeded max iterations");
         return x;
     }
 
     /**
      * Single-sided Jacobian, faster.
      * 
-     * @param initialX start here
-     * @param restarts number of random restarts in case of non-convergence
+     * @param initialX       start here
+     * @param restarts       number of random restarts in case of non-convergence
+     * @param throwOnFailure throw an exception if we fail to find a solution. Some
+     *                       clients can't tolerate a "kinda close" solution.
      */
-    public Vector<X> solve2(Vector<X> initialX, int restarts) {
+    public Vector<X> solve2(Vector<X> initialX, int restarts, boolean throwOnFailure) {
         // System.out.printf("initialX: %s\n", StrUtil.vecStr(initialX));
         long startTime = System.nanoTime();
         int iter = 0;
@@ -162,13 +165,14 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                     x.set(i, 0, x.get(i) + 0.1 * (random.nextDouble() - 0.5));
                 }
                 limit(x);
-                return solve2(x, restarts - 1);
+                return solve2(x, restarts - 1, throwOnFailure);
             }
             // if (DEBUG)
             System.out.printf("random restart failed, error %f\n", error.maxAbs());
-            // throw new IllegalArgumentException(
-            // String.format("failed to converge for inputs %s",
-            // StrUtil.vecStr(initialX)));
+            if (throwOnFailure)
+                throw new IllegalArgumentException(
+                        String.format("failed to converge for inputs %s",
+                                StrUtil.vecStr(initialX)));
             return x;
         } finally {
             long finishTime = System.nanoTime();

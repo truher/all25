@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.spline.PoseWithCurvature;
@@ -362,5 +363,9 @@ public class GeometryUtil {
 
     public static Vector<N6> toVec(Twist3d twist) {
         return VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz);
+    }
+
+    public static Vector<N2> toVec(Translation2d t) {
+        return VecBuilder.fill(t.getX(), t.getY());
     }
 }

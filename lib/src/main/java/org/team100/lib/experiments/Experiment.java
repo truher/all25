@@ -75,5 +75,9 @@ public enum Experiment {
      * Compensate for moving shooter and moving target when computing turret
      * solution.
      */
-    TurretIntercept
+    TurretIntercept,
+    /**
+     * Use "shooting method" for turret solution
+     */
+    TurretShootingMethod
 }

@@ -1,6 +1,7 @@
 package org.team100.lib.kinematics.urdf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
 
@@ -55,13 +56,9 @@ public class URDFCartesianTest {
         Pose3d end = new Pose3d(1.5, 0.5, 0.05, new Rotation3d());
         // initial position is just somewhere random
         Vector<N3> q0 = VecBuilder.fill(0.1, 0.1, 0.1);
-        Map<String, Double> qMap = m.inverse(
-                q0, 1, "center_point", end);
-        assertEquals(3, qMap.size());
-        assertEquals(0.5, qMap.get("base_gantry"), 1e-3);
-        // this is the coordinate that should be limited.
-        assertEquals(1.0, qMap.get("gantry_head"), 1e-3);
-        assertEquals(0.15, qMap.get("head_spindle"), 1e-3);
+        // solution is not possible
+        assertThrows(IllegalArgumentException.class, () -> m.inverse(
+                q0, 1, "center_point", end));
     }
 
     /** 52 us per solve on my laptop, 2 solver iterations each. */
