@@ -1,5 +1,6 @@
 package org.team100.lib.state;
 
+import org.team100.lib.geometry.GlobalVelocityR2;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.timing.TimedPose;
@@ -100,6 +101,10 @@ public class ModelR3 {
 
     public GlobalVelocityR3 velocity() {
         return new GlobalVelocityR3(m_x.v(), m_y.v(), m_theta.v());
+    }
+
+    public GlobalVelocityR2 velocityR2() {
+        return new GlobalVelocityR2(m_x.v(), m_y.v());
     }
 
     /** Robot-relative speeds */

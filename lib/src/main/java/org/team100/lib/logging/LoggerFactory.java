@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.geometry.GlobalAccelerationR3;
 import org.team100.lib.geometry.GlobalDeltaR3;
+import org.team100.lib.geometry.GlobalVelocityR2;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
@@ -630,6 +631,30 @@ public class LoggerFactory {
 
     public GlobalVelocityR3Logger globalVelocityR3Logger(Level level, String leaf) {
         return new GlobalVelocityR3Logger(level, leaf);
+    }
+
+    public class GlobalVelocityR2Logger {
+        private final Level m_level;
+        private final DoubleLogger m_xLogger;
+        private final DoubleLogger m_yLogger;
+
+        GlobalVelocityR2Logger(Level level, String leaf) {
+            m_level = level;
+            m_xLogger = doubleLogger(level, join(leaf, "x m_s"));
+            m_yLogger = doubleLogger(level, join(leaf, "y m_s"));
+        }
+
+        public void log(Supplier<GlobalVelocityR2> vals) {
+            if (!allow(m_level))
+                return;
+            GlobalVelocityR2 val = vals.get();
+            m_xLogger.log(val::x);
+            m_yLogger.log(val::y);
+        }
+    }
+
+    public GlobalVelocityR2Logger globalVelocityR2Logger(Level level, String leaf) {
+        return new GlobalVelocityR2Logger(level, leaf);
     }
 
     public class GlobalAccelerationR3Logger {

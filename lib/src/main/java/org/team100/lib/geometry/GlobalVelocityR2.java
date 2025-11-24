@@ -13,6 +13,8 @@ import edu.wpi.first.math.numbers.N3;
 
 /** Velocity in R2, companion to Translation2d. */
 public record GlobalVelocityR2(double x, double y) {
+    public static GlobalVelocityR2 ZERO = new GlobalVelocityR2(0, 0);
+
     public static GlobalVelocityR2 fromPolar(Rotation2d angle, double speed) {
         return new GlobalVelocityR2(speed * angle.getCos(), speed * angle.getSin());
     }

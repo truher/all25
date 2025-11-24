@@ -21,10 +21,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
  */
 public class Ball {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
-    private static final double SPEED_M_S = 1;
     private final DoubleArrayLogger m_log_field_ball;
     private final Supplier<ModelR3> m_robot;
     private final Supplier<Rotation2d> m_azimuth;
+    /** Projectile speed m/s */
+    private final double m_speed;
 
     // null when contained in robot.
     private Translation2d m_location;
@@ -33,15 +34,17 @@ public class Ball {
     public Ball(
             LoggerFactory field,
             Supplier<ModelR3> robot,
-            Supplier<Rotation2d> azimuth) {
+            Supplier<Rotation2d> azimuth,
+            double speed) {
         m_log_field_ball = field.doubleArrayLogger(Level.COMP, "ball");
         m_robot = robot;
         m_azimuth = azimuth;
+        m_speed = speed;
     }
 
     private void launch() {
         // velocity due only to the gun
-        GlobalVelocityR2 v = GlobalVelocityR2.fromPolar(m_azimuth.get(), SPEED_M_S);
+        GlobalVelocityR2 v = GlobalVelocityR2.fromPolar(m_azimuth.get(), m_speed);
         // velocity due to robot translation
         GlobalVelocityR2 mv = GlobalVelocityR2.fromSe2(m_robot.get().velocity());
         // initial position
