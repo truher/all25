@@ -11,15 +11,13 @@ import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 /**
  * Simulated projectile in XY plane, uses constant velocity, continues forever.
  * 
  * Provides Field2d visualization using the name "ball".
  */
-public class BallR2 {
+public class BallR2 implements Ball {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private final DoubleArrayLogger m_log_field_ball;
     private final Supplier<ModelR3> m_robot;
@@ -48,33 +46,29 @@ public class BallR2 {
         m_speed = speed;
     }
 
-    /** Sets initial position and velocity. */
-    void launch() {
+    @Override
+    public void launch() {
         // Velocity due only to the gun
         GlobalVelocityR2 v = GlobalVelocityR2.fromPolar(m_azimuth.get(), m_speed);
         // Velocity due to robot translation
         GlobalVelocityR2 mv = GlobalVelocityR2.fromSe2(m_robot.get().velocity());
-        // Initial position is at the robot center.  TODO: offsets.
+        // Initial position is at the robot center. TODO: offsets.
         m_location = m_robot.get().pose().getTranslation();
         // Initial velocity.
         m_velocity = v.plus(mv);
     }
 
-    /** Evolves state one time step. */
-    void fly() {
+    @Override
+    public void fly() {
         m_location = m_velocity.integrate(m_location, DT);
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         m_location = null;
     }
 
-    /** Shoot the ball and continue its path as long as the command runs. */
-    public Command shoot() {
-        return Commands.startRun(this::launch, this::fly)
-                .finallyDo(this::reset);
-    }
-
+    @Override
     public void periodic() {
         m_log_field_ball.log(this::poseArray);
     }

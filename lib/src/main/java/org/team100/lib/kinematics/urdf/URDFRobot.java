@@ -132,7 +132,7 @@ public class URDFRobot<Q extends Num> {
                 minQ(m_qDim), maxQ(m_qDim),
                 tolerance, iterations, dqLimit);
         long startTime = System.nanoTime();
-        Vector<Q> qVec = solver.solve2(q0, restarts);
+        Vector<Q> qVec = solver.solve2(q0, restarts, true);
 
         if (DEBUG) {
             long finishTime = System.nanoTime();

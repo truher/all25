@@ -17,13 +17,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 /**
  * Simulated projectile in three dimensions
  */
-public class BallR3 {
+public class BallR3 implements Ball {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private final DoubleArrayLogger m_log_field_ball;
     private final Drag m_drag;
@@ -67,8 +65,8 @@ public class BallR3 {
         m_omega = omega;
     }
 
-    /** Sets initial position and velocity. */
-    void launch() {
+    @Override
+    public void launch() {
         // Velocity due only to the gun
         GlobalVelocity3d v = GlobalVelocity3d.fromPolar(
                 m_azimuth.get(), m_elevation.get(), m_speed);
@@ -84,8 +82,8 @@ public class BallR3 {
         m_az = m_azimuth.get();
     }
 
-    /** Evolves state one time step. */
-    void fly() {
+    @Override
+    public void fly() {
         Matrix<N6, N1> x = NumericalIntegration.rk4(m_drag, m_x, DT);
         if (x.get(1, 0) >= 0) {
             // only update if above the floor
@@ -93,17 +91,13 @@ public class BallR3 {
         }
     }
 
-    private void reset() {
+    @Override
+    public void reset() {
         m_location = null;
         m_x = null;
     }
 
-    /** Shoot the ball and continue its path as long as the command runs. */
-    public Command shoot() {
-        return Commands.startRun(this::launch, this::fly)
-                .finallyDo(this::reset);
-    }
-
+    @Override
     public void periodic() {
         m_log_field_ball.log(this::poseArray);
     }

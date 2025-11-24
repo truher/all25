@@ -358,7 +358,7 @@ public class NewtonsMethodTest {
         NewtonsMethod<N1, N1> s = new NewtonsMethod<>(Nat.N1(), Nat.N1(), f, minQ, maxQ, 1e-3, 10, 1);
 
         // f(-1) = -1 + 1 = 0
-        Vector<N1> x = s.solve2(q0, 1);
+        Vector<N1> x = s.solve2(q0, 1, true);
         assertEquals(-1, x.get(0), 1e-3);
     }
 
@@ -374,7 +374,7 @@ public class NewtonsMethodTest {
         int iter = 0;
         int maxIter = 100000;
         for (iter = 0; iter < maxIter; ++iter) {
-            s.solve2(q0, 1);
+            s.solve2(q0, 1, true);
         }
         long finishTime = System.nanoTime();
         if (DEBUG) {
@@ -393,7 +393,7 @@ public class NewtonsMethodTest {
         Vector<N1> minQ = VecBuilder.fill(-10);
         Vector<N1> maxQ = VecBuilder.fill(10);
         NewtonsMethod<N1, N1> s = new NewtonsMethod<>(Nat.N1(), Nat.N1(), f, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N1> x = s.solve2(q0, 1);
+        Vector<N1> x = s.solve2(q0, 1, true);
         // f(1.414) = 2 - 2 = 0
         assertEquals(1.414, x.get(0), 1e-3);
     }
@@ -429,7 +429,7 @@ public class NewtonsMethodTest {
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
         NewtonsMethod<N2, N3> s = new NewtonsMethod<>(Nat.N2(), Nat.N3(), err, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> x = s.solve2(q0, 5);
+        Vector<N2> x = s.solve2(q0, 5, true);
         assertEquals(0.524, x.get(0), 1e-3);
         assertEquals(2.094, x.get(1), 1e-3);
     }
@@ -612,7 +612,7 @@ public class NewtonsMethodTest {
         Vector<N2> minQ = VecBuilder.fill(-Math.PI, -Math.PI);
         Vector<N2> maxQ = VecBuilder.fill(Math.PI, Math.PI);
         NewtonsMethod<N2, N2> s = new NewtonsMethod<>(Nat.N2(), Nat.N2(), err, minQ, maxQ, 1e-3, 10, 1);
-        Vector<N2> x = s.solve2(q0, 5);
+        Vector<N2> x = s.solve2(q0, 5, true);
         assertEquals(0.524, x.get(0), 1e-3);
         assertEquals(2.094, x.get(1), 1e-3);
     }
@@ -635,7 +635,7 @@ public class NewtonsMethodTest {
         int iterations = 50000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; ++i) {
-            s.solve2(q0, 5);
+            s.solve2(q0, 5, true);
         }
         long finishTime = System.currentTimeMillis();
         if (DEBUG) {
@@ -685,7 +685,7 @@ public class NewtonsMethodTest {
                 1.4888289270e-04);
         Vector<N5> q0 = c.toVec();
         long startTime = System.nanoTime();
-        solver.solve2(q0, restarts);
+        solver.solve2(q0, restarts, true);
         if (DEBUG) {
             long finishTime = System.nanoTime();
             System.out.printf("ET (ms): %6.3f\n",
