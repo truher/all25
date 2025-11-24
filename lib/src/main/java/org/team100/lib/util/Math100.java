@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * Various math utilities.
  */
 public class Math100 {
-    public static final boolean DEBUG = false;
     private static final double EPSILON = 1e-6;
 
     /**

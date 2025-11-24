@@ -12,7 +12,7 @@ import org.team100.lib.subsystems.turret.Turret;
 import org.team100.lib.targeting.TargetDesignator;
 import org.team100.lib.util.Banner;
 import org.team100.lib.util.RoboRioChannel;
-import org.team100.lib.visualization.Ball;
+import org.team100.lib.visualization.BallR2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
     private final ManualPose m_pose;
     private final TargetDesignator m_target;
     private final SolidIndicator m_indicator;
-    private final Ball m_ball;
+    private final BallR2 m_ball;
 
     public Robot() {
         Banner.printBanner();
@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
         m_turret = new Turret(rootLogger, fieldLogger, m_pose::getState, m_target::getTarget, SPEED);
         m_indicator = new SolidIndicator(new RoboRioChannel(0), 40);
         m_indicator.state(this::indicatorState);
-        m_ball = new Ball(fieldLogger, m_pose::getState, m_turret::getAzimuth, SPEED);
+        m_ball = new BallR2(fieldLogger, m_pose::getState, m_turret::getAzimuth, SPEED);
 
         // button 1
         new Trigger(m_controller::a).onTrue(m_target.a());

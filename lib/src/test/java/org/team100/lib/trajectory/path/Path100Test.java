@@ -21,7 +21,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 class Path100Test {
     private static final double DELTA = 0.001;
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final List<Rotation2d> HEADINGS = Arrays.asList(
             GeometryUtil.fromDegrees(0),

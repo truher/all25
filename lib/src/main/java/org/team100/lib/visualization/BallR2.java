@@ -15,11 +15,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 /**
- * Simulated projectile.
+ * Simulated projectile in XY plane, uses constant velocity, continues forever.
  * 
  * Provides Field2d visualization using the name "ball".
  */
-public class Ball {
+public class BallR2 {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private final DoubleArrayLogger m_log_field_ball;
     private final Supplier<ModelR3> m_robot;
@@ -28,10 +28,16 @@ public class Ball {
     private final double m_speed;
 
     // null when contained in robot.
-    private Translation2d m_location;
-    private GlobalVelocityR2 m_velocity;
+    Translation2d m_location;
+    GlobalVelocityR2 m_velocity;
 
-    public Ball(
+    /**
+     * @param field   log
+     * @param robot   state (pose2d, velocityR3)
+     * @param azimuth absolute
+     * @param speed   muzzle speed
+     */
+    public BallR2(
             LoggerFactory field,
             Supplier<ModelR3> robot,
             Supplier<Rotation2d> azimuth,
@@ -42,19 +48,20 @@ public class Ball {
         m_speed = speed;
     }
 
-    private void launch() {
-        // velocity due only to the gun
+    /** Sets initial position and velocity. */
+    void launch() {
+        // Velocity due only to the gun
         GlobalVelocityR2 v = GlobalVelocityR2.fromPolar(m_azimuth.get(), m_speed);
-        // velocity due to robot translation
+        // Velocity due to robot translation
         GlobalVelocityR2 mv = GlobalVelocityR2.fromSe2(m_robot.get().velocity());
-        // initial position
+        // Initial position is at the robot center.  TODO: offsets.
         m_location = m_robot.get().pose().getTranslation();
-        // initial velocity
+        // Initial velocity.
         m_velocity = v.plus(mv);
     }
 
-    private void fly() {
-        // evolve state with zero acceleration
+    /** Evolves state one time step. */
+    void fly() {
         m_location = m_velocity.integrate(m_location, DT);
     }
 
@@ -73,7 +80,15 @@ public class Ball {
     }
 
     private double[] poseArray() {
-        Translation2d t = m_location == null ? m_robot.get().translation() : m_location;
+        Translation2d t = location();
         return new double[] { t.getX(), t.getY(), 0 };
+    }
+
+    private Translation2d location() {
+        if (m_location == null) {
+            // The ball is riding with the robot.
+            return m_robot.get().translation();
+        }
+        return m_location;
     }
 }
