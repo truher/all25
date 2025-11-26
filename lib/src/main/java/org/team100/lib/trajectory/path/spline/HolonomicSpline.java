@@ -78,11 +78,14 @@ public class HolonomicSpline {
         if (DEBUG) {
             System.out.printf("scale %f %f\n", scale0, scale1);
         }
+        Translation2d course0 = new Translation2d(1,0).rotateBy(p0.course());
+        Translation2d course1 = new Translation2d(1,0).rotateBy(p1.course());
+        
         double x0 = p0.translation().getX();
         double x1 = p1.translation().getX();
         // first derivatives are just the course
-        double dx0 = p0.course().getCos() * scale0;
-        double dx1 = p1.course().getCos() * scale1;
+        double dx0 = course0.getX() * scale0;
+        double dx1 = course1.getX() * scale1;
         // second derivatives are zero at the ends
         double ddx0 = 0;
         double ddx1 = 0;
@@ -90,8 +93,8 @@ public class HolonomicSpline {
         double y0 = p0.translation().getY();
         double y1 = p1.translation().getY();
         // first derivatives are just the course
-        double dy0 = p0.course().getSin() * scale0;
-        double dy1 = p1.course().getSin() * scale1;
+        double dy0 = course0.getY() * scale0;
+        double dy1 = course1.getY() * scale1;
         // second derivatives are zero at the ends
         double ddy0 = 0;
         double ddy1 = 0;
@@ -100,7 +103,7 @@ public class HolonomicSpline {
         m_y = SplineR1.get(y0, y1, dy0, dy1, ddy0, ddy1);
 
         m_r0 = p0.heading();
-        double delta = p0.heading().unaryMinus().rotateBy(p1.heading()).getRadians();
+        double delta = p1.heading().minus(p0.heading()).getRadians();
 
         // previously dtheta at the endpoints was zero, which is bad: it meant the omega
         // value varied all over the place, even for theta paths that should be

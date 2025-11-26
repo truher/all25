@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -83,6 +84,17 @@ class GeometryUtilTest {
         assertEquals(0.785, twist.dx, DELTA);
         assertEquals(-0.785, twist.dy, DELTA);
         assertEquals(1.571, twist.dtheta, DELTA);
+    }
+
+    @Test
+    void testDistance2() {
+        assertEquals(1, GeometryUtil.distanceM(new Translation2d(1, 0), new Translation2d(0, 0)), DELTA);
+    }
+
+    @Test
+    void testDistance3() {
+        assertEquals(1, GeometryUtil.distanceM(
+                new Translation3d(1, 0, 0), new Translation3d(0, 0, 0)), DELTA);
     }
 
     @Test

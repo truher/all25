@@ -264,7 +264,11 @@ public class GeometryUtil {
     }
 
     public static double distanceM(Translation2d a, Translation2d b) {
-        return inverse(a).plus(b).getNorm();
+        return a.getDistance(b);
+    }
+
+    public static double distanceM(Translation3d a, Translation3d b) {
+        return a.getDistance(b);
     }
 
     public static Translation2d inverse(Translation2d a) {
