@@ -1,7 +1,10 @@
 package org.team100.lib.trajectory.path.spline;
 
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.HolonomicPose3d;
+import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.Pose3dWithMotion;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -94,6 +97,45 @@ public class HolonomicSpline3d {
         double ddyaw0 = 0;
         double ddyaw1 = 0;
         m_yaw = SplineR1.get(0.0, yawDelta, dyaw0, dyaw1, ddyaw0, ddyaw1);
+    }
+
+    /**
+     * Cartesian coordinate in meters.
+     * 
+     * @param t ranges from 0 to 1
+     * @return the point on the spline for that t value
+     */
+    protected Translation3d getPoint(double t) {
+        return new Translation3d(x(t), y(t), z(t));
+    }
+
+    double x(double t) {
+        return m_x.getPosition(t);
+    }
+
+    double y(double t) {
+        return m_y.getPosition(t);
+    }
+
+    double z(double t) {
+        return m_z.getPosition(t);
+    }
+
+    public Pose3dWithMotion getPose3dWithMotion(double p) {
+        return null;
+        // return new Pose3dWithMotion(
+        //         new HolonomicPose3d(
+        //                 getPoint(p),
+        //                 getHeading(p),
+        //                 getCourse(p).orElseThrow()),
+        //         getDHeadingDs(p),
+        //         getCurvature(p),
+        //         getDCurvatureDs(p));
+    }
+
+    protected Rotation3d getHeading(double t) {
+        return null;
+        // return m_r0.rotateBy(Rotation2d.fromRadians(m_theta.getPosition(t)));
     }
 
 }
