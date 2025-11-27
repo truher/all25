@@ -18,6 +18,9 @@ accelerating ahead of $x$, and then brakes gently for the rest of the time.
 The fine joint, $q_2$, is capable of much faster acceleration, and so makes
 up the difference.
 
+Another use case is cascaded PID control: the coarse joint responds relatively
+slowly, and the fine joint responds more quickly:
+
 ## Kinematics
 
 Redundant mechanisms have nonunique inverse kinematics, so the problem needs to be solved
