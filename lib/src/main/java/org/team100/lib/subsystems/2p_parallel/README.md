@@ -8,18 +8,47 @@ Why would we want redundant joints?  One reason is to allow "coarse" and "fine" 
 the drivetrain could execute "coarse" motion (large, slow, approximate) and the
 mechanism could execute "fine" motion (small, quick, accurate).
 
-Here's a use case for this capability: coming to a stop with higher acceleration than
-the "coarse" mechanism can manage ([spreadsheet](https://docs.google.com/spreadsheets/d/1Z7twUzL8mwdp5JcAuysRHhibZrmlWo9Cy3-zGcI3sXY/edit?gid=1682330556#gid=1682330556)):
+### Tolerance
+
+A simple use case involves tolerances: within the loose tolerance of the coarse joint,
+the fine joint does all the work:
+
+<img src="chart4.png" width=500/>
+
+This might be applicable for the case where the drivetrain gets "close enough" to a target,
+and then stops, to avoid upsetting a mechanism that's moving the rest of the way.
+
+### Cascaded PID
+
+A simple use case is cascaded PID control: the coarse joint responds relatively
+slowly, and the fine joint responds more quickly, within its limits:
+
+<img src="chart2.png" width=500/>
+
+The control scheme here is very simple, just "P" and "D," but it compares favorably to the same
+coarse control, with the same "P" value, (but more "D") by itself:
+
+<img src="chart3.png" width=500/>
+
+It's not a night-and-day difference, and not what we really want, but it is simple.
+
+### Planning
+
+A better use case involves planning: coming to a stop with higher acceleration than
+the "coarse" mechanism can produce ([spreadsheet](https://docs.google.com/spreadsheets/d/1Z7twUzL8mwdp5JcAuysRHhibZrmlWo9Cy3-zGcI3sXY/edit?gid=1682330556#gid=1682330556)):
 
 <img src="chart.png" width=500/>
 
 In this example, the coarse joint, $q_1$, anticipates the approaching stop by
 accelerating ahead of $x$, and then brakes gently for the rest of the time.
 The fine joint, $q_2$, is capable of much faster acceleration, and so makes
-up the difference.
+up the difference, holding back during the $q_1$ acceleration and gentle
+deceleration, and then taking most of the load for the final stop, which is much
+four times more sudden than $q_1$ can handle alone.
 
-Another use case is cascaded PID control: the coarse joint responds relatively
-slowly, and the fine joint responds more quickly:
+Because, in this case, the coarse joint anticipates the deceleration long before it occurs, it would
+need to be planned in advance, part of a per-joint trajectory planner.
+
 
 ## Kinematics
 
