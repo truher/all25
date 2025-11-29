@@ -12,7 +12,27 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 
+/**
+ * Demo of offset control, without actually changing any control
+ * classes.
+ * 
+ * The controlled state is the "toolpoint" of the robot.
+ * 
+ * The drivetrain is the delegate, and its velocity commands are
+ * derived from the toolpoint velocities using a fixed offset.
+ * 
+ * Some of the toolpoint desired velocity is perpendicular to the offset, and so
+ * by adding a rotation to the delegate, we can move the toolpoint in its
+ * desired direction a bit faster, in exchange for some theta error. This
+ * essentially edits the output of the controller, so we can leave the
+ * controller alone.
+ */
 public class OffsetDrivetrain implements VelocitySubsystemR3 {
+    /**
+     * How much of the perpendicular speed to mix in. This interacts with the
+     * controller "P" values, so should be tuned together with them.
+     */
+    private static final double OMEGA_MIXER = 2.0;
     private final VelocitySubsystemR3 m_delegate;
     private final Translation2d m_offset;
 
@@ -39,9 +59,21 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
      */
     @Override
     public void setVelocity(GlobalVelocityR3 setpoint) {
-        Translation2d inverseOffset = m_offset.unaryMinus();
-        m_delegate.setVelocity(setpoint.plus(
-                tangentialVelocity(omega(setpoint), r(inverseOffset))));
+        // the component of the cartesian part that tries to spin
+        // the delegate
+        // adding some of this will make the toolpoint move more rapidly
+        // towards the cartesian goal, while injecting theta error.
+        GlobalVelocityR3 perpendicularOmega = omega(r(m_offset), velocity(setpoint));
+
+        // the component of the rotation part that tries to move the
+        // delegate in x and y
+        // respecting 100% of this velocity will keep the toolpoint
+        // where it wants to go (if the delegate responds perfectly)
+        GlobalVelocityR3 tangentialVelocity = tangentialVelocity(omega(setpoint), r(m_offset.unaryMinus()));
+
+        m_delegate.setVelocity(setpoint
+                .plus(tangentialVelocity)
+                .plus(perpendicularOmega.times(OMEGA_MIXER)));
     }
 
     @Override
@@ -49,13 +81,29 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
         m_delegate.stop();
     }
 
-    /** Compute toolpoint pose from delegate pose and offset. */
+    /**
+     * The perpendicular component of v across r, as an angular velocity.
+     * 
+     * omega = (r \cross v) / r^2
+     * 
+     * Cartesian components are always zero.
+     */
+    private GlobalVelocityR3 omega(Vector<N3> r, Vector<N3> v) {
+        return GlobalVelocityR3.fromVector(
+                Vector.cross(r, v).div(r.norm() * r.norm()));
+    }
+
+    /**
+     * Computes toolpoint pose from delegate pose and offset.
+     */
     private Pose2d toolpointPose() {
         return m_delegate.getState().pose().transformBy(
                 new Transform2d(m_offset, Rotation2d.kZero));
     }
 
-    /** Compute toolpoint velocity from delegate velocity, pose, and offset. */
+    /**
+     * Computes toolpoint velocity from delegate velocity, pose, and offset.
+     */
     private GlobalVelocityR3 toolpointVelocity() {
         GlobalVelocityR3 delegateVelocity = m_delegate.getState().velocity();
         return delegateVelocity.plus(
@@ -66,18 +114,35 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
         return m_delegate.getState().rotation();
     }
 
-    /** radial vector */
+    /**
+     * Vector form of the offset, rotated by the delegate pose rotation.
+     */
     private Vector<N3> r(Translation2d offset) {
         return GeometryUtil.toVec3(
                 offset.rotateBy(delegateRotation()));
     }
 
+    /**
+     * Cartesian component of velocity.
+     */
+    private Vector<N3> velocity(GlobalVelocityR3 v) {
+        return v.vVector();
+    }
+
+    /**
+     * Omega component of the velocity
+     */
     private Vector<N3> omega(GlobalVelocityR3 v) {
         return v.omegaVector();
     }
 
     /**
+     * Computes the cartesian velocity created by the rotational velocity omega,
+     * through the radius r.
+     * 
      * v = omega \cross r
+     * 
+     * Omega component is always zero.
      */
     private GlobalVelocityR3 tangentialVelocity(
             Vector<N3> omega, Vector<N3> r) {

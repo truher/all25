@@ -15,8 +15,7 @@ import org.team100.lib.subsystems.r3.commands.helper.VelocityReferenceController
  * 
  * There's no profile, no trajectory, just give it a point
  * you want to go to, and it will go there. It makes no attempt to
- * impose feasibility constraints or coordinate the axes, so it tries
- * to use the setpoint generator to moderate the output.
+ * impose feasibility constraints or coordinate the axes.
  * 
  * This is really only intended for testing.
  */

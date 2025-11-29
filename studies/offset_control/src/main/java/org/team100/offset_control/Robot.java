@@ -3,15 +3,18 @@ package org.team100.offset_control;
 
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.controller.r3.ControllerFactoryR3;
+import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 import org.team100.lib.subsystems.r3.commands.DriveToPoseWithProfile;
+import org.team100.lib.subsystems.r3.commands.test.DriveToStateSimple;
 import org.team100.lib.subsystems.test.OffsetDrivetrain;
 import org.team100.lib.subsystems.test.TrivialDrivetrain;
 import org.team100.lib.util.Banner;
@@ -54,15 +57,44 @@ public class Robot extends TimedRobot {
 
         HolonomicProfile profile = HolonomicProfile.currentLimitedExponential(
                 1, 2, 4, 5, 10, 5);
-        ControllerR3 controller = ControllerFactoryR3
-                .auto2025LooseTolerance(rootLogger);
+        ControllerR3 controller = new FullStateControllerR3(
+                rootLogger,
+                7.2, // p cartesian
+                3.5, // p theta
+                0.055, // p cartesian v
+                0.01, // p theta v
+                0.035, // x tol
+                0.1, // theta tol
+                1, // xdot tol
+                1);
+
         DriveToPoseWithProfile driveCmd = new DriveToPoseWithProfile(
                 rootLogger, m_subsystem, controller,
                 profile,
-                () -> new Pose2d(4, 4, Rotation2d.k180deg));
-
+                () -> new Pose2d(4, 4, Rotation2d.kCW_90deg));
         new Trigger(m_controller::a).whileTrue(
                 driveCmd.until(driveCmd::isDone));
+
+        ControllerR3 gentleController = new FullStateControllerR3(
+                rootLogger,
+                3, // p cartesian
+                1, // p theta
+                0.04, // p cartesian v
+                0.01, // p theta v
+                0.05, // x tol
+                0.05, // theta tol
+                1, // xdot tol
+                1); // omega tol
+        MoveAndHold driveSimple = new DriveToStateSimple(
+                rootLogger, gentleController, m_subsystem, new ModelR3());
+        new Trigger(m_controller::b).whileTrue(
+                driveSimple.until(driveSimple::isDone));
+
+        MoveAndHold driveSimple2 = new DriveToStateSimple(
+                rootLogger, gentleController, m_subsystem,
+                new ModelR3(new Pose2d(4, 4, Rotation2d.kCW_90deg)));
+        new Trigger(m_controller::x).whileTrue(
+                driveSimple2.until(driveSimple2::isDone));
     }
 
     @Override
