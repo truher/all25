@@ -123,4 +123,14 @@ public record GlobalVelocityR3(double x, double y, double theta) {
     public Vector<N3> toVector() {
         return VecBuilder.fill(x, y, theta);
     }
+
+    /** Angular velocity vector, i.e. just the theta component. */
+    public Vector<N3> omegaVector() {
+        return VecBuilder.fill(0, 0, theta);
+    }
+
+    /** Cartesian velocity vector, i.e. just the x and y components. */
+    public Vector<N3> vVector() {
+        return VecBuilder.fill(x, y, 0);
+    }
 }

@@ -372,4 +372,9 @@ public class GeometryUtil {
     public static Vector<N2> toVec(Translation2d t) {
         return VecBuilder.fill(t.getX(), t.getY());
     }
+
+    /** 3-vector for translation */
+    public static Vector<N3> toVec3(Translation2d t) {
+        return VecBuilder.fill(t.getX(), t.getY(), 0);
+    }
 }

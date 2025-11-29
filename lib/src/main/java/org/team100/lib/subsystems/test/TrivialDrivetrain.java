@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 /**
  * Executes desired velocity exactly.
- * Visualizes drivetrain pose.
  */
 public class TrivialDrivetrain implements VelocitySubsystemR3 {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
@@ -19,9 +18,9 @@ public class TrivialDrivetrain implements VelocitySubsystemR3 {
     private GlobalVelocityR3 m_setpoint;
     private ModelR3 m_state;
 
-    public TrivialDrivetrain() {
+    public TrivialDrivetrain(Pose2d initial) {
         m_setpoint = new GlobalVelocityR3(0, 0, 0);
-        m_state = new ModelR3(Pose2d.kZero);
+        m_state = new ModelR3(initial);
         m_stateCache = Cache.of(this::update);
     }
 

@@ -36,10 +36,12 @@ public class Robot extends TimedRobot {
         Logging log = Logging.instance();
         LoggerFactory fieldLogger = log.fieldLogger;
         LoggerFactory rootLogger = log.rootLogger;
-        TrivialDrivetrain delegate = new TrivialDrivetrain();
+        // real robot starts at (-4,0)
+        TrivialDrivetrain delegate = new TrivialDrivetrain(
+                new Pose2d(-4, 0, Rotation2d.kZero));
+        // offset is x+4 so tool point should be at zero
         m_subsystem = new OffsetDrivetrain(
-                delegate,
-                new Translation2d(4, 0));
+                delegate, new Translation2d(4, 0));
         m_robotViz = new RobotPoseVisualization(
                 fieldLogger,
                 () -> delegate.getState().pose(),
