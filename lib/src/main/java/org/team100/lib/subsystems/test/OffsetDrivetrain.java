@@ -6,6 +6,7 @@ import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class OffsetDrivetrain implements VelocitySubsystemR3 {
@@ -22,11 +23,10 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
         ModelR3 state = m_delegate.getState();
         Pose2d statePose = state.pose();
         Rotation2d rotation = statePose.getRotation();
-        Pose2d pose = new Pose2d(
-                statePose.getTranslation().minus(m_offset), rotation);
+        Pose2d pose = statePose.transformBy(new Transform2d(m_offset.unaryMinus(), Rotation2d.kZero));
         GlobalVelocityR3 v = state.velocity();
-        double vx = v.x() - v.theta() * m_offset.rotateBy(rotation).getY();
-        double vy = v.y() + v.theta() * m_offset.rotateBy(rotation).getX();
+        double vx = v.x() + v.theta() * m_offset.rotateBy(rotation).getY();
+        double vy = v.y() - v.theta() * m_offset.rotateBy(rotation).getX();
         double vtheta = v.theta();
         GlobalVelocityR3 vv = new GlobalVelocityR3(vx, vy, vtheta);
         return new ModelR3(pose, vv);
@@ -40,8 +40,8 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
     @Override
     public void setVelocity(GlobalVelocityR3 setpoint) {
         Rotation2d rotation = m_delegate.getState().pose().getRotation();
-        double vx = setpoint.x() + setpoint.theta() * m_offset.rotateBy(rotation).getY();
-        double vy = setpoint.y() - setpoint.theta() * m_offset.rotateBy(rotation).getX();
+        double vx = setpoint.x() - setpoint.theta() * m_offset.rotateBy(rotation).getY();
+        double vy = setpoint.y() + setpoint.theta() * m_offset.rotateBy(rotation).getX();
         double vtheta = setpoint.theta();
         m_delegate.setVelocity(new GlobalVelocityR3(vx, vy, vtheta));
     }
