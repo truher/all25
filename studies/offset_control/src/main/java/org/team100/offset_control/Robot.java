@@ -12,12 +12,14 @@ import org.team100.lib.logging.Logging;
 import org.team100.lib.profile.HolonomicProfile;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 import org.team100.lib.subsystems.r3.commands.DriveToPoseWithProfile;
+import org.team100.lib.subsystems.test.OffsetDrivetrain;
 import org.team100.lib.subsystems.test.TrivialDrivetrain;
 import org.team100.lib.util.Banner;
 import org.team100.lib.visualization.RobotPoseVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -33,7 +35,9 @@ public class Robot extends TimedRobot {
         Logging log = Logging.instance();
         LoggerFactory fieldLogger = log.fieldLogger;
         LoggerFactory rootLogger = log.rootLogger;
-        m_subsystem = new TrivialDrivetrain();
+        m_subsystem = new OffsetDrivetrain(
+                new TrivialDrivetrain(),
+                new Translation2d(4, 0));
         m_robotViz = new RobotPoseVisualization(
                 fieldLogger, () -> m_subsystem.getState().pose());
         m_controller = new DriverXboxControl(0);
@@ -45,7 +49,7 @@ public class Robot extends TimedRobot {
         DriveToPoseWithProfile driveCmd = new DriveToPoseWithProfile(
                 rootLogger, m_subsystem, controller,
                 profile,
-                () -> new Pose2d(1, 1, Rotation2d.kZero));
+                () -> new Pose2d(4, 4, Rotation2d.kZero));
 
         new Trigger(m_controller::a).whileTrue(
                 driveCmd.until(driveCmd::isDone));

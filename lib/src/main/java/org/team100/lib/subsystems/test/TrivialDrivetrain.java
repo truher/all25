@@ -8,7 +8,6 @@ import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * Executes desired velocity exactly.
@@ -42,15 +41,9 @@ public class TrivialDrivetrain implements VelocitySubsystemR3 {
     }
 
     private ModelR3 update() {
-        double vx = m_setpoint.x();
-        double vy = m_setpoint.y();
-        double omega = m_setpoint.theta();
         m_state = new ModelR3(
-                new Pose2d(
-                        m_state.pose().getX() + vx * DT,
-                        m_state.pose().getY() + vy * DT,
-                        m_state.pose().getRotation().plus(new Rotation2d(omega * DT))),
-                new GlobalVelocityR3(vx, vy, omega));
+                m_setpoint.integrate(m_state.pose(), DT),
+                m_setpoint);
         return m_state;
     }
 

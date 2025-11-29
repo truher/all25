@@ -59,6 +59,14 @@ public record GlobalVelocityR3(double x, double y, double theta) {
         return new GlobalVelocityR3(x - other.x, y - other.y, theta - other.theta);
     }
 
+    /** Integrate the velocity from the initial pose for time dt */
+    public Pose2d integrate(Pose2d initial, double dt) {
+        return new Pose2d(
+                initial.getX() + x * dt,
+                initial.getY() + y * dt,
+                initial.getRotation().plus(new Rotation2d(theta * dt)));
+    }
+
     public GlobalAccelerationR3 accel(GlobalVelocityR3 previous, double dt) {
         GlobalVelocityR3 v = minus(previous).div(dt);
         return new GlobalAccelerationR3(v.x(), v.y(), v.theta());
