@@ -17,8 +17,9 @@ public class RobotPoseVisualization implements Runnable {
 
     public RobotPoseVisualization(
             LoggerFactory fieldLogger,
-            Supplier<Pose2d> pose) {
-        m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
+            Supplier<Pose2d> pose,
+            String label) {
+        m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, label);
         m_pose = pose;
     }
 

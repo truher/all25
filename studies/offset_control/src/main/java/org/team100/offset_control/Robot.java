@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class Robot extends TimedRobot {
     private final VelocitySubsystemR3 m_subsystem;
     private final Runnable m_robotViz;
+    private final Runnable m_ctrlViz;
     private final DriverXboxControl m_controller;
 
     public Robot() {
@@ -35,11 +36,18 @@ public class Robot extends TimedRobot {
         Logging log = Logging.instance();
         LoggerFactory fieldLogger = log.fieldLogger;
         LoggerFactory rootLogger = log.rootLogger;
+        TrivialDrivetrain delegate = new TrivialDrivetrain();
         m_subsystem = new OffsetDrivetrain(
-                new TrivialDrivetrain(),
+                delegate,
                 new Translation2d(4, 0));
         m_robotViz = new RobotPoseVisualization(
-                fieldLogger, () -> m_subsystem.getState().pose());
+                fieldLogger,
+                () -> delegate.getState().pose(),
+                "robot");
+        m_ctrlViz = new RobotPoseVisualization(
+                fieldLogger,
+                () -> m_subsystem.getState().pose(),
+                "ctrl");
         m_controller = new DriverXboxControl(0);
 
         HolonomicProfile profile = HolonomicProfile.currentLimitedExponential(
@@ -49,7 +57,7 @@ public class Robot extends TimedRobot {
         DriveToPoseWithProfile driveCmd = new DriveToPoseWithProfile(
                 rootLogger, m_subsystem, controller,
                 profile,
-                () -> new Pose2d(4, 4, Rotation2d.kZero));
+                () -> new Pose2d(4, 4, Rotation2d.k180deg));
 
         new Trigger(m_controller::a).whileTrue(
                 driveCmd.until(driveCmd::isDone));
@@ -61,6 +69,7 @@ public class Robot extends TimedRobot {
         Cache.refresh();
         CommandScheduler.getInstance().run();
         m_robotViz.run();
+        m_ctrlViz.run();
     }
 
     @Override
