@@ -28,55 +28,75 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Robot extends TimedRobot {
-    private final VelocitySubsystemR3 m_subsystem;
+    private static final double REEF_X = 3.089;
+    private static final double REEF_Y = 4.026;
     private final Runnable m_robotViz;
-    private final Runnable m_ctrlViz;
+    private final Runnable m_toolpointViz;
     private final DriverXboxControl m_controller;
 
     public Robot() {
         Banner.printBanner();
         Experiments.instance.show();
-        Logging log = Logging.instance();
-        LoggerFactory fieldLogger = log.fieldLogger;
-        LoggerFactory rootLogger = log.rootLogger;
-        // real robot starts at (-4,0)
-        TrivialDrivetrain delegate = new TrivialDrivetrain(
-                new Pose2d(-4, 0, Rotation2d.kZero));
-        // offset is x+4 so tool point should be at zero
-        m_subsystem = new OffsetDrivetrain(
-                delegate, new Translation2d(4, 0));
+        LoggerFactory field = Logging.instance().fieldLogger;
+        LoggerFactory log = Logging.instance().rootLogger;
+
+        Translation2d offset = new Translation2d(1, 0);
+        TrivialDrivetrain robot = new TrivialDrivetrain(
+                new Pose2d(offset.unaryMinus(), Rotation2d.kZero));
+        VelocitySubsystemR3 toolpoint = new OffsetDrivetrain(
+                robot, offset);
+
         m_robotViz = new RobotPoseVisualization(
-                fieldLogger,
-                () -> delegate.getState().pose(),
-                "robot");
-        m_ctrlViz = new RobotPoseVisualization(
-                fieldLogger,
-                () -> m_subsystem.getState().pose(),
-                "ctrl");
+                field, () -> robot.getState().pose(), "robot");
+        m_toolpointViz = new RobotPoseVisualization(
+                field, () -> toolpoint.getState().pose(), "ctrl");
         m_controller = new DriverXboxControl(0);
 
+        setup1(log, toolpoint);
+
+        setup2(log, toolpoint);
+    }
+
+    /** Setup profiles to A and to B */
+    private void setup1(LoggerFactory log, VelocitySubsystemR3 toolpoint) {
+        // this is intended to be *fast*
         HolonomicProfile profile = HolonomicProfile.currentLimitedExponential(
-                1, 2, 4, 5, 10, 5);
+                5, // v cartesian
+                10, // a cartesian
+                20, // stall a cartesian
+                10, // omega
+                10, // alpha
+                20); // stall alpha
+        // this should try to control cartesian much harder than rotation
         ControllerR3 controller = new FullStateControllerR3(
-                rootLogger,
-                7.2, // p cartesian
-                3.5, // p theta
+                log,
+                10, // p cartesian
+                4, // p theta
                 0.055, // p cartesian v
-                0.01, // p theta v
-                0.035, // x tol
-                0.1, // theta tol
-                1, // xdot tol
-                1);
+                0.005, // p theta v
+                0.03, // x tol
+                0.03, // theta tol
+                0.1, // xdot tol
+                0.1);
 
-        DriveToPoseWithProfile driveCmd = new DriveToPoseWithProfile(
-                rootLogger, m_subsystem, controller,
-                profile,
-                () -> new Pose2d(4, 4, Rotation2d.kCW_90deg));
-        new Trigger(m_controller::a).whileTrue(
-                driveCmd.until(driveCmd::isDone));
+        // these aren't actually A and B, they're further apart to make the demo look
+        // better.
+        Pose2d A = new Pose2d(REEF_X, REEF_Y + 0.5, Rotation2d.kZero);
+        Pose2d B = new Pose2d(REEF_X, REEF_Y - 0.5, Rotation2d.kZero);
 
+        DriveToPoseWithProfile toA = new DriveToPoseWithProfile(
+                log, toolpoint, controller, profile, () -> A);
+        new Trigger(m_controller::a).whileTrue(toA.until(toA::isDone));
+
+        DriveToPoseWithProfile toB = new DriveToPoseWithProfile(
+                log, toolpoint, controller, profile, () -> B);
+        new Trigger(m_controller::b).whileTrue(toB.until(toB::isDone));
+    }
+
+    /** Setup pure PID examples */
+    private void setup2(LoggerFactory log, VelocitySubsystemR3 toolpoint) {
         ControllerR3 gentleController = new FullStateControllerR3(
-                rootLogger,
+                log,
                 3, // p cartesian
                 1, // p theta
                 0.04, // p cartesian v
@@ -86,14 +106,14 @@ public class Robot extends TimedRobot {
                 1, // xdot tol
                 1); // omega tol
         MoveAndHold driveSimple = new DriveToStateSimple(
-                rootLogger, gentleController, m_subsystem, new ModelR3());
-        new Trigger(m_controller::b).whileTrue(
+                log, gentleController, toolpoint, new ModelR3());
+        new Trigger(m_controller::x).whileTrue(
                 driveSimple.until(driveSimple::isDone));
 
         MoveAndHold driveSimple2 = new DriveToStateSimple(
-                rootLogger, gentleController, m_subsystem,
+                log, gentleController, toolpoint,
                 new ModelR3(new Pose2d(4, 4, Rotation2d.kCW_90deg)));
-        new Trigger(m_controller::x).whileTrue(
+        new Trigger(m_controller::y).whileTrue(
                 driveSimple2.until(driveSimple2::isDone));
     }
 
@@ -103,7 +123,7 @@ public class Robot extends TimedRobot {
         Cache.refresh();
         CommandScheduler.getInstance().run();
         m_robotViz.run();
-        m_ctrlViz.run();
+        m_toolpointViz.run();
     }
 
     @Override
