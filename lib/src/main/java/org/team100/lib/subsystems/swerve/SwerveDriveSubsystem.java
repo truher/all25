@@ -47,6 +47,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
     private final ModelR3Logger m_log_state;
     private final DoubleLogger m_log_turning;
     private final DoubleArrayLogger m_log_pose_array;
+    // TODO: pull the field logger out into a separate observer.
     private final DoubleArrayLogger m_log_field_robot;
     private final EnumLogger m_log_skill;
     private final GlobalVelocityR3Logger m_log_input;

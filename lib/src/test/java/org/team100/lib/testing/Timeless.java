@@ -1,7 +1,6 @@
 package org.team100.lib.testing;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
@@ -23,31 +22,29 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
  */
 public interface Timeless {
 
-    /** Make sure the cache doesn't try to update stale things. */
+    /** One big method because Junit */
     @BeforeEach
-    default void clearCache() {
-        Cache.clear();
-    }
-
-    /* Simulated motors don't move unless enabled, so enable them. */
-    @BeforeEach
-    default void enableMotors() {
-        DriverStationSim.setEnabled(true);
-        DriverStationSim.notifyNewData();
-    }
-
-    /** Avoid mixing mutable values between tests. */
-    @BeforeEach
-    default void unpublish() {
-        Mutable.unpublishAll();
-    }
-
-    /** Do any time-related setup *in your test method* ! */
-    @BeforeEach
-    default void pauseTiming() {
+    default void setupSim() {
+        // Do any time-related setup *in your test method* !
         HAL.initialize(500, 0);
         SimHooks.pauseTiming();
         Takt.update();
+
+        // Make sure the cache doesn't try to update stale things.
+        Cache.clear();
+
+        // Simulated motors don't move unless enabled, so enable them.
+        DriverStationSim.setEnabled(true);
+        DriverStationSim.notifyNewData();
+
+        // Avoid mixing mutable values between tests.
+        Mutable.unpublishAll();
+        try {
+            // wait for CTRE threads
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @AfterEach

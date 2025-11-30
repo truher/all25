@@ -27,7 +27,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 class HolonomicSplineTest implements Timeless {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
@@ -71,7 +71,6 @@ class HolonomicSplineTest implements Timeless {
 
     @Test
     void testRotation() {
-
         HolonomicSpline s = new HolonomicSpline(
                 new HolonomicPose2d(new Translation2d(), new Rotation2d(), new Rotation2d()),
                 new HolonomicPose2d(new Translation2d(1, 0), new Rotation2d(1), new Rotation2d()));
@@ -105,6 +104,23 @@ class HolonomicSplineTest implements Timeless {
         assertEquals(1, p.getPose().heading().getRadians(), DELTA);
         assertEquals(1, p.getHeadingRateRad_M(), DELTA);
 
+    }
+
+    @Test
+    void testRotation2() {
+        // Make sure the rotation goes over +/- pi
+        HolonomicSpline s = new HolonomicSpline(
+                new HolonomicPose2d(new Translation2d(), new Rotation2d(2.5), new Rotation2d()),
+                new HolonomicPose2d(new Translation2d(1,0), new Rotation2d(-2.5), new Rotation2d()));
+        if (DEBUG) {
+            System.out.println("d, x, y, heading, course");
+            for (double tt = 0; tt <= 1.0; tt += 0.01) {
+                var ss = s.getPose2dWithMotion(tt);
+                Pose2d pose = ss.getPose().pose();
+                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
+                        tt, pose.getX(), pose.getY(), pose.getRotation().getRadians(), ss.getCourse().getRadians());
+            }
+        }
     }
 
     @Test
