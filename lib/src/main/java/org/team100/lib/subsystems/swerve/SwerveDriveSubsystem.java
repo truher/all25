@@ -47,15 +47,12 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
     private final ModelR3Logger m_log_state;
     private final DoubleLogger m_log_turning;
     private final DoubleArrayLogger m_log_pose_array;
-    // TODO: pull the field logger out into a separate observer.
-    private final DoubleArrayLogger m_log_field_robot;
     private final EnumLogger m_log_skill;
     private final GlobalVelocityR3Logger m_log_input;
 
     private final List<Player> m_players;
 
     public SwerveDriveSubsystem(
-            LoggerFactory fieldLogger,
             LoggerFactory parent,
             OdometryUpdater odometryUpdater,
             FreshSwerveEstimate estimate,
@@ -71,7 +68,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
         m_log_state = log.modelR3Logger(Level.COMP, "state");
         m_log_turning = log.doubleLogger(Level.TRACE, "Tur Deg");
         m_log_pose_array = log.doubleArrayLogger(Level.COMP, "pose array");
-        m_log_field_robot = fieldLogger.doubleArrayLogger(Level.COMP, "robot");
         m_log_skill = log.enumLogger(Level.TRACE, "skill level");
         m_log_input = log.globalVelocityR3Logger(Level.TRACE, "drive input");
         m_players = m_swerveLocal.players();
@@ -174,10 +170,6 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
         m_log_turning.log(() -> getPose().getRotation().getDegrees());
         m_log_pose_array.log(this::poseArray);
 
-        // Update the Field2d widget
-        // the name "field" is used by Field2d.
-        // the name "robot" can be anything.
-        m_log_field_robot.log(this::poseArray);
         m_log_skill.log(() -> DriverSkill.level());
         m_swerveLocal.periodic();
     }

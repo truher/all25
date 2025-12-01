@@ -74,7 +74,6 @@ public class Fixture {
 
         SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
         drive = new SwerveDriveSubsystem(
-                fieldLogger,
                 logger,
                 odometryUpdater,
                 estimate,

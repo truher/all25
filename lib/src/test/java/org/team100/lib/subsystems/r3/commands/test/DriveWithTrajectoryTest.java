@@ -175,7 +175,6 @@ public class DriveWithTrajectoryTest implements Timeless {
         SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);
 
         SwerveDriveSubsystem drive = new SwerveDriveSubsystem(
-                fieldLogger,
                 logger,
                 odometryUpdater,
                 estimate,
