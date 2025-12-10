@@ -6,6 +6,7 @@ import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.ObjectCache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.DriverSkill;
+import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.localization.OdometryUpdater;
@@ -78,17 +79,28 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
     // ACTUATORS
     //
 
-    /** Skip all scaling, limits generator, etc. */
+    /**
+     * Skip all scaling, limits generator, etc.
+     * 
+     * @param nextV for the next timestep
+     */
     @Override
-    public void setVelocity(GlobalVelocityR3 input) {
+    public void setVelocity(GlobalVelocityR3 nextV) {
         // keep the limiter up to date on what we're doing
-        m_limiter.updateSetpoint(input);
+        m_limiter.updateSetpoint(nextV);
 
-        Rotation2d theta = getPose().getRotation();
-        ChassisSpeeds targetChassisSpeeds = SwerveKinodynamics.toInstantaneousChassisSpeeds(
-                input, theta);
-        m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
-        m_log_input.log(() -> input);
+        // Actuation is constant for the whole control period, which means
+        // that to calculate robot-relative speed from field-relative speed,
+        // we need to use the robot rotation *at the future time*.
+        ModelR3 currentState = getState();
+        // Note this may add a bit of noise.
+        ModelR3 nextState = currentState.evolve(TimedRobot100.LOOP_PERIOD_S);
+        Rotation2d nextTheta = nextState.rotation();
+
+        ChassisSpeeds nextSpeed = SwerveKinodynamics.toInstantaneousChassisSpeeds(
+                nextV, nextTheta);
+        m_swerveLocal.setChassisSpeeds(nextSpeed);
+        m_log_input.log(() -> nextV);
     }
 
     /**

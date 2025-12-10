@@ -50,6 +50,8 @@ public abstract class SwerveModule100 implements Player {
     /**
      * The previous desired angle, used if the current desired angle is empty (i.e.
      * the module is motionless) and to calculate steering velocity.
+     * This is set to the "next" value and read, one step later, as the "current"
+     * value
      */
     private Rotation2d m_previousDesiredWrappedAngle;
     private double m_previousTime;
@@ -89,6 +91,8 @@ public abstract class SwerveModule100 implements Player {
      * 
      * Note: this uses "wrapped" states that come from inverse kinematics, since the
      * kinematics doesn't care about the total turns of the modules;
+     * 
+     * @param desiredWrapped for now+dt
      */
     void setDesiredState(SwerveModuleState100 desiredWrapped) {
         desiredWrapped = usePreviousAngleIfEmpty(desiredWrapped);
@@ -179,60 +183,76 @@ public abstract class SwerveModule100 implements Player {
     /////////////////////////////////////////////////////////////////
 
     /**
-     * Turning servo commands always specify zero-velocity goal.
+     * Turning servo commands compute the velocity based on the previous desired
+     * angle.
+     * 
+     * @param nextWrapped for now+dt, i.e. "next"
      */
-    private void actuate(SwerveModuleState100 desiredWrapped) {
-        double speed = desiredWrapped.speedMetersPerSecond();
-        if (desiredWrapped.angle().isEmpty())
+    private void actuate(SwerveModuleState100 nextWrapped) {
+        double nextSpeed = nextWrapped.speedMetersPerSecond();
+        if (nextWrapped.angle().isEmpty())
             throw new IllegalArgumentException("actuation needs a real angle");
 
-        Rotation2d desiredWrappedAngle = desiredWrapped.angle().get();
+        Rotation2d nextWrappedAngle = nextWrapped.angle().get();
+        double dt = dt();
+        double nextOmega = omega(nextWrappedAngle, dt);
 
         if (Experiments.instance.enabled(Experiment.CorrectSpeedForSteering)) {
             // help drive motors overcome steering.
-            speed = correctSpeedForSteering(speed, desiredWrappedAngle);
+            nextSpeed = correctSpeedForSteering(nextSpeed, nextOmega, dt);
         }
         if (Experiments.instance.enabled(Experiment.ReduceCrossTrackError)) {
             double measuredAngleRad = m_turningServo.getWrappedPositionRad();
-            speed = reduceCrossTrackError(measuredAngleRad, speed, desiredWrappedAngle);
+            nextSpeed = reduceCrossTrackError(measuredAngleRad, nextSpeed, nextWrappedAngle);
 
         }
-        m_driveServo.setVelocity(speed);
+        m_driveServo.setVelocity(nextSpeed);
 
         if (Experiments.instance.enabled(Experiment.UnprofiledSteering)) {
-            // no profile, just low-level position
-            m_turningServo.setPositionDirect(desiredWrappedAngle.getRadians(), 0, 0);
+            // no profile, just low-level position.  Note the omega here may show up as noise.
+            m_turningServo.setPositionDirect(nextWrappedAngle.getRadians(), nextOmega, 0);
         } else {
             // use the profile
-            m_turningServo.setPositionProfiled(desiredWrappedAngle.getRadians(), 0);
+            m_turningServo.setPositionProfiled(nextWrappedAngle.getRadians(), 0);
         }
-        m_previousDesiredWrappedAngle = desiredWrappedAngle;
+        m_previousDesiredWrappedAngle = nextWrappedAngle;
     }
 
     /**
      * Correct the desired speed for steering coupling.
-     * 
-     * Angle can be the "wrapped" version since the difference from the previous
-     * iteration is surely small.
      */
-    private double correctSpeedForSteering(double desiredSpeed, Rotation2d desiredWrappedAngle) {
-        double dt = dt();
-        if (dt > 0.04) {
-            // clock is unreliable, don't do anything.
-            return desiredSpeed;
-        }
-        if (dt < 0.01) {
-            // avoid short intervals
-            return desiredSpeed;
-        }
-        // dtheta is definitely a lot less than 2pi so wrapped is fine.
-        Rotation2d dthetaWrapped = desiredWrappedAngle.minus(m_previousDesiredWrappedAngle);
-        double omega = dthetaWrapped.getRadians() / dt;
-        double correction = m_wheelRadiusM * omega / m_finalDriveRatio;
+    private double correctSpeedForSteering(double speed, double omega, double dt) {
+        double correction = speedCorrection(speed, omega, dt);
         if (DEBUG) {
             System.out.printf("correction %6.3f\n", correction);
         }
-        return desiredSpeed + correction;
+        return speed + correction;
+    }
+
+    private double speedCorrection(double desiredSpeed, double omega, double dt) {
+        if (dt > 0.04) {
+            // clock is unreliable, don't do anything.
+            return 0;
+        }
+        if (dt < 0.01) {
+            // avoid short intervals
+            return 0;
+        }
+        return m_wheelRadiusM * omega / m_finalDriveRatio;
+    }
+
+    /**
+     * use the previous desired angle to compute steering angular velocity in
+     * radians per sec
+     * 
+     * @param desiredWrappedAngle angle for the next timestep
+     * @param dt                  time until then (s)
+     * @returns rad/s
+     */
+    private double omega(Rotation2d desiredWrappedAngle, double dt) {
+        // dtheta is definitely a lot less than 2pi so wrapped is fine.
+        Rotation2d dthetaWrapped = desiredWrappedAngle.minus(m_previousDesiredWrappedAngle);
+        return dthetaWrapped.getRadians() / dt;
     }
 
     /**

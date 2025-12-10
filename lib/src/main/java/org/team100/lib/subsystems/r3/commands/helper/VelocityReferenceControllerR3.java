@@ -28,6 +28,12 @@ public class VelocityReferenceControllerR3 extends ReferenceControllerR3Base {
         m_subsystem = subsystem;
     }
 
+    /**
+     * @param next ignored
+     * @param u    represents the control for the next dt, so it's also what the
+     *             subsystem should be doing at the next timestep. set the subsystem
+     *             velocity to this
+     */
     @Override
     void execute100(ControlR3 next, GlobalVelocityR3 u) {
         m_subsystem.setVelocity(u);

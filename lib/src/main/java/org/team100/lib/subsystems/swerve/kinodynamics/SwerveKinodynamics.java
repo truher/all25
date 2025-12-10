@@ -203,9 +203,11 @@ public class SwerveKinodynamics {
      * translational acceleration.
      * 
      * States may include empty angles for motionless wheels.
+     * 
+     * @param nextSpeed represents the desired speed for now+dt.
      */
-    public SwerveModuleStates toSwerveModuleStates(ChassisSpeeds in) {
-        return toSwerveModuleStates(in, TimedRobot100.LOOP_PERIOD_S);
+    public SwerveModuleStates toSwerveModuleStates(ChassisSpeeds nextSpeed) {
+        return toSwerveModuleStates(nextSpeed, TimedRobot100.LOOP_PERIOD_S);
     }
 
     /**
@@ -213,16 +215,18 @@ public class SwerveKinodynamics {
      * 
      * States may include empty angles for motionless wheels.
      * Otherwise angle is always within [-pi, pi].
+     * 
+     * @param nextSpeed represents the desired speed for now+dt.
      */
-    SwerveModuleStates toSwerveModuleStates(ChassisSpeeds in, double dt) {
+    SwerveModuleStates toSwerveModuleStates(ChassisSpeeds nextSpeed, double dt) {
         // This is the extra correction angle ...
-        Rotation2d angle = new Rotation2d(VeeringCorrection.correctionRad(in.omegaRadiansPerSecond));
+        Rotation2d angle = new Rotation2d(VeeringCorrection.correctionRad(nextSpeed.omegaRadiansPerSecond));
         // ... which is subtracted here; this isn't really a field-relative
         // transformation it's just a rotation.
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                in.vxMetersPerSecond,
-                in.vyMetersPerSecond,
-                in.omegaRadiansPerSecond,
+                nextSpeed.vxMetersPerSecond,
+                nextSpeed.vyMetersPerSecond,
+                nextSpeed.omegaRadiansPerSecond,
                 angle);
         // discretization does not affect omega
         DiscreteSpeed descretized = discretize(chassisSpeeds, dt);

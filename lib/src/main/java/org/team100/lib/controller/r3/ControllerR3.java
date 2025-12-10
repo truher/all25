@@ -7,7 +7,7 @@ import org.team100.lib.state.ModelR3;
 /**
  * Feedback and feedforward control.
  */
-public interface ControllerR3  {
+public interface ControllerR3 {
 
     /**
      * Feedback should compare the current-instant measurement to the
@@ -20,8 +20,12 @@ public interface ControllerR3  {
      * @param measurement      Current measurement state in field coordinates
      * @param currentReference Current reference state i.e. setpoint
      * @param nextReference    Reference for dt in the future, used for feedforward.
-     * @return Control output, should be given to
-     *         SwerveDriveSubsystem.driveInFieldCoords() or something similar.
+     * @return Control output for the period during dt, so it's also what the next
+     *         measurement should be. If there's no current error (i.e. feedback is
+     *         zero), then this output is usually just the feedforward, i.e. the
+     *         next reference velocity.
+     *         Give this to SwerveDriveSubsystem.driveInFieldCoords() or something
+     *         similar.
      */
     GlobalVelocityR3 calculate(
             ModelR3 measurement,

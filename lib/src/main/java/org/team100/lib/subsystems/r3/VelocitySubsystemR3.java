@@ -10,6 +10,10 @@ import org.team100.lib.geometry.GlobalVelocityR3;
  */
 public interface VelocitySubsystemR3 extends SubsystemR3 {
 
-    /** No scaling or filtering. */
-    void setVelocity(GlobalVelocityR3 setpoint);
+    /**
+     * No scaling or filtering.
+     * 
+     * @param nextV for the next timestep.
+     */
+    void setVelocity(GlobalVelocityR3 nextV);
 }

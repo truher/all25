@@ -171,16 +171,16 @@ public class SwerveModuleCollection implements Player {
      * 
      * Works fine with empty angles.
      * 
-     * @param swerveModuleStates
+     * @param nextStates for now+dt
      */
-    public void setDesiredStates(SwerveModuleStates swerveModuleStates) {
+    public void setDesiredStates(SwerveModuleStates nextStates) {
         if (DEBUG) {
-            System.out.printf("setDesiredStates() %s\n", swerveModuleStates);
+            System.out.printf("setDesiredStates() %s\n", nextStates);
         }
-        m_frontLeft.setDesiredState(swerveModuleStates.frontLeft());
-        m_frontRight.setDesiredState(swerveModuleStates.frontRight());
-        m_rearLeft.setDesiredState(swerveModuleStates.rearLeft());
-        m_rearRight.setDesiredState(swerveModuleStates.rearRight());
+        m_frontLeft.setDesiredState(nextStates.frontLeft());
+        m_frontRight.setDesiredState(nextStates.frontRight());
+        m_rearLeft.setDesiredState(nextStates.rearLeft());
+        m_rearRight.setDesiredState(nextStates.rearRight());
     }
 
     /**
