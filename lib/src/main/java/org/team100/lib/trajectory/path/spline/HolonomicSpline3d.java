@@ -1,9 +1,7 @@
 package org.team100.lib.trajectory.path.spline;
 
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.HolonomicPose3d;
-import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.Pose3dWithMotion;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -124,13 +122,13 @@ public class HolonomicSpline3d {
     public Pose3dWithMotion getPose3dWithMotion(double p) {
         return null;
         // return new Pose3dWithMotion(
-        //         new HolonomicPose3d(
-        //                 getPoint(p),
-        //                 getHeading(p),
-        //                 getCourse(p).orElseThrow()),
-        //         getDHeadingDs(p),
-        //         getCurvature(p),
-        //         getDCurvatureDs(p));
+        // new HolonomicPose3d(
+        // getPoint(p),
+        // getHeading(p),
+        // getCourse(p).orElseThrow()),
+        // getDHeadingDs(p),
+        // getCurvature(p),
+        // getDCurvatureDs(p));
     }
 
     protected Rotation3d getHeading(double t) {

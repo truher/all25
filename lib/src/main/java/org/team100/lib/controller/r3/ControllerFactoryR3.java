@@ -93,7 +93,7 @@ public class ControllerFactoryR3 {
     public static FullStateControllerR3 pick(LoggerFactory log) {
         return new FullStateControllerR3(log,
                 7.2, // p cartesian
-                3.5, // p theta
+                13.5, // p theta
                 0.055, // p cartesian v
                 0.01, // p theta v
                 0.15, // x tol
