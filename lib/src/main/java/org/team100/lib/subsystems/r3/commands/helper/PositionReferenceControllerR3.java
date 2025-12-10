@@ -31,6 +31,10 @@ public class PositionReferenceControllerR3 extends ReferenceControllerR3Base {
         m_subsystem = subsystem;
     }
 
+    /**
+     * @param next set the subsystem position to this
+     * @param u    ignored, since this uses outboard feedback only.
+     */
     @Override
     void execute100(ControlR3 next, GlobalVelocityR3 u) {
         m_subsystem.set(next);

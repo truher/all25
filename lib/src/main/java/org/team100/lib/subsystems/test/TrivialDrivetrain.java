@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 public class TrivialDrivetrain implements VelocitySubsystemR3 {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private final ObjectCache<ModelR3> m_stateCache;
+    /** setpoint for the next timestep. used only by update(). */
     private GlobalVelocityR3 m_setpoint;
     private ModelR3 m_state;
 

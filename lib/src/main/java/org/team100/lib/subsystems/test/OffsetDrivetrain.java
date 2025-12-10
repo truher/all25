@@ -55,23 +55,23 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
      * Set delegate velocity from toolpoint velocity and offset.
      * r is from toolpoint to delegate, so invert offset.
      * 
-     * @param setpoint toolpoint velocity
+     * @param nextV toolpoint velocity for the next timestep
      */
     @Override
-    public void setVelocity(GlobalVelocityR3 setpoint) {
+    public void setVelocity(GlobalVelocityR3 nextV) {
         // the component of the cartesian part that tries to spin
         // the delegate
         // adding some of this will make the toolpoint move more rapidly
         // towards the cartesian goal, while injecting theta error.
-        GlobalVelocityR3 perpendicularOmega = omega(r(m_offset), velocity(setpoint));
+        GlobalVelocityR3 perpendicularOmega = omega(r(m_offset), velocity(nextV));
 
         // the component of the rotation part that tries to move the
         // delegate in x and y
         // respecting 100% of this velocity will keep the toolpoint
         // where it wants to go (if the delegate responds perfectly)
-        GlobalVelocityR3 tangentialVelocity = tangentialVelocity(omega(setpoint), r(m_offset.unaryMinus()));
+        GlobalVelocityR3 tangentialVelocity = tangentialVelocity(omega(nextV), r(m_offset.unaryMinus()));
 
-        m_delegate.setVelocity(setpoint
+        m_delegate.setVelocity(nextV
                 .plus(tangentialVelocity)
                 .plus(perpendicularOmega.times(OMEGA_MIXER)));
     }

@@ -86,18 +86,22 @@ public class MecanumDrive100 extends SubsystemBase implements VelocitySubsystemR
         return new ModelR3(m_pose, m_input);
     }
 
-    /** Use inverse kinematics to set wheel speeds. */
+    /**
+     * Use inverse kinematics to set wheel speeds.
+     * 
+     * @param nextV for the next timestep
+     */
     @Override
-    public void setVelocity(GlobalVelocityR3 input) {
+    public void setVelocity(GlobalVelocityR3 nextV) {
         Rotation2d yaw = getYaw();
         ChassisSpeeds speed = SwerveKinodynamics.toInstantaneousChassisSpeeds(
-                input, yaw);
+                nextV, yaw);
         MecanumDriveWheelSpeeds mSpeed = m_kinematics.toWheelSpeeds(speed);
         m_frontLeft.setVelocity(mSpeed.frontLeftMetersPerSecond);
         m_frontRight.setVelocity(mSpeed.frontRightMetersPerSecond);
         m_rearLeft.setVelocity(mSpeed.rearLeftMetersPerSecond);
         m_rearRight.setVelocity(mSpeed.rearRightMetersPerSecond);
-        m_log_input.log(() -> input);
+        m_log_input.log(() -> nextV);
     }
 
     private Rotation2d getYaw() {

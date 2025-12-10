@@ -62,11 +62,13 @@ public class SwerveLocal implements Player {
     /**
      * Discretizes the speeds, calculates the inverse kinematic module states, and
      * sets the module states.
+     * 
+     * @param nextSpeed for the next timestep.
      */
-    void setChassisSpeeds(ChassisSpeeds speeds) {
-        SwerveModuleStates states = m_swerveKinodynamics.toSwerveModuleStates(speeds);
+    void setChassisSpeeds(ChassisSpeeds nextSpeed) {
+        SwerveModuleStates states = m_swerveKinodynamics.toSwerveModuleStates(nextSpeed);
         setModuleStates(states);
-        m_log_chassis_speed.log(() -> speeds);
+        m_log_chassis_speed.log(() -> nextSpeed);
     }
 
     void stop() {
@@ -118,7 +120,10 @@ public class SwerveLocal implements Player {
 
     /////////////////////////////////////////////////////////
 
-    private void setModuleStates(SwerveModuleStates states) {
-        m_modules.setDesiredStates(states);
+    /**
+     * @param nextStates for now+dt
+     */
+    private void setModuleStates(SwerveModuleStates nextStates) {
+        m_modules.setDesiredStates(nextStates);
     }
 }

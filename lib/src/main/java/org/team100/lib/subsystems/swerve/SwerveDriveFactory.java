@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.RobotController;
 public class SwerveDriveFactory {
 
     public static SwerveDriveSubsystem get(
-            LoggerFactory fieldLogger,
             LoggerFactory driveLog,
             SwerveKinodynamics swerveKinodynamics,
             AprilTagRobotLocalizer localizer,
@@ -39,7 +38,6 @@ public class SwerveDriveFactory {
                 swerveKinodynamics,
                 RobotController::getBatteryVoltage);
         return new SwerveDriveSubsystem(
-                fieldLogger,
                 driveLog,
                 odometryUpdater,
                 estimate,

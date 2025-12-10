@@ -87,6 +87,12 @@ public abstract class ControllerR3Base implements ControllerR3 {
         return calculate100(m_positionError, m_velocityError, nextReference);
     }
 
+    /**
+     * @param positionError current reference minus current measurement
+     * @param velocityError current reference minus current measurement
+     * @param nextReference velocity for dt from now
+     * @returns control output for the period during dt
+     */
     public abstract GlobalVelocityR3 calculate100(
             GlobalDeltaR3 positionError,
             GlobalVelocityR3 velocityError,

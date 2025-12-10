@@ -50,7 +50,7 @@ public abstract class ReferenceControllerR3Base {
      * Actuate the subsystem here.
      * 
      * @param next The next control setpoint.
-     * @param u    The controller output.
+     * @param u    The controller output for the next dt
      */
     abstract void execute100(ControlR3 next, GlobalVelocityR3 u);
 
@@ -63,6 +63,8 @@ public abstract class ReferenceControllerR3Base {
             ModelR3 current = m_reference.current();
             ControlR3 next = m_reference.next();
             ModelR3 error = current.minus(measurement);
+            // u represents the time from now until now+dt, so it's also
+            // what the mechanism should be doing at the next time step
             GlobalVelocityR3 u = m_controller.calculate(measurement, current, next);
             execute100(next, u);
             m_log_measurement.log(() -> measurement);

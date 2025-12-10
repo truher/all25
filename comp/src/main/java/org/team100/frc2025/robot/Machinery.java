@@ -29,6 +29,7 @@ import org.team100.lib.subsystems.swerve.module.SwerveModuleCollection;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
 import org.team100.lib.util.CanId;
+import org.team100.lib.visualization.RobotPoseVisualization;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -52,6 +53,7 @@ public class Machinery {
     private static final LoggerFactory logger = Logging.instance().rootLogger;
     private static final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
 
+    private final Runnable m_robotViz;
     private final Runnable m_combinedViz;
     private final Runnable m_climberViz;
     private final SwerveModuleCollection m_modules;
@@ -143,7 +145,6 @@ public class Machinery {
         // DRIVETRAIN
         //
         m_drive = SwerveDriveFactory.get(
-                fieldLogger,
                 driveLog,
                 m_swerveKinodynamics,
                 m_localizer,
@@ -151,6 +152,8 @@ public class Machinery {
                 history,
                 m_modules);
         m_drive.resetPose(new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d(Math.PI)));
+        m_robotViz = new RobotPoseVisualization(
+                fieldLogger, () -> m_drive.getState().pose(), "robot");
 
         ////////////////////////////////////////////////////////////
         //
@@ -171,6 +174,7 @@ public class Machinery {
         // show the closest target on field2d
         m_targets.periodic();
         m_leds.periodic();
+        m_robotViz.run();
         m_combinedViz.run();
         m_climberViz.run();
     }
