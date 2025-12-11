@@ -11,6 +11,7 @@ import org.team100.lib.geometry.GlobalVelocityR2;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class ShootingMethodTest {
+    private static final double DELTA = 0.001;
 
     @Test
     void testMotionless() {

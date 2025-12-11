@@ -1,5 +1,7 @@
 package org.team100.lib.subsystems.shooter;
 
+import java.lang.System.Logger;
+
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -24,6 +26,7 @@ public class IndexerServo extends SubsystemBase {
         m_doubleLogger.log(() -> value);
     }
 
+
     public void stop() {
         m_servo.setSpeed(0);
     }
@@ -32,15 +35,15 @@ public class IndexerServo extends SubsystemBase {
         m_servo.setPosition(0.2);
     }
 
-    public void setPosition(double value) {
+    public void setPosition(double value){
         m_servo.setPosition(value);
     }
 
-    public Command servoOut() {
+    public Command servoOut(){
         return run(() -> setPosition(0.7));
     }
 
-    public Command servoIn() {
+    public Command servoIn(){
         return run(() -> setPosition(0.2));
     }
 

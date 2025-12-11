@@ -153,6 +153,7 @@ public class DriveWithTrajectoryTest implements Timeless {
         assertEquals(0, trajectory.sample(0).velocityM_S(), DELTA);
         ControllerR3 controller = ControllerFactoryR3.test(logger);
 
+        LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
         Gyro gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
         SwerveHistory history = new SwerveHistory(
                 swerveKinodynamics,
