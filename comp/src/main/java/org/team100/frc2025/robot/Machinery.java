@@ -129,6 +129,7 @@ public class Machinery {
 
         m_localizer = new AprilTagRobotLocalizer(
                 driveLog,
+                fieldLogger,
                 layout,
                 history,
                 visionUpdater);

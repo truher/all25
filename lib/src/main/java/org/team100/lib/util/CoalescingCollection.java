@@ -20,7 +20,6 @@ public class CoalescingCollection<T> {
     private final TrailingHistory<T> m_delegate;
     /** True if items should be combined. */
     private final BiPredicate<T, T> m_near;
-    /**  */
     private final Function<Collection<T>, T> m_combine;
 
     public CoalescingCollection(

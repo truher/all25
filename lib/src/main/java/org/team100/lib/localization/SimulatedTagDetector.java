@@ -20,7 +20,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -29,6 +29,9 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * Publishes AprilTag Blip24 sightings on Network Tables, just like real
  * cameras would.
+ * 
+ * This uses a separate client NT instance, so there will be weird delays due to
+ * NT rate-limiting -- these are realistic and so should be handled correctly.
  */
 public class SimulatedTagDetector {
     private static final boolean DEBUG = false;
@@ -73,10 +76,11 @@ public class SimulatedTagDetector {
         m_layout = layout;
         m_history = history;
         m_publishers = new HashMap<>();
+        // Use a separate instance so that the timestamps are written realistically.
         m_inst = NetworkTableInstance.create();
-        // this is a client just like the camera is a client.
-        m_inst.startClient4("SimulatedTagDetector");
+        // This is a client just like the camera is a client.
         m_inst.setServer("localhost");
+        m_inst.startClient4("SimulatedTagDetector");
         m_rand = new Random();
         for (Camera camera : m_cameras) {
             // see tag_detector.py
@@ -84,7 +88,7 @@ public class SimulatedTagDetector {
             m_publishers.put(
                     camera,
                     m_inst.getStructArrayTopic(
-                            name, Blip24.struct).publish());
+                            name, Blip24.struct).publish(PubSubOption.keepDuplicates(true)));
         }
     }
 
@@ -151,14 +155,12 @@ public class SimulatedTagDetector {
                 if (visible(tagInCamera)) {
                     // publish it
                     if (DEBUG) {
-
                         System.out.print("VISIBLE ");
                     }
                     blips.add(Blip24.fromXForward(tagId, tagInCamera));
                 } else {
                     // ignore it
                     if (DEBUG) {
-
                         System.out.print(" . ");
                     }
                 }
@@ -177,17 +179,15 @@ public class SimulatedTagDetector {
 
             }
 
-            // publish whatever we saw
-            // with a timestamp matching the pose above
-            long delayUs = (long) actualDelay * 1000000;
-            long timestampUs = NetworkTablesJNI.now();
+            // Use exactly the history lookup timestamp.
+            long time = (long) (timestampS * 1000000.0);
             publisher.set(
-                    blips.toArray(new Blip24[0]), timestampUs - delayUs);
+                    blips.toArray(new Blip24[0]), time);
             if (PUBLISH_DEBUG) {
                 System.out.printf("%s\n", blips);
             }
         }
-
+        m_inst.flush();
     }
 
     /** Return the transform from the camera pose to the tag pose. */

@@ -1,9 +1,7 @@
 package org.team100.lib.trajectory.path.spline;
 
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.HolonomicPose3d;
-import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.Pose3dWithMotion;
 
 import edu.wpi.first.math.geometry.Rotation2d;

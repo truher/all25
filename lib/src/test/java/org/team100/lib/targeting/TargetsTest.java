@@ -30,15 +30,25 @@ public class TargetsTest implements Timeless {
             new TestPrimitiveLogger());
 
     @Test
-    void testTargets() {
+    void testTargets() throws InterruptedException {
+        NetworkTableInstance.getDefault().startServer();
+        Thread.sleep(50);
         stepTime();
+
         ModelR3 p = new ModelR3();
         Targets t = new Targets(logger, logger, (x) -> p);
         t.update();
         assertTrue(t.getTargets().isEmpty());
         // send some blips
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+
+        // client instance
+        NetworkTableInstance inst = NetworkTableInstance.create();
+        inst.setServer("localhost");
         inst.startClient4("tag_finder24");
+
+        // wait for the NT thread
+        Thread.sleep(200);
+        assertTrue(inst.isConnected());
 
         // test4 camera offset is 0,0,1, without rotation
         StructArrayTopic<Rotation3d> topic = inst.getStructArrayTopic(
@@ -48,6 +58,9 @@ public class TargetsTest implements Timeless {
         // tilt down 45
         pub.set(new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) },
                 (long) (Takt.get() * 1000000.0));
+        // wait for NT rate-limiting
+        Thread.sleep(100);
+        inst.flush();
         stepTime();
         t.update();
         assertEquals(1, t.getTargets().size());
@@ -57,25 +70,32 @@ public class TargetsTest implements Timeless {
         // target is on bore
         assertEquals(0, target.getY(), DELTA);
 
+        inst.close();
     }
 
     @Test
-    void testTranslations() {
+    void testTranslations() throws InterruptedException {
+        NetworkTableInstance.getDefault().startServer();
+        Thread.sleep(50);
         stepTime();
 
         ModelR3 p = new ModelR3();
+        Targets reader = new Targets(logger, logger, (x) -> p);
+        Thread.sleep(50);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 logger,
                 List.of(Camera.TEST4),
                 x -> p,
                 new Translation2d[] { new Translation2d(1, 0) });
 
-        // need to instantiate the reader prior to the writer update because the poller
-        // ignores things that came before.
-        Targets reader = new Targets(logger, logger, (x) -> p);
+        // wait for NT rate-limiting
+        Thread.sleep(100);
 
         stepTime();
         writer.update();
+
+        // wait for NT rate-limiting
+        Thread.sleep(100);
 
         stepTime();
         reader.update();
@@ -93,22 +113,28 @@ public class TargetsTest implements Timeless {
     }
 
     @Test
-    void testMultipleCameras() {
+    void testMultipleCameras() throws InterruptedException {
+        NetworkTableInstance.getDefault().startServer();
+        Thread.sleep(50);
         stepTime();
-        ModelR3 p = new ModelR3();
 
+        ModelR3 p = new ModelR3();
+        Targets reader = new Targets(logger, logger, (x) -> p);
+        Thread.sleep(50);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 logger,
                 List.of(Camera.TEST4, Camera.TEST5),
                 x -> p,
                 new Translation2d[] { new Translation2d(1, 0) });
 
-        // need to instantiate the reader prior to the writer update because the poller
-        // ignores things that came before.
-        Targets reader = new Targets(logger, logger, (x) -> p);
+        // wait for NT rate-limiting
+        Thread.sleep(100);
 
         stepTime();
         writer.update();
+
+        // wait for NT rate-limiting
+        Thread.sleep(100);
 
         stepTime();
         reader.update();
@@ -127,10 +153,14 @@ public class TargetsTest implements Timeless {
     }
 
     @Test
-    void testMultipleTargets() {
+    void testMultipleTargets() throws InterruptedException {
+        NetworkTableInstance.getDefault().startServer();
+        Thread.sleep(100);
         stepTime();
 
         ModelR3 p = new ModelR3();
+        Targets reader = new Targets(logger, logger, x -> p);
+        Thread.sleep(100);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 logger,
                 List.of(Camera.TEST4),
@@ -139,12 +169,14 @@ public class TargetsTest implements Timeless {
                         new Translation2d(1, 0),
                         new Translation2d(2, 0) });
 
-        // need to instantiate the reader prior to the writer update because the poller
-        // ignores things that came before.
-        Targets reader = new Targets(logger, logger, x -> p);
+        // wait for NT rate-limiting
+        Thread.sleep(200);
 
         stepTime();
         writer.update();
+
+        // wait for NT rate-limiting
+        Thread.sleep(200);
 
         stepTime();
         reader.update();
@@ -162,10 +194,14 @@ public class TargetsTest implements Timeless {
     }
 
     @Test
-    void testMultipleTargetsAndCameras() {
+    void testMultipleTargetsAndCameras() throws InterruptedException {
+        NetworkTableInstance.getDefault().startServer();
+        Thread.sleep(50);
         stepTime();
-        ModelR3 p = new ModelR3();
 
+        ModelR3 p = new ModelR3();
+        Targets reader = new Targets(logger, logger, (x) -> p);
+        Thread.sleep(50);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 logger,
                 List.of(Camera.TEST4, Camera.TEST5),
@@ -174,12 +210,14 @@ public class TargetsTest implements Timeless {
                         new Translation2d(1, 0),
                         new Translation2d(2, 0) });
 
-        // need to instantiate the reader prior to the writer update because the poller
-        // ignores things that came before.
-        Targets reader = new Targets(logger, logger, (x) -> p);
+        // wait for NT rate-limiting
+        Thread.sleep(200);
 
         stepTime();
         writer.update();
+
+        // wait for NT rate-limiting
+        Thread.sleep(200);
 
         stepTime();
         reader.update();

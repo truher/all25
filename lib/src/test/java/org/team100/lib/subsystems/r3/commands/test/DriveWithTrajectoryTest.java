@@ -45,6 +45,7 @@ public class DriveWithTrajectoryTest implements Timeless {
 
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
+    private static final LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
     private static final TrajectoryVisualization viz = new TrajectoryVisualization(logger);
 
     @Test
@@ -169,7 +170,7 @@ public class DriveWithTrajectoryTest implements Timeless {
         AprilTagFieldLayoutWithCorrectOrientation layout = new AprilTagFieldLayoutWithCorrectOrientation();
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, history, visionUpdater);
+                logger, fieldLogger, layout, history, visionUpdater);
         FreshSwerveEstimate estimate = new FreshSwerveEstimate(localizer, odometryUpdater, history);
         SwerveLocal swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
         SwerveLimiter limiter = new SwerveLimiter(logger, swerveKinodynamics, () -> 12);

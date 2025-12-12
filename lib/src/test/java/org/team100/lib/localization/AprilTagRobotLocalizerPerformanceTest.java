@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 class AprilTagRobotLocalizerPerformanceTest {
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
+    private static final LoggerFactory fieldLogger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     // uncomment this to run it. it consumes all the CPU.
     // @Test
@@ -46,7 +47,7 @@ class AprilTagRobotLocalizerPerformanceTest {
         };
 
         AprilTagRobotLocalizer localizer = new AprilTagRobotLocalizer(
-                logger, layout, history, visionUpdater);
+                logger, fieldLogger, layout, history, visionUpdater);
 
         // camera sees the tag straight ahead in the center of the frame,
         // but rotated pi/4 to the left. this is ignored anyway.

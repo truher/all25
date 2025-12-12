@@ -8,6 +8,10 @@ import java.util.stream.Collectors;
 
 /**
  * A collection that evicts old entries.
+ * 
+ * Note eviction happens at *write* time, to avoid the reader needing to know
+ * the timestamp, so if you stop writing to this collection, stale entries will
+ * hang around. Use cleanup() to evict old entries on demand.
  */
 public class TrailingHistory<T> {
     public record ValueRecord<T>(double time, T value) {
@@ -31,7 +35,7 @@ public class TrailingHistory<T> {
         m_entries.add(new ValueRecord<>(time, value));
     }
 
-    /** Remove stale entries and all the values. */
+    /** Remove stale entries and add all the values. */
     public void addAll(double time, Collection<T> values) {
         cleanup(time);
         m_entries.addAll(
@@ -55,9 +59,8 @@ public class TrailingHistory<T> {
         return m_entries.size();
     }
 
-    //////////////////
-
-    private void cleanup(double time) {
+    /** Remove stale entries. */
+    public void cleanup(double time) {
         double horizon = time - m_timeout;
         m_entries.removeIf(x -> x.time < horizon);
     }
