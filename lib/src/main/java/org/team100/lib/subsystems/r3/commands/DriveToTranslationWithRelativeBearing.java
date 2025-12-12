@@ -8,7 +8,7 @@ import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
@@ -34,7 +34,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
     private final Supplier<Optional<Translation2d>> m_targets;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
-    private final HolonomicProfile m_profile;
+    private final ProfileR3 m_profile;
     private final Rotation2d m_relativeBearing;
     private final Translation2d m_relativeTranslation;
 
@@ -49,7 +49,7 @@ public class DriveToTranslationWithRelativeBearing extends MoveAndHold {
             Supplier<Optional<Translation2d>> targetes,
             VelocitySubsystemR3 drive,
             ControllerR3 controller,
-            HolonomicProfile profile,
+            ProfileR3 profile,
             Rotation2d relativeBearing,
             Translation2d relativeTranslation) {
         m_log = parent.type(this);

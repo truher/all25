@@ -9,6 +9,9 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Camera;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.localization.SwerveHistory;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,6 +33,8 @@ public class SimulatedTargetWriter {
     private static final double DELAY = 0.085;
 
     private final Map<Camera, StructArrayPublisher<Rotation3d>> m_publishers;
+    private final DoubleLogger m_log_timestamp;
+    private final DoubleLogger m_log_poseTimestamp;
     private final List<Camera> m_cameras;
     private final DoubleFunction<ModelR3> m_history;
 
@@ -39,9 +44,13 @@ public class SimulatedTargetWriter {
     private final NetworkTableInstance m_inst;
 
     public SimulatedTargetWriter(
+            LoggerFactory parent,
             List<Camera> cameras,
             DoubleFunction<ModelR3> history,
             Translation2d[] targets) {
+        LoggerFactory log = parent.type(this);
+        m_log_timestamp = log.doubleLogger(Level.TRACE, "timestamp");
+        m_log_poseTimestamp = log.doubleLogger(Level.TRACE, "pose timestamp");
         m_cameras = cameras;
         m_history = history;
         m_targets = targets;
@@ -59,7 +68,7 @@ public class SimulatedTargetWriter {
         }
     }
 
-    public static Runnable get(SwerveHistory history) {
+    public static Runnable get(LoggerFactory parent, SwerveHistory history) {
         if (RobotBase.isReal()) {
             // Real robots get an empty simulated target detector.
             return () -> {
@@ -67,6 +76,7 @@ public class SimulatedTargetWriter {
         }
         // In simulation, we want the real simulated target detector.
         SimulatedTargetWriter tsim = new SimulatedTargetWriter(
+                parent,
                 List.of(Camera.SWERVE_LEFT,
                         Camera.SWERVE_RIGHT,
                         Camera.FUNNEL,
@@ -85,6 +95,7 @@ public class SimulatedTargetWriter {
             System.out.println("simulated target write update");
         // select pose from a little while ago
         double timestampS = Takt.get() - DELAY;
+        m_log_poseTimestamp.log(() -> timestampS);
         Pose2d pose = m_history.apply(timestampS).pose();
 
         for (Map.Entry<Camera, StructArrayPublisher<Rotation3d>> entry : m_publishers.entrySet()) {
@@ -105,6 +116,7 @@ public class SimulatedTargetWriter {
             // long timestampUs = (long)(Takt.get() * 1000000.0);
 
             long time = timestampUs - delayUs;
+            m_log_timestamp.log(() -> time / 1000000.0);
             if (DEBUG) {
                 System.out.printf("writer timestamp %d\n", time);
             }

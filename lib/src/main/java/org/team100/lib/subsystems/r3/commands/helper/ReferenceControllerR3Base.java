@@ -71,6 +71,9 @@ public abstract class ReferenceControllerR3Base {
             m_log_current.log(() -> current);
             m_log_next.log(() -> next);
             m_log_error.log(() -> error);
+            // log these
+            isDone();
+            toGo();
         } catch (IllegalStateException ex) {
             // This happens when the trajectory generator produces an empty trajectory.
         }

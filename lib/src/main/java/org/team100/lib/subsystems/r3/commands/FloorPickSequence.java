@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 import org.team100.lib.targeting.Targets;
 
@@ -31,7 +31,7 @@ public class FloorPickSequence {
             VelocitySubsystemR3 drive,
             Targets targets,
             ControllerR3 controller,
-            HolonomicProfile profile) {
+            ProfileR3 profile) {
         LoggerFactory log = parent.type(FloorPickSequence.class);
         Supplier<Optional<Translation2d>> target = targets::getClosestTarget;
         Supplier<Optional<Translation2d>> runway = () -> {

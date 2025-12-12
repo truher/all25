@@ -21,9 +21,19 @@ import edu.wpi.first.math.numbers.N3;
  * The drivetrain is the delegate, and its velocity commands are
  * derived from the toolpoint velocities using a fixed offset.
  * 
- * This version of the offset drivetrain does not include boosting.
+ * This version of the offset drivetrain includes "boosting", which means that
+ * some of the toolpoint desired velocity is perpendicular to the offset, and so
+ * by adding a rotation to the delegate, we can move the toolpoint in its
+ * desired direction a bit faster, in exchange for some theta error. This
+ * essentially edits the output of the controller, so we can leave the
+ * controller alone.
  */
-public class OffsetDrivetrain implements VelocitySubsystemR3 {
+public class OffsetDrivetrainWithBoost implements VelocitySubsystemR3 {
+    /**
+     * How much of the perpendicular speed to mix in. This interacts with the
+     * controller "P" values, so should be tuned together with them.
+     */
+    private static final double OMEGA_MIXER = 2.0;
     private final VelocitySubsystemR3 m_delegate;
     private final Translation2d m_offset;
 
@@ -31,7 +41,7 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
      * @param delgate the real drivetrain
      * @param offset  from delegate to toolpoint
      */
-    public OffsetDrivetrain(
+    public OffsetDrivetrainWithBoost(
             VelocitySubsystemR3 delegate, Translation2d offset) {
         m_delegate = delegate;
         m_offset = offset;
@@ -50,6 +60,13 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
      */
     @Override
     public void setVelocity(GlobalVelocityR3 nextV) {
+        // the component of the cartesian part that tries to spin
+        // the delegate
+        // adding some of this will make the toolpoint move more rapidly
+        // towards the cartesian goal, while injecting theta error.
+        GlobalVelocityR3 perpendicularOmega = OffsetUtil.omega(
+                r(m_offset), OffsetUtil.velocity(nextV));
+
         // the component of the rotation part that tries to move the
         // delegate in x and y
         // respecting 100% of this velocity will keep the toolpoint
@@ -57,7 +74,9 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
         GlobalVelocityR3 tangentialVelocity = OffsetUtil.tangentialVelocity(
                 OffsetUtil.omega(nextV), r(m_offset.unaryMinus()));
 
-        m_delegate.setVelocity(nextV.plus(tangentialVelocity));
+        m_delegate.setVelocity(nextV
+                .plus(tangentialVelocity)
+                .plus(perpendicularOmega.times(OMEGA_MIXER)));
     }
 
     @Override

@@ -65,6 +65,7 @@ public class TargetsTest implements Timeless {
 
         ModelR3 p = new ModelR3();
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                logger,
                 List.of(Camera.TEST4),
                 x -> p,
                 new Translation2d[] { new Translation2d(1, 0) });
@@ -97,6 +98,7 @@ public class TargetsTest implements Timeless {
         ModelR3 p = new ModelR3();
 
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                logger,
                 List.of(Camera.TEST4, Camera.TEST5),
                 x -> p,
                 new Translation2d[] { new Translation2d(1, 0) });
@@ -130,6 +132,7 @@ public class TargetsTest implements Timeless {
 
         ModelR3 p = new ModelR3();
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                logger,
                 List.of(Camera.TEST4),
                 x -> p,
                 new Translation2d[] {
@@ -164,6 +167,7 @@ public class TargetsTest implements Timeless {
         ModelR3 p = new ModelR3();
 
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                logger,
                 List.of(Camera.TEST4, Camera.TEST5),
                 x -> p,
                 new Translation2d[] {

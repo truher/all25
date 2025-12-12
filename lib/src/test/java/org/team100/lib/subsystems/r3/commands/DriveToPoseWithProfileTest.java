@@ -6,7 +6,8 @@ import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.HolonomicProfile;
+import org.team100.lib.profile.r3.HolonomicProfileFactory;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.MockSubsystemR3;
 import org.team100.lib.testing.Timeless;
@@ -25,7 +26,7 @@ public class DriveToPoseWithProfileTest implements Timeless {
     LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
     MockSubsystemR3 subsystem = new MockSubsystemR3(new ModelR3());
     FullStateControllerR3 controller = ControllerFactoryR3.test(log);
-    HolonomicProfile profile = HolonomicProfile.wpi(1, 1, 1, 1);
+    HolonomicProfile profile = HolonomicProfileFactory.wpi(1, 1, 1, 1);
 
     /**
      * the goal can be a constant, as shown here, or it can be updated somehow (e.g.

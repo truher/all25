@@ -73,6 +73,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         SwerveKinodynamics kinodynamics = SwerveKinodynamicsFactory.forTest(logger);
         Gyro gyro = new MockGyro();
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -104,6 +105,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         Gyro gyro = new MockGyro();
 
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -148,6 +150,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -192,6 +195,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -242,6 +246,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         positions = positionZero;
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -360,6 +365,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -481,6 +487,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         positions = positionZero;
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -539,6 +546,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] visionMeasurementStdDevs = new double[] { 1.0, 1.0, Double.MAX_VALUE };
         positions = positionZero;
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -596,6 +604,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, Double.MAX_VALUE };
         positions = positionZero;
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -654,6 +663,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] stateStdDevs = new double[] { 0.001, 0.001, 0.01 };
         double[] visionMeasurementStdDevs = new double[] { 0.1, 0.1, Double.MAX_VALUE };
         SwerveHistory history = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -753,6 +763,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.5, 0.5, 0.5 };
         var estimator = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -907,6 +918,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         double[] stateStdDevs = new double[] { 0.1, 0.1, 0.1 };
         double[] visionMeasurementStdDevs = new double[] { 0.9, 0.9, 0.9 };
         var estimator = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,
@@ -951,6 +963,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         Gyro gyro = new MockGyro();
 
         var estimator = new SwerveHistory(
+                logger,
                 kinodynamics,
                 Rotation2d.kZero,
                 positionZero,

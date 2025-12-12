@@ -3,6 +3,9 @@ package org.team100.lib.network;
 import java.util.EnumSet;
 
 import org.team100.lib.config.Camera;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.MultiSubscriber;
@@ -27,6 +30,7 @@ public abstract class CameraReader<T> {
      */
     private static final int QUEUE_DEPTH = 10;
 
+    private final DoubleLogger m_log_timestamp;
     /** e.g. "blips" or "Rotation3d" */
     private final String m_ntValueName;
     /** Manages the queue of incoming messages. */
@@ -35,9 +39,12 @@ public abstract class CameraReader<T> {
     private final StructBuffer<T> m_buf;
 
     public CameraReader(
+            LoggerFactory parent,
             String ntRootName,
             String ntValueName,
             StructBuffer<T> buf) {
+        LoggerFactory log = parent.type(this);
+        m_log_timestamp = log.doubleLogger(Level.TRACE, "timestamp");
         m_ntValueName = ntValueName;
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_poller = new NetworkTableListenerPoller(inst);
@@ -101,17 +108,12 @@ public abstract class CameraReader<T> {
                 System.out.printf("camera %s offset %s\n", cameraId, cameraOffset);
             }
 
-            // server time is in microseconds
+            // time is in microseconds
             // https://docs.wpilib.org/en/stable/docs/software/networktables/networktables-intro.html#timestamps
-            //
-            // ATTENTION! (sep 15 2025)
-            //
-            // using server time seems to break the tests, like server time ignores the test
-            // clock, which makes me wonder if it's just the wrong thing to use all the
-            // time, so this uses "local" time now.
-            // TODO: check that this is doing the right thing
-            // double valueTimestamp = ((double)ntValue.getServerTime()) / 1000000.0;
+            // in the past this was "server time," but "server time" is completely broken,
+            // because it can be 0 or 1 for "locally created values".  Never use server time.
             double valueTimestamp = ((double) ntValue.getTime()) / 1000000.0;
+            m_log_timestamp.log(() -> valueTimestamp);
             if (DEBUG) {
                 System.out.printf("reader timestamp %f\n", valueTimestamp);
             }

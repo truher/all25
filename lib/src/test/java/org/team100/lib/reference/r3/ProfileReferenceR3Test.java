@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.HolonomicProfile;
+import org.team100.lib.profile.r3.HolonomicProfileFactory;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.testing.Timeless;
@@ -22,7 +23,7 @@ public class ProfileReferenceR3Test implements Timeless {
     void testSimple() {
         ModelR3 measurement = new ModelR3(new Pose2d(0, 0, Rotation2d.kZero));
         ModelR3 goal = new ModelR3(new Pose2d(1, 0, Rotation2d.kZero));
-        HolonomicProfile hp = HolonomicProfile.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
+        HolonomicProfile hp = HolonomicProfileFactory.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
         ProfileReferenceR3 r = new ProfileReferenceR3(logger, hp, "test");
         r.setGoal(goal);
         r.initialize(measurement);

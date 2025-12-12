@@ -7,7 +7,7 @@ import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
@@ -23,7 +23,7 @@ public class DriveToStateWithProfile extends MoveAndHold {
     private final Supplier<ModelR3> m_goals;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
-    private final HolonomicProfile m_profile;
+    private final ProfileR3 m_profile;
 
     private ModelR3 m_goal;
     private ProfileReferenceR3 m_reference;
@@ -35,7 +35,7 @@ public class DriveToStateWithProfile extends MoveAndHold {
             Supplier<ModelR3> goal,
             VelocitySubsystemR3 drive,
             ControllerR3 controller,
-            HolonomicProfile profile) {
+            ProfileR3 profile) {
         m_log = parent.type(this);
         m_log_target = fieldLogger.doubleArrayLogger(Level.TRACE, "target");
         m_goals = goal;

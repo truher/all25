@@ -1,4 +1,4 @@
-package org.team100.lib.profile;
+package org.team100.lib.profile.r3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,7 +22,7 @@ class HolonomicProfileTest implements Timeless {
 
     @Test
     void testSolve() {
-        HolonomicProfile hp = HolonomicProfile.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
+        HolonomicProfile hp = HolonomicProfileFactory.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
         ModelR3 i = new ModelR3(
                 new Pose2d(0, 0, Rotation2d.kZero), new GlobalVelocityR3(1, 0, 0));
         ModelR3 g = new ModelR3(
@@ -44,7 +44,7 @@ class HolonomicProfileTest implements Timeless {
      */
     @Test
     void test2d() {
-        HolonomicProfile hp = HolonomicProfile.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
+        HolonomicProfile hp = HolonomicProfileFactory.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
         ModelR3 i = new ModelR3();
         ModelR3 g = new ModelR3(new Pose2d(1, 5, Rotation2d.kZero));
         hp.solve(i, g);
@@ -62,7 +62,7 @@ class HolonomicProfileTest implements Timeless {
      */
     @Test
     void test2dExp() {
-        HolonomicProfile hp = HolonomicProfile.currentLimitedExponential(1, 1, 2, 1, 1, 2);
+        HolonomicProfile hp = HolonomicProfileFactory.currentLimitedExponential(1, 1, 2, 1, 1, 2);
         ModelR3 i = new ModelR3();
         ModelR3 g = new ModelR3(new Pose2d(1, 5, Rotation2d.kZero));
         hp.solve(i, g);
@@ -76,7 +76,7 @@ class HolonomicProfileTest implements Timeless {
 
     @Test
     void test2dWithEntrySpeed() {
-        HolonomicProfile hp = HolonomicProfile.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
+        HolonomicProfile hp = HolonomicProfileFactory.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
         ModelR3 i = new ModelR3(new Pose2d(), new GlobalVelocityR3(1, 0, 0));
         ModelR3 g = new ModelR3(new Pose2d(0, 1, Rotation2d.kZero));
         hp.solve(i, g);
@@ -103,7 +103,7 @@ class HolonomicProfileTest implements Timeless {
      */
     @Test
     void testSolvePerformance() {
-        HolonomicProfile hp = HolonomicProfile.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
+        HolonomicProfile hp = HolonomicProfileFactory.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
         ModelR3 i = new ModelR3(new Pose2d(), new GlobalVelocityR3(1, 0, 0));
         ModelR3 g = new ModelR3(new Pose2d(0, 1, Rotation2d.kZero));
         int N = 10000;

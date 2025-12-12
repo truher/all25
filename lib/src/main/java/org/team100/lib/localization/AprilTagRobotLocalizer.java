@@ -142,7 +142,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             AprilTagFieldLayoutWithCorrectOrientation layout,
             DoubleFunction<ModelR3> history,
             VisionUpdater visionUpdater) {
-        super("vision", "blips", StructBuffer.create(Blip24.struct));
+        super(parent, "vision", "blips", StructBuffer.create(Blip24.struct));
         LoggerFactory log = parent.type(this);
         m_layout = layout;
         m_history = history;

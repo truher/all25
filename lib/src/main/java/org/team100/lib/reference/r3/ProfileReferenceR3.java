@@ -7,7 +7,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.ControlR3Logger;
 import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 
@@ -36,7 +36,7 @@ public class ProfileReferenceR3 implements ReferenceR3 {
 
     private final LoggerFactory m_log;
 
-    private final HolonomicProfile m_profile;
+    private final ProfileR3 m_profile;
     /** The name is for debugging. */
     private final String m_name;
     private final ObjectCache<References> m_references;
@@ -56,7 +56,7 @@ public class ProfileReferenceR3 implements ReferenceR3 {
 
     public ProfileReferenceR3(
             LoggerFactory parent,
-            HolonomicProfile profile,
+            ProfileR3 profile,
             String name) {
         m_log = parent.type(this);
         m_profile = profile;
