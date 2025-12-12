@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.HolonomicPose3d;
-import org.team100.lib.geometry.Pose3dWithMotion;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Rotation3d;

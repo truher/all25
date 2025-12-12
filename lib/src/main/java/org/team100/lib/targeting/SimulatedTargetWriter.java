@@ -18,13 +18,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * Write simulated targets to Network Tables, so the Targets receiver can pick
  * them up.
+ * 
+ * This uses a separate client NT instance, so there will be weird delays due to
+ * NT rate-limiting -- these are realistic and so should be handled correctly.
  */
 public class SimulatedTargetWriter {
     private static final boolean DEBUG = false;
@@ -33,7 +36,6 @@ public class SimulatedTargetWriter {
     private static final double DELAY = 0.085;
 
     private final Map<Camera, StructArrayPublisher<Rotation3d>> m_publishers;
-    private final DoubleLogger m_log_timestamp;
     private final DoubleLogger m_log_poseTimestamp;
     private final List<Camera> m_cameras;
     private final DoubleFunction<ModelR3> m_history;
@@ -49,22 +51,22 @@ public class SimulatedTargetWriter {
             DoubleFunction<ModelR3> history,
             Translation2d[] targets) {
         LoggerFactory log = parent.type(this);
-        m_log_timestamp = log.doubleLogger(Level.TRACE, "timestamp");
-        m_log_poseTimestamp = log.doubleLogger(Level.TRACE, "pose timestamp");
+        m_log_poseTimestamp = log.doubleLogger(Level.TRACE, "pose timestamp (s)");
         m_cameras = cameras;
         m_history = history;
         m_targets = targets;
         m_publishers = new HashMap<>();
-        m_inst = NetworkTableInstance.getDefault();
-        m_inst.startClient4("tag_finder24");
+        // Use a separate instance so that the timestamps are written correctly.
+        m_inst = NetworkTableInstance.create();
         m_inst.setServer("localhost");
+        m_inst.startClient4("tag_finder24");
         for (Camera camera : m_cameras) {
             String name = "objectVision/"
                     + camera.getSerial() + "/0/Rotation3d";
             m_publishers.put(
                     camera,
                     m_inst.getStructArrayTopic(
-                            name, Rotation3d.struct).publish());
+                            name, Rotation3d.struct).publish(PubSubOption.keepDuplicates(true)));
         }
     }
 
@@ -110,18 +112,14 @@ public class SimulatedTargetWriter {
             // Rotation3d[] rots = new Rotation3d[] { new Rotation3d(0, Math.PI / 4, 0) };
             Rotation3d[] rots = rot.toArray(new Rotation3d[0]);
 
-            // write timestamp corresponding to pose
-            long delayUs = (long) (DELAY * 1000000.0);
-            long timestampUs = NetworkTablesJNI.now();
-            // long timestampUs = (long)(Takt.get() * 1000000.0);
-
-            long time = timestampUs - delayUs;
-            m_log_timestamp.log(() -> time / 1000000.0);
+            // Use exactly the timestamp used in this history lookup.
+            long time = (long) (timestampS * 1000000.0);
             if (DEBUG) {
-                System.out.printf("writer timestamp %d\n", time);
+                System.out.printf("writer timestamp us %d\n", time);
             }
             publisher.set(rots, time);
         }
+        m_inst.flush();
     }
 
     public void close() {

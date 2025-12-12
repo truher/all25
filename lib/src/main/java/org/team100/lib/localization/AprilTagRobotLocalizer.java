@@ -2,6 +2,7 @@ package org.team100.lib.localization;
 
 import java.util.Optional;
 import java.util.function.DoubleFunction;
+import java.util.stream.DoubleStream;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.experiments.Experiment;
@@ -10,6 +11,7 @@ import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
+import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
@@ -89,6 +91,9 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     private final StructArrayPublisher<Pose3d> m_pub_tags;
     /** Just tags we use for pose estimation. */
     private final StructArrayPublisher<Pose3d> m_pub_used_tags;
+    /** Logging the same thing for the Glass Field2d widget, for simulation. */
+    private final DoubleArrayLogger m_log_allTags;
+    private final DoubleArrayLogger m_log_usedTags;
 
     /**
      * The pose we derive from each sighting, so we can see it in AdvantageScope's
@@ -139,6 +144,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
      */
     public AprilTagRobotLocalizer(
             LoggerFactory parent,
+            LoggerFactory fieldLogger,
             AprilTagFieldLayoutWithCorrectOrientation layout,
             DoubleFunction<ModelR3> history,
             VisionUpdater visionUpdater) {
@@ -149,6 +155,9 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         m_visionUpdater = visionUpdater;
         m_allTags = new TrailingHistory<>(HISTORY_DURATION);
         m_usedTags = new TrailingHistory<>(HISTORY_DURATION);
+
+        m_log_allTags = fieldLogger.doubleArrayLogger(Level.TRACE, "all tags");
+        m_log_usedTags = fieldLogger.doubleArrayLogger(Level.TRACE, "used tags");
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_pub_tags = inst.getStructArrayTopic("tags", Pose3d.struct).publish();
@@ -189,6 +198,12 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     protected void finishUpdate() {
         m_pub_tags.set(m_allTags.getAll().toArray(new Pose3d[0]));
         m_pub_used_tags.set(m_usedTags.getAll().toArray(new Pose3d[0]));
+        m_log_allTags.log(
+                () -> m_allTags.getAll().stream().flatMapToDouble(
+                        x -> DoubleStream.of(x.getX(), x.getY(), x.toPose2d().getRotation().getDegrees())).toArray());
+        m_log_usedTags.log(
+                () -> m_usedTags.getAll().stream().flatMapToDouble(
+                        x -> DoubleStream.of(x.getX(), x.getY(), x.toPose2d().getRotation().getDegrees())).toArray());
     }
 
     /**
@@ -213,9 +228,15 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             double valueTimestamp,
             Optional<Alliance> optAlliance) {
 
-        // Vasili added this extra delay after some experimentation that he should
-        // describe here.
-        final double IMPORTANT_MAGIC_NUMBER = 0.027;
+        // Vasili added this extra delay after some experimentation, but
+        // it breaks simulation, so I set it back to zero.
+        // The effect is to make the received sight
+        // appear as if it were from further in the past than the timestamp says it is,
+        // which would be required if there were delay (a lot of delay) not included
+        // in the timestamp.
+        // TODO: figure out what this does and describe it describe here.
+        // final double IMPORTANT_MAGIC_NUMBER = 0.027;
+        final double IMPORTANT_MAGIC_NUMBER = 0.0;
         double correctedTimestamp = valueTimestamp - IMPORTANT_MAGIC_NUMBER;
 
         // this seems to always be 1. ????
@@ -294,12 +315,21 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 m_log_using_gyro.log(() -> false);
             }
 
-            extralog(
-                    correctedTimestamp,
-                    historicalPose,
-                    cameraOffset,
-                    tagInCamera,
-                    tagInField);
+            // Log the estimated tag position, for visualization of vision error
+
+            // Field-to-robot
+            Pose3d historicalPose3d = new Pose3d(historicalPose);
+            // Field-to-robot plus robot-to-camera = field-to-camera
+            Pose3d historicalCameraInField = historicalPose3d.transformBy(cameraOffset);
+            // given the historical pose, where do we think the tag is?
+            Pose3d estimatedTagInField = historicalCameraInField.transformBy(tagInCamera);
+            m_allTags.add(correctedTimestamp, estimatedTagInField);
+            // clean the used-tags collection in case we don't end up writing to it.
+            m_usedTags.cleanup(correctedTimestamp);
+
+            // log the norm of the translational error of the tag.
+            Transform3d tagError = tagInField.minus(estimatedTagInField);
+            m_log_tag_error.log(() -> tagError.getTranslation().getNorm());
 
             // Estimate of robot pose.
             Pose3d pose3d = PoseEstimationHelper.robotInField(
@@ -348,6 +378,11 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 continue;
             }
 
+            // If we got this far, we're using the tag for localization, so add it to the
+            // history of used tags.
+
+            m_usedTags.add(correctedTimestamp, estimatedTagInField);
+
             m_visionUpdater.put(
                     correctedTimestamp,
                     pose,
@@ -357,26 +392,6 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             m_latestTime = Takt.get();
             m_prevPose = pose;
         }
-    }
-
-    /** visualization stuff, not used in computation */
-    private void extralog(
-            double correctedTimestamp,
-            Pose2d historicalPose,
-            Transform3d cameraOffset,
-            Transform3d tagInCamera,
-            Pose3d tagInField) {
-        // Field-to-robot
-        Pose3d historicalPose3d = new Pose3d(historicalPose);
-        // Field-to-robot plus robot-to-camera = field-to-camera
-        Pose3d historicalCameraInField = historicalPose3d.transformBy(cameraOffset);
-        // given the historical pose, where do we think the tag is?
-        Pose3d estimatedTagInField = historicalCameraInField.transformBy(tagInCamera);
-        m_allTags.add(correctedTimestamp, estimatedTagInField);
-        // log the norm of the translational error of the tag.
-        Transform3d tagError = tagInField.minus(estimatedTagInField);
-        m_log_tag_error.log(() -> tagError.getTranslation().getNorm());
-        m_usedTags.add(correctedTimestamp, estimatedTagInField);
     }
 
     static double[] stateStdDevs() {

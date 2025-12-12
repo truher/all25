@@ -65,6 +65,9 @@ public abstract class CameraReader<T> {
      * Memo.updateAll(), which runs in Robot.robotPeriodic().
      */
     public void update() {
+        if (DEBUG) {
+            System.out.println("update");
+        }
         beginUpdate();
         for (NetworkTableEvent e : m_poller.readQueue()) {
             ValueEventData valueEventData = e.valueData;
@@ -110,8 +113,7 @@ public abstract class CameraReader<T> {
 
             // time is in microseconds
             // https://docs.wpilib.org/en/stable/docs/software/networktables/networktables-intro.html#timestamps
-            // in the past this was "server time," but "server time" is completely broken,
-            // because it can be 0 or 1 for "locally created values".  Never use server time.
+            // NT provides a local time comparable to FPGATime, which is what the history uses.
             double valueTimestamp = ((double) ntValue.getTime()) / 1000000.0;
             m_log_timestamp.log(() -> valueTimestamp);
             if (DEBUG) {

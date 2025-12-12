@@ -1,7 +1,5 @@
 package org.team100.lib.subsystems.shooter;
 
-import java.lang.System.Logger;
-
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;

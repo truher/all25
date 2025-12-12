@@ -13,6 +13,7 @@ import org.team100.lib.state.ModelR3;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /** Timeless because the clock is used to decide to ignore (stale) input. */
 public class SimulatedTargetWriterTest implements Timeless {
@@ -21,9 +22,14 @@ public class SimulatedTargetWriterTest implements Timeless {
             new TestPrimitiveLogger());
 
     @Test
-    void testOne() {
+    void testOne() throws InterruptedException {
+        NetworkTableInstance.getDefault().startServer();
+        Thread.sleep(50);
         stepTime();
+
         ModelR3 p = new ModelR3();
+        Targets reader = new Targets(logger, logger, x -> p);
+        Thread.sleep(50);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 logger,
                 List.of(Camera.TEST4),
@@ -31,12 +37,17 @@ public class SimulatedTargetWriterTest implements Timeless {
                 new Translation2d[] {
                         new Translation2d(1, 0) });
 
-        // need to instantiate the reader prior to the writer update because the poller
-        // ignores things that came before.
-        Targets reader = new Targets(logger, logger, x -> p);
+        Thread.sleep(50);
+
+        // wait for NT rate-limiting
+        Thread.sleep(200);
 
         stepTime();
         writer.update();
+
+        // wait for NT rate-limiting
+        Thread.sleep(200);
+
         stepTime();
         reader.update();
 

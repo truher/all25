@@ -43,12 +43,14 @@ public class Targets extends CameraReader<Rotation3d> {
     /** Targets closer than this to each other are combined */
     private static final double NEARNESS_THRESHOLD = 0.15;
 
-    public final DoubleArrayLogger m_log_target;
+    public final DoubleArrayLogger m_log_allTargets;
+    public final DoubleArrayLogger m_log_coalescedTargets;
 
     /** state = f(takt seconds) from history. */
     private final DoubleFunction<ModelR3> m_history;
-    /** Accumulation of targets we see. */
-    // private final TrailingHistory<Translation2d> m_targets;
+    /** Accumulation of targets we see; this is really for logging only. */
+    private final TrailingHistory<Translation2d> m_allTargets;
+    /** Coalesced targets */
     private final CoalescingCollection<Translation2d> m_targets;
     /** Side effect mutates targets. */
     private final SideEffect m_vision;
@@ -63,11 +65,12 @@ public class Targets extends CameraReader<Rotation3d> {
         super(parent, "objectVision", "Rotation3d", StructBuffer.create(Rotation3d.struct));
         LoggerFactory log = parent.type(this);
         m_log_historySize = log.intLogger(Level.TRACE, "history size");
-        m_log_target = fieldLogger.doubleArrayLogger(Level.TRACE, "all_targets");
+        m_log_allTargets = fieldLogger.doubleArrayLogger(Level.TRACE, "all targets");
+        m_log_coalescedTargets = fieldLogger.doubleArrayLogger(Level.TRACE, "coalesced targets");
         m_log_age = log.doubleLogger(Level.TRACE, "target age");
         m_log_poseTimestamp = log.doubleLogger(Level.TRACE, "pose timestamp");
         m_history = history;
-        // m_targets = new TrailingHistory<>(HISTORY_DURATION);
+        m_allTargets = new TrailingHistory<>(HISTORY_DURATION);
         m_targets = new CoalescingCollection<>(
                 new TrailingHistory<>(HISTORY_DURATION),
                 new Near2d(NEARNESS_THRESHOLD),
@@ -91,29 +94,31 @@ public class Targets extends CameraReader<Rotation3d> {
         // ALERT!
         //
         // Vasili added this while testing target interception, but I have no idea why.
-        // It breaks all the simulations.  The effect is to make the received sight
+        // It breaks all the simulations. The effect is to make the received sight
         // appear as if it were from further in the past than the timestamp says it is,
         // which would be required if there were delay (a lot of delay) not included
         // in the timestamp.
         //
-        // TODO: explore the issue of time synchronization in more depth, maybe repeat
-        // the "visible LED" test we did a few years ago, to measure the glass-to-glass
-        // delay, using the RoboRIO as the trigger.
+        // TODO: explore the issue of time synchronization in more depth.
         //
-        // TODO: maybe add this extra delay to the python code; maybe the computation there
-        // is wrong somehow.
+        // TODO: maybe add this extra delay to the python code; maybe the computation
+        // there is wrong somehow.
         //
         // double SOME_SORT_OF_OFFSET = 0.05;
         double SOME_SORT_OF_OFFSET = 0.0;
         double poseTimestamp = valueTimestamp - SOME_SORT_OF_OFFSET;
         m_log_poseTimestamp.log(() -> poseTimestamp);
         Pose2d robotPose = m_history.apply(poseTimestamp).pose();
-        m_targets.addAll(
-                valueTimestamp,
-                TargetLocalizer.cameraRotsToFieldRelativeArray(
-                        robotPose,
-                        cameraOffset,
-                        sights));
+
+        // Tranform sights to field targets.
+        List<Translation2d> targets = TargetLocalizer.cameraRotsToFieldRelativeArray(
+                robotPose, cameraOffset, sights);
+        if (DEBUG) {
+            System.out.printf("targets %d\n", targets.size());
+        }
+
+        m_allTargets.addAll(valueTimestamp, targets);
+        m_targets.addAll(valueTimestamp, targets);
     }
 
     /**
@@ -142,9 +147,14 @@ public class Targets extends CameraReader<Rotation3d> {
         // x -> m_field_log.m_log_target.log(
         // () -> new double[] { x.getX(), x.getY(), 0 }));
 
-        // show *all* targets on the field2d widget.
-        m_log_target.log(
+        // Show coalesced targets on the field2d widget.
+        m_log_coalescedTargets.log(
                 () -> getTargets().stream().flatMapToDouble(
+                        x -> DoubleStream.of(x.getX(), x.getY(), 0.0)).toArray());
+
+        // Also show *all* the raw sightings.
+        m_log_allTargets.log(
+                () -> m_allTargets.getAll().stream().flatMapToDouble(
                         x -> DoubleStream.of(x.getX(), x.getY(), 0.0)).toArray());
 
         m_log_historySize.log(() -> m_targets.size());
