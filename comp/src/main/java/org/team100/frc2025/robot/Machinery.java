@@ -109,6 +109,7 @@ public class Machinery {
                 m_swerveKinodynamics,
                 m_modules);
         final SwerveHistory history = new SwerveHistory(
+                driveLog,
                 m_swerveKinodynamics,
                 gyro.getYawNWU(),
                 m_modules.positions(),
@@ -138,7 +139,7 @@ public class Machinery {
         // SIMULATED CAMERAS
         //
         m_simulatedTagDetector = SimulatedTagDetector.get(layout, history);
-        m_targetSimulator = SimulatedTargetWriter.get(history);
+        m_targetSimulator = SimulatedTargetWriter.get(driveLog, history);
 
         ////////////////////////////////////////////////////////////
         //

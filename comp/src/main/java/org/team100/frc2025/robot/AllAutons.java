@@ -8,7 +8,8 @@ import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.HolonomicProfileFactory;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
@@ -27,7 +28,7 @@ public class AllAutons {
         m_autonChooser = new AutonChooser();
         LoggerFactory autoLog = Logging.instance().rootLogger.name("Auton");
 
-        final HolonomicProfile profile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
+        final ProfileR3 profile = HolonomicProfileFactory.currentLimitedExponential(1, 2, 4,
                 machinery.m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 machinery.m_swerveKinodynamics.getMaxAngleAccelRad_S2(),
                 5);

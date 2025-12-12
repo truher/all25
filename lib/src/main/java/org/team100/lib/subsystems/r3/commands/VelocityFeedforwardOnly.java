@@ -3,7 +3,7 @@ package org.team100.lib.subsystems.r3.commands;
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
@@ -19,7 +19,7 @@ public class VelocityFeedforwardOnly extends MoveAndHold {
     private static final boolean DEBUG = false;
 
     private final LoggerFactory m_log;
-    private final HolonomicProfile m_profile;
+    private final ProfileR3 m_profile;
     private final Pose2d m_goal;
     private final VelocitySubsystemR3 m_drive;
 
@@ -27,7 +27,7 @@ public class VelocityFeedforwardOnly extends MoveAndHold {
 
     public VelocityFeedforwardOnly(
             LoggerFactory parent,
-            HolonomicProfile profile,
+            ProfileR3 profile,
             Pose2d goal,
             VelocitySubsystemR3 drive) {
         m_log = parent.type(this);

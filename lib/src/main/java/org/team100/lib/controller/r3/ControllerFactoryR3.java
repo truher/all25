@@ -89,7 +89,6 @@ public class ControllerFactoryR3 {
                 1); // omega tol
     }
 
-    /** pick tolerance is *very* loose */
     public static FullStateControllerR3 pick(LoggerFactory log) {
         return new FullStateControllerR3(log,
                 7.2, // p cartesian
@@ -97,7 +96,7 @@ public class ControllerFactoryR3 {
                 0.055, // p cartesian v
                 0.01, // p theta v
                 0.15, // x tol
-                0.4, // theta tol
+                0.1, // theta tol
                 4, // xdot tol
                 4); // omega tol
     }

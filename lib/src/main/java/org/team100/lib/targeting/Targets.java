@@ -13,6 +13,7 @@ import org.team100.lib.geometry.Near2d;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
 import org.team100.lib.network.CameraReader;
 import org.team100.lib.state.ModelR3;
@@ -52,17 +53,19 @@ public class Targets extends CameraReader<Rotation3d> {
     /** Side effect mutates targets. */
     private final SideEffect m_vision;
     private final IntLogger m_log_historySize;
+    private final DoubleLogger m_log_age;
+    private final DoubleLogger m_log_poseTimestamp;
 
     public Targets(
-            LoggerFactory log,
+            LoggerFactory parent,
             LoggerFactory fieldLogger,
             DoubleFunction<ModelR3> history) {
-        super(
-                "objectVision",
-                "Rotation3d",
-                StructBuffer.create(Rotation3d.struct));
-        m_log_historySize = log.type(this).intLogger(Level.TRACE, "history size");
-        m_log_target = log.doubleArrayLogger(Level.TRACE, "target");
+        super(parent, "objectVision", "Rotation3d", StructBuffer.create(Rotation3d.struct));
+        LoggerFactory log = parent.type(this);
+        m_log_historySize = log.intLogger(Level.TRACE, "history size");
+        m_log_target = fieldLogger.doubleArrayLogger(Level.TRACE, "all_targets");
+        m_log_age = log.doubleLogger(Level.TRACE, "target age");
+        m_log_poseTimestamp = log.doubleLogger(Level.TRACE, "pose timestamp");
         m_history = history;
         // m_targets = new TrailingHistory<>(HISTORY_DURATION);
         m_targets = new CoalescingCollection<>(
@@ -78,13 +81,33 @@ public class Targets extends CameraReader<Rotation3d> {
             double valueTimestamp,
             Rotation3d[] sights) {
         double age = Takt.get() - valueTimestamp;
+        m_log_age.log(() -> age);
         if (age > MAX_SIGHT_AGE) {
             if (DEBUG) {
                 System.out.printf("WARNING: ignoring stale sight %f %f\n", Takt.get(), valueTimestamp);
             }
             return;
         }
-        Pose2d robotPose = m_history.apply(valueTimestamp-.05).pose();
+        // ALERT!
+        //
+        // Vasili added this while testing target interception, but I have no idea why.
+        // It breaks all the simulations.  The effect is to make the received sight
+        // appear as if it were from further in the past than the timestamp says it is,
+        // which would be required if there were delay (a lot of delay) not included
+        // in the timestamp.
+        //
+        // TODO: explore the issue of time synchronization in more depth, maybe repeat
+        // the "visible LED" test we did a few years ago, to measure the glass-to-glass
+        // delay, using the RoboRIO as the trigger.
+        //
+        // TODO: maybe add this extra delay to the python code; maybe the computation there
+        // is wrong somehow.
+        //
+        // double SOME_SORT_OF_OFFSET = 0.05;
+        double SOME_SORT_OF_OFFSET = 0.0;
+        double poseTimestamp = valueTimestamp - SOME_SORT_OF_OFFSET;
+        m_log_poseTimestamp.log(() -> poseTimestamp);
+        Pose2d robotPose = m_history.apply(poseTimestamp).pose();
         m_targets.addAll(
                 valueTimestamp,
                 TargetLocalizer.cameraRotsToFieldRelativeArray(

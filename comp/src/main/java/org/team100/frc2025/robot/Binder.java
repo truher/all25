@@ -19,9 +19,10 @@ import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.hid.OperatorXboxControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.HolonomicProfileFactory;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.subsystems.prr.commands.FollowJointProfiles;
-import org.team100.lib.subsystems.r3.commands.FloorPickSequence;
+import org.team100.lib.subsystems.r3.commands.FloorPickSequence2;
 import org.team100.lib.subsystems.r3.commands.ManualPosition;
 import org.team100.lib.subsystems.swerve.commands.SetRotation;
 import org.team100.lib.subsystems.swerve.commands.manual.DriveManuallySimple;
@@ -134,21 +135,33 @@ public class Binder {
                         m_machinery.m_manipulator.centerIntake()))
                 .onFalse(m_machinery.m_mech.profileHomeTerminal());
 
-        final HolonomicProfile coralPickProfile = HolonomicProfile.currentLimitedExponential(1, 2, 4,
-                m_machinery.m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
-                m_machinery.m_swerveKinodynamics.getMaxAngleAccelRad_S2(),
-                5);
+        // go full speed for rotation, so that rotation gets there first.
+        final ProfileR3 coralPickProfile = HolonomicProfileFactory.freeRotationCurrentLimitedExponential(
+                m_machinery.m_swerveKinodynamics, 0.5, 1.0);
 
         // Pick a game piece from the floor, based on camera input.
+        
+        // This is the old one, commented out while I work on the new one.
+        // whileTrue(driver::x,
+        // parallel(
+        // m_machinery.m_mech.pickWithProfile(),
+        // m_machinery.m_manipulator.centerIntake(),
+        // FloorPickSequence.get(
+        // log, fieldLogger, m_machinery.m_drive, m_machinery.m_targets,
+        // ControllerFactoryR3.pick(log), coralPickProfile)
+        // .withName("Floor Pick"))
+        // .until(m_machinery.m_manipulator::hasCoral));
+
+        // this skips the intaking, just to work on the drivetrain.
         whileTrue(driver::x,
-                parallel(
-                        m_machinery.m_mech.pickWithProfile(),
-                        m_machinery.m_manipulator.centerIntake(),
-                        FloorPickSequence.get(
-                                log, fieldLogger, m_machinery.m_drive, m_machinery.m_targets,
-                                ControllerFactoryR3.pick(log), coralPickProfile)
-                                .withName("Floor Pick"))
-                        .until(m_machinery.m_manipulator::hasCoral));
+                FloorPickSequence2.get(
+                        log,
+                        fieldLogger,
+                        m_machinery.m_drive,
+                        m_machinery.m_targets,
+                        ControllerFactoryR3.pick(log),
+                        coralPickProfile)
+                        .withName("FloorPick"));
 
         // Sideways intake for L1
         whileTrue(buttons::red2,
@@ -169,7 +182,7 @@ public class Binder {
         // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
 
         final LoggerFactory coralSequence = rootLogger.name("Coral Sequence");
-        final HolonomicProfile profile = HolonomicProfile.get(
+        final ProfileR3 profile = HolonomicProfileFactory.get(
                 coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5, 1, 0.2);
         final ControllerR3 holonomicController = ControllerFactoryR3.byIdentity(coralSequence);
 

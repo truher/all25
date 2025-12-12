@@ -5,6 +5,9 @@ import java.util.SortedMap;
 import java.util.function.DoubleFunction;
 
 import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.logging.Level;
+import org.team100.lib.logging.LoggerFactory;
+import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
@@ -36,15 +39,18 @@ public class SwerveHistory implements DoubleFunction<ModelR3> {
      */
     private static final double BUFFER_DURATION = 0.2;
 
+    private final DoubleLogger m_log_timestamp;
     private final SwerveKinodynamics m_kinodynamics;
     private final TimeInterpolatableBuffer100<InterpolationRecord> m_poseBuffer;
 
     public SwerveHistory(
+            LoggerFactory parent,
             SwerveKinodynamics kinodynamics,
             Rotation2d gyroAngle,
             SwerveModulePositions modulePositions,
             Pose2d initialPoseMeters,
             double timestampSeconds) {
+        m_log_timestamp = parent.type(this).doubleLogger(Level.TRACE, "sample timestamp");
         m_kinodynamics = kinodynamics;
         m_poseBuffer = new TimeInterpolatableBuffer100<>(
                 BUFFER_DURATION,
@@ -62,6 +68,7 @@ public class SwerveHistory implements DoubleFunction<ModelR3> {
      */
     @Override
     public ModelR3 apply(double timestampSeconds) {
+        m_log_timestamp.log(() -> timestampSeconds);
         return m_poseBuffer.get(timestampSeconds).m_state;
     }
 

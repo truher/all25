@@ -22,7 +22,7 @@ import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.CoralStation;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.subsystems.r3.commands.DriveToPoseWithProfile;
 import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
 
@@ -33,13 +33,13 @@ public class Auton {
 
     private final LoggerFactory m_log;
     private final Machinery m_machinery;
-    private final HolonomicProfile m_autoProfile;
+    private final ProfileR3 m_autoProfile;
     private final FullStateControllerR3 m_autoController;
 
     public Auton(
             LoggerFactory parent,
             Machinery machinery,
-            HolonomicProfile autoProfile,
+            ProfileR3 autoProfile,
             FullStateControllerR3 autoController) {
         m_log = parent.type(this);
         m_machinery = machinery;

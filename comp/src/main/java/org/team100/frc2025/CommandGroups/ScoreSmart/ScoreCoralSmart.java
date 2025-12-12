@@ -16,7 +16,7 @@ import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.profile.HolonomicProfile;
+import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,7 +31,7 @@ public class ScoreCoralSmart {
             CalgamesMech mech,
             Manipulator manipulator,
             ControllerR3 controller,
-            HolonomicProfile profile,
+            ProfileR3 profile,
             SwerveDriveSubsystem drive,
             DoubleConsumer heedRadiusM,
             Supplier<ScoringLevel> level,

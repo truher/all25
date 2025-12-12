@@ -54,6 +54,7 @@ public class Fixture {
         gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);
         swerveLocal = new SwerveLocal(logger, swerveKinodynamics, collection);
         history = new SwerveHistory(
+                logger,
                 swerveKinodynamics,
                 Rotation2d.kZero,
                 SwerveModulePositions.kZero(),

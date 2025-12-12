@@ -25,6 +25,7 @@ public class SimulatedTargetWriterTest implements Timeless {
         stepTime();
         ModelR3 p = new ModelR3();
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
+                logger,
                 List.of(Camera.TEST4),
                 x -> p,
                 new Translation2d[] {
