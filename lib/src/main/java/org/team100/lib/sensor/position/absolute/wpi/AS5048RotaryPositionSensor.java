@@ -29,6 +29,10 @@ import org.team100.lib.util.RoboRioChannel;
  */
 public class AS5048RotaryPositionSensor extends DutyCycleRotaryPositionSensor {
 
+    // package private so simulator can see it
+    static final double SENSOR_MIN = 0.003888;
+    static final double SENSOR_MAX = 0.998058;
+    
     public AS5048RotaryPositionSensor(
             LoggerFactory parent,
             RoboRioChannel channel,
@@ -37,11 +41,13 @@ public class AS5048RotaryPositionSensor extends DutyCycleRotaryPositionSensor {
         super(parent, channel, inputOffset, drive);
     }
 
-    protected double m_sensorMin() {
-        return 0.003888;
+    @Override
+    protected double sensorMin() {
+        return SENSOR_MIN;
     }
 
-    protected double m_sensorMax() {
-        return 0.998058;
+    @Override
+    protected double sensorMax() {
+        return SENSOR_MAX;
     }
 }

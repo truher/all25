@@ -56,8 +56,6 @@ The camera pipeline works as follows:
 The description above has no adjustable fudge factors, and yet we have felt the need
 to add them: there is some source of delay not accounted for here.
 
-For this project, we'll simply put a number there, "EXTRA_DELAY".
-
 ### Total Delay
 
 The delay internal to the camera/pi system is computed as follows:
@@ -73,13 +71,21 @@ than the system time), to produce the Network Tables timestamp.
 ## Comparing Measurements
 
 To compare measurements, we'll keep a timestamped history of all the measurements received.
-The different sources will never produce measurements for the same instants, so we'll interpolate
-between adjacent measurements to find estimates we can use to calculate a difference.
+We then log the history at a point further in the past than any of the delays:
+one second ago.  The samples should be the same, so we also log the difference, which
+should be zero.
 
-The goal is to adjust EXTRA_DELAY until the difference in measurements is nearly zero.
+## Taking Action
+
+The difference will certainly not be zero, so what should we do?
+
+Previously we added extra delay on the RoboRIO end, but I think that's the wrong
+thing to do (among other reasons, it means that the simulator needs to duplicate
+the "extra" delay).
+
+It would be better to modify the sender, so that it tells the truth.
 
 If the *variance* of the difference turns out to be large, then we'll need to look more closely.
-
 
 ## Appendix: Camera Delay Background
 

@@ -64,12 +64,12 @@ public class AnalogRotaryPositionSensorTest {
         try {
             AnalogInputSim sim = new AnalogInputSim(0);
             sim.setInitialized(true);
-            final double range = sensor.m_sensorMax() - sensor.m_sensorMin();
+            final double range = sensor.sensorMax() - sensor.sensorMin();
             for (double unwrappedRad = -6 * Math.PI; unwrappedRad < 6 * Math.PI; unwrappedRad += 0.1) {
                 double wrapped = MathUtil.inputModulus(unwrappedRad, 0, 2 * Math.PI);
                 double piwrapped = MathUtil.angleModulus(unwrappedRad);
                 double sensorTurns = wrapped / (2 * Math.PI);
-                double ratio = sensorTurns * range + sensor.m_sensorMin();
+                double ratio = sensorTurns * range + sensor.sensorMin();
                 sim.setVoltage(ratio * 5);
                 Cache.refresh();
                 double sensorWrapped = sensor.getWrappedPositionRad();

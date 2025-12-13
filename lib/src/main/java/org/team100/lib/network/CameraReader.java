@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.ValueEventData;
 import edu.wpi.first.util.struct.StructBuffer;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Reads camera input from network tables, which is always a StructArray.
@@ -31,6 +32,7 @@ public abstract class CameraReader<T> {
     private static final int QUEUE_DEPTH = 10;
 
     private final DoubleLogger m_log_timestamp;
+    private final DoubleLogger m_log_age;
     /** e.g. "blips" or "Rotation3d" */
     private final String m_ntValueName;
     /** Manages the queue of incoming messages. */
@@ -44,7 +46,8 @@ public abstract class CameraReader<T> {
             String ntValueName,
             StructBuffer<T> buf) {
         LoggerFactory log = parent.type(this);
-        m_log_timestamp = log.doubleLogger(Level.TRACE, "timestamp");
+        m_log_timestamp = log.doubleLogger(Level.TRACE, "timestamp (s)");
+        m_log_age = log.doubleLogger(Level.TRACE, "age (s)");
         m_ntValueName = ntValueName;
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_poller = new NetworkTableListenerPoller(inst);
@@ -113,9 +116,12 @@ public abstract class CameraReader<T> {
 
             // time is in microseconds
             // https://docs.wpilib.org/en/stable/docs/software/networktables/networktables-intro.html#timestamps
-            // NT provides a local time comparable to FPGATime, which is what the history uses.
+            // NT provides a local time comparable to FPGATime, which is what the history
+            // uses.
             double valueTimestamp = ((double) ntValue.getTime()) / 1000000.0;
+            double age = Timer.getFPGATimestamp() - valueTimestamp;
             m_log_timestamp.log(() -> valueTimestamp);
+            m_log_age.log(() -> age);
             if (DEBUG) {
                 System.out.printf("reader timestamp %f\n", valueTimestamp);
             }
