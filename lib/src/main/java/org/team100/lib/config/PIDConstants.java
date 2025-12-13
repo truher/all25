@@ -32,6 +32,11 @@ public class PIDConstants {
         return new PIDConstants(log, 0, 0);
     }
 
+    /**
+     * PID units for REV motor outboard velocity control are duty cycle per RPM, so
+     * if you want to control to a few hundred RPM, P should be something like
+     * 0.0002.
+     */
     public static PIDConstants makeVelocityPID(LoggerFactory log, double p) {
         return new PIDConstants(log, 0, p);
     }
