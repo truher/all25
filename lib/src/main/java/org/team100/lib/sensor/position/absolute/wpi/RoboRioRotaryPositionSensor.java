@@ -51,9 +51,9 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
      */
     protected abstract double getRatio();
 
-    protected abstract double m_sensorMin();
+    protected abstract double sensorMin();
 
-    protected abstract double m_sensorMax();
+    protected abstract double sensorMax();
 
     private int wrap() {
         double current = getWrappedPositionRad();
@@ -88,16 +88,17 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
         return positionRad;
     }
 
-    /** map to full [0,1] */
-    protected double mapSensorRange(double ratio) {
-        // map sensor range
-        if (ratio < m_sensorMin()) {
-            ratio = m_sensorMin();
+    /**
+     * map to full [0,1]
+     */
+    static double mapSensorRange(double ratio, double sensorMin, double sensorMax) {
+        if (ratio < sensorMin) {
+            ratio = sensorMin;
         }
-        if (ratio > m_sensorMax()) {
-            ratio = m_sensorMax();
+        if (ratio > sensorMax) {
+            ratio = sensorMax;
         }
-        return (ratio - m_sensorMin()) / (m_sensorMax() - m_sensorMin());
+        return (ratio - sensorMin) / (sensorMax - sensorMin);
     }
 
     /**
@@ -105,10 +106,10 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
      * 
      * @return radians, [-pi, pi]
      */
-    protected double getRad() {
+    private double getRad() {
         double ratio = getRatio();
 
-        double posTurns = mapSensorRange(ratio);
+        double posTurns = mapSensorRange(ratio, sensorMin(), sensorMax());
         m_log_position_turns.log(() -> posTurns);
 
         double turnsMinusOffset = posTurns - m_positionOffset;
@@ -123,6 +124,8 @@ public abstract class RoboRioRotaryPositionSensor implements RotaryPositionSenso
                 throw new IllegalArgumentException();
         }
     }
+
+
 
     /**
      * Always returns zero.

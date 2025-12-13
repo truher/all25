@@ -31,7 +31,12 @@ public class NeoVortexCANSparkMotor extends CANSparkMotor {
                 neutral, motorPhase, statorCurrentLimit, ff, pid);
     }
 
-    /** Real or simulated depending on identity */
+    /**
+     * Real or simulated depending on identity.
+     * 
+     * PID units for outboard velocity control are duty cycle per RPM, so if you
+     * want to control to a few hundred RPM, P should be something like 0.0002.
+     */
     public static BareMotor get(
             LoggerFactory log, CanId can, MotorPhase phase, int statorLimit,
             Feedforward100 ff, PIDConstants pid) {

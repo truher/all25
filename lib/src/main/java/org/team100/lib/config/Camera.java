@@ -121,6 +121,7 @@ public enum Camera {
 
     UNKNOWN(null, new Transform3d());
 
+    private static final boolean DEBUG = false;
     private static Map<String, Camera> cameras = new HashMap<>();
     static {
         for (Camera i : Camera.values()) {
@@ -138,7 +139,8 @@ public enum Camera {
     public static Camera get(String serialNumber) {
         if (cameras.containsKey(serialNumber))
             return cameras.get(serialNumber);
-        System.out.printf("*** Using Camera UNKNOWN for serial number %s\n", serialNumber);
+        if (DEBUG)
+            System.out.printf("*** Using Camera UNKNOWN for serial number %s\n", serialNumber);
         return UNKNOWN;
     }
 

@@ -46,12 +46,12 @@ public class AnalogRotaryPositionSensor extends RoboRioRotaryPositionSensor {
     }
 
     @Override
-    protected double m_sensorMin() {
+    protected double sensorMin() {
         return 0.0;
     }
 
     @Override
-    protected double m_sensorMax() {
+    protected double sensorMax() {
         return 1.0;
     }
 
