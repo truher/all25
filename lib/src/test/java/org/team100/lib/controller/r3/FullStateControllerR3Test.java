@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DeltaSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
@@ -180,7 +180,7 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 currentReference = ModelR3
                 .fromTimedPose(new TimedPose(
                         new Pose2dWithMotion(
-                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
+                                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
                         0, 0, 0));
         DeltaSE2 err = controller.positionError(measurement, currentReference);
         assertEquals(0, err.getX(), 0.001);
@@ -195,7 +195,7 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 measurement = new ModelR3(new Pose2d(1, 0, new Rotation2d()));
         ModelR3 currentReference = ModelR3
                 .fromTimedPose(new TimedPose(new Pose2dWithMotion(
-                        HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0), 0, 0, 0));
+                        Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0), 0, 0, 0));
         DeltaSE2 err = controller.positionError(measurement, currentReference);
         assertEquals(-1, err.getX(), 0.001);
         assertEquals(0, err.getY(), 0.001);
@@ -209,7 +209,7 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 measurement = new ModelR3(new Pose2d(0, 0, new Rotation2d()));
         ModelR3 currentReference = ModelR3
                 .fromTimedPose(new TimedPose(new Pose2dWithMotion(
-                        HolonomicPose2d.make(1, 0, 0, 0), 0, 0, 0), 0, 0, 0));
+                        Pose2dWithDirection.make(1, 0, 0, 0), 0, 0, 0), 0, 0, 0));
         DeltaSE2 err = controller.positionError(measurement, currentReference);
         assertEquals(1, err.getX(), 0.001);
         assertEquals(0, err.getY(), 0.001);
@@ -224,7 +224,7 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 measurement = new ModelR3(new Pose2d(1, 0, new Rotation2d(1)));
         ModelR3 currentReference = ModelR3
                 .fromTimedPose(new TimedPose(new Pose2dWithMotion(
-                        HolonomicPose2d.make(0, 0, 1, 0), 0, 0, 0), 0, 0, 0));
+                        Pose2dWithDirection.make(0, 0, 1, 0), 0, 0, 0), 0, 0, 0));
         DeltaSE2 err = controller.positionError(measurement, currentReference);
         assertEquals(-1, err.getX(), 0.001);
         assertEquals(0, err.getY(), 0.001);
@@ -241,7 +241,7 @@ class FullStateControllerR3Test implements Timeless {
 
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0),
+                Pose2dWithDirection.make(0, 0, 0, 0),
                 0,
                 0, // no curvature
                 0); // no change in curvature
@@ -267,7 +267,7 @@ class FullStateControllerR3Test implements Timeless {
         // motion is in a straight line, down the x axis
         // setpoint is +x, facing down y
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(1, 0, Math.PI / 2, 0), 0,
+                Pose2dWithDirection.make(1, 0, Math.PI / 2, 0), 0,
                 0, // no curvature
                 0); // no change in curvature
         double t = 0;
@@ -293,7 +293,7 @@ class FullStateControllerR3Test implements Timeless {
         // motion is in a straight line, down the x axis
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0,
+                Pose2dWithDirection.make(0, 0, 0, 0), 0,
                 0, // no curvature
                 0); // no change in curvature
         double t = 0;
@@ -321,7 +321,7 @@ class FullStateControllerR3Test implements Timeless {
         // motion is in a straight line, down the x axis
         // at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0),
+                Pose2dWithDirection.make(0, 0, 0, 0),
                 0,
                 0, // no curvature
                 0); // no change in curvature
@@ -346,7 +346,7 @@ class FullStateControllerR3Test implements Timeless {
         // motion is in a straight line, down the x axis
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0,
+                Pose2dWithDirection.make(0, 0, 0, 0), 0,
                 0, // no curvature
                 0);// no change in curvature
         double t = 0;
@@ -370,7 +370,7 @@ class FullStateControllerR3Test implements Timeless {
         // motion is in a straight line, down the x axis
         // setpoint is the same
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, Math.PI / 2, 0), 0,
+                Pose2dWithDirection.make(0, 0, Math.PI / 2, 0), 0,
                 0, // no curvature
                 0); // no change in curvature
         double t = 0;
@@ -394,7 +394,7 @@ class FullStateControllerR3Test implements Timeless {
         // motion is tangential to the x axis but turning left
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0),
+                Pose2dWithDirection.make(0, 0, 0, 0),
                 1,
                 1, // driving and turning
                 0); // no change in curvature
@@ -418,7 +418,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is at the origin, facing ahead
         Pose2d currentState = new Pose2d();
         // setpoint is also at the origin
-        HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, 0, 0);
+        Pose2dWithDirection setpointPose = Pose2dWithDirection.make(0, 0, 0, 0);
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
@@ -454,7 +454,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is plus-Y, facing ahead
         Pose2d currentState = new Pose2d(0, 1, Rotation2d.kZero);
         // setpoint is at the origin
-        HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, 0, 0);
+        Pose2dWithDirection setpointPose = Pose2dWithDirection.make(0, 0, 0, 0);
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
@@ -490,7 +490,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is plus-theta
         Pose2d currentState = new Pose2d(0, 0, new Rotation2d(1.0));
         // setpoint is also at the origin
-        HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, 0, 0);
+        Pose2dWithDirection setpointPose = Pose2dWithDirection.make(0, 0, 0, 0);
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
@@ -529,7 +529,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is at the origin, facing down the y axis
         Pose2d currentState = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
         // setpoint is the same
-        HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, Math.PI / 2, 0);
+        Pose2dWithDirection setpointPose = Pose2dWithDirection.make(0, 0, Math.PI / 2, 0);
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
@@ -564,7 +564,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is plus-y, facing down the y axis
         Pose2d currentState = new Pose2d(0, 1, Rotation2d.kCCW_Pi_2);
         // setpoint is parallel at the origin
-        HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, Math.PI / 2, 0);
+        Pose2dWithDirection setpointPose = Pose2dWithDirection.make(0, 0, Math.PI / 2, 0);
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
@@ -599,7 +599,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is at the origin, facing ahead
         Pose2d currentState = new Pose2d();
         // setpoint is also at the origin
-        HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, 0, 0);
+        Pose2dWithDirection setpointPose = Pose2dWithDirection.make(0, 0, 0, 0);
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
@@ -637,7 +637,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is at the origin, facing +y
         Pose2d currentPose = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
         // setpoint postion is the same
-        HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, Math.PI / 2, 0);
+        Pose2dWithDirection setpointPose = Pose2dWithDirection.make(0, 0, Math.PI / 2, 0);
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
@@ -680,7 +680,7 @@ class FullStateControllerR3Test implements Timeless {
                 new VelocitySE2(0.5, 0, 0));
 
         // setpoint postion is ahead in x and y and theta
-        HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, Math.PI / 2, 0);
+        Pose2dWithDirection setpointPose = Pose2dWithDirection.make(0, 0, Math.PI / 2, 0);
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;

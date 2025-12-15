@@ -7,7 +7,7 @@ import java.util.function.Function;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.CoralStation;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.Trajectory100;
@@ -52,16 +52,14 @@ public class GoToCoralStation implements Function<Pose2d, Trajectory100> {
         Rotation2d newInitialSpline = FieldConstants.calculateDeltaSpline(
                 courseToGoal, courseToGoal.rotateBy(Rotation2d.fromDegrees(-90)), scaleAdjust);
 
-        List<HolonomicPose2d> waypoints = new ArrayList<>();
+        List<Pose2dWithDirection> waypoints = new ArrayList<>();
         waypoints.add(
-                new HolonomicPose2d(
-                        currTranslation,
-                        currentPose.getRotation(),
+                new Pose2dWithDirection(
+                        currentPose,
                         DirectionSE2.fromRotation(newInitialSpline)));
         waypoints.add(
-                new HolonomicPose2d(
-                        goal.getTranslation(),
-                        goal.getRotation(),
+                new Pose2dWithDirection(
+                        goal,
                         DirectionSE2.fromRotation(courseToGoal)));
 
         return m_planner.restToRest(waypoints);

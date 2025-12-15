@@ -14,7 +14,7 @@ import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.geometry.AccelerationSE2;
 import org.team100.lib.geometry.VelocitySE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ConfigLogger;
@@ -490,87 +490,87 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
 
     public MoveAndHold homeToL1() {
         return m_transit.endless("homeToL1",
-                HolonomicPose2d.make(m_home, -1.5),
-                HolonomicPose2d.make(L2, -1.7));
+                Pose2dWithDirection.make(m_home, -1.5),
+                Pose2dWithDirection.make(L2, -1.7));
     }
 
     // NEVER CALL
     public Command l1ToHome() {
         return m_transit.terminal("l1ToHome",
-                HolonomicPose2d.make(L2, 1.3),
-                HolonomicPose2d.make(m_home, 1.5));
+                Pose2dWithDirection.make(L2, 1.3),
+                Pose2dWithDirection.make(m_home, 1.5));
     }
 
     public MoveAndHold homeToL2() {
         return m_transit.endless("homeToL2",
-                HolonomicPose2d.make(m_home, 1.5),
-                HolonomicPose2d.make(L2, 1.5));
+                Pose2dWithDirection.make(m_home, 1.5),
+                Pose2dWithDirection.make(L2, 1.5));
     }
 
     public Command l2ToHome() {
         return m_transit.terminal("l2ToHome",
-                HolonomicPose2d.make(L2, -1.5),
-                HolonomicPose2d.make(m_home, -1.5));
+                Pose2dWithDirection.make(L2, -1.5),
+                Pose2dWithDirection.make(m_home, -1.5));
     }
 
     public MoveAndHold homeToL3() {
         return m_transit.endless("homeToL3",
-                HolonomicPose2d.make(m_home, 0.8),
-                HolonomicPose2d.make(L3, 1.5));
+                Pose2dWithDirection.make(m_home, 0.8),
+                Pose2dWithDirection.make(L3, 1.5));
     }
 
     public Command l3ToHome() {
         return m_transit.terminal("l3ToHome",
-                HolonomicPose2d.make(L3, -1.5),
-                HolonomicPose2d.make(m_home, -2.3));
+                Pose2dWithDirection.make(L3, -1.5),
+                Pose2dWithDirection.make(m_home, -2.3));
     }
 
     public MoveAndHold homeToL4() {
         return m_transit.endless("homeToL4",
-                HolonomicPose2d.make(m_home, 0.1),
-                HolonomicPose2d.make(L4, 1.5));
+                Pose2dWithDirection.make(m_home, 0.1),
+                Pose2dWithDirection.make(L4, 1.5));
     }
 
     public MoveAndHold homeToL4Back() {
         return m_transit.endless("homeToL4",
-                HolonomicPose2d.make(m_home, 0.1),
-                HolonomicPose2d.make(L4_BACK, -1.5));
+                Pose2dWithDirection.make(m_home, 0.1),
+                Pose2dWithDirection.make(L4_BACK, -1.5));
     }
 
     public Command l4ToHome() {
         return m_transit.terminal("l4ToHome",
-                HolonomicPose2d.make(L4, -1.5),
-                HolonomicPose2d.make(m_home, -3));
+                Pose2dWithDirection.make(L4, -1.5),
+                Pose2dWithDirection.make(m_home, -3));
     }
 
     public Command l4BackToHome() {
         return m_transit.terminal("l4ToHome",
-                HolonomicPose2d.make(L4_BACK, 1.5),
-                HolonomicPose2d.make(m_home, -3));
+                Pose2dWithDirection.make(L4_BACK, 1.5),
+                Pose2dWithDirection.make(m_home, -3));
     }
 
     public Command homeToAlgaeL2() {
         return m_transit.endless("homeToAlgaeL2",
-                HolonomicPose2d.make(m_home, 1.5),
-                HolonomicPose2d.make(ALGAE_L2, 1.5));
+                Pose2dWithDirection.make(m_home, 1.5),
+                Pose2dWithDirection.make(ALGAE_L2, 1.5));
     }
 
     public Command homeToAlgaeL3() {
         return m_transit.endless("homeToAlgaeL3",
-                HolonomicPose2d.make(m_home, 0),
-                HolonomicPose2d.make(ALGAE_L3, 1.5));
+                Pose2dWithDirection.make(m_home, 0),
+                Pose2dWithDirection.make(ALGAE_L3, 1.5));
     }
 
     public Command algaeL2ToHome() {
         return m_transit.terminal("homeToAlgaeL2",
-                HolonomicPose2d.make(ALGAE_L2, -1.0),
-                HolonomicPose2d.make(m_home, Math.PI));
+                Pose2dWithDirection.make(ALGAE_L2, -1.0),
+                Pose2dWithDirection.make(m_home, Math.PI));
     }
 
     public Command algaeL3ToHome() {
         return m_transit.terminal("homeToAlgaeL3",
-                HolonomicPose2d.make(ALGAE_L3, -1.0),
-                HolonomicPose2d.make(m_home, Math.PI));
+                Pose2dWithDirection.make(ALGAE_L3, -1.0),
+                Pose2dWithDirection.make(m_home, Math.PI));
     }
 
     /**
@@ -598,14 +598,14 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      */
     public MoveAndHold homeToBarge() {
         return m_transit.endless("homeToBarge",
-                HolonomicPose2d.make(m_home, 0),
-                HolonomicPose2d.make(BARGE, -1));
+                Pose2dWithDirection.make(m_home, 0),
+                Pose2dWithDirection.make(BARGE, -1));
     }
 
     public MoveAndHold bargeToHome() {
         return m_transit.endless("bargeToHome",
-                HolonomicPose2d.make(BARGE, 2.5),
-                HolonomicPose2d.make(m_home, Math.PI));
+                Pose2dWithDirection.make(BARGE, 2.5),
+                Pose2dWithDirection.make(m_home, Math.PI));
 
     }
 

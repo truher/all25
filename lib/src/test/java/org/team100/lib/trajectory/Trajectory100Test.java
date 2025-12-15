@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -37,14 +37,12 @@ class Trajectory100Test implements Timeless {
         Translation2d goalTranslation = end.getTranslation();
         Translation2d translationToGoal = goalTranslation.minus(currentTranslation);
         Rotation2d angleToGoal = translationToGoal.getAngle();
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(
-                        currentTranslation,
-                        start.getRotation(),
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        start,
                         DirectionSE2.fromRotation(angleToGoal)),
-                new HolonomicPose2d(
-                        goalTranslation,
-                        end.getRotation(),
+                new Pose2dWithDirection(
+                        end,
                         DirectionSE2.fromRotation(angleToGoal)));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
@@ -75,14 +73,12 @@ class Trajectory100Test implements Timeless {
         Translation2d goalTranslation = end.getTranslation();
         Translation2d translationToGoal = goalTranslation.minus(currentTranslation);
         Rotation2d angleToGoal = translationToGoal.getAngle();
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(
-                        currentTranslation,
-                        start.getRotation(),
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        start,
                         DirectionSE2.fromRotation(angleToGoal)),
-                new HolonomicPose2d(
-                        goalTranslation,
-                        end.getRotation(),
+                new Pose2dWithDirection(
+                        end,
                         DirectionSE2.fromRotation(angleToGoal)));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
@@ -105,14 +101,16 @@ class Trajectory100Test implements Timeless {
     @Test
     void testSampleThoroughly() {
 
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        Rotation2d.kZero,
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_X));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
@@ -142,14 +140,16 @@ class Trajectory100Test implements Timeless {
 
     @Test
     void testSampleThoroughlyWithRotation() {
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        Rotation2d.kZero,
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        Rotation2d.kCCW_Pi_2,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                Rotation2d.kCCW_Pi_2),
                         DirectionSE2.TO_X));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
@@ -185,18 +185,21 @@ class Trajectory100Test implements Timeless {
     // There's no need to run this all the time
     // @Test
     void testSamplePerformance() {
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        Rotation2d.kZero,
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(10, 0),
-                        Rotation2d.kCCW_Pi_2,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(10, 0),
+                                Rotation2d.kCCW_Pi_2),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(10, 10),
-                        Rotation2d.kPi,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(10, 10),
+                                Rotation2d.kPi),
                         DirectionSE2.TO_X));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);

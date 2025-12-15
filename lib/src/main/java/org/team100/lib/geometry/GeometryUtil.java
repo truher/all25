@@ -205,10 +205,9 @@ public class GeometryUtil {
     }
 
     // TODO: fix interpolation
-    public static HolonomicPose2d interpolate(HolonomicPose2d a, HolonomicPose2d b, double x) {
-        return new HolonomicPose2d(
-                a.translation().interpolate(b.translation(), x),
-                interpolate2(a.heading(), b.heading(), x),
+    public static Pose2dWithDirection interpolate(Pose2dWithDirection a, Pose2dWithDirection b, double x) {
+        return new Pose2dWithDirection(
+                interpolate(a.pose(), b.pose(), x),
                 DirectionSE2.fromRotation(interpolate2(
                         a.course().toRotation(),
                         b.course().toRotation(), x)));

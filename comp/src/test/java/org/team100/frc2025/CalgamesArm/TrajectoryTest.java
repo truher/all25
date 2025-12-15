@@ -3,7 +3,7 @@ package org.team100.frc2025.CalgamesArm;
 import java.util.List;
 
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -45,7 +45,7 @@ public class TrajectoryTest {
     /**
      * Yields a curve.
      * 
-     * A HolonomicPose2d allows separate specification of heading (which way the
+     * A Pose2dWithDirection allows separate specification of heading (which way the
      * front of the robot is facing) and course (which way the robot is moving).
      * 
      * In this case, is facing +x, and moving +x, and it ends up moving +y but
@@ -57,14 +57,16 @@ public class TrajectoryTest {
                 new ConstantConstraint(log, 2, 0.5),
                 new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(
-                        new Translation2d(1, 1),
-                        new Rotation2d(),
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 1),
+                                new Rotation2d()),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(9, 9),
-                        new Rotation2d(-Math.PI / 2),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(9, 9),
+                                new Rotation2d(-Math.PI / 2)),
                         DirectionSE2.TO_Y));
         Trajectory100 t = p.restToRest(waypoints);
         new TrajectoryPlotter(0.1).plot(t, "simple");
@@ -82,18 +84,21 @@ public class TrajectoryTest {
                 new ConstantConstraint(log, 2, 0.5),
                 new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(
-                        new Translation2d(1, 1),
-                        new Rotation2d(),
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 1),
+                                new Rotation2d()),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(5, 5),
-                        new Rotation2d(-2),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(5, 5),
+                                new Rotation2d(-2)),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(9, 9),
-                        new Rotation2d(-Math.PI / 2),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(9, 9),
+                                new Rotation2d(-Math.PI / 2)),
                         DirectionSE2.TO_Y));
         Trajectory100 t = p.restToRest(waypoints);
         new TrajectoryPlotter(0.1).plot(t, "simple");
@@ -107,20 +112,23 @@ public class TrajectoryTest {
                 new ConstantConstraint(log, 2, 0.5),
                 new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
-        List<HolonomicPose2d> waypoints = List.of(
+        List<Pose2dWithDirection> waypoints = List.of(
                 // pickup
-                new HolonomicPose2d(
-                        new Translation2d(1, 0.1),
-                        new Rotation2d(-Math.PI),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0.1),
+                                new Rotation2d(-Math.PI)),
                         DirectionSE2.TO_Y),
                 // place for gateway point?
-                new HolonomicPose2d(
-                        new Translation2d(3, 7),
-                        new Rotation2d(Math.PI / 2),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(3, 7),
+                                new Rotation2d(Math.PI / 2)),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(6, 9),
-                        new Rotation2d(-((7 * Math.PI) / 36)),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(6, 9),
+                                new Rotation2d(-((7 * Math.PI) / 36))),
                         DirectionSE2.TO_Y));
         @SuppressWarnings("unused")
         Trajectory100 t = p.restToRest(waypoints);
@@ -133,25 +141,29 @@ public class TrajectoryTest {
                 new ConstantConstraint(log, 2, 0.5),
                 new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
-        List<HolonomicPose2d> waypoints = List.of(
+        List<Pose2dWithDirection> waypoints = List.of(
                 // pickup
-                new HolonomicPose2d(
-                        new Translation2d(1, 0.1),
-                        new Rotation2d(-Math.PI),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0.1),
+                                new Rotation2d(-Math.PI)),
                         DirectionSE2.TO_Y),
                 // place for gateway point
-                new HolonomicPose2d(
-                        new Translation2d(0.75, 3),
-                        new Rotation2d(-Math.PI),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0.75, 3),
+                                new Rotation2d(-Math.PI)),
                         DirectionSE2.TO_Y),
                 // place for gateway point
-                new HolonomicPose2d(
-                        new Translation2d(3, 7),
-                        new Rotation2d(Math.PI / 2),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(3, 7),
+                                new Rotation2d(Math.PI / 2)),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(6, 9),
-                        new Rotation2d(-((7 * Math.PI) / 36)),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(6, 9),
+                                new Rotation2d(-((7 * Math.PI) / 36))),
                         DirectionSE2.TO_Y));
         @SuppressWarnings("unused")
         Trajectory100 t = p.restToRest(waypoints);

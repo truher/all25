@@ -3,7 +3,7 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -25,7 +25,7 @@ class YawRateConstraintTest implements Timeless {
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forTest(logger),
                 YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0),
+                Pose2dWithDirection.make(0, 0, 0, 0),
                 1, // spatial, so rad/m
                 0, 0);
         assertEquals(-8.485, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
@@ -39,7 +39,7 @@ class YawRateConstraintTest implements Timeless {
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forTest2(logger),
                 YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 1, // spatial, so rad/m
+                Pose2dWithDirection.make(0, 0, 0, 0), 1, // spatial, so rad/m
                 0, 0);
         assertEquals(5.656, c.getMaxVelocity(p).getValue(), DELTA);
     }
@@ -52,7 +52,7 @@ class YawRateConstraintTest implements Timeless {
                 YAW_RATE_SCALE);
         // driving and spinning
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 1,
+                Pose2dWithDirection.make(0, 0, 0, 0), 1,
                 0, 0);
         // there is an accel limit.
         assertEquals(-8.485,
@@ -68,7 +68,7 @@ class YawRateConstraintTest implements Timeless {
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forRealisticTest(logger),
                 scale);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0),
+                Pose2dWithDirection.make(0, 0, 0, 0),
                 1, // spatial, so rad/m
                 0, 0);
         // this number is still quite high even with a low scale.

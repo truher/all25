@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,14 +29,12 @@ public class Prewarmer {
         double startS = Takt.actual();
 
         // Exercise the trajectory planner.
-        List<HolonomicPose2d> waypoints = new ArrayList<>();
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(),
-                Rotation2d.kZero,
+        List<Pose2dWithDirection> waypoints = new ArrayList<>();
+        waypoints.add(new Pose2dWithDirection(
+                new Pose2d(new Translation2d(), Rotation2d.kZero),
                 DirectionSE2.TO_X));
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(1, 0),
-                Rotation2d.kZero,
+        waypoints.add(new Pose2dWithDirection(
+                new Pose2d(new Translation2d(1, 0), Rotation2d.kZero),
                 DirectionSE2.TO_X));
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium(logger));

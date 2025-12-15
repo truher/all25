@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -44,13 +44,15 @@ class HolonomicSplineTest implements Timeless {
     @Test
     void testLinear() {
         HolonomicSpline s = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        new Rotation2d(),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        new Rotation2d(),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d()),
                         DirectionSE2.TO_X));
         Translation2d t = s.getPoint(0);
         assertEquals(0, t.getX(), DELTA);
@@ -69,13 +71,15 @@ class HolonomicSplineTest implements Timeless {
     @Test
     void testLinear2() {
         HolonomicSpline s = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        new Rotation2d(),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(2, 0),
-                        new Rotation2d(),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(2, 0),
+                                new Rotation2d()),
                         DirectionSE2.TO_X));
         Translation2d t = s.getPoint(0);
         assertEquals(0, t.getX(), DELTA);
@@ -94,13 +98,15 @@ class HolonomicSplineTest implements Timeless {
     @Test
     void testRotation() {
         HolonomicSpline s = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        new Rotation2d(),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        new Rotation2d(1),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d(1)),
                         DirectionSE2.TO_X));
 
         if (DEBUG) {
@@ -138,13 +144,15 @@ class HolonomicSplineTest implements Timeless {
     void testRotation2() {
         // Make sure the rotation goes over +/- pi
         HolonomicSpline s = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        new Rotation2d(2.5),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d(2.5)),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        new Rotation2d(-2.5),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d(-2.5)),
                         DirectionSE2.TO_X));
         if (DEBUG) {
             System.out.println("d, x, y, heading, course");
@@ -168,43 +176,51 @@ class HolonomicSplineTest implements Timeless {
         // magic number of 1 makes something about 1.5% from a circle, close enough.
         double magicNumber = 1.0;
         HolonomicSpline s0 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        Rotation2d.k180deg,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                Rotation2d.k180deg),
                         DirectionSE2.TO_Y),
-                new HolonomicPose2d(
-                        new Translation2d(0, 1),
-                        Rotation2d.kCW_90deg,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, 1),
+                                Rotation2d.kCW_90deg),
                         DirectionSE2.MINUS_X),
                 magicNumber, magicNumber);
         HolonomicSpline s1 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(0, 1),
-                        Rotation2d.kCW_90deg,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, 1),
+                                Rotation2d.kCW_90deg),
                         DirectionSE2.MINUS_X),
-                new HolonomicPose2d(
-                        new Translation2d(-1, 0),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(-1, 0),
+                                Rotation2d.kZero),
                         DirectionSE2.MINUS_Y),
                 magicNumber, magicNumber);
         HolonomicSpline s2 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(-1, 0),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(-1, 0),
+                                Rotation2d.kZero),
                         DirectionSE2.MINUS_Y),
-                new HolonomicPose2d(
-                        new Translation2d(0, -1),
-                        Rotation2d.kCCW_90deg,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, -1),
+                                Rotation2d.kCCW_90deg),
                         DirectionSE2.TO_X),
                 magicNumber, magicNumber);
         HolonomicSpline s3 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(0, -1),
-                        Rotation2d.kCCW_90deg,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, -1),
+                                Rotation2d.kCCW_90deg),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        Rotation2d.k180deg,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                Rotation2d.k180deg),
                         DirectionSE2.TO_Y),
                 magicNumber, magicNumber);
         List<HolonomicSpline> splines = new ArrayList<>();
@@ -263,24 +279,28 @@ class HolonomicSplineTest implements Timeless {
         double magicNumber = 1.0;
         // turn a bit to the left
         HolonomicSpline s0 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(0, 0),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, 0),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        new Rotation2d(1),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d(1)),
                         DirectionSE2.TO_X),
                 magicNumber, magicNumber);
         // turn much more to the left
         HolonomicSpline s1 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        new Rotation2d(1),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d(1)),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(2, 0),
-                        Rotation2d.k180deg,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(2, 0),
+                                Rotation2d.k180deg),
                         DirectionSE2.TO_X),
                 magicNumber, magicNumber);
         List<HolonomicSpline> splines = new ArrayList<>();
@@ -327,25 +347,29 @@ class HolonomicSplineTest implements Timeless {
         // this goes straight ahead to (1,0)
         // derivatives point straight ahead
         HolonomicSpline s0 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(0, 0),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, 0),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_X),
                 magicNumber, magicNumber);
         // this is a sharp turn to the left
         // derivatives point to the left
         HolonomicSpline s1 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_Y),
-                new HolonomicPose2d(
-                        new Translation2d(1, 1),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 1),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_Y),
                 magicNumber, magicNumber);
         List<HolonomicSpline> splines = new ArrayList<>();
@@ -405,13 +429,15 @@ class HolonomicSplineTest implements Timeless {
 
         // radius is 1 m.
         HolonomicSpline s0 = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(0, -1),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, -1),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        Rotation2d.kZero,
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                Rotation2d.kZero),
                         DirectionSE2.TO_Y),
                 1.2, 1.2);
         if (DEBUG) {

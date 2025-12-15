@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.prr.AnalyticalJacobian;
 import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
@@ -62,7 +62,7 @@ public class MechTrajectories extends Command {
     }
 
     /** A command that goes from the start to the end and then finishes. */
-    public Command terminal(String name, HolonomicPose2d start, HolonomicPose2d end) {
+    public Command terminal(String name, Pose2dWithDirection start, Pose2dWithDirection end) {
 
         /** Use the start course and ignore the start pose for now */
         MoveAndHold f = new GoToPosePosition(
@@ -73,7 +73,7 @@ public class MechTrajectories extends Command {
     }
 
     /** A command that goes from the start to the end and then waits forever. */
-    public MoveAndHold endless(String name, HolonomicPose2d start, HolonomicPose2d end) {
+    public MoveAndHold endless(String name, Pose2dWithDirection start, Pose2dWithDirection end) {
 
         /** Use the start course and ignore the start pose for now */
         GoToPosePosition c = new GoToPosePosition(

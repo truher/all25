@@ -3,9 +3,9 @@ package org.team100.lib.trajectory.path.spline;
 import java.util.Optional;
 
 import org.team100.lib.geometry.DirectionR3;
+import org.team100.lib.geometry.DirectionSE3;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose3d;
-import org.team100.lib.geometry.Pose3dWithMotion;
+import org.team100.lib.geometry.Pose3dWithDirection;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,16 +42,16 @@ public class HolonomicSpline3d {
     private final Rotation2d m_pitch0;
     private final Rotation2d m_yaw0;
 
-    public HolonomicSpline3d(HolonomicPose3d p0, HolonomicPose3d p1) {
+    public HolonomicSpline3d(Pose3dWithDirection p0, Pose3dWithDirection p1) {
         this(p0, p1, 1.2, 1.2);
     }
 
-    public HolonomicSpline3d(HolonomicPose3d p0, HolonomicPose3d p1, double mN0, double mN1) {
+    public HolonomicSpline3d(Pose3dWithDirection p0, Pose3dWithDirection p1, double mN0, double mN1) {
         double scale0 = mN0 * GeometryUtil.distanceM(p0.translation(), p1.translation());
         double scale1 = mN1 * GeometryUtil.distanceM(p0.translation(), p1.translation());
 
-        DirectionR3 course0 = p0.course();
-        DirectionR3 course1 = p1.course();
+        DirectionSE3 course0 = p0.course();
+        DirectionSE3 course1 = p1.course();
 
         double x0 = p0.translation().getX();
         double x1 = p1.translation().getX();
@@ -142,14 +142,14 @@ public class HolonomicSpline3d {
     }
 
     // public Pose3dWithMotion getPose3dWithMotion(double p) {
-    //     return new Pose3dWithMotion(
-    //             new HolonomicPose3d(
-    //                     getPoint(p),
-    //                     getHeading(p),
-    //                     getCourse(p).orElseThrow()),
-    //             getDHeadingDs(p),
-    //             getCurvature(p),
-    //             getDCurvatureDs(p));
+    // return new Pose3dWithMotion(
+    // new HolonomicPose3d(
+    // getPoint(p),
+    // getHeading(p),
+    // getCourse(p).orElseThrow()),
+    // getDHeadingDs(p),
+    // getCurvature(p),
+    // getDCurvatureDs(p));
     // }
 
     public Optional<DirectionR3> getCourse(double t) {

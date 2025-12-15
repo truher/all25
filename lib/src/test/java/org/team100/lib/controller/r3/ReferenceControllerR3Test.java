@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -130,18 +130,21 @@ public class ReferenceControllerR3Test implements Timeless {
 
     @Test
     void testFieldRelativeTrajectory() {
-        List<HolonomicPose2d> waypoints = new ArrayList<>();
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(),
-                Rotation2d.fromDegrees(180),
+        List<Pose2dWithDirection> waypoints = new ArrayList<>();
+        waypoints.add(new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(),
+                        Rotation2d.fromDegrees(180)),
                 DirectionSE2.TO_X));
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(100, 4),
-                Rotation2d.fromDegrees(180),
+        waypoints.add(new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 4),
+                        Rotation2d.fromDegrees(180)),
                 DirectionSE2.TO_X));
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(196, 13),
-                Rotation2d.fromDegrees(0),
+        waypoints.add(new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(196, 13),
+                        Rotation2d.fromDegrees(0)),
                 DirectionSE2.TO_X));
 
         double start_vel = 0.0;

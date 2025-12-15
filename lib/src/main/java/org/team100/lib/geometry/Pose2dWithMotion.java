@@ -6,15 +6,15 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * HolonomicPose2d with:
+ * Pose2dWithDirection with:
  * 
  * * the spatial rate of change in heading
  * * the spatial rate of change in course
  * * the spatial rate of change in course curvature
  */
 public class Pose2dWithMotion {
-    /** Position, heading and course. */
-    private final HolonomicPose2d m_pose;
+    /** Pose and course. */
+    private final Pose2dWithDirection m_pose;
     /** Change in heading per meter of motion, rad/m. */
     private final double m_headingRate;
     /** Change in course per change in distance, rad/m. */
@@ -30,7 +30,7 @@ public class Pose2dWithMotion {
      * @param dCurvatureDsRad_M2 acceleration in course per meter traveled squared.
      */
     public Pose2dWithMotion(
-            HolonomicPose2d pose,
+            Pose2dWithDirection pose,
             double headingRate,
             double curvatureRad_M,
             double dCurvatureDsRad_M2) {
@@ -40,7 +40,7 @@ public class Pose2dWithMotion {
         m_dCurvatureDsRad_M2 = dCurvatureDsRad_M2;
     }
 
-    public HolonomicPose2d getPose() {
+    public Pose2dWithDirection getPose() {
         return m_pose;
     }
 

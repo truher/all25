@@ -2,7 +2,7 @@ package org.team100.lib.visualization;
 
 import java.util.List;
 
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
@@ -32,7 +32,7 @@ public class TrajectoryVisualization {
         double[] arr = new double[m_trajectory.length() * 3];
         int ndx = 0;
         for (TimedPose p : m_trajectory.getPoints()) {
-            HolonomicPose2d pose = p.state().getPose();
+            Pose2dWithDirection pose = p.state().getPose();
             arr[ndx + 0] = pose.translation().getX();
             arr[ndx + 1] = pose.translation().getY();
             arr[ndx + 2] = pose.heading().getDegrees();

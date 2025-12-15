@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
@@ -32,13 +32,13 @@ class Path100Test {
 
     private static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
             new Pose2dWithMotion(
-                    HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
+                    Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
             new Pose2dWithMotion(
-                    HolonomicPose2d.make(24, 0, Math.toRadians(30), 0), 0, 0, 0),
+                    Pose2dWithDirection.make(24, 0, Math.toRadians(30), 0), 0, 0, 0),
             new Pose2dWithMotion(
-                    HolonomicPose2d.make(36, 12, Math.toRadians(60), 0), 0, 0, 0),
+                    Pose2dWithDirection.make(36, 12, Math.toRadians(60), 0), 0, 0, 0),
             new Pose2dWithMotion(
-                    HolonomicPose2d.make(60, 12, Math.toRadians(90), 0), 0, 0, 0));
+                    Pose2dWithDirection.make(60, 12, Math.toRadians(90), 0), 0, 0, 0));
 
     @Test
     void testEmpty() {
@@ -54,13 +54,15 @@ class Path100Test {
     void testSimple() {
         // spline is in the x direction, no curvature.
         HolonomicSpline spline = new HolonomicSpline(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        new Rotation2d(),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 0),
-                        new Rotation2d(),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d()),
                         DirectionSE2.TO_X)) {
 
             @Override
@@ -137,19 +139,19 @@ class Path100Test {
     void test() throws TimingException {
         List<Pose2dWithMotion> waypoints = Arrays.asList(
                 new Pose2dWithMotion(
-                        HolonomicPose2d.make(0.0, 0.0, Math.toRadians(0), 0),
+                        Pose2dWithDirection.make(0.0, 0.0, Math.toRadians(0), 0),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        HolonomicPose2d.make(24.0, 0.0, Math.toRadians(30), 0),
+                        Pose2dWithDirection.make(24.0, 0.0, Math.toRadians(30), 0),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        HolonomicPose2d.make(36.0, 0.0, Math.toRadians(60), Math.PI / 2),
+                        Pose2dWithDirection.make(36.0, 0.0, Math.toRadians(60), Math.PI / 2),
                         1e6, 0, 0),
                 new Pose2dWithMotion(
-                        HolonomicPose2d.make(36.0, 24.0, Math.toRadians(60), 0),
+                        Pose2dWithDirection.make(36.0, 24.0, Math.toRadians(60), 0),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        HolonomicPose2d.make(60.0, 24.0, Math.toRadians(180), 0),
+                        Pose2dWithDirection.make(60.0, 24.0, Math.toRadians(180), 0),
                         0.1, 0, 0));
 
         // Create the reference trajectory (straight line motion between waypoints).

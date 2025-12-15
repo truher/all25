@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
@@ -102,11 +102,11 @@ public class TrajectoryPlanner {
                 initial.plus(new Transform2d(1, 0, Rotation2d.kZero)));
     }
 
-    public Trajectory100 restToRest(List<HolonomicPose2d> waypoints) {
+    public Trajectory100 restToRest(List<Pose2dWithDirection> waypoints) {
         return generateTrajectory(waypoints, 0.0, 0.0);
     }
 
-    public Trajectory100 restToRest(List<HolonomicPose2d> waypoints, List<Double> mN) {
+    public Trajectory100 restToRest(List<Pose2dWithDirection> waypoints, List<Double> mN) {
         return generateTrajectory(waypoints, 0.0, 0.0, mN);
     }
 
@@ -138,13 +138,11 @@ public class TrajectoryPlanner {
         try {
             return generateTrajectory(
                     List.of(
-                            new HolonomicPose2d(
-                                    startTranslation,
-                                    startState.rotation(),
+                            new Pose2dWithDirection(
+                                    startState.pose(),
                                     DirectionSE2.fromRotation(startingAngle)),
-                            new HolonomicPose2d(
-                                    endTranslation,
-                                    endState.rotation(),
+                            new Pose2dWithDirection(
+                                    endState.pose(),
                                     DirectionSE2.fromRotation(courseToGoal))),
                     startVelocity.norm(),
                     endVelocity.norm(),
@@ -178,13 +176,11 @@ public class TrajectoryPlanner {
         try {
             return generateTrajectory(
                     List.of(
-                            new HolonomicPose2d(
-                                    startTranslation,
-                                    startState.rotation(),
+                            new Pose2dWithDirection(
+                                    startState.pose(),
                                     DirectionSE2.fromRotation(startCourse)),
-                            new HolonomicPose2d(
-                                    endTranslation,
-                                    endState.rotation(),
+                            new Pose2dWithDirection(
+                                    endState.pose(),
                                     DirectionSE2.fromRotation(endCourse))),
                     splineEntranceVelocity,
                     splineExitVelocity,
@@ -213,13 +209,11 @@ public class TrajectoryPlanner {
         try {
             return restToRest(
                     List.of(
-                            new HolonomicPose2d(
-                                    startTranslation,
-                                    start.getRotation(),
+                            new Pose2dWithDirection(
+                                    start,
                                     DirectionSE2.fromRotation(courseToGoal)),
-                            new HolonomicPose2d(
-                                    endTranslation,
-                                    end.getRotation(),
+                            new Pose2dWithDirection(
+                                    end,
                                     DirectionSE2.fromRotation(courseToGoal))));
         } catch (TrajectoryGenerationException e) {
             return null;
@@ -230,7 +224,7 @@ public class TrajectoryPlanner {
      * The shape of the spline accommodates the start and end velocities.
      */
     public Trajectory100 generateTrajectory(
-            List<HolonomicPose2d> waypoints,
+            List<Pose2dWithDirection> waypoints,
             double start_vel,
             double end_vel) {
         try {
@@ -257,7 +251,7 @@ public class TrajectoryPlanner {
     }
 
     public Trajectory100 generateTrajectory(
-            List<HolonomicPose2d> waypoints,
+            List<Pose2dWithDirection> waypoints,
             double start_vel,
             double end_vel,
             List<Double> mN) {

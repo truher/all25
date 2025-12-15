@@ -3,7 +3,7 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -18,7 +18,7 @@ public class ConstantConstraintTest implements Timeless {
     void testVelocity() {
         ConstantConstraint c = new ConstantConstraint(logger, 2, 3);
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0);
+                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0);
         assertEquals(2, c.getMaxVelocity(state).getValue(), DELTA);
     }
 
@@ -26,7 +26,7 @@ public class ConstantConstraintTest implements Timeless {
     void testAccel() {
         ConstantConstraint c = new ConstantConstraint(logger, 2, 3);
         Pose2dWithMotion state = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0);
+                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0);
         assertEquals(-3, c.getMinMaxAcceleration(state, 1).getMinAccel(), DELTA);
         assertEquals(3, c.getMinMaxAcceleration(state, 1).getMaxAccel(), DELTA);
 

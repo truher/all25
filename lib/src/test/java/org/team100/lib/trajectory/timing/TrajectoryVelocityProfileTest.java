@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -31,8 +31,8 @@ public class TrajectoryVelocityProfileTest implements Timeless {
 
     // A five-meter straight line.
     public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
-            new Pose2dWithMotion(HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(HolonomicPose2d.make(5, 0, 0, 0), 0, 0, 0));
+            new Pose2dWithMotion(Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
+            new Pose2dWithMotion(Pose2dWithDirection.make(5, 0, 0, 0), 0, 0, 0));
 
     // No rotation.
     public static final List<Rotation2d> HEADINGS = List.of(

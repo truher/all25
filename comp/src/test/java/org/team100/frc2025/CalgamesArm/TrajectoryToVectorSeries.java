@@ -1,7 +1,7 @@
 package org.team100.frc2025.CalgamesArm;
 
 import org.jfree.data.xy.VectorSeries;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.timing.TimedPose;
 
@@ -24,7 +24,7 @@ public class TrajectoryToVectorSeries {
         double duration = t.duration();
         for (double time = 0; time < duration; time += DT) {
             TimedPose p = t.sample(time);
-            HolonomicPose2d pp = p.state().getPose();
+            Pose2dWithDirection pp = p.state().getPose();
             double x = pp.translation().getX();
             double y = pp.translation().getY();
             Rotation2d heading = pp.heading();
@@ -41,7 +41,7 @@ public class TrajectoryToVectorSeries {
         double duration = t.duration();
         for (double time = 0; time < duration; time += DT) {
             TimedPose p = t.sample(time);
-            HolonomicPose2d pp = p.state().getPose();
+            Pose2dWithDirection pp = p.state().getPose();
             double y = pp.translation().getX();
             double x = -pp.translation().getY();
             Rotation2d heading = pp.heading();

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.util.Math100;
 
@@ -48,7 +48,7 @@ public class HolonomicSpline {
      * You'll probably want to call SplineUtil.forceC1() and
      * SplineUtil.optimizeSpline() after creating these segments.
      */
-    public HolonomicSpline(HolonomicPose2d p0, HolonomicPose2d p1) {
+    public HolonomicSpline(Pose2dWithDirection p0, Pose2dWithDirection p1) {
         this(p0, p1, 1.2, 1.2);
     }
 
@@ -73,7 +73,7 @@ public class HolonomicSpline {
      * @param mN0 starting magic number
      * @param mN1 ending magic number
      */
-    public HolonomicSpline(HolonomicPose2d p0, HolonomicPose2d p1, double mN0, double mN1) {
+    public HolonomicSpline(Pose2dWithDirection p0, Pose2dWithDirection p1, double mN0, double mN1) {
         double scale0 = mN0 * GeometryUtil.distanceM(p0.translation(), p1.translation());
         double scale1 = mN1 * GeometryUtil.distanceM(p0.translation(), p1.translation());
         if (DEBUG) {
@@ -145,9 +145,8 @@ public class HolonomicSpline {
 
     public Pose2dWithMotion getPose2dWithMotion(double p) {
         return new Pose2dWithMotion(
-                new HolonomicPose2d(
-                        getPoint(p),
-                        getHeading(p),
+                new Pose2dWithDirection(
+                        new Pose2d(getPoint(p), getHeading(p)),
                         DirectionSE2.fromRotation(getCourse(p).orElseThrow())),
                 getDHeadingDs(p),
                 getCurvature(p),

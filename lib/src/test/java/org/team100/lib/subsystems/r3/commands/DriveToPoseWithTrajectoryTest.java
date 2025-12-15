@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.logging.LoggerFactory;
@@ -57,7 +57,7 @@ class DriveToPoseWithTrajectoryTest implements Timeless {
                         List.of(
                                 new TimedPose(
                                         new Pose2dWithMotion(
-                                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
+                                                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
                                         0, 0, 0))),
                 controller,
                 viz);

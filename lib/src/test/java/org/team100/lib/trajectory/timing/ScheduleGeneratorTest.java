@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -25,6 +25,7 @@ import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -35,10 +36,10 @@ public class ScheduleGeneratorTest {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
-            new Pose2dWithMotion(HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(HolonomicPose2d.make(24.0, 0.0, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(HolonomicPose2d.make(36, 12, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(HolonomicPose2d.make(60, 12, 0, 0), 0, 0, 0));
+            new Pose2dWithMotion(Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
+            new Pose2dWithMotion(Pose2dWithDirection.make(24.0, 0.0, 0, 0), 0, 0, 0),
+            new Pose2dWithMotion(Pose2dWithDirection.make(36, 12, 0, 0), 0, 0, 0),
+            new Pose2dWithMotion(Pose2dWithDirection.make(60, 12, 0, 0), 0, 0, 0));
 
     public static final List<Rotation2d> HEADINGS = List.of(
             GeometryUtil.fromDegrees(0),
@@ -104,8 +105,8 @@ public class ScheduleGeneratorTest {
     @Test
     void testJustTurningInPlace() {
         Path100 path = new Path100(Arrays.asList(
-                new Pose2dWithMotion(HolonomicPose2d.make(0, 0, 0, 0), 1, 0, 0),
-                new Pose2dWithMotion(HolonomicPose2d.make(0, 0, Math.PI, 0), 1, 0, 0)));
+                new Pose2dWithMotion(Pose2dWithDirection.make(0, 0, 0, 0), 1, 0, 0),
+                new Pose2dWithMotion(Pose2dWithDirection.make(0, 0, Math.PI, 0), 1, 0, 0)));
 
         // Triangle profile.
         assertThrows(IllegalArgumentException.class,
@@ -265,14 +266,16 @@ public class ScheduleGeneratorTest {
      */
     @Test
     void testPerformance() {
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(
-                        new Translation2d(),
-                        new Rotation2d(),
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
                         DirectionSE2.TO_X),
-                new HolonomicPose2d(
-                        new Translation2d(1, 1),
-                        new Rotation2d(),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 1),
+                                new Rotation2d()),
                         DirectionSE2.TO_Y));
         long startTimeNs = System.nanoTime();
         final int iterations = 100;

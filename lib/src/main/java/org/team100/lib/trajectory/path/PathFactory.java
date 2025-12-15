@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.path.spline.SplineUtil;
@@ -18,7 +18,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 public class PathFactory {
 
     public static Path100 pathFromWaypoints(
-            List<HolonomicPose2d> waypoints,
+            List<Pose2dWithDirection> waypoints,
             double maxDx,
             double maxDy,
             double maxDTheta,
@@ -39,7 +39,7 @@ public class PathFactory {
     }
 
     public static Path100 pathFromWaypoints(
-            List<HolonomicPose2d> waypoints,
+            List<Pose2dWithDirection> waypoints,
             double maxDx,
             double maxDy,
             double maxDTheta) {
@@ -65,15 +65,15 @@ public class PathFactory {
         List<HolonomicSpline> splines = new ArrayList<>(waypoints.size() - 1);
         // first make a series of straight lines, with corners at the waypoints
         for (int i = 1; i < waypoints.size(); ++i) {
-            Translation2d p0 = waypoints.get(i - 1).getTranslation();
-            Translation2d p1 = waypoints.get(i).getTranslation();
-            Rotation2d course = p1.minus(p0).getAngle();
+            Pose2d pose0 = waypoints.get(i - 1);
+            Pose2d pose1 = waypoints.get(i);
+            Rotation2d course = pose1.getTranslation().minus(pose0.getTranslation()).getAngle();
             splines.add(new HolonomicSpline(
-                    new HolonomicPose2d(
-                            p0, waypoints.get(i - 1).getRotation(),
+                    new Pose2dWithDirection(
+                            pose0,
                             DirectionSE2.fromRotation(course)),
-                    new HolonomicPose2d(
-                            p1, waypoints.get(i).getRotation(),
+                    new Pose2dWithDirection(
+                            pose1,
                             DirectionSE2.fromRotation(course))));
         }
         // then adjust the control points to make it C1 smooth

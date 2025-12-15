@@ -1,7 +1,6 @@
 package org.team100.lib.geometry;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 
 /**
  * A direction (i.e. unit-length vector) in the SE2 manifold,

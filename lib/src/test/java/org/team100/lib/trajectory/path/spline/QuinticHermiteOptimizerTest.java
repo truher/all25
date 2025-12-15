@@ -8,8 +8,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -18,17 +19,20 @@ class QuinticHermiteOptimizerTest {
 
     @Test
     void test() {
-        HolonomicPose2d a = new HolonomicPose2d(
-                new Translation2d(0, 100),
-                new Rotation2d(),
+        Pose2dWithDirection a = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 100),
+                        new Rotation2d()),
                 DirectionSE2.MINUS_Y);
-        HolonomicPose2d b = new HolonomicPose2d(
-                new Translation2d(50, 0),
-                new Rotation2d(),
+        Pose2dWithDirection b = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(50, 0),
+                        new Rotation2d()),
                 DirectionSE2.TO_X);
-        HolonomicPose2d c = new HolonomicPose2d(
-                new Translation2d(100, 100),
-                new Rotation2d(),
+        Pose2dWithDirection c = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 100),
+                        new Rotation2d()),
                 DirectionSE2.TO_Y);
 
         List<HolonomicSpline> splines = new ArrayList<>();
@@ -37,21 +41,25 @@ class QuinticHermiteOptimizerTest {
 
         assertTrue(SplineUtil.optimizeSpline(splines) < 0.014);
 
-        HolonomicPose2d d = new HolonomicPose2d(
-                new Translation2d(0, 0),
-                new Rotation2d(),
+        Pose2dWithDirection d = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 0),
+                        new Rotation2d()),
                 DirectionSE2.TO_Y);
-        HolonomicPose2d e = new HolonomicPose2d(
-                new Translation2d(0, 50),
-                new Rotation2d(),
+        Pose2dWithDirection e = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 50),
+                        new Rotation2d()),
                 DirectionSE2.TO_X);
-        HolonomicPose2d f = new HolonomicPose2d(
-                new Translation2d(100, 50),
-                new Rotation2d(),
+        Pose2dWithDirection f = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 50),
+                        new Rotation2d()),
                 DirectionSE2.MINUS_Y);
-        HolonomicPose2d g = new HolonomicPose2d(
-                new Translation2d(100, 0),
-                new Rotation2d(),
+        Pose2dWithDirection g = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 0),
+                        new Rotation2d()),
                 DirectionSE2.MINUS_X);
 
         List<HolonomicSpline> splines1 = new ArrayList<>();
@@ -61,25 +69,30 @@ class QuinticHermiteOptimizerTest {
 
         assertEquals(0.54, SplineUtil.optimizeSpline(splines1), 0.01);
 
-        HolonomicPose2d h = new HolonomicPose2d(
-                new Translation2d(0, 0),
-                new Rotation2d(),
+        Pose2dWithDirection h = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 0),
+                        new Rotation2d()),
                 DirectionSE2.TO_X);
-        HolonomicPose2d i = new HolonomicPose2d(
-                new Translation2d(50, 0),
-                new Rotation2d(),
+        Pose2dWithDirection i = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(50, 0),
+                        new Rotation2d()),
                 DirectionSE2.TO_X);
-        HolonomicPose2d j = new HolonomicPose2d(
-                new Translation2d(100, 50),
-                new Rotation2d(),
+        Pose2dWithDirection j = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 50),
+                        new Rotation2d()),
                 new DirectionSE2(1, 1, 0));
-        HolonomicPose2d k = new HolonomicPose2d(
-                new Translation2d(150, 0),
-                new Rotation2d(),
+        Pose2dWithDirection k = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(150, 0),
+                        new Rotation2d()),
                 DirectionSE2.MINUS_Y);
-        HolonomicPose2d l = new HolonomicPose2d(
-                new Translation2d(150, -50),
-                new Rotation2d(),
+        Pose2dWithDirection l = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(150, -50),
+                        new Rotation2d()),
                 DirectionSE2.MINUS_Y);
 
         List<HolonomicSpline> splines2 = new ArrayList<>();
@@ -95,17 +108,20 @@ class QuinticHermiteOptimizerTest {
 
     @Test
     void testHolonomic() {
-        HolonomicPose2d a = new HolonomicPose2d(
-                new Translation2d(0, 100),
-                new Rotation2d(),
+        Pose2dWithDirection a = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 100),
+                        new Rotation2d()),
                 DirectionSE2.MINUS_Y);
-        HolonomicPose2d b = new HolonomicPose2d(
-                new Translation2d(50, 0),
-                new Rotation2d(Math.PI / 2),
+        Pose2dWithDirection b = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(50, 0),
+                        new Rotation2d(Math.PI / 2)),
                 DirectionSE2.TO_X);
-        HolonomicPose2d c = new HolonomicPose2d(
-                new Translation2d(100, 100),
-                new Rotation2d(Math.PI),
+        Pose2dWithDirection c = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 100),
+                        new Rotation2d(Math.PI)),
                 DirectionSE2.TO_Y);
 
         List<HolonomicSpline> splines = new ArrayList<>();
@@ -114,21 +130,25 @@ class QuinticHermiteOptimizerTest {
 
         assertTrue(SplineUtil.optimizeSpline(splines) < 0.014);
 
-        HolonomicPose2d d = new HolonomicPose2d(
-                new Translation2d(0, 0),
-                new Rotation2d(),
+        Pose2dWithDirection d = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 0),
+                        new Rotation2d()),
                 DirectionSE2.TO_Y);
-        HolonomicPose2d e = new HolonomicPose2d(
-                new Translation2d(0, 50),
-                new Rotation2d(Math.PI / 2),
+        Pose2dWithDirection e = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 50),
+                        new Rotation2d(Math.PI / 2)),
                 DirectionSE2.TO_X);
-        HolonomicPose2d f = new HolonomicPose2d(
-                new Translation2d(100, 50),
-                new Rotation2d(Math.PI),
+        Pose2dWithDirection f = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 50),
+                        new Rotation2d(Math.PI)),
                 DirectionSE2.MINUS_Y);
-        HolonomicPose2d g = new HolonomicPose2d(
-                new Translation2d(100, 0),
-                new Rotation2d(),
+        Pose2dWithDirection g = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 0),
+                        new Rotation2d()),
                 DirectionSE2.MINUS_X);
 
         List<HolonomicSpline> splines1 = new ArrayList<>();
@@ -138,25 +158,30 @@ class QuinticHermiteOptimizerTest {
 
         assertEquals(0.54, SplineUtil.optimizeSpline(splines1), 0.01);
 
-        HolonomicPose2d h = new HolonomicPose2d(
-                new Translation2d(0, 0),
-                new Rotation2d(),
+        Pose2dWithDirection h = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 0),
+                        new Rotation2d()),
                 DirectionSE2.TO_X);
-        HolonomicPose2d i = new HolonomicPose2d(
-                new Translation2d(50, 0),
-                new Rotation2d(Math.PI / 2),
+        Pose2dWithDirection i = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(50, 0),
+                        new Rotation2d(Math.PI / 2)),
                 DirectionSE2.TO_X);
-        HolonomicPose2d j = new HolonomicPose2d(
-                new Translation2d(100, 50),
-                new Rotation2d(Math.PI),
+        Pose2dWithDirection j = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(100, 50),
+                        new Rotation2d(Math.PI)),
                 new DirectionSE2(1, 1, 0));
-        HolonomicPose2d k = new HolonomicPose2d(
-                new Translation2d(150, 0),
-                new Rotation2d(),
+        Pose2dWithDirection k = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(150, 0),
+                        new Rotation2d()),
                 DirectionSE2.MINUS_Y);
-        HolonomicPose2d l = new HolonomicPose2d(
-                new Translation2d(150, -50),
-                new Rotation2d(Math.PI / 2),
+        Pose2dWithDirection l = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(150, -50),
+                        new Rotation2d(Math.PI / 2)),
                 DirectionSE2.MINUS_Y);
 
         List<HolonomicSpline> splines2 = new ArrayList<>();
