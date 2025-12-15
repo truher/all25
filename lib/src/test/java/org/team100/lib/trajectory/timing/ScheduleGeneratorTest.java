@@ -36,10 +36,14 @@ public class ScheduleGeneratorTest {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
-            new Pose2dWithMotion(Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(Pose2dWithDirection.make(24.0, 0.0, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(Pose2dWithDirection.make(36, 12, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(Pose2dWithDirection.make(60, 12, 0, 0), 0, 0, 0));
+            new Pose2dWithMotion(Pose2dWithDirection.make(
+                    new Pose2d(0, 0, new Rotation2d(0)), 0), 0, 0, 0),
+            new Pose2dWithMotion(Pose2dWithDirection.make(
+                    new Pose2d(24.0, 0.0, new Rotation2d(0)), 0), 0, 0, 0),
+            new Pose2dWithMotion(Pose2dWithDirection.make(
+                    new Pose2d(36, 12, new Rotation2d(0)), 0), 0, 0, 0),
+            new Pose2dWithMotion(Pose2dWithDirection.make(
+                    new Pose2d(60, 12, new Rotation2d(0)), 0), 0, 0, 0));
 
     public static final List<Rotation2d> HEADINGS = List.of(
             GeometryUtil.fromDegrees(0),
@@ -105,8 +109,10 @@ public class ScheduleGeneratorTest {
     @Test
     void testJustTurningInPlace() {
         Path100 path = new Path100(Arrays.asList(
-                new Pose2dWithMotion(Pose2dWithDirection.make(0, 0, 0, 0), 1, 0, 0),
-                new Pose2dWithMotion(Pose2dWithDirection.make(0, 0, Math.PI, 0), 1, 0, 0)));
+                new Pose2dWithMotion(Pose2dWithDirection.make(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0), 1, 0, 0),
+                new Pose2dWithMotion(Pose2dWithDirection.make(
+                        new Pose2d(0, 0, new Rotation2d(Math.PI)), 0), 1, 0, 0)));
 
         // Triangle profile.
         assertThrows(IllegalArgumentException.class,

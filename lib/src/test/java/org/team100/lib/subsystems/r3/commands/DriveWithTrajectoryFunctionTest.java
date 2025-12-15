@@ -20,6 +20,7 @@ import org.team100.lib.trajectory.timing.YawRateConstraint;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -47,7 +48,8 @@ public class DriveWithTrajectoryFunctionTest implements Timeless {
         return planner.restToRest(
                 List.of(
                         Pose2dWithDirection.make(startingPose, 0),
-                        Pose2dWithDirection.make(1, 2, Math.PI / 2, Math.PI / 2)));
+                        Pose2dWithDirection.make(
+                                new Pose2d(1, 2, new Rotation2d(Math.PI / 2)), Math.PI / 2)));
     }
 
     @Test

@@ -1,6 +1,5 @@
 package org.team100.frc2025;
 
-import org.team100.lib.subsystems.shooter.IndexerServo;
 import org.team100.lib.subsystems.shooter.SingleDrumShooter;
 
 import edu.wpi.first.wpilibj2.command.Command;

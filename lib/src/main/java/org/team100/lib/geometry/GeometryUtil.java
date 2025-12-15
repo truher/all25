@@ -208,9 +208,11 @@ public class GeometryUtil {
     public static Pose2dWithDirection interpolate(Pose2dWithDirection a, Pose2dWithDirection b, double x) {
         return new Pose2dWithDirection(
                 interpolate(a.pose(), b.pose(), x),
-                DirectionSE2.fromRotation(interpolate2(
-                        a.course().toRotation(),
-                        b.course().toRotation(), x)));
+                DirectionSE2.fromDirections(
+                        DirectionR2.fromRotation(interpolate2(
+                                a.course().toRotation(),
+                                b.course().toRotation(), x)),
+                        0));
     }
 
     /**

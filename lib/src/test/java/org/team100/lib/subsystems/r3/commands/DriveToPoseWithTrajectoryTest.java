@@ -57,7 +57,9 @@ class DriveToPoseWithTrajectoryTest implements Timeless {
                         List.of(
                                 new TimedPose(
                                         new Pose2dWithMotion(
-                                                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
+                                                Pose2dWithDirection.make(
+                                                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                                                0, 0, 0),
                                         0, 0, 0))),
                 controller,
                 viz);

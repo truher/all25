@@ -3,6 +3,7 @@ package org.team100.lib.subsystems.r3.commands;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
+import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
@@ -43,9 +44,10 @@ public class GoToPosePosition extends MoveAndHold {
 
     @Override
     public void initialize() {
-        Pose2dWithDirection m_currentPose = Pose2dWithDirection.make(
+        Pose2dWithDirection m_currentPose = new Pose2dWithDirection(
                 m_subsystem.getState().pose(),
-                DirectionSE2.fromRotation(m_course));
+                DirectionSE2.fromDirections(
+                        DirectionR2.fromRotation(m_course), 0));
         Trajectory100 m_trajectory = m_trajectoryPlanner.restToRest(
                 List.of(m_currentPose, m_goal));
         m_referenceController = new PositionReferenceControllerR3(

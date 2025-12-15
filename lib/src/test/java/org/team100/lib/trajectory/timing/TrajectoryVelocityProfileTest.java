@@ -17,6 +17,7 @@ import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.Path100;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
@@ -31,8 +32,10 @@ public class TrajectoryVelocityProfileTest implements Timeless {
 
     // A five-meter straight line.
     public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
-            new Pose2dWithMotion(Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(Pose2dWithDirection.make(5, 0, 0, 0), 0, 0, 0));
+            new Pose2dWithMotion(Pose2dWithDirection.make(
+                    new Pose2d(0, 0, new Rotation2d(0)), 0), 0, 0, 0),
+            new Pose2dWithMotion(Pose2dWithDirection.make(
+                    new Pose2d(5, 0, new Rotation2d(0)), 0), 0, 0, 0));
 
     // No rotation.
     public static final List<Rotation2d> HEADINGS = List.of(

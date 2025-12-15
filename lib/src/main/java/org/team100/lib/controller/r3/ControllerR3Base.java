@@ -8,8 +8,8 @@ import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.ControlR3Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.GlobaDeltaR3Logger;
-import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 

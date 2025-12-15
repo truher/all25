@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.AccelerationSE2;
-import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -22,6 +22,7 @@ import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /** How do the joints respond to trajectories? */
 public class TrajectoryJointTest {
@@ -49,8 +50,10 @@ public class TrajectoryJointTest {
         TrajectoryPlanner m_planner = new TrajectoryPlanner(c);
 
         Trajectory100 t = m_planner.restToRest(List.of(
-                Pose2dWithDirection.make(1, 0, 0, 0),
-                Pose2dWithDirection.make(1.9, 0.5, 2.5, 2)));
+                Pose2dWithDirection.make(
+                        new Pose2d(1, 0, new Rotation2d(0)), 0),
+                Pose2dWithDirection.make(
+                        new Pose2d(1.9, 0.5, new Rotation2d(2.5)), 2)));
 
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(
                 0.5, 0.3);

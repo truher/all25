@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 class VelocityLimitRegionConstraintTest {
@@ -17,7 +19,8 @@ class VelocityLimitRegionConstraintTest {
         VelocityLimitRegionConstraint c = new VelocityLimitRegionConstraint(
                 new Translation2d(), new Translation2d(1, 1), 1);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                Pose2dWithDirection.make(-1, -1, 0, 0),
+                Pose2dWithDirection.make(
+                        new Pose2d(-1, -1, new Rotation2d(0)), 0),
                 0, // spatial, so rad/m
                 0, 0);
         assertEquals(Double.NEGATIVE_INFINITY, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
@@ -31,7 +34,8 @@ class VelocityLimitRegionConstraintTest {
         VelocityLimitRegionConstraint c = new VelocityLimitRegionConstraint(
                 new Translation2d(), new Translation2d(1, 1), 1);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                Pose2dWithDirection.make(0.5, 0.5, 0, 0),
+                Pose2dWithDirection.make(
+                        new Pose2d(0.5, 0.5, new Rotation2d(0)), 0),
                 0, // spatial, so rad/m
                 0, 0);
         assertEquals(Double.NEGATIVE_INFINITY, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);

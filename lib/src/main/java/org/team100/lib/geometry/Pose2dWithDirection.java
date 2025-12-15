@@ -25,29 +25,11 @@ public record Pose2dWithDirection(
         return pose.getRotation();
     }
 
-    public static Pose2dWithDirection make(Pose2d p, DirectionSE2 course) {
-        return new Pose2dWithDirection(p, course);
-    }
-
     /** Course without rotation */
     public static Pose2dWithDirection make(Pose2d p, double course) {
         return new Pose2dWithDirection(
                 p,
                 new DirectionSE2(Math.cos(course), Math.sin(course), 0));
-    }
-
-    /** Course without rotation */
-    public static Pose2dWithDirection make(double x, double y, double heading, double course) {
-        return new Pose2dWithDirection(
-                new Pose2d(new Translation2d(x, y), new Rotation2d(heading)),
-                new DirectionSE2(Math.cos(course), Math.sin(course), 0));
-    }
-
-    /** For tank drive, heading and course are the same. */
-    public static Pose2dWithDirection tank(double x, double y, double heading) {
-        return new Pose2dWithDirection(
-                new Pose2d(new Translation2d(x, y), new Rotation2d(heading)),
-                new DirectionSE2(Math.cos(heading), Math.sin(heading), 0));
     }
 
     /**

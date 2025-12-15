@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+
 class TimedStateTest {
     private static final double EPSILON = 1e-12;
 
@@ -14,13 +17,17 @@ class TimedStateTest {
         // At (0,0,0), t=0, v=0, acceleration=1
         TimedPose start_state = new TimedPose(
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
+                        Pose2dWithDirection.make(
+                                new Pose2d(0, 0, new Rotation2d(0)), 0),
+                        0, 0, 0),
                 0.0, 0.0, 1.0);
 
         // At (.5,0,0), t=1, v=1, acceleration=0
         TimedPose end_state = new TimedPose(
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(0.5, 0, 0, 0), 0, 0, 0),
+                        Pose2dWithDirection.make(
+                                new Pose2d(0.5, 0, new Rotation2d(0)), 0),
+                        0, 0, 0),
                 1.0, 1.0, 0.0);
 
         TimedPose i0 = start_state.interpolate2(end_state, 0.0);

@@ -12,6 +12,9 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+
 class SwerveDriveDynamicsConstraintTest {
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
@@ -23,19 +26,23 @@ class SwerveDriveDynamicsConstraintTest {
 
         // motionless
         double m = c.getMaxVelocity(new Pose2dWithMotion(
-                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0)).getValue();
+                Pose2dWithDirection.make(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                0, 0, 0)).getValue();
         assertEquals(5, m, DELTA);
 
         // moving in +x, no curvature, no rotation
         m = c.getMaxVelocity(new Pose2dWithMotion(
-                Pose2dWithDirection.make(0, 0, 0, 0),
+                Pose2dWithDirection.make(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0),
                 0, 0, 0)).getValue();
         // max allowed velocity is full speed
         assertEquals(5, m, DELTA);
 
         // moving in +x, 5 rad/meter
         m = c.getMaxVelocity(new Pose2dWithMotion(
-                Pose2dWithDirection.make(0, 0, 0, 0),
+                Pose2dWithDirection.make(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0),
                 5, 0, 0)).getValue();
         // at 5 rad/m with 0.5m sides the fastest you can go is 1.55 m/s.
         assertEquals(1.925, m, DELTA);
@@ -46,7 +53,8 @@ class SwerveDriveDynamicsConstraintTest {
         // traveling 1 m/s, there are 4 m/s available for the fastest wheel
         // which means 11.314 rad/s, and also 11.314 rad/m since we're going 1 m/s.
         Pose2dWithMotion state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(0, 0, 0, 0),
+                Pose2dWithDirection.make(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0),
                 11.313708, 0, 0);
         m = c.getMaxVelocity(
                 state)
@@ -64,7 +72,9 @@ class SwerveDriveDynamicsConstraintTest {
         SwerveDriveDynamicsConstraint c = new SwerveDriveDynamicsConstraint(logger, kinodynamics, 1, 1);
         // this is constant
         MinMaxAcceleration m = c.getMinMaxAcceleration(new Pose2dWithMotion(
-                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0), 0);
+                Pose2dWithDirection.make(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                0, 0, 0), 0);
         assertEquals(-20, m.getMinAccel(), DELTA);
         assertEquals(10, m.getMaxAccel(), DELTA);
     }

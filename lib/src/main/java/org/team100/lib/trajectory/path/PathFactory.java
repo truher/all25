@@ -3,6 +3,7 @@ package org.team100.lib.trajectory.path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Pose2dWithDirection;
@@ -12,7 +13,6 @@ import org.team100.lib.trajectory.path.spline.SplineUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 public class PathFactory {
@@ -71,10 +71,12 @@ public class PathFactory {
             splines.add(new HolonomicSpline(
                     new Pose2dWithDirection(
                             pose0,
-                            DirectionSE2.fromRotation(course)),
+                            DirectionSE2.fromDirections(
+                                    DirectionR2.fromRotation(course), 0)),
                     new Pose2dWithDirection(
                             pose1,
-                            DirectionSE2.fromRotation(course))));
+                            DirectionSE2.fromDirections(
+                                    DirectionR2.fromRotation(course), 0))));
         }
         // then adjust the control points to make it C1 smooth
         SplineUtil.forceC1(splines);

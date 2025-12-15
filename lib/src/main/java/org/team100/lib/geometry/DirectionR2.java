@@ -1,5 +1,7 @@
 package org.team100.lib.geometry;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+
 /**
  * Represents a direction in a 2d plane as a unit vector in R2.
  * 
@@ -28,6 +30,10 @@ public class DirectionR2 {
         double h = Math.sqrt(px * px + py * py);
         x = px / h;
         y = py / h;
+    }
+
+    public static DirectionR2 fromRotation(Rotation2d r) {
+        return new DirectionR2(r.getCos(), r.getSin());
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.team100.lib.subsystems.r3.commands.DriveToTranslationFacingWithProfil
 import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,7 +53,8 @@ public class LolipopAuto {
                 m_log, m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
                 (p) -> m_planner.restToRest(List.of(
                         Pose2dWithDirection.make(m_machinery.m_drive.getPose(), Math.PI),
-                        Pose2dWithDirection.make(3, 5, 0, -2))));
+                        Pose2dWithDirection.make(
+                                new Pose2d(3, 5, new Rotation2d(0)), -2))));
 
         DriveToPoseWithProfile toReefA = new DriveToPoseWithProfile(
                 m_log, m_machinery.m_drive, m_autoController, m_autoProfile,

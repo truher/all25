@@ -5,13 +5,12 @@ import java.util.List;
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.field.MechanicalMayhem2025;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.shooter.IndexerServo;
 import org.team100.lib.subsystems.shooter.SingleDrumShooter;
 import org.team100.lib.subsystems.tank.TankDrive;
 import org.team100.lib.subsystems.tank.commands.FixedTrajectory;
-import org.team100.lib.subsystems.tank.commands.ToPoseWithTrajectory;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -90,48 +89,48 @@ public class Autons {
     private Trajectory100 redLeftTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT),
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_LEFT
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_RED_LEFT),
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_RED_LEFT
                         .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
     }
 
     private Trajectory100 redRightTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_RIGHT),
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_RIGHT
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_RED_RIGHT),
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_RED_RIGHT
                         .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
     }
 
     private Trajectory100 redCenterTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_CENTER),
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_RED_CENTER
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_RED_CENTER),
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_RED_CENTER
                         .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
     }
 
     private Trajectory100 blueLeftTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_LEFT),
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_LEFT
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_BLUE_LEFT),
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_BLUE_LEFT
                         .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
     }
 
     private Trajectory100 blueRightTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_RIGHT),
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_RIGHT
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_BLUE_RIGHT),
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_BLUE_RIGHT
                         .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
     }
 
     private Trajectory100 blueCenterTrajectory(TrajectoryPlanner planner) {
         // delaying construction allows trajectory constraints to be mutable
         return planner.restToRest(List.of(
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_CENTER),
-                HolonomicPose2d.tank(MechanicalMayhem2025.START_BLUE_CENTER
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_BLUE_CENTER),
+                Pose2dWithDirection.tank(MechanicalMayhem2025.START_BLUE_CENTER
                         .plus(new Transform2d(1.5, 0, Rotation2d.kZero)))));
     }
 

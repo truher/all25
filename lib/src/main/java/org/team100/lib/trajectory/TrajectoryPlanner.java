@@ -3,9 +3,10 @@ package org.team100.lib.trajectory;
 import java.util.List;
 import java.util.function.Function;
 
-import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
@@ -140,10 +141,12 @@ public class TrajectoryPlanner {
                     List.of(
                             new Pose2dWithDirection(
                                     startState.pose(),
-                                    DirectionSE2.fromRotation(startingAngle)),
+                                    DirectionSE2.fromDirections(
+                                            DirectionR2.fromRotation(startingAngle), 0)),
                             new Pose2dWithDirection(
                                     endState.pose(),
-                                    DirectionSE2.fromRotation(courseToGoal))),
+                                    DirectionSE2.fromDirections(
+                                            DirectionR2.fromRotation(courseToGoal), 0))),
                     startVelocity.norm(),
                     endVelocity.norm(),
                     magicNumbers);
@@ -178,10 +181,12 @@ public class TrajectoryPlanner {
                     List.of(
                             new Pose2dWithDirection(
                                     startState.pose(),
-                                    DirectionSE2.fromRotation(startCourse)),
+                                    DirectionSE2.fromDirections(
+                                            DirectionR2.fromRotation(startCourse), 0)),
                             new Pose2dWithDirection(
                                     endState.pose(),
-                                    DirectionSE2.fromRotation(endCourse))),
+                                    DirectionSE2.fromDirections(
+                                            DirectionR2.fromRotation(endCourse), 0))),
                     splineEntranceVelocity,
                     splineExitVelocity,
                     magicNumbers);
@@ -211,10 +216,12 @@ public class TrajectoryPlanner {
                     List.of(
                             new Pose2dWithDirection(
                                     start,
-                                    DirectionSE2.fromRotation(courseToGoal)),
+                                    DirectionSE2.fromDirections(
+                                            DirectionR2.fromRotation(courseToGoal), 0)),
                             new Pose2dWithDirection(
                                     end,
-                                    DirectionSE2.fromRotation(courseToGoal))));
+                                    DirectionSE2.fromDirections(
+                                            DirectionR2.fromRotation(courseToGoal), 0))));
         } catch (TrajectoryGenerationException e) {
             return null;
         }

@@ -4,9 +4,9 @@ package org.team100.lib.subsystems.swerve;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.timing.TimedPose;
 
@@ -31,7 +31,9 @@ class ModelR3Test {
         ModelR3 s = ModelR3.fromTimedPose(
                 new TimedPose(
                         new Pose2dWithMotion(
-                                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
+                                Pose2dWithDirection.make(
+                                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                                0, 0, 0),
                         0, 0, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
@@ -46,7 +48,9 @@ class ModelR3Test {
         ModelR3 s = ModelR3.fromTimedPose(
                 new TimedPose(
                         new Pose2dWithMotion(
-                                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
+                                Pose2dWithDirection.make(
+                                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                                0, 0, 0),
                         0, 0, 1));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
@@ -61,7 +65,9 @@ class ModelR3Test {
         ModelR3 s = ModelR3.fromTimedPose(
                 new TimedPose(
                         new Pose2dWithMotion(
-                                Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
+                                Pose2dWithDirection.make(
+                                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                                0, 0, 0),
                         0, 1, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);
@@ -77,7 +83,9 @@ class ModelR3Test {
         ModelR3 s = ModelR3.fromTimedPose(
                 new TimedPose(
                         new Pose2dWithMotion(
-                                Pose2dWithDirection.make(0, 0, 0, 0), 0, 1, 0),
+                                Pose2dWithDirection.make(
+                                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                                0, 1, 0),
                         0, 1, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);

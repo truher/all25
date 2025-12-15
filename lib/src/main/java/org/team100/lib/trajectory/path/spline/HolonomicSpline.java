@@ -2,6 +2,7 @@ package org.team100.lib.trajectory.path.spline;
 
 import java.util.Optional;
 
+import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Pose2dWithDirection;
@@ -147,7 +148,8 @@ public class HolonomicSpline {
         return new Pose2dWithMotion(
                 new Pose2dWithDirection(
                         new Pose2d(getPoint(p), getHeading(p)),
-                        DirectionSE2.fromRotation(getCourse(p).orElseThrow())),
+                        DirectionSE2.fromDirections(
+                                DirectionR2.fromRotation(getCourse(p).orElseThrow()), 0)),
                 getDHeadingDs(p),
                 getCurvature(p),
                 getDCurvatureDs(p));

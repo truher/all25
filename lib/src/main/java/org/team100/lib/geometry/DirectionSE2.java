@@ -33,9 +33,12 @@ public class DirectionSE2 {
     public static final DirectionSE2 MINUS_Y = new DirectionSE2(0, -1, 0);
     public static final DirectionSE2 SPIN = new DirectionSE2(0, 0, 1);
 
-    /** Adapter for rotation-free directions */
-    public static final DirectionSE2 fromRotation(Rotation2d r) {
-        return new DirectionSE2(r.getCos(), r.getSin(), 0);
+    /**
+     * @param course cartesian course
+     * @param theta  direction of rotation
+     */
+    public static final DirectionSE2 fromDirections(DirectionR2 course, double theta) {
+        return new DirectionSE2(course.x, course.y, theta);
     }
 
     @Override

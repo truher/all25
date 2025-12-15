@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
@@ -40,10 +41,12 @@ class Trajectory100Test implements Timeless {
         List<Pose2dWithDirection> waypoints = List.of(
                 new Pose2dWithDirection(
                         start,
-                        DirectionSE2.fromRotation(angleToGoal)),
+                        DirectionSE2.fromDirections(
+                                DirectionR2.fromRotation(angleToGoal), 0)),
                 new Pose2dWithDirection(
                         end,
-                        DirectionSE2.fromRotation(angleToGoal)));
+                        DirectionSE2.fromDirections(
+                                DirectionR2.fromRotation(angleToGoal), 0)));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
@@ -76,10 +79,12 @@ class Trajectory100Test implements Timeless {
         List<Pose2dWithDirection> waypoints = List.of(
                 new Pose2dWithDirection(
                         start,
-                        DirectionSE2.fromRotation(angleToGoal)),
+                        DirectionSE2.fromDirections(
+                                DirectionR2.fromRotation(angleToGoal), 0)),
                 new Pose2dWithDirection(
                         end,
-                        DirectionSE2.fromRotation(angleToGoal)));
+                        DirectionSE2.fromDirections(
+                                DirectionR2.fromRotation(angleToGoal), 0)));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);

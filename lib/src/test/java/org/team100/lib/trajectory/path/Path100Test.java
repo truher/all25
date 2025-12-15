@@ -32,13 +32,21 @@ class Path100Test {
 
     private static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
             new Pose2dWithMotion(
-                    Pose2dWithDirection.make(0, 0, 0, 0), 0, 0, 0),
+                    Pose2dWithDirection.make(
+                            new Pose2d(0, 0, new Rotation2d(0)), 0),
+                    0, 0, 0),
             new Pose2dWithMotion(
-                    Pose2dWithDirection.make(24, 0, Math.toRadians(30), 0), 0, 0, 0),
+                    Pose2dWithDirection.make(
+                            new Pose2d(24, 0, new Rotation2d(Math.toRadians(30))), 0),
+                    0, 0, 0),
             new Pose2dWithMotion(
-                    Pose2dWithDirection.make(36, 12, Math.toRadians(60), 0), 0, 0, 0),
+                    Pose2dWithDirection.make(
+                            new Pose2d(36, 12, new Rotation2d(Math.toRadians(60))), 0),
+                    0, 0, 0),
             new Pose2dWithMotion(
-                    Pose2dWithDirection.make(60, 12, Math.toRadians(90), 0), 0, 0, 0));
+                    Pose2dWithDirection.make(
+                            new Pose2d(60, 12, new Rotation2d(Math.toRadians(90))), 0),
+                    0, 0, 0));
 
     @Test
     void testEmpty() {
@@ -139,19 +147,24 @@ class Path100Test {
     void test() throws TimingException {
         List<Pose2dWithMotion> waypoints = Arrays.asList(
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(0.0, 0.0, Math.toRadians(0), 0),
+                        Pose2dWithDirection.make(
+                                new Pose2d(0.0, 0.0, new Rotation2d(Math.toRadians(0))), 0),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(24.0, 0.0, Math.toRadians(30), 0),
+                        Pose2dWithDirection.make(
+                                new Pose2d(24.0, 0.0, new Rotation2d(Math.toRadians(30))), 0),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(36.0, 0.0, Math.toRadians(60), Math.PI / 2),
+                        Pose2dWithDirection.make(
+                                new Pose2d(36.0, 0.0, new Rotation2d(Math.toRadians(60))), Math.PI / 2),
                         1e6, 0, 0),
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(36.0, 24.0, Math.toRadians(60), 0),
+                        Pose2dWithDirection.make(
+                                new Pose2d(36.0, 24.0, new Rotation2d(Math.toRadians(60))), 0),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(60.0, 24.0, Math.toRadians(180), 0),
+                        Pose2dWithDirection.make(
+                                new Pose2d(60.0, 24.0, new Rotation2d(Math.toRadians(180))), 0),
                         0.1, 0, 0));
 
         // Create the reference trajectory (straight line motion between waypoints).
