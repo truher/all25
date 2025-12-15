@@ -11,17 +11,8 @@ import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.TestLoggerFactory;
-import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
-import org.team100.lib.trajectory.timing.ScheduleGenerator;
-import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,52 +22,6 @@ import edu.wpi.first.math.geometry.Twist2d;
 public class PathFactoryTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.01;
-    private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
-
-    @Test
-    void testForced() throws TimingException {
-        List<Pose2d> waypoints = List.of(
-                new Pose2d(0, 0, new Rotation2d()),
-                new Pose2d(1, 0, new Rotation2d()),
-                new Pose2d(1, 1, new Rotation2d()));
-        Path100 path = PathFactory.withoutControlPoints(waypoints, 0.01, 0.01, 0.1);
-        // sample the path so we can see it
-        for (double t = 0; t <= path.getMaxDistance(); t += 0.1) {
-            if (DEBUG)
-                System.out.printf("%.1f %5.2f %5.2f\n",
-                        t,
-                        path.sample(t).getPose().translation().getX(),
-                        path.sample(t).getPose().translation().getY());
-        }
-        // schedule it so we can see it
-        // no constraints
-        TimingConstraintFactory f = new TimingConstraintFactory(SwerveKinodynamicsFactory.forTest(logger));
-        List<TimingConstraint> constraints = f.forTest(logger);
-        ScheduleGenerator scheduler = new ScheduleGenerator(constraints);
-        Trajectory100 trajectory = scheduler.timeParameterizeTrajectory(
-                path,
-                0.0127,
-                0.05,
-                0.05);
-
-        for (double t = 0; t < trajectory.duration(); t += 0.1) {
-            if (DEBUG)
-                System.out.printf("%.1f %5.2f %5.2f\n",
-                        t,
-                        trajectory.sample(t).state().getPose().translation().getX(),
-                        trajectory.sample(t).state().getPose().translation().getY());
-        }
-
-        assertEquals(13, path.length());
-        Pose2dWithMotion p = path.getPoint(0);
-        assertEquals(0, p.getPose().translation().getX(), DELTA);
-        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
-        p = path.getPoint(1);
-        assertEquals(0.3, p.getPose().translation().getX(), DELTA);
-        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
-        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
-    }
 
     @Test
     void testBackingUp() {

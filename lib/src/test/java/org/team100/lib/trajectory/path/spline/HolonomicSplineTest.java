@@ -1,6 +1,7 @@
 package org.team100.lib.trajectory.path.spline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -17,12 +18,14 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
+import org.team100.lib.trajectory.TrajectoryPlotter;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -38,7 +41,6 @@ class HolonomicSplineTest implements Timeless {
         Translation2d t = new Translation2d(1, 0).rotateBy(course);
         assertEquals(0.707, t.getX(), DELTA);
         assertEquals(0.707, t.getY(), DELTA);
-
     }
 
     @Test
@@ -54,6 +56,10 @@ class HolonomicSplineTest implements Timeless {
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
                         DirectionSE2.TO_X));
+
+        TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
+        plotter.plot("rotation", List.of(s));
+
         Translation2d t = s.getPoint(0);
         assertEquals(0, t.getX(), DELTA);
         t = s.getPoint(1);
@@ -81,6 +87,10 @@ class HolonomicSplineTest implements Timeless {
                                 new Translation2d(2, 0),
                                 new Rotation2d()),
                         DirectionSE2.TO_X));
+
+        TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
+        plotter.plot("rotation", List.of(s));
+
         Translation2d t = s.getPoint(0);
         assertEquals(0, t.getX(), DELTA);
         t = s.getPoint(1);
@@ -109,15 +119,8 @@ class HolonomicSplineTest implements Timeless {
                                 new Rotation2d(1)),
                         DirectionSE2.TO_X));
 
-        if (DEBUG) {
-            System.out.println("d, x, y, heading, course");
-            for (double tt = 0; tt <= 1.0; tt += 0.01) {
-                var ss = s.getPose2dWithMotion(tt);
-                Pose2d pose = ss.getPose().pose();
-                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
-                        tt, pose.getX(), pose.getY(), pose.getRotation().getRadians(), ss.getCourse().getRadians());
-            }
-        }
+        TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
+        plotter.plot("rotation", List.of(s));
 
         // now that the magic numbers apply to the rotational scaling, the heading rate
         // is constant.
@@ -229,53 +232,56 @@ class HolonomicSplineTest implements Timeless {
         splines.add(s2);
         splines.add(s3);
 
-        // what do the unoptimized splines look like?
-        // for (int i = 0; i < 4; ++i) {
-        // HolonomicSpline s = splines.get(i);
-        // for (double j = 0; j < 0.99; j += 0.1) {
-        // Pose2d p = s.getPose2d(j);
-        // System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
-        // i + j, p.getX(), p.getY(), p.getRotation().getRadians());
-        // }
-        // }
-
-        // optimization does not help, the individual splines are already "optimal."
-
-        SplineUtil.forceC1(splines);
-
-        SplineUtil.optimizeSpline(splines);
+        // before optimization
 
         // spline joints are C1 smooth (i.e. same slope)
-        assertTrue(SplineUtil.verifyC1(splines));
+        assertTrue(verifyC1(splines));
         // spline joints are C2 smooth (i.e. same curvature)
-        assertTrue(SplineUtil.verifyC2(splines));
-        // spline joints are C3 smooth (i.e. same rate of change of curvature)
-        // assertTrue(SplineUtil.verifyC3(splines));
+        assertTrue(verifyC2(splines));
 
-        for (int i = 0; i < 4; ++i) {
-            HolonomicSpline s = splines.get(i);
+        checkCircle(splines, 0.020, 0.026);
+
+        // optimize and compare
+        TrajectoryPlotter.plot(splines, 0.1, 1);
+
+        // after optimization
+
+        // spline joints are C1 smooth (i.e. same slope)
+        assertTrue(verifyC1(splines));
+        // spline joints are C2 smooth (i.e. same curvature)
+        assertTrue(verifyC2(splines));
+
+        // optimization very slightly reduces the range error but increases the azimuth
+        // error.
+        checkCircle(splines, 0.018, 0.041);
+    }
+
+    private void checkCircle(List<HolonomicSpline> splines, double rangeError, double azimuthError) {
+        double actualRangeError = 0;
+        double actualAzimuthError = 0;
+        for (HolonomicSpline s : splines) {
             for (double j = 0; j < 0.99; j += 0.1) {
                 Pose2d p = s.getPose2d(j);
-                // the heading should point to the origin all the time, more or less.
+                // the position should be on the circle
+                double range = p.getTranslation().getNorm();
+                actualRangeError = Math.max(actualRangeError, Math.abs(1.0 - range));
 
+                // the heading should point to the origin all the time.
                 Rotation2d angleFromOrigin = p.getTranslation().unaryMinus().getAngle();
                 Rotation2d error = angleFromOrigin.minus(p.getRotation());
                 // there's about 2 degrees of error here because the spline is not quite a
                 // circle.
                 // 3/10/25 i made generation coarser so it's less accurate.
-                assertEquals(0, error.getRadians(), 0.05);
-                if (DEBUG)
-                    System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
-                            i + j, p.getX(), p.getY(), p.getRotation().getRadians());
+                actualAzimuthError = Math.max(actualAzimuthError, Math.abs(error.getRadians()));
             }
         }
+        assertEquals(0, actualRangeError, rangeError);
+        assertEquals(0, actualAzimuthError, azimuthError);
+
     }
 
     @Test
-    void testMismatchedThetaDerivatives() {
-        // if the theta derivative and each endpoint is the average delta,
-        // what happens when adjacent segments have different deltas?
-        // the optimizer needs to make them the same.
+    void testLine() {
         double magicNumber = 1.0;
         // turn a bit to the left
         HolonomicSpline s0 = new HolonomicSpline(
@@ -307,36 +313,64 @@ class HolonomicSplineTest implements Timeless {
         splines.add(s0);
         splines.add(s1);
 
-        // for (int i = 0; i < 2; ++i) {
-        // HolonomicSpline s = splines.get(i);
-        // for (double j = 0; j < 0.99; j += 0.1) {
-        // Pose2d p = s.getPose2d(j);
-        // if (DEBUG)
-        // System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
-        // i + j, p.getX(), p.getY(), p.getRotation().getRadians());
-        // }
-        // }
+        TrajectoryPlotter.plot(splines, 0.1, 1);
 
-        SplineUtil.forceC1(splines);
-
-        SplineUtil.optimizeSpline(splines);
-
-        // spline joints are C1 smooth (i.e. same slope)
-        assertTrue(SplineUtil.verifyC1(splines));
+        // spline joints are not C1 smooth
+        assertFalse(verifyC1(splines));
         // spline joints are C2 smooth (i.e. same curvature)
-        assertTrue(SplineUtil.verifyC2(splines));
-        // spline joints are C3 smooth (i.e. same rate of change of curvature)
-        // assertTrue(SplineUtil.verifyC3(splines));
+        assertTrue(verifyC2(splines));
+    }
 
-        for (int i = 0; i < 2; ++i) {
-            HolonomicSpline s = splines.get(i);
-            for (double j = 0; j < 0.99; j += 0.1) {
-                Pose2d p = s.getPose2d(j);
-                if (DEBUG)
-                    System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
-                            i + j, p.getX(), p.getY(), p.getRotation().getRadians());
-            }
-        }
+    /**
+     * A kinda-realistic test path:
+     * 
+     * * start facing towards the driver
+     * * back up
+     * * rotate towards +y, also drive towards +y
+     * 
+     * Does optimization really help here?
+     */
+    @Test
+    void testPath0() {
+        double magicNumber = 1.0;
+        // turn a bit to the left
+        Pose2dWithDirection p0 = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0, 0),
+                        new Rotation2d(-1, 0)),
+                new DirectionSE2(1, 0, 0));
+        Pose2dWithDirection p1 = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(0.7, 0.3),
+                        new Rotation2d(-1, 1)),
+                new DirectionSE2(1, 1, -1));
+        Pose2dWithDirection p2 = new Pose2dWithDirection(
+                new Pose2d(
+                        new Translation2d(1, 1),
+                        new Rotation2d(0, 1)),
+                new DirectionSE2(0, 1, 0));
+
+        HolonomicSpline s01 = new HolonomicSpline(
+                p0, p1, magicNumber, magicNumber);
+        HolonomicSpline s12 = new HolonomicSpline(
+                p1, p2, magicNumber, magicNumber);
+        List<HolonomicSpline> splines = new ArrayList<>();
+        splines.add(s01);
+        splines.add(s12);
+
+        // before
+        // spline joints are not C1 smooth
+        assertTrue(verifyC1(splines));
+        // spline joints are C2 smooth (i.e. same curvature)
+        assertTrue(verifyC2(splines));
+
+        TrajectoryPlotter.plot(splines, 0.1, 1);
+
+        // after
+        // spline joints are not C1 smooth
+        assertTrue(verifyC1(splines));
+        // spline joints are C2 smooth (i.e. same curvature)
+        assertTrue(verifyC2(splines));
     }
 
     @Test
@@ -376,19 +410,7 @@ class HolonomicSplineTest implements Timeless {
         splines.add(s0);
         splines.add(s1);
 
-        // for (int i = 0; i < 2; ++i) {
-        // HolonomicSpline s = splines.get(i);
-        // for (double j = 0; j < 0.99; j += 0.1) {
-        // Pose2d p = s.getPose2d(j);
-        // if (DEBUG)
-        // System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
-        // i + j, p.getX(), p.getY(), p.getRotation().getRadians());
-        // }
-        // }
-
-        SplineUtil.forceC1(splines);
-
-        SplineUtil.optimizeSpline(splines);
+        TrajectoryPlotter.plot(splines, 0.1, 1);
 
         for (HolonomicSpline s : splines) {
             if (DEBUG)
@@ -396,21 +418,9 @@ class HolonomicSplineTest implements Timeless {
         }
 
         // spline joints are C1 smooth (i.e. same slope)
-        assertTrue(SplineUtil.verifyC1(splines));
+        assertFalse(verifyC1(splines));
         // spline joints are C2 smooth (i.e. same curvature)
-        assertTrue(SplineUtil.verifyC2(splines));
-        // spline joints are C3 smooth (i.e. same rate of change of curvature)
-        // assertTrue(SplineUtil.verifyC3(splines));
-
-        for (int i = 0; i < 2; ++i) {
-            HolonomicSpline s = splines.get(i);
-            for (double j = 0; j < 0.99; j += 0.1) {
-                Pose2d p = s.getPose2d(j);
-                if (DEBUG)
-                    System.out.printf("%.1f, %.2f, %.2f, %.2f\n",
-                            i + j, p.getX(), p.getY(), p.getRotation().getRadians());
-            }
-        }
+        assertTrue(verifyC2(splines));
 
         Path100 path = new Path100(PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05));
         if (DEBUG)
@@ -419,6 +429,10 @@ class HolonomicSplineTest implements Timeless {
         ScheduleGenerator scheduleGenerator = new ScheduleGenerator(constraints);
         Trajectory100 trajectory = scheduleGenerator.timeParameterizeTrajectory(path,
                 0.05, 0, 0);
+
+        TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
+        plotter.plot("plot", trajectory);
+
         if (DEBUG)
             System.out.printf("trajectory %s\n", trajectory);
 
@@ -447,6 +461,10 @@ class HolonomicSplineTest implements Timeless {
         }
 
         List<HolonomicSpline> splines = List.of(s0);
+
+        TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
+        plotter.plot("splines", splines);
+
         List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05);
         if (DEBUG) {
             for (Pose2dWithMotion p : motion) {
@@ -474,7 +492,73 @@ class HolonomicSplineTest implements Timeless {
         // a = v^2/r so v = sqrt(ar) = 2.858
         Trajectory100 trajectory = scheduleGenerator.timeParameterizeTrajectory(path,
                 0.05, 2.858, 2.858);
+
+        plotter.plot("plot", trajectory);
+
         if (DEBUG)
             System.out.printf("trajectory %s\n", trajectory);
+    }
+
+    /**
+     * True if adjacent spline endpoints have (nearly) identical derivative terms.
+     */
+    static boolean verifyC1(List<HolonomicSpline> splines) {
+        if (splines.size() < 2)
+            return true;
+        for (int i = 0; i < splines.size() - 1; ++i) {
+            HolonomicSpline s0 = splines.get(i);
+            HolonomicSpline s1 = splines.get(i + 1);
+            if (!MathUtil.isNear(s0.dx(1), s1.dx(0), 1e-6)) {
+                if (DEBUG) {
+                    System.out.printf("bad x C1 %f %f\n", s0.dx(1), s1.dx(0));
+                }
+                return false;
+            }
+            if (!MathUtil.isNear(s0.dy(1), s1.dy(0), 1e-6)) {
+                if (DEBUG) {
+                    System.out.printf("bad y C1 %f %f\n", s0.dy(1), s1.dy(0));
+                }
+                return false;
+            }
+            if (!MathUtil.isNear(s0.dtheta(1), s1.dtheta(0), 1e-6)) {
+                if (DEBUG) {
+                    System.out.printf("bad theta C1 %f %f\n", s0.dtheta(1), s1.dtheta(0));
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * True if adjacent spline endpoints have (nearly) identical second-derivative
+     * terms.
+     */
+    static boolean verifyC2(List<HolonomicSpline> splines) {
+        if (splines.size() < 2)
+            return true;
+        for (int i = 0; i < splines.size() - 1; ++i) {
+            HolonomicSpline s0 = splines.get(i);
+            HolonomicSpline s1 = splines.get(i + 1);
+            if (!MathUtil.isNear(s0.ddx(1), s1.ddx(0), 1e-6)) {
+                if (DEBUG) {
+                    System.out.printf("bad x C2 %f %f\n", s0.ddx(1), s1.ddx(0));
+                }
+                return false;
+            }
+            if (!MathUtil.isNear(s0.ddy(1), s1.ddy(0), 1e-6)) {
+                if (DEBUG) {
+                    System.out.printf("bad y C2 %f %f\n", s0.ddy(1), s1.ddy(0));
+                }
+                return false;
+            }
+            if (!MathUtil.isNear(s0.ddtheta(1), s1.ddtheta(0), 1e-6)) {
+                if (DEBUG) {
+                    System.out.printf("bad theta C2 %f %f\n", s0.ddtheta(1), s1.ddtheta(0));
+                }
+                return false;
+            }
+        }
+        return true;
     }
 }

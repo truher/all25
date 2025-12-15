@@ -1,15 +1,12 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.trajectory;
 
 import org.jfree.data.xy.VectorSeries;
 import org.team100.lib.geometry.Pose2dWithDirection;
-import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class TrajectoryToVectorSeries {
-    /** Time between samples */
-    private static final double DT = 0.1;
 
     /** Length of the vector indicating heading */
     private final double m_scale;
@@ -19,10 +16,11 @@ public class TrajectoryToVectorSeries {
     }
 
     /** Maps x to x, y to y */
-    public VectorSeries convert(Trajectory100 t) {
-        VectorSeries s = new VectorSeries("trajectory");
+    public VectorSeries convert(String name, Trajectory100 t) {
+        VectorSeries s = new VectorSeries(name);
         double duration = t.duration();
-        for (double time = 0; time < duration; time += DT) {
+        double dt = duration/20;
+        for (double time = 0; time < duration; time += dt) {
             TimedPose p = t.sample(time);
             Pose2dWithDirection pp = p.state().getPose();
             double x = pp.translation().getX();

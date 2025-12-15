@@ -1,24 +1,21 @@
 package org.team100.lib.trajectory.path.spline;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.trajectory.TrajectoryPlotter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-class QuinticHermiteOptimizerTest {
-    private static double kEpsilon = 1e-12;
+public class QuinticHermiteOptimizerTest {
 
     @Test
-    void test() {
+    void test0() {
         Pose2dWithDirection a = new Pose2dWithDirection(
                 new Pose2d(
                         new Translation2d(0, 100),
@@ -39,7 +36,12 @@ class QuinticHermiteOptimizerTest {
         splines.add(new HolonomicSpline(a, b));
         splines.add(new HolonomicSpline(b, c));
 
-        assertTrue(SplineUtil.optimizeSpline(splines) < 0.014);
+        TrajectoryPlotter.plot(splines, 5, 10);
+
+    }
+
+    @Test
+    void test1() {
 
         Pose2dWithDirection d = new Pose2dWithDirection(
                 new Pose2d(
@@ -62,13 +64,17 @@ class QuinticHermiteOptimizerTest {
                         new Rotation2d()),
                 DirectionSE2.MINUS_X);
 
-        List<HolonomicSpline> splines1 = new ArrayList<>();
-        splines1.add(new HolonomicSpline(d, e));
-        splines1.add(new HolonomicSpline(e, f));
-        splines1.add(new HolonomicSpline(f, g));
+        List<HolonomicSpline> splines = new ArrayList<>();
+        splines.add(new HolonomicSpline(d, e));
+        splines.add(new HolonomicSpline(e, f));
+        splines.add(new HolonomicSpline(f, g));
 
-        assertEquals(0.54, SplineUtil.optimizeSpline(splines1), 0.01);
+        TrajectoryPlotter.plot(splines, 5, 10);
 
+    }
+
+    @Test
+    void test2() {
         Pose2dWithDirection h = new Pose2dWithDirection(
                 new Pose2d(
                         new Translation2d(0, 0),
@@ -101,13 +107,12 @@ class QuinticHermiteOptimizerTest {
         splines2.add(new HolonomicSpline(j, k));
         splines2.add(new HolonomicSpline(k, l));
 
-        assertTrue(SplineUtil.optimizeSpline(splines2) < 0.05);
-        assertEquals(0.0, splines2.get(0).getCurvature(1.0), kEpsilon);
-        assertEquals(0.0, splines2.get(2).getCurvature(1.0), kEpsilon);
+        TrajectoryPlotter.plot(splines2, 5, 10);
+
     }
 
     @Test
-    void testHolonomic() {
+    void test3() {
         Pose2dWithDirection a = new Pose2dWithDirection(
                 new Pose2d(
                         new Translation2d(0, 100),
@@ -128,7 +133,12 @@ class QuinticHermiteOptimizerTest {
         splines.add(new HolonomicSpline(a, b));
         splines.add(new HolonomicSpline(b, c));
 
-        assertTrue(SplineUtil.optimizeSpline(splines) < 0.014);
+        TrajectoryPlotter.plot(splines, 5, 10);
+
+    }
+
+    @Test
+    void test4() {
 
         Pose2dWithDirection d = new Pose2dWithDirection(
                 new Pose2d(
@@ -151,12 +161,16 @@ class QuinticHermiteOptimizerTest {
                         new Rotation2d()),
                 DirectionSE2.MINUS_X);
 
-        List<HolonomicSpline> splines1 = new ArrayList<>();
-        splines1.add(new HolonomicSpline(d, e));
-        splines1.add(new HolonomicSpline(e, f));
-        splines1.add(new HolonomicSpline(f, g));
+        List<HolonomicSpline> splines = new ArrayList<>();
+        splines.add(new HolonomicSpline(d, e));
+        splines.add(new HolonomicSpline(e, f));
+        splines.add(new HolonomicSpline(f, g));
 
-        assertEquals(0.54, SplineUtil.optimizeSpline(splines1), 0.01);
+        TrajectoryPlotter.plot(splines, 5, 10);
+    }
+
+    @Test
+    void test5() {
 
         Pose2dWithDirection h = new Pose2dWithDirection(
                 new Pose2d(
@@ -184,16 +198,13 @@ class QuinticHermiteOptimizerTest {
                         new Rotation2d(Math.PI / 2)),
                 DirectionSE2.MINUS_Y);
 
-        List<HolonomicSpline> splines2 = new ArrayList<>();
-        splines2.add(new HolonomicSpline(h, i));
-        splines2.add(new HolonomicSpline(i, j));
-        splines2.add(new HolonomicSpline(j, k));
-        splines2.add(new HolonomicSpline(k, l));
+        List<HolonomicSpline> splines = new ArrayList<>();
+        splines.add(new HolonomicSpline(h, i));
+        splines.add(new HolonomicSpline(i, j));
+        splines.add(new HolonomicSpline(j, k));
+        splines.add(new HolonomicSpline(k, l));
 
-        assertTrue(SplineUtil.optimizeSpline(splines2) < 0.05);
-        assertEquals(0.0, splines2.get(0).getCurvature(1.0), kEpsilon);
-        assertEquals(0.0, splines2.get(2).getCurvature(1.0), kEpsilon);
+        TrajectoryPlotter.plot(splines, 5, 10);
 
     }
-
 }

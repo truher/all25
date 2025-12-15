@@ -1,4 +1,4 @@
-package org.team100.frc2025.CalgamesArm;
+package org.team100.lib.trajectory;
 
 import java.util.List;
 
@@ -8,8 +8,6 @@ import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.trajectory.Trajectory100;
-import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
@@ -41,7 +39,7 @@ public class TrajectoryTest {
                 new Pose2d(0, 0, new Rotation2d()),
                 new Pose2d(10, 1, new Rotation2d()));
         if (SHOW)
-            new TrajectoryPlotter(0.1).plot(t, "simple");
+            new TrajectoryPlotter(0.1).plot("simple", t );
     }
 
     /**
@@ -72,7 +70,7 @@ public class TrajectoryTest {
                         DirectionSE2.TO_Y));
         Trajectory100 t = p.restToRest(waypoints);
         if (SHOW)
-            new TrajectoryPlotter(0.1).plot(t, "simple");
+            new TrajectoryPlotter(0.1).plot("curved", t);
     }
 
     /**
@@ -104,6 +102,6 @@ public class TrajectoryTest {
                         DirectionSE2.TO_Y));
         Trajectory100 t = p.restToRest(waypoints);
         if (SHOW)
-            new TrajectoryPlotter(0.1).plot(t, "simple");
+            new TrajectoryPlotter(0.1).plot("multiple", t);
     }
 }
