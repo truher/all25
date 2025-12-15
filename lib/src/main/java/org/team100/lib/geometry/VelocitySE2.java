@@ -13,22 +13,21 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
 /**
- * This is velocity in the global reference frame, the first derivative of
- * Pose2d. This means "field relative" for robot navigation and control. It is
- * similar to WPI ChassisSpeeds, but field-relative. It is also useful for
- * purposes other than navigation, e.g. planar mechanism kinematics.
+ * The first derivative of Pose2d with respect to time.
  * 
  * Units are meters, radians, and seconds.
  * 
- * This implements velocity in R3, not SE(2); see README.md for details.
+ * Everything here is in the R3 tangent space to SE(2).
+ * 
+ * See README.md for details.
  */
-public record GlobalVelocityR3(double x, double y, double theta) {
+public record VelocitySE2(double x, double y, double theta) {
 
-    public static final GlobalVelocityR3 ZERO = new GlobalVelocityR3(0, 0, 0);
+    public static final VelocitySE2 ZERO = new VelocitySE2(0, 0, 0);
 
-    public static GlobalVelocityR3 velocity(Pose2d start, Pose2d end, double dt) {
-        GlobalDeltaR3 d = GlobalDeltaR3.delta(start, end);
-        return new GlobalVelocityR3(d.getX(), d.getY(), d.getRotation().getRadians()).div(dt);
+    public static VelocitySE2 velocity(Pose2d start, Pose2d end, double dt) {
+        DeltaSE2 d = DeltaSE2.delta(start, end);
+        return new VelocitySE2(d.getX(), d.getY(), d.getRotation().getRadians()).div(dt);
     }
 
     /** The cartesian part only */
@@ -36,11 +35,11 @@ public record GlobalVelocityR3(double x, double y, double theta) {
         return Math.hypot(x, y);
     }
 
-    public GlobalVelocityR3 normalize() {
+    public VelocitySE2 normalize() {
         double norm = norm();
         if (norm < 1e-6)
             return ZERO;
-        return new GlobalVelocityR3(x, y, theta).times(1.0 / norm);
+        return new VelocitySE2(x, y, theta).times(1.0 / norm);
     }
 
     /** Field-relative course, or empty if slower than 1 micron/sec. */
@@ -50,13 +49,13 @@ public record GlobalVelocityR3(double x, double y, double theta) {
         return Optional.of(new Rotation2d(x, y));
     }
 
-    public GlobalVelocityR3 plus(GlobalVelocityR3 other) {
-        return new GlobalVelocityR3(x + other.x, y + other.y, theta + other.theta);
+    public VelocitySE2 plus(VelocitySE2 other) {
+        return new VelocitySE2(x + other.x, y + other.y, theta + other.theta);
     }
 
     /** The return type here isn't really right. */
-    public GlobalVelocityR3 minus(GlobalVelocityR3 other) {
-        return new GlobalVelocityR3(x - other.x, y - other.y, theta - other.theta);
+    public VelocitySE2 minus(VelocitySE2 other) {
+        return new VelocitySE2(x - other.x, y - other.y, theta - other.theta);
     }
 
     /** Integrate the velocity from the initial pose for time dt */
@@ -67,25 +66,25 @@ public record GlobalVelocityR3(double x, double y, double theta) {
                 initial.getRotation().plus(new Rotation2d(theta * dt)));
     }
 
-    public GlobalAccelerationR3 accel(GlobalVelocityR3 previous, double dt) {
-        GlobalVelocityR3 v = minus(previous).div(dt);
-        return new GlobalAccelerationR3(v.x(), v.y(), v.theta());
+    public AccelerationSE2 accel(VelocitySE2 previous, double dt) {
+        VelocitySE2 v = minus(previous).div(dt);
+        return new AccelerationSE2(v.x(), v.y(), v.theta());
     }
 
-    public GlobalVelocityR3 times(double scalar) {
-        return new GlobalVelocityR3(x * scalar, y * scalar, theta * scalar);
+    public VelocitySE2 times(double scalar) {
+        return new VelocitySE2(x * scalar, y * scalar, theta * scalar);
     }
 
-    public GlobalVelocityR3 div(double scalar) {
-        return new GlobalVelocityR3(x / scalar, y / scalar, theta / scalar);
+    public VelocitySE2 div(double scalar) {
+        return new VelocitySE2(x / scalar, y / scalar, theta / scalar);
     }
 
-    public GlobalVelocityR3 times(double cartesian, double angular) {
-        return new GlobalVelocityR3(x * cartesian, y * cartesian, theta * angular);
+    public VelocitySE2 times(double cartesian, double angular) {
+        return new VelocitySE2(x * cartesian, y * cartesian, theta * angular);
     }
 
     /** Dot product of translational part. */
-    public double dot(GlobalVelocityR3 other) {
+    public double dot(VelocitySE2 other) {
         return x * other.x + y * other.y;
     }
 
@@ -94,17 +93,17 @@ public record GlobalVelocityR3(double x, double y, double theta) {
         double speed = norm();
         double decelTime = speed / accel;
         // the unit here is wrong
-        GlobalVelocityR3 dx = normalize().times(0.5 * speed * decelTime);
+        VelocitySE2 dx = normalize().times(0.5 * speed * decelTime);
         return new Translation2d(dx.x, dx.y);
     }
 
-    public GlobalVelocityR3 clamp(double maxVelocity, double maxOmega) {
+    public VelocitySE2 clamp(double maxVelocity, double maxOmega) {
         double norm = Math.hypot(x, y);
         double ratio = 1.0;
         if (norm > 1e-3 && norm > maxVelocity) {
             ratio = maxVelocity / norm;
         }
-        return new GlobalVelocityR3(ratio * x, ratio * y, MathUtil.clamp(theta, -maxOmega, maxOmega));
+        return new VelocitySE2(ratio * x, ratio * y, MathUtil.clamp(theta, -maxOmega, maxOmega));
     }
 
     @Override
@@ -112,12 +111,12 @@ public record GlobalVelocityR3(double x, double y, double theta) {
         return String.format("(%5.2f, %5.2f, %5.2f)", x, y, theta);
     }
 
-    public static GlobalVelocityR3 fromVector(Vector<N3> v) {
-        return new GlobalVelocityR3(v.get(0), v.get(1), v.get(2));
+    public static VelocitySE2 fromVector(Vector<N3> v) {
+        return new VelocitySE2(v.get(0), v.get(1), v.get(2));
     }
 
-    public static GlobalVelocityR3 fromVector(Matrix<N3, N1> v) {
-        return new GlobalVelocityR3(v.get(0, 0), v.get(1, 0), v.get(2, 0));
+    public static VelocitySE2 fromVector(Matrix<N3, N1> v) {
+        return new VelocitySE2(v.get(0, 0), v.get(1, 0), v.get(2, 0));
     }
 
     public Vector<N3> toVector() {

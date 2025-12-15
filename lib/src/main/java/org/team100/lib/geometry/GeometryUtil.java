@@ -55,7 +55,7 @@ public class GeometryUtil {
         return a.getX() * b.getX() + a.getY() * b.getY();
     }
 
-    public static double dot(Translation2d a, GlobalVelocityR3 b) {
+    public static double dot(Translation2d a, VelocitySE2 b) {
         return a.getX() * b.x() + a.getY() * b.y();
     }
 
@@ -71,8 +71,8 @@ public class GeometryUtil {
         return new Twist2d(twist.dx * scale, twist.dy * scale, twist.dtheta * scale);
     }
 
-    public static GlobalVelocityR3 scale(GlobalVelocityR3 v, double scale) {
-        return new GlobalVelocityR3(v.x() * scale, v.y() * scale, v.theta() * scale);
+    public static VelocitySE2 scale(VelocitySE2 v, double scale) {
+        return new VelocitySE2(v.x() * scale, v.y() * scale, v.theta() * scale);
     }
 
     public static Pose2d transformBy(Pose2d a, Pose2d b) {
@@ -204,11 +204,14 @@ public class GeometryUtil {
         return new Pose2d(lerpT, lerpR);
     }
 
+    // TODO: fix interpolation
     public static HolonomicPose2d interpolate(HolonomicPose2d a, HolonomicPose2d b, double x) {
         return new HolonomicPose2d(
                 a.translation().interpolate(b.translation(), x),
                 interpolate2(a.heading(), b.heading(), x),
-                interpolate2(a.course(), b.course(), x));
+                DirectionSE2.fromRotation(interpolate2(
+                        a.course().toRotation(),
+                        b.course().toRotation(), x)));
     }
 
     /**

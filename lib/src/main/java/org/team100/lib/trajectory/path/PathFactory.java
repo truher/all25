@@ -3,6 +3,7 @@ package org.team100.lib.trajectory.path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
@@ -28,7 +29,7 @@ public class PathFactory {
                     new HolonomicSpline(
                             waypoints.get(i - 1),
                             waypoints.get(i),
-                            mN.get(i-1),
+                            mN.get(i - 1),
                             mN.get(i)));
         }
         // does not force C1, theta responds too much
@@ -68,8 +69,12 @@ public class PathFactory {
             Translation2d p1 = waypoints.get(i).getTranslation();
             Rotation2d course = p1.minus(p0).getAngle();
             splines.add(new HolonomicSpline(
-                    new HolonomicPose2d(p0, waypoints.get(i - 1).getRotation(), course),
-                    new HolonomicPose2d(p1, waypoints.get(i).getRotation(), course)));
+                    new HolonomicPose2d(
+                            p0, waypoints.get(i - 1).getRotation(),
+                            DirectionSE2.fromRotation(course)),
+                    new HolonomicPose2d(
+                            p1, waypoints.get(i).getRotation(),
+                            DirectionSE2.fromRotation(course))));
         }
         // then adjust the control points to make it C1 smooth
         SplineUtil.forceC1(splines);

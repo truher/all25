@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -33,13 +34,17 @@ class TrajectoryPlannerTest implements Timeless {
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
-
-
     @Test
     void testLinear() {
         List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(new Translation2d(), new Rotation2d(), new Rotation2d()),
-                new HolonomicPose2d(new Translation2d(1, 0), new Rotation2d(), new Rotation2d()));
+                new HolonomicPose2d(
+                        new Translation2d(),
+                        new Rotation2d(),
+                        DirectionSE2.TO_X),
+                new HolonomicPose2d(
+                        new Translation2d(1, 0),
+                        new Rotation2d(),
+                        DirectionSE2.TO_X));
         List<TimingConstraint> constraints = new ArrayList<>();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         Trajectory100 t = planner.restToRest(waypoints);
@@ -52,8 +57,14 @@ class TrajectoryPlannerTest implements Timeless {
     @Test
     void testBackingUp() {
         List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(new Translation2d(0, 0), Rotation2d.kZero, new Rotation2d(Math.PI)),
-                new HolonomicPose2d(new Translation2d(1, 0), Rotation2d.kZero, Rotation2d.kZero));
+                new HolonomicPose2d(
+                        new Translation2d(0, 0),
+                        Rotation2d.kZero,
+                        DirectionSE2.MINUS_X),
+                new HolonomicPose2d(
+                        new Translation2d(1, 0),
+                        Rotation2d.kZero,
+                        DirectionSE2.TO_X));
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
 
         // these are the same as StraightLineTrajectoryTest.
@@ -81,8 +92,14 @@ class TrajectoryPlannerTest implements Timeless {
     @Test
     void testPerformance() {
         List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(new Translation2d(), new Rotation2d(), new Rotation2d()),
-                new HolonomicPose2d(new Translation2d(1, 1), new Rotation2d(), new Rotation2d(Math.PI / 2)));
+                new HolonomicPose2d(
+                        new Translation2d(),
+                        new Rotation2d(),
+                        DirectionSE2.TO_X),
+                new HolonomicPose2d(
+                        new Translation2d(1, 1),
+                        new Rotation2d(),
+                        DirectionSE2.TO_Y));
         List<TimingConstraint> constraints = new ArrayList<>();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         long startTimeNs = System.nanoTime();
@@ -105,14 +122,12 @@ class TrajectoryPlannerTest implements Timeless {
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
-
-
     @Test
     void testRestToRest() {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(0, 0, 0));
+        ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(0, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 trajectory = planner.restToRest(start.pose(), end);
         assertEquals(1.565, trajectory.duration(), DELTA);
@@ -140,7 +155,7 @@ class TrajectoryPlannerTest implements Timeless {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(1, 0, 0));
+        ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(1.176, traj.duration(), DELTA);
@@ -151,7 +166,7 @@ class TrajectoryPlannerTest implements Timeless {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(-1, 0, 0));
+        ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(-1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(1.176, traj.duration(), DELTA);
@@ -162,7 +177,7 @@ class TrajectoryPlannerTest implements Timeless {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        ModelR3 start = new ModelR3(Pose2d.kZero, new GlobalVelocityR3(0, 1, 0));
+        ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
         assertEquals(2.958, traj.duration(), DELTA);

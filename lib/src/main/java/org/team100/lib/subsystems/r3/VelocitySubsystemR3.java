@@ -1,6 +1,6 @@
 package org.team100.lib.subsystems.r3;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 
 /**
  * A subsystem with three independent dimensions, controlled by velocity.
@@ -15,5 +15,5 @@ public interface VelocitySubsystemR3 extends SubsystemR3 {
      * 
      * @param nextV for the next timestep.
      */
-    void setVelocity(GlobalVelocityR3 nextV);
+    void setVelocity(VelocitySE2 nextV);
 }

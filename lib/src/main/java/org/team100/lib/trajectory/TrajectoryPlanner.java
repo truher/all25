@@ -3,7 +3,8 @@ package org.team100.lib.trajectory;
 import java.util.List;
 import java.util.function.Function;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.path.Path100;
@@ -115,10 +116,10 @@ public class TrajectoryPlanner {
 
     public Trajectory100 movingToMoving(ModelR3 startState, ModelR3 endState) {
         Translation2d startTranslation = startState.translation();
-        GlobalVelocityR3 startVelocity = startState.velocity();
+        VelocitySE2 startVelocity = startState.velocity();
 
         Translation2d endTranslation = endState.translation();
-        GlobalVelocityR3 endVelocity = endState.velocity();
+        VelocitySE2 endVelocity = endState.velocity();
 
         // should work with out this.
         if (startVelocity.norm() < VELOCITY_EPSILON && endVelocity.norm() < VELOCITY_EPSILON) {
@@ -140,11 +141,11 @@ public class TrajectoryPlanner {
                             new HolonomicPose2d(
                                     startTranslation,
                                     startState.rotation(),
-                                    startingAngle),
+                                    DirectionSE2.fromRotation(startingAngle)),
                             new HolonomicPose2d(
                                     endTranslation,
                                     endState.rotation(),
-                                    courseToGoal)),
+                                    DirectionSE2.fromRotation(courseToGoal))),
                     startVelocity.norm(),
                     endVelocity.norm(),
                     magicNumbers);
@@ -154,12 +155,13 @@ public class TrajectoryPlanner {
         }
     }
 
-    public Trajectory100 movingToMoving(ModelR3 startState, Rotation2d startCourse, double splineEntranceVelocity, ModelR3 endState, Rotation2d endCourse, double splineExitVelocity) {
+    public Trajectory100 movingToMoving(ModelR3 startState, Rotation2d startCourse, double splineEntranceVelocity,
+            ModelR3 endState, Rotation2d endCourse, double splineExitVelocity) {
         Translation2d startTranslation = startState.translation();
-        GlobalVelocityR3 startVelocity = startState.velocity();
+        VelocitySE2 startVelocity = startState.velocity();
 
         Translation2d endTranslation = endState.translation();
-        GlobalVelocityR3 endVelocity = endState.velocity();
+        VelocitySE2 endVelocity = endState.velocity();
 
         // should work with out this.
         if (startVelocity.norm() < VELOCITY_EPSILON && endVelocity.norm() < VELOCITY_EPSILON) {
@@ -179,11 +181,11 @@ public class TrajectoryPlanner {
                             new HolonomicPose2d(
                                     startTranslation,
                                     startState.rotation(),
-                                    startCourse),
+                                    DirectionSE2.fromRotation(startCourse)),
                             new HolonomicPose2d(
                                     endTranslation,
                                     endState.rotation(),
-                                    endCourse)),
+                                    DirectionSE2.fromRotation(endCourse))),
                     splineEntranceVelocity,
                     splineExitVelocity,
                     magicNumbers);
@@ -193,8 +195,10 @@ public class TrajectoryPlanner {
         }
     }
 
-    public Trajectory100 movingToRest(ModelR3 startState, Rotation2d startCourse, double splineEntranceVelocity, Pose2d end, Rotation2d endCourse, double splineExitVelocity) {
-        return movingToMoving(startState, startCourse,splineEntranceVelocity, new ModelR3(end), endCourse,splineExitVelocity);
+    public Trajectory100 movingToRest(ModelR3 startState, Rotation2d startCourse, double splineEntranceVelocity,
+            Pose2d end, Rotation2d endCourse, double splineExitVelocity) {
+        return movingToMoving(startState, startCourse, splineEntranceVelocity, new ModelR3(end), endCourse,
+                splineExitVelocity);
     }
 
     /**
@@ -209,8 +213,14 @@ public class TrajectoryPlanner {
         try {
             return restToRest(
                     List.of(
-                            new HolonomicPose2d(startTranslation, start.getRotation(), courseToGoal),
-                            new HolonomicPose2d(endTranslation, end.getRotation(), courseToGoal)));
+                            new HolonomicPose2d(
+                                    startTranslation,
+                                    start.getRotation(),
+                                    DirectionSE2.fromRotation(courseToGoal)),
+                            new HolonomicPose2d(
+                                    endTranslation,
+                                    end.getRotation(),
+                                    DirectionSE2.fromRotation(courseToGoal))));
         } catch (TrajectoryGenerationException e) {
             return null;
         }

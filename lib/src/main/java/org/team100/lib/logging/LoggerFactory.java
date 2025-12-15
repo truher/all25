@@ -7,12 +7,12 @@ import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalDeltaR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.DeltaSE2;
 import org.team100.lib.geometry.GlobalVelocityR2;
-import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.primitive.PrimitiveLogger;
 import org.team100.lib.reference.r1.SetpointsR1;
@@ -517,7 +517,7 @@ public class LoggerFactory {
                 return;
             HolonomicPose2d val = vals.get().getPose();
             m_pose2dLogger.log(val::pose);
-            m_rotation2dLogger.log(val::course);
+            m_rotation2dLogger.log(() -> val.course().toRotation());
         }
     }
 
@@ -592,45 +592,45 @@ public class LoggerFactory {
             m_thetaLogger = doubleLogger(level, join(leaf, "theta rad"));
         }
 
-        public void log(Supplier<GlobalDeltaR3> vals) {
+        public void log(Supplier<DeltaSE2> vals) {
             if (!allow(m_level))
                 return;
-            GlobalDeltaR3 val = vals.get();
+            DeltaSE2 val = vals.get();
             m_xLogger.log(val::getX);
             m_yLogger.log(val::getY);
             m_thetaLogger.log(val::getRadians);
         }
     }
 
-    public GlobaDeltaR3Logger globalDeltaR3Logger(Level level, String leaf) {
+    public GlobaDeltaR3Logger DeltaSE2Logger(Level level, String leaf) {
         return new GlobaDeltaR3Logger(level, leaf);
     }
 
-    public class GlobalVelocityR3Logger {
+    public class VelocitySE2Logger {
         private final Level m_level;
         private final DoubleLogger m_xLogger;
         private final DoubleLogger m_yLogger;
         private final DoubleLogger m_thetaLogger;
 
-        GlobalVelocityR3Logger(Level level, String leaf) {
+        VelocitySE2Logger(Level level, String leaf) {
             m_level = level;
             m_xLogger = doubleLogger(level, join(leaf, "x m_s"));
             m_yLogger = doubleLogger(level, join(leaf, "y m_s"));
             m_thetaLogger = doubleLogger(level, join(leaf, "theta rad_s"));
         }
 
-        public void log(Supplier<GlobalVelocityR3> vals) {
+        public void log(Supplier<VelocitySE2> vals) {
             if (!allow(m_level))
                 return;
-            GlobalVelocityR3 val = vals.get();
+            VelocitySE2 val = vals.get();
             m_xLogger.log(val::x);
             m_yLogger.log(val::y);
             m_thetaLogger.log(val::theta);
         }
     }
 
-    public GlobalVelocityR3Logger globalVelocityR3Logger(Level level, String leaf) {
-        return new GlobalVelocityR3Logger(level, leaf);
+    public VelocitySE2Logger VelocitySE2Logger(Level level, String leaf) {
+        return new VelocitySE2Logger(level, leaf);
     }
 
     public class GlobalVelocityR2Logger {
@@ -657,31 +657,31 @@ public class LoggerFactory {
         return new GlobalVelocityR2Logger(level, leaf);
     }
 
-    public class GlobalAccelerationR3Logger {
+    public class AccelerationSE2Logger {
         private final Level m_level;
         private final DoubleLogger m_xLogger;
         private final DoubleLogger m_yLogger;
         private final DoubleLogger m_thetaLogger;
 
-        GlobalAccelerationR3Logger(Level level, String leaf) {
+        AccelerationSE2Logger(Level level, String leaf) {
             m_level = level;
             m_xLogger = doubleLogger(level, join(leaf, "x m_s_s"));
             m_yLogger = doubleLogger(level, join(leaf, "y m_s_s"));
             m_thetaLogger = doubleLogger(level, join(leaf, "theta rad_s_s"));
         }
 
-        public void log(Supplier<GlobalAccelerationR3> vals) {
+        public void log(Supplier<AccelerationSE2> vals) {
             if (!allow(m_level))
                 return;
-            GlobalAccelerationR3 val = vals.get();
+            AccelerationSE2 val = vals.get();
             m_xLogger.log(val::x);
             m_yLogger.log(val::y);
             m_thetaLogger.log(val::theta);
         }
     }
 
-    public GlobalAccelerationR3Logger globalAccelerationR3Logger(Level level, String leaf) {
-        return new GlobalAccelerationR3Logger(level, leaf);
+    public AccelerationSE2Logger AccelerationSE2Logger(Level level, String leaf) {
+        return new AccelerationSE2Logger(level, leaf);
     }
 
     public class Model100Logger {

@@ -3,6 +3,7 @@ package org.team100.lib.subsystems.r3.commands;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
@@ -43,7 +44,8 @@ public class GoToPosePosition extends MoveAndHold {
     @Override
     public void initialize() {
         HolonomicPose2d m_currentPose = HolonomicPose2d.make(
-                m_subsystem.getState().pose(), m_course);
+                m_subsystem.getState().pose(),
+                DirectionSE2.fromRotation(m_course));
         Trajectory100 m_trajectory = m_trajectoryPlanner.restToRest(
                 List.of(m_currentPose, m_goal));
         m_referenceController = new PositionReferenceControllerR3(

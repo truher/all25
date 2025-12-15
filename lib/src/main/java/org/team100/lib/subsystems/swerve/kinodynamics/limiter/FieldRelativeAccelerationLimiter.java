@@ -1,12 +1,12 @@
 package org.team100.lib.subsystems.swerve.kinodynamics.limiter;
 
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.logging.LoggerFactory.GlobalAccelerationR3Logger;
+import org.team100.lib.logging.LoggerFactory.AccelerationSE2Logger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 /**
@@ -20,7 +20,7 @@ public class FieldRelativeAccelerationLimiter {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_scale;
-    private final GlobalAccelerationR3Logger m_log_accel;
+    private final AccelerationSE2Logger m_log_accel;
     private final SwerveKinodynamics m_limits;
     private final double m_cartesianScale;
     private final double m_alphaScale;
@@ -38,17 +38,17 @@ public class FieldRelativeAccelerationLimiter {
             double alphaScale) {
         LoggerFactory log = parent.type(this);
         m_log_scale = log.doubleLogger(Level.TRACE, "scale");
-        m_log_accel = log.globalAccelerationR3Logger(Level.TRACE, "accel");
+        m_log_accel = log.AccelerationSE2Logger(Level.TRACE, "accel");
         m_limits = limits;
         m_cartesianScale = cartesianScale;
         m_alphaScale = alphaScale;
     }
 
-    public GlobalVelocityR3 apply(
-            GlobalVelocityR3 prev,
-            GlobalVelocityR3 target) {
+    public VelocitySE2 apply(
+            VelocitySE2 prev,
+            VelocitySE2 target) {
         // Acceleration required to achieve the target.
-        GlobalAccelerationR3 accel = target.accel(
+        AccelerationSE2 accel = target.accel(
                 prev,
                 TimedRobot100.LOOP_PERIOD_S);
         m_log_accel.log(() -> accel);
@@ -56,7 +56,7 @@ public class FieldRelativeAccelerationLimiter {
         double alphaScale = alphaScale(accel);
         double scale = Math.min(cartesianScale, alphaScale);
         m_log_scale.log(() -> scale);
-        GlobalVelocityR3 result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
+        VelocitySE2 result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
         if (DEBUG) {
             System.out.printf(
                     "FieldRelativeAccelerationLimiter prev %s target %s accel %s cartesian scale %5.2f alpha scale %5.2f total scale %5.2f result %s\n",
@@ -66,9 +66,9 @@ public class FieldRelativeAccelerationLimiter {
     }
 
     double cartesianScale(
-            GlobalVelocityR3 prev,
-            GlobalVelocityR3 target,
-            GlobalAccelerationR3 accel) {
+            VelocitySE2 prev,
+            VelocitySE2 target,
+            AccelerationSE2 accel) {
         double a = accel.norm();
         if (Math.abs(a) < 1e-6) {
             // Avoid divide-by-zero.
@@ -82,7 +82,7 @@ public class FieldRelativeAccelerationLimiter {
         return Math.min(1, accelLimit / a);
     }
 
-    private double alphaScale(GlobalAccelerationR3 accel) {
+    private double alphaScale(AccelerationSE2 accel) {
         double a = accel.theta();
         if (Math.abs(a) < 1e-6) {
             // Avoid divide-by-zero.

@@ -2,7 +2,7 @@ package org.team100.lib.subsystems.r3.commands;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.subsystems.r3.PositionSubsystemR3;
@@ -44,7 +44,7 @@ public class ManualPosition extends Command {
         // control is velocity.
         // velocity in m/s and rad/s
         // we want full scale to be about 0.5 m/s and 0.5 rad/s
-        GlobalVelocityR3 jv = new GlobalVelocityR3(
+        VelocitySE2 jv = new VelocitySE2(
                 input.x() * 1.5,
                 input.y() * 1.5,
                 input.theta() * 3);

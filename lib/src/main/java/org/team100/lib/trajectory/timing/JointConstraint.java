@@ -1,7 +1,7 @@
 package org.team100.lib.trajectory.timing;
 
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.state.ControlR3;
@@ -48,7 +48,7 @@ public class JointConstraint implements TimingConstraint {
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
         HolonomicPose2d pose = state.getPose();
         // Velocity if translation speed were 1.0 m/s.
-        GlobalVelocityR3 v = new GlobalVelocityR3(
+        VelocitySE2 v = new VelocitySE2(
                 state.getCourse().getCos(),
                 state.getCourse().getSin(),
                 state.getHeadingRateRad_M());
@@ -69,7 +69,7 @@ public class JointConstraint implements TimingConstraint {
 
         EAWConfig q = m_k.inverse(pose.pose());
 
-        GlobalVelocityR3 maxV = m_j.forward(q, maxQdotInMotionDirection);
+        VelocitySE2 maxV = m_j.forward(q, maxQdotInMotionDirection);
         double norm = maxV.norm();
         if (Double.isNaN(norm))
             return new NonNegativeDouble(0);
@@ -80,7 +80,7 @@ public class JointConstraint implements TimingConstraint {
     public MinMaxAcceleration getMinMaxAcceleration(
             Pose2dWithMotion state, double velocityM_S) {
         Pose2d pose = state.getPose().pose();
-        Rotation2d course2 = state.getPose().course();
+        Rotation2d course2 = state.getPose().course().toRotation();
 
         double c = course2.getCos();
         double s = course2.getSin();
@@ -90,14 +90,14 @@ public class JointConstraint implements TimingConstraint {
         double omega = velocityM_S * r;
 
         // actual cartesian velocity
-        GlobalVelocityR3 v = new GlobalVelocityR3(vx, vy, omega);
+        VelocitySE2 v = new VelocitySE2(vx, vy, omega);
 
         EAWConfig q = m_k.inverse(pose);
         // actual qdot
         JointVelocities qdot = m_j.inverse(new ModelR3(pose, v));
 
         // find accel in motion
-        GlobalAccelerationR3 unitA = new GlobalAccelerationR3(c, s, r);
+        AccelerationSE2 unitA = new AccelerationSE2(c, s, r);
         ControlR3 sc = new ControlR3(pose, v, unitA);
         // corresponding a vector in joint space
         JointAccelerations qddot = m_j.inverseA(sc);
@@ -112,7 +112,7 @@ public class JointConstraint implements TimingConstraint {
         // scale qddot to the nearest maximum
         JointAccelerations maxQddotInMotionDirection = qddot.times(1 / maxScale);
 
-        GlobalAccelerationR3 fa = m_j.forwardA(q, qdot, maxQddotInMotionDirection);
+        AccelerationSE2 fa = m_j.forwardA(q, qdot, maxQddotInMotionDirection);
 
         double norm = fa.norm();
         if (Double.isNaN(norm))

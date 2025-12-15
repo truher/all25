@@ -44,8 +44,9 @@ public class Pose2dWithMotion {
         return m_pose;
     }
 
+    // TODO: change to DirectionSE2
     public Rotation2d getCourse() {
-        return m_pose.course();
+        return m_pose.course().toRotation();
     }
 
     /**

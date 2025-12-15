@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalDeltaR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.DeltaSE2;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -30,7 +30,7 @@ class FullStateControllerR3Test implements Timeless {
     void testAtRest() {
         FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
-        GlobalVelocityR3 t = c.calculate(
+        VelocitySE2 t = c.calculate(
                 new ModelR3(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -54,7 +54,7 @@ class FullStateControllerR3Test implements Timeless {
         FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
         // no velocity, no feedforward
-        GlobalVelocityR3 t = c.calculate(
+        VelocitySE2 t = c.calculate(
                 new ModelR3(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -78,7 +78,7 @@ class FullStateControllerR3Test implements Timeless {
     void testFast() {
         FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
-        GlobalVelocityR3 t = c.calculate(
+        VelocitySE2 t = c.calculate(
                 new ModelR3(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -103,7 +103,7 @@ class FullStateControllerR3Test implements Timeless {
     void testOnTrack() {
         FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
-        GlobalVelocityR3 t = c.calculate(
+        VelocitySE2 t = c.calculate(
                 new ModelR3(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -128,7 +128,7 @@ class FullStateControllerR3Test implements Timeless {
         FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
         // none of these have any velocity so there's no feedforward.
-        GlobalVelocityR3 t = c.calculate(
+        VelocitySE2 t = c.calculate(
                 new ModelR3(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -152,7 +152,7 @@ class FullStateControllerR3Test implements Timeless {
     void testRotation() {
         FullStateControllerR3 c = ControllerFactoryR3.test2(logger);
         assertFalse(c.atReference());
-        GlobalVelocityR3 t = c.calculate(
+        VelocitySE2 t = c.calculate(
                 new ModelR3(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -182,7 +182,7 @@ class FullStateControllerR3Test implements Timeless {
                         new Pose2dWithMotion(
                                 HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
                         0, 0, 0));
-        GlobalDeltaR3 err = controller.positionError(measurement, currentReference);
+        DeltaSE2 err = controller.positionError(measurement, currentReference);
         assertEquals(0, err.getX(), 0.001);
         assertEquals(0, err.getY(), 0.001);
         assertEquals(0, err.getRotation().getRadians(), 0.001);
@@ -196,7 +196,7 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 currentReference = ModelR3
                 .fromTimedPose(new TimedPose(new Pose2dWithMotion(
                         HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0), 0, 0, 0));
-        GlobalDeltaR3 err = controller.positionError(measurement, currentReference);
+        DeltaSE2 err = controller.positionError(measurement, currentReference);
         assertEquals(-1, err.getX(), 0.001);
         assertEquals(0, err.getY(), 0.001);
         assertEquals(0, err.getRotation().getRadians(), 0.001);
@@ -210,7 +210,7 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 currentReference = ModelR3
                 .fromTimedPose(new TimedPose(new Pose2dWithMotion(
                         HolonomicPose2d.make(1, 0, 0, 0), 0, 0, 0), 0, 0, 0));
-        GlobalDeltaR3 err = controller.positionError(measurement, currentReference);
+        DeltaSE2 err = controller.positionError(measurement, currentReference);
         assertEquals(1, err.getX(), 0.001);
         assertEquals(0, err.getY(), 0.001);
         assertEquals(0, err.getRotation().getRadians(), 0.001);
@@ -225,7 +225,7 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 currentReference = ModelR3
                 .fromTimedPose(new TimedPose(new Pose2dWithMotion(
                         HolonomicPose2d.make(0, 0, 1, 0), 0, 0, 0), 0, 0, 0));
-        GlobalDeltaR3 err = controller.positionError(measurement, currentReference);
+        DeltaSE2 err = controller.positionError(measurement, currentReference);
         assertEquals(-1, err.getX(), 0.001);
         assertEquals(0, err.getY(), 0.001);
         assertEquals(0, err.getRotation().getRadians(), 0.001);
@@ -252,7 +252,7 @@ class FullStateControllerR3Test implements Timeless {
         double acceleration = 0;
         // we're exactly on the setpoint so zero error
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 positionError = controller.positionError(measurement, currentReference);
+        DeltaSE2 positionError = controller.positionError(measurement, currentReference);
         assertEquals(0, positionError.getX(), DELTA);
         assertEquals(0, positionError.getY(), DELTA);
         assertEquals(0, positionError.getRadians(), DELTA);
@@ -276,7 +276,7 @@ class FullStateControllerR3Test implements Timeless {
         // constant speed
         double acceleration = 0;
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 positionError = controller.positionError(measurement, currentReference);
+        DeltaSE2 positionError = controller.positionError(measurement, currentReference);
         assertEquals(1, positionError.getX(), DELTA);
         assertEquals(0, positionError.getY(), DELTA);
         assertEquals(0, positionError.getRadians(), DELTA);
@@ -289,7 +289,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement position doesn't matter, rotation here matches velocity below
         ModelR3 measurement = new ModelR3(
                 new Pose2d(1, 2, new Rotation2d(Math.PI)),
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(1, 0, 0));
         // motion is in a straight line, down the x axis
         // setpoint is also at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
@@ -302,7 +302,7 @@ class FullStateControllerR3Test implements Timeless {
         // constant speed
         double acceleration = 0;
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalVelocityR3 error = controller.velocityError(measurement, currentReference);
+        VelocitySE2 error = controller.velocityError(measurement, currentReference);
         // we're exactly on the setpoint so zero error
         assertEquals(0, error.x(), DELTA);
         assertEquals(0, error.y(), DELTA);
@@ -317,7 +317,7 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is the wrong velocity
         ModelR3 measurement = new ModelR3(
                 new Pose2d(),
-                new GlobalVelocityR3(0, 1, 0));
+                new VelocitySE2(0, 1, 0));
         // motion is in a straight line, down the x axis
         // at the origin
         Pose2dWithMotion state = new Pose2dWithMotion(
@@ -332,7 +332,7 @@ class FullStateControllerR3Test implements Timeless {
         double acceleration = 0;
 
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalVelocityR3 error = controller.velocityError(measurement, currentReference);
+        VelocitySE2 error = controller.velocityError(measurement, currentReference);
         // error should include both components
         assertEquals(1, error.x(), DELTA);
         assertEquals(-1, error.y(), DELTA);
@@ -357,7 +357,7 @@ class FullStateControllerR3Test implements Timeless {
         TimedPose setpoint = new TimedPose(state, t, velocity, acceleration);
         // feedforward should be straight ahead, no rotation.
         ControlR3 nextReference = ControlR3.fromTimedPose(setpoint);
-        GlobalVelocityR3 speeds = controller.feedforward(nextReference);
+        VelocitySE2 speeds = controller.feedforward(nextReference);
         assertEquals(1, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
         assertEquals(0, speeds.theta(), DELTA);
@@ -381,7 +381,7 @@ class FullStateControllerR3Test implements Timeless {
         TimedPose setpoint = new TimedPose(state, t, velocity, acceleration);
         // feedforward should be -y, robot relative, no rotation.
         ControlR3 nextReference = ControlR3.fromTimedPose(setpoint);
-        GlobalVelocityR3 speeds = controller.feedforward(nextReference);
+        VelocitySE2 speeds = controller.feedforward(nextReference);
         assertEquals(1, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
         assertEquals(0, speeds.theta(), DELTA);
@@ -404,7 +404,7 @@ class FullStateControllerR3Test implements Timeless {
         // constant speed
         double acceleration = 0;
         ControlR3 nextReference = ControlR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalVelocityR3 speeds = controller.feedforward(nextReference);
+        VelocitySE2 speeds = controller.feedforward(nextReference);
         // feedforward should be ahead and rotating.
         assertEquals(1, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -436,11 +436,11 @@ class FullStateControllerR3Test implements Timeless {
         double acceleration = 0;
         ModelR3 measurement = new ModelR3(
                 currentState,
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(1, 0, 0));
         // feedforward should be straight ahead, no rotation.
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 err = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
-        GlobalVelocityR3 speeds = controller.positionFeedback(err);
+        DeltaSE2 err = DeltaSE2.delta(measurement.pose(), currentReference.pose());
+        VelocitySE2 speeds = controller.positionFeedback(err);
         // we're exactly on the setpoint so zero feedback
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -472,11 +472,11 @@ class FullStateControllerR3Test implements Timeless {
         double acceleration = 0;
         ModelR3 measurement = new ModelR3(
                 currentState,
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(1, 0, 0));
         // feedforward should be straight ahead, no rotation.
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 err = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
-        GlobalVelocityR3 speeds = controller.positionFeedback(err);
+        DeltaSE2 err = DeltaSE2.delta(measurement.pose(), currentReference.pose());
+        VelocitySE2 speeds = controller.positionFeedback(err);
         // setpoint should be negative y
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(-1, speeds.y(), DELTA);
@@ -508,11 +508,11 @@ class FullStateControllerR3Test implements Timeless {
         double acceleration = 0;
         ModelR3 measurement = new ModelR3(
                 currentState,
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(1, 0, 0));
         // feedforward should be straight ahead, no rotation.
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 err = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
-        GlobalVelocityR3 speeds = controller.positionFeedback(err);
+        DeltaSE2 err = DeltaSE2.delta(measurement.pose(), currentReference.pose());
+        VelocitySE2 speeds = controller.positionFeedback(err);
         // robot is on the setpoint in translation
         // but needs negative rotation
         // setpoint should be negative theta
@@ -547,10 +547,10 @@ class FullStateControllerR3Test implements Timeless {
         double acceleration = 0;
         ModelR3 measurement = new ModelR3(
                 currentState,
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(1, 0, 0));
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 err = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
-        GlobalVelocityR3 speeds = controller.positionFeedback(err);
+        DeltaSE2 err = DeltaSE2.delta(measurement.pose(), currentReference.pose());
+        VelocitySE2 speeds = controller.positionFeedback(err);
         // on target
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -582,10 +582,10 @@ class FullStateControllerR3Test implements Timeless {
         double acceleration = 0;
         ModelR3 measurement = new ModelR3(
                 currentState,
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(1, 0, 0));
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 err = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
-        GlobalVelocityR3 speeds = controller.positionFeedback(err);
+        DeltaSE2 err = DeltaSE2.delta(measurement.pose(), currentReference.pose());
+        VelocitySE2 speeds = controller.positionFeedback(err);
         // feedback is -y field relative
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(-1, speeds.y(), DELTA);
@@ -618,11 +618,11 @@ class FullStateControllerR3Test implements Timeless {
         // motion is on setpoint
         ModelR3 measurement = new ModelR3(
                 currentState,
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(1, 0, 0));
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 perr = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
-        GlobalVelocityR3 verr = currentReference.velocity().minus(measurement.velocity());
-        GlobalVelocityR3 speeds = controller.fullFeedback(perr, verr);
+        DeltaSE2 perr = DeltaSE2.delta(measurement.pose(), currentReference.pose());
+        VelocitySE2 verr = currentReference.velocity().minus(measurement.velocity());
+        VelocitySE2 speeds = controller.fullFeedback(perr, verr);
         // we're exactly on the setpoint so zero feedback
         assertEquals(0, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -656,11 +656,11 @@ class FullStateControllerR3Test implements Timeless {
         // measurement is too slow
         ModelR3 measurement = new ModelR3(
                 currentPose,
-                new GlobalVelocityR3(0.5, 0, 0));
+                new VelocitySE2(0.5, 0, 0));
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
-        GlobalDeltaR3 perr = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
-        GlobalVelocityR3 verr = currentReference.velocity().minus(measurement.velocity());
-        GlobalVelocityR3 speeds = controller.fullFeedback(perr, verr);
+        DeltaSE2 perr = DeltaSE2.delta(measurement.pose(), currentReference.pose());
+        VelocitySE2 verr = currentReference.velocity().minus(measurement.velocity());
+        VelocitySE2 speeds = controller.fullFeedback(perr, verr);
         // speed up
         assertEquals(0.5, speeds.x(), DELTA);
         assertEquals(0, speeds.y(), DELTA);
@@ -677,7 +677,7 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 measurement = new ModelR3(
                 new Pose2d(0.1, 0.1,
                         Rotation2d.kCCW_Pi_2.plus(new Rotation2d(0.1))),
-                new GlobalVelocityR3(0.5, 0, 0));
+                new VelocitySE2(0.5, 0, 0));
 
         // setpoint postion is ahead in x and y and theta
         HolonomicPose2d setpointPose = HolonomicPose2d.make(0, 0, Math.PI / 2, 0);
@@ -700,9 +700,9 @@ class FullStateControllerR3Test implements Timeless {
         ModelR3 currentReference = ModelR3.fromTimedPose(new TimedPose(state, t, velocity, acceleration));
 
         // feedforward should be straight ahead, no rotation.
-        GlobalDeltaR3 perr = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
-        GlobalVelocityR3 verr = currentReference.velocity().minus(measurement.velocity());
-        GlobalVelocityR3 positionFeedback = controller.positionFeedback(perr);
+        DeltaSE2 perr = DeltaSE2.delta(measurement.pose(), currentReference.pose());
+        VelocitySE2 verr = currentReference.velocity().minus(measurement.velocity());
+        VelocitySE2 positionFeedback = controller.positionFeedback(perr);
         // field-relative x is ahead
         assertEquals(-0.1, positionFeedback.x(), DELTA);
         // field-relative y is ahead
@@ -710,13 +710,13 @@ class FullStateControllerR3Test implements Timeless {
         // pull back theta
         assertEquals(-0.1, positionFeedback.theta(), DELTA);
 
-        GlobalVelocityR3 velocityFeedback = controller.velocityFeedback(verr);
+        VelocitySE2 velocityFeedback = controller.velocityFeedback(verr);
 
         assertEquals(0.5, velocityFeedback.x(), DELTA);
         assertEquals(0, velocityFeedback.y(), DELTA);
         assertEquals(0, velocityFeedback.theta(), DELTA);
 
-        GlobalVelocityR3 speeds = controller.fullFeedback(perr, verr);
+        VelocitySE2 speeds = controller.fullFeedback(perr, verr);
         // this is just the sum
         assertEquals(0.4, speeds.x(), DELTA);
         assertEquals(-0.1, speeds.y(), DELTA);

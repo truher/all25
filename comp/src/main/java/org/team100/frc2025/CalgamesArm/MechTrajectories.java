@@ -66,7 +66,7 @@ public class MechTrajectories extends Command {
 
         /** Use the start course and ignore the start pose for now */
         MoveAndHold f = new GoToPosePosition(
-                m_log, m_subsystem, start.course(), end, m_planner);
+                m_log, m_subsystem, start.course().toRotation(), end, m_planner);
         return f
                 .until(f::isDone)
                 .withName(name);
@@ -77,7 +77,7 @@ public class MechTrajectories extends Command {
 
         /** Use the start course and ignore the start pose for now */
         GoToPosePosition c = new GoToPosePosition(
-                m_log, m_subsystem, start.course(), end, m_planner);
+                m_log, m_subsystem, start.course().toRotation(), end, m_planner);
         c.setName(name);
         return c;
 

@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
@@ -287,7 +287,7 @@ public class SwerveKinodynamics {
      * This simply rotates the velocity from the field frame to the robot frame.
      */
     public static ChassisSpeeds toInstantaneousChassisSpeeds(
-            GlobalVelocityR3 v,
+            VelocitySE2 v,
             Rotation2d theta) {
         return ChassisSpeeds.fromFieldRelativeSpeeds(
                 v.x(),
@@ -300,9 +300,9 @@ public class SwerveKinodynamics {
      * Field-relative speed, without discretization.
      * This simply rotates the velocity from the robot frame to the field frame.
      */
-    public static GlobalVelocityR3 fromInstantaneousChassisSpeeds(ChassisSpeeds instantaneous, Rotation2d theta) {
+    public static VelocitySE2 fromInstantaneousChassisSpeeds(ChassisSpeeds instantaneous, Rotation2d theta) {
         ChassisSpeeds c = ChassisSpeeds.fromRobotRelativeSpeeds(instantaneous, theta);
-        return new GlobalVelocityR3(c.vxMetersPerSecond, c.vyMetersPerSecond, c.omegaRadiansPerSecond);
+        return new VelocitySE2(c.vxMetersPerSecond, c.vyMetersPerSecond, c.omegaRadiansPerSecond);
     }
 
     public SwerveDriveKinematics100 getKinematics() {

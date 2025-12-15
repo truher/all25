@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
@@ -265,8 +266,14 @@ public class ScheduleGeneratorTest {
     @Test
     void testPerformance() {
         List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(new Translation2d(), new Rotation2d(), new Rotation2d()),
-                new HolonomicPose2d(new Translation2d(1, 1), new Rotation2d(), new Rotation2d(Math.PI / 2)));
+                new HolonomicPose2d(
+                        new Translation2d(),
+                        new Rotation2d(),
+                        DirectionSE2.TO_X),
+                new HolonomicPose2d(
+                        new Translation2d(1, 1),
+                        new Rotation2d(),
+                        DirectionSE2.TO_Y));
         long startTimeNs = System.nanoTime();
         final int iterations = 100;
         final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;

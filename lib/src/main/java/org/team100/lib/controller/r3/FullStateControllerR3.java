@@ -1,10 +1,10 @@
 package org.team100.lib.controller.r3;
 
-import org.team100.lib.geometry.GlobalDeltaR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.DeltaSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.state.ControlR3;
 
 /**
@@ -12,9 +12,9 @@ import org.team100.lib.state.ControlR3;
  */
 public class FullStateControllerR3 extends ControllerR3Base {
 
-    private final GlobalVelocityR3Logger m_log_u_FF;
-    private final GlobalVelocityR3Logger m_log_u_FB;
-    private final GlobalVelocityR3Logger m_log_u_VFB;
+    private final VelocitySE2Logger m_log_u_FF;
+    private final VelocitySE2Logger m_log_u_FB;
+    private final VelocitySE2Logger m_log_u_VFB;
 
     private final double m_kPCart;
     private final double m_kPTheta;
@@ -34,9 +34,9 @@ public class FullStateControllerR3 extends ControllerR3Base {
         super(parent, xTolerance, thetaTolerance, xDotTolerance, omegaTolerance);
         LoggerFactory log = parent.type(this);
 
-        m_log_u_FF = log.globalVelocityR3Logger(Level.TRACE, "feedforward");
-        m_log_u_FB = log.globalVelocityR3Logger(Level.TRACE, "position feedback");
-        m_log_u_VFB = log.globalVelocityR3Logger(Level.TRACE, "velocity feedback");
+        m_log_u_FF = log.VelocitySE2Logger(Level.TRACE, "feedforward");
+        m_log_u_FB = log.VelocitySE2Logger(Level.TRACE, "position feedback");
+        m_log_u_VFB = log.VelocitySE2Logger(Level.TRACE, "velocity feedback");
 
         m_kPCart = kPCart;
         m_kPTheta = kPTheta;
@@ -45,12 +45,12 @@ public class FullStateControllerR3 extends ControllerR3Base {
     }
 
     @Override
-    public GlobalVelocityR3 calculate100(
-            GlobalDeltaR3 positionError,
-            GlobalVelocityR3 velocityError,
+    public VelocitySE2 calculate100(
+            DeltaSE2 positionError,
+            VelocitySE2 velocityError,
             ControlR3 nextReference) {
-        GlobalVelocityR3 u_FF = feedforward(nextReference);
-        GlobalVelocityR3 u_FB = fullFeedback(positionError, velocityError);
+        VelocitySE2 u_FF = feedforward(nextReference);
+        VelocitySE2 u_FB = fullFeedback(positionError, velocityError);
         return u_FF.plus(u_FB);
     }
 
@@ -58,22 +58,22 @@ public class FullStateControllerR3 extends ControllerR3Base {
     //
     // package-private for testing
 
-    GlobalVelocityR3 feedforward(ControlR3 nextReference) {
+    VelocitySE2 feedforward(ControlR3 nextReference) {
         m_log_u_FF.log(() -> nextReference.velocity());
         return nextReference.velocity();
     }
 
-    GlobalVelocityR3 fullFeedback(GlobalDeltaR3 positionError, GlobalVelocityR3 velocityError) {
-        GlobalVelocityR3 u_XFB = positionFeedback(positionError);
-        GlobalVelocityR3 u_VFB = velocityFeedback(velocityError);
+    VelocitySE2 fullFeedback(DeltaSE2 positionError, VelocitySE2 velocityError) {
+        VelocitySE2 u_XFB = positionFeedback(positionError);
+        VelocitySE2 u_VFB = velocityFeedback(velocityError);
         return u_XFB.plus(u_VFB);
     }
 
     /**
      * Returns position feedback proportional to position error.
      */
-    GlobalVelocityR3 positionFeedback(GlobalDeltaR3 positionError) {
-        GlobalVelocityR3 u_FB = new GlobalVelocityR3(
+    VelocitySE2 positionFeedback(DeltaSE2 positionError) {
+        VelocitySE2 u_FB = new VelocitySE2(
                 m_kPCart * positionError.getX(),
                 m_kPCart * positionError.getY(),
                 m_kPTheta * positionError.getRotation().getRadians());
@@ -84,8 +84,8 @@ public class FullStateControllerR3 extends ControllerR3Base {
     /**
      * Returns velocity feedback proportional to velocity error.
      */
-    GlobalVelocityR3 velocityFeedback(GlobalVelocityR3 velocityError) {
-        GlobalVelocityR3 u_VFB = new GlobalVelocityR3(
+    VelocitySE2 velocityFeedback(VelocitySE2 velocityError) {
+        VelocitySE2 u_VFB = new VelocitySE2(
                 m_kPCartV * velocityError.x(),
                 m_kPCartV * velocityError.y(),
                 m_kPThetaV * velocityError.theta());

@@ -4,7 +4,7 @@ import org.team100.lib.config.DriverSkill;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
@@ -31,9 +31,9 @@ public class FieldRelativeAdapter implements DriverAdapter {
         if (DEBUG) {
             System.out.printf("FieldRelativeDriver %s\n", t);
         }
-        GlobalVelocityR3 v = m_driver.apply(s, t);
+        VelocitySE2 v = m_driver.apply(s, t);
         // scale for driver skill.
-        GlobalVelocityR3 scaled = GeometryUtil.scale(v, DriverSkill.level().scale());
+        VelocitySE2 scaled = GeometryUtil.scale(v, DriverSkill.level().scale());
 
         // Apply field-relative limits.
         if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {

@@ -9,7 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -131,11 +132,17 @@ public class ReferenceControllerR3Test implements Timeless {
     void testFieldRelativeTrajectory() {
         List<HolonomicPose2d> waypoints = new ArrayList<>();
         waypoints.add(new HolonomicPose2d(
-                new Translation2d(), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0)));
+                new Translation2d(),
+                Rotation2d.fromDegrees(180),
+                DirectionSE2.TO_X));
         waypoints.add(new HolonomicPose2d(
-                new Translation2d(100, 4), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0)));
+                new Translation2d(100, 4),
+                Rotation2d.fromDegrees(180),
+                DirectionSE2.TO_X));
         waypoints.add(new HolonomicPose2d(
-                new Translation2d(196, 13), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)));
+                new Translation2d(196, 13),
+                Rotation2d.fromDegrees(0),
+                DirectionSE2.TO_X));
 
         double start_vel = 0.0;
         double end_vel = 0.0;
@@ -166,7 +173,7 @@ public class ReferenceControllerR3Test implements Timeless {
                 logger, drive, swerveController, reference);
 
         Pose2d pose = trajectory.sample(0).state().getPose().pose();
-        GlobalVelocityR3 velocity = GlobalVelocityR3.ZERO;
+        VelocitySE2 velocity = VelocitySE2.ZERO;
 
         double mDt = 0.02;
         int i = 0;

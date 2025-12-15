@@ -14,12 +14,12 @@ and the correct derivative takes this into account: see `Pose2d.exp()` and
 `Pose2d.log()`.
  
 We mostly do not use `exp()` and `log()`.  We treat global velocity and
-acceleration as if all the components were independent, i.e. using the R3 vector space,
-not the SE(2) Lie group.
+acceleration as if all the components were independent,
+i.e. using the R3 vector space, not the SE(2) Lie group.
 
 Why?  Because at large scales, we think in R3, e.g. we define
 trajectories and means to follow them without worrying about the coupling
-in SE(2).  We *do* handle SE(2) correct at the smallest scale, one
+in SE(2).  We *do* handle SE(2) correctly at the smallest scale, one
 robot-clock step at a time, where, for example, drivetrain actuation
 needs to be correctly "discretized" so that the constant-twist paths
 the robot follows (approximately) during a single time step end up

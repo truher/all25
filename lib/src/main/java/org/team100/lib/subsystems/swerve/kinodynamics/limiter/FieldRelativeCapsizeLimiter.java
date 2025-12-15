@@ -1,13 +1,13 @@
 package org.team100.lib.subsystems.swerve.kinodynamics.limiter;
 
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.logging.LoggerFactory.GlobalAccelerationR3Logger;
-import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.AccelerationSE2Logger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 /**
@@ -17,9 +17,9 @@ public class FieldRelativeCapsizeLimiter {
     private static final boolean DEBUG = false;
 
     private final DoubleLogger m_log_scale;
-    private final GlobalAccelerationR3Logger m_log_accel;
-    private final GlobalVelocityR3Logger m_log_prev;
-    private final GlobalVelocityR3Logger m_log_target;
+    private final AccelerationSE2Logger m_log_accel;
+    private final VelocitySE2Logger m_log_prev;
+    private final VelocitySE2Logger m_log_target;
 
     private final SwerveKinodynamics limits;
 
@@ -28,19 +28,19 @@ public class FieldRelativeCapsizeLimiter {
             SwerveKinodynamics m_limits) {
         LoggerFactory log = parent.type(this);
         m_log_scale = log.doubleLogger(Level.TRACE, "scale");
-        m_log_accel = log.globalAccelerationR3Logger(Level.TRACE, "accel");
-        m_log_prev = log.globalVelocityR3Logger(Level.TRACE, "prev");
-        m_log_target = log.globalVelocityR3Logger(Level.TRACE, "target");
+        m_log_accel = log.AccelerationSE2Logger(Level.TRACE, "accel");
+        m_log_prev = log.VelocitySE2Logger(Level.TRACE, "prev");
+        m_log_target = log.VelocitySE2Logger(Level.TRACE, "target");
         limits = m_limits;
     }
 
-    public GlobalVelocityR3 apply(
-            GlobalVelocityR3 prev,
-            GlobalVelocityR3 target) {
+    public VelocitySE2 apply(
+            VelocitySE2 prev,
+            VelocitySE2 target) {
         m_log_prev.log(() -> prev);
         m_log_target.log(() -> target);
         // Acceleration required to achieve the target.
-        GlobalAccelerationR3 accel = target.accel(
+        AccelerationSE2 accel = target.accel(
                 prev,
                 TimedRobot100.LOOP_PERIOD_S);
         m_log_accel.log(() -> accel);
@@ -51,7 +51,7 @@ public class FieldRelativeCapsizeLimiter {
         }
         double scale = scale(a);
         m_log_scale.log(() -> scale);
-        GlobalVelocityR3 result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
+        VelocitySE2 result = prev.plus(accel.times(scale).integrate(TimedRobot100.LOOP_PERIOD_S));
         if (DEBUG) {
             System.out.printf("FieldRelativeCapsizeLimiter prev %s target %s accel %s scale %5.2f result %s\n",
                     prev, target, accel, scale, result);

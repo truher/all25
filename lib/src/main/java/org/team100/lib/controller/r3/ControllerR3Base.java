@@ -1,14 +1,14 @@
 package org.team100.lib.controller.r3;
 
-import org.team100.lib.geometry.GlobalDeltaR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.DeltaSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
 import org.team100.lib.logging.LoggerFactory.ControlR3Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.GlobaDeltaR3Logger;
-import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
@@ -27,7 +27,7 @@ public abstract class ControllerR3Base implements ControllerR3 {
     private final ControlR3Logger m_log_nextReference;
 
     private final GlobaDeltaR3Logger m_log_position_error;
-    private final GlobalVelocityR3Logger m_log_velocity_error;
+    private final VelocitySE2Logger m_log_velocity_error;
     /** Error in cartesian distance, i.e. hypot(x, y). */
     private final DoubleLogger m_log_cartesianPositionError;
     /** Error in cartesian velocity, i.e. hypot(vx, vy). */
@@ -43,9 +43,9 @@ public abstract class ControllerR3Base implements ControllerR3 {
     private final double m_omegaTolerance;
 
     /** The position error calculated in the most-recent call to calculate. */
-    private GlobalDeltaR3 m_positionError;
+    private DeltaSE2 m_positionError;
     /** The velocity error calculated in the most-recent call to calculate. */
-    private GlobalVelocityR3 m_velocityError;
+    private VelocitySE2 m_velocityError;
 
     public ControllerR3Base(
             LoggerFactory parent,
@@ -59,8 +59,8 @@ public abstract class ControllerR3Base implements ControllerR3 {
         m_log_currentReference = log.modelR3Logger(Level.DEBUG, "current reference");
         m_log_nextReference = log.controlR3Logger(Level.DEBUG, "next reference");
 
-        m_log_position_error = log.globalDeltaR3Logger(Level.TRACE, "position error");
-        m_log_velocity_error = log.globalVelocityR3Logger(Level.TRACE, "velocity error");
+        m_log_position_error = log.DeltaSE2Logger(Level.TRACE, "position error");
+        m_log_velocity_error = log.VelocitySE2Logger(Level.TRACE, "velocity error");
         m_log_cartesianPositionError = log.doubleLogger(Level.TRACE, "cartesian position error");
         m_log_cartesianVelocityError = log.doubleLogger(Level.TRACE, "cartesian velocity error ");
 
@@ -75,7 +75,7 @@ public abstract class ControllerR3Base implements ControllerR3 {
     }
 
     @Override
-    public GlobalVelocityR3 calculate(
+    public VelocitySE2 calculate(
             ModelR3 measurement,
             ModelR3 currentReference,
             ControlR3 nextReference) {
@@ -93,9 +93,9 @@ public abstract class ControllerR3Base implements ControllerR3 {
      * @param nextReference velocity for dt from now
      * @returns control output for the period during dt
      */
-    public abstract GlobalVelocityR3 calculate100(
-            GlobalDeltaR3 positionError,
-            GlobalVelocityR3 velocityError,
+    public abstract VelocitySE2 calculate100(
+            DeltaSE2 positionError,
+            VelocitySE2 velocityError,
             ControlR3 nextReference);
 
     /**
@@ -111,7 +111,7 @@ public abstract class ControllerR3Base implements ControllerR3 {
     }
 
     /** True if cartesian and rotation position errors are within tolerance. */
-    boolean positionOK(GlobalDeltaR3 positionError) {
+    boolean positionOK(DeltaSE2 positionError) {
         double cartesian = positionError.getTranslation().getNorm();
         m_log_cartesianPositionError.log(() -> cartesian);
         double rotation = Math.abs(positionError.getRotation().getRadians());
@@ -121,7 +121,7 @@ public abstract class ControllerR3Base implements ControllerR3 {
     }
 
     /** True if cartesian and rotation velocity errors are within tolerance. */
-    boolean velocityOK(GlobalVelocityR3 velocityError) {
+    boolean velocityOK(VelocitySE2 velocityError) {
         double cartesian = velocityError.norm();
         m_log_cartesianVelocityError.log(() -> cartesian);
         double rotation = Math.abs(velocityError.angle().orElse(Rotation2d.kZero).getRadians());
@@ -133,8 +133,8 @@ public abstract class ControllerR3Base implements ControllerR3 {
     /**
      * Wraps heading.
      */
-    GlobalDeltaR3 positionError(ModelR3 measurement, ModelR3 currentReference) {
-        GlobalDeltaR3 err = GlobalDeltaR3.delta(measurement.pose(), currentReference.pose());
+    DeltaSE2 positionError(ModelR3 measurement, ModelR3 currentReference) {
+        DeltaSE2 err = DeltaSE2.delta(measurement.pose(), currentReference.pose());
         m_log_position_error.log(() -> err);
         return err;
     }
@@ -142,8 +142,8 @@ public abstract class ControllerR3Base implements ControllerR3 {
     /**
      * Velocity does not wrap.
      */
-    GlobalVelocityR3 velocityError(ModelR3 measurement, ModelR3 currentReference) {
-        GlobalVelocityR3 err = currentReference.velocity().minus(measurement.velocity());
+    VelocitySE2 velocityError(ModelR3 measurement, ModelR3 currentReference) {
+        VelocitySE2 err = currentReference.velocity().minus(measurement.velocity());
         m_log_velocity_error.log(() -> err);
         return err;
     }

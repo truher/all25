@@ -2,7 +2,7 @@ package org.team100.lib.localization;
 
 import java.util.Objects;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveDriveKinematics100;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModuleDeltas;
@@ -72,9 +72,9 @@ class InterpolationRecord implements Interpolatable<InterpolationRecord> {
         Pose2d pose = m_state.pose().exp(twist);
 
         // these lerps are wrong but maybe close enough
-        GlobalVelocityR3 startVelocity = m_state.velocity();
-        GlobalVelocityR3 endVelocity = endValue.m_state.velocity();
-        GlobalVelocityR3 velocity = startVelocity.plus(endVelocity.minus(startVelocity).times(t));
+        VelocitySE2 startVelocity = m_state.velocity();
+        VelocitySE2 endVelocity = endValue.m_state.velocity();
+        VelocitySE2 velocity = startVelocity.plus(endVelocity.minus(startVelocity).times(t));
 
         ModelR3 newState = new ModelR3(pose, velocity);
         return new InterpolationRecord(m_kinematics, newState, wheelLerp);

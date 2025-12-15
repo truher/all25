@@ -3,7 +3,7 @@ package org.team100.lib.subsystems.swerve.kinodynamics.limiter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -35,9 +35,9 @@ public class FieldRelativeCapsizeLimiterTest implements Timeless {
     void testUnconstrained() {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
-        GlobalVelocityR3 result = limiter.apply(
-                new GlobalVelocityR3(0, 0, 0),
-                new GlobalVelocityR3(0, 0, 0));
+        VelocitySE2 result = limiter.apply(
+                new VelocitySE2(0, 0, 0),
+                new VelocitySE2(0, 0, 0));
         assertEquals(0, result.x(), DELTA);
         assertEquals(0, result.y(), DELTA);
         assertEquals(0, result.theta(), DELTA);
@@ -48,9 +48,9 @@ public class FieldRelativeCapsizeLimiterTest implements Timeless {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         assertEquals(8.166, limits.getMaxCapsizeAccelM_S2(), DELTA);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
-        GlobalVelocityR3 result = limiter.apply(
-                new GlobalVelocityR3(0, 0, 0),
-                new GlobalVelocityR3(1, 0, 0));
+        VelocitySE2 result = limiter.apply(
+                new VelocitySE2(0, 0, 0),
+                new VelocitySE2(1, 0, 0));
         // 0.163 is 8.166 * 0.02
         assertEquals(0.163, result.x(), DELTA);
         assertEquals(0, result.y(), DELTA);
@@ -68,9 +68,9 @@ public class FieldRelativeCapsizeLimiterTest implements Timeless {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         assertEquals(8.166, limits.getMaxCapsizeAccelM_S2(), DELTA);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
-        GlobalVelocityR3 result = limiter.apply(
-                new GlobalVelocityR3(1, 0, 0),
-                new GlobalVelocityR3(0, 1, 0));
+        VelocitySE2 result = limiter.apply(
+                new VelocitySE2(1, 0, 0),
+                new VelocitySE2(0, 1, 0));
         assertEquals(0.884, result.x(), DELTA);
         assertEquals(0.115, result.y(), DELTA);
         assertEquals(0, result.theta(), DELTA);
@@ -81,9 +81,9 @@ public class FieldRelativeCapsizeLimiterTest implements Timeless {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.lowCapsize(logger);
         assertEquals(1.225, limits.getMaxCapsizeAccelM_S2(), DELTA);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
-        GlobalVelocityR3 result = limiter.apply(
-                new GlobalVelocityR3(1, 0, 0),
-                new GlobalVelocityR3(0, 1, 0));
+        VelocitySE2 result = limiter.apply(
+                new VelocitySE2(1, 0, 0),
+                new VelocitySE2(0, 1, 0));
         assertEquals(0.982, result.x(), DELTA);
         assertEquals(0.017, result.y(), DELTA);
         assertEquals(0, result.theta(), DELTA);
@@ -94,9 +94,9 @@ public class FieldRelativeCapsizeLimiterTest implements Timeless {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         assertEquals(8.166, limits.getMaxCapsizeAccelM_S2(), DELTA);
         FieldRelativeCapsizeLimiter limiter = new FieldRelativeCapsizeLimiter(logger, limits);
-        GlobalVelocityR3 result = limiter.apply(
-                new GlobalVelocityR3(5, 0, 0),
-                new GlobalVelocityR3(0, 5, 0));
+        VelocitySE2 result = limiter.apply(
+                new VelocitySE2(5, 0, 0),
+                new VelocitySE2(0, 5, 0));
         assertEquals(4.884, result.x(), DELTA);
         assertEquals(0.115, result.y(), DELTA);
         assertEquals(0, result.theta(), DELTA);

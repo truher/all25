@@ -13,7 +13,17 @@ import edu.wpi.first.math.numbers.N6;
  * 
  */
 public class SplineR1Test {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
+
+    /**
+     * Making the end derivatives the average, with zero second derivative, makes
+     * the spline always just a straight line
+     */
+    @Test
+    void testEnds() {
+        SplineR1 spline = SplineR1.get(0, 1, 1, 1, 0, 0);
+        show(spline);
+    }
 
     /** Look at an example */
     @Test
@@ -23,13 +33,18 @@ public class SplineR1Test {
         // is not useful without modifying the schedule.
         // Spline1d spline = Spline1d.get(0, 1, 0, 0, 0, 0);
         SplineR1 spline = SplineR1.viaMatrix(0, 1, 0, 0, 0, 0);
+        show(spline);
+    }
+
+    private void show(SplineR1 spline) {
+        System.out.println("t, x, v, a, j");
         for (double t = 0; t <= 1; t += 0.01) {
             double x = spline.getPosition(t);
             double v = spline.getVelocity(t);
             double a = spline.getAcceleration(t);
             double j = spline.getJerk(t);
             if (DEBUG)
-                System.out.printf("%8.3f %8.3f %8.3f %8.3f %8.3f\n",
+                System.out.printf("%8.3f, %8.3f, %8.3f, %8.3f, %8.3f\n",
                         t, x, v, a, j);
         }
     }

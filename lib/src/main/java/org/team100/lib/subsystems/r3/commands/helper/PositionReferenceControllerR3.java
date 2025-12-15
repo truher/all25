@@ -2,7 +2,7 @@ package org.team100.lib.subsystems.r3.commands.helper;
 
 import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.controller.r3.NullControllerR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.ReferenceR3;
 import org.team100.lib.state.ControlR3;
@@ -36,7 +36,7 @@ public class PositionReferenceControllerR3 extends ReferenceControllerR3Base {
      * @param u    ignored, since this uses outboard feedback only.
      */
     @Override
-    void execute100(ControlR3 next, GlobalVelocityR3 u) {
+    void execute100(ControlR3 next, VelocitySE2 u) {
         m_subsystem.set(next);
     }
 

@@ -3,8 +3,8 @@ package org.team100.frc2025.CalgamesArm;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -62,8 +62,8 @@ public class TrajectoryJointTest {
         for (double tt = 0; tt < t.duration(); tt += 0.02) {
             ControlR3 m = ControlR3.fromTimedPose(t.sample(tt));
             Pose2d p = m.pose();
-            GlobalVelocityR3 v = m.velocity();
-            GlobalAccelerationR3 a = m.acceleration();
+            VelocitySE2 v = m.velocity();
+            AccelerationSE2 a = m.acceleration();
             EAWConfig q = k.inverse(p);
             JointVelocities jv = J.inverse(m.model());
             JointAccelerations ja = J.inverseA(m);

@@ -1,7 +1,7 @@
 package org.team100.lib.state;
 
 import org.team100.lib.geometry.GlobalVelocityR2;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.timing.TimedPose;
 
@@ -31,7 +31,7 @@ public class ModelR3 {
         m_theta = theta;
     }
 
-    public ModelR3(Pose2d x, GlobalVelocityR3 v) {
+    public ModelR3(Pose2d x, VelocitySE2 v) {
         this(
                 new Model100(x.getX(), v.x()),
                 new Model100(x.getY(), v.y()),
@@ -40,7 +40,7 @@ public class ModelR3 {
 
     /** Motionless with the specified pose */
     public ModelR3(Pose2d x) {
-        this(x, new GlobalVelocityR3(0, 0, 0));
+        this(x, new VelocitySE2(0, 0, 0));
     }
 
     /** Motionless at the origin with the specified heading */
@@ -99,8 +99,8 @@ public class ModelR3 {
         return new Rotation2d(m_theta.x());
     }
 
-    public GlobalVelocityR3 velocity() {
-        return new GlobalVelocityR3(m_x.v(), m_y.v(), m_theta.v());
+    public VelocitySE2 velocity() {
+        return new VelocitySE2(m_x.v(), m_y.v(), m_theta.v());
     }
 
     public GlobalVelocityR2 velocityR2() {

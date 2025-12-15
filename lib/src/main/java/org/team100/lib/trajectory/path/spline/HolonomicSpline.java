@@ -2,6 +2,7 @@ package org.team100.lib.trajectory.path.spline;
 
 import java.util.Optional;
 
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
@@ -33,12 +34,12 @@ public class HolonomicSpline {
 
     private final SplineR1 m_x;
     private final SplineR1 m_y;
-    private final SplineR1 m_theta;
+    private final SplineR1 m_heading;
     /**
-     * Offset for rotational spline: the rotational spline doesn't include the
+     * Offset for heading spline: the heading spline doesn't include the
      * starting point in order to correctly handle wrapping.
      */
-    private final Rotation2d m_r0;
+    private final Rotation2d m_heading0;
 
     /**
      * The theta endpoint derivative is just the average theta rate, which is new,
@@ -78,14 +79,17 @@ public class HolonomicSpline {
         if (DEBUG) {
             System.out.printf("scale %f %f\n", scale0, scale1);
         }
-        Translation2d course0 = new Translation2d(1,0).rotateBy(p0.course());
-        Translation2d course1 = new Translation2d(1,0).rotateBy(p1.course());
-        
+
+        // Translation2d course0 = new Translation2d(1,0).rotateBy(p0.course());
+        // Translation2d course1 = new Translation2d(1,0).rotateBy(p1.course());
+
         double x0 = p0.translation().getX();
         double x1 = p1.translation().getX();
         // first derivatives are just the course
-        double dx0 = course0.getX() * scale0;
-        double dx1 = course1.getX() * scale1;
+        // double dx0 = course0.getX() * scale0;
+        double dx0 = p0.course().x * scale0;
+        // double dx1 = course1.getX() * scale1;
+        double dx1 = p1.course().x * scale1;
         // second derivatives are zero at the ends
         double ddx0 = 0;
         double ddx1 = 0;
@@ -93,8 +97,10 @@ public class HolonomicSpline {
         double y0 = p0.translation().getY();
         double y1 = p1.translation().getY();
         // first derivatives are just the course
-        double dy0 = course0.getY() * scale0;
-        double dy1 = course1.getY() * scale1;
+        // double dy0 = course0.getY() * scale0;
+        double dy0 = p0.course().y * scale0;
+        // double dy1 = course1.getY() * scale1;
+        double dy1 = p1.course().y * scale1;
         // second derivatives are zero at the ends
         double ddy0 = 0;
         double ddy1 = 0;
@@ -102,7 +108,7 @@ public class HolonomicSpline {
         m_x = SplineR1.get(x0, x1, dx0, dx1, ddx0, ddx1);
         m_y = SplineR1.get(y0, y1, dy0, dy1, ddy0, ddy1);
 
-        m_r0 = p0.heading();
+        m_heading0 = p0.heading();
         double delta = p1.heading().minus(p0.heading()).getRadians();
 
         // previously dtheta at the endpoints was zero, which is bad: it meant the omega
@@ -117,12 +123,12 @@ public class HolonomicSpline {
         // second derivatives are zero at the ends
         double ddtheta0 = 0;
         double ddtheta1 = 0;
-        m_theta = SplineR1.get(0.0, delta, dtheta0, dtheta1, ddtheta0, ddtheta1);
+        m_heading = SplineR1.get(0.0, delta, dtheta0, dtheta1, ddtheta0, ddtheta1);
     }
 
     @Override
     public String toString() {
-        return "HolonomicSpline [m_x=" + m_x + ", m_y=" + m_y + ", m_theta=" + m_theta + ", m_r0=" + m_r0 + "]";
+        return "HolonomicSpline [m_x=" + m_x + ", m_y=" + m_y + ", m_theta=" + m_heading + ", m_r0=" + m_heading0 + "]";
     }
 
     /** This is used by various optimization steps. */
@@ -133,8 +139,8 @@ public class HolonomicSpline {
             Rotation2d r0) {
         m_x = x;
         m_y = y;
-        m_theta = theta;
-        m_r0 = r0;
+        m_heading = theta;
+        m_heading0 = r0;
     }
 
     public Pose2dWithMotion getPose2dWithMotion(double p) {
@@ -142,7 +148,7 @@ public class HolonomicSpline {
                 new HolonomicPose2d(
                         getPoint(p),
                         getHeading(p),
-                        getCourse(p).orElseThrow()),
+                        DirectionSE2.fromRotation(getCourse(p).orElseThrow())),
                 getDHeadingDs(p),
                 getCurvature(p),
                 getDCurvatureDs(p));
@@ -171,11 +177,11 @@ public class HolonomicSpline {
     ////////////////////////////////////////////////////////////////////////
 
     protected Rotation2d getHeading(double t) {
-        return m_r0.rotateBy(Rotation2d.fromRadians(m_theta.getPosition(t)));
+        return m_heading0.rotateBy(Rotation2d.fromRadians(m_heading.getPosition(t)));
     }
 
     protected double getDHeading(double t) {
-        return m_theta.getVelocity(t);
+        return m_heading.getVelocity(t);
     }
 
     HolonomicSpline replaceFirstDerivatives(
@@ -201,13 +207,13 @@ public class HolonomicSpline {
                         m_y.getAcceleration(0),
                         m_y.getAcceleration(1)),
                 SplineR1.get(
-                        m_theta.getPosition(0),
-                        m_theta.getPosition(1),
+                        m_heading.getPosition(0),
+                        m_heading.getPosition(1),
                         dtheta0,
                         dtheta1,
-                        m_theta.getAcceleration(0),
-                        m_theta.getAcceleration(1)),
-                m_r0);
+                        m_heading.getAcceleration(0),
+                        m_heading.getAcceleration(1)),
+                m_heading0);
     }
 
     /**
@@ -222,8 +228,8 @@ public class HolonomicSpline {
         return new HolonomicSpline(
                 m_x.addCoefs(SplineR1.get(0, 0, 0, 0, ddx0_sub, ddx1_sub)),
                 m_y.addCoefs(SplineR1.get(0, 0, 0, 0, ddy0_sub, ddy1_sub)),
-                m_theta,
-                m_r0);
+                m_heading,
+                m_heading0);
     }
 
     /**
@@ -302,7 +308,7 @@ public class HolonomicSpline {
     }
 
     double dtheta(double t) {
-        return m_theta.getVelocity(t);
+        return m_heading.getVelocity(t);
     }
 
     double ddx(double t) {
@@ -314,7 +320,7 @@ public class HolonomicSpline {
     }
 
     double ddtheta(double t) {
-        return m_theta.getAcceleration(t);
+        return m_heading.getAcceleration(t);
     }
 
     double dddx(double t) {
@@ -326,7 +332,7 @@ public class HolonomicSpline {
     }
 
     double dddtheta(double t) {
-        return m_theta.getJerk(t);
+        return m_heading.getJerk(t);
     }
 
     /**

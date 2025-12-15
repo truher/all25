@@ -4,7 +4,7 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.function.DoubleFunction;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -59,7 +59,7 @@ public class SwerveHistory implements DoubleFunction<ModelR3> {
                         m_kinodynamics.getKinematics(),
                         new ModelR3(
                                 initialPoseMeters,
-                                new GlobalVelocityR3(0, 0, 0)),
+                                new VelocitySE2(0, 0, 0)),
                         modulePositions));
     }
 
@@ -82,7 +82,7 @@ public class SwerveHistory implements DoubleFunction<ModelR3> {
                 timestampSeconds,
                 new InterpolationRecord(
                         m_kinodynamics.getKinematics(),
-                        new ModelR3(pose, new GlobalVelocityR3(0, 0, 0)),
+                        new ModelR3(pose, new VelocitySE2(0, 0, 0)),
                         modulePositions));
     }
 

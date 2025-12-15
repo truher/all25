@@ -9,7 +9,7 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.FreshSwerveEstimate;
@@ -87,7 +87,7 @@ public class SimulatedDrivingTest implements Timeless {
 
     @Test
     void testSteps() {
-        GlobalVelocityR3 input = new GlobalVelocityR3(2, 0, 3.5);
+        VelocitySE2 input = new VelocitySE2(2, 0, 3.5);
         Rotation2d theta = new Rotation2d();
         ChassisSpeeds targetChassisSpeeds = SwerveKinodynamics.toInstantaneousChassisSpeeds(input, theta);
         SwerveModuleStates states = swerveKinodynamics.toSwerveModuleStates(targetChassisSpeeds);
@@ -139,7 +139,7 @@ public class SimulatedDrivingTest implements Timeless {
     void testStraight() {
         // just +x
         collection.reset();
-        GlobalVelocityR3 input = new GlobalVelocityR3(2, 0, 0);
+        VelocitySE2 input = new VelocitySE2(2, 0, 0);
         double start = Takt.get();
         for (int i = 0; i < 100; ++i) {
             stepTime();
@@ -154,7 +154,7 @@ public class SimulatedDrivingTest implements Timeless {
         // just +x
         // this accelerates infinitely, immediately to the requested speed.
         collection.reset();
-        GlobalVelocityR3 input = new GlobalVelocityR3(2, 0, 0);
+        VelocitySE2 input = new VelocitySE2(2, 0, 0);
         double start = Takt.get();
         for (int i = 0; i < 100; ++i) {
             stepTime();
@@ -175,7 +175,7 @@ public class SimulatedDrivingTest implements Timeless {
         Experiments.instance.testOverride(Experiment.UseSetpointGenerator, true);
         collection.reset();
         // +x and spinning. course is always zero.
-        GlobalVelocityR3 input = new GlobalVelocityR3(2, 0, 3.5);
+        VelocitySE2 input = new VelocitySE2(2, 0, 3.5);
         for (int i = 0; i < 50; ++i) {
             if (DEBUG)
                 System.out.printf("\nstep time ...\n");
@@ -193,7 +193,7 @@ public class SimulatedDrivingTest implements Timeless {
     void testVeeringVerbatim() {
         collection.reset();
         // +x and spinning
-        GlobalVelocityR3 input = new GlobalVelocityR3(2, 0, 3.5);
+        VelocitySE2 input = new VelocitySE2(2, 0, 3.5);
         for (int i = 0; i < 100; ++i) {
             if (DEBUG)
                 System.out.printf("\nstep time ...\n");
@@ -208,7 +208,7 @@ public class SimulatedDrivingTest implements Timeless {
     @Test
     void testGyro() {
         // spin fast
-        GlobalVelocityR3 input = new GlobalVelocityR3(0, 0, 4);
+        VelocitySE2 input = new VelocitySE2(0, 0, 4);
         if (DEBUG)
             System.out.printf("pose %s, gyro %s, rate %f\n",
                     drive.getPose(),

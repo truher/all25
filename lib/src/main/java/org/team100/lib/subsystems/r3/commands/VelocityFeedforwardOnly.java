@@ -1,7 +1,7 @@
 package org.team100.lib.subsystems.r3.commands;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.reference.r3.ProfileReferenceR3;
@@ -46,7 +46,7 @@ public class VelocityFeedforwardOnly extends MoveAndHold {
 
     @Override
     public void execute() {
-        GlobalVelocityR3 velocity = m_reference.next().velocity();
+        VelocitySE2 velocity = m_reference.next().velocity();
         if (DEBUG)
             System.out.printf("velocity %s\n", velocity);
         m_drive.setVelocity(velocity);

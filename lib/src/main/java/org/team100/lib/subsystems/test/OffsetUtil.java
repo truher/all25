@@ -1,6 +1,6 @@
 package org.team100.lib.subsystems.test;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
@@ -14,8 +14,8 @@ public class OffsetUtil {
      * 
      * Cartesian components are always zero.
      */
-    static GlobalVelocityR3 omega(Vector<N3> r, Vector<N3> v) {
-        return GlobalVelocityR3.fromVector(
+    static VelocitySE2 omega(Vector<N3> r, Vector<N3> v) {
+        return VelocitySE2.fromVector(
                 Vector.cross(r, v).div(r.norm() * r.norm()));
     }
 
@@ -27,23 +27,23 @@ public class OffsetUtil {
      * 
      * Omega component is always zero.
      */
-    static GlobalVelocityR3 tangentialVelocity(
+    static VelocitySE2 tangentialVelocity(
             Vector<N3> omega, Vector<N3> r) {
-        return GlobalVelocityR3.fromVector(
+        return VelocitySE2.fromVector(
                 Vector.cross(omega, r));
     }
 
     /**
      * Cartesian component of velocity.
      */
-    static Vector<N3> velocity(GlobalVelocityR3 v) {
+    static Vector<N3> velocity(VelocitySE2 v) {
         return v.vVector();
     }
 
     /**
      * Omega component of the velocity
      */
-    static Vector<N3> omega(GlobalVelocityR3 v) {
+    static Vector<N3> omega(VelocitySE2 v) {
         return v.omegaVector();
     }
 

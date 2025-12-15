@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -33,7 +33,7 @@ public class AnalyticalJacobianTest {
         EAWConfig q = new EAWConfig(0, 0, 0);
         // extended and motionless
         JointVelocities jv = new JointVelocities(0, 0, 0);
-        GlobalVelocityR3 v = j.forward(q, jv);
+        VelocitySE2 v = j.forward(q, jv);
         assertEquals(0, v.x(), DELTA);
         assertEquals(0, v.y(), DELTA);
         assertEquals(0, v.theta(), DELTA);
@@ -87,21 +87,21 @@ public class AnalyticalJacobianTest {
         assertEquals(0, jv.wrist(), DELTA);
 
         // +x
-        v = new ModelR3(p, new GlobalVelocityR3(1, 0, 0));
+        v = new ModelR3(p, new VelocitySE2(1, 0, 0));
         jv = j.inverse(v);
         assertEquals(1, jv.elevator(), DELTA);
         assertEquals(0, jv.shoulder(), DELTA);
         assertEquals(0, jv.wrist(), DELTA);
 
         // +y
-        v = new ModelR3(p, new GlobalVelocityR3(0, 1, 0));
+        v = new ModelR3(p, new VelocitySE2(0, 1, 0));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(0.5, jv.shoulder(), DELTA);
         assertEquals(-0.5, jv.wrist(), DELTA);
 
         // +theta
-        v = new ModelR3(p, new GlobalVelocityR3(0, 0, 1));
+        v = new ModelR3(p, new VelocitySE2(0, 0, 1));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(-0.5, jv.shoulder(), DELTA);
@@ -116,7 +116,7 @@ public class AnalyticalJacobianTest {
         // extended, motionless
         JointVelocities qdot = new JointVelocities(0, 0, 0);
         JointAccelerations qddot = new JointAccelerations(0, 0, 0);
-        GlobalAccelerationR3 a = j.forwardA(q, qdot, qddot);
+        AccelerationSE2 a = j.forwardA(q, qdot, qddot);
         assertEquals(0, a.x(), DELTA);
         assertEquals(0, a.y(), DELTA);
         assertEquals(0, a.theta(), DELTA);
@@ -175,8 +175,8 @@ public class AnalyticalJacobianTest {
         // extended, motionless
         EAWConfig c = new EAWConfig(0, 0, 0);
         Pose2d p = k.forward(c);
-        GlobalVelocityR3 v = new GlobalVelocityR3(0, 0, 0);
-        ControlR3 m = new ControlR3(p, v, new GlobalAccelerationR3(0, 0, 0));
+        VelocitySE2 v = new VelocitySE2(0, 0, 0);
+        ControlR3 m = new ControlR3(p, v, new AccelerationSE2(0, 0, 0));
         JointAccelerations ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -185,8 +185,8 @@ public class AnalyticalJacobianTest {
         // +x => +elevator
         c = new EAWConfig(0, 0, 0);
         p = k.forward(c);
-        v = new GlobalVelocityR3(0, 0, 0);
-        m = new ControlR3(p, v, new GlobalAccelerationR3(1, 0, 0));
+        v = new VelocitySE2(0, 0, 0);
+        m = new ControlR3(p, v, new AccelerationSE2(1, 0, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -195,8 +195,8 @@ public class AnalyticalJacobianTest {
         // +y => +shoulder and -wrist (because zero theta)
         c = new EAWConfig(0, 0, 0);
         p = k.forward(c);
-        v = new GlobalVelocityR3(0, 0, 0);
-        m = new ControlR3(p, v, new GlobalAccelerationR3(0, 1, 0));
+        v = new VelocitySE2(0, 0, 0);
+        m = new ControlR3(p, v, new AccelerationSE2(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(0.5, ja.shoulder(), DELTA);
@@ -205,8 +205,8 @@ public class AnalyticalJacobianTest {
         // +theta => -shoulder, +wrist (because no translation)
         c = new EAWConfig(0, 0, 0);
         p = k.forward(c);
-        v = new GlobalVelocityR3(0, 0, 0);
-        m = new ControlR3(p, v, new GlobalAccelerationR3(0, 0, 1));
+        v = new VelocitySE2(0, 0, 0);
+        m = new ControlR3(p, v, new AccelerationSE2(0, 0, 1));
         ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(-0.5, ja.shoulder(), DELTA);
@@ -216,8 +216,8 @@ public class AnalyticalJacobianTest {
         // using 45 deg because of singularity at 90
         c = new EAWConfig(0, Math.PI / 4, 0);
         p = k.forward(c);
-        v = new GlobalVelocityR3(0, 0, 0);
-        m = new ControlR3(p, v, new GlobalAccelerationR3(1, 0, 0));
+        v = new VelocitySE2(0, 0, 0);
+        m = new ControlR3(p, v, new AccelerationSE2(1, 0, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -227,8 +227,8 @@ public class AnalyticalJacobianTest {
         c = new EAWConfig(0, Math.PI / 4, 0);
         // using 45 deg because of singularity at 90
         p = k.forward(c);
-        v = new GlobalVelocityR3(0, 0, 0);
-        m = new ControlR3(p, v, new GlobalAccelerationR3(0, 1, 0));
+        v = new VelocitySE2(0, 0, 0);
+        m = new ControlR3(p, v, new AccelerationSE2(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0.707, ja.shoulder(), DELTA);
@@ -238,8 +238,8 @@ public class AnalyticalJacobianTest {
         c = new EAWConfig(0, Math.PI / 4, Math.PI / 4);
         // using 45 deg because of singularity at 90
         p = k.forward(c);
-        v = new GlobalVelocityR3(0, 0, 0);
-        m = new ControlR3(p, v, new GlobalAccelerationR3(0, 1, 0));
+        v = new VelocitySE2(0, 0, 0);
+        m = new ControlR3(p, v, new AccelerationSE2(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0.707, ja.shoulder(), DELTA);
@@ -261,7 +261,7 @@ public class AnalyticalJacobianTest {
             TimedPose tp = t.sample(time);
             ModelR3 sm = ModelR3.fromTimedPose(tp);
             Pose2d p = sm.pose();
-            GlobalVelocityR3 v = sm.velocity();
+            VelocitySE2 v = sm.velocity();
             EAWConfig c = k.inverse(p);
             JointVelocities jv = j.inverse(sm);
             if (DEBUG)
