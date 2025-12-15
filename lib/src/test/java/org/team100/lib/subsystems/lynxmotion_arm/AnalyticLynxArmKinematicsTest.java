@@ -117,7 +117,7 @@ public class AnalyticLynxArmKinematicsTest {
 
     }
 
-    // @Test
+    @Test
     void testBadRotation() {
         // stretched out along x but with the wrong end rotation
         AnalyticLynxArmKinematics k = AnalyticLynxArmKinematics.unit();
@@ -129,7 +129,12 @@ public class AnalyticLynxArmKinematicsTest {
                 new Pose3d(),
                 new Pose3d(new Translation3d(2, 0, 1), new Rotation3d(0, 0, 1)));
         LynxArmConfig q = new LynxArmConfig(0, 0, 0, 0, 0);
-        assertThrows(IllegalArgumentException.class, () -> k.inverse(q, t.p6()));
+        LynxArmConfig foo = k.inverse(q, t.p6());
+        assertEquals(0, foo.swing().getAsDouble(), DELTA);
+        assertEquals(-0.288, foo.boom(), DELTA);
+        assertEquals(0.576, foo.stick(), DELTA);
+        assertEquals(-0.288, foo.wrist(), DELTA);
+        assertEquals(0, foo.twist().getAsDouble(), DELTA);
     }
 
     @Test

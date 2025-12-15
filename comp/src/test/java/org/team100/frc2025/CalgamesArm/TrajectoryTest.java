@@ -2,6 +2,7 @@ package org.team100.frc2025.CalgamesArm;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.logging.LoggerFactory;
@@ -21,6 +22,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * These pop up GUI windows, so leave them commented out when you check in.
  */
 public class TrajectoryTest {
+    private static final boolean SHOW = false;
     LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /**
@@ -29,7 +31,7 @@ public class TrajectoryTest {
      * TrajectoryPlanner.restToRest() has several overloads: the one that takes
      * two non-holonomic poses draws a straight line between them.
      */
-    // @Test
+    @Test
     void testSimple() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(log, 1, 0.1),
@@ -38,8 +40,8 @@ public class TrajectoryTest {
         Trajectory100 t = p.restToRest(
                 new Pose2d(0, 0, new Rotation2d()),
                 new Pose2d(10, 1, new Rotation2d()));
-        new TrajectoryPlotter(0.1).plot(t, "simple");
-        Thread.sleep(5000);
+        if (SHOW)
+            new TrajectoryPlotter(0.1).plot(t, "simple");
     }
 
     /**
@@ -51,7 +53,7 @@ public class TrajectoryTest {
      * In this case, is facing +x, and moving +x, and it ends up moving +y but
      * facing the other way (i.e. backwards)
      */
-    // @Test
+    @Test
     void testCurved() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(log, 2, 0.5),
@@ -69,8 +71,8 @@ public class TrajectoryTest {
                                 new Rotation2d(-Math.PI / 2)),
                         DirectionSE2.TO_Y));
         Trajectory100 t = p.restToRest(waypoints);
-        new TrajectoryPlotter(0.1).plot(t, "simple");
-        Thread.sleep(5000);
+        if (SHOW)
+            new TrajectoryPlotter(0.1).plot(t, "simple");
     }
 
     /**
@@ -78,7 +80,7 @@ public class TrajectoryTest {
      * specifying many such points will make the curve harder to calculate and
      * harder to make smooth.
      */
-    // @Test
+    @Test
     void testMultipleWaypoints() throws InterruptedException {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(log, 2, 0.5),
@@ -101,73 +103,7 @@ public class TrajectoryTest {
                                 new Rotation2d(-Math.PI / 2)),
                         DirectionSE2.TO_Y));
         Trajectory100 t = p.restToRest(waypoints);
-        new TrajectoryPlotter(0.1).plot(t, "simple");
-        Thread.sleep(5000);
+        if (SHOW)
+            new TrajectoryPlotter(0.1).plot(t, "simple");
     }
-
-    /** Example of using a trajectory library for 2025 scoring paths */
-    // @Test
-    void testPickupToPlace() {
-        List<TimingConstraint> c = List.of(
-                new ConstantConstraint(log, 2, 0.5),
-                new YawRateConstraint(log, 1, 1));
-        TrajectoryPlanner p = new TrajectoryPlanner(c);
-        List<Pose2dWithDirection> waypoints = List.of(
-                // pickup
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(1, 0.1),
-                                new Rotation2d(-Math.PI)),
-                        DirectionSE2.TO_Y),
-                // place for gateway point?
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(3, 7),
-                                new Rotation2d(Math.PI / 2)),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(6, 9),
-                                new Rotation2d(-((7 * Math.PI) / 36))),
-                        DirectionSE2.TO_Y));
-        @SuppressWarnings("unused")
-        Trajectory100 t = p.restToRest(waypoints);
-        // TrajectoryPlotter.plot(t, "simple");
-    }
-
-    // @Test
-    void testSingularityDemo() {
-        List<TimingConstraint> c = List.of(
-                new ConstantConstraint(log, 2, 0.5),
-                new YawRateConstraint(log, 1, 1));
-        TrajectoryPlanner p = new TrajectoryPlanner(c);
-        List<Pose2dWithDirection> waypoints = List.of(
-                // pickup
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(1, 0.1),
-                                new Rotation2d(-Math.PI)),
-                        DirectionSE2.TO_Y),
-                // place for gateway point
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(0.75, 3),
-                                new Rotation2d(-Math.PI)),
-                        DirectionSE2.TO_Y),
-                // place for gateway point
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(3, 7),
-                                new Rotation2d(Math.PI / 2)),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(6, 9),
-                                new Rotation2d(-((7 * Math.PI) / 36))),
-                        DirectionSE2.TO_Y));
-        @SuppressWarnings("unused")
-        Trajectory100 t = p.restToRest(waypoints);
-        // TrajectoryPlotter.plot(t, "simple");
-    }
-
 }

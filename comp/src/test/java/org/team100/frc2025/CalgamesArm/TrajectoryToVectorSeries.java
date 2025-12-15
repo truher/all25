@@ -34,22 +34,4 @@ public class TrajectoryToVectorSeries {
         }
         return s;
     }
-
-    /** Maps x to y, y to -x */
-    public VectorSeries convertRotated(Trajectory100 t) {
-        VectorSeries s = new VectorSeries("trajectory");
-        double duration = t.duration();
-        for (double time = 0; time < duration; time += DT) {
-            TimedPose p = t.sample(time);
-            Pose2dWithDirection pp = p.state().getPose();
-            double y = pp.translation().getX();
-            double x = -pp.translation().getY();
-            Rotation2d heading = pp.heading();
-            double dy = m_scale * heading.getCos();
-            double dx = -m_scale * heading.getSin();
-            s.add(x, y, dx, dy);
-        }
-        return s;
-    }
-
 }
