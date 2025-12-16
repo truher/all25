@@ -285,12 +285,12 @@ public class ScheduleGeneratorTest {
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1.2),
+                        new DirectionSE2(1, 0, 0), 1.2),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_Y, 1.2));
+                        new DirectionSE2(0, 1, 0), 1.2));
         long startTimeNs = System.nanoTime();
         final int iterations = 100;
         final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;

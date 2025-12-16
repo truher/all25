@@ -39,14 +39,8 @@ class Trajectory100Test implements Timeless {
         Translation2d translationToGoal = goalTranslation.minus(currentTranslation);
         Rotation2d angleToGoal = translationToGoal.getAngle();
         List<WaypointSE2> waypoints = List.of(
-                new WaypointSE2(
-                        start,
-                        DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(angleToGoal), 0), 1),
-                new WaypointSE2(
-                        end,
-                        DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(angleToGoal), 0), 1));
+                new WaypointSE2(start, DirectionSE2.irrotational(angleToGoal), 1),
+                new WaypointSE2(end, DirectionSE2.irrotational(angleToGoal), 1));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
@@ -77,14 +71,8 @@ class Trajectory100Test implements Timeless {
         Translation2d translationToGoal = goalTranslation.minus(currentTranslation);
         Rotation2d angleToGoal = translationToGoal.getAngle();
         List<WaypointSE2> waypoints = List.of(
-                new WaypointSE2(
-                        start,
-                        DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(angleToGoal), 0), 1),
-                new WaypointSE2(
-                        end,
-                        DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(angleToGoal), 0), 1));
+                new WaypointSE2(start, DirectionSE2.irrotational(angleToGoal), 1),
+                new WaypointSE2(end, DirectionSE2.irrotational(angleToGoal), 1));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
@@ -111,12 +99,12 @@ class Trajectory100Test implements Timeless {
                         new Pose2d(
                                 new Translation2d(),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
@@ -152,17 +140,17 @@ class Trajectory100Test implements Timeless {
                         new Pose2d(
                                 new Translation2d(),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(10, 0),
                                 Rotation2d.kCCW_Pi_2),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(10, 10),
                                 Rotation2d.kPi),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);

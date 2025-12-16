@@ -46,8 +46,7 @@ public class GoToPosePosition extends MoveAndHold {
     public void initialize() {
         WaypointSE2 m_currentPose = new WaypointSE2(
                 m_subsystem.getState().pose(),
-                DirectionSE2.fromDirections(
-                        DirectionR2.fromRotation(m_course), 0), 1);
+                DirectionSE2.irrotational(m_course), 1);
         Trajectory100 m_trajectory = m_trajectoryPlanner.restToRest(
                 List.of(m_currentPose, m_goal));
         m_referenceController = new PositionReferenceControllerR3(

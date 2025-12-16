@@ -135,17 +135,17 @@ public class ReferenceControllerR3Test implements Timeless {
                 new Pose2d(
                         new Translation2d(),
                         Rotation2d.fromDegrees(180)),
-                DirectionSE2.TO_X, 1));
+                new DirectionSE2(1, 0, 0), 1));
         waypoints.add(new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 4),
                         Rotation2d.fromDegrees(180)),
-                DirectionSE2.TO_X, 1));
+                new DirectionSE2(1, 0, 0), 1));
         waypoints.add(new WaypointSE2(
                 new Pose2d(
                         new Translation2d(196, 13),
                         Rotation2d.fromDegrees(0)),
-                DirectionSE2.TO_X, 1));
+                new DirectionSE2(1, 0, 0), 1));
 
         double start_vel = 0.0;
         double end_vel = 0.0;

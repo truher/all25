@@ -136,13 +136,11 @@ public class TrajectoryPlanner {
                     List.of(
                             new WaypointSE2(
                                     startState.pose(),
-                                    DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(startingAngle), 0),
+                                    DirectionSE2.irrotational(startingAngle),
                                     e1),
                             new WaypointSE2(
                                     endState.pose(),
-                                    DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(courseToGoal), 0),
+                                    DirectionSE2.irrotational(courseToGoal),
                                     1.2)),
                     startVelocity.norm(),
                     endVelocity.norm());
@@ -176,13 +174,11 @@ public class TrajectoryPlanner {
                     List.of(
                             new WaypointSE2(
                                     startState.pose(),
-                                    DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(startCourse), 0),
+                                    DirectionSE2.irrotational(startCourse),
                                     e1),
                             new WaypointSE2(
                                     endState.pose(),
-                                    DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(endCourse), 0),
+                                    DirectionSE2.irrotational(endCourse),
                                     1.2)),
                     splineEntranceVelocity,
                     splineExitVelocity);
@@ -208,18 +204,11 @@ public class TrajectoryPlanner {
         Rotation2d courseToGoal = endTranslation.minus(startTranslation).getAngle();
 
         try {
-            return restToRest(
-                    List.of(
-                            new WaypointSE2(
-                                    start,
-                                    DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(courseToGoal), 0),
-                                    1),
-                            new WaypointSE2(
-                                    end,
-                                    DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(courseToGoal), 0),
-                                    1)));
+            // direction towards goal without rotating
+            DirectionSE2 direction = DirectionSE2.irrotational(courseToGoal);
+            return restToRest(List.of(
+                    new WaypointSE2(start, direction, 1),
+                    new WaypointSE2(end, direction, 1)));
         } catch (TrajectoryGenerationException e) {
             return null;
         }

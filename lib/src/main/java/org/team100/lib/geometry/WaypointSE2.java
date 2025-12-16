@@ -40,7 +40,7 @@ public record WaypointSE2(Pose2d pose, DirectionSE2 course, double scale) {
 
     /** Course without rotation, with unit scale. */
     public static WaypointSE2 irrotational(Pose2d p, double course, double scale) {
-        return new WaypointSE2(p, new DirectionSE2(Math.cos(course), Math.sin(course), 0), scale);
+        return new WaypointSE2(p, DirectionSE2.irrotational(course), scale);
     }
 
     /**

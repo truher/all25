@@ -54,16 +54,8 @@ public class GoToCoralStation implements Function<Pose2d, Trajectory100> {
                 courseToGoal, courseToGoal.rotateBy(Rotation2d.fromDegrees(-90)), scaleAdjust);
 
         List<WaypointSE2> waypoints = new ArrayList<>();
-        waypoints.add(
-                new WaypointSE2(
-                        currentPose,
-                        DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(newInitialSpline), 0), 1));
-        waypoints.add(
-                new WaypointSE2(
-                        goal,
-                        DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(courseToGoal), 0), 1));
+        waypoints.add(new WaypointSE2(currentPose, DirectionSE2.irrotational(newInitialSpline), 1));
+        waypoints.add(new WaypointSE2(goal, DirectionSE2.irrotational(courseToGoal), 1));
 
         return m_planner.restToRest(waypoints);
     }

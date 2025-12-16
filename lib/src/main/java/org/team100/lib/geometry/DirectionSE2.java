@@ -31,18 +31,24 @@ public class DirectionSE2 {
         return new Rotation2d(x, y);
     }
 
-    public static final DirectionSE2 TO_X = new DirectionSE2(1, 0, 0);
-    public static final DirectionSE2 MINUS_X = new DirectionSE2(-1, 0, 0);
-    public static final DirectionSE2 TO_Y = new DirectionSE2(0, 1, 0);
-    public static final DirectionSE2 MINUS_Y = new DirectionSE2(0, -1, 0);
-    public static final DirectionSE2 SPIN = new DirectionSE2(0, 0, 1);
+    /** In the direction of the specified angle in radians, without rotation */
+    public static DirectionSE2 irrotational(double rad) {
+        return fromDirections(rad, 0);
+    }
 
-    /**
-     * @param course cartesian course
-     * @param theta  direction of rotation
-     */
-    public static final DirectionSE2 fromDirections(DirectionR2 course, double theta) {
-        return new DirectionSE2(course.x, course.y, theta);
+    /** In the direction of the specified angle, without rotation */
+    public static DirectionSE2 irrotational(Rotation2d angle) {
+        return fromDirections(angle, 0);
+    }
+
+    /** In the direction of the specified angle in radians, while rotating */
+    public static DirectionSE2 fromDirections(double rad, double theta) {
+        return fromDirections(new Rotation2d(rad), theta);
+    }
+
+    /** In the direction of the specified angle, while rotating */
+    public static DirectionSE2 fromDirections(Rotation2d angle, double theta) {
+        return new DirectionSE2(angle.getCos(), angle.getSin(), theta);
     }
 
     @Override

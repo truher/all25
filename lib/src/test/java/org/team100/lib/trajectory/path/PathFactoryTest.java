@@ -31,12 +31,12 @@ public class PathFactoryTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(0, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.MINUS_X, 1),
+                        new DirectionSE2(-1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
         Path100 path = PathFactory.pathFromWaypoints(
                 waypoints,
                 0.0127,
@@ -53,17 +53,17 @@ public class PathFactoryTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(0, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_Y, 1));
+                        new DirectionSE2(0, 1, 0), 1));
         Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
 
         assertEquals(9, path.length());
@@ -84,12 +84,12 @@ public class PathFactoryTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
         Path100 path = PathFactory.pathFromWaypoints(
                 waypoints, 0.01, 0.01, 0.1);
         assertEquals(2, path.length());
@@ -129,22 +129,22 @@ public class PathFactoryTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(0, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_Y, 1),
+                        new DirectionSE2(0, 1, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_Y, 1));
+                        new DirectionSE2(0, 1, 0), 1));
         Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
         TrajectoryPlotter.plot(path, 0.1, 1);
     }
@@ -184,7 +184,7 @@ public class PathFactoryTest implements Timeless {
                 new Pose2d(
                         new Translation2d(0, 0),
                         Rotation2d.kZero),
-                DirectionSE2.TO_X, 1.2);
+                new DirectionSE2(1, 0, 0), 1.2);
         WaypointSE2 p2 = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(15, 10),
@@ -219,12 +219,12 @@ public class PathFactoryTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(0, -1),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_Y, 1));
+                        new DirectionSE2(0, 1, 0), 1));
         List<HolonomicSpline> splines = List.of(s0);
         List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.001, 0.001, 0.001);
         for (Pose2dWithMotion p : motion) {
@@ -245,12 +245,12 @@ public class PathFactoryTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1.2),
+                        new DirectionSE2(1, 0, 0), 1.2),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_Y, 1.2));
+                        new DirectionSE2(0, 1, 0), 1.2));
         long startTimeNs = System.nanoTime();
         Path100 t = new Path100(new ArrayList<>());
         final int iterations = 100;

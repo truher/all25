@@ -62,12 +62,12 @@ public class TrajectoryTest {
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(9, 9),
                                 new Rotation2d(-Math.PI / 2)),
-                        DirectionSE2.TO_Y, 1));
+                        new DirectionSE2(0, 1, 0), 1));
         Trajectory100 t = p.restToRest(waypoints);
         if (SHOW)
             new TrajectoryPlotter(0.1).plot("curved", t);
@@ -89,17 +89,17 @@ public class TrajectoryTest {
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(5, 5),
                                 new Rotation2d(-2)),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(9, 9),
                                 new Rotation2d(-Math.PI / 2)),
-                        DirectionSE2.TO_Y, 1));
+                        new DirectionSE2(0, 1, 0), 1));
         Trajectory100 t = p.restToRest(waypoints);
         if (SHOW)
             new TrajectoryPlotter(0.1).plot("multiple", t);

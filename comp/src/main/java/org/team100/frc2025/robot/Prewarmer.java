@@ -32,11 +32,11 @@ public class Prewarmer {
         List<WaypointSE2> waypoints = new ArrayList<>();
         waypoints.add(new WaypointSE2(
                 new Pose2d(new Translation2d(), Rotation2d.kZero),
-                DirectionSE2.TO_X,
+                new DirectionSE2(1, 0, 0),
                 1));
         waypoints.add(new WaypointSE2(
                 new Pose2d(new Translation2d(1, 0), Rotation2d.kZero),
-                DirectionSE2.TO_X,
+                new DirectionSE2(1, 0, 0),
                 1));
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium(logger));

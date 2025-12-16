@@ -50,12 +50,12 @@ class HolonomicSplineTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
 
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
@@ -81,12 +81,12 @@ class HolonomicSplineTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(2, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
 
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
@@ -115,12 +115,12 @@ class HolonomicSplineTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1.2),
+                        new DirectionSE2(1, 0, 0), 1.2),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d(1)),
-                        DirectionSE2.TO_X, 1.2));
+                        new DirectionSE2(1, 0, 0), 1.2));
 
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
@@ -210,12 +210,12 @@ class HolonomicSplineTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d(2.5)),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d(-2.5)),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
     }
@@ -351,24 +351,24 @@ class HolonomicSplineTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(0, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d(1)),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
         // turn much more to the left
         HolonomicSpline s1 = new HolonomicSpline(
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d(1)),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(2, 0),
                                 Rotation2d.k180deg),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(s0);
         splines.add(s1);
@@ -442,12 +442,12 @@ class HolonomicSplineTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(0, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1));
+                        new DirectionSE2(1, 0, 0), 1));
         // this is a sharp turn to the left
         // derivatives point to the left
         HolonomicSpline s1 = new HolonomicSpline(
@@ -455,12 +455,12 @@ class HolonomicSplineTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_Y, 1),
+                        new DirectionSE2(0, 1, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_Y, 1));
+                        new DirectionSE2(0, 1, 0), 1));
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(s0);
         splines.add(s1);
@@ -502,12 +502,12 @@ class HolonomicSplineTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(0, -1),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X, 1.2),
+                        new DirectionSE2(1, 0, 0), 1.2),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_Y, 1.2));
+                        new DirectionSE2(0, 1, 0), 1.2));
         if (DEBUG) {
             for (double t = 0; t < 1; t += 0.03) {
                 System.out.printf("%5.3f %5.3f\n", s0.x(t), s0.y(t));

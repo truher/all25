@@ -65,12 +65,12 @@ class Path100Test {
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1),
+                        new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X, 1)) {
+                        new DirectionSE2(1, 0, 0), 1)) {
 
             @Override
             public Translation2d getPoint(double t) {
