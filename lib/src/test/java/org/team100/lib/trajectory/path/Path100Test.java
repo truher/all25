@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
@@ -31,20 +31,20 @@ class Path100Test {
 
     private static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
             new Pose2dWithMotion(
-                    Pose2dWithDirection.make(
-                            new Pose2d(0, 0, new Rotation2d(0)), 0),
+                    WaypointSE2.irrotational(
+                            new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                     0, 0, 0),
             new Pose2dWithMotion(
-                    Pose2dWithDirection.make(
-                            new Pose2d(24, 0, new Rotation2d(Math.toRadians(30))), 0),
+                    WaypointSE2.irrotational(
+                            new Pose2d(24, 0, new Rotation2d(Math.toRadians(30))), 0, 1.2),
                     0, 0, 0),
             new Pose2dWithMotion(
-                    Pose2dWithDirection.make(
-                            new Pose2d(36, 12, new Rotation2d(Math.toRadians(60))), 0),
+                    WaypointSE2.irrotational(
+                            new Pose2d(36, 12, new Rotation2d(Math.toRadians(60))), 0, 1.2),
                     0, 0, 0),
             new Pose2dWithMotion(
-                    Pose2dWithDirection.make(
-                            new Pose2d(60, 12, new Rotation2d(Math.toRadians(90))), 0),
+                    WaypointSE2.irrotational(
+                            new Pose2d(60, 12, new Rotation2d(Math.toRadians(90))), 0, 1.2),
                     0, 0, 0));
 
     @Test
@@ -61,16 +61,16 @@ class Path100Test {
     void testSimple() {
         // spline is in the x direction, no curvature.
         HolonomicSpline spline = new HolonomicSpline(
-                new Pose2dWithDirection(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X)) {
+                        DirectionSE2.TO_X, 1)) {
 
             @Override
             public Translation2d getPoint(double t) {
@@ -146,24 +146,24 @@ class Path100Test {
     void test() throws TimingException {
         List<Pose2dWithMotion> waypoints = Arrays.asList(
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(
-                                new Pose2d(0.0, 0.0, new Rotation2d(Math.toRadians(0))), 0),
+                        WaypointSE2.irrotational(
+                                new Pose2d(0.0, 0.0, new Rotation2d(Math.toRadians(0))), 0, 1.2),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(
-                                new Pose2d(24.0, 0.0, new Rotation2d(Math.toRadians(30))), 0),
+                        WaypointSE2.irrotational(
+                                new Pose2d(24.0, 0.0, new Rotation2d(Math.toRadians(30))), 0, 1.2),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(
-                                new Pose2d(36.0, 0.0, new Rotation2d(Math.toRadians(60))), Math.PI / 2),
+                        WaypointSE2.irrotational(
+                                new Pose2d(36.0, 0.0, new Rotation2d(Math.toRadians(60))), Math.PI / 2, 1.2),
                         1e6, 0, 0),
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(
-                                new Pose2d(36.0, 24.0, new Rotation2d(Math.toRadians(60))), 0),
+                        WaypointSE2.irrotational(
+                                new Pose2d(36.0, 24.0, new Rotation2d(Math.toRadians(60))), 0, 1.2),
                         0.1, 0, 0),
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(
-                                new Pose2d(60.0, 24.0, new Rotation2d(Math.toRadians(180))), 0),
+                        WaypointSE2.irrotational(
+                                new Pose2d(60.0, 24.0, new Rotation2d(Math.toRadians(180))), 0, 1.2),
                         0.1, 0, 0));
 
         // Create the reference trajectory (straight line motion between waypoints).

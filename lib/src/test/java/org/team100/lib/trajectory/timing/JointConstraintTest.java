@@ -3,7 +3,7 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.subsystems.prr.AnalyticalJacobian;
 import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
@@ -25,8 +25,8 @@ public class JointConstraintTest {
         JointConstraint jc = new JointConstraint(k, j, maxJv, maxJa);
         // motion +x, limiter is elevator.
         Pose2dWithMotion state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(3, 0, new Rotation2d(0)), 0),
+                WaypointSE2.irrotational(
+                        new Pose2d(3, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0, 0);
         assertEquals(1, jc.getMaxVelocity(state).getValue(), DELTA);
         assertEquals(-1, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
@@ -42,8 +42,8 @@ public class JointConstraintTest {
         JointConstraint jc = new JointConstraint(k, j, maxJv, maxJa);
         // motion +y, shoulder and wrist have same constraint
         Pose2dWithMotion state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(3, 0, new Rotation2d(0)), Math.PI / 2),
+                WaypointSE2.irrotational(
+                        new Pose2d(3, 0, new Rotation2d(0)), Math.PI / 2, 1.2),
                 0, 0, 0);
         assertEquals(2, jc.getMaxVelocity(state).getValue(), DELTA);
         assertEquals(-2, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
@@ -59,8 +59,8 @@ public class JointConstraintTest {
         JointConstraint jc = new JointConstraint(k, j, maxJv, maxJa);
         // bent wrist, motion +x, bend doesn't matter.
         Pose2dWithMotion state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(2, 1, new Rotation2d(Math.PI / 2)), 0),
+                WaypointSE2.irrotational(
+                        new Pose2d(2, 1, new Rotation2d(Math.PI / 2)), 0, 1.2),
                 0, 0, 0);
         assertEquals(1, jc.getMaxVelocity(state).getValue(), DELTA);
         assertEquals(-1, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
@@ -76,8 +76,8 @@ public class JointConstraintTest {
         JointConstraint jc = new JointConstraint(k, j, maxJv, maxJa);
         // bent wrist, motion +y, shoulder is the limiter
         Pose2dWithMotion state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(2, 1, new Rotation2d(Math.PI / 2)), Math.PI / 2),
+                WaypointSE2.irrotational(
+                        new Pose2d(2, 1, new Rotation2d(Math.PI / 2)), Math.PI / 2, 1.2),
                 0, 0, 0);
         assertEquals(2, jc.getMaxVelocity(state).getValue(), DELTA);
         assertEquals(-2, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);
@@ -93,8 +93,8 @@ public class JointConstraintTest {
         JointConstraint jc = new JointConstraint(k, j, maxJv, maxJa);
         // bent wrist and shoulder, arm at 45, motion +y,
         Pose2dWithMotion state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(2, 1 + Math.sqrt(2), new Rotation2d(Math.PI / 2)), Math.PI / 2),
+                WaypointSE2.irrotational(
+                        new Pose2d(2, 1 + Math.sqrt(2), new Rotation2d(Math.PI / 2)), Math.PI / 2, 1.2),
                 0, 0, 0);
         assertEquals(1, jc.getMaxVelocity(state).getValue(), DELTA);
         assertEquals(-1, jc.getMinMaxAcceleration(state, 0).getMinAccel(), DELTA);

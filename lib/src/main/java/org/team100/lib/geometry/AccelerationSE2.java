@@ -28,11 +28,6 @@ public record AccelerationSE2(double x, double y, double theta) {
         return new AccelerationSE2(x - other.x, y - other.y, theta - other.theta);
     }
 
-    public JerkSE2 jerk(AccelerationSE2 previous, double dt) {
-        AccelerationSE2 v = minus(previous).div(dt);
-        return new JerkSE2(v.x(), v.y(), v.theta());
-    }
-
     public AccelerationSE2 times(double scalar) {
         return new AccelerationSE2(x * scalar, y * scalar, theta * scalar);
     }

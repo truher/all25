@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.AccelerationSE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -50,10 +50,10 @@ public class TrajectoryJointTest {
         TrajectoryPlanner m_planner = new TrajectoryPlanner(c);
 
         Trajectory100 t = m_planner.restToRest(List.of(
-                Pose2dWithDirection.make(
-                        new Pose2d(1, 0, new Rotation2d(0)), 0),
-                Pose2dWithDirection.make(
-                        new Pose2d(1.9, 0.5, new Rotation2d(2.5)), 2)));
+                WaypointSE2.irrotational(
+                        new Pose2d(1, 0, new Rotation2d(0)), 0, 1.2),
+                WaypointSE2.irrotational(
+                        new Pose2d(1.9, 0.5, new Rotation2d(2.5)), 2, 1.2)));
 
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(
                 0.5, 0.3);

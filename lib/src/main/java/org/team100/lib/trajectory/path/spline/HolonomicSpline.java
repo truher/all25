@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -41,14 +41,6 @@ public class HolonomicSpline {
     private final Rotation2d m_heading0;
 
     /**
-     * The theta endpoint derivative is just the average theta rate, which is new,
-     * it used to be zero.
-     */
-    public HolonomicSpline(Pose2dWithDirection p0, Pose2dWithDirection p1) {
-        this(p0, p1, 1.2, 1.2);
-    }
-
-    /**
      * Specify the magic number you want: this scales the derivatives at the
      * endpoints, i.e. how "strongly" the derivative affects the curve. High magic
      * number means low curvature at the endpoint.
@@ -68,18 +60,16 @@ public class HolonomicSpline {
      * 
      * @param p0  starting pose
      * @param p1  ending pose
-     * @param mN0 starting magic number
-     * @param mN1 ending magic number
      */
-    public HolonomicSpline(Pose2dWithDirection p0, Pose2dWithDirection p1, double mN0, double mN1) {
+    public HolonomicSpline(WaypointSE2 p0, WaypointSE2 p1) {
         // Distance metric includes both translation and rotation. This is not
         // the geodesic distance, which is zero for spin-in-place. It's just the
         // L2 norm for all three dimensions.
         double distance = GeometryUtil.doubleGeodesicDistance(p0.pose(), p1.pose());
         if (DEBUG)
             System.out.printf("distance %f\n", distance);
-        double scale0 = mN0 * distance;
-        double scale1 = mN1 * distance;
+        double scale0 = p0.scale() * distance;
+        double scale1 = p1.scale() * distance;
 
         if (DEBUG) {
             System.out.printf("scale %f %f\n", scale0, scale1);
@@ -125,9 +115,9 @@ public class HolonomicSpline {
      */
     public Pose2dWithMotion getPose2dWithMotion(double p) {
         return new Pose2dWithMotion(
-                new Pose2dWithDirection(
+                new WaypointSE2(
                         new Pose2d(getPoint(p), getHeading(p)),
-                        getCourse(p)),
+                        getCourse(p), 1),
                 getDHeadingDs(p),
                 getCurvature(p),
                 getDCurvatureDs(p));

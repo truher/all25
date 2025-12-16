@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -36,17 +36,17 @@ class TrajectoryPlannerTest implements Timeless {
 
     @Test
     void testLinear() {
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1.2),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X));
+                        DirectionSE2.TO_X, 1.2));
         List<TimingConstraint> constraints = new ArrayList<>();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         Trajectory100 t = planner.restToRest(waypoints);
@@ -58,17 +58,17 @@ class TrajectoryPlannerTest implements Timeless {
 
     @Test
     void testBackingUp() {
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(0, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.MINUS_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.MINUS_X, 1.2),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X));
+                        DirectionSE2.TO_X, 1.2));
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
 
         // these are the same as StraightLineTrajectoryTest.
@@ -95,17 +95,17 @@ class TrajectoryPlannerTest implements Timeless {
      */
     @Test
     void testPerformance() {
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1.2),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_Y));
+                        DirectionSE2.TO_Y, 1.2));
         List<TimingConstraint> constraints = new ArrayList<>();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         long startTimeNs = System.nanoTime();

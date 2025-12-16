@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 
@@ -16,36 +16,13 @@ public class PathFactory {
     private static final boolean DEBUG = false;
 
     public static Path100 pathFromWaypoints(
-            List<Pose2dWithDirection> waypoints,
-            double maxDx,
-            double maxDy,
-            double maxDTheta,
-            List<Double> magicNumbers) {
-        List<HolonomicSpline> splines = new ArrayList<>(waypoints.size() - 1);
-        for (int i = 1; i < waypoints.size(); ++i) {
-            splines.add(
-                    new HolonomicSpline(
-                            waypoints.get(i - 1),
-                            waypoints.get(i),
-                            magicNumbers.get(i - 1),
-                            magicNumbers.get(i)));
-        }
-        return new Path100(PathFactory.parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
-    }
-
-    public static Path100 pathFromWaypoints(
-            List<Pose2dWithDirection> waypoints,
+            List<WaypointSE2> waypoints,
             double maxDx,
             double maxDy,
             double maxDTheta) {
         List<HolonomicSpline> splines = new ArrayList<>(waypoints.size() - 1);
         for (int i = 1; i < waypoints.size(); ++i) {
-            HolonomicSpline s = new HolonomicSpline(
-                    waypoints.get(i - 1),
-                    waypoints.get(i));
-            if (DEBUG)
-                System.out.printf("%d %s\n", i, s);
-            splines.add(s);
+            splines.add(new HolonomicSpline(waypoints.get(i - 1), waypoints.get(i)));
         }
         return new Path100(PathFactory.parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
     }

@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 import org.team100.lib.geometry.AccelerationSE2;
 import org.team100.lib.geometry.DeltaSE2;
 import org.team100.lib.geometry.GlobalVelocityR2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.localization.Blip24;
@@ -515,7 +515,7 @@ public class LoggerFactory {
         public void log(Supplier<Pose2dWithMotion> vals) {
             if (!allow(m_level))
                 return;
-            Pose2dWithDirection val = vals.get().getPose();
+            WaypointSE2 val = vals.get().getPose();
             m_pose2dLogger.log(val::pose);
             m_rotation2dLogger.log(() -> val.course().toRotation());
         }

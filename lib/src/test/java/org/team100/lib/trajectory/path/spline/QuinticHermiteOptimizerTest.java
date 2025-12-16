@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.TrajectoryPlotter;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,21 +16,21 @@ public class QuinticHermiteOptimizerTest {
 
     @Test
     void test0() {
-        Pose2dWithDirection a = new Pose2dWithDirection(
+        WaypointSE2 a = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(0, 100),
                         new Rotation2d()),
-                DirectionSE2.MINUS_Y);
-        Pose2dWithDirection b = new Pose2dWithDirection(
+                DirectionSE2.MINUS_Y, 1);
+        WaypointSE2 b = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(50, 0),
                         new Rotation2d()),
-                DirectionSE2.TO_X);
-        Pose2dWithDirection c = new Pose2dWithDirection(
+                DirectionSE2.TO_X, 1);
+        WaypointSE2 c = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 100),
                         new Rotation2d()),
-                DirectionSE2.TO_Y);
+                DirectionSE2.TO_Y, 1);
 
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(new HolonomicSpline(a, b));
@@ -43,26 +43,26 @@ public class QuinticHermiteOptimizerTest {
     @Test
     void test1() {
 
-        Pose2dWithDirection d = new Pose2dWithDirection(
+        WaypointSE2 d = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(0, 0),
                         new Rotation2d()),
-                DirectionSE2.TO_Y);
-        Pose2dWithDirection e = new Pose2dWithDirection(
+                DirectionSE2.TO_Y, 1);
+        WaypointSE2 e = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(0, 50),
                         new Rotation2d()),
-                DirectionSE2.TO_X);
-        Pose2dWithDirection f = new Pose2dWithDirection(
+                DirectionSE2.TO_X, 1);
+        WaypointSE2 f = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 50),
                         new Rotation2d()),
-                DirectionSE2.MINUS_Y);
-        Pose2dWithDirection g = new Pose2dWithDirection(
+                DirectionSE2.MINUS_Y, 1);
+        WaypointSE2 g = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 0),
                         new Rotation2d()),
-                DirectionSE2.MINUS_X);
+                DirectionSE2.MINUS_X, 1);
 
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(new HolonomicSpline(d, e));
@@ -75,31 +75,31 @@ public class QuinticHermiteOptimizerTest {
 
     @Test
     void test2() {
-        Pose2dWithDirection h = new Pose2dWithDirection(
+        WaypointSE2 h = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(0, 0),
                         new Rotation2d()),
-                DirectionSE2.TO_X);
-        Pose2dWithDirection i = new Pose2dWithDirection(
+                DirectionSE2.TO_X, 1);
+        WaypointSE2 i = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(50, 0),
                         new Rotation2d()),
-                DirectionSE2.TO_X);
-        Pose2dWithDirection j = new Pose2dWithDirection(
+                DirectionSE2.TO_X, 1);
+        WaypointSE2 j = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 50),
                         new Rotation2d()),
-                new DirectionSE2(1, 1, 0));
-        Pose2dWithDirection k = new Pose2dWithDirection(
+                new DirectionSE2(1, 1, 0), 1);
+        WaypointSE2 k = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(150, 0),
                         new Rotation2d()),
-                DirectionSE2.MINUS_Y);
-        Pose2dWithDirection l = new Pose2dWithDirection(
+                DirectionSE2.MINUS_Y, 1);
+        WaypointSE2 l = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(150, -50),
                         new Rotation2d()),
-                DirectionSE2.MINUS_Y);
+                DirectionSE2.MINUS_Y, 1);
 
         List<HolonomicSpline> splines2 = new ArrayList<>();
         splines2.add(new HolonomicSpline(h, i));
@@ -113,21 +113,21 @@ public class QuinticHermiteOptimizerTest {
 
     @Test
     void test3() {
-        Pose2dWithDirection a = new Pose2dWithDirection(
+        WaypointSE2 a = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(0, 100),
                         new Rotation2d()),
-                DirectionSE2.MINUS_Y);
-        Pose2dWithDirection b = new Pose2dWithDirection(
+                DirectionSE2.MINUS_Y, 1);
+        WaypointSE2 b = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(50, 0),
                         new Rotation2d(Math.PI / 2)),
-                DirectionSE2.TO_X);
-        Pose2dWithDirection c = new Pose2dWithDirection(
+                DirectionSE2.TO_X, 1);
+        WaypointSE2 c = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 100),
                         new Rotation2d(Math.PI)),
-                DirectionSE2.TO_Y);
+                DirectionSE2.TO_Y, 1);
 
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(new HolonomicSpline(a, b));
@@ -140,26 +140,26 @@ public class QuinticHermiteOptimizerTest {
     @Test
     void test4() {
 
-        Pose2dWithDirection d = new Pose2dWithDirection(
+        WaypointSE2 d = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(0, 0),
                         new Rotation2d()),
-                DirectionSE2.TO_Y);
-        Pose2dWithDirection e = new Pose2dWithDirection(
+                DirectionSE2.TO_Y, 1);
+        WaypointSE2 e = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(0, 50),
                         new Rotation2d(Math.PI / 2)),
-                DirectionSE2.TO_X);
-        Pose2dWithDirection f = new Pose2dWithDirection(
+                DirectionSE2.TO_X, 1);
+        WaypointSE2 f = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 50),
                         new Rotation2d(Math.PI)),
-                DirectionSE2.MINUS_Y);
-        Pose2dWithDirection g = new Pose2dWithDirection(
+                DirectionSE2.MINUS_Y, 1);
+        WaypointSE2 g = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 0),
                         new Rotation2d()),
-                DirectionSE2.MINUS_X);
+                DirectionSE2.MINUS_X, 1);
 
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(new HolonomicSpline(d, e));
@@ -172,31 +172,31 @@ public class QuinticHermiteOptimizerTest {
     @Test
     void test5() {
 
-        Pose2dWithDirection h = new Pose2dWithDirection(
+        WaypointSE2 h = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(0, 0),
                         new Rotation2d()),
-                DirectionSE2.TO_X);
-        Pose2dWithDirection i = new Pose2dWithDirection(
+                DirectionSE2.TO_X, 1);
+        WaypointSE2 i = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(50, 0),
                         new Rotation2d(Math.PI / 2)),
-                DirectionSE2.TO_X);
-        Pose2dWithDirection j = new Pose2dWithDirection(
+                DirectionSE2.TO_X, 1);
+        WaypointSE2 j = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(100, 50),
                         new Rotation2d(Math.PI)),
-                new DirectionSE2(1, 1, 0));
-        Pose2dWithDirection k = new Pose2dWithDirection(
+                new DirectionSE2(1, 1, 0), 1);
+        WaypointSE2 k = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(150, 0),
                         new Rotation2d()),
-                DirectionSE2.MINUS_Y);
-        Pose2dWithDirection l = new Pose2dWithDirection(
+                DirectionSE2.MINUS_Y, 1);
+        WaypointSE2 l = new WaypointSE2(
                 new Pose2d(
                         new Translation2d(150, -50),
                         new Rotation2d(Math.PI / 2)),
-                DirectionSE2.MINUS_Y);
+                DirectionSE2.MINUS_Y, 1);
 
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(new HolonomicSpline(h, i));

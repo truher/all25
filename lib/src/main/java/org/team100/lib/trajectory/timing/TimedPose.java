@@ -1,6 +1,7 @@
 package org.team100.lib.trajectory.timing;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -11,6 +12,7 @@ import edu.wpi.first.math.MathUtil;
  * The timing fields are set by the ScheduleGenerator.
  */
 public class TimedPose {
+    private static final boolean DEBUG = false;
     private final Pose2dWithMotion m_state;
     /** Time we achieve this state. */
     private final double m_timeS;
@@ -91,13 +93,21 @@ public class TimedPose {
     @Override
     public boolean equals(final Object other) {
         if (!(other instanceof TimedPose)) {
+            if (DEBUG)
+                System.out.println("wrong type");
             return false;
         }
         TimedPose ts = (TimedPose) other;
-        boolean stateEqual = m_state.equals(ts.m_state);
-        if (!stateEqual) {
+        if (!m_state.equals(ts.m_state)) {
+            if (DEBUG)
+                System.out.println("wrong state");
             return false;
         }
-        return Math.abs(m_timeS - ts.m_timeS) <= 1e-12;
+        if (!Math100.epsilonEquals(m_timeS, ts.m_timeS)) {
+            if (DEBUG)
+                System.out.println("wrong time");
+            return false;
+        }
+        return true;
     }
 }

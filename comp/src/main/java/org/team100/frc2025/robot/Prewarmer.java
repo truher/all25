@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
@@ -29,13 +29,15 @@ public class Prewarmer {
         double startS = Takt.actual();
 
         // Exercise the trajectory planner.
-        List<Pose2dWithDirection> waypoints = new ArrayList<>();
-        waypoints.add(new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = new ArrayList<>();
+        waypoints.add(new WaypointSE2(
                 new Pose2d(new Translation2d(), Rotation2d.kZero),
-                DirectionSE2.TO_X));
-        waypoints.add(new Pose2dWithDirection(
+                DirectionSE2.TO_X,
+                1));
+        waypoints.add(new WaypointSE2(
                 new Pose2d(new Translation2d(1, 0), Rotation2d.kZero),
-                DirectionSE2.TO_X));
+                DirectionSE2.TO_X,
+                1));
         TrajectoryPlanner planner = new TrajectoryPlanner(
                 new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium(logger));
         planner.restToRest(waypoints);

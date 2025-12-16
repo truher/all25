@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.path.Path100;
@@ -103,12 +103,8 @@ public class TrajectoryPlanner {
                 initial.plus(new Transform2d(1, 0, Rotation2d.kZero)));
     }
 
-    public Trajectory100 restToRest(List<Pose2dWithDirection> waypoints) {
+    public Trajectory100 restToRest(List<WaypointSE2> waypoints) {
         return generateTrajectory(waypoints, 0.0, 0.0);
-    }
-
-    public Trajectory100 restToRest(List<Pose2dWithDirection> waypoints, List<Double> mN) {
-        return generateTrajectory(waypoints, 0.0, 0.0, mN);
     }
 
     public Trajectory100 movingToRest(ModelR3 startState, Pose2d end) {
@@ -134,22 +130,22 @@ public class TrajectoryPlanner {
         // use the start velocity to adjust the first magic number.
         // divide by the distance because the spline multiplies by it
         double e1 = 2.0 * startVelocity.norm() / full.getNorm();
-        List<Double> magicNumbers = List.of(e1, 1.2);
 
         try {
             return generateTrajectory(
                     List.of(
-                            new Pose2dWithDirection(
+                            new WaypointSE2(
                                     startState.pose(),
                                     DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(startingAngle), 0)),
-                            new Pose2dWithDirection(
+                                            DirectionR2.fromRotation(startingAngle), 0),
+                                    e1),
+                            new WaypointSE2(
                                     endState.pose(),
                                     DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(courseToGoal), 0))),
+                                            DirectionR2.fromRotation(courseToGoal), 0),
+                                    1.2)),
                     startVelocity.norm(),
-                    endVelocity.norm(),
-                    magicNumbers);
+                    endVelocity.norm());
         } catch (TrajectoryGenerationException e) {
             System.out.println("WARNING: Trajectory Generation Exception");
             return new Trajectory100();
@@ -174,22 +170,22 @@ public class TrajectoryPlanner {
         // use the start velocity to adjust the first magic number.
         // divide by the distance because the spline multiplies by it
         double e1 = 2.0 * startVelocity.norm() / full.getNorm();
-        List<Double> magicNumbers = List.of(e1, 1.2);
 
         try {
             return generateTrajectory(
                     List.of(
-                            new Pose2dWithDirection(
+                            new WaypointSE2(
                                     startState.pose(),
                                     DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(startCourse), 0)),
-                            new Pose2dWithDirection(
+                                            DirectionR2.fromRotation(startCourse), 0),
+                                    e1),
+                            new WaypointSE2(
                                     endState.pose(),
                                     DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(endCourse), 0))),
+                                            DirectionR2.fromRotation(endCourse), 0),
+                                    1.2)),
                     splineEntranceVelocity,
-                    splineExitVelocity,
-                    magicNumbers);
+                    splineExitVelocity);
         } catch (TrajectoryGenerationException e) {
             System.out.println("WARNING: Trajectory Generation Exception");
             return new Trajectory100();
@@ -214,14 +210,16 @@ public class TrajectoryPlanner {
         try {
             return restToRest(
                     List.of(
-                            new Pose2dWithDirection(
+                            new WaypointSE2(
                                     start,
                                     DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(courseToGoal), 0)),
-                            new Pose2dWithDirection(
+                                            DirectionR2.fromRotation(courseToGoal), 0),
+                                    1),
+                            new WaypointSE2(
                                     end,
                                     DirectionSE2.fromDirections(
-                                            DirectionR2.fromRotation(courseToGoal), 0))));
+                                            DirectionR2.fromRotation(courseToGoal), 0),
+                                    1)));
         } catch (TrajectoryGenerationException e) {
             return null;
         }
@@ -231,7 +229,7 @@ public class TrajectoryPlanner {
      * The shape of the spline accommodates the start and end velocities.
      */
     public Trajectory100 generateTrajectory(
-            List<Pose2dWithDirection> waypoints,
+            List<WaypointSE2> waypoints,
             double start_vel,
             double end_vel) {
         try {
@@ -253,34 +251,6 @@ public class TrajectoryPlanner {
             System.out.println("WARNING: Bad trajectory input!!");
             // print the stack trace if you want to know who is calling
             // e.printStackTrace();
-            return new Trajectory100();
-        }
-    }
-
-    public Trajectory100 generateTrajectory(
-            List<Pose2dWithDirection> waypoints,
-            double start_vel,
-            double end_vel,
-            List<Double> mN) {
-        try {
-            // Create a path from splines.
-            Path100 path = PathFactory.pathFromWaypoints(
-                    waypoints,
-                    m_splineTolerance,
-                    m_splineTolerance,
-                    m_splineRotationTolerance,
-                    mN);
-            // Generate the timed trajectory.
-            return m_scheduleGenerator.timeParameterizeTrajectory(
-                    path,
-                    m_trajectoryStep,
-                    start_vel,
-                    end_vel);
-        } catch (IllegalArgumentException e) {
-            // catches various kinds of malformed input, returns a no-op.
-            // this should never actually happen.
-            System.out.println("WARNING: Bad trajectory input!!");
-            e.printStackTrace();
             return new Trajectory100();
         }
     }

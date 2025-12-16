@@ -213,13 +213,14 @@ public class GeometryUtil {
                 MathUtil.interpolate(a.theta, b.theta, x));
     }
 
-    public static Pose2dWithDirection interpolate(
-            Pose2dWithDirection a,
-            Pose2dWithDirection b,
+    public static WaypointSE2 interpolate(
+            WaypointSE2 a,
+            WaypointSE2 b,
             double x) {
-        return new Pose2dWithDirection(
+        return new WaypointSE2(
                 interpolate(a.pose(), b.pose(), x),
-                interpolate(a.course(), b.course(), x));
+                interpolate(a.course(), b.course(), x),
+                MathUtil.interpolate(a.scale(), b.scale(), x));
     }
 
     /**
@@ -302,7 +303,7 @@ public class GeometryUtil {
         return doubleGeodesicDistance(a.getPose(), b.getPose());
     }
 
-    public static double doubleGeodesicDistance(Pose2dWithDirection a, Pose2dWithDirection b) {
+    public static double doubleGeodesicDistance(WaypointSE2 a, WaypointSE2 b) {
         return doubleGeodesicDistance(a.pose(), b.pose());
     }
 

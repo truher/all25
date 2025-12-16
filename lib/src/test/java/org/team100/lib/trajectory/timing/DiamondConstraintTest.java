@@ -3,7 +3,7 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -22,20 +22,20 @@ public class DiamondConstraintTest implements Timeless {
         // here the two speeds are the same
         DiamondConstraint c = new DiamondConstraint(logger, 1, 1, 4);
         Pose2dWithMotion state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0, 0);
         // moving purely in x, get the x number
         assertEquals(1, c.getMaxVelocity(state).getValue(), DELTA);
         state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 2),
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 2, 1.2),
                 0, 0, 0);
         // moving purely in y, get the y number
         assertEquals(1, c.getMaxVelocity(state).getValue(), DELTA);
         state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 4),
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 4, 1.2),
                 0, 0, 0);
         // moving diagonally, get less.
         assertEquals(0.707, c.getMaxVelocity(state).getValue(), DELTA);
@@ -45,20 +45,20 @@ public class DiamondConstraintTest implements Timeless {
     void testVelocity() {
         DiamondConstraint c = new DiamondConstraint(logger, 2, 3, 4);
         Pose2dWithMotion state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(0, 0, new Rotation2d(0)), 0),
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0, 0);
         // moving purely in x, get the x number
         assertEquals(2, c.getMaxVelocity(state).getValue(), DELTA);
         state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 2),
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 2, 1.2),
                 0, 0, 0);
         // moving purely in y, get the y number
         assertEquals(3, c.getMaxVelocity(state).getValue(), DELTA);
         state = new Pose2dWithMotion(
-                Pose2dWithDirection.make(
-                        new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 4),
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 4, 1.2),
                 0, 0, 0);
         // moving diagonally, get less.
         assertEquals(1.697, c.getMaxVelocity(state).getValue(), DELTA);

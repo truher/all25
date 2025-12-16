@@ -3,7 +3,7 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,16 +17,16 @@ class TimedStateTest {
         // At (0,0,0), t=0, v=0, acceleration=1
         TimedPose start_state = new TimedPose(
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(
-                                new Pose2d(0, 0, new Rotation2d(0)), 0),
+                        WaypointSE2.irrotational(
+                                new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                         0, 0, 0),
                 0.0, 0.0, 1.0);
 
         // At (.5,0,0), t=1, v=1, acceleration=0
         TimedPose end_state = new TimedPose(
                 new Pose2dWithMotion(
-                        Pose2dWithDirection.make(
-                                new Pose2d(0.5, 0, new Rotation2d(0)), 0),
+                        WaypointSE2.irrotational(
+                                new Pose2d(0.5, 0, new Rotation2d(0)), 0, 1.2),
                         0, 0, 0),
                 1.0, 1.0, 0.0);
 

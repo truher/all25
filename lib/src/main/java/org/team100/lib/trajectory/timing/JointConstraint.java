@@ -2,7 +2,7 @@ package org.team100.lib.trajectory.timing;
 
 import org.team100.lib.geometry.AccelerationSE2;
 import org.team100.lib.geometry.VelocitySE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
@@ -46,7 +46,7 @@ public class JointConstraint implements TimingConstraint {
 
     @Override
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-        Pose2dWithDirection pose = state.getPose();
+        WaypointSE2 pose = state.getPose();
         // Velocity if translation speed were 1.0 m/s.
         VelocitySE2 v = new VelocitySE2(
                 state.getCourse().getCos(),

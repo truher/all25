@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -37,14 +37,14 @@ public class ScheduleGeneratorTest {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
-            new Pose2dWithMotion(Pose2dWithDirection.make(
-                    new Pose2d(0, 0, new Rotation2d(0)), 0), 0, 0, 0),
-            new Pose2dWithMotion(Pose2dWithDirection.make(
-                    new Pose2d(24.0, 0.0, new Rotation2d(0)), 0), 0, 0, 0),
-            new Pose2dWithMotion(Pose2dWithDirection.make(
-                    new Pose2d(36, 12, new Rotation2d(0)), 0), 0, 0, 0),
-            new Pose2dWithMotion(Pose2dWithDirection.make(
-                    new Pose2d(60, 12, new Rotation2d(0)), 0), 0, 0, 0));
+            new Pose2dWithMotion(WaypointSE2.irrotational(
+                    new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2), 0, 0, 0),
+            new Pose2dWithMotion(WaypointSE2.irrotational(
+                    new Pose2d(24.0, 0.0, new Rotation2d(0)), 0, 1.2), 0, 0, 0),
+            new Pose2dWithMotion(WaypointSE2.irrotational(
+                    new Pose2d(36, 12, new Rotation2d(0)), 0, 1.2), 0, 0, 0),
+            new Pose2dWithMotion(WaypointSE2.irrotational(
+                    new Pose2d(60, 12, new Rotation2d(0)), 0, 1.2), 0, 0, 0));
 
     public static final List<Rotation2d> HEADINGS = List.of(
             GeometryUtil.fromDegrees(0),
@@ -112,14 +112,14 @@ public class ScheduleGeneratorTest {
 
         Path100 path = new Path100(Arrays.asList(
                 new Pose2dWithMotion(
-                        new Pose2dWithDirection(
+                        new WaypointSE2(
                                 new Pose2d(0, 0, new Rotation2d(0)),
-                                new DirectionSE2(0, 0, 1)),
+                                new DirectionSE2(0, 0, 1), 1),
                         1, 0, 0),
                 new Pose2dWithMotion(
-                        new Pose2dWithDirection(
+                        new WaypointSE2(
                                 new Pose2d(0, 0, new Rotation2d(Math.PI)),
-                                new DirectionSE2(0, 0, 1)),
+                                new DirectionSE2(0, 0, 1), 1),
                         1, 0, 0)));
         if (DEBUG)
             System.out.printf("PATH: %s\n", path);
@@ -280,17 +280,17 @@ public class ScheduleGeneratorTest {
      */
     @Test
     void testPerformance() {
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1.2),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_Y));
+                        DirectionSE2.TO_Y, 1.2));
         long startTimeNs = System.nanoTime();
         final int iterations = 100;
         final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;

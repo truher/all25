@@ -1,7 +1,7 @@
 package org.team100.lib.trajectory;
 
 import org.jfree.data.xy.VectorSeries;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.timing.TimedPose;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,7 +22,7 @@ public class TrajectoryToVectorSeries {
         double dt = duration/20;
         for (double time = 0; time < duration; time += dt) {
             TimedPose p = t.sample(time);
-            Pose2dWithDirection pp = p.state().getPose();
+            WaypointSE2 pp = p.state().getPose();
             double x = pp.translation().getX();
             double y = pp.translation().getY();
             Rotation2d heading = pp.heading();

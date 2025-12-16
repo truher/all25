@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -38,15 +38,15 @@ class Trajectory100Test implements Timeless {
         Translation2d goalTranslation = end.getTranslation();
         Translation2d translationToGoal = goalTranslation.minus(currentTranslation);
         Rotation2d angleToGoal = translationToGoal.getAngle();
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         start,
                         DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(angleToGoal), 0)),
-                new Pose2dWithDirection(
+                                DirectionR2.fromRotation(angleToGoal), 0), 1),
+                new WaypointSE2(
                         end,
                         DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(angleToGoal), 0)));
+                                DirectionR2.fromRotation(angleToGoal), 0), 1));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
@@ -76,15 +76,15 @@ class Trajectory100Test implements Timeless {
         Translation2d goalTranslation = end.getTranslation();
         Translation2d translationToGoal = goalTranslation.minus(currentTranslation);
         Rotation2d angleToGoal = translationToGoal.getAngle();
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         start,
                         DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(angleToGoal), 0)),
-                new Pose2dWithDirection(
+                                DirectionR2.fromRotation(angleToGoal), 0), 1),
+                new WaypointSE2(
                         end,
                         DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(angleToGoal), 0)));
+                                DirectionR2.fromRotation(angleToGoal), 0), 1));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
@@ -106,17 +106,17 @@ class Trajectory100Test implements Timeless {
     @Test
     void testSampleThoroughly() {
 
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X));
+                        DirectionSE2.TO_X, 1));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
@@ -147,22 +147,22 @@ class Trajectory100Test implements Timeless {
     // There's no need to run this all the time
     // @Test
     void testSamplePerformance() {
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(),
                                 Rotation2d.kZero),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(10, 0),
                                 Rotation2d.kCCW_Pi_2),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(10, 10),
                                 Rotation2d.kPi),
-                        DirectionSE2.TO_X));
+                        DirectionSE2.TO_X, 1));
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);

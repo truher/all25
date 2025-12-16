@@ -7,7 +7,7 @@ import org.team100.lib.controller.r3.ControllerR3;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
@@ -57,18 +57,20 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
         Pose2d pose = m_drive.getState().pose();
         Translation2d toGoal = m_goal.getTranslation().minus(pose.getTranslation());
         VelocitySE2 startVelocity = m_drive.getState().velocity();
-        Pose2dWithDirection startWaypoint = new Pose2dWithDirection(
+        WaypointSE2 startWaypoint = new WaypointSE2(
                 pose,
                 DirectionSE2.fromDirections(
                         DirectionR2.fromRotation(
                                 startVelocity.angle().orElse(toGoal.getAngle())),
-                        0));
-        Pose2dWithDirection endWaypoint = new Pose2dWithDirection(
+                        0),
+                1);
+        WaypointSE2 endWaypoint = new WaypointSE2(
                 m_goal,
                 DirectionSE2.fromDirections(
                         DirectionR2.fromRotation(
                                 m_endVelocity.angle().orElse(toGoal.getAngle())),
-                        0));
+                        0),
+                1);
         Trajectory100 trajectory = m_planner.generateTrajectory(
                 List.of(startWaypoint, endWaypoint),
                 startVelocity.norm(),

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -45,7 +45,7 @@ public class TrajectoryTest {
     /**
      * Yields a curve.
      * 
-     * A Pose2dWithDirection allows separate specification of heading (which way the
+     * A WaypointSE2 allows separate specification of heading (which way the
      * front of the robot is facing) and course (which way the robot is moving).
      * 
      * In this case, is facing +x, and moving +x, and it ends up moving +y but
@@ -57,17 +57,17 @@ public class TrajectoryTest {
                 new ConstantConstraint(log, 2, 0.5),
                 new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(9, 9),
                                 new Rotation2d(-Math.PI / 2)),
-                        DirectionSE2.TO_Y));
+                        DirectionSE2.TO_Y, 1));
         Trajectory100 t = p.restToRest(waypoints);
         if (SHOW)
             new TrajectoryPlotter(0.1).plot("curved", t);
@@ -84,22 +84,22 @@ public class TrajectoryTest {
                 new ConstantConstraint(log, 2, 0.5),
                 new YawRateConstraint(log, 1, 1));
         TrajectoryPlanner p = new TrajectoryPlanner(c);
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(5, 5),
                                 new Rotation2d(-2)),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
+                        DirectionSE2.TO_X, 1),
+                new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(9, 9),
                                 new Rotation2d(-Math.PI / 2)),
-                        DirectionSE2.TO_Y));
+                        DirectionSE2.TO_Y, 1));
         Trajectory100 t = p.restToRest(waypoints);
         if (SHOW)
             new TrajectoryPlotter(0.1).plot("multiple", t);

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
@@ -49,8 +49,8 @@ public class ToPoseWithTrajectory extends Command {
         m_startTimeS = Takt.get();
         // may return null
         m_trajectory = m_planner.restToRest(List.of(
-                Pose2dWithDirection.tank(m_drive.getPose()),
-                Pose2dWithDirection.tank(m_goal)));
+                WaypointSE2.tank(m_drive.getPose()),
+                WaypointSE2.tank(m_goal)));
         m_viz.setViz(m_trajectory);
     }
 
