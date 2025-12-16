@@ -3,6 +3,7 @@ package org.team100.lib.trajectory.path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
 
@@ -13,7 +14,7 @@ import org.team100.lib.trajectory.timing.ScheduleGenerator;
  */
 public class Path100 {
     private final List<Pose2dWithMotion> m_points;
-    /** in meters */
+    /** double geodesic distance which is meters and radians */
     private final double[] m_distances;
 
     public Path100(final List<Pose2dWithMotion> states) {
@@ -26,8 +27,11 @@ public class Path100 {
         m_points.add(states.get(0));
         for (int i = 1; i < states.size(); ++i) {
             m_points.add(states.get(i));
-            m_distances[i] = m_distances[i - 1]
-                    + getPoint(i - 1).distanceM(getPoint(i));
+            Pose2dWithMotion p0 = getPoint(i - 1);
+            Pose2dWithMotion p1 = getPoint(i);
+            // use the distance metric that includes rotation
+            double dist = GeometryUtil.doubleGeodesicDistance(p0, p1);
+            m_distances[i] = m_distances[i - 1] + dist;
         }
     }
 
@@ -39,7 +43,7 @@ public class Path100 {
         return m_points.size();
     }
 
-    public Pose2dWithMotion getPoint(final int index) {
+    public Pose2dWithMotion getPoint(int index) {
         if (m_points.isEmpty())
             return null;
         return m_points.get(index);
@@ -63,24 +67,24 @@ public class Path100 {
      */
     public Pose2dWithMotion sample(double distance) throws ScheduleGenerator.TimingException {
         if (distance >= getMaxDistance()) {
-            Pose2dWithMotion point = getPoint(length() - 1);
-            return point;
+            // off the end
+            return getPoint(length() - 1);
         }
         if (distance <= 0.0) {
-            Pose2dWithMotion point = getPoint(0);
-            return point;
+            // before the start
+            return getPoint(0);
         }
-        for (int i = 1; i < m_distances.length; ++i) {
-            final Pose2dWithMotion point = getPoint(i);
-            if (m_distances[i] >= distance) {
-                final Pose2dWithMotion prev_s = getPoint(i - 1);
-                if (Math.abs(m_distances[i] - m_distances[i - 1]) <= 1e-12) {
-                    return point;
-                } else {
-                    return prev_s.interpolate(
-                            point,
-                            (distance - m_distances[i - 1]) / (m_distances[i] - m_distances[i - 1]));
-                }
+        for (int i = 1; i < length(); ++i) {
+            // walk through the points to bracket the desired distance
+            Pose2dWithMotion p0 = getPoint(i - 1);
+            Pose2dWithMotion p1 = getPoint(i);
+            double d0 = m_distances[i - 1];
+            double d1 = m_distances[i];
+            double d = d1 - d0;
+            if (d1 >= distance) {
+                // Found the bracket.
+                double s = (distance - d0) / d;
+                return p0.interpolate(p1, s);
             }
         }
         throw new ScheduleGenerator.TimingException();

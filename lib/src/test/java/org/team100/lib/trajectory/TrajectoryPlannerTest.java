@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Pose2dWithDirection;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -175,7 +175,8 @@ class TrajectoryPlannerTest implements Timeless {
         ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(-1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
-        assertEquals(1.176, traj.duration(), DELTA);
+        TrajectoryPlotter.plot(traj, 0.1, 1);
+        assertEquals(1.549, traj.duration(), DELTA);
     }
 
     @Test

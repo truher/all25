@@ -13,7 +13,7 @@ import edu.wpi.first.math.numbers.N6;
  * 
  */
 public class SplineR1Test {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /**
      * Making the end derivatives the average, with zero second derivative, makes

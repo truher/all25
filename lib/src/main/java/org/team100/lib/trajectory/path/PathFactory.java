@@ -9,10 +9,11 @@ import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 public class PathFactory {
+    private static final boolean DEBUG = false;
 
     public static Path100 pathFromWaypoints(
             List<Pose2dWithDirection> waypoints,
@@ -39,9 +40,12 @@ public class PathFactory {
             double maxDTheta) {
         List<HolonomicSpline> splines = new ArrayList<>(waypoints.size() - 1);
         for (int i = 1; i < waypoints.size(); ++i) {
-            splines.add(new HolonomicSpline(
+            HolonomicSpline s = new HolonomicSpline(
                     waypoints.get(i - 1),
-                    waypoints.get(i)));
+                    waypoints.get(i));
+            if (DEBUG)
+                System.out.printf("%d %s\n", i, s);
+            splines.add(s);
         }
         return new Path100(PathFactory.parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
     }
@@ -87,6 +91,8 @@ public class PathFactory {
         rv.add(splines.get(0).getPose2dWithMotion(0.0));
         for (int i = 0; i < splines.size(); i++) {
             HolonomicSpline s = splines.get(i);
+            if (DEBUG)
+                System.out.printf("%d %s\n", i, s);
             List<Pose2dWithMotion> samples = parameterizeSpline(s, maxDx, maxDy, maxDTheta, 0.0, 1.0);
             samples.remove(0);
             rv.addAll(samples);
@@ -94,6 +100,9 @@ public class PathFactory {
         return rv;
     }
 
+    /**
+     * Recursively add points until they're close to the real curve.
+     */
     private static void getSegmentArc(
             HolonomicSpline s,
             List<Pose2dWithMotion> rv,
@@ -103,29 +112,27 @@ public class PathFactory {
             double maxDy,
             double maxDTheta) {
         Pose2d p0 = s.getPose2d(t0);
-        Pose2d phalf = s.getPose2d(t0 + (t1 - t0) * .5);
+        double thalf = (t0 + t1) / 2;
+        Pose2d phalf = s.getPose2d(thalf);
         Pose2d p1 = s.getPose2d(t1);
-        Twist2d twist_full = Pose2d.kZero.log(GeometryUtil.transformBy(GeometryUtil.inverse(p0), p1));
-        Pose2d phalf_predicted = GeometryUtil.transformBy(p0,
-                Pose2d.kZero.exp(GeometryUtil.scale(twist_full, 0.5)));
-        Pose2d error = GeometryUtil.transformBy(GeometryUtil.inverse(phalf), phalf_predicted);
 
-        if (GeometryUtil.norm(twist_full) < 1e-6) {
-            // the Rotation2d below will be garbage in this case so give up.
-            return;
-        }
-        Rotation2d course_predicted = (new Rotation2d(twist_full.dx, twist_full.dy))
-                .rotateBy(phalf_predicted.getRotation());
+        // twist from p0 to p1
+        Twist2d twist_full = p0.log(p1);
+        // twist halfway from p0 to p1
+        Twist2d twist_half = GeometryUtil.scale(twist_full, 0.5);
+        // point halfway from p0 to p1
+        Pose2d phalf_predicted = p0.exp(twist_half);
+        // difference between twist and sample
+        Transform2d error = phalf_predicted.minus(phalf);
 
-        Rotation2d course_half = s.getCourse(t0 + (t1 - t0) * .5).orElse(course_predicted);
-        double course_error = course_predicted.unaryMinus().rotateBy(course_half).getRadians();
-        if (Math.abs(error.getTranslation().getY()) > maxDy ||
-                Math.abs(error.getTranslation().getX()) > maxDx ||
-                Math.abs(error.getRotation().getRadians()) > maxDTheta ||
-                Math.abs(course_error) > maxDTheta) {
-            getSegmentArc(s, rv, t0, (t0 + t1) / 2, maxDx, maxDy, maxDTheta);
-            getSegmentArc(s, rv, (t0 + t1) / 2, t1, maxDx, maxDy, maxDTheta);
+        if (Math.abs(error.getTranslation().getX()) > maxDx ||
+                Math.abs(error.getTranslation().getY()) > maxDy ||
+                Math.abs(error.getRotation().getRadians()) > maxDTheta) {
+            // add a point in between
+            getSegmentArc(s, rv, t0, thalf, maxDx, maxDy, maxDTheta);
+            getSegmentArc(s, rv, thalf, t1, maxDx, maxDy, maxDTheta);
         } else {
+            // midpoint is close enough, this looks good
             rv.add(s.getPose2dWithMotion(t1));
         }
     }

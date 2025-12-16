@@ -21,6 +21,7 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.Trajectory100;
+import org.team100.lib.trajectory.TrajectoryPlotter;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
@@ -108,26 +109,33 @@ public class ScheduleGeneratorTest {
      */
     @Test
     void testJustTurningInPlace() {
+
         Path100 path = new Path100(Arrays.asList(
-                new Pose2dWithMotion(Pose2dWithDirection.make(
-                        new Pose2d(0, 0, new Rotation2d(0)), 0), 1, 0, 0),
-                new Pose2dWithMotion(Pose2dWithDirection.make(
-                        new Pose2d(0, 0, new Rotation2d(Math.PI)), 0), 1, 0, 0)));
+                new Pose2dWithMotion(
+                        new Pose2dWithDirection(
+                                new Pose2d(0, 0, new Rotation2d(0)),
+                                new DirectionSE2(0, 0, 1)),
+                        1, 0, 0),
+                new Pose2dWithMotion(
+                        new Pose2dWithDirection(
+                                new Pose2d(0, 0, new Rotation2d(Math.PI)),
+                                new DirectionSE2(0, 0, 1)),
+                        1, 0, 0)));
+        if (DEBUG)
+            System.out.printf("PATH: %s\n", path);
+        TrajectoryPlotter.plot(path, 0.1, 1);
 
-        // Triangle profile.
-        assertThrows(IllegalArgumentException.class,
-                () -> buildAndCheckTrajectory(
-                        path, 1.0, new ArrayList<TimingConstraint>(), 0.0, 0.0, 20.0, 5.0));
+        List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
+        ScheduleGenerator u = new ScheduleGenerator(constraints);
+        Trajectory100 timed_traj = u.timeParameterizeTrajectory(
+                path,
+                1.0,
+                0.0,
+                0.0);
+        final Trajectory100 traj = timed_traj;
 
-        // Trapezoidal profile.
-        assertThrows(IllegalArgumentException.class,
-                () -> buildAndCheckTrajectory(
-                        path, 1.0, new ArrayList<TimingConstraint>(), 0.0, 0.0, 10.0, 5.0));
+        assertTrue(traj.isEmpty());
 
-        // Trapezoidal profile with start and end velocities.
-        assertThrows(IllegalArgumentException.class,
-                () -> buildAndCheckTrajectory(
-                        path, 1.0, new ArrayList<TimingConstraint>(), 5.0, 2.0, 10.0, 5.0));
     }
 
     /**

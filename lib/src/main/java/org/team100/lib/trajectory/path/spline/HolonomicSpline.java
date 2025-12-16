@@ -2,12 +2,10 @@ package org.team100.lib.trajectory.path.spline;
 
 import java.util.Optional;
 
-import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,7 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * motion; that's not true here.
  * 
  * This happily produces "splines" with sharp corners, if the segment
- * derivatives don't match. To fix that, use SplineUtil.forceC1().
+ * derivatives don't match.
  */
 public class HolonomicSpline {
     private static final boolean DEBUG = false;
@@ -45,9 +43,6 @@ public class HolonomicSpline {
     /**
      * The theta endpoint derivative is just the average theta rate, which is new,
      * it used to be zero.
-     * 
-     * You'll probably want to call SplineUtil.forceC1() and
-     * SplineUtil.optimizeSpline() after creating these segments.
      */
     public HolonomicSpline(Pose2dWithDirection p0, Pose2dWithDirection p1) {
         this(p0, p1, 1.2, 1.2);
@@ -58,16 +53,18 @@ public class HolonomicSpline {
      * endpoints, i.e. how "strongly" the derivative affects the curve. High magic
      * number means low curvature at the endpoint.
      * 
-     * The theta endpoint derivative is just the average theta rate, which is new,
-     * it used to be zero.
+     * Previously, the theta endpoint derivatives were the average rate, which
+     * yielded paths with a lot of rotation at the last second. Typically this isn't
+     * what you want: you're approaching some target, and rotation is disruptive to
+     * everything: vision, actuation, everything.
+     *
+     * Instead, we now use the "course" to specify the whole SE(2) direction, so if
+     * you want rotation at the end, you can say that, and if you want no rotation
+     * at the end, you can say that too.
      * 
-     * Maybe the theta rate should be specified instead of taking the average.
-     * 
-     * You'll probably want to call SplineUtil.forceC1() and
-     * SplineUtil.optimizeSpline() after creating these segments.
-     * 
-     * Magic numbers also scale theta endpoints, so that the translation and
-     * rotation splines track together.
+     * All second derivatives are zero, and we don't try to change this anymore with
+     * optimization. Optimization just doesn't help very much, and it's a pain when
+     * it behaves strangely.
      * 
      * @param p0  starting pose
      * @param p1  ending pose
@@ -75,55 +72,46 @@ public class HolonomicSpline {
      * @param mN1 ending magic number
      */
     public HolonomicSpline(Pose2dWithDirection p0, Pose2dWithDirection p1, double mN0, double mN1) {
-        double scale0 = mN0 * GeometryUtil.distanceM(p0.translation(), p1.translation());
-        double scale1 = mN1 * GeometryUtil.distanceM(p0.translation(), p1.translation());
+        // Distance metric includes both translation and rotation. This is not
+        // the geodesic distance, which is zero for spin-in-place. It's just the
+        // L2 norm for all three dimensions.
+        double distance = GeometryUtil.doubleGeodesicDistance(p0.pose(), p1.pose());
+        if (DEBUG)
+            System.out.printf("distance %f\n", distance);
+        double scale0 = mN0 * distance;
+        double scale1 = mN1 * distance;
+
         if (DEBUG) {
             System.out.printf("scale %f %f\n", scale0, scale1);
         }
 
-        // Translation2d course0 = new Translation2d(1,0).rotateBy(p0.course());
-        // Translation2d course1 = new Translation2d(1,0).rotateBy(p1.course());
-
+        // Endpoints:
         double x0 = p0.translation().getX();
         double x1 = p1.translation().getX();
-        // first derivatives are just the course
-        // double dx0 = course0.getX() * scale0;
-        double dx0 = p0.course().x * scale0;
-        // double dx1 = course1.getX() * scale1;
-        double dx1 = p1.course().x * scale1;
-        // second derivatives are zero at the ends
-        double ddx0 = 0;
-        double ddx1 = 0;
-
         double y0 = p0.translation().getY();
         double y1 = p1.translation().getY();
-        // first derivatives are just the course
-        // double dy0 = course0.getY() * scale0;
-        double dy0 = p0.course().y * scale0;
-        // double dy1 = course1.getY() * scale1;
-        double dy1 = p1.course().y * scale1;
-        // second derivatives are zero at the ends
-        double ddy0 = 0;
-        double ddy1 = 0;
-
-        m_x = SplineR1.get(x0, x1, dx0, dx1, ddx0, ddx1);
-        m_y = SplineR1.get(y0, y1, dy0, dy1, ddy0, ddy1);
-
+        // To avoid 180 degrees, heading uses an offset
         m_heading0 = p0.heading();
         double delta = p1.heading().minus(p0.heading()).getRadians();
 
-        // previously dtheta at the endpoints was zero, which is bad: it meant the omega
-        // value varied all over the place, even for theta paths that should be
-        // completely smooth.
-        // a reasonable derivative for theta is just the average (i.e. the course from
-        // the preceding point to the following point)
-        // this will produce a "corner" in theta, which you may want to fix with
-        // SplineUtil.forceC1().
-        double dtheta0 = delta * mN0;
-        double dtheta1 = delta * mN1;
-        // second derivatives are zero at the ends
+        // First derivatives are the course:
+        double dx0 = p0.course().x * scale0;
+        double dx1 = p1.course().x * scale1;
+        double dy0 = p0.course().y * scale0;
+        double dy1 = p1.course().y * scale1;
+        double dtheta0 = p0.course().theta * scale0;
+        double dtheta1 = p1.course().theta * scale1;
+
+        // Second derivatives are zero:
+        double ddx0 = 0;
+        double ddx1 = 0;
+        double ddy0 = 0;
+        double ddy1 = 0;
         double ddtheta0 = 0;
         double ddtheta1 = 0;
+
+        m_x = SplineR1.get(x0, x1, dx0, dx1, ddx0, ddx1);
+        m_y = SplineR1.get(y0, y1, dy0, dy1, ddy0, ddy1);
         m_heading = SplineR1.get(0.0, delta, dtheta0, dtheta1, ddtheta0, ddtheta1);
     }
 
@@ -132,43 +120,41 @@ public class HolonomicSpline {
         return "HolonomicSpline [m_x=" + m_x + ", m_y=" + m_y + ", m_theta=" + m_heading + ", m_r0=" + m_heading0 + "]";
     }
 
-    /** This is used by various optimization steps. */
-    private HolonomicSpline(
-            SplineR1 x,
-            SplineR1 y,
-            SplineR1 theta,
-            Rotation2d r0) {
-        m_x = x;
-        m_y = y;
-        m_heading = theta;
-        m_heading0 = r0;
-    }
-
+    /**
+     * @param p [0,1]
+     */
     public Pose2dWithMotion getPose2dWithMotion(double p) {
         return new Pose2dWithMotion(
                 new Pose2dWithDirection(
                         new Pose2d(getPoint(p), getHeading(p)),
-                        DirectionSE2.fromDirections(
-                                DirectionR2.fromRotation(getCourse(p).orElseThrow()), 0)),
+                        getCourse(p)),
                 getDHeadingDs(p),
                 getCurvature(p),
                 getDCurvatureDs(p));
     }
 
+    /** So we can see it */
+    public void printSamples() {
+        System.out.println("p, x, heading, heading rate");
+        for (double p = 0; p < 1; p += 0.05) {
+            Pose2dWithMotion pwm = getPose2dWithMotion(p);
+            System.out.printf("%f, %f, %f, %f\n",
+                    p,
+                    pwm.getPose().pose().getX(),
+                    pwm.getPose().heading().getRadians(),
+                    pwm.getHeadingRateRad_M());
+        }
+    }
+
     /**
-     * Course is the direction of motion, regardless of the direction the robot is
-     * facing (heading). It's optional to account for the motionless case.
-     *
-     * Course is the same for holonomic and nonholonomic splines.
+     * Course is the direction of motion in SE(2), which means it includes both
+     * cartesian dimensions and also the rotation dimension.
      */
-    public Optional<Rotation2d> getCourse(double t) {
+    public DirectionSE2 getCourse(double t) {
         double dx = dx(t);
         double dy = dy(t);
-        if (Math100.epsilonEquals(dx, 0.0) && Math100.epsilonEquals(dy, 0.0)) {
-            // rotation below would be garbage so give up
-            return Optional.empty();
-        }
-        return Optional.of(new Rotation2d(dx, dy));
+        double dtheta = dtheta(t);
+        return new DirectionSE2(dx, dy, dtheta);
     }
 
     public Pose2d getPose2d(double p) {
@@ -183,54 +169,6 @@ public class HolonomicSpline {
 
     protected double getDHeading(double t) {
         return m_heading.getVelocity(t);
-    }
-
-    HolonomicSpline replaceFirstDerivatives(
-            double dx0,
-            double dx1,
-            double dy0,
-            double dy1,
-            double dtheta0,
-            double dtheta1) {
-        return new HolonomicSpline(
-                SplineR1.get(
-                        m_x.getPosition(0),
-                        m_x.getPosition(1),
-                        dx0,
-                        dx1,
-                        m_x.getAcceleration(0),
-                        m_x.getAcceleration(1)),
-                SplineR1.get(
-                        m_y.getPosition(0),
-                        m_y.getPosition(1),
-                        dy0,
-                        dy1,
-                        m_y.getAcceleration(0),
-                        m_y.getAcceleration(1)),
-                SplineR1.get(
-                        m_heading.getPosition(0),
-                        m_heading.getPosition(1),
-                        dtheta0,
-                        dtheta1,
-                        m_heading.getAcceleration(0),
-                        m_heading.getAcceleration(1)),
-                m_heading0);
-    }
-
-    /**
-     * Return a new spline that is a copy of this one, but incrementing the second
-     * derivatives by the specified amounts.
-     */
-    HolonomicSpline addToSecondDerivatives(
-            double ddx0_sub,
-            double ddx1_sub,
-            double ddy0_sub,
-            double ddy1_sub) {
-        return new HolonomicSpline(
-                m_x.addCoefs(SplineR1.get(0, 0, 0, 0, ddx0_sub, ddx1_sub)),
-                m_y.addCoefs(SplineR1.get(0, 0, 0, 0, ddy0_sub, ddy1_sub)),
-                m_heading,
-                m_heading0);
     }
 
     /**

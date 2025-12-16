@@ -12,6 +12,7 @@ import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Pose2dWithDirection;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.testing.Timeless;
+import org.team100.lib.trajectory.TrajectoryPlotter;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -102,6 +103,25 @@ public class PathFactoryTest implements Timeless {
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
+    /** Turning in place works now. */
+    @Test
+    void testSpin() {
+        List<Pose2dWithDirection> waypoints = List.of(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, 0),
+                                Rotation2d.kZero),
+                        new DirectionSE2(0, 0, 1)),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, 0),
+                                Rotation2d.kCCW_90deg),
+                        new DirectionSE2(0, 0, 1)));
+        Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
+        TrajectoryPlotter.plot(path, 0.1, 1);
+    }
+
+    /** Hard corners work now. */
     @Test
     void testActualCorner() {
         List<Pose2dWithDirection> waypoints = List.of(
@@ -125,35 +145,37 @@ public class PathFactoryTest implements Timeless {
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
                         DirectionSE2.TO_Y));
-        assertThrows(IllegalArgumentException.class,
-                () -> PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1));
+        Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
+        TrajectoryPlotter.plot(path, 0.1, 1);
     }
 
     @Test
     void testComposite() {
+        // note none of these directions include rotation; it's all in between.
         List<Pose2dWithDirection> waypoints = List.of(
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(0, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X),
+                        new DirectionSE2(1, 0, 0)),
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        DirectionSE2.TO_X),
+                        new DirectionSE2(1, 0, 0)),
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d(1)),
-                        DirectionSE2.TO_X),
+                        new DirectionSE2(1, 0, 0)),
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(2, 0),
                                 new Rotation2d(1)),
-                        DirectionSE2.TO_X));
-        assertThrows(IllegalArgumentException.class,
-                () -> PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1));
+                        new DirectionSE2(1, 0, 0)));
+        Path100 foo = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
+        TrajectoryPlotter.plot(foo, 0.1, 1);
+        assertEquals(4, foo.length(), 0.001);
     }
 
     @Test

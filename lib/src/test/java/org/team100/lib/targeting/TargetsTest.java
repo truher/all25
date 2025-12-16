@@ -82,7 +82,7 @@ public class TargetsTest implements Timeless {
 
         ModelR3 p = new ModelR3();
         Targets reader = new Targets(logger, logger, (x) -> p);
-        Thread.sleep(50);
+        Thread.sleep(200);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
                 logger,
                 List.of(Camera.TEST4),
@@ -90,13 +90,13 @@ public class TargetsTest implements Timeless {
                 new Translation2d[] { new Translation2d(1, 0) });
 
         // wait for NT rate-limiting
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         stepTime();
         writer.update();
 
         // wait for NT rate-limiting
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         stepTime();
         reader.update();

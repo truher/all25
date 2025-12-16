@@ -106,7 +106,10 @@ class HolonomicSplineTest implements Timeless {
     }
 
     @Test
-    void testRotation() {
+    void testRotationSoft() {
+        // move ahead 1m while rotation 1 rad to the left
+        // this has no rotation at the ends.
+        // the rotation rate is zero at the ends and much higher in the middle.
         HolonomicSpline s = new HolonomicSpline(
                 new Pose2dWithDirection(
                         new Pose2d(
@@ -122,20 +125,76 @@ class HolonomicSplineTest implements Timeless {
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
 
+        if (DEBUG)
+            s.printSamples();
+
         // now that the magic numbers apply to the rotational scaling, the heading rate
         // is constant.
         Translation2d t = s.getPoint(0);
         assertEquals(0, t.getX(), DELTA);
         t = s.getPoint(1);
         assertEquals(1, t.getX(), DELTA);
+
+        Pose2dWithMotion p = s.getPose2dWithMotion(0);
+        assertEquals(0, p.getPose().translation().getX(), DELTA);
+        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
+        // initial rotation rate is zero
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
+
+        p = s.getPose2dWithMotion(0.5);
+        assertEquals(0.5, p.getPose().translation().getX(), DELTA);
+        assertEquals(0.5, p.getPose().heading().getRadians(), DELTA);
+        // high rotation rate in the middle
+        assertEquals(4.807, p.getHeadingRateRad_M(), DELTA);
+
+        p = s.getPose2dWithMotion(1);
+        assertEquals(1, p.getPose().translation().getX(), DELTA);
+        assertEquals(1, p.getPose().heading().getRadians(), DELTA);
+        // rotation rate is zero at the end
+        assertEquals(0, p.getHeadingRateRad_M(), DELTA);
+
+    }
+
+    @Test
+    void testRotationFast() {
+        // move ahead 1m while rotation 1 rad to the left
+        // this has lots of rotation at the ends
+        // the "spatial" rotation rate is constant, i.e.
+        // rotation and translation speed are proportional.
+        HolonomicSpline s = new HolonomicSpline(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
+                        new DirectionSE2(1, 0, 1)),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d(1)),
+                        new DirectionSE2(1, 0, 1)));
+
+        TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
+        plotter.plot("rotation", List.of(s));
+
+        s.printSamples();
+
+        // now that the magic numbers apply to the rotational scaling, the heading rate
+        // is constant.
+        Translation2d t = s.getPoint(0);
+        assertEquals(0, t.getX(), DELTA);
+        t = s.getPoint(1);
+        assertEquals(1, t.getX(), DELTA);
+
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
         assertEquals(0, p.getPose().translation().getX(), DELTA);
         assertEquals(0, p.getPose().heading().getRadians(), DELTA);
         assertEquals(1, p.getHeadingRateRad_M(), DELTA);
+
         p = s.getPose2dWithMotion(0.5);
         assertEquals(0.5, p.getPose().translation().getX(), DELTA);
         assertEquals(0.5, p.getPose().heading().getRadians(), DELTA);
         assertEquals(1, p.getHeadingRateRad_M(), DELTA);
+
         p = s.getPose2dWithMotion(1);
         assertEquals(1, p.getPose().translation().getX(), DELTA);
         assertEquals(1, p.getPose().heading().getRadians(), DELTA);
@@ -157,15 +216,37 @@ class HolonomicSplineTest implements Timeless {
                                 new Translation2d(1, 0),
                                 new Rotation2d(-2.5)),
                         DirectionSE2.TO_X));
-        if (DEBUG) {
-            System.out.println("d, x, y, heading, course");
-            for (double tt = 0; tt <= 1.0; tt += 0.01) {
-                var ss = s.getPose2dWithMotion(tt);
-                Pose2d pose = ss.getPose().pose();
-                System.out.printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n",
-                        tt, pose.getX(), pose.getY(), pose.getRotation().getRadians(), ss.getCourse().getRadians());
-            }
-        }
+        TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
+        plotter.plot("rotation", List.of(s));
+    }
+
+    /** Turning in place splines work. */
+    @Test
+    void spin() {
+        double magicNumber = 0.9;
+        HolonomicSpline s0 = new HolonomicSpline(
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, 0),
+                                Rotation2d.kZero),
+                        new DirectionSE2(0, 0, 1)),
+                new Pose2dWithDirection(
+                        new Pose2d(
+                                new Translation2d(0, 0),
+                                Rotation2d.kCCW_90deg),
+                        new DirectionSE2(0, 0, 1)),
+                magicNumber, magicNumber);
+
+        List<HolonomicSpline> splines = new ArrayList<>();
+        splines.add(s0);
+
+        // before
+        assertTrue(verifyC1(splines));
+        // spline joints are C2 smooth (i.e. same curvature)
+        assertTrue(verifyC2(splines));
+
+        // optimize and compare
+        TrajectoryPlotter.plot(splines, 0.1, 1);
     }
 
     @Test
@@ -173,58 +254,57 @@ class HolonomicSplineTest implements Timeless {
         // four splines that make a circle should have nice even curvature and velocity
         // throughout. The circle is centered at zero, the heading always points there.
         //
-        // the spline code currently does not behave correctly, it wants the theta
-        // speed to be zero at each of the spline endpoints below.
+        // This now uses the specification of SE(2) "course" which includes rotation.
         //
-        // magic number of 1 makes something about 1.5% from a circle, close enough.
-        double magicNumber = 1.0;
+        // I fiddled with the magic number to make a pretty good circle.
+        double magicNumber = 0.9;
         HolonomicSpline s0 = new HolonomicSpline(
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.k180deg),
-                        DirectionSE2.TO_Y),
+                        new DirectionSE2(0, 1, 1)),
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(0, 1),
                                 Rotation2d.kCW_90deg),
-                        DirectionSE2.MINUS_X),
+                        new DirectionSE2(-1, 0, 1)),
                 magicNumber, magicNumber);
         HolonomicSpline s1 = new HolonomicSpline(
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(0, 1),
                                 Rotation2d.kCW_90deg),
-                        DirectionSE2.MINUS_X),
+                        new DirectionSE2(-1, 0, 1)),
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(-1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.MINUS_Y),
+                        new DirectionSE2(0, -1, 1)),
                 magicNumber, magicNumber);
         HolonomicSpline s2 = new HolonomicSpline(
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(-1, 0),
                                 Rotation2d.kZero),
-                        DirectionSE2.MINUS_Y),
+                        new DirectionSE2(0, -1, 1)),
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(0, -1),
                                 Rotation2d.kCCW_90deg),
-                        DirectionSE2.TO_X),
+                        new DirectionSE2(1, 0, 1)),
                 magicNumber, magicNumber);
         HolonomicSpline s3 = new HolonomicSpline(
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(0, -1),
                                 Rotation2d.kCCW_90deg),
-                        DirectionSE2.TO_X),
+                        new DirectionSE2(1, 0, 1)),
                 new Pose2dWithDirection(
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 Rotation2d.k180deg),
-                        DirectionSE2.TO_Y),
+                        new DirectionSE2(0, 1, 1)),
                 magicNumber, magicNumber);
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(s0);
@@ -232,28 +312,16 @@ class HolonomicSplineTest implements Timeless {
         splines.add(s2);
         splines.add(s3);
 
-        // before optimization
-
-        // spline joints are C1 smooth (i.e. same slope)
+        // before
         assertTrue(verifyC1(splines));
         // spline joints are C2 smooth (i.e. same curvature)
         assertTrue(verifyC2(splines));
 
-        checkCircle(splines, 0.020, 0.026);
+        checkCircle(splines, 0.011, 0.005);
 
         // optimize and compare
         TrajectoryPlotter.plot(splines, 0.1, 1);
 
-        // after optimization
-
-        // spline joints are C1 smooth (i.e. same slope)
-        assertTrue(verifyC1(splines));
-        // spline joints are C2 smooth (i.e. same curvature)
-        assertTrue(verifyC2(splines));
-
-        // optimization very slightly reduces the range error but increases the azimuth
-        // error.
-        checkCircle(splines, 0.018, 0.041);
     }
 
     private void checkCircle(List<HolonomicSpline> splines, double rangeError, double azimuthError) {
@@ -332,7 +400,7 @@ class HolonomicSplineTest implements Timeless {
      */
     @Test
     void testPath0() {
-        double magicNumber = 1.0;
+        double magicNumber = 0.7;
         // turn a bit to the left
         Pose2dWithDirection p0 = new Pose2dWithDirection(
                 new Pose2d(
@@ -341,7 +409,7 @@ class HolonomicSplineTest implements Timeless {
                 new DirectionSE2(1, 0, 0));
         Pose2dWithDirection p1 = new Pose2dWithDirection(
                 new Pose2d(
-                        new Translation2d(0.7, 0.3),
+                        new Translation2d(0.707, 0.293),
                         new Rotation2d(-1, 1)),
                 new DirectionSE2(1, 1, -1));
         Pose2dWithDirection p2 = new Pose2dWithDirection(
@@ -350,8 +418,12 @@ class HolonomicSplineTest implements Timeless {
                         new Rotation2d(0, 1)),
                 new DirectionSE2(0, 1, 0));
 
+        if (DEBUG)
+            System.out.println("s01");
         HolonomicSpline s01 = new HolonomicSpline(
                 p0, p1, magicNumber, magicNumber);
+        if (DEBUG)
+            System.out.println("s12");
         HolonomicSpline s12 = new HolonomicSpline(
                 p1, p2, magicNumber, magicNumber);
         List<HolonomicSpline> splines = new ArrayList<>();
@@ -359,17 +431,13 @@ class HolonomicSplineTest implements Timeless {
         splines.add(s12);
 
         // before
-        // spline joints are not C1 smooth
         assertTrue(verifyC1(splines));
-        // spline joints are C2 smooth (i.e. same curvature)
         assertTrue(verifyC2(splines));
 
         TrajectoryPlotter.plot(splines, 0.1, 1);
 
         // after
-        // spline joints are not C1 smooth
         assertTrue(verifyC1(splines));
-        // spline joints are C2 smooth (i.e. same curvature)
         assertTrue(verifyC2(splines));
     }
 

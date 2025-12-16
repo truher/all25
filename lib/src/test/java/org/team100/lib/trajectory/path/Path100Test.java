@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
@@ -84,8 +83,8 @@ class Path100Test {
             }
 
             @Override
-            public Optional<Rotation2d> getCourse(double t) {
-                return Optional.of(Rotation2d.kZero);
+            public DirectionSE2 getCourse(double t) {
+                return new DirectionSE2(0, 0, 0);
             }
 
             @Override
@@ -181,8 +180,8 @@ class Path100Test {
         }
 
         assertEquals(0.0, path.getMinDistance(), DELTA);
-        // paths no longer use constant-twist arcs so this is just the lengths
-        assertEquals(84, path.getMaxDistance(), DELTA);
+        // constant-twist arcs
+        assertEquals(84.108, path.getMaxDistance(), DELTA);
 
         // initial sample is exactly at the start
         Pose2dWithMotion sample0 = path.sample(0.0);
@@ -196,40 +195,40 @@ class Path100Test {
         assertEquals(0, sample0.getPose().heading().getDegrees());
 
         Pose2dWithMotion sample12 = path.sample(12.0);
-        assertEquals(12, sample12.getPose().translation().getX(), DELTA);
+        assertEquals(11.997, sample12.getPose().translation().getX(), DELTA);
         assertEquals(0, sample12.getPose().translation().getY(), DELTA);
 
         // course should be +x
         assertEquals(0, sample12.getCourse().getDegrees(), DELTA);
 
-        assertEquals(15, sample12.getPose().heading().getDegrees(), DELTA);
+        assertEquals(14.996, sample12.getPose().heading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample5 = path.sample(48);
         assertEquals(36, sample5.getPose().translation().getX(), DELTA);
-        assertEquals(12, sample5.getPose().translation().getY(), DELTA);
-        assertEquals(45, sample5.getCourse().getDegrees(), DELTA);
+        assertEquals(11.983, sample5.getPose().translation().getY(), DELTA);
+        assertEquals(45.082, sample5.getCourse().getDegrees(), DELTA);
         assertEquals(60, sample5.getPose().heading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample6 = path.sample(60);
         assertEquals(36, sample6.getPose().translation().getX(), DELTA);
-        assertEquals(24, sample6.getPose().translation().getY(), DELTA);
-        assertEquals(0, sample6.getCourse().getDegrees(), DELTA);
+        assertEquals(23.983, sample6.getPose().translation().getY(), DELTA);
+        assertEquals(0.041, sample6.getCourse().getDegrees(), DELTA);
         assertEquals(60, sample6.getPose().heading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample72 = path.sample(72.0);
-        assertEquals(48, sample72.getPose().translation().getX(), DELTA);
+        assertEquals(47.937, sample72.getPose().translation().getX(), DELTA);
         assertEquals(24, sample72.getPose().translation().getY(), DELTA);
 
         // course should be +x
         assertEquals(0, sample72.getCourse().getDegrees(), DELTA);
 
-        assertEquals(120, sample72.getPose().heading().getDegrees(), DELTA);
+        assertEquals(119.687, sample72.getPose().heading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample8 = path.sample(84);
-        assertEquals(60, sample8.getPose().translation().getX(), DELTA);
+        assertEquals(59.892, sample8.getPose().translation().getX(), DELTA);
         assertEquals(24, sample8.getPose().translation().getY(), DELTA);
         assertEquals(0, sample8.getCourse().getDegrees(), DELTA);
-        assertEquals(180, sample8.getPose().heading().getDegrees(), DELTA);
+        assertEquals(179.460, sample8.getPose().heading().getDegrees(), DELTA);
 
     }
 }

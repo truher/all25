@@ -144,10 +144,12 @@ public class GeometryUtil {
      * path length for nonzero omega.
      */
     public static double norm(Twist2d a) {
-        // Common case of dy == 0
-        if (a.dy == 0.0)
-            return Math.abs(a.dx);
         return Math.hypot(a.dx, a.dy);
+    }
+
+    /* All components of the twist. */
+    public static double normL2(Twist2d a) {
+        return Math.sqrt(a.dx * a.dx + a.dy * a.dy + a.dtheta * a.dtheta);
     }
 
     public static double norm(Twist3d t) {
@@ -204,15 +206,20 @@ public class GeometryUtil {
         return new Pose2d(lerpT, lerpR);
     }
 
-    // TODO: fix interpolation
-    public static Pose2dWithDirection interpolate(Pose2dWithDirection a, Pose2dWithDirection b, double x) {
+    public static DirectionSE2 interpolate(DirectionSE2 a, DirectionSE2 b, double x) {
+        return new DirectionSE2(
+                MathUtil.interpolate(a.x, b.x, x),
+                MathUtil.interpolate(a.y, b.y, x),
+                MathUtil.interpolate(a.theta, b.theta, x));
+    }
+
+    public static Pose2dWithDirection interpolate(
+            Pose2dWithDirection a,
+            Pose2dWithDirection b,
+            double x) {
         return new Pose2dWithDirection(
                 interpolate(a.pose(), b.pose(), x),
-                DirectionSE2.fromDirections(
-                        DirectionR2.fromRotation(interpolate2(
-                                a.course().toRotation(),
-                                b.course().toRotation(), x)),
-                        0));
+                interpolate(a.course(), b.course(), x));
     }
 
     /**
@@ -254,6 +261,10 @@ public class GeometryUtil {
                 MathUtil.interpolate(a.getZ(), b.getZ(), x));
     }
 
+    // TODO: move this whole section about distances to a separate class.
+    //
+    // https://vnav.mit.edu/material/04-05-LieGroups-notes.pdf
+
     public static double distance(PoseWithCurvature a, PoseWithCurvature b) {
         // this is not used
         return norm(slog(transformBy(inverse(a.poseMeters), b.poseMeters)));
@@ -265,6 +276,34 @@ public class GeometryUtil {
      */
     public static double distanceM(Pose2d a, Pose2d b) {
         return norm(slog(transformBy(inverse(a), b)));
+    }
+
+    /**
+     * Double-geodesic combines the angular distance with the translational
+     * distance, weighting 1 radian equal to 1 meter.
+     * 
+     * This is not the geodesic distance, which is zero for spin-in-place. It's just
+     * the L2 norm for all three dimensions.
+     * 
+     * TODO: adjustable weights
+     * 
+     * @see https://vnav.mit.edu/material/04-05-LieGroups-notes.pdf
+     */
+    public static double doubleGeodesicDistance(Pose2d a, Pose2d b) {
+        Translation2d tDiff = a.getTranslation().minus(b.getTranslation());
+        double tSqDist = dot(tDiff, tDiff);
+        double aDiff = a.getRotation().minus(b.getRotation()).getRadians();
+        if (DEBUG)
+            System.out.printf("double geodesic distance t %f a %f\n", tSqDist, aDiff * aDiff);
+        return Math.sqrt(aDiff * aDiff + tSqDist);
+    }
+
+    public static double doubleGeodesicDistance(Pose2dWithMotion a, Pose2dWithMotion b) {
+        return doubleGeodesicDistance(a.getPose(), b.getPose());
+    }
+
+    public static double doubleGeodesicDistance(Pose2dWithDirection a, Pose2dWithDirection b) {
+        return doubleGeodesicDistance(a.pose(), b.pose());
     }
 
     public static double distanceM(Translation2d a, Translation2d b) {

@@ -48,4 +48,10 @@ public class DirectionSE2 {
                 && Math.abs(other.y - y) < 1E-9
                 && Math.abs(other.theta - theta) < 1E-9;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%5.3f %5.3f %5.3f", x, y, theta);
+    }
+
 }

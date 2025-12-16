@@ -87,12 +87,13 @@ class GeometryUtilTest {
     }
 
     @Test
-    void testDistance2() {
-        assertEquals(1, GeometryUtil.distanceM(new Translation2d(1, 0), new Translation2d(0, 0)), DELTA);
+    void testDistance2d() {
+        assertEquals(1, GeometryUtil.distanceM(
+                new Translation2d(1, 0), new Translation2d(0, 0)), DELTA);
     }
 
     @Test
-    void testDistance3() {
+    void testDistance3d() {
         assertEquals(1, GeometryUtil.distanceM(
                 new Translation3d(1, 0, 0), new Translation3d(0, 0, 0)), DELTA);
     }
@@ -135,7 +136,18 @@ class GeometryUtilTest {
                         new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
                         new Pose2d(0, 1, Rotation2d.kZero)),
                 DELTA);
-
+        // pure rotation yields zero distance, which isn't really what we want.
+        assertEquals(0,
+                GeometryUtil.distanceM(
+                        new Pose2d(0, 0, Rotation2d.kZero),
+                        new Pose2d(0, 0, Rotation2d.kCCW_90deg)),
+                DELTA);
+        // use double geodesic distance to fix that.
+        assertEquals(1.571,
+                GeometryUtil.doubleGeodesicDistance(
+                        new Pose2d(0, 0, Rotation2d.kZero),
+                        new Pose2d(0, 0, Rotation2d.kCCW_90deg)),
+                DELTA);
     }
 
     @Test

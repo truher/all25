@@ -17,6 +17,7 @@ import org.jfree.chart.renderer.xy.VectorRenderer;
 import org.jfree.data.Range;
 import org.jfree.data.xy.VectorSeries;
 import org.jfree.data.xy.VectorSeriesCollection;
+import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.TimedPose;
 
@@ -27,10 +28,12 @@ public class TrajectoryPlotter {
 
     private final TrajectoryToVectorSeries converter;
     private final SplineToVectorSeries splineConverter;
+    private final PathToVectorSeries pathConverter;
 
     public TrajectoryPlotter(double arrowLength) {
         converter = new TrajectoryToVectorSeries(arrowLength);
         splineConverter = new SplineToVectorSeries(arrowLength);
+        pathConverter = new PathToVectorSeries(arrowLength);
     }
 
     public void plot(String name, Trajectory100 t) {
@@ -43,6 +46,10 @@ public class TrajectoryPlotter {
 
     public VectorSeries convert(String name, Trajectory100 t) {
         return converter.convert(name, t);
+    }
+
+    public VectorSeries convert(String name, Path100 path) {
+        return pathConverter.convert(name, path);
     }
 
     public void plot(String name, List<HolonomicSpline> s) {
@@ -106,6 +113,14 @@ public class TrajectoryPlotter {
         return range(s, (p) -> p.getY());
     }
 
+    public Range xRange(Path100 path) {
+        return range(path, (p) -> p.getX());
+    }
+
+    public Range yRange(Path100 path) {
+        return range(path, (p) -> p.getY());
+    }
+
     /** Adds margin */
     Range range(Trajectory100 t, ToDoubleFunction<TimedPose> f) {
         double max = Double.NEGATIVE_INFINITY;
@@ -138,6 +153,34 @@ public class TrajectoryPlotter {
         return new Range(min, max);
     }
 
+    /** Adds margin */
+    Range range(Path100 t, ToDoubleFunction<Pose2d> f) {
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < t.length(); ++i) {
+            Pose2d p = t.getPoint(i).getPose().pose();
+            double x = f.applyAsDouble(p);
+            if (x + 0.1 > max)
+                max = x + 0.1;
+            if (x - 0.1 < min)
+                min = x - 0.1;
+        }
+        return new Range(min, max);
+    }
+
+    public static void plot(
+            Trajectory100 t,
+            double arrows,
+            double ticks) {
+        TrajectoryPlotter plotter = new TrajectoryPlotter(arrows);
+        VectorSeries series = plotter.convert("trajectory", t);
+        Range xrange = plotter.xRange(t);
+        Range yrange = plotter.yRange(t);
+
+        if (SHOW)
+            plotter.actuallyPlot("compare", xrange, yrange, ticks, series);
+    }
+
     public static void plot(
             List<HolonomicSpline> splines,
             double arrows,
@@ -146,6 +189,19 @@ public class TrajectoryPlotter {
         VectorSeries series = plotter.convert("before", splines);
         Range xrange = plotter.xRange(splines);
         Range yrange = plotter.yRange(splines);
+
+        if (SHOW)
+            plotter.actuallyPlot("compare", xrange, yrange, ticks, series);
+    }
+
+    public static void plot(
+            Path100 path,
+            double arrows,
+            double ticks) {
+        TrajectoryPlotter plotter = new TrajectoryPlotter(arrows);
+        VectorSeries series = plotter.convert("path", path);
+        Range xrange = plotter.xRange(path);
+        Range yrange = plotter.yRange(path);
 
         if (SHOW)
             plotter.actuallyPlot("compare", xrange, yrange, ticks, series);

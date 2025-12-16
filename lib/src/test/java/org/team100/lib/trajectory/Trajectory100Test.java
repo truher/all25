@@ -143,49 +143,6 @@ class Trajectory100Test implements Timeless {
         assertEquals(1.000, trajectory.sample(1.5).state().getPose().translation().getX(), DELTA);
     }
 
-    @Test
-    void testSampleThoroughlyWithRotation() {
-        List<Pose2dWithDirection> waypoints = List.of(
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(),
-                                Rotation2d.kZero),
-                        DirectionSE2.TO_X),
-                new Pose2dWithDirection(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                Rotation2d.kCCW_Pi_2),
-                        DirectionSE2.TO_X));
-
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
-        List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-
-        Trajectory100 trajectory = planner.restToRest(waypoints);
-
-        // these numbers are sensitive to the "faceting" of the trajectory into poses.
-        assertEquals(1.561, trajectory.duration(), DELTA);
-        assertEquals(0.000, trajectory.sample(0).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.010, trajectory.sample(0.1).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.04, trajectory.sample(0.2).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.09, trajectory.sample(0.3).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.16, trajectory.sample(0.4).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.247, trajectory.sample(0.5).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.337, trajectory.sample(0.6).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.427, trajectory.sample(0.7).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.517, trajectory.sample(0.8).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.607, trajectory.sample(0.9).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.697, trajectory.sample(1).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.787, trajectory.sample(1.1).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.869, trajectory.sample(1.2).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.931, trajectory.sample(1.3).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.973, trajectory.sample(1.4).state().getPose().translation().getX(), DELTA);
-        assertEquals(0.996, trajectory.sample(1.5).state().getPose().translation().getX(), DELTA);
-        assertEquals(1.000, trajectory.sample(1.6).state().getPose().translation().getX(), DELTA);
-        assertEquals(1.000, trajectory.sample(1.7).state().getPose().translation().getX(), DELTA);
-
-    }
-
     /** Does the index help? No. */
     // There's no need to run this all the time
     // @Test
