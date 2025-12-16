@@ -59,7 +59,7 @@ class DriveToPoseWithTrajectoryTest implements Timeless {
                                         new Pose2dWithMotion(
                                                 WaypointSE2.irrotational(
                                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                                0, 0, 0),
+                                                0, 0),
                                         0, 0, 0))),
                 controller,
                 viz);

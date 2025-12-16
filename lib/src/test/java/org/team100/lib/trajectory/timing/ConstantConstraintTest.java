@@ -23,7 +23,7 @@ public class ConstantConstraintTest implements Timeless {
         Pose2dWithMotion state = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 0, 0);
+                0, 0);
         assertEquals(2, c.getMaxVelocity(state).getValue(), DELTA);
     }
 
@@ -33,7 +33,7 @@ public class ConstantConstraintTest implements Timeless {
         Pose2dWithMotion state = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 0, 0);
+                0, 0);
         assertEquals(-3, c.getMinMaxAcceleration(state, 1).getMinAccel(), DELTA);
         assertEquals(3, c.getMinMaxAcceleration(state, 1).getMaxAccel(), DELTA);
 

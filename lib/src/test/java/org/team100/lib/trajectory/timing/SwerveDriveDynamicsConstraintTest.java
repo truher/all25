@@ -28,14 +28,14 @@ class SwerveDriveDynamicsConstraintTest {
         double m = c.getMaxVelocity(new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 0, 0)).getValue();
+                0, 0)).getValue();
         assertEquals(5, m, DELTA);
 
         // moving in +x, no curvature, no rotation
         m = c.getMaxVelocity(new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 0, 0)).getValue();
+                0, 0)).getValue();
         // max allowed velocity is full speed
         assertEquals(5, m, DELTA);
 
@@ -43,7 +43,7 @@ class SwerveDriveDynamicsConstraintTest {
         m = c.getMaxVelocity(new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                5, 0, 0)).getValue();
+                5, 0)).getValue();
         // at 5 rad/m with 0.5m sides the fastest you can go is 1.55 m/s.
         assertEquals(1.925, m, DELTA);
 
@@ -55,7 +55,7 @@ class SwerveDriveDynamicsConstraintTest {
         Pose2dWithMotion state = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                11.313708, 0, 0);
+                11.313708, 0);
         m = c.getMaxVelocity(
                 state)
                 .getValue();
@@ -74,7 +74,7 @@ class SwerveDriveDynamicsConstraintTest {
         MinMaxAcceleration m = c.getMinMaxAcceleration(new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 0, 0), 0);
+                0, 0), 0);
         assertEquals(-20, m.getMinAccel(), DELTA);
         assertEquals(10, m.getMaxAccel(), DELTA);
     }

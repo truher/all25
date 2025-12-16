@@ -19,7 +19,7 @@ class TimedStateTest {
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                        0, 0, 0),
+                        0, 0),
                 0.0, 0.0, 1.0);
 
         // At (.5,0,0), t=1, v=1, acceleration=0
@@ -27,7 +27,7 @@ class TimedStateTest {
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(0.5, 0, new Rotation2d(0)), 0, 1.2),
-                        0, 0, 0),
+                        0, 0),
                 1.0, 1.0, 0.0);
 
         TimedPose i0 = start_state.interpolate2(end_state, 0.0);

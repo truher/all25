@@ -33,19 +33,19 @@ class Path100Test {
             new Pose2dWithMotion(
                     WaypointSE2.irrotational(
                             new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                    0, 0, 0),
+                    0, 0),
             new Pose2dWithMotion(
                     WaypointSE2.irrotational(
                             new Pose2d(24, 0, new Rotation2d(Math.toRadians(30))), 0, 1.2),
-                    0, 0, 0),
+                    0, 0),
             new Pose2dWithMotion(
                     WaypointSE2.irrotational(
                             new Pose2d(36, 12, new Rotation2d(Math.toRadians(60))), 0, 1.2),
-                    0, 0, 0),
+                    0, 0),
             new Pose2dWithMotion(
                     WaypointSE2.irrotational(
                             new Pose2d(60, 12, new Rotation2d(Math.toRadians(90))), 0, 1.2),
-                    0, 0, 0));
+                    0, 0));
 
     @Test
     void testEmpty() {
@@ -98,11 +98,6 @@ class Path100Test {
             }
 
             @Override
-            public double getDCurvature(double t) {
-                return 0;
-            }
-
-            @Override
             public double getVelocity(double t) {
                 return 1;
             }
@@ -148,23 +143,23 @@ class Path100Test {
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(0.0, 0.0, new Rotation2d(Math.toRadians(0))), 0, 1.2),
-                        0.1, 0, 0),
+                        0.1, 0),
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(24.0, 0.0, new Rotation2d(Math.toRadians(30))), 0, 1.2),
-                        0.1, 0, 0),
+                        0.1, 0),
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(36.0, 0.0, new Rotation2d(Math.toRadians(60))), Math.PI / 2, 1.2),
-                        1e6, 0, 0),
+                        1e6, 0),
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(36.0, 24.0, new Rotation2d(Math.toRadians(60))), 0, 1.2),
-                        0.1, 0, 0),
+                        0.1, 0),
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(60.0, 24.0, new Rotation2d(Math.toRadians(180))), 0, 1.2),
-                        0.1, 0, 0));
+                        0.1, 0));
 
         // Create the reference trajectory (straight line motion between waypoints).
         Path100 path = new Path100(waypoints);

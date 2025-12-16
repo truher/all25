@@ -20,24 +20,20 @@ public class Pose2dWithMotion {
     private final double m_headingRate;
     /** Change in course per change in distance, rad/m. */
     private final double m_curvatureRad_M;
-    /** Change in curvature per meter, rad/m^2 */
-    private final double m_dCurvatureDsRad_M2;
+
 
     /**
      * @param pose               location and heading and direction of travel
      * @param headingRate        change in heading, per meter traveled
      * @param curvatureRad_M     change in course per meter traveled.
-     * @param dCurvatureDsRad_M2 acceleration in course per meter traveled squared.
      */
     public Pose2dWithMotion(
             WaypointSE2 pose,
             double headingRate,
-            double curvatureRad_M,
-            double dCurvatureDsRad_M2) {
+            double curvatureRad_M) {
         m_pose = pose;
         m_headingRate = headingRate;
         m_curvatureRad_M = curvatureRad_M;
-        m_dCurvatureDsRad_M2 = dCurvatureDsRad_M2;
     }
 
     public WaypointSE2 getPose() {
@@ -63,18 +59,12 @@ public class Pose2dWithMotion {
         return m_curvatureRad_M;
     }
 
-    /** Radians per meter squared */
-    public double getDCurvatureDs() {
-        return m_dCurvatureDsRad_M2;
-    }
-
     /** This no longer uses a constant-twist arc, it's a straight line. */
     public Pose2dWithMotion interpolate(final Pose2dWithMotion other, double x) {
         return new Pose2dWithMotion(
                 GeometryUtil.interpolate(m_pose, other.m_pose, x),
                 MathUtil.interpolate(m_headingRate, other.m_headingRate, x),
-                Math100.interpolate(m_curvatureRad_M, other.m_curvatureRad_M, x),
-                Math100.interpolate(m_dCurvatureDsRad_M2, other.m_dCurvatureDsRad_M2, x));
+                Math100.interpolate(m_curvatureRad_M, other.m_curvatureRad_M, x));
     }
 
     /** This no longer uses a constant-twist arc, it's a straight line. */
@@ -105,24 +95,18 @@ public class Pose2dWithMotion {
                 System.out.println("wrong curvature");
             return false;
         }
-        if (!Math100.epsilonEquals(m_dCurvatureDsRad_M2, p2dwc.m_dCurvatureDsRad_M2)) {
-            if (DEBUG)
-                System.out.println("wrong dcurvature");
-            return false;
-        }
         return true;
     }
 
     public String toString() {
         return String.format(
-                "x %5.3f, y %5.3f, theta %5.3f, course %s, dtheta %5.3f, curvature %5.3f, dcurvature_ds %5.3f",
+                "x %5.3f, y %5.3f, theta %5.3f, course %s, dtheta %5.3f, curvature %5.3f",
                 m_pose.translation().getX(),
                 m_pose.translation().getY(),
                 m_pose.heading().getRadians(),
                 m_pose.course(),
                 m_headingRate,
-                m_curvatureRad_M,
-                m_dCurvatureDsRad_M2);
+                m_curvatureRad_M);
     }
 
 }

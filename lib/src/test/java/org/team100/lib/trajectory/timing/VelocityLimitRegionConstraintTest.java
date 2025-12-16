@@ -22,7 +22,7 @@ class VelocityLimitRegionConstraintTest {
                 WaypointSE2.irrotational(
                         new Pose2d(-1, -1, new Rotation2d(0)), 0, 1.2),
                 0, // spatial, so rad/m
-                0, 0);
+                0);
         assertEquals(Double.NEGATIVE_INFINITY, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
         assertEquals(Double.POSITIVE_INFINITY, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
         assertEquals(Double.POSITIVE_INFINITY, c.getMaxVelocity(p).getValue(), DELTA);
@@ -37,7 +37,7 @@ class VelocityLimitRegionConstraintTest {
                 WaypointSE2.irrotational(
                         new Pose2d(0.5, 0.5, new Rotation2d(0)), 0, 1.2),
                 0, // spatial, so rad/m
-                0, 0);
+                0);
         assertEquals(Double.NEGATIVE_INFINITY, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
         assertEquals(Double.POSITIVE_INFINITY, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
         assertEquals(1, c.getMaxVelocity(p).getValue(), DELTA);

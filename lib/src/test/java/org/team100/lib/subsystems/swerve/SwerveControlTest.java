@@ -32,7 +32,7 @@ class SwerveControlTest {
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                0, 0, 0),
+                                0, 0),
                         0, 0, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
@@ -49,7 +49,7 @@ class SwerveControlTest {
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                0, 0, 0),
+                                0, 0),
                         0, 0, 1));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
@@ -66,7 +66,7 @@ class SwerveControlTest {
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                0, 0, 0),
+                                0, 0),
                         0, 1, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);
@@ -84,7 +84,7 @@ class SwerveControlTest {
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                0, 1, 0),
+                                0, 1),
                         0, 1, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);

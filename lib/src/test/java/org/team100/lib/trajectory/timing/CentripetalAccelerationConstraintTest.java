@@ -31,7 +31,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
         Pose2dWithMotion p = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 1, 0);
+                0, 1);
         // motionless, so 100% of the capsize accel is available
         assertEquals(-8.166, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
         assertEquals(8.166, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
@@ -50,7 +50,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
         Pose2dWithMotion p = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 1, 0);
+                0, 1);
         // moving, only some of the capsize accel is available
         assertEquals(-5.257, c.getMinMaxAcceleration(p, 2.5).getMinAccel(), DELTA);
         assertEquals(5.257, c.getMinMaxAcceleration(p, 2.5).getMaxAccel(), DELTA);
@@ -69,7 +69,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
         Pose2dWithMotion p = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 1, 0);
+                0, 1);
         // above the velocity limit
         assertEquals(-1, c.getMinMaxAcceleration(p, 3).getMinAccel(), DELTA);
         assertEquals(0, c.getMinMaxAcceleration(p, 3).getMaxAccel(), DELTA);
@@ -87,7 +87,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
         Pose2dWithMotion p = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 1, 0);
+                0, 1);
         assertEquals(-4.083, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
         assertEquals(4.083, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
         assertEquals(2.021, c.getMaxVelocity(p).getValue(), DELTA);
@@ -104,7 +104,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
         Pose2dWithMotion p = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                0, 0, 0);
+                0, 0);
         assertEquals(-4.083, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
         assertEquals(4.083, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
         assertEquals(Double.POSITIVE_INFINITY, c.getMaxVelocity(p).getValue(), DELTA);

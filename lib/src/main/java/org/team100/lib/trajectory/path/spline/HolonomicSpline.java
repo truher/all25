@@ -119,8 +119,7 @@ public class HolonomicSpline {
                         new Pose2d(getPoint(p), getHeading(p)),
                         getCourse(p), 1),
                 getDHeadingDs(p),
-                getCurvature(p),
-                getDCurvatureDs(p));
+                getCurvature(p));
     }
 
     /** So we can see it */
@@ -167,17 +166,6 @@ public class HolonomicSpline {
      */
     private double getDHeadingDs(double p) {
         return getDHeading(p) / getVelocity(p);
-    }
-
-    /**
-     * DCurvatureDs is the change in curvature per distance traveled, i.e. the
-     * "spatial change in curvature"
-     * 
-     * dk/dp / ds/dp = dk/ds
-     * rad/mp / m/p = rad/m^2
-     */
-    private double getDCurvatureDs(double p) {
-        return getDCurvature(p) / getVelocity(p);
     }
 
     /** Returns pose in the nonholonomic sense, where the rotation is the course */
@@ -252,18 +240,6 @@ public class HolonomicSpline {
         return m_heading.getAcceleration(t);
     }
 
-    double dddx(double t) {
-        return m_x.getJerk(t);
-    }
-
-    double dddy(double t) {
-        return m_y.getJerk(t);
-    }
-
-    double dddtheta(double t) {
-        return m_heading.getJerk(t);
-    }
-
     /**
      * Velocity is the change in position per parameter, p: ds/dp (meters per p).
      * Since p is not time, it is not "velocity" in the usual sense.
@@ -285,70 +261,4 @@ public class HolonomicSpline {
         double ddy = ddy(t);
         return (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * Math.sqrt((dx * dx + dy * dy)));
     }
-
-    /**
-     * DCurvature is the change in curvature per change in p.
-     * dk/dp (rad/m per p)
-     * If you want change in curvature per meter, use getDCurvatureDs.
-     */
-    protected double getDCurvature(double t) {
-        double dx = dx(t);
-        double dy = dy(t);
-        double dx2dy2 = (dx * dx + dy * dy);
-        double ddx = ddx(t);
-        double ddy = ddy(t);
-        double dddx = dddx(t);
-        double dddy = dddy(t);
-        double num = (dx * dddy - dddx * dy) * dx2dy2
-                - 3 * (dx * ddy - ddx * dy) * (dx * ddx + dy * ddy);
-        return num / (dx2dy2 * dx2dy2 * Math.sqrt(dx2dy2));
-    }
-
-    double dCurvature2(double t) {
-        double dx = dx(t);
-        double dy = dy(t);
-        double dx2dy2 = (dx * dx + dy * dy);
-        if (dx2dy2 == 0)
-            throw new IllegalArgumentException();
-        double ddx = ddx(t);
-        double ddy = ddy(t);
-        double dddx = dddx(t);
-        double dddy = dddy(t);
-        double num = (dx * dddy - dddx * dy) * dx2dy2
-                - 3 * (dx * ddy - ddx * dy) * (dx * ddx + dy * ddy);
-        return num * num / (dx2dy2 * dx2dy2 * dx2dy2 * dx2dy2 * dx2dy2);
-    }
-
-    /** integrate curvature over the length of the spline. */
-    double maxCurvature() {
-        double dt = 1.0 / SAMPLES;
-        double maxC = 0;
-        for (double t = 0; t < 1.0; t += dt) {
-            maxC = Math.max(maxC, getCurvature(t));
-        }
-        return maxC;
-    }
-
-    /** integrate curvature over the length of the spline. */
-    double sumCurvature() {
-        double dt = 1.0 / SAMPLES;
-        double sum = 0;
-        for (double t = 0; t < 1.0; t += dt) {
-            sum += (dt * getCurvature(t));
-        }
-        return sum;
-    }
-
-    /**
-     * @return integral of dCurvature^2 over the length of the spline
-     */
-    double sumDCurvature2() {
-        double dt = 1.0 / SAMPLES;
-        double sum = 0;
-        for (double t = 0; t < 1.0; t += dt) {
-            sum += (dt * dCurvature2(t));
-        }
-        return sum;
-    }
-
 }
