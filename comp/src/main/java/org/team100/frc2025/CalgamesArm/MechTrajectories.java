@@ -8,12 +8,9 @@ import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.prr.AnalyticalJacobian;
 import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
-import org.team100.lib.subsystems.prr.JointAccelerations;
-import org.team100.lib.subsystems.prr.JointVelocities;
 import org.team100.lib.subsystems.r3.commands.GoToPosePosition;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.JointConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TorqueConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
@@ -22,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 /** Make a trajectory from the start to the end and follow it. */
 public class MechTrajectories extends Command {
-    private static final boolean USE_JOINT_CONSTRAINT = false;
 
     private final LoggerFactory m_log;
     private final CalgamesMech m_subsystem;
@@ -36,21 +32,12 @@ public class MechTrajectories extends Command {
         m_log = parent.type(this);
         m_subsystem = mech;
         List<TimingConstraint> c = new ArrayList<>();
-        if (USE_JOINT_CONSTRAINT) {
-            // This is experimental, don't use it.
-            c.add(new JointConstraint(
-                    k,
-                    j,
-                    new JointVelocities(10, 10, 10),
-                    new JointAccelerations(10, 10, 10)));
 
-        } else {
-            // These are known to work, but suboptimal.
-            c.add(new ConstantConstraint(m_log, 10, 5));
-            c.add(new YawRateConstraint(m_log, 10, 5));
-            // This is new
-            c.add(new TorqueConstraint(20));
-        }
+        // These are known to work, but suboptimal.
+        c.add(new ConstantConstraint(m_log, 10, 5));
+        c.add(new YawRateConstraint(m_log, 10, 5));
+        // This is new
+        c.add(new TorqueConstraint(20));
 
         // ALERT!
         // The parameters here used to be double these values;
