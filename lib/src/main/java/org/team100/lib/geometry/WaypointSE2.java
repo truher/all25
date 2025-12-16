@@ -7,6 +7,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /**
+ * Pose and direction in SE(2). Direction is a unit vector describing how pose
+ * changes with the spline parameter.
+ * 
  * For constructing splines.
  * 
  * The scale factor is somewhat like "velocity" but in the spline constructor it

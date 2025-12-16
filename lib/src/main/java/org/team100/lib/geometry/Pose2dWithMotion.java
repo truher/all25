@@ -3,10 +3,10 @@ package org.team100.lib.geometry;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * WaypointSE2 with:
+ * WaypointSE2 and curvature in SE(2). Curvature is a unit vector describing how
+ * direction changes with the spline parameter.
  * 
  * * the spatial rate of change in heading
  * * the spatial rate of change in course
@@ -21,11 +21,10 @@ public class Pose2dWithMotion {
     /** Change in course per change in distance, rad/m. */
     private final double m_curvatureRad_M;
 
-
     /**
-     * @param pose               location and heading and direction of travel
-     * @param headingRate        change in heading, per meter traveled
-     * @param curvatureRad_M     change in course per meter traveled.
+     * @param pose           location and heading and direction of travel
+     * @param headingRate    change in heading, per meter traveled
+     * @param curvatureRad_M change in course per meter traveled.
      */
     public Pose2dWithMotion(
             WaypointSE2 pose,
@@ -38,11 +37,6 @@ public class Pose2dWithMotion {
 
     public WaypointSE2 getPose() {
         return m_pose;
-    }
-
-    // TODO: change to DirectionSE2
-    public Rotation2d getCourse() {
-        return m_pose.course().toRotation();
     }
 
     /**

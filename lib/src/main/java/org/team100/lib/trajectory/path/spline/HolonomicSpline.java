@@ -1,11 +1,9 @@
 package org.team100.lib.trajectory.path.spline;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.WaypointSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,9 +25,6 @@ import edu.wpi.first.math.geometry.Translation2d;
  */
 public class HolonomicSpline {
     private static final boolean DEBUG = false;
-    // curvature measurement performance scales with sample count so make it kinda
-    // low. most splines go between 0.5 and 5 meters so this is steps of 2 to 20 cm.
-    private static final int SAMPLES = 25;
 
     private final SplineR1 m_x;
     private final SplineR1 m_y;
@@ -58,8 +53,8 @@ public class HolonomicSpline {
      * optimization. Optimization just doesn't help very much, and it's a pain when
      * it behaves strangely.
      * 
-     * @param p0  starting pose
-     * @param p1  ending pose
+     * @param p0 starting pose
+     * @param p1 ending pose
      */
     public HolonomicSpline(WaypointSE2 p0, WaypointSE2 p1) {
         // Distance metric includes both translation and rotation. This is not
@@ -136,13 +131,14 @@ public class HolonomicSpline {
     }
 
     /**
-     * Course is the direction of motion in SE(2), which means it includes both
-     * cartesian dimensions and also the rotation dimension.
+     * Direction of motion in SE(2). Includes both cartesian dimensions and also the
+     * rotation dimension. This is exactly a unit-length twist in the motion
+     * direction.
      */
-    public DirectionSE2 getCourse(double t) {
-        double dx = dx(t);
-        double dy = dy(t);
-        double dtheta = dtheta(t);
+    public DirectionSE2 getCourse(double p) {
+        double dx = dx(p);
+        double dy = dy(p);
+        double dtheta = dtheta(p);
         return new DirectionSE2(dx, dy, dtheta);
     }
 
@@ -168,32 +164,6 @@ public class HolonomicSpline {
         return getDHeading(p) / getVelocity(p);
     }
 
-    /** Returns pose in the nonholonomic sense, where the rotation is the course */
-    Optional<Pose2d> getStartPose() {
-        double dx = dx(0);
-        double dy = dy(0);
-        if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) {
-            // rotation below would be garbage, so give up.
-            return Optional.empty();
-        }
-        return Optional.of(new Pose2d(
-                getPoint(0),
-                new Rotation2d(dx, dy)));
-    }
-
-    /** Returns pose in the nonholonomic sense, where the rotation is the course */
-    Optional<Pose2d> getEndPose() {
-        double dx = dx(1);
-        double dy = dy(1);
-        if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) {
-            // rotation below would be garbage, so give up.
-            return Optional.empty();
-        }
-        return Optional.of(new Pose2d(
-                getPoint(1),
-                new Rotation2d(dx, dy)));
-    }
-
     /**
      * Cartesian coordinate in meters.
      * 
@@ -216,28 +186,34 @@ public class HolonomicSpline {
         return getHeading(t).getRadians();
     }
 
-    double dx(double t) {
-        return m_x.getVelocity(t);
+    /** dx/dp */
+    double dx(double p) {
+        return m_x.getVelocity(p);
     }
 
-    double dy(double t) {
-        return m_y.getVelocity(t);
+    /** dy/dp */
+    double dy(double p) {
+        return m_y.getVelocity(p);
     }
 
-    double dtheta(double t) {
-        return m_heading.getVelocity(t);
+    /** dtheta/dp */
+    double dtheta(double p) {
+        return m_heading.getVelocity(p);
     }
 
-    double ddx(double t) {
-        return m_x.getAcceleration(t);
+    /** d^2x/dp^2 */
+    double ddx(double p) {
+        return m_x.getAcceleration(p);
     }
 
-    double ddy(double t) {
-        return m_y.getAcceleration(t);
+    /** d^2y/dp^2 */
+    double ddy(double p) {
+        return m_y.getAcceleration(p);
     }
 
-    double ddtheta(double t) {
-        return m_heading.getAcceleration(t);
+    /** d^2theta/dp^2 */
+    double ddtheta(double p) {
+        return m_heading.getAcceleration(p);
     }
 
     /**

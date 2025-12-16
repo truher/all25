@@ -206,9 +206,10 @@ public class PathFactoryTest implements Timeless {
             cur_pose = sample;
         }
 
-        assertEquals(15.0, cur_pose.getPose().translation().getX(), 0.001);
-        assertEquals(10.0, cur_pose.getPose().translation().getY(), 0.001);
-        assertEquals(78.690, cur_pose.getCourse().getDegrees(), 0.001);
+        WaypointSE2 pose = cur_pose.getPose();
+        assertEquals(15.0, pose.translation().getX(), 0.001);
+        assertEquals(10.0, pose.translation().getY(), 0.001);
+        assertEquals(78.690, pose.course().toRotation().getDegrees(), 0.001);
         assertEquals(20.416, arclength, 0.001);
     }
 

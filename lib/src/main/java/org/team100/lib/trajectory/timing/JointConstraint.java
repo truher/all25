@@ -48,9 +48,10 @@ public class JointConstraint implements TimingConstraint {
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
         WaypointSE2 pose = state.getPose();
         // Velocity if translation speed were 1.0 m/s.
+        Rotation2d course = state.getPose().course().toRotation();
         VelocitySE2 v = new VelocitySE2(
-                state.getCourse().getCos(),
-                state.getCourse().getSin(),
+                course.getCos(),
+                course.getSin(),
                 state.getHeadingRateRad_M());
         ModelR3 m = new ModelR3(pose.pose(), v);
 

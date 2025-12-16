@@ -170,7 +170,8 @@ class Path100Test {
                 Pose2dWithMotion s = path.sample(d);
                 Pose2d p = s.getPose().pose();
                 System.out.printf("%d, %6.3f, %6.3f, %6.3f, %6.3f\n",
-                        d, p.getX(), p.getY(), p.getRotation().getRadians(), s.getCourse().getRadians());
+                        d, p.getX(), p.getY(), p.getRotation().getRadians(),
+                        s.getPose().course().toRotation().getRadians());
             }
         }
 
@@ -184,7 +185,7 @@ class Path100Test {
         assertEquals(0, sample0.getPose().translation().getY(), DELTA);
 
         // course is +x
-        assertEquals(0, sample0.getCourse().getDegrees());
+        assertEquals(0, sample0.getPose().course().toRotation().getDegrees());
 
         // heading is 0
         assertEquals(0, sample0.getPose().heading().getDegrees());
@@ -194,20 +195,20 @@ class Path100Test {
         assertEquals(0, sample12.getPose().translation().getY(), DELTA);
 
         // course should be +x
-        assertEquals(0, sample12.getCourse().getDegrees(), DELTA);
+        assertEquals(0, sample12.getPose().course().toRotation().getDegrees(), DELTA);
 
         assertEquals(14.996, sample12.getPose().heading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample5 = path.sample(48);
         assertEquals(36, sample5.getPose().translation().getX(), DELTA);
         assertEquals(11.983, sample5.getPose().translation().getY(), DELTA);
-        assertEquals(45.082, sample5.getCourse().getDegrees(), DELTA);
+        assertEquals(45.082, sample5.getPose().course().toRotation().getDegrees(), DELTA);
         assertEquals(60, sample5.getPose().heading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample6 = path.sample(60);
         assertEquals(36, sample6.getPose().translation().getX(), DELTA);
         assertEquals(23.983, sample6.getPose().translation().getY(), DELTA);
-        assertEquals(0.041, sample6.getCourse().getDegrees(), DELTA);
+        assertEquals(0.041, sample6.getPose().course().toRotation().getDegrees(), DELTA);
         assertEquals(60, sample6.getPose().heading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample72 = path.sample(72.0);
@@ -215,14 +216,14 @@ class Path100Test {
         assertEquals(24, sample72.getPose().translation().getY(), DELTA);
 
         // course should be +x
-        assertEquals(0, sample72.getCourse().getDegrees(), DELTA);
+        assertEquals(0, sample72.getPose().course().toRotation().getDegrees(), DELTA);
 
         assertEquals(119.687, sample72.getPose().heading().getDegrees(), DELTA);
 
         Pose2dWithMotion sample8 = path.sample(84);
         assertEquals(59.892, sample8.getPose().translation().getX(), DELTA);
         assertEquals(24, sample8.getPose().translation().getY(), DELTA);
-        assertEquals(0, sample8.getCourse().getDegrees(), DELTA);
+        assertEquals(0, sample8.getPose().course().toRotation().getDegrees(), DELTA);
         assertEquals(179.460, sample8.getPose().heading().getDegrees(), DELTA);
 
     }

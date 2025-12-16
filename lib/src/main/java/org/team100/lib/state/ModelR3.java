@@ -1,7 +1,9 @@
 package org.team100.lib.state;
 
 import org.team100.lib.geometry.GlobalVelocityR2;
+import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.timing.TimedPose;
 
@@ -128,14 +130,17 @@ public class ModelR3 {
      * Transform timed pose into swerve state.
      */
     public static ModelR3 fromTimedPose(TimedPose timedPose) {
-        double xx = timedPose.state().getPose().translation().getX();
-        double yx = timedPose.state().getPose().translation().getY();
-        double thetax = timedPose.state().getPose().heading().getRadians();
-        Rotation2d course = timedPose.state().getCourse();
+        Pose2dWithMotion state = timedPose.state();
+        WaypointSE2 pose = state.getPose();
+        Translation2d translation = pose.translation();
+        double xx = translation.getX();
+        double yx = translation.getY();
+        double thetax = pose.heading().getRadians();
+        Rotation2d course = state.getPose().course().toRotation();
         double velocityM_s = timedPose.velocityM_S();
         double xv = course.getCos() * velocityM_s;
         double yv = course.getSin() * velocityM_s;
-        double thetav = timedPose.state().getHeadingRateRad_M() * velocityM_s;
+        double thetav = state.getHeadingRateRad_M() * velocityM_s;
         return new ModelR3(
                 new Model100(xx, xv),
                 new Model100(yx, yv),

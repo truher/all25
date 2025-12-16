@@ -5,12 +5,15 @@ import org.team100.lib.util.Math100;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * A direction (i.e. unit-length vector) in the SE2 manifold,
- * rigid transformations in two dimensions (which have three dimensions).
+ * A direction (i.e. unit-length vector) in the SE(2) manifold, describing the
+ * evolution of Pose2d over some parameterization.
+ * 
+ * SE(2) is the space of rigid transformations in two dimensions (thus SE(2) is
+ * three-dimensional, x, y, and theta).
  * 
  * This is useful for representing spline controls for Pose2d.
  * 
- * It is exactly a unit-length Twist2d.
+ * This is exactly a unit-length Twist2d.
  */
 public class DirectionSE2 {
     private static final boolean DEBUG = false;
