@@ -126,7 +126,7 @@ public class ScheduleGeneratorTest {
         assertEquals(Math.PI, path.getMaxDistance(), DELTA);
         if (DEBUG)
             System.out.printf("PATH:\n%s\n", path);
-        TrajectoryPlotter.plot(path, 0.1, 1);
+        TrajectoryPlotter.plot(path, 0.1);
 
         List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
         ScheduleGenerator u = new ScheduleGenerator(constraints);

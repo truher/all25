@@ -234,13 +234,10 @@ class HolonomicSplineTest implements Timeless {
         List<HolonomicSpline> splines = new ArrayList<>();
         splines.add(s0);
 
-        // before
         assertTrue(verifyC1(splines));
-        // spline joints are C2 smooth (i.e. same curvature)
         assertTrue(verifyC2(splines));
 
-        // optimize and compare
-        TrajectoryPlotter.plot(splines, 0.1, 1);
+        TrajectoryPlotter.plot(splines, 0.1);
     }
 
     @Test
@@ -310,7 +307,7 @@ class HolonomicSplineTest implements Timeless {
         checkCircle(splines, 0.011, 0.005);
 
         // optimize and compare
-        TrajectoryPlotter.plot(splines, 0.1, 1);
+        TrajectoryPlotter.plot(splines, 0.1);
 
     }
 
@@ -368,7 +365,7 @@ class HolonomicSplineTest implements Timeless {
         splines.add(s0);
         splines.add(s1);
 
-        TrajectoryPlotter.plot(splines, 0.1, 1);
+        TrajectoryPlotter.plot(splines, 0.1);
 
         // spline joints are not C1 smooth
         assertFalse(verifyC1(splines));
@@ -414,15 +411,10 @@ class HolonomicSplineTest implements Timeless {
         splines.add(s01);
         splines.add(s12);
 
-        // before
         assertTrue(verifyC1(splines));
         assertTrue(verifyC2(splines));
 
-        TrajectoryPlotter.plot(splines, 0.1, 1);
-
-        // after
-        assertTrue(verifyC1(splines));
-        assertTrue(verifyC2(splines));
+        TrajectoryPlotter.plot(splines, 0.1);
     }
 
     @Test
@@ -460,7 +452,7 @@ class HolonomicSplineTest implements Timeless {
         splines.add(s0);
         splines.add(s1);
 
-        TrajectoryPlotter.plot(splines, 0.1, 1);
+        TrajectoryPlotter.plot(splines, 0.1);
 
         for (HolonomicSpline s : splines) {
             if (DEBUG)

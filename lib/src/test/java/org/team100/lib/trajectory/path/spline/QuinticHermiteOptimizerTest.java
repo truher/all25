@@ -36,7 +36,7 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new HolonomicSpline(a, b));
         splines.add(new HolonomicSpline(b, c));
 
-        TrajectoryPlotter.plot(splines, 5, 10);
+        TrajectoryPlotter.plot(splines, 5);
 
     }
 
@@ -69,7 +69,7 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new HolonomicSpline(e, f));
         splines.add(new HolonomicSpline(f, g));
 
-        TrajectoryPlotter.plot(splines, 5, 10);
+        TrajectoryPlotter.plot(splines, 5);
 
     }
 
@@ -107,7 +107,7 @@ public class QuinticHermiteOptimizerTest {
         splines2.add(new HolonomicSpline(j, k));
         splines2.add(new HolonomicSpline(k, l));
 
-        TrajectoryPlotter.plot(splines2, 5, 10);
+        TrajectoryPlotter.plot(splines2, 5);
 
     }
 
@@ -133,7 +133,7 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new HolonomicSpline(a, b));
         splines.add(new HolonomicSpline(b, c));
 
-        TrajectoryPlotter.plot(splines, 5, 10);
+        TrajectoryPlotter.plot(splines, 5);
 
     }
 
@@ -166,7 +166,7 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new HolonomicSpline(e, f));
         splines.add(new HolonomicSpline(f, g));
 
-        TrajectoryPlotter.plot(splines, 5, 10);
+        TrajectoryPlotter.plot(splines, 5);
     }
 
     @Test
@@ -204,7 +204,7 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new HolonomicSpline(j, k));
         splines.add(new HolonomicSpline(k, l));
 
-        TrajectoryPlotter.plot(splines, 5, 10);
+        TrajectoryPlotter.plot(splines, 5);
 
     }
 }

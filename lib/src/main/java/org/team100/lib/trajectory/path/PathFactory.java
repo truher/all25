@@ -24,7 +24,7 @@ public class PathFactory {
         for (int i = 1; i < waypoints.size(); ++i) {
             splines.add(new HolonomicSpline(waypoints.get(i - 1), waypoints.get(i)));
         }
-        return new Path100(PathFactory.parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
+        return new Path100(parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
     }
 
     /**

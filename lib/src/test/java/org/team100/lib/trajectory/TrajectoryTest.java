@@ -20,7 +20,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * These pop up GUI windows, so leave them commented out when you check in.
  */
 public class TrajectoryTest {
-    private static final boolean SHOW = false;
+    private static final boolean SHOW = true;
     LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /**
@@ -39,7 +39,7 @@ public class TrajectoryTest {
                 new Pose2d(0, 0, new Rotation2d()),
                 new Pose2d(10, 1, new Rotation2d()));
         if (SHOW)
-            new TrajectoryPlotter(0.1).plot("simple", t );
+            new TrajectoryPlotter(0.5).plot("simple", t );
     }
 
     /**
@@ -70,7 +70,7 @@ public class TrajectoryTest {
                         new DirectionSE2(0, 1, 0), 1));
         Trajectory100 t = p.restToRest(waypoints);
         if (SHOW)
-            new TrajectoryPlotter(0.1).plot("curved", t);
+            new TrajectoryPlotter(0.5).plot("curved", t);
     }
 
     /**
@@ -102,6 +102,6 @@ public class TrajectoryTest {
                         new DirectionSE2(0, 1, 0), 1));
         Trajectory100 t = p.restToRest(waypoints);
         if (SHOW)
-            new TrajectoryPlotter(0.1).plot("multiple", t);
+            new TrajectoryPlotter(0.3).plot("multiple", t);
     }
 }

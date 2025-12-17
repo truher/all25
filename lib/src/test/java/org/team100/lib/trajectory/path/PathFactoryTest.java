@@ -118,7 +118,7 @@ public class PathFactoryTest implements Timeless {
                                 Rotation2d.kCCW_90deg),
                         new DirectionSE2(0, 0, 1), 1));
         Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
-        TrajectoryPlotter.plot(path, 0.1, 1);
+        TrajectoryPlotter.plot(path, 0.1);
     }
 
     /** Hard corners work now. */
@@ -146,7 +146,7 @@ public class PathFactoryTest implements Timeless {
                                 new Rotation2d()),
                         new DirectionSE2(0, 1, 0), 1));
         Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
-        TrajectoryPlotter.plot(path, 0.1, 1);
+        TrajectoryPlotter.plot(path, 0.1);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class PathFactoryTest implements Timeless {
                                 new Rotation2d(1)),
                         new DirectionSE2(1, 0, 0), 1));
         Path100 foo = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
-        TrajectoryPlotter.plot(foo, 0.1, 1);
+        TrajectoryPlotter.plot(foo, 0.1);
         assertEquals(4, foo.length(), 0.001);
     }
 

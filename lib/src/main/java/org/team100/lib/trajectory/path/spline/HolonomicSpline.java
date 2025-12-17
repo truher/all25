@@ -53,6 +53,8 @@ public class HolonomicSpline {
      * optimization. Optimization just doesn't help very much, and it's a pain when
      * it behaves strangely.
      * 
+     * To avoid confusion, the parameter should always be called "s".
+     * 
      * @param p0 starting pose
      * @param p1 ending pose
      */
@@ -108,13 +110,13 @@ public class HolonomicSpline {
     /**
      * TODO: eliminate the waypoint here, for sure eliminate the scale.
      * 
-     * @param p [0,1]
+     * @param s [0,1]
      */
-    public Pose2dWithMotion getPose2dWithMotion(double p) {
+    public Pose2dWithMotion getPose2dWithMotion(double s) {
         return new Pose2dWithMotion(
-                new WaypointSE2(getPose2d(p), getCourse(p), 1), // <<< TODO: remove the "1"
-                getDHeadingDs(p),
-                getCurvature(p));
+                new WaypointSE2(getPose2d(s), getCourse(s), 1), // <<< TODO: remove the "1"
+                getDHeadingDs(s),
+                getCurvature(s));
     }
 
     /**
@@ -122,96 +124,96 @@ public class HolonomicSpline {
      * rotation dimension. This is exactly a unit-length twist in the motion
      * direction.
      */
-    private DirectionSE2 getCourse(double p) {
-        double dx = dx(p);
-        double dy = dy(p);
-        double dtheta = dtheta(p);
+    private DirectionSE2 getCourse(double s) {
+        double dx = dx(s);
+        double dy = dy(s);
+        double dtheta = dtheta(s);
         return new DirectionSE2(dx, dy, dtheta);
     }
 
-    public Pose2d getPose2d(double p) {
-        return new Pose2d(new Translation2d(x(p), y(p)), getHeading(p));
+    public Pose2d getPose2d(double s) {
+        return new Pose2d(new Translation2d(x(s), y(s)), getHeading(s));
     }
 
     ////////////////////////////////////////////////////////////////////////
 
-    private double getDHeading(double t) {
-        return m_heading.getVelocity(t);
+    private double getDHeading(double s) {
+        return m_heading.getVelocity(s);
     }
 
     /**
      * Change in heading per distance traveled, i.e. spatial change in heading.
      * dtheta/ds (radians/meter).
      */
-    private double getDHeadingDs(double p) {
-        return getDHeading(p) / getVelocity(p);
+    private double getDHeadingDs(double s) {
+        return getDHeading(s) / getVelocity(s);
     }
 
-    /** x at p */
-    double x(double p) {
-        return m_x.getPosition(p);
+    /** x at s */
+    public double x(double s) {
+        return m_x.getPosition(s);
     }
 
-    /** y at p */
-    double y(double p) {
-        return m_y.getPosition(p);
+    /** y at s */
+    double y(double s) {
+        return m_y.getPosition(s);
     }
 
-    /** heading at p */
-    private Rotation2d getHeading(double t) {
-        double headingFromZero = m_heading.getPosition(t);
+    /** heading at s */
+    private Rotation2d getHeading(double s) {
+        double headingFromZero = m_heading.getPosition(s);
         return m_heading0.rotateBy(Rotation2d.fromRadians(headingFromZero));
     }
 
-    /** dx/dp */
-    double dx(double p) {
-        return m_x.getVelocity(p);
+    /** dx/ds */
+    public double dx(double s) {
+        return m_x.getVelocity(s);
     }
 
-    /** dy/dp */
-    double dy(double p) {
-        return m_y.getVelocity(p);
+    /** dy/ds */
+    double dy(double s) {
+        return m_y.getVelocity(s);
     }
 
-    /** dheading/dp */
-    double dtheta(double p) {
-        return m_heading.getVelocity(p);
+    /** dheading/ds */
+    double dtheta(double s) {
+        return m_heading.getVelocity(s);
     }
 
-    /** d^2x/dp^2 */
-    double ddx(double p) {
-        return m_x.getAcceleration(p);
+    /** d^2x/ds^2 */
+    public double ddx(double s) {
+        return m_x.getAcceleration(s);
     }
 
-    /** d^2y/dp^2 */
-    double ddy(double p) {
-        return m_y.getAcceleration(p);
+    /** d^2y/ds^2 */
+    double ddy(double s) {
+        return m_y.getAcceleration(s);
     }
 
-    /** d^2heading/dp^2 */
-    double ddtheta(double p) {
-        return m_heading.getAcceleration(p);
+    /** d^2heading/ds^2 */
+    double ddtheta(double s) {
+        return m_heading.getAcceleration(s);
     }
 
     /**
-     * Velocity is the change in position per parameter, p: ds/dp (meters per p).
-     * Since p is not time, it is not "velocity" in the usual sense.
+     * Velocity is the change in position per parameter, p: dx/ds (meters per s).
+     * Since s is not time, it is not "velocity" in the usual sense.
      */
-    private double getVelocity(double t) {
-        return Math.hypot(dx(t), dy(t));
+    private double getVelocity(double s) {
+        return Math.hypot(dx(s), dy(s));
     }
 
     /**
      * Curvature is the change in motion direction per distance traveled.
      * rad/m.
      * Note the denominator is distance in this case, not the parameter, p.
-     * but the argument to this function *is* the parameter, p. :-)
+     * but the argument to this function *is* the parameter, s. :-)
      */
-    private double getCurvature(double t) {
-        double dx = dx(t);
-        double dy = dy(t);
-        double ddx = ddx(t);
-        double ddy = ddy(t);
+    private double getCurvature(double s) {
+        double dx = dx(s);
+        double dy = dy(s);
+        double ddx = ddx(s);
+        double ddy = ddy(s);
         return (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * Math.sqrt((dx * dx + dy * dy)));
     }
 }

@@ -1,6 +1,9 @@
 package org.team100.lib.trajectory;
 
+import java.util.List;
+
 import org.jfree.data.xy.VectorSeries;
+import org.jfree.data.xy.XYSeries;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
@@ -40,6 +43,15 @@ public class PathToVectorSeries {
             e.printStackTrace();
         }
         return s;
+    }
+
+    public static XYSeries x(String name, List<Pose2dWithMotion> poses) {
+        XYSeries series = new XYSeries(name);
+        for (int i = 0; i < poses.size(); ++i) {
+            Pose2dWithMotion pose = poses.get(i);
+            series.add(i, pose.getPose().pose().getX());
+        }
+        return series;
     }
 
 }
