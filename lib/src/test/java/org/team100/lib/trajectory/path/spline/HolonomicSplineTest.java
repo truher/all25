@@ -60,17 +60,17 @@ class HolonomicSplineTest implements Timeless {
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
 
-        Translation2d t = s.getPoint(0);
+        Translation2d t = s.getPose2d(0).getTranslation();
         assertEquals(0, t.getX(), DELTA);
-        t = s.getPoint(1);
+        t = s.getPose2d(1).getTranslation();
         assertEquals(1, t.getX(), DELTA);
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
-        assertEquals(0, p.getPose().translation().getX(), DELTA);
-        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(0, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = s.getPose2dWithMotion(1);
-        assertEquals(1, p.getPose().translation().getX(), DELTA);
-        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(1, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
@@ -91,17 +91,17 @@ class HolonomicSplineTest implements Timeless {
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
 
-        Translation2d t = s.getPoint(0);
+        Translation2d t = s.getPose2d(0).getTranslation();
         assertEquals(0, t.getX(), DELTA);
-        t = s.getPoint(1);
+        t = s.getPose2d(1).getTranslation();
         assertEquals(2, t.getX(), DELTA);
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
-        assertEquals(0, p.getPose().translation().getX(), DELTA);
-        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(0, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = s.getPose2dWithMotion(1);
-        assertEquals(2, p.getPose().translation().getX(), DELTA);
-        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(2, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
@@ -125,31 +125,28 @@ class HolonomicSplineTest implements Timeless {
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
 
-        if (DEBUG)
-            s.printSamples();
-
         // now that the magic numbers apply to the rotational scaling, the heading rate
         // is constant.
-        Translation2d t = s.getPoint(0);
+        Translation2d t = s.getPose2d(0).getTranslation();
         assertEquals(0, t.getX(), DELTA);
-        t = s.getPoint(1);
+        t = s.getPose2d(1).getTranslation();
         assertEquals(1, t.getX(), DELTA);
 
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
-        assertEquals(0, p.getPose().translation().getX(), DELTA);
-        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(0, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         // initial rotation rate is zero
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
 
         p = s.getPose2dWithMotion(0.5);
-        assertEquals(0.5, p.getPose().translation().getX(), DELTA);
-        assertEquals(0.5, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(0.5, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0.5, p.getPose().pose().getRotation().getRadians(), DELTA);
         // high rotation rate in the middle
         assertEquals(4.807, p.getHeadingRateRad_M(), DELTA);
 
         p = s.getPose2dWithMotion(1);
-        assertEquals(1, p.getPose().translation().getX(), DELTA);
-        assertEquals(1, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(1, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(1, p.getPose().pose().getRotation().getRadians(), DELTA);
         // rotation rate is zero at the end
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
 
@@ -176,28 +173,26 @@ class HolonomicSplineTest implements Timeless {
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("rotation", List.of(s));
 
-        s.printSamples();
-
         // now that the magic numbers apply to the rotational scaling, the heading rate
         // is constant.
-        Translation2d t = s.getPoint(0);
+        Translation2d t = s.getPose2d(0).getTranslation();
         assertEquals(0, t.getX(), DELTA);
-        t = s.getPoint(1);
+        t = s.getPose2d(1).getTranslation();
         assertEquals(1, t.getX(), DELTA);
 
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
-        assertEquals(0, p.getPose().translation().getX(), DELTA);
-        assertEquals(0, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(0, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(1, p.getHeadingRateRad_M(), DELTA);
 
         p = s.getPose2dWithMotion(0.5);
-        assertEquals(0.5, p.getPose().translation().getX(), DELTA);
-        assertEquals(0.5, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(0.5, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0.5, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(1, p.getHeadingRateRad_M(), DELTA);
 
         p = s.getPose2dWithMotion(1);
-        assertEquals(1, p.getPose().translation().getX(), DELTA);
-        assertEquals(1, p.getPose().heading().getRadians(), DELTA);
+        assertEquals(1, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(1, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(1, p.getHeadingRateRad_M(), DELTA);
 
     }
@@ -522,15 +517,15 @@ class HolonomicSplineTest implements Timeless {
         List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05);
         if (DEBUG) {
             for (Pose2dWithMotion p : motion) {
-                System.out.printf("%5.3f %5.3f\n", p.getPose().translation().getX(), p.getPose().translation().getY());
+                System.out.printf("%5.3f %5.3f\n", p.getPose().pose().getTranslation().getX(), p.getPose().pose().getTranslation().getY());
             }
         }
         Path100 path = new Path100(motion);
         if (DEBUG) {
             for (int i = 0; i < path.length(); ++i) {
                 System.out.printf("%5.3f %5.3f\n",
-                        path.getPoint(i).getPose().translation().getX(),
-                        path.getPoint(i).getPose().translation().getY());
+                        path.getPoint(i).getPose().pose().getTranslation().getX(),
+                        path.getPoint(i).getPose().pose().getTranslation().getY());
             }
         }
 

@@ -16,7 +16,13 @@ public class TimedPose {
     private final Pose2dWithMotion m_state;
     /** Time we achieve this state. */
     private final double m_timeS;
-    /** ds/dt */
+
+    /**
+     * ds/dt
+     * 
+     * if we're using L2 norm then this isn't meters and isn't always even cartesian
+     * at all
+     */
     private final double m_velocityM_S;
     /** d^2s/dt^2 */
     private double m_accelM_S_S;

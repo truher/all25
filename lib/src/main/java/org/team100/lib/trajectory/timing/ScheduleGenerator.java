@@ -98,6 +98,8 @@ public class ScheduleGenerator {
 
     private void forwardWork(ConstrainedState s0, ConstrainedState s1) {
         // constant-twist path length between states
+        // actually this is now the double-geodesic metric (L2 for all 3 dimensions)
+        // which means it is not just meters.
         double dsM = s1.getState().distanceM(s0.getState());
 
         // We may need to iterate to find the maximum end velocity and common
@@ -211,6 +213,7 @@ public class ScheduleGenerator {
     private static Trajectory100 integrate(List<ConstrainedState> states) throws TimingException {
         List<TimedPose> poses = new ArrayList<>(states.size());
         double time = 0.0; // time along path
+        // this should be L2 distance
         double distance = 0.0; // distance along path
         double v0 = 0.0;
         for (int i = 0; i < states.size(); ++i) {

@@ -52,9 +52,9 @@ class TestSE2Math {
         // this test is silly
         // assertTrue(1 / kTestEpsilon < rot2.getTan());
         // this tests the angle-wrapping thing that wpi doesn't do
-        //assertEquals(90, rot2.getDegrees(), kTestEpsilon);
+        // assertEquals(90, rot2.getDegrees(), kTestEpsilon);
         assertEquals(-270, rot2.getDegrees(), EPSILON);
-        assertEquals(-3*Math.PI / 2, rot2.getRadians(), EPSILON);
+        assertEquals(-3 * Math.PI / 2, rot2.getRadians(), EPSILON);
 
         rot1 = Rotation2d.fromDegrees(1);
         rot2 = rot1.unaryMinus();
@@ -251,24 +251,30 @@ class TestSE2Math {
     }
 
     @Test
-    void testTwist() {
+    void testTwist0() {
         // Exponentiation (integrate twist to obtain a Pose2d)
         Twist2d twist = new Twist2d(1.0, 0.0, 0.0);
         Pose2d pose = Pose2d.kZero.exp(twist);
         assertEquals(1.0, pose.getTranslation().getX(), EPSILON);
         assertEquals(0.0, pose.getTranslation().getY(), EPSILON);
         assertEquals(0.0, pose.getRotation().getDegrees(), EPSILON);
+    }
 
+    @Test
+    void testTwist1() {
         // Scaled.
-        twist = new Twist2d(1.0, 0.0, 0.0);
-        pose = Pose2d.kZero.exp(GeometryUtil.scale(twist, 2.5));
+        Twist2d twist = new Twist2d(1.0, 0.0, 0.0);
+        Pose2d pose = Pose2d.kZero.exp(GeometryUtil.scale(twist, 2.5));
         assertEquals(2.5, pose.getTranslation().getX(), EPSILON);
         assertEquals(0.0, pose.getTranslation().getY(), EPSILON);
         assertEquals(0.0, pose.getRotation().getDegrees(), EPSILON);
+    }
 
+    @Test
+    void testTwist2() {
         // Logarithm (find the twist to apply to obtain a given Pose2d)
-        pose = new Pose2d(new Translation2d(2.0, 2.0), Rotation2d.fromRadians(Math.PI / 2));
-        twist = Pose2d.kZero.log(pose);
+        Pose2d pose = new Pose2d(new Translation2d(2.0, 2.0), Rotation2d.fromRadians(Math.PI / 2));
+        Twist2d twist = Pose2d.kZero.log(pose);
         assertEquals(Math.PI, twist.dx, EPSILON);
         assertEquals(0.0, twist.dy, EPSILON);
         assertEquals(Math.PI / 2, twist.dtheta, EPSILON);
@@ -278,5 +284,37 @@ class TestSE2Math {
         assertEquals(new_pose.getTranslation().getX(), pose.getTranslation().getX(), EPSILON);
         assertEquals(new_pose.getTranslation().getY(), pose.getTranslation().getY(), EPSILON);
         assertEquals(new_pose.getRotation().getDegrees(), pose.getRotation().getDegrees(), EPSILON);
+    }
+
+    @Test
+    void testTwist3() {
+        // a pure rotation
+        Pose2d start = new Pose2d(0, 0, new Rotation2d(0));
+        Pose2d end = new Pose2d(0, 0, new Rotation2d(1));
+        Twist2d between = start.log(end);
+        assertEquals(0, between.dx, EPSILON);
+        assertEquals(0.0, between.dy, EPSILON);
+        assertEquals(1, between.dtheta, EPSILON);
+        // in this case, the distances are the same.
+        assertEquals(1, GeometryUtil.normL2(between), EPSILON);
+        assertEquals(1, GeometryUtil.doubleGeodesicDistance(start, end), EPSILON);
+    }
+
+    @Test
+    void testTwist4() {
+        // rotation AND translation
+        Pose2d start = new Pose2d(0, 0, new Rotation2d(0));
+        Pose2d end = new Pose2d(1, 0, new Rotation2d(1));
+        Twist2d between = start.log(end);
+        assertEquals(0.915, between.dx, 0.001);
+        assertEquals(-0.5, between.dy, EPSILON);
+        assertEquals(1, between.dtheta, EPSILON);
+        // in this case, the distances are NOT the same.
+        assertEquals(1.445, GeometryUtil.normL2(between), 0.001);
+        assertEquals(1.414, GeometryUtil.doubleGeodesicDistance(start, end), 0.001);
+        // this just seems wrong
+        assertEquals(1.043, GeometryUtil.distanceM(start, end), 0.001);
+        // this is just the cartesian part
+        assertEquals(1, start.getTranslation().getDistance(end.getTranslation()), 0.001);
     }
 }

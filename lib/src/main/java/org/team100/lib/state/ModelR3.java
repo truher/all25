@@ -132,10 +132,10 @@ public class ModelR3 {
     public static ModelR3 fromTimedPose(TimedPose timedPose) {
         Pose2dWithMotion state = timedPose.state();
         WaypointSE2 pose = state.getPose();
-        Translation2d translation = pose.translation();
+        Translation2d translation = pose.pose().getTranslation();
         double xx = translation.getX();
         double yx = translation.getY();
-        double thetax = pose.heading().getRadians();
+        double thetax = pose.pose().getRotation().getRadians();
         Rotation2d course = state.getPose().course().toRotation();
         double velocityM_s = timedPose.velocityM_S();
         double xv = course.getCos() * velocityM_s;

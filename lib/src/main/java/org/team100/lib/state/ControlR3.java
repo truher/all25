@@ -125,9 +125,9 @@ public class ControlR3 {
      * Correctly accounts for centripetal acceleration.
      */
     public static ControlR3 fromTimedPose(TimedPose timedPose) {
-        double xx = timedPose.state().getPose().translation().getX();
-        double yx = timedPose.state().getPose().translation().getY();
-        double thetax = timedPose.state().getPose().heading().getRadians();
+        double xx = timedPose.state().getPose().pose().getTranslation().getX();
+        double yx = timedPose.state().getPose().pose().getTranslation().getY();
+        double thetax = timedPose.state().getPose().pose().getRotation().getRadians();
 
         double velocityM_s = timedPose.velocityM_S();
         Rotation2d course = timedPose.state().getPose().course().toRotation();

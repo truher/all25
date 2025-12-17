@@ -54,19 +54,21 @@ public class Pose2dWithMotion {
     }
 
     /** This no longer uses a constant-twist arc, it's a straight line. */
-    public Pose2dWithMotion interpolate(final Pose2dWithMotion other, double x) {
+    public Pose2dWithMotion interpolate(Pose2dWithMotion other, double x) {
         return new Pose2dWithMotion(
                 GeometryUtil.interpolate(m_pose, other.m_pose, x),
                 MathUtil.interpolate(m_headingRate, other.m_headingRate, x),
                 Math100.interpolate(m_curvatureRad_M, other.m_curvatureRad_M, x));
     }
 
-    /** This no longer uses a constant-twist arc, it's a straight line. */
-    public double distanceM(final Pose2dWithMotion other) {
-        return m_pose.translation().getDistance(other.m_pose.translation());
+    /** This now uses double-geodesic distance, i.e. L2 norm including rotation. */
+    public double distanceM(Pose2dWithMotion other) {
+        return GeometryUtil.doubleGeodesicDistance(this, other);
+        // return
+        // m_pose.pose().getTranslation().getDistance(other.m_pose.pose().getTranslation());
     }
 
-    public boolean equals(final Object other) {
+    public boolean equals(Object other) {
         if (!(other instanceof Pose2dWithMotion)) {
             if (DEBUG)
                 System.out.println("wrong type");
@@ -95,9 +97,9 @@ public class Pose2dWithMotion {
     public String toString() {
         return String.format(
                 "x %5.3f, y %5.3f, theta %5.3f, course %s, dtheta %5.3f, curvature %5.3f",
-                m_pose.translation().getX(),
-                m_pose.translation().getY(),
-                m_pose.heading().getRadians(),
+                m_pose.pose().getTranslation().getX(),
+                m_pose.pose().getTranslation().getY(),
+                m_pose.pose().getRotation().getRadians(),
                 m_pose.course(),
                 m_headingRate,
                 m_curvatureRad_M);

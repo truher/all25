@@ -71,13 +71,13 @@ public class HolonomicSpline {
         }
 
         // Endpoints:
-        double x0 = p0.translation().getX();
-        double x1 = p1.translation().getX();
-        double y0 = p0.translation().getY();
-        double y1 = p1.translation().getY();
+        double x0 = p0.pose().getTranslation().getX();
+        double x1 = p1.pose().getTranslation().getX();
+        double y0 = p0.pose().getTranslation().getY();
+        double y1 = p1.pose().getTranslation().getY();
         // To avoid 180 degrees, heading uses an offset
-        m_heading0 = p0.heading();
-        double delta = p1.heading().minus(p0.heading()).getRadians();
+        m_heading0 = p0.pose().getRotation();
+        double delta = p1.pose().getRotation().minus(p0.pose().getRotation()).getRadians();
 
         // First derivatives are the course:
         double dx0 = p0.course().x * scale0;
@@ -106,28 +106,15 @@ public class HolonomicSpline {
     }
 
     /**
+     * TODO: eliminate the waypoint here, for sure eliminate the scale.
+     * 
      * @param p [0,1]
      */
     public Pose2dWithMotion getPose2dWithMotion(double p) {
         return new Pose2dWithMotion(
-                new WaypointSE2(
-                        new Pose2d(getPoint(p), getHeading(p)),
-                        getCourse(p), 1),
+                new WaypointSE2(getPose2d(p), getCourse(p), 1), // <<< TODO: remove the "1"
                 getDHeadingDs(p),
                 getCurvature(p));
-    }
-
-    /** So we can see it */
-    public void printSamples() {
-        System.out.println("p, x, heading, heading rate");
-        for (double p = 0; p < 1; p += 0.05) {
-            Pose2dWithMotion pwm = getPose2dWithMotion(p);
-            System.out.printf("%f, %f, %f, %f\n",
-                    p,
-                    pwm.getPose().pose().getX(),
-                    pwm.getPose().heading().getRadians(),
-                    pwm.getHeadingRateRad_M());
-        }
     }
 
     /**
@@ -135,7 +122,7 @@ public class HolonomicSpline {
      * rotation dimension. This is exactly a unit-length twist in the motion
      * direction.
      */
-    public DirectionSE2 getCourse(double p) {
+    private DirectionSE2 getCourse(double p) {
         double dx = dx(p);
         double dy = dy(p);
         double dtheta = dtheta(p);
@@ -143,16 +130,12 @@ public class HolonomicSpline {
     }
 
     public Pose2d getPose2d(double p) {
-        return new Pose2d(getPoint(p), getHeading(p));
+        return new Pose2d(new Translation2d(x(p), y(p)), getHeading(p));
     }
 
     ////////////////////////////////////////////////////////////////////////
 
-    protected Rotation2d getHeading(double t) {
-        return m_heading0.rotateBy(Rotation2d.fromRadians(m_heading.getPosition(t)));
-    }
-
-    protected double getDHeading(double t) {
+    private double getDHeading(double t) {
         return m_heading.getVelocity(t);
     }
 
@@ -164,26 +147,20 @@ public class HolonomicSpline {
         return getDHeading(p) / getVelocity(p);
     }
 
-    /**
-     * Cartesian coordinate in meters.
-     * 
-     * @param t ranges from 0 to 1
-     * @return the point on the spline for that t value
-     */
-    protected Translation2d getPoint(double t) {
-        return new Translation2d(x(t), y(t));
+    /** x at p */
+    double x(double p) {
+        return m_x.getPosition(p);
     }
 
-    double x(double t) {
-        return m_x.getPosition(t);
+    /** y at p */
+    double y(double p) {
+        return m_y.getPosition(p);
     }
 
-    double y(double t) {
-        return m_y.getPosition(t);
-    }
-
-    double theta(double t) {
-        return getHeading(t).getRadians();
+    /** heading at p */
+    private Rotation2d getHeading(double t) {
+        double headingFromZero = m_heading.getPosition(t);
+        return m_heading0.rotateBy(Rotation2d.fromRadians(headingFromZero));
     }
 
     /** dx/dp */
@@ -196,7 +173,7 @@ public class HolonomicSpline {
         return m_y.getVelocity(p);
     }
 
-    /** dtheta/dp */
+    /** dheading/dp */
     double dtheta(double p) {
         return m_heading.getVelocity(p);
     }
@@ -211,7 +188,7 @@ public class HolonomicSpline {
         return m_y.getAcceleration(p);
     }
 
-    /** d^2theta/dp^2 */
+    /** d^2heading/dp^2 */
     double ddtheta(double p) {
         return m_heading.getAcceleration(p);
     }
@@ -220,7 +197,7 @@ public class HolonomicSpline {
      * Velocity is the change in position per parameter, p: ds/dp (meters per p).
      * Since p is not time, it is not "velocity" in the usual sense.
      */
-    protected double getVelocity(double t) {
+    private double getVelocity(double t) {
         return Math.hypot(dx(t), dy(t));
     }
 
@@ -230,7 +207,7 @@ public class HolonomicSpline {
      * Note the denominator is distance in this case, not the parameter, p.
      * but the argument to this function *is* the parameter, p. :-)
      */
-    protected double getCurvature(double t) {
+    private double getCurvature(double t) {
         double dx = dx(t);
         double dy = dy(t);
         double ddx = ddx(t);

@@ -46,7 +46,7 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
         // velocity.
         Rotation2d course = state.getPose().course().toRotation();
 
-        Rotation2d course_local = course.minus(state.getPose().heading());
+        Rotation2d course_local = course.minus(state.getPose().pose().getRotation());
         double vx = course_local.getCos();
         double vy = course_local.getSin();
         // rad/m

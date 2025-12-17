@@ -25,7 +25,7 @@ public class VelocityLimitRegionConstraint implements TimingConstraint {
 
     @Override
     public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-        final Translation2d translation = state.getPose().translation();
+        final Translation2d translation = state.getPose().pose().getTranslation();
         if (translation.getX() <= m_max.getX() && translation.getX() >= m_min.getX() &&
                 translation.getY() <= m_max.getY() && translation.getY() >= m_min.getY()) {
             return new NonNegativeDouble(m_limit);

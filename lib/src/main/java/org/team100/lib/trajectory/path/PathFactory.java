@@ -83,8 +83,8 @@ public class PathFactory {
     private static void getSegmentArc(
             HolonomicSpline s,
             List<Pose2dWithMotion> rv,
-            double t0,
-            double t1,
+            double t0, // [0,1] not time
+            double t1, // [0,1] not time
             double maxDx,
             double maxDy,
             double maxDTheta) {

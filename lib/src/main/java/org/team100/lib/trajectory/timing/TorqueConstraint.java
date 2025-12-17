@@ -58,7 +58,7 @@ public class TorqueConstraint implements TimingConstraint {
         Rotation2d course = pose.course().toRotation();
         // acceleration unit vector
         Translation2d u = new Translation2d(1.0, course);
-        Translation2d r = pose.translation();
+        Translation2d r = pose.pose().getTranslation();
         double cross = r.getX() * u.getY() - r.getY() * u.getX();
         double a = Math.abs(m_maxTorque / (M * cross));
         if (DEBUG) {

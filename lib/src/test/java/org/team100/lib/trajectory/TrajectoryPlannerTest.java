@@ -52,7 +52,7 @@ class TrajectoryPlannerTest implements Timeless {
         Trajectory100 t = planner.restToRest(waypoints);
         assertEquals(12, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.6, p.state().getPose().translation().getX(), DELTA);
+        assertEquals(0.6, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
@@ -83,7 +83,7 @@ class TrajectoryPlannerTest implements Timeless {
         Trajectory100 t = planner.generateTrajectory(
                 waypoints, start_vel, end_vel);
         TimedPose p = t.getPoint(6);
-        assertEquals(0.272, p.state().getPose().translation().getX(), DELTA);
+        assertEquals(0.272, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 
     }
@@ -124,7 +124,7 @@ class TrajectoryPlannerTest implements Timeless {
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.585, p.state().getPose().translation().getX(), DELTA);
+        assertEquals(0.585, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 

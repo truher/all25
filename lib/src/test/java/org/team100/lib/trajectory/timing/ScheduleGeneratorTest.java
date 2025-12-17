@@ -3,7 +3,6 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -13,8 +12,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -31,7 +30,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class ScheduleGeneratorTest {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     public static final double EPSILON = 1e-12;
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
@@ -121,18 +120,23 @@ public class ScheduleGeneratorTest {
                                 new Pose2d(0, 0, new Rotation2d(Math.PI)),
                                 new DirectionSE2(0, 0, 1), 1),
                         1, 0)));
+
+        // our distance metric combines meters and radians with equal weight
+        // because this is pure rotation, the "distance" here is in radians.
+        assertEquals(Math.PI, path.getMaxDistance(), DELTA);
         if (DEBUG)
-            System.out.printf("PATH: %s\n", path);
+            System.out.printf("PATH:\n%s\n", path);
         TrajectoryPlotter.plot(path, 0.1, 1);
 
         List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
         ScheduleGenerator u = new ScheduleGenerator(constraints);
-        Trajectory100 timed_traj = u.timeParameterizeTrajectory(
+        Trajectory100 traj = u.timeParameterizeTrajectory(
                 path,
                 1.0,
                 0.0,
                 0.0);
-        final Trajectory100 traj = timed_traj;
+        if (DEBUG)
+            System.out.printf("TRAJ:\n%s\n", traj);
 
         assertTrue(traj.isEmpty());
 
@@ -203,7 +207,7 @@ public class ScheduleGeneratorTest {
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
             public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-                if (state.getPose().translation().getX() >= 24.0) {
+                if (state.getPose().pose().getTranslation().getX() >= 24.0) {
                     return new NonNegativeDouble(5.0);
                 } else {
                     return new NonNegativeDouble(Double.POSITIVE_INFINITY);
@@ -319,7 +323,7 @@ public class ScheduleGeneratorTest {
         }
         assertEquals(18, t.length());
         TimedPose p = t.getPoint(6);
-        assertEquals(0.575, p.state().getPose().translation().getX(), DELTA);
+        assertEquals(0.575, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 
     }

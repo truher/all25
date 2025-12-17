@@ -4,7 +4,6 @@ import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * Pose and direction in SE(2). Direction is a unit vector describing how pose
@@ -32,14 +31,6 @@ import edu.wpi.first.math.geometry.Translation2d;
  */
 public record WaypointSE2(Pose2d pose, DirectionSE2 course, double scale) {
     private static final boolean DEBUG = false;
-
-    public Translation2d translation() {
-        return pose.getTranslation();
-    }
-
-    public Rotation2d heading() {
-        return pose.getRotation();
-    }
 
     /** Course without rotation, with unit scale. */
     public static WaypointSE2 irrotational(Pose2d p, double course, double scale) {

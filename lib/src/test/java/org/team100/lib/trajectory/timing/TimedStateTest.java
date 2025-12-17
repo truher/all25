@@ -40,6 +40,6 @@ class TimedStateTest {
         assertEquals(0.5, intermediate_state.getTimeS(), EPSILON);
         assertEquals(start_state.acceleration(), intermediate_state.acceleration(), EPSILON);
         assertEquals(0.5, intermediate_state.velocityM_S(), EPSILON);
-        assertEquals(0.125, intermediate_state.state().getPose().translation().getX(), EPSILON);
+        assertEquals(0.125, intermediate_state.state().getPose().pose().getTranslation().getX(), EPSILON);
     }
 }

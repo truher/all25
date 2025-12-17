@@ -33,9 +33,9 @@ public class TrajectoryVisualization {
         int ndx = 0;
         for (TimedPose p : m_trajectory.getPoints()) {
             WaypointSE2 pose = p.state().getPose();
-            arr[ndx + 0] = pose.translation().getX();
-            arr[ndx + 1] = pose.translation().getY();
-            arr[ndx + 2] = pose.heading().getDegrees();
+            arr[ndx + 0] = pose.pose().getTranslation().getX();
+            arr[ndx + 1] = pose.pose().getTranslation().getY();
+            arr[ndx + 2] = pose.pose().getRotation().getDegrees();
             ndx += 3;
         }
         return arr;

@@ -56,10 +56,6 @@ public class Path100 {
         return m_distances[m_distances.length - 1];
     }
 
-    public double getMinDistance() {
-        return 0.0;
-    }
-
     /**
      * Walks through all the points to find the bracketing points.
      * 

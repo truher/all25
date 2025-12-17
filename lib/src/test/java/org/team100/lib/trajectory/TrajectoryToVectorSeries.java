@@ -23,9 +23,9 @@ public class TrajectoryToVectorSeries {
         for (double time = 0; time < duration; time += dt) {
             TimedPose p = t.sample(time);
             WaypointSE2 pp = p.state().getPose();
-            double x = pp.translation().getX();
-            double y = pp.translation().getY();
-            Rotation2d heading = pp.heading();
+            double x = pp.pose().getTranslation().getX();
+            double y = pp.pose().getTranslation().getY();
+            Rotation2d heading = pp.pose().getRotation();
             double dx = m_scale * heading.getCos();
             double dy = m_scale * heading.getSin();
             s.add(x, y, dx, dy);
