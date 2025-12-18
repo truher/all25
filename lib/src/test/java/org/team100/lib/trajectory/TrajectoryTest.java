@@ -23,7 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  */
 public class TrajectoryTest {
     private static final boolean DEBUG = true;
-    private static final boolean SHOW = true;
+    private static final boolean SHOW = false;
     LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     /**
@@ -115,7 +115,7 @@ public class TrajectoryTest {
             // ca = v^2*curvature
             DirectionSE2 course0 = p0.state().getPose().course();
             DirectionSE2 course1 = p1.state().getPose().course();
-            p1.state().getPose().pose().log(p0.state().getPose().pose()
+            p1.state().getPose().pose().log(p0.state().getPose().pose());
             double dcourse1 = GeometryUtil.norm(course1.minus(course0));
             // double dcourse1 = GeometryUtil.normL2(course1.minus(course0));
             double dcourse = course1.toRotation().minus(course0.toRotation()).getRadians();

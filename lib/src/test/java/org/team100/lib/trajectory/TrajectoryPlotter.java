@@ -29,7 +29,7 @@ import org.team100.lib.trajectory.timing.TimedPose;
 import edu.wpi.first.math.geometry.Pose2d;
 
 public class TrajectoryPlotter {
-    public static final boolean SHOW = true;
+    public static final boolean SHOW = false;
     private static final int SIZE = 500;
 
     private final TrajectoryToVectorSeries converter;
@@ -111,7 +111,8 @@ public class TrajectoryPlotter {
     }
 
     /**
-     * renderer is a supplier because new XYPlot writes the dataset name into the renderer.
+     * renderer is a supplier because new XYPlot writes the dataset name into the
+     * renderer.
      * 
      * mutability is bad.
      */
@@ -119,6 +120,8 @@ public class TrajectoryPlotter {
             String name,
             Supplier<XYItemRenderer> renderer,
             XYDataset... dataSets) {
+        if (!SHOW)
+            return;
 
         // "true" means "modal" so wait for close.
         JDialog frame = new JDialog((Frame) null, name, true);
@@ -144,10 +147,6 @@ public class TrajectoryPlotter {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
-
- 
-
-
 
     public static void plot(
             Trajectory100 t,

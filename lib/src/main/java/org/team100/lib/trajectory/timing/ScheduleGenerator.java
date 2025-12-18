@@ -308,7 +308,11 @@ public class ScheduleGenerator {
      * @param v1 final velocity
      * @param ds distance
      */
-    static double accel(double v0, double v1, double ds) {
+    public static double accel(double v0, double v1, double ds) {
+        if (Math.abs(ds) < 1e-6) {
+            // prevent division by zero
+            return 0;
+        }
         /*
          * a = dv/dt
          * v = ds/dt
@@ -319,7 +323,11 @@ public class ScheduleGenerator {
          * a = (v0+v1)(v1-v0)/2ds
          * a = (v1^2 - v0^2)/2ds
          */
-        return (v1 * v1 - v0 * v0) / (2.0 * ds);
+        double a = (v1 * v1 - v0 * v0) / (2.0 * ds);
+        double dv = v1 - v0;
+        // this can be negative, which indicates that v1 precedes v0
+        double dt = a / dv;
+        return a;
     }
 
     public static class TimingException extends Exception {

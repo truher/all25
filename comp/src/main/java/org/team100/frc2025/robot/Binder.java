@@ -10,6 +10,7 @@ import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
 import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmartLuke;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
+import org.team100.frc2025.Swerve.Auto.BigLoop;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
@@ -22,6 +23,7 @@ import org.team100.lib.logging.Logging;
 import org.team100.lib.profile.r3.HolonomicProfileFactory;
 import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.subsystems.prr.commands.FollowJointProfiles;
+import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
 import org.team100.lib.subsystems.r3.commands.FloorPickSequence2;
 import org.team100.lib.subsystems.r3.commands.ManualPosition;
 import org.team100.lib.subsystems.swerve.commands.SetRotation;
@@ -140,7 +142,7 @@ public class Binder {
                 m_machinery.m_swerveKinodynamics, 0.5, 1.0);
 
         // Pick a game piece from the floor, based on camera input.
-        
+
         // This is the old one, commented out while I work on the new one.
         // whileTrue(driver::x,
         // parallel(
@@ -188,16 +190,30 @@ public class Binder {
 
         // Drive to a scoring location at the reef and score.
         whileTrue(driver::b, m_machinery.m_manipulator.centerEject());
-        whileTrue(driver::a,
-                // TODO make this seperate/combined with scoring in general
-                ScoreCoralSmartLuke.get(
-                        coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
-                        holonomicController, profile, m_machinery.m_drive,
-                        m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
-        // ScoreCoralSmart.get(
+        // whileTrue(driver::a,
+        //         // TODO make this seperate/combined with scoring in general
+        //         ScoreCoralSmartLuke.get(
+        //                 coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
+        //                 holonomicController, profile, m_machinery.m_drive,
+        //                 m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
+        // // ScoreCoralSmart.get(
         // coralSequence, m_machinery.m_mech, m_machinery.m_manipulator,
         // holonomicController, profile, m_machinery.m_drive,
         // m_machinery.m_localizer::setHeedRadiusM, buttons::level, buttons::point));
+
+        ///////////////////////////////////////////////////
+        //
+        // for testing
+        //
+        BigLoop bigloop = new BigLoop(rootLogger, m_machinery.m_swerveKinodynamics);
+        DriveWithTrajectoryFunction navigator = new DriveWithTrajectoryFunction(
+                rootLogger, m_machinery.m_drive, holonomicController, m_machinery.m_trajectoryViz,
+                bigloop);
+        whileTrue(driver::a,
+                navigator.until(navigator::isDone));
+        //
+        //
+        ///////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////
         //

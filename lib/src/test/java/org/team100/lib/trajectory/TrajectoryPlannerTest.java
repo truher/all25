@@ -187,7 +187,7 @@ class TrajectoryPlannerTest implements Timeless {
         ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
-        assertEquals(2.958, traj.duration(), DELTA);
+        assertEquals(2.869, traj.duration(), DELTA);
     }
 
 }

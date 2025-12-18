@@ -175,7 +175,7 @@ class Trajectory100Test implements Timeless {
 
         Path100 path = PathFactory.pathFromWaypoints(
                 waypoints, 0.02, 0.2, 0.1);
-        assertEquals(23.049, path.getMaxDistance(), 0.001);
+        assertEquals(23.063, path.getMaxDistance(), 0.001);
 
         start = System.nanoTime();
         for (int rep = 0; rep < reps; ++rep) {

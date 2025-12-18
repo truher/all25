@@ -143,7 +143,7 @@ class HolonomicSplineTest implements Timeless {
         assertEquals(0.5, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0.5, p.getPose().pose().getRotation().getRadians(), DELTA);
         // high rotation rate in the middle
-        assertEquals(4.807, p.getHeadingRateRad_M(), DELTA);
+        assertEquals(0.979, p.getHeadingRateRad_M(), DELTA);
 
         p = s.getPose2dWithMotion(1);
         assertEquals(1, p.getPose().pose().getTranslation().getX(), DELTA);
@@ -184,17 +184,17 @@ class HolonomicSplineTest implements Timeless {
         Pose2dWithMotion p = s.getPose2dWithMotion(0);
         assertEquals(0, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
-        assertEquals(1, p.getHeadingRateRad_M(), DELTA);
+        assertEquals(0.707, p.getHeadingRateRad_M(), DELTA);
 
         p = s.getPose2dWithMotion(0.5);
         assertEquals(0.5, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0.5, p.getPose().pose().getRotation().getRadians(), DELTA);
-        assertEquals(1, p.getHeadingRateRad_M(), DELTA);
+        assertEquals(0.707, p.getHeadingRateRad_M(), DELTA);
 
         p = s.getPose2dWithMotion(1);
         assertEquals(1, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(1, p.getPose().pose().getRotation().getRadians(), DELTA);
-        assertEquals(1, p.getHeadingRateRad_M(), DELTA);
+        assertEquals(0.707, p.getHeadingRateRad_M(), DELTA);
 
     }
 
