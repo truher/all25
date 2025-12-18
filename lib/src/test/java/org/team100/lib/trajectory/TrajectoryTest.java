@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
+import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.trajectory.timing.TimedPose;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 
@@ -20,6 +22,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * These pop up GUI windows, so leave them commented out when you check in.
  */
 public class TrajectoryTest {
+    private static final boolean DEBUG = true;
     private static final boolean SHOW = true;
     LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
@@ -39,7 +42,99 @@ public class TrajectoryTest {
                 new Pose2d(0, 0, new Rotation2d()),
                 new Pose2d(10, 1, new Rotation2d()));
         if (SHOW)
-            new TrajectoryPlotter(0.5).plot("simple", t );
+            new TrajectoryPlotter(0.5).plot("simple", t);
+    }
+
+    @Test
+    void testCircle() {
+        // see HolonomicSplineTest.testCircle();
+        // this is to see how to create the dtheta and curvature
+        // without the spline.
+        double scale = 0.9;
+        WaypointSE2 p0 = new WaypointSE2(
+                new Pose2d(new Translation2d(1, 0), Rotation2d.k180deg),
+                new DirectionSE2(0, 1, 1), scale);
+        WaypointSE2 p1 = new WaypointSE2(
+                new Pose2d(new Translation2d(0, 1), Rotation2d.kCW_90deg),
+                new DirectionSE2(-1, 0, 1), scale);
+        WaypointSE2 p2 = new WaypointSE2(
+                new Pose2d(new Translation2d(-1, 0), Rotation2d.kZero),
+                new DirectionSE2(0, -1, 1), scale);
+        WaypointSE2 p3 = new WaypointSE2(
+                new Pose2d(new Translation2d(0, -1), Rotation2d.kCCW_90deg),
+                new DirectionSE2(1, 0, 1), scale);
+
+        List<WaypointSE2> waypoints = List.of(p0, p1, p2, p3, p0);
+
+        List<TimingConstraint> c = List.of(
+                new ConstantConstraint(log, 2, 0.5),
+                new YawRateConstraint(log, 1, 1));
+        TrajectoryPlanner p = new TrajectoryPlanner(c);
+        Trajectory100 trajectory = p.generateTrajectory(waypoints, 0, 0);
+
+        //
+        TrajectoryPlotter.plot(trajectory, 0.25);
+
+    }
+
+    @Test
+    void testDheading() {
+        double scale = 0.9;
+        WaypointSE2 w0 = new WaypointSE2(
+                new Pose2d(new Translation2d(1, 0), Rotation2d.k180deg),
+                new DirectionSE2(0, 1, 1), scale);
+        WaypointSE2 w1 = new WaypointSE2(
+                new Pose2d(new Translation2d(0, 1), Rotation2d.kCW_90deg),
+                new DirectionSE2(-1, 0, 1), scale);
+        List<WaypointSE2> waypoints = List.of(w0, w1);
+
+        List<TimingConstraint> c = List.of(
+                new ConstantConstraint(log, 2, 0.5),
+                new YawRateConstraint(log, 1, 1));
+        TrajectoryPlanner p = new TrajectoryPlanner(c);
+        Trajectory100 trajectory = p.generateTrajectory(waypoints, 0, 0);
+        double duration = trajectory.duration();
+        TimedPose p0 = trajectory.sample(0);
+        if (DEBUG)
+            System.out.println(
+                    "t, intrinsic_heading_dt, heading_dt, intrinsic_ca, extrinsic_ca, extrinsic v, intrinsic v, dcourse, dcourse1");
+        for (double t = 0.04; t < duration; t += 0.04) {
+            TimedPose p1 = trajectory.sample(t);
+            double distance = p1.distance(p0);
+            double distanceCartesian = p1.distanceCartesian(p0);
+            Rotation2d heading0 = p0.state().getPose().pose().getRotation();
+            Rotation2d heading1 = p1.state().getPose().pose().getRotation();
+            double dheading = heading1.minus(heading0).getRadians();
+            // compute time derivative of heading two ways:
+            // this just compares the poses and uses the known time step
+            double dheadingDt = dheading / 0.04;
+            // this uses the intrinsic heading rate and the velocity
+            // rad/m * m/s = rad/s
+            double intrinsicDheadingDt = p0.state().getHeadingRateRad_M() * p0.velocityM_S();
+            // curvature is used to compute centripetal acceleration
+            // ca = v^2*curvature
+            DirectionSE2 course0 = p0.state().getPose().course();
+            DirectionSE2 course1 = p1.state().getPose().course();
+            p1.state().getPose().pose().log(p0.state().getPose().pose()
+            double dcourse1 = GeometryUtil.norm(course1.minus(course0));
+            // double dcourse1 = GeometryUtil.normL2(course1.minus(course0));
+            double dcourse = course1.toRotation().minus(course0.toRotation()).getRadians();
+            double radius = dcourse / distance;
+            // derived v is pretty close
+            double v = distance / 0.04;
+            double extrinsicCa = v * v / radius;
+            double intrinsicCa = p0.velocityM_S() * p0.velocityM_S() * p0.state().getCurvature();
+            if (DEBUG)
+                System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
+                        t, intrinsicDheadingDt, dheadingDt,
+                        intrinsicCa, extrinsicCa,
+                        v, p0.velocityM_S(),
+                        dcourse, dcourse1);
+            p0 = p1;
+        }
+
+        //
+        TrajectoryPlotter.plot(trajectory, 0.25);
     }
 
     /**

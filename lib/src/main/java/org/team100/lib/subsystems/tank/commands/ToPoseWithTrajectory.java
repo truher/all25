@@ -67,7 +67,7 @@ public class ToPoseWithTrajectory extends Command {
             Pose2d currentPose = m_drive.getPose();
             Pose2d poseReference = current.state().getPose().pose();
             double velocityReference = next.velocityM_S();
-            double omegaReference = next.velocityM_S() * next.state().getCurvature();
+            double omegaReference = next.velocityM_S() * next.state().getHeadingRateRad_M();
             ChassisSpeeds speeds = m_controller.calculate(
                     currentPose, poseReference, velocityReference, omegaReference);
             m_drive.setVelocity(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);

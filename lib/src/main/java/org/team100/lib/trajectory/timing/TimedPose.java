@@ -92,9 +92,15 @@ public class TimedPose {
                 m_accelM_S_S);
     }
 
+    /** L2 norm */
     public double distance(TimedPose other) {
         return m_state.distanceM(other.m_state);
     }
+
+    public double distanceCartesian(TimedPose other) {
+        return m_state.distanceCartesian(other.m_state);
+    }
+
 
     @Override
     public boolean equals(final Object other) {

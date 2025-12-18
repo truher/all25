@@ -12,7 +12,7 @@ import org.team100.lib.trajectory.path.Path100;
  * schedule.
  */
 public class ScheduleGenerator {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final double EPSILON = 1e-6;
     /** this is the default, in order to make the constraints set the actual */
     private static final double HIGH_ACCEL = 1000;
@@ -33,17 +33,7 @@ public class ScheduleGenerator {
             double start_vel,
             double end_vel) {
         try {
-            double maxDistance = path.getMaxDistance();
-            if (maxDistance == 0)
-                throw new IllegalArgumentException();
-            int num_states = (int) Math.ceil(maxDistance / step + 1);
-            List<Pose2dWithMotion> samples = new ArrayList<>(num_states);
-            for (int i = 0; i < num_states; ++i) {
-                Pose2dWithMotion state = path.sample(Math.min(i * step, maxDistance));
-                if (DEBUG)
-                    System.out.printf("%d %s\n", i, state);
-                samples.add(state);
-            }
+            List<Pose2dWithMotion> samples = resample(path, step);
             return timeParameterizeTrajectory(samples, start_vel, end_vel);
         } catch (TimingException e) {
             e.printStackTrace();
@@ -53,10 +43,30 @@ public class ScheduleGenerator {
     }
 
     /**
+     * Samples the path evenly by distance.
+     */
+    private List<Pose2dWithMotion> resample(Path100 path, double step) throws TimingException {
+        double maxDistance = path.getMaxDistance();
+        if (maxDistance == 0)
+            throw new IllegalArgumentException();
+        int num_states = (int) Math.ceil(maxDistance / step + 1);
+        List<Pose2dWithMotion> samples = new ArrayList<>(num_states);
+        for (int i = 0; i < num_states; ++i) {
+            // the dtheta and curvature come from here and are never changed.
+            // the values here are just interpolated from the original values.
+            Pose2dWithMotion state = path.sample(Math.min(i * step, maxDistance));
+            if (DEBUG)
+                System.out.printf("RESAMPLE: %d %s\n", i, state);
+            samples.add(state);
+        }
+        return samples;
+    }
+
+    /**
      * input is some set of samples (could be evenly sampled or not), output is
      * these same samples with time.
      */
-    private Trajectory100 timeParameterizeTrajectory(
+    public Trajectory100 timeParameterizeTrajectory(
             List<Pose2dWithMotion> samples,
             double start_vel,
             double end_vel) throws TimingException {

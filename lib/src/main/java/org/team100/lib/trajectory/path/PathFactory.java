@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 public class PathFactory {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public static Path100 pathFromWaypoints(
             List<WaypointSE2> waypoints,
@@ -69,7 +69,7 @@ public class PathFactory {
         for (int i = 0; i < splines.size(); i++) {
             HolonomicSpline s = splines.get(i);
             if (DEBUG)
-                System.out.printf("%d %s\n", i, s);
+                System.out.printf("SPLINE:\n%d\n%s\n", i, s);
             List<Pose2dWithMotion> samples = parameterizeSpline(s, maxDx, maxDy, maxDTheta, 0.0, 1.0);
             samples.remove(0);
             rv.addAll(samples);
@@ -78,20 +78,25 @@ public class PathFactory {
     }
 
     /**
-     * Recursively add points until they're close to the real curve.
+     * Recursive bisection to find a series of secant lines close to the real curve.
+     * 
+     * Note if the path is s-shaped, then bisection can find the middle :-)
      */
     private static void getSegmentArc(
-            HolonomicSpline s,
+            HolonomicSpline spline,
             List<Pose2dWithMotion> rv,
             double t0, // [0,1] not time
             double t1, // [0,1] not time
             double maxDx,
             double maxDy,
             double maxDTheta) {
-        Pose2d p0 = s.getPose2d(t0);
+        // points must be this close together
+        // TODO: make this a parameter.
+        final double maxNorm = 0.1;
+        Pose2d p0 = spline.getPose2d(t0);
         double thalf = (t0 + t1) / 2;
-        Pose2d phalf = s.getPose2d(thalf);
-        Pose2d p1 = s.getPose2d(t1);
+        Pose2d phalf = spline.getPose2d(thalf);
+        Pose2d p1 = spline.getPose2d(t1);
 
         // twist from p0 to p1
         Twist2d twist_full = p0.log(p1);
@@ -102,15 +107,17 @@ public class PathFactory {
         // difference between twist and sample
         Transform2d error = phalf_predicted.minus(phalf);
 
-        if (Math.abs(error.getTranslation().getX()) > maxDx ||
-                Math.abs(error.getTranslation().getY()) > maxDy ||
-                Math.abs(error.getRotation().getRadians()) > maxDTheta) {
+        if (Math.abs(error.getTranslation().getX()) > maxDx
+                || Math.abs(error.getTranslation().getY()) > maxDy
+                || Math.abs(error.getRotation().getRadians()) > maxDTheta
+                || GeometryUtil.normL2(twist_half) > maxNorm) {
             // add a point in between
-            getSegmentArc(s, rv, t0, thalf, maxDx, maxDy, maxDTheta);
-            getSegmentArc(s, rv, thalf, t1, maxDx, maxDy, maxDTheta);
+            // note the extra condition to avoid points too far apart.
+            getSegmentArc(spline, rv, t0, thalf, maxDx, maxDy, maxDTheta);
+            getSegmentArc(spline, rv, thalf, t1, maxDx, maxDy, maxDTheta);
         } else {
             // midpoint is close enough, this looks good
-            rv.add(s.getPose2dWithMotion(t1));
+            rv.add(spline.getPose2dWithMotion(t1));
         }
     }
 }

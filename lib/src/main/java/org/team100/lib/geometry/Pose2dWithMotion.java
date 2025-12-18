@@ -63,9 +63,20 @@ public class Pose2dWithMotion {
 
     /** This now uses double-geodesic distance, i.e. L2 norm including rotation. */
     public double distanceM(Pose2dWithMotion other) {
+        //
+        // this should match HolonomicSpline.getVelocity() for the
+        // dheading/dt thing to work.
+        //
+        //
         return GeometryUtil.doubleGeodesicDistance(this, other);
+        //
+        //
         // return
         // m_pose.pose().getTranslation().getDistance(other.m_pose.pose().getTranslation());
+    }
+
+    public double distanceCartesian(Pose2dWithMotion other) {
+        return m_pose.pose().getTranslation().getDistance(other.m_pose.pose().getTranslation());
     }
 
     public boolean equals(Object other) {

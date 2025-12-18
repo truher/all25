@@ -57,7 +57,8 @@ public class Path100 {
     }
 
     /**
-     * Walks through all the points to find the bracketing points.
+     * Walks through all the points to find the bracketing points, and then
+     * interpolates between them.
      * 
      * @param distance in meters, always a non-negative number.
      */

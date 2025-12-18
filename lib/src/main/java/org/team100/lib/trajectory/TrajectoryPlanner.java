@@ -3,10 +3,9 @@ package org.team100.lib.trajectory;
 import java.util.List;
 import java.util.function.Function;
 
-import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
@@ -29,6 +28,7 @@ import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGeneratio
  * 4. assign timestamps to each step
  */
 public class TrajectoryPlanner {
+    private static final boolean DEBUG = true;
     /*
      * Maximum distance of the secant lines to the continuous spline. The resulting
      * path will have little scallops if it involves rotation. In SE(2), a constant
@@ -228,12 +228,17 @@ public class TrajectoryPlanner {
                     m_splineTolerance,
                     m_splineTolerance,
                     m_splineRotationTolerance);
+            if (DEBUG)
+                System.out.printf("PATH\n%s\n", path);
             // Generate the timed trajectory.
-            return m_scheduleGenerator.timeParameterizeTrajectory(
+            Trajectory100 result = m_scheduleGenerator.timeParameterizeTrajectory(
                     path,
                     m_trajectoryStep,
                     start_vel,
                     end_vel);
+            if (DEBUG)
+                System.out.printf("TRAJECTORY\n%s\n", result);
+            return result;
         } catch (IllegalArgumentException e) {
             // catches various kinds of malformed input, returns a no-op.
             // this should never actually happen.

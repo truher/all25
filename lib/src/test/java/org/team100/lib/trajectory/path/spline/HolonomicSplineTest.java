@@ -9,8 +9,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.WaypointSE2;
+import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -31,7 +32,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 class HolonomicSplineTest implements Timeless {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final double DELTA = 0.001;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
@@ -249,55 +250,23 @@ class HolonomicSplineTest implements Timeless {
         //
         // I fiddled with the scale to make a pretty good circle.
         double scale = 0.9;
-        HolonomicSpline s0 = new HolonomicSpline(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                Rotation2d.k180deg),
-                        new DirectionSE2(0, 1, 1), scale),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(0, 1),
-                                Rotation2d.kCW_90deg),
-                        new DirectionSE2(-1, 0, 1), scale));
-        HolonomicSpline s1 = new HolonomicSpline(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(0, 1),
-                                Rotation2d.kCW_90deg),
-                        new DirectionSE2(-1, 0, 1), scale),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(-1, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(0, -1, 1), scale));
-        HolonomicSpline s2 = new HolonomicSpline(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(-1, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(0, -1, 1), scale),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(0, -1),
-                                Rotation2d.kCCW_90deg),
-                        new DirectionSE2(1, 0, 1), scale));
-        HolonomicSpline s3 = new HolonomicSpline(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(0, -1),
-                                Rotation2d.kCCW_90deg),
-                        new DirectionSE2(1, 0, 1), scale),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                Rotation2d.k180deg),
-                        new DirectionSE2(0, 1, 1), scale));
-        List<HolonomicSpline> splines = new ArrayList<>();
-        splines.add(s0);
-        splines.add(s1);
-        splines.add(s2);
-        splines.add(s3);
+        WaypointSE2 p0 = new WaypointSE2(
+                new Pose2d(new Translation2d(1, 0), Rotation2d.k180deg),
+                new DirectionSE2(0, 1, 1), scale);
+        WaypointSE2 p1 = new WaypointSE2(
+                new Pose2d(new Translation2d(0, 1), Rotation2d.kCW_90deg),
+                new DirectionSE2(-1, 0, 1), scale);
+        WaypointSE2 p2 = new WaypointSE2(
+                new Pose2d(new Translation2d(-1, 0), Rotation2d.kZero),
+                new DirectionSE2(0, -1, 1), scale);
+        WaypointSE2 p3 = new WaypointSE2(
+                new Pose2d(new Translation2d(0, -1), Rotation2d.kCCW_90deg),
+                new DirectionSE2(1, 0, 1), scale);
+        HolonomicSpline s0 = new HolonomicSpline(p0, p1);
+        HolonomicSpline s1 = new HolonomicSpline(p1, p2);
+        HolonomicSpline s2 = new HolonomicSpline(p2, p3);
+        HolonomicSpline s3 = new HolonomicSpline(p3, p0);
+        List<HolonomicSpline> splines = List.of(s0, s1, s2, s3);
 
         // before
         assertTrue(verifyC1(splines));
@@ -308,6 +277,50 @@ class HolonomicSplineTest implements Timeless {
 
         // optimize and compare
         TrajectoryPlotter.plot(splines, 0.1);
+
+    }
+
+    @Test
+    void testDheading() {
+        // does the spline-derived dheading match the post-hoc one?
+        double scale = 0.9;
+        WaypointSE2 w0 = new WaypointSE2(
+                new Pose2d(new Translation2d(1, 0), Rotation2d.k180deg),
+                new DirectionSE2(0, 1, 1), scale);
+        WaypointSE2 w1 = new WaypointSE2(
+                new Pose2d(new Translation2d(0, 1), Rotation2d.kCW_90deg),
+                new DirectionSE2(-1, 0, 1), scale);
+        HolonomicSpline spline = new HolonomicSpline(w0, w1);
+        Pose2dWithMotion p0 = spline.getPose2dWithMotion(0.0);
+        if (DEBUG)
+            System.out.println(
+                    "s, p0_heading_rate, p0_curvature, distance, post_hoc_heading_rate, post_hoc_curvature, post_hoc_heading_rate2, post_hoc_curvature2");
+        for (double s = 0.01; s <= 1.0; s += 0.01) {
+            Pose2dWithMotion p1 = spline.getPose2dWithMotion(s);
+            double l2distance = p1.distanceM(p0);
+            double cartesianDistance = p1.distanceCartesian(p0);
+            Rotation2d heading0 = p0.getPose().pose().getRotation();
+            Rotation2d heading1 = p1.getPose().pose().getRotation();
+            double dheading = heading1.minus(heading0).getRadians();
+            DirectionSE2 course0 = p0.getPose().course();
+            DirectionSE2 course1 = p1.getPose().course();
+            double curve = GeometryUtil.normL2(course1.minus(course0));
+            // this value is wrong because we use the l2 distance,
+            // so it's kind of counting the rotation twice.
+            double dheadingDx = dheading / l2distance;
+            double curveDx = curve / l2distance;
+            // this value matches the intrinsic one since it just uses
+            // cartesian distance in the denominator.
+            double dheadingDx2 = dheading / cartesianDistance;
+            double curveDx2 = curve / cartesianDistance;
+
+            if (DEBUG)
+                System.out.printf(
+                        "%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f \n",
+                        s, p0.getHeadingRateRad_M(), p0.getCurvature(),
+                        l2distance, dheadingDx, curveDx, dheadingDx2, curveDx2);
+            p0 = p1;
+        }
 
     }
 
@@ -509,7 +522,8 @@ class HolonomicSplineTest implements Timeless {
         List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05);
         if (DEBUG) {
             for (Pose2dWithMotion p : motion) {
-                System.out.printf("%5.3f %5.3f\n", p.getPose().pose().getTranslation().getX(), p.getPose().pose().getTranslation().getY());
+                System.out.printf("%5.3f %5.3f\n", p.getPose().pose().getTranslation().getX(),
+                        p.getPose().pose().getTranslation().getY());
             }
         }
         Path100 path = new Path100(motion);

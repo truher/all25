@@ -61,6 +61,40 @@ public class ParameterizationTest {
     }
 
     /**
+     * Shows x as a function of the spline parameter, s.
+     */
+    @Test
+    void testSplineCurved() {
+        // a straight line in x, since the direction is also +x
+        // note the zero scale here to force zero velocity at the ends
+        HolonomicSpline spline = new HolonomicSpline(
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(0, 0),
+                                new Rotation2d(0)),
+                        new DirectionSE2(0, 1, 0), 1),
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d(0)),
+                        new DirectionSE2(0, 1, 0), 1));
+
+        TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
+        plotter.plot("spline", List.of(spline));
+
+        // XYSeries sx = SplineToVectorSeries.x("x", List.of(spline));
+        // XYSeries sxPrime = SplineToVectorSeries.xPrime("xprime", List.of(spline));
+        // XYSeries sxPrimePrime = SplineToVectorSeries.xPrimePrime("xprimeprime",
+        // List.of(spline));
+
+        // XYDataset d1 = TrajectoryPlotter.collect(sx);
+        // XYDataset d2 = TrajectoryPlotter.collect(sxPrime);
+        // XYDataset d3 = TrajectoryPlotter.collect(sxPrimePrime);
+
+        // TrajectoryPlotter.actuallyPlot("spline", renderer, d1, d2, d3);
+    }
+
+    /**
      * Show x as a function of the pose list index.
      * The pose list has no parameter, it's just a list
      */
@@ -104,6 +138,9 @@ public class ParameterizationTest {
                                 new Rotation2d(0)),
                         new DirectionSE2(0, 1, 0), 1));
         Trajectory100 trajectory = p.generateTrajectory(waypoints, 0, 0);
+
+        // this is wrong somehow
+        System.out.printf("TRAJECTORY\n%s\n", trajectory);
 
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("trajectory", trajectory);

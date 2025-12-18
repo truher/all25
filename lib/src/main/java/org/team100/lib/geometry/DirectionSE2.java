@@ -3,6 +3,7 @@ package org.team100.lib.geometry;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 
 /**
  * A direction (i.e. unit-length vector) in the SE(2) manifold, describing the
@@ -27,6 +28,14 @@ public class DirectionSE2 {
         x = px / h;
         y = py / h;
         theta = ptheta / h;
+    }
+
+    public Twist2d minus(DirectionSE2 other) {
+        return new Twist2d(x - other.x, y - other.y, theta - other.theta);
+    }
+
+    public double normL2() {
+        return Math.sqrt(x * x + y * y + theta * theta);
     }
 
     /** Cartesian part of direction, as an old-fashioned Rotation2d */
