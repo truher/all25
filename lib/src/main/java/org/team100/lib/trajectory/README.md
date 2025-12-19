@@ -43,11 +43,20 @@ The velocity with respect to $s$ is $q'(s) = dq/ds$
 
 The accleration with respect to $s$ is $q''(s) = d^2q/ds^2$
 
-So we're constructing a function for $s(t)$ and its derivatives.
+So we're constructing a function for $s(t)$ and its time derivatives,
 
-so using the chain rule: $v(t) = \dot{q}(t) = \dfrac{dq}{ds} \dfrac{dq}{dt} = q'(s)\dot{s}$
+$\dot{s} = \dfrac{ds}{dt}$
 
-and using the product rule: $a(t) = \ddot{q}(t) = q''(s)\dot{s}^2 + q'(s)\ddot{s}$
+$\ddot{s} = \dfrac{d^2s}{dt^2}$
+
+Position is just the composite:
+$x(t) = q(t) = q(s(t))$
+
+so using the chain rule:
+$v(t) = \dot{q}(t) = \dfrac{dq}{ds} \dfrac{ds}{dt} = q'(s(t))\dot{s}$
+
+and using the product rule:
+$a(t) = \ddot{q}(t) = q''(s)\dot{s}^2 + q'(s)\ddot{s}$
 
 ## Constructing $s(t)$
 

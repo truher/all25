@@ -7,7 +7,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.util.Math100;
 
 public class SwerveUtil {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     /**
      * At low speed, accel is limited by the current limiters.

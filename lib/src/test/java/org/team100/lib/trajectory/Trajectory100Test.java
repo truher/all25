@@ -29,7 +29,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 class Trajectory100Test implements Timeless {
     private static final double DELTA = 0.001;
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test

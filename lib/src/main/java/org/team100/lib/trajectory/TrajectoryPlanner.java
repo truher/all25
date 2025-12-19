@@ -28,7 +28,7 @@ import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGeneratio
  * 4. assign timestamps to each step
  */
 public class TrajectoryPlanner {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     /*
      * Maximum distance of the secant lines to the continuous spline. The resulting
      * path will have little scallops if it involves rotation. In SE(2), a constant

@@ -22,7 +22,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * These pop up GUI windows, so leave them commented out when you check in.
  */
 public class TrajectoryTest {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final boolean SHOW = false;
     LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 

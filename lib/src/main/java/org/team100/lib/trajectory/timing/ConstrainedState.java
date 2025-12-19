@@ -7,6 +7,7 @@ import org.team100.lib.trajectory.timing.TimingConstraint.NonNegativeDouble;
 import org.team100.lib.util.Math100;
 
 class ConstrainedState {
+    private static final boolean DEBUG = true;
     // using MAX_VALUE tickles some bugs
     private static final double MAX_V = 100;
     private static final double MAX_A = 100;
@@ -34,7 +35,11 @@ class ConstrainedState {
         for (TimingConstraint constraint : constraints) {
             NonNegativeDouble constraintVel = constraint.getMaxVelocity(m_state);
             double value = constraintVel.getValue();
-            setVelocityM_S(Math.min(getVelocityM_S(), value));
+            value = Math.min(getVelocityM_S(), value);
+            if (DEBUG)
+                System.out.printf("VELOCITY CONSTRAINT %s %5.3f\n",
+                        constraint.getClass().getSimpleName(), value);
+            setVelocityM_S(value);
         }
     }
 
@@ -49,6 +54,11 @@ class ConstrainedState {
             m_minAccelM_S2 = Math.max(m_minAccelM_S2, minAccel);
             double maxAccel = Math100.notNaN(min_max_accel.getMaxAccel());
             m_maxAccelM_S2 = Math.min(m_maxAccelM_S2, maxAccel);
+            if (DEBUG)
+                System.out.printf("ACCEL CONSTRAINT %s %5.3f %5.3f\n",
+                        constraint.getClass().getSimpleName(),
+                        m_minAccelM_S2,
+                        m_maxAccelM_S2);
         }
 
     }

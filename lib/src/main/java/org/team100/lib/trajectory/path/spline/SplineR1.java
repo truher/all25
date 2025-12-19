@@ -130,39 +130,39 @@ public class SplineR1 {
     }
 
     /**
-     * @param t ranges from 0 to 1
-     * @return the point on the spline for that t value
+     * @param s ranges from 0 to 1
+     * @return the point on the spline for that s value
      */
-    public double getPosition(double t) {
-        return a * t * t * t * t * t + b * t * t * t * t + c * t * t * t + d * t * t + e * t + f;
+    public double getPosition(double s) {
+        return a * s * s * s * s * s + b * s * s * s * s + c * s * s * s + d * s * s + e * s + f;
     }
 
     /**
-     * @return rate of change of position with respect to parameter, i.e. ds/dt
+     * @return rate of change of position with respect to parameter, i.e. dq/ds
      */
-    public double getVelocity(double t) {
-        return 5 * a * t * t * t * t + 4 * b * t * t * t + 3 * c * t * t + 2 * d * t + e;
+    public double getVelocity(double s) {
+        return 5 * a * s * s * s * s + 4 * b * s * s * s + 3 * c * s * s + 2 * d * s + e;
     }
 
     /**
-     * @return acceleration of position with respect to parameter, i.e. d^2s/dt^2
+     * @return acceleration of position with respect to parameter, i.e. d^2q/ds^2
      */
-    public double getAcceleration(double t) {
-        return 20 * a * t * t * t + 12 * b * t * t + 6 * c * t + 2 * d;
+    public double getAcceleration(double s) {
+        return 20 * a * s * s * s + 12 * b * s * s + 6 * c * s + 2 * d;
     }
 
     /**
-     * @return jerk of position with respect to parameter, i.e. d^3s/dt^3.
+     * @return jerk of position with respect to parameter, i.e. d^3q/ds^3.
      */
-    public double getJerk(double t) {
-        return 60 * a * t * t + 24 * b * t + 6 * c;
+    public double getJerk(double s) {
+        return 60 * a * s * s + 24 * b * s + 6 * c;
     }
 
     /**
-     * @return snap of position with respect to parameter, i.e. d^4s/dt^4.
+     * @return snap of position with respect to parameter, i.e. d^4q/ds^4.
      */
-    public double getSnap(double t) {
-        return 120 * a * t + 24 * b;
+    public double getSnap(double s) {
+        return 120 * a * s + 24 * b;
     }
 
     @Override

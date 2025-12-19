@@ -70,6 +70,8 @@ public class ScheduleGenerator {
             List<Pose2dWithMotion> samples,
             double start_vel,
             double end_vel) throws TimingException {
+        if (samples.size() < 3)
+            throw new IllegalArgumentException("must have at least three samples");
         List<ConstrainedState> constrainedStates = forwardPass(samples, start_vel);
         Pose2dWithMotion lastState = samples.get(samples.size() - 1);
         backwardsPass(lastState, end_vel, constrainedStates);
@@ -95,13 +97,22 @@ public class ScheduleGenerator {
 
         // work forward through the samples
         List<ConstrainedState> constrainedStates = new ArrayList<>(samples.size());
-        for (Pose2dWithMotion sample : samples) {
+        for (int i = 1; i < samples.size(); ++i) {
+            Pose2dWithMotion sample = samples.get(i);
             double dsM = sample.distanceM(predecessor.getState());
+            if (DEBUG)
+                System.out.printf("i%d dsM %f\n", i, dsM);
             ConstrainedState constrainedState = new ConstrainedState(
                     sample, dsM + predecessor.getDistanceM());
             constrainedStates.add(constrainedState);
             forwardWork(predecessor, constrainedState);
             predecessor = constrainedState;
+        }
+        if (DEBUG) {
+            System.out.println("after forward pass:");
+            for (int i = 0; i < constrainedStates.size(); ++i) {
+                System.out.printf("%d, %s\n", i, constrainedStates.get(i));
+            }
         }
         return constrainedStates;
     }
@@ -117,6 +128,8 @@ public class ScheduleGenerator {
         while (true) {
             // first try the previous state accel to get the new state velocity
             double v1 = v1(s0.getVelocityM_S(), s0.getMaxAccel(), dsM);
+            if (DEBUG)
+                System.out.printf("initial v1 %5.3f\n", v1);
             s1.setVelocityM_S(v1);
 
             // also use max accels for the new state accels
@@ -126,8 +139,17 @@ public class ScheduleGenerator {
             // reduce velocity according to constraints
             s1.clampVelocity(m_constraints);
 
+            if (DEBUG)
+                System.out.printf("accel before %5.3f\n", s1.getMaxAccel());
             // reduce accel according to constraints
+            // in the failure case, this is clamped to zero,
+            // because the velocity is very high.
+            // and that's because the preceding accel is the near-infinite value
+            // which means we exceed the max in one time step
+            // so the key is to not do that, i think.
             s1.clampAccel(m_constraints);
+            if (DEBUG)
+                System.out.printf("accel after %5.3f\n", s1.getMaxAccel());
 
             // motionless
             if (Math.abs(dsM) < EPSILON) {
@@ -135,9 +157,15 @@ public class ScheduleGenerator {
             }
 
             double accel = accel(s0.getVelocityM_S(), s1.getVelocityM_S(), dsM);
+            // in the failure case, max accel is zero so this always fails.
             if (accel > s1.getMaxAccel() + EPSILON) {
                 // implied accel is too high because v1 is too high, perhaps because
                 // a0 was too high, try again with the (lower) constrained value
+                //
+                // if the constrained value is zero, this doesn't work at all.
+                if (DEBUG)
+                    System.out.printf("accel too high %5.3f, %5.3f, %5.3f\n",
+                            accel, s0.getMaxAccel(), s1.getMaxAccel());
                 s0.setMaxAccel(s1.getMaxAccel());
                 continue;
             }
@@ -168,6 +196,12 @@ public class ScheduleGenerator {
             ConstrainedState constrainedState = constrainedStates.get(i);
             backwardsWork(constrainedState, successor);
             successor = constrainedState;
+        }
+        if (DEBUG) {
+            System.out.println("after backwards pass:");
+            for (int i = 0; i < constrainedStates.size(); ++i) {
+                System.out.printf("%d, %s\n", i, constrainedStates.get(i));
+            }
         }
     }
 
@@ -226,10 +260,14 @@ public class ScheduleGenerator {
         // this should be L2 distance
         double distance = 0.0; // distance along path
         double v0 = 0.0;
+        if (DEBUG)
+            System.out.println("i, v0, v1, ds");
         for (int i = 0; i < states.size(); ++i) {
             ConstrainedState state = states.get(i);
             final double ds = state.getDistanceM() - distance;
             final double v1 = state.getVelocityM_S();
+            if (DEBUG)
+                System.out.printf("%d, %5.3f, %5.3f, %5.3f\n", i, v0, v1, ds);
             double dt = 0.0;
             if (i > 0) {
                 double prevAccel = accel(v0, v1, ds);

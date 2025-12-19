@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 public class PathFactory {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public static Path100 pathFromWaypoints(
             List<WaypointSE2> waypoints,

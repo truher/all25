@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * omega limit calculation is correct.
  */
 public class SwerveDriveDynamicsConstraint implements TimingConstraint {
+    private static final boolean DEBUG = true;
     private final SwerveKinodynamics m_limits;
     private final Mutable vScale;
     private final Mutable aScale;
@@ -84,6 +85,11 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
         // min accel is stronger than max accel
         double minAccel = -1.0 * maxA();
         double maxAccel = SwerveUtil.minAccel(m_limits, 1, 1, velocity);
+        // i think this only works because it's not *exactly* zero at full speed.
+        if (Math.abs(maxAccel) < 1e-3)
+            maxAccel = 0.0;
+        if (DEBUG)
+            System.out.printf("SWERVE CONSTRAINT %f\n", maxAccel);
         return new MinMaxAcceleration(
                 minAccel,
                 maxAccel);
