@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * Various math utilities.
  */
 public class Math100 {
+    private static final boolean DEBUG = false;
     private static final double EPSILON = 1e-6;
 
     /**
@@ -17,7 +18,8 @@ public class Math100 {
      */
     public static List<Double> solveQuadratic(double a, double b, double c) {
         double disc = b * b - 4 * a * c;
-
+        if (DEBUG)
+            System.out.printf("a %f b %f c %f disc %f\n", a, b, c, disc);
         if (epsilonEquals(disc, 0.0)) {
             return List.of(-b / (2 * a));
         } else if (disc > 0.0) {
