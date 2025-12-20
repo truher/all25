@@ -47,15 +47,17 @@ public class DirectSchedule {
         }
     }
 
-    /** position for time t */
+    /** q(t) position for time t */
     public double x(double t) {
         return q(s(t));
     }
 
+    /** qdot(t) */
     public double v(double t) {
         return qprime(s(t)) * sdot(t);
     }
 
+    /** qdotdot(t) */
     public double a(double t) {
         return qprimeprime(s(t)) * sdot(t) * sdot(t) + qprime(s(t)) * sdotdot(t);
     }

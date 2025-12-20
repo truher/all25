@@ -3,7 +3,10 @@ package org.team100.lib.trajectory.timing;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.trajectory.path.spline.SplineR1;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+
 public class DirectScheduleTest {
+    private static final double EPSILON = 1e-6;
 
     @Test
     void testSimple0() {
@@ -89,6 +92,49 @@ public class DirectScheduleTest {
             System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
                     t, schedule.x(t), schedule.v(t), schedule.a(t),
                     schedule.qprime(schedule.s(t)));
+        }
+    }
+
+    @Test
+    void testSimple2() {
+        SplineR1 spline = SplineR1.get(0, 1, 0, 0, 0, 0);
+        InterpolatingDoubleTreeMap m = new InterpolatingDoubleTreeMap();
+        for (double s = 0; s <= 1; s += 0.05) {
+            double q = spline.getPosition(s);
+            m.put(q, s);
+        }
+        System.out.println("q, s");
+        for (double q = 0; q <= 1.001; q += 0.01) {
+            double s = m.get(q);
+            double qprime = spline.getVelocity(s);
+            double qprimeprime = spline.getAcceleration(s);
+            System.out.printf("%5.3f, %5.3f, %5.3f\n", q, s);
+        }
+    }
+
+    @Test
+    void testSimple3() {
+        SplineR1 spline = SplineR1.get(0, 1, 0, 0, 0, 0);
+
+        double DS = 0.01;
+        double qq = 0;
+        System.out.println("s, q, qq, qError, qprime, qprimeprime");
+        for (double s = 0; s <= 1.001; s += DS) {
+            double q = spline.getPosition(s);
+            double qprime = spline.getVelocity(s);
+            // https://en.wikipedia.org/wiki/Numerical_integration
+            if (s > 0) {
+                // trapezoid integration is good to about 50 ppm
+                // qq += (spline.getVelocity(s - DS) + spline.getVelocity(s)) * DS/2;
+                // simpsons rule is good to 2 ppb
+                qq += (spline.getVelocity(s - DS)
+                        + 4 * spline.getVelocity(s - DS / 2)
+                        + spline.getVelocity(s)) * DS / 6;
+            }
+            double qError = q - qq;
+            double qprimeprime = spline.getAcceleration(s);
+            System.out.printf("%10.8f, %10.8f, %10.8f, %12.10f, %10.8f, %10.8f\n",
+                    s, q, qq, qError, qprime, qprimeprime);
         }
     }
 
