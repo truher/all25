@@ -138,4 +138,156 @@ public class DirectScheduleTest {
         }
     }
 
+    /** qdot constraint varies; for now it's a function of s */
+    double qdotmax(double s) {
+        if (s > 0.4 && s < 0.6)
+            return 0.5;
+        return 1.0;
+    }
+
+    double qdotdotmax(double s) {
+        return 5.0;
+    }
+
+    @Test
+    void testSimple4() {
+        int n = 100;
+        SplineR1 q = SplineR1.get(0, 1, 0, 0, 0, 0);
+
+        // these are the spline sample points; they can be
+        // in arbitrary locations. s is immutable.
+        double[] s = new double[n + 1];
+        for (int i = 0; i < n + 1; ++i) {
+            s[i] = (double) i / n;
+        }
+        // start with initial estimate of sdot
+        double[] sdot = new double[n + 1];
+        for (int i = 0; i < n + 1; ++i) {
+            sdot[i] = 1.0;
+        }
+
+        // velocity constraint
+        for (int i = 0; i < n + 1; ++i) {
+            // first derivative of q wrt parameter s
+            double qprimei = q.getVelocity(s[i]);
+            // second derivative of q wrt parameter s
+            double qprimeprimei = q.getAcceleration(s[i]);
+            // first derivative of q wrt time, using chain rule
+            // qdot = dq/ds * ds/dt
+            double qdoti = qprimei * sdot[i];
+            // also sdot(t) = 1/tprime(s)
+            // adjust sdot so that qdot is under the constraint
+            double qdotmaxi = qdotmax(s[i]);
+            if (Math.abs(qdoti) > qdotmaxi) {
+                sdot[i] = qdotmaxi / qprimei;
+            }
+        }
+        // accel constraint
+        for (int i = 1; i < n + 1; ++i) {
+            // previous
+            int j = i - 1;
+            // first derivative of q wrt parameter s
+            double qprimei = q.getVelocity(s[i]);
+            // second derivative of q wrt parameter s
+            double qprimeprimei = q.getAcceleration(s[i]);
+
+            double ds = s[i] - s[j];
+
+            double sdotdoti = 0;
+            // trailing difference to get tprimeprime
+            double tprimeprimei = (1 / sdot[i] - 1 / sdot[j]) / ds;
+            // differentiate sdot to get sdotdot.
+            // d2s/dt2 = - d2t/ds2 * (ds/dt)^3
+            // sdotdot = -tprimeprime * sdot^3
+            sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
+
+            // chain rule
+            // d2q/dt2 = d2q/ds2 * (ds/dt)^2 + dq/ds * d2s/dt2
+            // qdotdot = qprimeprime * sdot^2 + qprime * sdotdot
+            double qdotdoti = qprimeprimei * sdot[i] * sdot[i] + qprimei * sdotdoti;
+            // adjust sdot so that qdotdot is under the constraint
+            double qdotdotmaxi = qdotdotmax(s[i]);
+            if (Math.abs(qdotdoti) > qdotdotmaxi) {
+                sdotdoti = (qdotdotmaxi - qprimeprimei * sdot[i] * sdot[i]) / qprimei;
+                // integrate to find sdot
+                // sdot = ds/dt
+                // dt = ds/sdot
+                double sdotnew = sdot[j] + sdotdoti * ds / sdot[i];
+                if (Math.abs(sdotnew) < Math.abs(sdot[i]))
+                    sdot[i] = sdotnew;
+            }
+        }
+
+        // accel constraint backwards
+        for (int i = n-1; i > 0; --i) {
+            // previous
+            int j = i + 1;
+            // first derivative of q wrt parameter s
+            double qprimei = q.getVelocity(s[i]);
+            // second derivative of q wrt parameter s
+            double qprimeprimei = q.getAcceleration(s[i]);
+
+            double ds = s[i] - s[j];
+
+            double sdotdoti = 0;
+            // trailing difference to get tprimeprime
+            double tprimeprimei = (1 / sdot[i] - 1 / sdot[j]) / ds;
+            // differentiate sdot to get sdotdot.
+            // d2s/dt2 = - d2t/ds2 * (ds/dt)^3
+            // sdotdot = -tprimeprime * sdot^3
+            sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
+
+            // chain rule
+            // d2q/dt2 = d2q/ds2 * (ds/dt)^2 + dq/ds * d2s/dt2
+            // qdotdot = qprimeprime * sdot^2 + qprime * sdotdot
+            double qdotdoti = qprimeprimei * sdot[i] * sdot[i] + qprimei * sdotdoti;
+            // adjust sdot so that qdotdot is under the constraint
+            double qdotdotmaxi = qdotdotmax(s[i]);
+            if (Math.abs(qdotdoti) > qdotdotmaxi) {
+                sdotdoti = (qdotdotmaxi - qprimeprimei * sdot[i] * sdot[i]) / qprimei;
+                // integrate to find sdot
+                // sdot = ds/dt
+                // dt = ds/sdot
+                double sdotnew = sdot[j] + sdotdoti * ds / sdot[i];
+                if (Math.abs(sdotnew) < Math.abs(sdot[i]))
+                    sdot[i] = sdotnew;
+            }
+        }
+
+        // integrate and dump the result
+        System.out.println("t, s, sdot, sdotdot, q, qdot, qdotdot");
+        double t = 0;
+        for (int i = 0; i < n + 1; ++i) {
+
+            double qi = q.getPosition(s[i]);
+            double qprimei = q.getVelocity(s[i]);
+            double qprimeprimei = q.getAcceleration(s[i]);
+            double qdoti = qprimei * sdot[i];
+            double sdotdoti = 0;
+            double qdotdoti = 0;
+            if (i > 0) {
+                // Integrate.
+                // We have sdot(t) but we want to integrate over s to find t
+                // The derivative of the inverse is the reciprocal
+                // https://en.wikipedia.org/wiki/Inverse_function_rule
+                // sdot(t) = 1/tprime(s)
+                double ds = s[i] - s[i - 1];
+                // tprime = dt/ds
+                double tprimei = 1 / sdot[i];
+                double dt1 = tprimei * ds;
+
+                // trailing difference to get tprimeprime
+                double tprimeprimei = (1 / sdot[i] - 1 / sdot[i - 1]) / ds;
+                // differentiate sdot to get sdotdot.
+                // d2s/dt2 = - d2t/ds2 * (ds/dt)^3
+                sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
+                qdotdoti = qprimeprimei * sdot[i] * sdot[i] + qprimei * sdotdoti;
+
+                t += dt1;
+            }
+            System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
+                    t, s[i], sdot[i], sdotdoti, qi, qdoti, qdotdoti);
+        }
+    }
+
 }
