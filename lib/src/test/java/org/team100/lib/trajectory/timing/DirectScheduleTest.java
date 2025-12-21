@@ -182,6 +182,7 @@ public class DirectScheduleTest {
                 sdot[i] = qdotmaxi / qprimei;
             }
         }
+
         // accel constraint
         for (int i = 1; i < n + 1; ++i) {
             // previous
@@ -193,13 +194,12 @@ public class DirectScheduleTest {
 
             double ds = s[i] - s[j];
 
-            double sdotdoti = 0;
             // trailing difference to get tprimeprime
             double tprimeprimei = (1 / sdot[i] - 1 / sdot[j]) / ds;
             // differentiate sdot to get sdotdot.
             // d2s/dt2 = - d2t/ds2 * (ds/dt)^3
             // sdotdot = -tprimeprime * sdot^3
-            sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
+            double sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
 
             // chain rule
             // d2q/dt2 = d2q/ds2 * (ds/dt)^2 + dq/ds * d2s/dt2
@@ -207,35 +207,38 @@ public class DirectScheduleTest {
             double qdotdoti = qprimeprimei * sdot[i] * sdot[i] + qprimei * sdotdoti;
             // adjust sdot so that qdotdot is under the constraint
             double qdotdotmaxi = qdotdotmax(s[i]);
-            if (Math.abs(qdotdoti) > qdotdotmaxi) {
-                sdotdoti = (qdotdotmaxi - qprimeprimei * sdot[i] * sdot[i]) / qprimei;
-                // integrate to find sdot
-                // sdot = ds/dt
-                // dt = ds/sdot
-                double sdotnew = sdot[j] + sdotdoti * ds / sdot[i];
-                if (Math.abs(sdotnew) < Math.abs(sdot[i]))
+            if (Math.abs(qdotdoti) > Math.abs(qdotdotmaxi)) {
+                double sdotnew = Math.sqrt((2 * qdotdotmaxi * ds + qprimei * sdot[j] * sdot[j])
+                        / (2 * qprimeprimei * ds + qprimei));
+                if (sdotnew < sdot[i]) {
                     sdot[i] = sdotnew;
+                    tprimeprimei = (1 / sdot[i] - 1 / sdot[j]) / ds;
+                    sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
+                }
             }
         }
 
         // accel constraint backwards
-        for (int i = n-1; i > 0; --i) {
+        for (int i = n - 1; i > 0; --i) {
             // previous
             int j = i + 1;
             // first derivative of q wrt parameter s
-            double qprimei = q.getVelocity(s[i]);
+            // note negative sign
+            double qprimei = - q.getVelocity(s[i]);
             // second derivative of q wrt parameter s
-            double qprimeprimei = q.getAcceleration(s[i]);
+            // note negative sign
+            double qprimeprimei = - q.getAcceleration(s[i]);
 
+            // this is a negative number
             double ds = s[i] - s[j];
 
-            double sdotdoti = 0;
             // trailing difference to get tprimeprime
+            // this is a positive number
             double tprimeprimei = (1 / sdot[i] - 1 / sdot[j]) / ds;
             // differentiate sdot to get sdotdot.
             // d2s/dt2 = - d2t/ds2 * (ds/dt)^3
             // sdotdot = -tprimeprime * sdot^3
-            sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
+            double sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
 
             // chain rule
             // d2q/dt2 = d2q/ds2 * (ds/dt)^2 + dq/ds * d2s/dt2
@@ -243,14 +246,14 @@ public class DirectScheduleTest {
             double qdotdoti = qprimeprimei * sdot[i] * sdot[i] + qprimei * sdotdoti;
             // adjust sdot so that qdotdot is under the constraint
             double qdotdotmaxi = qdotdotmax(s[i]);
-            if (Math.abs(qdotdoti) > qdotdotmaxi) {
-                sdotdoti = (qdotdotmaxi - qprimeprimei * sdot[i] * sdot[i]) / qprimei;
-                // integrate to find sdot
-                // sdot = ds/dt
-                // dt = ds/sdot
-                double sdotnew = sdot[j] + sdotdoti * ds / sdot[i];
-                if (Math.abs(sdotnew) < Math.abs(sdot[i]))
+            if (Math.abs(qdotdoti) > Math.abs(qdotdotmaxi)) {
+                double sdotnew = Math.sqrt((2 * qdotdotmaxi * ds + qprimei * sdot[j] * sdot[j])
+                        / (2 * qprimeprimei * ds + qprimei));
+                if (sdotnew < sdot[i]) {
                     sdot[i] = sdotnew;
+                    tprimeprimei = (1 / sdot[i] - 1 / sdot[j]) / ds;
+                    sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
+                }
             }
         }
 
@@ -266,18 +269,19 @@ public class DirectScheduleTest {
             double sdotdoti = 0;
             double qdotdoti = 0;
             if (i > 0) {
+                int j = i - 1;
                 // Integrate.
                 // We have sdot(t) but we want to integrate over s to find t
                 // The derivative of the inverse is the reciprocal
                 // https://en.wikipedia.org/wiki/Inverse_function_rule
                 // sdot(t) = 1/tprime(s)
-                double ds = s[i] - s[i - 1];
+                double ds = s[i] - s[j];
                 // tprime = dt/ds
                 double tprimei = 1 / sdot[i];
                 double dt1 = tprimei * ds;
 
                 // trailing difference to get tprimeprime
-                double tprimeprimei = (1 / sdot[i] - 1 / sdot[i - 1]) / ds;
+                double tprimeprimei = (1 / sdot[i] - 1 / sdot[j]) / ds;
                 // differentiate sdot to get sdotdot.
                 // d2s/dt2 = - d2t/ds2 * (ds/dt)^3
                 sdotdoti = -tprimeprimei * sdot[i] * sdot[i] * sdot[i];
