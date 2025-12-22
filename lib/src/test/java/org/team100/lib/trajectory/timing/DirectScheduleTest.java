@@ -143,7 +143,11 @@ public class DirectScheduleTest {
     }
 
     /**
-     * qdot constraint varies; for now it's a function of s
+     * qdot constraint varies; for now it's a function of s.
+     * 
+     * In reality, depends on curvature and course and heading and heading rate,
+     * none of which vary during scheduling.
+     * 
      * always positive.
      */
     double qdotmax(double s) {
@@ -154,24 +158,28 @@ public class DirectScheduleTest {
 
     /**
      * a positive number
+     * 
+     * In reality, depends on pose and curvature and heading rate, and also pathwise
+     * velocity. of these only pathwise velocity changes during the scheduling.
      */
-    double qdotdotmax(double s) {
+    double qdotdotmax(double s, double v) {
         if (s < 0.1) // soft start
-            return s * 50;
-        if (s > 0.9) // soft stop
-            return (1 - s) * 50;
-        return 5.0;
+            return (s * 50) - v;
+        return 5.0 - v;
     }
 
     /**
      * Since v is never negative, qdotdotmin always means deceleration.
      * 
+     * In reality, depends on pose and curvature and heading rate, and also pathwise
+     * velocity. of these only pathwise velocity changes during the scheduling.
+     * 
      * @returns a negative number
      */
-    double qdotdotmin(double s) {
+    double qdotdotmin(double s, double v) {
         if (s > 0.9) // soft stop
-            return (1 - s) * -50;
-        return -10.0;
+            return (1 - s) * -50 + v;
+        return -10.0 + v;
     }
 
     @Test
@@ -231,7 +239,7 @@ public class DirectScheduleTest {
             // qdotdot = qprimeprime * sdot^2 + qprime * sdotdot
             double qdotdoti = qprimeprimei * sdot[i] * sdot[i] + qprimei * sdotdoti;
             // adjust sdot so that qdotdot is under the constraint
-            double qdotdotmaxi = qdotdotmax(s[i]);
+            double qdotdotmaxi = qdotdotmax(s[i], 0);
             if (Math.abs(qdotdoti) > Math.abs(qdotdotmaxi)) {
                 double sdotnew = Math.sqrt((2 * qdotdotmaxi * ds + qprimei * sdot[j] * sdot[j])
                         / (2 * qprimeprimei * ds + qprimei));
@@ -270,7 +278,7 @@ public class DirectScheduleTest {
             // qdotdot = qprimeprime * sdot^2 + qprime * sdotdot
             double qdotdoti = qprimeprimei * sdot[i] * sdot[i] + qprimei * sdotdoti;
             // adjust sdot so that qdotdot is under the constraint
-            double qdotdotmaxi = qdotdotmax(s[i]);
+            double qdotdotmaxi = qdotdotmax(s[i], 0);
             if (Math.abs(qdotdoti) > Math.abs(qdotdotmaxi)) {
                 double sdotnew = Math.sqrt((2 * qdotdotmaxi * ds + qprimei * sdot[j] * sdot[j])
                         / (2 * qprimeprimei * ds + qprimei));
@@ -360,32 +368,44 @@ public class DirectScheduleTest {
         for (int i = 2; i < n + 1; ++i) {
             double v0 = (q.getPosition(s[i - 1]) - q.getPosition(s[i - 2])) / dt[i - 2];
             double dx = q.getPosition(s[i]) - q.getPosition(s[i - 1]);
-            double v = dx / dt[i - 1];
-            double a = (v - v0) / dt[i - 1];
-            if (a > 0) {
-                double amax = qdotdotmax(s[i]);
-                if (a > amax) {
-                    // System.out.printf("forward pos s %f a %f\n", s[i], a);
-                    double A = amax;
-                    double B = v0;
-                    double C = -dx;
-                    List<Double> soln = Math100.solveQuadratic(A, B, C);
-                    double newdt = choose(soln);
-                    // only slower
-                    dt[i - 1] = Math.max(dt[i - 1], newdt);
+            while (true) {
+                double v = dx / dt[i - 1];
+                // System.out.printf("i %d v %f\n", i, v);
+                double a = (v - v0) / dt[i - 1];
+                if (a > 0) {
+                    double amax = qdotdotmax(s[i], v);
+                    if (a > amax) {
+                        // System.out.printf("forward pos s %f a %f\n", s[i], a);
+                        double A = amax;
+                        double B = v0;
+                        double C = -dx;
+                        List<Double> soln = Math100.solveQuadratic(A, B, C);
+                        double newdt = choose(soln);
+                        // only slower
+                        if (newdt > dt[i - 1]) {
+                            dt[i - 1] = newdt;
+                            // System.out.printf("newdt %f\n", newdt);
+                            continue;
+                        }
+                    }
+                } else if (a < 0) {
+                    double amin = qdotdotmin(s[i], v);
+                    if (a < amin) {
+                        // System.out.printf("forward neg s %f a %f\n", s[i], a);
+                        double A = amin;
+                        double B = v0;
+                        double C = -dx;
+                        List<Double> soln = Math100.solveQuadratic(A, B, C);
+                        double newdt = choose(soln);
+                        // only slower
+                        if (newdt > dt[i - 1]) {
+                            dt[i - 1] = newdt;
+                            // System.out.printf("newdt %f\n", newdt);
+                            continue;
+                        }
+                    }
                 }
-            } else if (a < 0) {
-                double amin = qdotdotmin(s[i]);
-                if (a < amin) {
-                    // System.out.printf("forward neg s %f a %f\n", s[i], a);
-                    double A = amin;
-                    double B = v0;
-                    double C = -dx;
-                    List<Double> soln = Math100.solveQuadratic(A, B, C);
-                    double newdt = choose(soln);
-                    // only slower
-                    dt[i - 1] = Math.max(dt[i - 1], newdt);
-                }
+                break;
             }
         }
 
@@ -393,32 +413,41 @@ public class DirectScheduleTest {
         for (int i = n - 2; i >= 0; --i) {
             double v0 = (q.getPosition(s[i + 2]) - q.getPosition(s[i + 1])) / dt[i + 1];
             double dx = q.getPosition(s[i + 1]) - q.getPosition(s[i]);
-            double v = dx / dt[i];
-            double a = (v0 - v) / dt[i];
-            if (a > 0) {
-                double amax = qdotdotmax(s[i]);
-                if (a > amax) {
-                    // System.out.printf("backward pos s %f v %f v0 %f a %f\n", s[i], v, v0, a);
-                    double A = amax;
-                    double B = -v0;
-                    double C = dx;
-                    List<Double> soln = Math100.solveQuadratic(A, B, C);
-                    double newdt = choose(soln);
-                    // only slower
-                    dt[i] = Math.max(dt[i], newdt);
+            while (true) {
+                double v = dx / dt[i];
+                double a = (v0 - v) / dt[i];
+                if (a > 0) {
+                    double amax = qdotdotmax(s[i], v);
+                    if (a > amax) {
+                        // System.out.printf("backward pos s %f v %f v0 %f a %f\n", s[i], v, v0, a);
+                        double A = amax;
+                        double B = -v0;
+                        double C = dx;
+                        List<Double> soln = Math100.solveQuadratic(A, B, C);
+                        double newdt = choose(soln);
+                        // only slower
+                        if (newdt > dt[i]) {
+                            dt[i] = newdt;
+                            continue;
+                        }
+                    }
+                } else if (a < 0) {
+                    double amin = qdotdotmin(s[i], v);
+                    if (a < amin) {
+                        // System.out.printf("backward neg s %f v %f v0 %f a %f\n", s[i], v, v0, a);
+                        double A = amin;
+                        double B = -v0;
+                        double C = dx;
+                        List<Double> soln = Math100.solveQuadratic(A, B, C);
+                        double newdt = choose(soln);
+                        // only slower
+                        if (newdt > dt[i]) {
+                            dt[i] = newdt;
+                            continue;
+                        }
+                    }
                 }
-            } else if (a < 0) {
-                double amin = qdotdotmin(s[i]);
-                if (a < amin) {
-                    // System.out.printf("backward neg s %f v %f v0 %f a %f\n", s[i], v, v0, a);
-                    double A = amin;
-                    double B = -v0;
-                    double C = dx;
-                    List<Double> soln = Math100.solveQuadratic(A, B, C);
-                    double newdt = choose(soln);
-                    // only slower
-                    dt[i] = Math.max(dt[i], newdt);
-                }
+                break;
             }
         }
 

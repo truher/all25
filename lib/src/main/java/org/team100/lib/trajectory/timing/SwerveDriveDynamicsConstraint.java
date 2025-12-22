@@ -46,8 +46,8 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
         // First check instantaneous velocity and compute a limit based on drive
         // velocity.
         Rotation2d course = state.getPose().course().toRotation();
-
-        Rotation2d course_local = course.minus(state.getPose().pose().getRotation());
+        Rotation2d heading = state.getPose().pose().getRotation();
+        Rotation2d course_local = course.minus(heading);
         double vx = course_local.getCos();
         double vy = course_local.getSin();
         // rad/m

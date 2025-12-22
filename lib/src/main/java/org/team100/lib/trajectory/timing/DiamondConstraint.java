@@ -47,6 +47,7 @@ public class DiamondConstraint implements TimingConstraint {
 
     @Override
     public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocityM_S) {
+        // TODO: this should also have a diamond shape
         return new MinMaxAcceleration(-m_maxAccel.getAsDouble(), m_maxAccel.getAsDouble());
     }
 
