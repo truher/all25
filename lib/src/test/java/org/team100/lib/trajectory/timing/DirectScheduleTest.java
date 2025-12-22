@@ -1,7 +1,11 @@
 package org.team100.lib.trajectory.timing;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import org.team100.lib.optimization.GoldenSectionSearch;
 import org.team100.lib.trajectory.path.spline.SplineR1;
+import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
@@ -138,14 +142,25 @@ public class DirectScheduleTest {
         }
     }
 
-    /** qdot constraint varies; for now it's a function of s */
+    /**
+     * qdot constraint varies; for now it's a function of s
+     * always positive.
+     */
     double qdotmax(double s) {
-        if (s > 0.4 && s < 0.6)
+        if (s > 0.45 && s < 0.55)
             return 0.5;
         return 1.0;
     }
 
+    /**
+     * a positive number
+     * TODO: both bounds (which are not the same)
+     */
     double qdotdotmax(double s) {
+        if (s < 0.1) // soft start
+            return s * 50;
+        if (s > 0.9) // soft stop
+            return (1 - s) * 50;
         return 5.0;
     }
 
@@ -224,10 +239,10 @@ public class DirectScheduleTest {
             int j = i + 1;
             // first derivative of q wrt parameter s
             // note negative sign
-            double qprimei = - q.getVelocity(s[i]);
+            double qprimei = -q.getVelocity(s[i]);
             // second derivative of q wrt parameter s
             // note negative sign
-            double qprimeprimei = - q.getAcceleration(s[i]);
+            double qprimeprimei = -q.getAcceleration(s[i]);
 
             // this is a negative number
             double ds = s[i] - s[j];
@@ -292,6 +307,128 @@ public class DirectScheduleTest {
             System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
                     t, s[i], sdot[i], sdotdoti, qi, qdoti, qdotdoti);
         }
+    }
+
+    /**
+     * schedules dt directly, doesn't try to us spline velocity etc.
+     * 
+     * makes no attempt to limit jerk; jerk limiting would require an iterative
+     * solver, which would be nice to avoid, and it's not that important
+     * in practice.
+     */
+    @Test
+    void testSimple5() {
+        int n = 100;
+        SplineR1 q = SplineR1.get(0, 1, 0, 0, 0, 0);
+        // these are the spline sample points; they can be
+        // in arbitrary locations. s is immutable.
+        double[] s = new double[n + 1];
+        for (int i = 0; i < n + 1; ++i) {
+            s[i] = (double) i / n;
+        }
+
+        // initial dt
+        // new dt is never less than this so choose a small number
+        double[] dt = new double[n + 1];
+        for (int i = 0; i < n; ++i) {
+            dt[i] = 0.10 / n;
+        }
+
+        // velocity constraint
+        for (int i = 1; i < n + 1; ++i) {
+            // dx is never negative
+            double dx = q.getPosition(s[i]) - q.getPosition(s[i - 1]);
+            // v is never negative
+            double v = dx / dt[i - 1];
+            double vmax = qdotmax(s[i]);
+            double newdt = dx / vmax;
+            // only slower
+            dt[i - 1] = Math.max(dt[i - 1], newdt);
+        }
+
+        // accel constraint forward, using backward finite differences
+        for (int i = 2; i < n + 1; ++i) {
+            double v0 = (q.getPosition(s[i - 1]) - q.getPosition(s[i - 2])) / dt[i - 2];
+            double dx = q.getPosition(s[i]) - q.getPosition(s[i - 1]);
+            double v = dx / dt[i - 1];
+            double a = (v - v0) / dt[i - 1];
+            double amax = qdotdotmax(s[i]);
+            if (Math.abs(a) > amax) {
+                amax = Math.signum(a) * amax;
+                double A = amax;
+                double B = v0;
+                double C = -dx;
+                List<Double> soln = Math100.solveQuadratic(A, B, C);
+                double newdt = choose(soln);
+                // only slower
+                dt[i - 1] = Math.max(dt[i - 1], newdt);
+            }
+        }
+
+        // accel constraint backward, using forward finite differences
+        for (int i = n - 2; i >= 0; --i) {
+            double v0 = (q.getPosition(s[i + 2]) - q.getPosition(s[i + 1])) / dt[i + 1];
+            double dx = q.getPosition(s[i + 1]) - q.getPosition(s[i]);
+            double v = dx / dt[i];
+            double a = (v - v0) / dt[i];
+            double amax = qdotdotmax(s[i]);
+            if (Math.abs(a) > amax) {
+                amax = Math.signum(a) * amax;
+                double A = amax;
+                double B = v0;
+                double C = -dx;
+                List<Double> soln = Math100.solveQuadratic(A, B, C);
+                double newdt = choose(soln);
+                // only slower
+                dt[i] = Math.max(dt[i], newdt);
+            }
+        }
+
+        // integrate and dump the result
+        System.out.println("s, dt, t, x, v, a");
+        double t = 0;
+        for (int i = 0; i < n + 1; ++i) {
+            double x = q.getPosition(s[i]);
+            double v = 0;
+            double a = 0;
+            if (i > 0) {
+                t += dt[i - 1];
+            }
+            // compute v using backward finite difference
+            if (i > 0) {
+                double dx = q.getPosition(s[i]) - q.getPosition(s[i - 1]);
+                v = dx / dt[i - 1];
+            }
+            // compute a using backward finite difference
+            if (i > 1) {
+                double dx0 = q.getPosition(s[i]) - q.getPosition(s[i - 1]);
+                double v0 = dx0 / dt[i - 1];
+                double dx1 = q.getPosition(s[i - 1]) - q.getPosition(s[i - 2]);
+                double v1 = dx1 / dt[i - 2];
+                a = (v0 - v1) / dt[i - 1];
+            }
+            System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
+                    s[i], dt[i], t, x, v, a);
+        }
+    }
+
+    /**
+     * choose smallest non-negative solution
+     * dt is never negative ... and i think also should never be zero ...
+     */
+    private double choose(List<Double> soln) {
+        double x0 = Double.POSITIVE_INFINITY;
+        for (double x : soln) {
+            if (x >= 0 && x < x0)
+                x0 = x;
+        }
+        if (Double.isFinite(x0))
+            return x0;
+
+        // System.out.println("no solution");
+        return 0;
+
+        // throw new IllegalArgumentException();
     }
 
 }
