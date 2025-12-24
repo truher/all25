@@ -51,6 +51,7 @@ public class Math100 {
         return Math.min(max, Math.max(min, v));
     }
 
+    /** Linear interpolation between a and b */
     public static double interpolate(double a, double b, double x) {
         if (x == 0)
             return a;

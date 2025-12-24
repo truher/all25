@@ -226,16 +226,6 @@ public class GeometryUtil {
         return a.unaryMinus().rotateBy(other).getRadians();
     }
 
-    public static Rotation2d interpolate2(Rotation2d a, final Rotation2d b, double x) {
-        if (x <= 0.0) {
-            return a;
-        } else if (x >= 1.0) {
-            return b;
-        }
-        double angle_diff = a.unaryMinus().rotateBy(b).getRadians();
-        return a.rotateBy(Rotation2d.fromRadians(angle_diff * x));
-    }
-
     /** Straight-line (not constant-twist) interpolation. */
     public static Pose2d interpolate(Pose2d a, Pose2d b, double x) {
         if (x <= 0.0) {
@@ -249,11 +239,11 @@ public class GeometryUtil {
         Rotation2d bR = b.getRotation();
         // each translation axis is interpolated separately
         Translation2d lerpT = aT.interpolate(bT, x);
-        // Rotation2d lerpR = aR.interpolate(bR, x);
-        Rotation2d lerpR = interpolate2(aR, bR, x);
+        Rotation2d lerpR = aR.interpolate(bR, x);
         return new Pose2d(lerpT, lerpR);
     }
 
+    /** Linear interpolation of each component */
     public static DirectionSE2 interpolate(DirectionSE2 a, DirectionSE2 b, double x) {
         return new DirectionSE2(
                 MathUtil.interpolate(a.x, b.x, x),
@@ -261,6 +251,7 @@ public class GeometryUtil {
                 MathUtil.interpolate(a.theta, b.theta, x));
     }
 
+    /** straight-line interpolation of pose, linear interpolation of course */
     public static WaypointSE2 interpolate(
             WaypointSE2 a,
             WaypointSE2 b,

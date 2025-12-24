@@ -38,14 +38,6 @@ class Math100Test {
         assertEquals(0, roots.size());
     }
 
-
-
-
-
-
-
-   
-
     @Test
     void testGetMinDistance() {
         double measurement = 4;
