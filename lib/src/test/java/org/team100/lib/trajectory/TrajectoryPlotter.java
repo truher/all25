@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.function.ToDoubleFunction;
 
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
@@ -24,9 +23,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
-import org.team100.lib.trajectory.timing.TimedPose;
-
-import edu.wpi.first.math.geometry.Pose2d;
 
 public class TrajectoryPlotter {
     public static final boolean SHOW = false;

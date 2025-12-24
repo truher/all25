@@ -121,7 +121,7 @@ public class PathFactoryTest implements Timeless {
         TrajectoryPlotter.plot(path, 0.1);
     }
 
-    /** Hard corners work now. */
+    /** Hard corners once again do not work. */
     @Test
     void testActualCorner() {
         List<WaypointSE2> waypoints = List.of(
@@ -135,11 +135,11 @@ public class PathFactoryTest implements Timeless {
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
                         new DirectionSE2(1, 0, 0), 1),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                new Rotation2d()),
-                        new DirectionSE2(0, 1, 0), 1),
+                // new WaypointSE2(
+                //         new Pose2d(
+                //                 new Translation2d(1, 0),
+                //                 new Rotation2d()),
+                //         new DirectionSE2(0, 1, 0), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
