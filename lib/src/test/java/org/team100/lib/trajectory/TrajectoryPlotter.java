@@ -25,7 +25,7 @@ import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 
 public class TrajectoryPlotter {
-    public static final boolean SHOW = true;
+    public static final boolean SHOW = false;
     private static final int SIZE = 500;
 
     private final TrajectoryToVectorSeries converter;
