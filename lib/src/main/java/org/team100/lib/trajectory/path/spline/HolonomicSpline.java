@@ -212,7 +212,7 @@ public class HolonomicSpline {
         //
         //
         // now yields SE(2) L2 norm, not just cartesian.
-        return Math.sqrt(dx*dx+dy*dy+dtheta*dtheta);
+        return Math.sqrt(dx * dx + dy * dy + dtheta * dtheta);
     }
 
     /**
@@ -221,11 +221,14 @@ public class HolonomicSpline {
      * Note the denominator is distance in this case, not the parameter, p.
      * but the argument to this function *is* the parameter, s. :-)
      */
-    private double getCurvature(double s) {
+    double getCurvature(double s) {
         double dx = dx(s);
         double dy = dy(s);
         double ddx = ddx(s);
         double ddy = ddy(s);
-        return (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * Math.sqrt((dx * dx + dy * dy)));
+        double d = dx * dx + dy * dy;
+        if (d <= 0)
+            return 0;
+        return (dx * ddy - ddx * dy) / Math.pow(d, 1.5);
     }
 }

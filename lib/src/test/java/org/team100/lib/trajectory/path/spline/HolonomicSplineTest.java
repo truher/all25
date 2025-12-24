@@ -37,6 +37,52 @@ class HolonomicSplineTest implements Timeless {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     @Test
+    void testCurvature() {
+        // straight line, zero curvature.
+        HolonomicSpline s = new HolonomicSpline(
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
+                        new DirectionSE2(1, 0, 0), 1),
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d()),
+                        new DirectionSE2(1, 0, 0), 1));
+        assertEquals(0, s.getCurvature(0.5), DELTA);
+
+        // left turn
+        s = new HolonomicSpline(
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
+                        new DirectionSE2(1, 0, 0), 1),
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(1, 1),
+                                new Rotation2d()),
+                        new DirectionSE2(0, 1, 0), 1));
+        assertEquals(0.950, s.getCurvature(0.5), DELTA);
+
+        // rotation in place yields zero curvature since there is no x/y motion, so
+        // curvature has no meaning.
+        s = new HolonomicSpline(
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
+                        new DirectionSE2(0, 0, 1), 1),
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d(1)),
+                        new DirectionSE2(0, 0, 1), 1));
+        assertEquals(0, s.getCurvature(0.5), DELTA);
+    }
+
+    @Test
     void testCourse() {
         Rotation2d course = new Rotation2d(Math.PI / 4);
         Translation2d t = new Translation2d(1, 0).rotateBy(course);
