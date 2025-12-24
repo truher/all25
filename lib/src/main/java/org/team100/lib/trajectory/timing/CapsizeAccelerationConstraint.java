@@ -38,11 +38,31 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      * If the curvature is zero, this will return infinity.
      */
     @Override
-    public NonNegativeDouble getMaxVelocity(final Pose2dWithMotion state) {
+    public double maxV(final Pose2dWithMotion state) {
         double mMaxCentripetalAccel = m_limits.getMaxCapsizeAccelM_S2() * m_scale.getAsDouble();
         double radius = 1 / state.getCurvature();
         // abs is used here to make sure sqrt is happy.
-        return new NonNegativeDouble(Math.sqrt(Math.abs(mMaxCentripetalAccel * radius)));
+        return Math.sqrt(Math.abs(mMaxCentripetalAccel * radius));
+    }
+
+    @Override
+    public double maxAccel(Pose2dWithMotion state, double velocity) {
+        double alongsq = alongSq(state, velocity);
+        if (alongsq < 0) {
+            // too fast for the curvature, can't speed up
+            return 0;
+        }
+        return Math.sqrt(alongsq);
+    }
+
+    @Override
+    public double maxDecel(Pose2dWithMotion state, double velocity) {
+        double alongsq = alongSq(state, velocity);
+        if (alongsq < 0) {
+            // too fast for the curvature, slowing down is ok
+            return -m_limits.getMaxDriveDecelerationM_S2() * m_scale.getAsDouble();
+        }
+        return -Math.sqrt(alongsq);
     }
 
     /**
@@ -56,19 +76,10 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      * so
      * along = sqrt(total^2 - v^4/r^2)
      */
-    @Override
-    public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocity) {
-        double mMaxCentripetalAccel = m_limits.getMaxCapsizeAccelM_S2() * m_scale.getAsDouble();
-
+    private double alongSq(Pose2dWithMotion state, double velocity) {
+        double maxCentripetalAccel = m_limits.getMaxCapsizeAccelM_S2() * m_scale.getAsDouble();
         double radius = 1 / state.getCurvature();
-        double centripetalAccel = velocity * velocity / radius;
-        double alongsq = mMaxCentripetalAccel * mMaxCentripetalAccel - centripetalAccel * centripetalAccel;
-        if (alongsq < 0) {
-            // if you're here, you're violating the velocity constraint above,
-            // and you should try to gently slow down.
-            return new MinMaxAcceleration(-m_limits.getMaxDriveDecelerationM_S2() * m_scale.getAsDouble(), 0);
-        }
-        double along = Math.sqrt(alongsq);
-        return new MinMaxAcceleration(-along, along);
+        double actualCentripetalAccel = velocity * velocity / radius;
+        return maxCentripetalAccel * maxCentripetalAccel - actualCentripetalAccel * actualCentripetalAccel;
     }
 }

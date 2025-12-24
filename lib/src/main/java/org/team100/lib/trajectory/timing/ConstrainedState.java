@@ -3,8 +3,6 @@ package org.team100.lib.trajectory.timing;
 import java.util.List;
 
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.trajectory.timing.TimingConstraint.NonNegativeDouble;
-import org.team100.lib.util.Math100;
 
 class ConstrainedState {
     private static final boolean DEBUG = false;
@@ -33,8 +31,7 @@ class ConstrainedState {
      */
     public void clampVelocity(List<TimingConstraint> constraints) {
         for (TimingConstraint constraint : constraints) {
-            NonNegativeDouble constraintVel = constraint.getMaxVelocity(m_state);
-            double value = constraintVel.getValue();
+            double value = constraint.maxV(m_state);
             value = Math.min(getVelocityM_S(), value);
             if (DEBUG)
                 System.out.printf("VELOCITY CONSTRAINT %s %5.3f\n",
@@ -48,12 +45,8 @@ class ConstrainedState {
      */
     public void clampAccel(List<TimingConstraint> constraints) {
         for (TimingConstraint constraint : constraints) {
-            TimingConstraint.MinMaxAcceleration min_max_accel = constraint
-                    .getMinMaxAcceleration(m_state, getVelocityM_S());
-            double minAccel = Math100.notNaN(min_max_accel.getMinAccel());
-            m_minAccelM_S2 = Math.max(m_minAccelM_S2, minAccel);
-            double maxAccel = Math100.notNaN(min_max_accel.getMaxAccel());
-            m_maxAccelM_S2 = Math.min(m_maxAccelM_S2, maxAccel);
+            m_minAccelM_S2 = Math.max(m_minAccelM_S2, constraint.maxDecel(m_state, getVelocityM_S()));
+            m_maxAccelM_S2 = Math.min(m_maxAccelM_S2, constraint.maxAccel(m_state, getVelocityM_S()));
             if (DEBUG)
                 System.out.printf("ACCEL CONSTRAINT %s %5.3f %5.3f\n",
                         constraint.getClass().getSimpleName(),

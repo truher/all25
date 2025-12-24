@@ -26,19 +26,19 @@ public class DiamondConstraintTest implements Timeless {
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);
         // moving purely in x, get the x number
-        assertEquals(1, c.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(1, c.maxV(state), DELTA);
         state = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 2, 1.2),
                 0, 0);
         // moving purely in y, get the y number
-        assertEquals(1, c.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(1, c.maxV(state), DELTA);
         state = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 4, 1.2),
                 0, 0);
         // moving diagonally, get less.
-        assertEquals(0.707, c.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(0.707, c.maxV(state), DELTA);
     }
 
     @Test
@@ -49,19 +49,19 @@ public class DiamondConstraintTest implements Timeless {
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);
         // moving purely in x, get the x number
-        assertEquals(2, c.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(2, c.maxV(state), DELTA);
         state = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 2, 1.2),
                 0, 0);
         // moving purely in y, get the y number
-        assertEquals(3, c.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(3, c.maxV(state), DELTA);
         state = new Pose2dWithMotion(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), Math.PI / 4, 1.2),
                 0, 0);
         // moving diagonally, get less.
-        assertEquals(1.697, c.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(1.697, c.maxV(state), DELTA);
 
     }
 

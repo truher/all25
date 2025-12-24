@@ -31,9 +31,9 @@ class YawRateConstraintTest implements Timeless {
                 WaypointSE2.irrotational(new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1, // spatial, so rad/m
                 0);
-        assertEquals(-8.485, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
-        assertEquals(8.485, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
-        assertEquals(2.828, c.getMaxVelocity(p).getValue(), DELTA);
+        assertEquals(-8.485, c.maxDecel(p, 0), DELTA);
+        assertEquals(8.485, c.maxAccel(p, 0), DELTA);
+        assertEquals(2.828, c.maxV(p), DELTA);
     }
 
     @Test
@@ -46,7 +46,7 @@ class YawRateConstraintTest implements Timeless {
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1, // spatial, so rad/m
                 0);
-        assertEquals(5.656, c.getMaxVelocity(p).getValue(), DELTA);
+        assertEquals(5.656, c.maxV(p), DELTA);
     }
 
     @Test
@@ -62,10 +62,9 @@ class YawRateConstraintTest implements Timeless {
                 1,
                 0);
         // there is an accel limit.
-        assertEquals(-8.485,
-                c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
+        assertEquals(-8.485, c.maxDecel(p, 0), DELTA);
         assertEquals(8.485,
-                c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
+                c.maxAccel(p, 0), DELTA);
     }
 
     @Test
@@ -80,9 +79,8 @@ class YawRateConstraintTest implements Timeless {
                 1, // spatial, so rad/m
                 0);
         // this number is still quite high even with a low scale.
-        assertEquals(-16.971,
-                c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
+        assertEquals(-16.971, c.maxDecel(p, 0), DELTA);
         assertEquals(16.971,
-                c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
+                c.maxAccel(p, 0), DELTA);
     }
 }

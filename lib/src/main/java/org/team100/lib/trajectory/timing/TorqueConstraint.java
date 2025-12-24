@@ -46,14 +46,23 @@ public class TorqueConstraint implements TimingConstraint {
     }
 
     @Override
-    public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
+    public double maxV(Pose2dWithMotion state) {
         // Do not constrain velocity.
-        return new NonNegativeDouble(Double.POSITIVE_INFINITY);
+        return Double.POSITIVE_INFINITY;
     }
 
     @Override
-    public MinMaxAcceleration getMinMaxAcceleration(
+    public double maxAccel(
             Pose2dWithMotion state, double velocityM_S) {
+        return getA(state);
+    }
+
+    @Override
+    public double maxDecel(Pose2dWithMotion state, double velocity) {
+        return -getA(state);
+    }
+
+    private double getA(Pose2dWithMotion state) {
         WaypointSE2 pose = state.getPose();
         Rotation2d course = pose.course().toRotation();
         // acceleration unit vector
@@ -65,6 +74,6 @@ public class TorqueConstraint implements TimingConstraint {
             System.out.printf("Torque Constraint a: %6.3f p: %s r: %6.3f course: %6.3f\n",
                     a, pose, r.getNorm(), course.getRadians());
         }
-        return new MinMaxAcceleration(-a, a);
+        return a;
     }
 }

@@ -7,7 +7,6 @@ import org.team100.lib.tuning.Mutable;
 
 /** Trivial constraint for testing. */
 public class ConstantConstraint implements TimingConstraint {
-    private static final boolean DEBUG = false;
     private final Mutable m_maxVelocity;
     private final Mutable m_maxAccel;
 
@@ -22,15 +21,17 @@ public class ConstantConstraint implements TimingConstraint {
     }
 
     @Override
-    public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-        return new NonNegativeDouble(m_maxVelocity.getAsDouble());
+    public double maxV(Pose2dWithMotion state) {
+        return m_maxVelocity.getAsDouble();
     }
 
     @Override
-    public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocityM_S) {
-        if (DEBUG)
-            System.out.printf("CONSTANT CONSTRAINT %f\n", m_maxAccel.getAsDouble());
-        return new MinMaxAcceleration(-m_maxAccel.getAsDouble(), m_maxAccel.getAsDouble());
+    public double maxAccel(Pose2dWithMotion state, double velocityM_S) {
+        return m_maxAccel.getAsDouble();
     }
-
+    
+    @Override
+    public double maxDecel(Pose2dWithMotion state, double velocity) {
+        return -m_maxAccel.getAsDouble();
+    }
 }

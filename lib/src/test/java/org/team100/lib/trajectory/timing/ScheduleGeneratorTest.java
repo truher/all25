@@ -26,7 +26,6 @@ import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlotter;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
-import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -88,13 +87,14 @@ public class ScheduleGeneratorTest {
         TimedPose prev_state = null;
         for (TimedPose state : traj.getPoints()) {
             for (final TimingConstraint constraint : constraints) {
-                assertTrue(state.velocityM_S() - EPSILON <= constraint.getMaxVelocity(state.state()).getValue());
-                final MinMaxAcceleration accel_limits = constraint.getMinMaxAcceleration(state.state(),
-                        state.velocityM_S());
-                assertTrue(state.acceleration() - EPSILON <= accel_limits.getMaxAccel(),
-                        String.format("%f %f", state.acceleration(), accel_limits.getMaxAccel()));
-                assertTrue(state.acceleration() + EPSILON >= accel_limits.getMinAccel(),
-                        String.format("%f %f", state.acceleration(), accel_limits.getMinAccel()));
+                assertTrue(state.velocityM_S() - EPSILON <= constraint.maxV(state.state()));
+                assertTrue(state.acceleration() - EPSILON <= constraint.maxAccel(
+                        state.state(), state.velocityM_S()),
+                        String.format("%f %f", state.acceleration(), constraint.maxAccel(
+                                state.state(), state.velocityM_S())));
+                assertTrue(state.acceleration() + EPSILON >= constraint.maxDecel(state.state(), state.velocityM_S()),
+                        String.format("%f %f", state.acceleration(),
+                                constraint.maxDecel(state.state(), state.velocityM_S())));
             }
             if (prev_state != null) {
                 assertEquals(state.velocityM_S(),
@@ -209,18 +209,22 @@ public class ScheduleGeneratorTest {
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
-            public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
+            public double maxV(Pose2dWithMotion state) {
                 if (state.getPose().pose().getTranslation().getX() >= 24.0) {
-                    return new NonNegativeDouble(5.0);
+                    return 5.0;
                 } else {
-                    return new NonNegativeDouble(Double.POSITIVE_INFINITY);
+                    return Double.POSITIVE_INFINITY;
                 }
             }
 
             @Override
-            public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state,
-                    double velocity) {
-                return new TimingConstraint.MinMaxAcceleration(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+            public double maxAccel(Pose2dWithMotion state, double velocity) {
+                return Double.POSITIVE_INFINITY;
+            }
+
+            @Override
+            public double maxDecel(Pose2dWithMotion state, double velocity) {
+                return Double.NEGATIVE_INFINITY;
             }
         }
 
@@ -236,14 +240,19 @@ public class ScheduleGeneratorTest {
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
-            public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-                return new NonNegativeDouble(Double.POSITIVE_INFINITY);
+            public double maxV(Pose2dWithMotion state) {
+                return Double.POSITIVE_INFINITY;
             }
 
             @Override
-            public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state,
+            public double maxAccel(Pose2dWithMotion state,
                     double velocity) {
-                return new TimingConstraint.MinMaxAcceleration(-10.0, 10.0 / velocity);
+                return 10.0 / velocity;
+            }
+
+            @Override
+            public double maxDecel(Pose2dWithMotion state, double velocity) {
+                return -10.0;
             }
         }
 

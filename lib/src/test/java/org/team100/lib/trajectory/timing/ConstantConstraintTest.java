@@ -24,7 +24,7 @@ public class ConstantConstraintTest implements Timeless {
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);
-        assertEquals(2, c.getMaxVelocity(state).getValue(), DELTA);
+        assertEquals(2, c.maxV(state), DELTA);
     }
 
     @Test
@@ -34,8 +34,8 @@ public class ConstantConstraintTest implements Timeless {
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);
-        assertEquals(-3, c.getMinMaxAcceleration(state, 1).getMinAccel(), DELTA);
-        assertEquals(3, c.getMinMaxAcceleration(state, 1).getMaxAccel(), DELTA);
+        assertEquals(-3, c.maxDecel(state, 1), DELTA);
+        assertEquals(3, c.maxAccel(state, 1), DELTA);
 
     }
 
