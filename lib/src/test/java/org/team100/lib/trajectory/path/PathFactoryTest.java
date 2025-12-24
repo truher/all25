@@ -121,7 +121,12 @@ public class PathFactoryTest implements Timeless {
         TrajectoryPlotter.plot(path, 0.1);
     }
 
-    /** Hard corners once again do not work. */
+    /**
+     * Hard corners once again do not work.
+     * 
+     * It *does* kinda work if the rotation axis is doing anything, which seems
+     * dumb.
+     */
     @Test
     void testActualCorner() {
         List<WaypointSE2> waypoints = List.of(
@@ -134,12 +139,12 @@ public class PathFactoryTest implements Timeless {
                         new Pose2d(
                                 new Translation2d(1, 0),
                                 new Rotation2d()),
-                        new DirectionSE2(1, 0, 0), 1),
-                // new WaypointSE2(
-                //         new Pose2d(
-                //                 new Translation2d(1, 0),
-                //                 new Rotation2d()),
-                //         new DirectionSE2(0, 1, 0), 1),
+                        new DirectionSE2(0, 0, 1), 1),
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d(1)),
+                        new DirectionSE2(0, 0, 1), 1),
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 1),
@@ -230,7 +235,8 @@ public class PathFactoryTest implements Timeless {
         List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.001, 0.001, 0.001);
         for (Pose2dWithMotion p : motion) {
             if (DEBUG)
-                System.out.printf("%5.3f %5.3f\n", p.getPose().pose().getTranslation().getX(), p.getPose().pose().getTranslation().getY());
+                System.out.printf("%5.3f %5.3f\n", p.getPose().pose().getTranslation().getX(),
+                        p.getPose().pose().getTranslation().getY());
         }
     }
 
