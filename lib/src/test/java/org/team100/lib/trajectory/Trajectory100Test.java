@@ -83,7 +83,7 @@ class Trajectory100Test implements Timeless {
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
 
-        assertEquals(1.417, trajectory.duration(), DELTA);
+        assertEquals(1.418, trajectory.duration(), DELTA);
         TimedPose sample = trajectory.sample(0);
         assertEquals(0, sample.state().getPose().pose().getTranslation().getX(), DELTA);
         sample = trajectory.sample(1);
@@ -115,8 +115,10 @@ class Trajectory100Test implements Timeless {
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
+        if (DEBUG)
+            System.out.println(trajectory);
 
-        assertEquals(1.417, trajectory.duration(), DELTA);
+        assertEquals(1.418, trajectory.duration(), DELTA);
         assertEquals(0.000, trajectory.sample(0.0).state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0.010, trajectory.sample(0.1).state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0.040, trajectory.sample(0.2).state().getPose().pose().getTranslation().getX(), DELTA);
@@ -138,7 +140,7 @@ class Trajectory100Test implements Timeless {
     /**
      * Does the index help? No.
      * 
-     * Does interpolation help, relative to just sampling the spline directly?  No.
+     * Does interpolation help, relative to just sampling the spline directly? No.
      * 
      * There's no need to run this all the time
      */

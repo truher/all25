@@ -12,7 +12,7 @@ import org.team100.lib.trajectory.path.Path100;
  * schedule.
  */
 public class ScheduleGenerator {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final double EPSILON = 1e-6;
     /** this is the default, in order to make the constraints set the actual */
     private static final double HIGH_ACCEL = 1000;
@@ -49,14 +49,18 @@ public class ScheduleGenerator {
         double maxDistance = path.getMaxDistance();
         if (maxDistance == 0)
             throw new IllegalArgumentException();
-        int num_states = (int) Math.ceil(maxDistance / step + 1);
+        int num_states = (int) Math.ceil(maxDistance / step) + 1;
+        if (DEBUG)
+            System.out.printf("resample max distance %f step %f num states %d f %f\n",
+                    maxDistance, step, num_states, maxDistance / step);
         List<Pose2dWithMotion> samples = new ArrayList<>(num_states);
         for (int i = 0; i < num_states; ++i) {
             // the dtheta and curvature come from here and are never changed.
             // the values here are just interpolated from the original values.
-            Pose2dWithMotion state = path.sample(Math.min(i * step, maxDistance));
+            double d = Math.min(i * step, maxDistance);
+            Pose2dWithMotion state = path.sample(d);
             if (DEBUG)
-                System.out.printf("RESAMPLE: %d %s\n", i, state);
+                System.out.printf("RESAMPLE: i=%d d=%f state=%s\n", i, d, state);
             samples.add(state);
         }
         return samples;
@@ -72,9 +76,28 @@ public class ScheduleGenerator {
             double end_vel) throws TimingException {
         if (samples.size() < 3)
             throw new IllegalArgumentException("must have at least three samples");
+        if (DEBUG) {
+            System.out.println("samples");
+            for (Pose2dWithMotion p2 : samples) {
+                System.out.println(p2);
+            }
+        }
         List<ConstrainedState> constrainedStates = forwardPass(samples, start_vel);
+        if (DEBUG) {
+            System.out.println("after forward");
+            for (ConstrainedState cs : constrainedStates) {
+                System.out.println(cs);
+            }
+        }
         Pose2dWithMotion lastState = samples.get(samples.size() - 1);
         backwardsPass(lastState, end_vel, constrainedStates);
+        if (DEBUG) {
+            System.out.println("after backward");
+            for (ConstrainedState cs : constrainedStates) {
+                System.out.println(cs);
+            }
+        }
+
         return integrate(constrainedStates);
     }
 
@@ -90,14 +113,19 @@ public class ScheduleGenerator {
      * acceleration during the backward pass (by slowing down the predecessor).
      */
     private List<ConstrainedState> forwardPass(List<Pose2dWithMotion> samples, double start_vel) {
+        
+        // note below we look again at this sample.  I think this exists
+        // only to supply the start velocity.
         ConstrainedState predecessor = new ConstrainedState(samples.get(0), 0);
         predecessor.setVelocityM_S(start_vel);
         predecessor.setMinAccel(-HIGH_ACCEL);
         predecessor.setMaxAccel(HIGH_ACCEL);
 
+
         // work forward through the samples
         List<ConstrainedState> constrainedStates = new ArrayList<>(samples.size());
-        for (int i = 1; i < samples.size(); ++i) {
+        // constrainedStates.add(predecessor);
+        for (int i = 0; i < samples.size(); ++i) {
             Pose2dWithMotion sample = samples.get(i);
             double dsM = sample.distanceM(predecessor.getState());
             if (DEBUG)
@@ -300,7 +328,9 @@ public class ScheduleGenerator {
         if (Math.abs(v0) > EPSILON) {
             return ds / v0;
         }
-        throw new TimingException();
+        // not moving at all so dt is always zero
+        return 0;
+        // throw new TimingException(String.format("%f %f %f %f", v0, v1, ds, accel));
     }
 
     /**
@@ -369,5 +399,11 @@ public class ScheduleGenerator {
     }
 
     public static class TimingException extends Exception {
+        public TimingException() {
+        }
+
+        public TimingException(String s) {
+            super(s);
+        }
     }
 }

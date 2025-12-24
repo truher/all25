@@ -7,7 +7,7 @@ import org.team100.lib.tuning.Mutable;
 
 /** Trivial constraint for testing. */
 public class ConstantConstraint implements TimingConstraint {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private final Mutable m_maxVelocity;
     private final Mutable m_maxAccel;
 

@@ -7,7 +7,7 @@ import org.team100.lib.trajectory.timing.TimingConstraint.NonNegativeDouble;
 import org.team100.lib.util.Math100;
 
 class ConstrainedState {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     // using MAX_VALUE tickles some bugs
     private static final double MAX_V = 100;
     private static final double MAX_A = 100;

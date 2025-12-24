@@ -20,7 +20,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * omega limit calculation is correct.
  */
 public class SwerveDriveDynamicsConstraint implements TimingConstraint {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private final SwerveKinodynamics m_limits;
     private final Mutable vScale;
     private final Mutable aScale;

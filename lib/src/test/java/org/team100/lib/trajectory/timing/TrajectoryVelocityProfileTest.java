@@ -28,7 +28,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * https://docs.google.com/spreadsheets/d/16UUCCz-qcPz_YZMnsJnVkVO1KGp5zHCOVo7EoJct2nA/edit?gid=0#gid=0
  */
 public class TrajectoryVelocityProfileTest implements Timeless {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     // A five-meter straight line.

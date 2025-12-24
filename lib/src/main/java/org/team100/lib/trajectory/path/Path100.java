@@ -31,6 +31,7 @@ public class Path100 {
             Pose2dWithMotion p1 = getPoint(i);
             // use the distance metric that includes rotation
             double dist = GeometryUtil.doubleGeodesicDistance(p0, p1);
+            // double dist = p0.distanceM(p1);
             m_distances[i] = m_distances[i - 1] + dist;
         }
     }

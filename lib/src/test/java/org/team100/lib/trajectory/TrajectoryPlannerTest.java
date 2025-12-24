@@ -51,6 +51,39 @@ class TrajectoryPlannerTest implements Timeless {
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         Trajectory100 t = planner.restToRest(waypoints);
         assertEquals(12, t.length());
+        TimedPose tp = t.getPoint(0);
+        // start at zero velocity
+        assertEquals(0, tp.velocityM_S(), DELTA);
+        TimedPose p = t.getPoint(6);
+        assertEquals(0.6, p.state().getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
+    }
+
+    @Test
+    void testLinearRealistic() {
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
+                        new DirectionSE2(1, 0, 0), 1.2),
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(1, 0),
+                                new Rotation2d()),
+                        new DirectionSE2(1, 0, 0), 1.2));
+        // these are the same as StraightLineTrajectoryTest.
+        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
+        List<TimingConstraint> constraints = List.of(
+                new ConstantConstraint(logger, 1, 1, limits),
+                new SwerveDriveDynamicsConstraint(logger, limits, 1, 1),
+                new YawRateConstraint(logger, limits, 0.2),
+                new CapsizeAccelerationConstraint(logger, limits, 0.2));
+        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+        Trajectory100 t = planner.restToRest(waypoints);
+        assertEquals(12, t.length());
+        TimedPose tp = t.getPoint(0);
+        assertEquals(0, tp.velocityM_S(), DELTA);
         TimedPose p = t.getPoint(6);
         assertEquals(0.6, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);

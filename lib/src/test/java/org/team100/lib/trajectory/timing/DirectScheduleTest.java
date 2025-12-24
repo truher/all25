@@ -99,23 +99,6 @@ public class DirectScheduleTest {
     }
 
     @Test
-    void testSimple2() {
-        SplineR1 spline = SplineR1.get(0, 1, 0, 0, 0, 0);
-        InterpolatingDoubleTreeMap m = new InterpolatingDoubleTreeMap();
-        for (double s = 0; s <= 1; s += 0.05) {
-            double q = spline.getPosition(s);
-            m.put(q, s);
-        }
-        System.out.println("q, s");
-        for (double q = 0; q <= 1.001; q += 0.01) {
-            double s = m.get(q);
-            double qprime = spline.getVelocity(s);
-            double qprimeprime = spline.getAcceleration(s);
-            System.out.printf("%5.3f, %5.3f, %5.3f\n", q, s);
-        }
-    }
-
-    @Test
     void testSimple3() {
         SplineR1 spline = SplineR1.get(0, 1, 0, 0, 0, 0);
 
