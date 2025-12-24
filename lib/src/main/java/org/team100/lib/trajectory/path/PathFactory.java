@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
@@ -110,7 +111,7 @@ public class PathFactory {
         if (Math.abs(error.getTranslation().getX()) > maxDx
                 || Math.abs(error.getTranslation().getY()) > maxDy
                 || Math.abs(error.getRotation().getRadians()) > maxDTheta
-                || GeometryUtil.normL2(twist_half) > maxNorm) {
+                || Metrics.l2Norm(twist_half) > maxNorm) {
             // add a point in between
             // note the extra condition to avoid points too far apart.
             getSegmentArc(spline, rv, t0, thalf, maxDx, maxDy, maxDTheta);

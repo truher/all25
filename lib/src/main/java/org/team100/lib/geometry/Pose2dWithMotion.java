@@ -68,7 +68,7 @@ public class Pose2dWithMotion {
         // dheading/dt thing to work.
         //
         //
-        return GeometryUtil.doubleGeodesicDistance(this, other);
+        return Metrics.doubleGeodesicDistance(this, other);
         //
         //
         // return

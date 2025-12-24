@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
@@ -350,7 +351,7 @@ class HolonomicSplineTest implements Timeless {
             double dheading = heading1.minus(heading0).getRadians();
             DirectionSE2 course0 = p0.getPose().course();
             DirectionSE2 course1 = p1.getPose().course();
-            double curve = GeometryUtil.normL2(course1.minus(course0));
+            double curve = Metrics.l2Norm(course1.minus(course0));
             // this value is wrong because we use the l2 distance,
             // so it's kind of counting the rotation twice.
             double dheadingDx = dheading / l2distance;

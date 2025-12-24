@@ -1,13 +1,10 @@
-package org.team100.lib.util;
+package org.team100.lib.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -249,66 +246,13 @@ class GeometryUtilTest {
 
     @Test
     void testDistance2d() {
-        assertEquals(1, GeometryUtil.distanceM(
-                new Translation2d(1, 0), new Translation2d(0, 0)), DELTA);
+        assertEquals(1, new Translation2d(1, 0).getDistance(new Translation2d(0, 0)), DELTA);
     }
 
     @Test
     void testDistance3d() {
-        assertEquals(1, GeometryUtil.distanceM(
-                new Translation3d(1, 0, 0), new Translation3d(0, 0, 0)), DELTA);
-    }
-
-    @Test
-    void testDistance() {
-        // same pose => 0
-        assertEquals(0,
-                GeometryUtil.distanceM(
-                        new Pose2d(1, 0, Rotation2d.kZero),
-                        new Pose2d(1, 0, Rotation2d.kZero)),
-                DELTA);
-        // 1d distance
         assertEquals(1,
-                GeometryUtil.distanceM(
-                        new Pose2d(0, 0, Rotation2d.kZero),
-                        new Pose2d(1, 0, Rotation2d.kZero)),
-                DELTA);
-        // 2d distance
-        assertEquals(1.414,
-                GeometryUtil.distanceM(
-                        new Pose2d(0, 1, Rotation2d.kZero),
-                        new Pose2d(1, 0, Rotation2d.kZero)),
-                DELTA);
-        // rotation means a little arc, so the path length is a little longer.
-        assertEquals(1.111,
-                GeometryUtil.distanceM(
-                        new Pose2d(0, 0, Rotation2d.kZero),
-                        new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
-                DELTA);
-        // the arc in this case is the entire quarter circle
-        assertEquals(1.571,
-                GeometryUtil.distanceM(
-                        new Pose2d(0, 1, Rotation2d.kZero),
-                        new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
-                DELTA);
-        // order doesn't matter
-        assertEquals(1.571,
-                GeometryUtil.distanceM(
-                        new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-                        new Pose2d(0, 1, Rotation2d.kZero)),
-                DELTA);
-        // pure rotation yields zero distance, which isn't really what we want.
-        assertEquals(0,
-                GeometryUtil.distanceM(
-                        new Pose2d(0, 0, Rotation2d.kZero),
-                        new Pose2d(0, 0, Rotation2d.kCCW_90deg)),
-                DELTA);
-        // use double geodesic distance to fix that.
-        assertEquals(1.571,
-                GeometryUtil.doubleGeodesicDistance(
-                        new Pose2d(0, 0, Rotation2d.kZero),
-                        new Pose2d(0, 0, Rotation2d.kCCW_90deg)),
-                DELTA);
+                new Translation3d(1, 0, 0).getDistance(new Translation3d(0, 0, 0)), DELTA);
     }
 
     @Test

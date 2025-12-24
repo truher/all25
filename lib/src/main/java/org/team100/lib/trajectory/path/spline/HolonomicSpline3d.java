@@ -47,8 +47,8 @@ public class HolonomicSpline3d {
     }
 
     public HolonomicSpline3d(Pose3dWithDirection p0, Pose3dWithDirection p1, double mN0, double mN1) {
-        double scale0 = mN0 * GeometryUtil.distanceM(p0.translation(), p1.translation());
-        double scale1 = mN1 * GeometryUtil.distanceM(p0.translation(), p1.translation());
+        double scale0 = mN0 * p0.translation().getDistance(p1.translation());
+        double scale1 = mN1 * p0.translation().getDistance(p1.translation());
 
         DirectionSE3 course0 = p0.course();
         DirectionSE3 course1 = p1.course();

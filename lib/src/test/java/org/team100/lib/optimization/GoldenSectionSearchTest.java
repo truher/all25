@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.function.DoubleUnaryOperator;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.Metrics;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -78,7 +78,7 @@ public class GoldenSectionSearchTest {
         DoubleUnaryOperator f = (x) -> {
             Pose3d sample = new Pose3d(new Translation3d(1, 1, 1), new Rotation3d(axis, x));
             Twist3d t = desired.log(sample);
-            return GeometryUtil.norm(t);
+            return Metrics.l2Norm(t);
         };
         GoldenSectionSearch s = new GoldenSectionSearch(f, 1e-12, 100);
         assertEquals(1.0, s.solve(-Math.PI, Math.PI), 1e-12);
@@ -92,7 +92,7 @@ public class GoldenSectionSearchTest {
         DoubleUnaryOperator f = (x) -> {
             Pose3d sample = new Pose3d(new Translation3d(1, 1, 1), new Rotation3d(axis, x));
             Twist3d t = desired.log(sample);
-            return GeometryUtil.norm(t);
+            return Metrics.l2Norm(t);
         };
         GoldenSectionSearch s = new GoldenSectionSearch(f, 1e-3, 100);
 

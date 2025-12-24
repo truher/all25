@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -116,7 +116,7 @@ public class TrajectoryTest {
             DirectionSE2 course0 = p0.state().getPose().course();
             DirectionSE2 course1 = p1.state().getPose().course();
             p1.state().getPose().pose().log(p0.state().getPose().pose());
-            double dcourse1 = GeometryUtil.norm(course1.minus(course0));
+            double dcourse1 = Metrics.translationalNorm(course1.minus(course0));
             // double dcourse1 = GeometryUtil.normL2(course1.minus(course0));
             double dcourse = course1.toRotation().minus(course0.toRotation()).getRadians();
             double radius = dcourse / distance;

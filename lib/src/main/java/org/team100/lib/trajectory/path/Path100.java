@@ -3,7 +3,7 @@ package org.team100.lib.trajectory.path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
 
@@ -30,7 +30,7 @@ public class Path100 {
             Pose2dWithMotion p0 = getPoint(i - 1);
             Pose2dWithMotion p1 = getPoint(i);
             // use the distance metric that includes rotation
-            double dist = GeometryUtil.doubleGeodesicDistance(p0, p1);
+            double dist = Metrics.doubleGeodesicDistance(p0, p1);
             // double dist = p0.distanceM(p1);
             m_distances[i] = m_distances[i - 1] + dist;
         }

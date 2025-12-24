@@ -1,7 +1,7 @@
 package org.team100.lib.trajectory.path.spline;
 
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.WaypointSE2;
 
@@ -62,7 +62,7 @@ public class HolonomicSpline {
         // Distance metric includes both translation and rotation. This is not
         // the geodesic distance, which is zero for spin-in-place. It's just the
         // L2 norm for all three dimensions.
-        double distance = GeometryUtil.doubleGeodesicDistance(p0.pose(), p1.pose());
+        double distance = Metrics.doubleGeodesicDistance(p0.pose(), p1.pose());
         if (DEBUG)
             System.out.printf("distance %f\n", distance);
         double scale0 = p0.scale() * distance;

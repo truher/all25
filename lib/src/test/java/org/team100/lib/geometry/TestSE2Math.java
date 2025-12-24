@@ -296,8 +296,8 @@ class TestSE2Math {
         assertEquals(0.0, between.dy, EPSILON);
         assertEquals(1, between.dtheta, EPSILON);
         // in this case, the distances are the same.
-        assertEquals(1, GeometryUtil.normL2(between), EPSILON);
-        assertEquals(1, GeometryUtil.doubleGeodesicDistance(start, end), EPSILON);
+        assertEquals(1, Metrics.l2Norm(between), EPSILON);
+        assertEquals(1, Metrics.doubleGeodesicDistance(start, end), EPSILON);
     }
 
     @Test
@@ -310,10 +310,10 @@ class TestSE2Math {
         assertEquals(-0.5, between.dy, EPSILON);
         assertEquals(1, between.dtheta, EPSILON);
         // in this case, the distances are NOT the same.
-        assertEquals(1.445, GeometryUtil.normL2(between), 0.001);
-        assertEquals(1.414, GeometryUtil.doubleGeodesicDistance(start, end), 0.001);
+        assertEquals(1.445, Metrics.l2Norm(between), 0.001);
+        assertEquals(1.414, Metrics.doubleGeodesicDistance(start, end), 0.001);
         // this just seems wrong
-        assertEquals(1.043, GeometryUtil.distanceM(start, end), 0.001);
+        assertEquals(1.043, Metrics.distanceM(start, end), 0.001);
         // this is just the cartesian part
         assertEquals(1, start.getTranslation().getDistance(end.getTranslation()), 0.001);
     }
