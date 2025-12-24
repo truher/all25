@@ -147,8 +147,10 @@ public class HolonomicSpline {
     /**
      * Change in heading per distance traveled, i.e. spatial change in heading.
      * dtheta/ds (radians/meter).
+     * 
+     * TODO: elsewhere this is combined with R2 pathwise velocity, so this is wrong.
      */
-    private double getDHeadingDs(double s) {
+    public double getDHeadingDs(double s) {
         return getDHeading(s) / getVelocity(s);
     }
 
@@ -221,14 +223,16 @@ public class HolonomicSpline {
      * Note the denominator is distance in this case, not the parameter, p.
      * but the argument to this function *is* the parameter, s. :-)
      */
-    double getCurvature(double s) {
+    public double getCurvature(double s) {
         double dx = dx(s);
         double dy = dy(s);
         double ddx = ddx(s);
         double ddy = ddy(s);
         double d = dx * dx + dy * dy;
-        if (d <= 0)
+        if (d <= 0) {
+            // this isn't really zero
             return 0;
+        }
         return (dx * ddy - ddx * dy) / Math.pow(d, 1.5);
     }
 }

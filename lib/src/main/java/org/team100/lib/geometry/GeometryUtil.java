@@ -30,6 +30,54 @@ public class GeometryUtil {
     private GeometryUtil() {
     }
 
+    /**
+     * Change in course per change in position.
+     * 
+     * The inverse radius of the circle fit to the three points.
+     * 
+     * This is to replace the spline-derived curvature.
+     * 
+     * https://en.wikipedia.org/wiki/Menger_curvature
+     * 
+     * https://hratliff.com/files/curvature_calculations_and_circle_fitting.pdf
+     */
+    public static double mengerCurvature(Translation2d t0, Translation2d t1, Translation2d t2) {
+        double x1 = t0.getX();
+        double x2 = t1.getX();
+        double x3 = t2.getX();
+        double y1 = t0.getY();
+        double y2 = t1.getY();
+        double y3 = t2.getY();
+        double dx12 = x2 - x1;
+        double dx23 = x3 - x2;
+        double dx13 = x1 - x3;
+        double dy12 = y2 - y1;
+        double dy23 = y3 - y2;
+        double dy13 = y1 - y3;
+        double num = 2 * Math.abs(dx12 * dy23 - dy12 * dx23);
+        double den = Math.sqrt((dx12 * dx12 + dy12 * dy12)
+                * (dx23 * dx23 + dy23 * dy23)
+                * (dx13 * dx13 + dy13 * dy13));
+        if (den < 1e-6) {
+            // this isn't really zero
+            return 0;
+        }
+        return num / den;
+    }
+
+    /**
+     * Change in heading per change in position, to replace the spline-derived
+     * heading rate.
+     */
+    public static double headingRatio(Pose2d p0, Pose2d p1) {
+        Rotation2d h0 = p0.getRotation();
+        Rotation2d h1 = p1.getRotation();
+        double d = doubleGeodesicDistance(p0, p1);
+        if (Math.abs(d) < 1e-6)
+            return 0;
+        return h1.minus(h0).getRadians() / d;
+    }
+
     /** Return a projected onto the direction of b, retaining the omega of a */
     public static ChassisSpeeds project(ChassisSpeeds a, ChassisSpeeds b) {
         double norm = norm(b);

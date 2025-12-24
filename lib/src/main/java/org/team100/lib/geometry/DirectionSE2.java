@@ -25,6 +25,8 @@ public class DirectionSE2 {
 
     public DirectionSE2(double px, double py, double ptheta) {
         double h = Math.sqrt(px * px + py * py + ptheta * ptheta);
+        if (h < 1e-6)
+            throw new IllegalArgumentException("zero direction is not allowed");
         x = px / h;
         y = py / h;
         theta = ptheta / h;
