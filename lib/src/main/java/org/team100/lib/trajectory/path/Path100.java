@@ -14,7 +14,10 @@ import org.team100.lib.trajectory.timing.ScheduleGenerator;
  */
 public class Path100 {
     private final List<Pose2dWithMotion> m_points;
-    /** double geodesic distance which is meters and radians */
+    /**
+     * Double geodesic distance which is meters and radians.
+     * Do not use this distance to compute planar velocity.
+     */
     private final double[] m_distances;
 
     public Path100(final List<Pose2dWithMotion> states) {
@@ -29,9 +32,9 @@ public class Path100 {
             m_points.add(states.get(i));
             Pose2dWithMotion p0 = getPoint(i - 1);
             Pose2dWithMotion p1 = getPoint(i);
-            // use the distance metric that includes rotation
-            double dist = Metrics.doubleGeodesicDistance(p0, p1);
-            // double dist = p0.distanceM(p1);
+            // using the distance metric that includes rotation makes it possible
+            // to have rotational paths
+            double dist = Metrics.doubleGeodesicDistance(p0.getPose().pose(), p1.getPose().pose());
             m_distances[i] = m_distances[i - 1] + dist;
         }
     }

@@ -245,17 +245,6 @@ class GeometryUtilTest {
     }
 
     @Test
-    void testDistance2d() {
-        assertEquals(1, new Translation2d(1, 0).getDistance(new Translation2d(0, 0)), DELTA);
-    }
-
-    @Test
-    void testDistance3d() {
-        assertEquals(1,
-                new Translation3d(1, 0, 0).getDistance(new Translation3d(0, 0, 0)), DELTA);
-    }
-
-    @Test
     void testCollinear() {
         assertTrue(GeometryUtil.isColinear(
                 new Pose2d(0, 0, new Rotation2d()),

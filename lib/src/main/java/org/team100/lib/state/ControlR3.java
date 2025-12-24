@@ -141,7 +141,7 @@ public class ControlR3 {
         double thetaa = timedPose.state().getHeadingRateRad_M() * accelM_s_s;
 
         // centripetal accel = v^2/r = v^2 * curvature
-        double curvRad_M = timedPose.state().getCurvature();
+        double curvRad_M = timedPose.state().getCurvatureRad_M();
         double centripetalAccelM_s_s = velocityM_s * velocityM_s * curvRad_M;
         double xCa = -1.0 * course.getSin() * centripetalAccelM_s_s;
         double yCa = course.getCos() * centripetalAccelM_s_s;

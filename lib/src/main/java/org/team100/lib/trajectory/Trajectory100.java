@@ -46,12 +46,12 @@ public class Trajectory100 {
             final TimedPose ceil = getPoint(i);
             if (ceil.getTimeS() >= timeS) {
                 final TimedPose floor = getPoint(i - 1);
-                double betweenPoints = ceil.getTimeS() - floor.getTimeS();
-                if (Math.abs(betweenPoints) <= 1e-12) {
+                double span = ceil.getTimeS() - floor.getTimeS();
+                if (Math.abs(span) <= 1e-12) {
                     return ceil;
                 }
-                double t = (timeS - floor.getTimeS()) / betweenPoints;
-                return floor.interpolate2(ceil, t);
+                double delta_t = timeS - floor.getTimeS();
+                return floor.interpolate(ceil, delta_t);
             }
         }
         throw new IllegalStateException("impossible trajectory: " + toString());

@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * This is just a container for the difference between two poses.
  * 
  * This treats the dimensions as independent, i.e. in the R3 tangent space,
- * not the SE(2) manifold.
+ * not the SE(2) manifold.  Actually it's more like R2xS1, independently.
  * 
  * The SE(2) difference represents a *geodesic* in SE(2), and for differences
  * that include rotation, this will appear as a curved path -- usually not what

@@ -60,15 +60,12 @@ class ConstrainedState {
         return m_state;
     }
 
-    /** this should be L2 distance */
+    /** Pathwise distance */
     public double getDistanceM() {
         return m_distanceM;
     }
 
-    /**
-     * if we're using L2 norm then this isn't meters and isn't always even cartesian
-     * at all
-     */
+    /** Pathwise velocity */
     public double getVelocityM_S() {
         return m_velocityM_S;
     }

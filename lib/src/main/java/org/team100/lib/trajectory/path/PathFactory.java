@@ -111,7 +111,7 @@ public class PathFactory {
         if (Math.abs(error.getTranslation().getX()) > maxDx
                 || Math.abs(error.getTranslation().getY()) > maxDy
                 || Math.abs(error.getRotation().getRadians()) > maxDTheta
-                || Metrics.l2Norm(twist_half) > maxNorm) {
+                || Metrics.translationalNorm(twist_half) > maxNorm) {
             // add a point in between
             // note the extra condition to avoid points too far apart.
             getSegmentArc(spline, rv, t0, thalf, maxDx, maxDy, maxDTheta);

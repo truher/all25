@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.WaypointSE2;
@@ -344,28 +343,24 @@ class HolonomicSplineTest implements Timeless {
                     "s, p0_heading_rate, p0_curvature, distance, post_hoc_heading_rate, post_hoc_curvature, post_hoc_heading_rate2, post_hoc_curvature2");
         for (double s = 0.01; s <= 1.0; s += 0.01) {
             Pose2dWithMotion p1 = spline.getPose2dWithMotion(s);
-            double l2distance = p1.distanceM(p0);
             double cartesianDistance = p1.distanceCartesian(p0);
             Rotation2d heading0 = p0.getPose().pose().getRotation();
             Rotation2d heading1 = p1.getPose().pose().getRotation();
             double dheading = heading1.minus(heading0).getRadians();
             DirectionSE2 course0 = p0.getPose().course();
             DirectionSE2 course1 = p1.getPose().course();
-            double curve = Metrics.l2Norm(course1.minus(course0));
-            // this value is wrong because we use the l2 distance,
-            // so it's kind of counting the rotation twice.
-            double dheadingDx = dheading / l2distance;
-            double curveDx = curve / l2distance;
+            double curve = Metrics.translationalNorm(course1.minus(course0));
             // this value matches the intrinsic one since it just uses
             // cartesian distance in the denominator.
             double dheadingDx2 = dheading / cartesianDistance;
             double curveDx2 = curve / cartesianDistance;
 
+         
             if (DEBUG)
                 System.out.printf(
-                        "%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f \n",
-                        s, p0.getHeadingRateRad_M(), p0.getCurvature(),
-                        l2distance, dheadingDx, curveDx, dheadingDx2, curveDx2);
+                        "%5.3f, %5.3f, %5.3f, %5.3f, %5.3f \n",
+                        s, p0.getHeadingRateRad_M(), p0.getCurvatureRad_M(),
+                        dheadingDx2, curveDx2);
             p0 = p1;
         }
 

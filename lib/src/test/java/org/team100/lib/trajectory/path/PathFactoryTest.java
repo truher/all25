@@ -180,7 +180,7 @@ public class PathFactoryTest implements Timeless {
                         new DirectionSE2(1, 0, 0), 1));
         Path100 foo = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
         TrajectoryPlotter.plot(foo, 0.1);
-        assertEquals(28, foo.length(), 0.001);
+        assertEquals(18, foo.length(), 0.001);
     }
 
     @Test

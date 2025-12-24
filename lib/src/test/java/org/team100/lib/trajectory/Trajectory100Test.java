@@ -118,6 +118,12 @@ class Trajectory100Test implements Timeless {
         if (DEBUG)
             System.out.println(trajectory);
 
+        if (DEBUG) {
+            for (double t = 0; t < 1.5; t += 0.1) {
+                System.out.printf("%5.3f %s\n", t, trajectory.sample(t));
+            }
+        }
+
         assertEquals(1.418, trajectory.duration(), DELTA);
         assertEquals(0.000, trajectory.sample(0.0).state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0.010, trajectory.sample(0.1).state().getPose().pose().getTranslation().getX(), DELTA);

@@ -72,9 +72,7 @@ public class TrajectoryTest {
         TrajectoryPlanner p = new TrajectoryPlanner(c);
         Trajectory100 trajectory = p.generateTrajectory(waypoints, 0, 0);
 
-        //
         TrajectoryPlotter.plot(trajectory, 0.25);
-
     }
 
     @Test
@@ -100,8 +98,6 @@ public class TrajectoryTest {
                     "t, intrinsic_heading_dt, heading_dt, intrinsic_ca, extrinsic_ca, extrinsic v, intrinsic v, dcourse, dcourse1");
         for (double t = 0.04; t < duration; t += 0.04) {
             TimedPose p1 = trajectory.sample(t);
-            double distance = p1.distance(p0);
-            double distanceCartesian = p1.distanceCartesian(p0);
             Rotation2d heading0 = p0.state().getPose().pose().getRotation();
             Rotation2d heading1 = p1.state().getPose().pose().getRotation();
             double dheading = heading1.minus(heading0).getRadians();
@@ -117,23 +113,17 @@ public class TrajectoryTest {
             DirectionSE2 course1 = p1.state().getPose().course();
             p1.state().getPose().pose().log(p0.state().getPose().pose());
             double dcourse1 = Metrics.translationalNorm(course1.minus(course0));
-            // double dcourse1 = GeometryUtil.normL2(course1.minus(course0));
             double dcourse = course1.toRotation().minus(course0.toRotation()).getRadians();
-            double radius = dcourse / distance;
-            // derived v is pretty close
-            double v = distance / 0.04;
-            double extrinsicCa = v * v / radius;
-            double intrinsicCa = p0.velocityM_S() * p0.velocityM_S() * p0.state().getCurvature();
+            double intrinsicCa = p0.velocityM_S() * p0.velocityM_S() * p0.state().getCurvatureRad_M();
+           
             if (DEBUG)
-                System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
+                System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
                         t, intrinsicDheadingDt, dheadingDt,
-                        intrinsicCa, extrinsicCa,
-                        v, p0.velocityM_S(),
+                        intrinsicCa, p0.velocityM_S(),
                         dcourse, dcourse1);
             p0 = p1;
         }
 
-        //
         TrajectoryPlotter.plot(trajectory, 0.25);
     }
 

@@ -124,10 +124,9 @@ public class ScheduleGenerator {
 
         // work forward through the samples
         List<ConstrainedState> constrainedStates = new ArrayList<>(samples.size());
-        // constrainedStates.add(predecessor);
         for (int i = 0; i < samples.size(); ++i) {
             Pose2dWithMotion sample = samples.get(i);
-            double dsM = sample.distanceM(predecessor.getState());
+            double dsM = sample.distanceCartesian(predecessor.getState());
             if (DEBUG)
                 System.out.printf("i%d dsM %f\n", i, dsM);
             ConstrainedState constrainedState = new ConstrainedState(
@@ -146,10 +145,12 @@ public class ScheduleGenerator {
     }
 
     private void forwardWork(ConstrainedState s0, ConstrainedState s1) {
-        // constant-twist path length between states
-        // actually this is now the double-geodesic metric (L2 for all 3 dimensions)
-        // which means it is not just meters.
-        double dsM = s1.getState().distanceM(s0.getState());
+        // R2 translation distance between states
+        // not constant-twist arc
+        // not double-geodesic with rotation
+        // Just translation, so that the pathwise velocity matches
+        // the curvature in the state.
+        double dsM = s1.getState().distanceCartesian(s0.getState());
 
         // We may need to iterate to find the maximum end velocity and common
         // acceleration, since acceleration limits may be a function of velocity.

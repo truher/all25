@@ -3,8 +3,6 @@ package org.team100.lib.trajectory.timing;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.util.Math100;
 
-import edu.wpi.first.math.MathUtil;
-
 /**
  * Represents a state within a 2d holonomic trajectory, i.e. with heading
  * independent from course.
@@ -16,15 +14,9 @@ public class TimedPose {
     private final Pose2dWithMotion m_state;
     /** Time we achieve this state. */
     private final double m_timeS;
-
-    /**
-     * ds/dt
-     * 
-     * if we're using L2 norm then this isn't meters and isn't always even cartesian
-     * at all
-     */
+    /** Instantaneous pathwise velocity, m/s. */
     private final double m_velocityM_S;
-    /** d^2s/dt^2 */
+    /** Instantaneous pathwise (not centripetal) acceleration, m/s^2. */
     private double m_accelM_S_S;
 
     public TimedPose(
@@ -42,10 +34,12 @@ public class TimedPose {
         return m_state;
     }
 
+    /** Time we achieve this state. */
     public double getTimeS() {
         return m_timeS;
     }
 
+    /** Instantaneous pathwise velocity, m/s. */
     public double velocityM_S() {
         return m_velocityM_S;
     }
@@ -55,7 +49,7 @@ public class TimedPose {
         m_accelM_S_S = acceleration;
     }
 
-    /** this means acceleration along the path, not centripetal acceleration. */
+    /** Instantaneous pathwise (not centripetal) acceleration, m/s^2. */
     public double acceleration() {
         return m_accelM_S_S;
     }
@@ -69,38 +63,36 @@ public class TimedPose {
                 m_accelM_S_S);
     }
 
-    public TimedPose interpolate2(TimedPose other, double x) {
-        final double new_t = MathUtil.interpolate(m_timeS, other.m_timeS, x);
-        final double delta_t = new_t - getTimeS();
-        if (delta_t < 0.0) {
-            return other.interpolate2(this, 1.0 - x);
-        }
-        boolean reversing = m_velocityM_S < 0.0 || (Math.abs(m_velocityM_S - 0.0) <= 1e-12 && acceleration() < 0.0);
-        final double new_v = m_velocityM_S + m_accelM_S_S * delta_t;
-        final double new_s = (reversing ? -1.0 : 1.0)
-                * (m_velocityM_S * delta_t + .5 * m_accelM_S_S * delta_t * delta_t);
+    /**
+     * Linear interpolation by time.
+     * 
+     * Velocity of this state is the initial velocity.
+     * Acceleration of this state is constant through the whole arc.
+     */
+    public TimedPose interpolate(TimedPose other, double delta_t) {
+        double tLerp = m_timeS + delta_t;
+        double vLerp = m_velocityM_S + m_accelM_S_S * delta_t;
+        double pathwiseDistance = m_velocityM_S * delta_t + 0.5 * m_accelM_S_S * delta_t * delta_t;
 
-        double interpolant = new_s / m_state.distanceM(other.m_state);
+        double distanceBetween = m_state.distanceCartesian(other.m_state);
+        double interpolant = pathwiseDistance / distanceBetween;
         if (Double.isNaN(interpolant)) {
             interpolant = 1.0;
         }
 
+        if (DEBUG)
+            System.out.printf("tlerp %f\n", tLerp);
         return new TimedPose(
                 m_state.interpolate(other.m_state, interpolant),
-                new_t,
-                new_v,
+                tLerp,
+                vLerp,
                 m_accelM_S_S);
     }
 
-    /** L2 norm */
-    public double distance(TimedPose other) {
-        return m_state.distanceM(other.m_state);
-    }
-
+    /** Translation only, ignores rotation */
     public double distanceCartesian(TimedPose other) {
         return m_state.distanceCartesian(other.m_state);
     }
-
 
     @Override
     public boolean equals(final Object other) {

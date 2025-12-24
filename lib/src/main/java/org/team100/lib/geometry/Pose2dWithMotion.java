@@ -4,34 +4,27 @@ import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
 
-/**
- * WaypointSE2 and curvature in SE(2). Curvature is a unit vector describing how
- * direction changes with the spline parameter.
- * 
- * * the spatial rate of change in heading
- * * the spatial rate of change in course
- * * the spatial rate of change in course curvature
- */
+/** WaypointSE2 with heading rate and curvature. */
 public class Pose2dWithMotion {
     private static final boolean DEBUG = false;
     /** Pose and course. */
     private final WaypointSE2 m_waypoint;
     /** Change in heading per meter of motion, rad/m. */
-    private final double m_headingRate;
+    private final double m_headingRateRad_M;
     /** Change in course per change in distance, rad/m. */
     private final double m_curvatureRad_M;
 
     /**
-     * @param waypoint           location and heading and direction of travel
-     * @param headingRate    change in heading, per meter traveled
-     * @param curvatureRad_M change in course per meter traveled.
+     * @param waypoint         location and heading and direction of travel
+     * @param headingRateRad_M change in heading, per meter traveled
+     * @param curvatureRad_M   change in course per meter traveled.
      */
     public Pose2dWithMotion(
             WaypointSE2 waypoint,
-            double headingRate,
+            double headingRateRad_M,
             double curvatureRad_M) {
         m_waypoint = waypoint;
-        m_headingRate = headingRate;
+        m_headingRateRad_M = headingRateRad_M;
         m_curvatureRad_M = curvatureRad_M;
     }
 
@@ -45,38 +38,32 @@ public class Pose2dWithMotion {
      * If you want radians per second, multiply by velocity (meters per second).
      */
     public double getHeadingRateRad_M() {
-        return m_headingRate;
+        return m_headingRateRad_M;
     }
 
     /** Radians per meter, which is the reciprocal of the radius. */
-    public double getCurvature() {
+    public double getCurvatureRad_M() {
         return m_curvatureRad_M;
     }
 
-    /** This no longer uses a constant-twist arc, it's a straight line. */
+    /**
+     * Linear interpolation of each component separately.
+     * 
+     * Not a constant-twist arc.
+     */
     public Pose2dWithMotion interpolate(Pose2dWithMotion other, double x) {
         return new Pose2dWithMotion(
                 GeometryUtil.interpolate(m_waypoint, other.m_waypoint, x),
-                MathUtil.interpolate(m_headingRate, other.m_headingRate, x),
+                MathUtil.interpolate(m_headingRateRad_M, other.m_headingRateRad_M, x),
                 Math100.interpolate(m_curvatureRad_M, other.m_curvatureRad_M, x));
     }
 
-    /** This now uses double-geodesic distance, i.e. L2 norm including rotation. */
-    public double distanceM(Pose2dWithMotion other) {
-        //
-        // this should match HolonomicSpline.getVelocity() for the
-        // dheading/dt thing to work.
-        //
-        //
-        return Metrics.doubleGeodesicDistance(this, other);
-        //
-        //
-        // return
-        // m_pose.pose().getTranslation().getDistance(other.m_pose.pose().getTranslation());
-    }
-
+    /**
+     * R2 (xy) planar distance only (IGNORES ROTATION) so that planar
+     * velocity and curvature works correctly.
+     */
     public double distanceCartesian(Pose2dWithMotion other) {
-        return m_waypoint.pose().getTranslation().getDistance(other.m_waypoint.pose().getTranslation());
+        return Metrics.translationalDistance(m_waypoint.pose(), other.m_waypoint.pose());
     }
 
     public boolean equals(Object other) {
@@ -92,7 +79,7 @@ public class Pose2dWithMotion {
                 System.out.println("wrong waypoint");
             return false;
         }
-        if (!Math100.epsilonEquals(m_headingRate, p2dwc.m_headingRate)) {
+        if (!Math100.epsilonEquals(m_headingRateRad_M, p2dwc.m_headingRateRad_M)) {
             if (DEBUG)
                 System.out.println("wrong heading rate");
             return false;
@@ -112,7 +99,7 @@ public class Pose2dWithMotion {
                 m_waypoint.pose().getTranslation().getY(),
                 m_waypoint.pose().getRotation().getRadians(),
                 m_waypoint.course(),
-                m_headingRate,
+                m_headingRateRad_M,
                 m_curvatureRad_M);
     }
 

@@ -40,7 +40,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
     @Override
     public double maxV(final Pose2dWithMotion state) {
         double mMaxCentripetalAccel = m_limits.getMaxCapsizeAccelM_S2() * m_scale.getAsDouble();
-        double radius = 1 / state.getCurvature();
+        double radius = 1 / state.getCurvatureRad_M();
         // abs is used here to make sure sqrt is happy.
         return Math.sqrt(Math.abs(mMaxCentripetalAccel * radius));
     }
@@ -78,7 +78,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      */
     private double alongSq(Pose2dWithMotion state, double velocity) {
         double maxCentripetalAccel = m_limits.getMaxCapsizeAccelM_S2() * m_scale.getAsDouble();
-        double radius = 1 / state.getCurvature();
+        double radius = 1 / state.getCurvatureRad_M();
         double actualCentripetalAccel = velocity * velocity / radius;
         return maxCentripetalAccel * maxCentripetalAccel - actualCentripetalAccel * actualCentripetalAccel;
     }

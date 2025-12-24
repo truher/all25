@@ -66,8 +66,7 @@ public class GeometryUtil {
     }
 
     /**
-     * Change in heading per change in position, to replace the spline-derived
-     * heading rate.
+     * Change in heading per change in position.
      */
     public static double headingRatio(Pose2d p0, Pose2d p1) {
         Rotation2d h0 = p0.getRotation();
