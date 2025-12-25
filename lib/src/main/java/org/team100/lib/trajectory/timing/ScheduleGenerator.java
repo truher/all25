@@ -58,18 +58,19 @@ public class ScheduleGenerator {
             throw new IllegalArgumentException("must have at least three samples");
 
         double distances[] = new double[n];
+        double velocities[] = new double[n];
+        double decels[] = new double[n];
+        double accels[] = new double[n];
 
         // note below we look again at this sample. I think this exists
         // only to supply the start velocity.
         Pose2dWithMotion previousPose = samples[0];
-        ConstrainedState s0 = new ConstrainedState();
         distances[0] = 0;
         double previousDistance = 0;
-        s0.velocity = start_vel;
-        s0.decel = -HIGH_ACCEL;
-        s0.accel = HIGH_ACCEL;
-
-        //
+        double previousVelocity = start_vel;
+        double previousDecel = -HIGH_ACCEL;
+        double previousAccel = HIGH_ACCEL;
+ 
         // Forward pass.
         //
         // We look at pairs of consecutive states, where the start state has already
@@ -79,12 +80,10 @@ public class ScheduleGenerator {
         // velocity. If there is no admissible end velocity or acceleration, we set the
         // end velocity to the state's maximum allowed velocity and will repair the
         // acceleration during the backward pass (by slowing down the predecessor).
-        //
 
-        // work forward through the samples
-        ConstrainedState[] constrainedStates = new ConstrainedState[n];
         {
             for (int i = 0; i < n; ++i) {
+
                 double arclength = samples[i].distanceCartesian(previousPose);
                 if (i > 0 && i < n - 1 && arclength < 1e-6) {
                     // the first distance is zero because of the weird loop structure.
@@ -94,81 +93,72 @@ public class ScheduleGenerator {
                 }
 
                 distances[i] = arclength + previousDistance;
-
-                constrainedStates[i] = new ConstrainedState();
-
-                // R2 translation distance between states
-                // not constant-twist arc
-                // not double-geodesic with rotation
-                // Just translation, so that the pathwise velocity matches
-                // the curvature in the state.
-                double arclength1 = samples[i].distanceCartesian(previousPose);
+                velocities[i] = 100;
 
                 // We may need to iterate to find the maximum end velocity and common
                 // acceleration, since acceleration limits may be a function of velocity.
                 while (true) {
                     // first try the previous state accel to get the new state velocity
-                    double v1 = Math100.v1(s0.velocity, s0.accel, arclength1);
+                    double v1 = Math100.v1(previousVelocity, previousAccel, arclength);
 
-                    constrainedStates[i].velocity = v1;
+                    velocities[i] = v1;
 
                     // also use max accels for the new state accels
-                    constrainedStates[i].decel = -HIGH_ACCEL;
-                    constrainedStates[i].accel = HIGH_ACCEL;
+                    decels[i] = -HIGH_ACCEL;
+                    accels[i] = HIGH_ACCEL;
 
                     // reduce velocity according to constraints
                     for (TimingConstraint constraint : m_constraints) {
-                        constrainedStates[i].velocity = Math.min(constrainedStates[i].velocity,
+                        velocities[i] = Math.min(velocities[i],
                                 constraint.maxV(samples[i]));
                     }
 
                     for (TimingConstraint constraint1 : m_constraints) {
-                        constrainedStates[i].decel = Math.max(constrainedStates[i].decel,
-                                constraint1.maxDecel(samples[i], constrainedStates[i].velocity));
-                        constrainedStates[i].accel = Math.min(constrainedStates[i].accel,
-                                constraint1.maxAccel(samples[i], constrainedStates[i].velocity));
+                        decels[i] = Math.max(decels[i], constraint1.maxDecel(samples[i], velocities[i]));
+                        accels[i] = Math.min(accels[i], constraint1.maxAccel(samples[i], velocities[i]));
+
                     }
 
                     // motionless, which can happen at the end
-                    if (Math.abs(arclength1) < EPSILON) {
+                    if (Math.abs(arclength) < EPSILON) {
                         break;
                     }
 
-                    double accel = Math100.accel(s0.velocity, constrainedStates[i].velocity, arclength1);
+                    double accel = Math100.accel(previousVelocity, velocities[i], arclength);
                     // in the failure case, max accel is zero so this always fails.
-                    if (accel > constrainedStates[i].accel + EPSILON) {
+                    if (accel > accels[i] + EPSILON) {
                         // implied accel is too high because v1 is too high, perhaps because
                         // a0 was too high, try again with the (lower) constrained value
                         //
                         // if the constrained value is zero, this doesn't work at all.
 
-                        s0.accel = constrainedStates[i].accel;
+                        previousAccel = accels[i];
                         continue;
                     }
-                    if (accel > s0.decel + EPSILON) {
+                    if (accel > previousDecel + EPSILON) {
                         // set the previous state accel to whatever the constrained velocity implies
-                        s0.accel = accel;
+                        previousAccel = accel;
                     }
                     break;
                 }
 
-                s0 = constrainedStates[i];
                 previousPose = samples[i];
                 previousDistance = distances[i];
+                previousVelocity = velocities[i];
+                previousDecel = decels[i];
+                previousAccel = accels[i];
             }
         }
 
         //
         // Backwards pass
         //
-
         {
             // "successor" comes before in the backwards walk. start with the last state.
             double successorDistance = distances[n - 1];
-            ConstrainedState s1 = new ConstrainedState();
-            s1.velocity = end_vel;
-            s1.decel = -HIGH_ACCEL;
-            s1.accel = HIGH_ACCEL;
+            double successorVelocity = end_vel;
+            double successorDecel = -HIGH_ACCEL;
+            double successorAccel = HIGH_ACCEL;
 
             // work backwards through the states list
             for (int i = n - 1; i >= 0; --i) {
@@ -183,22 +173,20 @@ public class ScheduleGenerator {
                     // s0 velocity can't be more than the accel implies
                     // so this is actually an estimate for v0
                     // min a is negative, dq is negative, so v0 is faster than v1
-                    double v0 = Math100.v1(s1.velocity, s1.decel, dq);
+                    double v0 = Math100.v1(successorVelocity, successorDecel, dq);
 
-                    if (constrainedStates[i].velocity <= v0) {
+                    if (velocities[i] <= v0) {
                         // s0 v is slower than implied v0, which means
                         // that actual accel is larger than the min, so we're fine
                         // No new limits to impose.
                         break;
                     }
                     // s0 v is too fast, turn it down to obey v1 min accel.
-                    constrainedStates[i].velocity = v0;
+                    velocities[i] = v0;
 
                     for (TimingConstraint constraint : m_constraints) {
-                        constrainedStates[i].decel = Math.max(constrainedStates[i].decel,
-                                constraint.maxDecel(samples[i], constrainedStates[i].velocity));
-                        constrainedStates[i].accel = Math.min(constrainedStates[i].accel,
-                                constraint.maxAccel(samples[i], constrainedStates[i].velocity));
+                        decels[i] = Math.max(decels[i], constraint.maxDecel(samples[i], velocities[i]));
+                        accels[i] = Math.min(accels[i], constraint.maxAccel(samples[i], velocities[i]));
                     }
 
                     // motionless, which can happen at the end
@@ -207,19 +195,21 @@ public class ScheduleGenerator {
                     }
 
                     // implied accel using the constrained v0
-                    double accel = Math100.accel(s1.velocity, constrainedStates[i].velocity, dq);
-                    if (accel < constrainedStates[i].decel - EPSILON) {
+                    double accel = Math100.accel(successorVelocity, velocities[i], dq);
+                    if (accel < decels[i] - EPSILON) {
                         // accel is too low which implies that s1 accel is too low, try again
-                        s1.decel = constrainedStates[i].decel;
+                        successorDecel = decels[i];
                         continue;
                     }
                     // set final accel to the implied value
-                    s1.decel = accel;
+                    successorDecel = accel;
                     break;
                 }
 
-                s1 = constrainedStates[i];
                 successorDistance = distances[i];
+                successorVelocity = velocities[i];
+                successorDecel = decels[i];
+                successorAccel = accels[i];
             }
         }
 
@@ -228,16 +218,18 @@ public class ScheduleGenerator {
         //
         // last state accel is always zero, which might be wrong.
         //
-
         List<TimedState> poses = new ArrayList<>(n);
         {
             double time = 0.0;
             double distance = 0.0;
+            //
+            // TODO i think this should be start_vel
+            //
             double v0 = 0.0;
 
             for (int i = 0; i < n; ++i) {
                 double dq = distances[i] - distance;
-                double v1 = constrainedStates[i].velocity;
+                double v1 = velocities[i];
 
                 double dt = 0.0;
                 if (i > 0) {

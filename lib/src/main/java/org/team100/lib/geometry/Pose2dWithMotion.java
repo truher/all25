@@ -60,7 +60,8 @@ public class Pose2dWithMotion {
 
     /**
      * R2 (xy) planar distance only (IGNORES ROTATION) so that planar
-     * velocity and curvature works correctly.
+     * velocity and curvature works correctly.  Not the twist arclength.
+     * Not the double-geodesic L2 thing. Just XY translation hypot.
      */
     public double distanceCartesian(Pose2dWithMotion other) {
         return Metrics.translationalDistance(m_waypoint.pose(), other.m_waypoint.pose());
