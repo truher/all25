@@ -1,100 +1,19 @@
 package org.team100.lib.trajectory.timing;
 
-import java.util.List;
-
 import org.team100.lib.geometry.Pose2dWithMotion;
 
 class ConstrainedState {
-    private static final boolean DEBUG = false;
-    // using MAX_VALUE tickles some bugs
-    private static final double MAX_V = 100;
-    private static final double MAX_A = 100;
-
-    private final Pose2dWithMotion m_state;
-    /** Cumulative distance along the path */
-    private final double m_distanceM;
-
-    private double m_velocityM_S;
-    private double m_minAccelM_S2;
-    private double m_maxAccelM_S2;
+    public final Pose2dWithMotion state;
+    public final double distance;
+    public double velocity;
+    public double decel;
+    public double accel;
 
     public ConstrainedState(Pose2dWithMotion state, double distance) {
-        m_state = state;
-        m_distanceM = distance;
-        setVelocityM_S(MAX_V);
-        setMinAccel(-MAX_A);
-        setMaxAccel(MAX_A);
-    }
-
-    /**
-     * Clamp state velocity to constraints.
-     */
-    public void clampVelocity(List<TimingConstraint> constraints) {
-        for (TimingConstraint constraint : constraints) {
-            double value = constraint.maxV(m_state);
-            value = Math.min(getVelocityM_S(), value);
-            if (DEBUG)
-                System.out.printf("VELOCITY CONSTRAINT %s %5.3f\n",
-                        constraint.getClass().getSimpleName(), value);
-            setVelocityM_S(value);
-        }
-    }
-
-    /**
-     * Clamp constraint state accelerations to the constraints.
-     */
-    public void clampAccel(List<TimingConstraint> constraints) {
-        for (TimingConstraint constraint : constraints) {
-            m_minAccelM_S2 = Math.max(m_minAccelM_S2, constraint.maxDecel(m_state, getVelocityM_S()));
-            m_maxAccelM_S2 = Math.min(m_maxAccelM_S2, constraint.maxAccel(m_state, getVelocityM_S()));
-            if (DEBUG)
-                System.out.printf("ACCEL CONSTRAINT %s %5.3f %5.3f\n",
-                        constraint.getClass().getSimpleName(),
-                        m_minAccelM_S2,
-                        m_maxAccelM_S2);
-        }
-
-    }
-
-    public Pose2dWithMotion getState() {
-        return m_state;
-    }
-
-    /** Pathwise distance */
-    public double getDistanceM() {
-        return m_distanceM;
-    }
-
-    /** Pathwise velocity */
-    public double getVelocityM_S() {
-        return m_velocityM_S;
-    }
-
-    public void setVelocityM_S(double velocityM_S) {
-        if (Double.isNaN(velocityM_S))
-            throw new IllegalArgumentException();
-        m_velocityM_S = velocityM_S;
-    }
-
-    public double getMinAccel() {
-        return m_minAccelM_S2;
-    }
-
-    public void setMinAccel(double minAccelM_S2) {
-        m_minAccelM_S2 = minAccelM_S2;
-    }
-
-    public double getMaxAccel() {
-        return m_maxAccelM_S2;
-    }
-
-    public void setMaxAccel(double maxAccelM_S2) {
-        m_maxAccelM_S2 = maxAccelM_S2;
-    }
-
-    @Override
-    public String toString() {
-        return m_state.toString() + ", distance: " + m_distanceM + ", vel: " + getVelocityM_S() + ", " +
-                "min_acceleration: " + m_minAccelM_S2 + ", max_acceleration: " + m_maxAccelM_S2;
+        this.state = state;
+        this.distance = distance;
+        velocity = 100;
+        decel = -100;
+        accel = 100;
     }
 }
