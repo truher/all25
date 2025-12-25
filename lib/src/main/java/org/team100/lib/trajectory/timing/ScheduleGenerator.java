@@ -62,15 +62,6 @@ public class ScheduleGenerator {
         double decels[] = new double[n];
         double accels[] = new double[n];
 
-        // note below we look again at this sample. I think this exists
-        // only to supply the start velocity.
-        Pose2dWithMotion previousPose = samples[0];
-        distances[0] = 0;
-        double previousDistance = 0;
-        double previousVelocity = start_vel;
-        double previousDecel = -HIGH_ACCEL;
-        double previousAccel = HIGH_ACCEL;
- 
         // Forward pass.
         //
         // We look at pairs of consecutive states, where the start state has already
@@ -82,6 +73,11 @@ public class ScheduleGenerator {
         // acceleration during the backward pass (by slowing down the predecessor).
 
         {
+            Pose2dWithMotion previousPose = samples[0];
+            double previousDistance = 0;
+            double previousVelocity = start_vel;
+            double previousDecel = -HIGH_ACCEL;
+            double previousAccel = HIGH_ACCEL;
             for (int i = 0; i < n; ++i) {
 
                 double arclength = samples[i].distanceCartesian(previousPose);
@@ -109,8 +105,7 @@ public class ScheduleGenerator {
 
                     // reduce velocity according to constraints
                     for (TimingConstraint constraint : m_constraints) {
-                        velocities[i] = Math.min(velocities[i],
-                                constraint.maxV(samples[i]));
+                        velocities[i] = Math.min(velocities[i], constraint.maxV(samples[i]));
                     }
 
                     for (TimingConstraint constraint1 : m_constraints) {
@@ -222,27 +217,22 @@ public class ScheduleGenerator {
         {
             double time = 0.0;
             double distance = 0.0;
-            //
-            // TODO i think this should be start_vel
-            //
             double v0 = 0.0;
 
             for (int i = 0; i < n; ++i) {
                 double dq = distances[i] - distance;
-                double v1 = velocities[i];
-
                 double dt = 0.0;
                 if (i > 0) {
-                    double prevAccel = Math100.accel(v0, v1, dq);
+                    double prevAccel = Math100.accel(v0, velocities[i], dq);
                     poses.get(i - 1).set_acceleration(prevAccel);
-                    dt = dt(v0, v1, dq, prevAccel);
+                    dt = dt(v0, velocities[i], dq, prevAccel);
                 }
                 time += dt;
                 if (Double.isNaN(time) || Double.isInfinite(time)) {
                     throw new TimingException();
                 }
-                poses.add(new TimedState(samples[i], time, v1, 0));
-                v0 = v1;
+                poses.add(new TimedState(samples[i], time, velocities[i], 0));
+                v0 = velocities[i];
                 distance = distances[i];
             }
         }
