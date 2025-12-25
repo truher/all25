@@ -7,16 +7,24 @@ import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
 
+import edu.wpi.first.math.geometry.Twist2d;
+
 /**
  * Represents a 2d holonomic path, i.e. with heading independent from course.
  * 
  * There's no timing information here. For that, see Trajectory100.
  */
 public class Path100 {
+    // if an interpolated point is more than this far from an endpoint,
+    // it indicates the endpoints are too far apart, including too far apart
+    // in rotation, which is an aspect of the path scheduling that the
+    // scheduler can't see
+    // TODO: make this a constructor parameter.
+    private static final double INTERPOLATION_LIMIT = 0.3;
     private final List<Pose2dWithMotion> m_points;
     /**
-     * Double geodesic distance which is meters and radians.
-     * Do not use this distance to compute planar velocity.
+     * Translational distance, just the xy plane, not the Twist arc
+     * or anything else, just xy distance.
      */
     private final double[] m_distances;
 
@@ -32,9 +40,7 @@ public class Path100 {
             m_points.add(states.get(i));
             Pose2dWithMotion p0 = getPoint(i - 1);
             Pose2dWithMotion p1 = getPoint(i);
-            // using the distance metric that includes rotation makes it possible
-            // to have rotational paths
-            double dist = Metrics.doubleGeodesicDistance(p0.getPose().pose(), p1.getPose().pose());
+            double dist = Metrics.translationalDistance(p0.getPose().pose(), p1.getPose().pose());
             m_distances[i] = m_distances[i - 1] + dist;
         }
     }
@@ -85,7 +91,18 @@ public class Path100 {
             if (d1 >= distance) {
                 // Found the bracket.
                 double s = (distance - d0) / d;
-                return p0.interpolate(p1, s);
+                Pose2dWithMotion lerp = p0.interpolate(p1, s);
+                // disallow corners
+                Twist2d t0 = p0.getPose().course().minus(lerp.getPose().course());
+                double l0 = Metrics.l2Norm(t0);
+                Twist2d t1 = p1.getPose().course().minus(lerp.getPose().course());
+                double l1 = Metrics.l2Norm(t1);
+                if (Math.max(l0, l1) > INTERPOLATION_LIMIT)
+                    throw new IllegalStateException(
+                            String.format(
+                                    "Interpolated value too far away, p0=%s, p1=%s, t0=%s t1=%s.  This usually indicates a sharp corner in the path, which is not allowed.",
+                                    p0, p1, t0, t1));
+                return lerp;
             }
         }
         throw new ScheduleGenerator.TimingException();

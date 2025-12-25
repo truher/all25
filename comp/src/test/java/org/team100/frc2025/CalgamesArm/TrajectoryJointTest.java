@@ -63,7 +63,7 @@ public class TrajectoryJointTest {
                     .println(
                             "t, x, y, r, vx, vy, vr, ax, ay, ar, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < t.duration(); tt += 0.02) {
-            ControlR3 m = ControlR3.fromTimedPose(t.sample(tt));
+            ControlR3 m = ControlR3.fromTimedState(t.sample(tt));
             Pose2d p = m.pose();
             VelocitySE2 v = m.velocity();
             AccelerationSE2 a = m.acceleration();

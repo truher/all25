@@ -21,7 +21,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -55,7 +55,7 @@ class DriveToPoseWithTrajectoryTest implements Timeless {
                 drive,
                 (start, end) -> new Trajectory100(
                         List.of(
-                                new TimedPose(
+                                new TimedState(
                                         new Pose2dWithMotion(
                                                 WaypointSE2.irrotational(
                                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),

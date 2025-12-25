@@ -71,7 +71,7 @@ public class Metrics {
      * Don't use it for anything where you compare it to xy planar distances or
      * velocities.
      */
-    static double l2Norm(Twist2d a) {
+   public static double l2Norm(Twist2d a) {
         return Math.sqrt(a.dx * a.dx + a.dy * a.dy + a.dtheta * a.dtheta);
     }
 
@@ -105,7 +105,7 @@ public class Metrics {
      * @see https://vnav.mit.edu/material/04-05-LieGroups-notes.pdf
      * @see https://rpk.lcsr.jhu.edu/wp-content/uploads/2017/08/Partial-Bi-Invariance-of-SE3-Metrics1.pdf
      */
-    public static double doubleGeodesicDistance(Pose2d a, Pose2d b) {
+    static double doubleGeodesicDistance(Pose2d a, Pose2d b) {
         Translation2d tDiff = a.getTranslation().minus(b.getTranslation());
         double tSqDist = GeometryUtil.dot(tDiff, tDiff);
         double aDiff = a.getRotation().minus(b.getRotation()).getRadians();

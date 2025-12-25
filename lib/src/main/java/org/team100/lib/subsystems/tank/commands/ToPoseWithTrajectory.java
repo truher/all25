@@ -10,7 +10,7 @@ import org.team100.lib.subsystems.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.controller.LTVUnicycleController;
@@ -61,9 +61,9 @@ public class ToPoseWithTrajectory extends Command {
                 return;
             // current for position error
             double t = progress();
-            TimedPose current = m_trajectory.sample(t);
+            TimedState current = m_trajectory.sample(t);
             // next for feedforward (and selecting K)
-            TimedPose next = m_trajectory.sample(t + TimedRobot100.LOOP_PERIOD_S);
+            TimedState next = m_trajectory.sample(t + TimedRobot100.LOOP_PERIOD_S);
             Pose2d currentPose = m_drive.getPose();
             Pose2d poseReference = current.state().getPose().pose();
             double velocityReference = next.velocityM_S();

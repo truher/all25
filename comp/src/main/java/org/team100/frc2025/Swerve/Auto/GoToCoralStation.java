@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.CoralStation;
-import org.team100.lib.geometry.DirectionR2;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;

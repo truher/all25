@@ -7,7 +7,7 @@ import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.trajectory.Trajectory100;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -31,7 +31,7 @@ public class TrajectoryVisualization {
     private static double[] fromTrajectory100(Trajectory100 m_trajectory) {
         double[] arr = new double[m_trajectory.length() * 3];
         int ndx = 0;
-        for (TimedPose p : m_trajectory.getPoints()) {
+        for (TimedState p : m_trajectory.getPoints()) {
             WaypointSE2 pose = p.state().getPose();
             arr[ndx + 0] = pose.pose().getTranslation().getX();
             arr[ndx + 1] = pose.pose().getTranslation().getY();

@@ -5,7 +5,7 @@ import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -129,7 +129,7 @@ public class ModelR3 {
     /**
      * Transform timed pose into swerve state.
      */
-    public static ModelR3 fromTimedPose(TimedPose timedPose) {
+    public static ModelR3 fromTimedState(TimedState timedPose) {
         Pose2dWithMotion state = timedPose.state();
         WaypointSE2 pose = state.getPose();
         Translation2d translation = pose.pose().getTranslation();

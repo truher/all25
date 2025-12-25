@@ -48,7 +48,7 @@ public class ScheduleGenerator {
     private List<Pose2dWithMotion> resample(Path100 path, double step) throws TimingException {
         double maxDistance = path.getMaxDistance();
         if (maxDistance == 0)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("max distance must be greater than zero");
         int num_states = (int) Math.ceil(maxDistance / step) + 1;
         if (DEBUG)
             System.out.printf("resample max distance %f step %f num states %d f %f\n",
@@ -113,20 +113,25 @@ public class ScheduleGenerator {
      * acceleration during the backward pass (by slowing down the predecessor).
      */
     private List<ConstrainedState> forwardPass(List<Pose2dWithMotion> samples, double start_vel) {
-        
-        // note below we look again at this sample.  I think this exists
+
+        // note below we look again at this sample. I think this exists
         // only to supply the start velocity.
         ConstrainedState predecessor = new ConstrainedState(samples.get(0), 0);
         predecessor.setVelocityM_S(start_vel);
         predecessor.setMinAccel(-HIGH_ACCEL);
         predecessor.setMaxAccel(HIGH_ACCEL);
 
-
         // work forward through the samples
         List<ConstrainedState> constrainedStates = new ArrayList<>(samples.size());
         for (int i = 0; i < samples.size(); ++i) {
             Pose2dWithMotion sample = samples.get(i);
             double dsM = sample.distanceCartesian(predecessor.getState());
+            if (i > 0 && i < samples.size() - 1 && dsM < 1e-6) {
+                // the first distance is zero because of the weird loop structure.
+                // the last distance can be zero if the step size exactly divides the path
+                // length
+                throw new IllegalStateException("zero distance not allowed");
+            }
             if (DEBUG)
                 System.out.printf("i%d dsM %f\n", i, dsM);
             ConstrainedState constrainedState = new ConstrainedState(
@@ -215,7 +220,8 @@ public class ScheduleGenerator {
             List<ConstrainedState> constrainedStates) {
         // "successor" comes before in the backwards walk. start with the last state.
         ConstrainedState endState = constrainedStates.get(constrainedStates.size() - 1);
-        ConstrainedState successor = new ConstrainedState(lastState, endState.getDistanceM());
+        ConstrainedState successor = new ConstrainedState(
+                lastState, endState.getDistanceM());
         successor.setVelocityM_S(end_velocity);
         successor.setMinAccel(-HIGH_ACCEL);
         successor.setMaxAccel(HIGH_ACCEL);
@@ -284,17 +290,18 @@ public class ScheduleGenerator {
      * last state accel is always zero, which might be wrong.
      */
     private static Trajectory100 integrate(List<ConstrainedState> states) throws TimingException {
-        List<TimedPose> poses = new ArrayList<>(states.size());
-        double time = 0.0; // time along path
-        // this should be L2 distance
-        double distance = 0.0; // distance along path
+        List<TimedState> poses = new ArrayList<>(states.size());
+        double time = 0.0;
+        // distance along path
+        // for turn-in-place,
+        double distance = 0.0;
         double v0 = 0.0;
         if (DEBUG)
             System.out.println("i, v0, v1, ds");
         for (int i = 0; i < states.size(); ++i) {
             ConstrainedState state = states.get(i);
-            final double ds = state.getDistanceM() - distance;
-            final double v1 = state.getVelocityM_S();
+            double ds = state.getDistanceM() - distance;
+            double v1 = state.getVelocityM_S();
             if (DEBUG)
                 System.out.printf("%d, %5.3f, %5.3f, %5.3f\n", i, v0, v1, ds);
             double dt = 0.0;
@@ -307,7 +314,7 @@ public class ScheduleGenerator {
             if (Double.isNaN(time) || Double.isInfinite(time)) {
                 throw new TimingException();
             }
-            poses.add(new TimedPose(state.getState(), time, v1, 0));
+            poses.add(new TimedState(state.getState(), time, v1, 0));
             v0 = v1;
             distance = state.getDistanceM();
         }

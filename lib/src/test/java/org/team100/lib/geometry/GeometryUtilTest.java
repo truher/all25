@@ -122,47 +122,11 @@ class GeometryUtilTest {
                         new DirectionSE2(1, 0, 1), 1));
         {
             double splineHR = spline.getDHeadingDs(0.5);
-            assertEquals(0.869, splineHR, DELTA);
+            assertEquals(0.811, splineHR, DELTA);
             Pose2d p0 = spline.getPose2d(0.49);
             Pose2d p1 = spline.getPose2d(0.51);
             double discreteHR = GeometryUtil.headingRatio(p0, p1);
-            assertEquals(0.869, discreteHR, DELTA);
-        }
-        double DS = 0.001;
-        for (double s = DS; s <= 1 - DS; s += DS) {
-            double splineHR = spline.getDHeadingDs(s);
-            Pose2d p0 = spline.getPose2d(s - DS);
-            Pose2d p1 = spline.getPose2d(s + DS);
-            double discreteHR = GeometryUtil.headingRatio(p0, p1);
-            if (DEBUG)
-                System.out.printf("%f %f %f %f\n", s, splineHR, discreteHR, splineHR - discreteHR);
-            // error scales with ds
-            assertEquals(splineHR, discreteHR, 0.00001);
-        }
-    }
-
-    @Test
-    void testHeadingRate2() {
-        // turning in place
-        HolonomicSpline spline = new HolonomicSpline(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(),
-                                new Rotation2d()),
-                        new DirectionSE2(0, 0, 1), 1),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(),
-                                new Rotation2d(1)),
-                        new DirectionSE2(0, 0, 1), 1));
-        {
-            double splineHR = spline.getDHeadingDs(0.5);
-            // this is heading change per L2 metric; pure rotation = 1
-            assertEquals(1, splineHR, DELTA);
-            Pose2d p0 = spline.getPose2d(0.49);
-            Pose2d p1 = spline.getPose2d(0.51);
-            double discreteHR = GeometryUtil.headingRatio(p0, p1);
-            assertEquals(1, discreteHR, DELTA);
+            assertEquals(0.811, discreteHR, DELTA);
         }
         double DS = 0.001;
         for (double s = DS; s <= 1 - DS; s += DS) {

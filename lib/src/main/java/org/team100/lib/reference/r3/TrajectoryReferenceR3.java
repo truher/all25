@@ -64,7 +64,7 @@ public class TrajectoryReferenceR3 implements ReferenceR3 {
 
     @Override
     public ModelR3 goal() {
-        ModelR3 goal = ControlR3.fromTimedPose(m_trajectory.getLastPoint()).model();
+        ModelR3 goal = ControlR3.fromTimedState(m_trajectory.getLastPoint()).model();
         m_log_goal.log(() -> goal);
         return goal;
     }
@@ -78,6 +78,6 @@ public class TrajectoryReferenceR3 implements ReferenceR3 {
     }
 
     private ControlR3 sample(double t) {
-        return ControlR3.fromTimedPose(m_trajectory.sample(t));
+        return ControlR3.fromTimedState(m_trajectory.sample(t));
     }
 }

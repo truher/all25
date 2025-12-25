@@ -15,9 +15,9 @@ The process of constructing a trajectory has three stages:
 
 3. Construct a list of points interpolated along the secant lines, such that the points aren't too far apart.
 
-4. Using a list of kinodynamic constraints (see `lib.trajectory.timing`), assign a time for each point.  The resulting list of `TimedPose`s is created by `ScheduleGenerator`, producing `Trajectory100`.
+4. Using a list of kinodynamic constraints (see `lib.trajectory.timing`), assign a time for each point.  The resulting list of `TimedState`s is created by `ScheduleGenerator`, producing `Trajectory100`.
 
-To use a trajectory, you `sample()` it, with time (in seconds) as the parameter.  The resulting `TimedPose` is interpolated between from the list above.
+To use a trajectory, you `sample()` it, with time (in seconds) as the parameter.  The resulting `TimedState` is interpolated between from the list above.
 
 If you want to use these trajectories for non-holonomic (e.g. "tank") drivetrains, it will work well enough to set the course and heading to be the same at each waypoint.
 
@@ -72,7 +72,7 @@ constrained states.
 
 ## Sampling
 
-at runtime, the `TimedPose` list is sampled by time, which means finding floor and ceiling
+at runtime, the `TimedState` list is sampled by time, which means finding floor and ceiling
 states and interpolating.  The interpolant is the fraction of time between states, which
 is used to derive the fraction of distance between states (i.e. along the secant line),
 which is used as the interpolant between poses.  Note the acceleration is not interpolated

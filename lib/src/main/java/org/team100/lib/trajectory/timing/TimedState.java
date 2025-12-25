@@ -9,7 +9,7 @@ import org.team100.lib.util.Math100;
  * 
  * The timing fields are set by the ScheduleGenerator.
  */
-public class TimedPose {
+public class TimedState {
     private static final boolean DEBUG = false;
     private final Pose2dWithMotion m_state;
     /** Time we achieve this state. */
@@ -19,7 +19,7 @@ public class TimedPose {
     /** Instantaneous pathwise (not centripetal) acceleration, m/s^2. */
     private double m_accelM_S_S;
 
-    public TimedPose(
+    public TimedState(
             Pose2dWithMotion state,
             double t,
             double velocity,
@@ -69,7 +69,7 @@ public class TimedPose {
      * Velocity of this state is the initial velocity.
      * Acceleration of this state is constant through the whole arc.
      */
-    public TimedPose interpolate(TimedPose other, double delta_t) {
+    public TimedState interpolate(TimedState other, double delta_t) {
         double tLerp = m_timeS + delta_t;
         double vLerp = m_velocityM_S + m_accelM_S_S * delta_t;
         double pathwiseDistance = m_velocityM_S * delta_t + 0.5 * m_accelM_S_S * delta_t * delta_t;
@@ -82,7 +82,7 @@ public class TimedPose {
 
         if (DEBUG)
             System.out.printf("tlerp %f\n", tLerp);
-        return new TimedPose(
+        return new TimedState(
                 m_state.interpolate(other.m_state, interpolant),
                 tLerp,
                 vLerp,
@@ -90,18 +90,18 @@ public class TimedPose {
     }
 
     /** Translation only, ignores rotation */
-    public double distanceCartesian(TimedPose other) {
+    public double distanceCartesian(TimedState other) {
         return m_state.distanceCartesian(other.m_state);
     }
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof TimedPose)) {
+        if (!(other instanceof TimedState)) {
             if (DEBUG)
                 System.out.println("wrong type");
             return false;
         }
-        TimedPose ts = (TimedPose) other;
+        TimedState ts = (TimedState) other;
         if (!m_state.equals(ts.m_state)) {
             if (DEBUG)
                 System.out.println("wrong state");

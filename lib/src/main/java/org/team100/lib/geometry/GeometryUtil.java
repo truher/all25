@@ -65,18 +65,6 @@ public class GeometryUtil {
         return num / den;
     }
 
-    /**
-     * Change in heading per change in position.
-     */
-    public static double headingRatio(Pose2d p0, Pose2d p1) {
-        Rotation2d h0 = p0.getRotation();
-        Rotation2d h1 = p1.getRotation();
-        double d = Metrics.doubleGeodesicDistance(p0, p1);
-        if (Math.abs(d) < 1e-6)
-            return 0;
-        return h1.minus(h0).getRadians() / d;
-    }
-
     /** Return a projected onto the direction of b, retaining the omega of a */
     public static ChassisSpeeds project(ChassisSpeeds a, ChassisSpeeds b) {
         double norm = Metrics.translationalNorm(b);
@@ -376,5 +364,23 @@ public class GeometryUtil {
     /** 3-vector for translation */
     public static Vector<N3> toVec3(Translation2d t) {
         return VecBuilder.fill(t.getX(), t.getY(), 0);
+    }
+
+    /////////////////////////////////////////////////////////////////
+    ///
+    /// DANGER ZONE
+    ///
+    /// Don't use anything below here unless you really know what you're doing
+    ///
+    /**
+     * Change in heading per change in position.
+     */
+    static double headingRatio(Pose2d p0, Pose2d p1) {
+        Rotation2d h0 = p0.getRotation();
+        Rotation2d h1 = p1.getRotation();
+        double d = Metrics.doubleGeodesicDistance(p0, p1);
+        if (Math.abs(d) < 1e-6)
+            return 0;
+        return h1.minus(h0).getRadians() / d;
     }
 }

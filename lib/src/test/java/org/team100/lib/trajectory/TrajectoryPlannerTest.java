@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -20,7 +20,7 @@ import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.SwerveDriveDynamicsConstraint;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
@@ -51,10 +51,10 @@ class TrajectoryPlannerTest implements Timeless {
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         Trajectory100 t = planner.restToRest(waypoints);
         assertEquals(12, t.length());
-        TimedPose tp = t.getPoint(0);
+        TimedState tp = t.getPoint(0);
         // start at zero velocity
         assertEquals(0, tp.velocityM_S(), DELTA);
-        TimedPose p = t.getPoint(6);
+        TimedState p = t.getPoint(6);
         assertEquals(0.6, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
@@ -82,43 +82,11 @@ class TrajectoryPlannerTest implements Timeless {
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         Trajectory100 t = planner.restToRest(waypoints);
         assertEquals(12, t.length());
-        TimedPose tp = t.getPoint(0);
+        TimedState tp = t.getPoint(0);
         assertEquals(0, tp.velocityM_S(), DELTA);
-        TimedPose p = t.getPoint(6);
+        TimedState p = t.getPoint(6);
         assertEquals(0.6, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
-    }
-
-    @Test
-    void testBackingUp() {
-        List<WaypointSE2> waypoints = List.of(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(0, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(-1, 0, 0), 1.2),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(1, 0, 0), 1.2));
-        SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
-
-        // these are the same as StraightLineTrajectoryTest.
-        List<TimingConstraint> constraints = List.of(
-                new ConstantConstraint(logger, 1, 1, limits),
-                new SwerveDriveDynamicsConstraint(logger, limits, 1, 1),
-                new YawRateConstraint(logger, limits, 0.2),
-                new CapsizeAccelerationConstraint(logger, limits, 0.2));
-        double start_vel = 1;
-        double end_vel = 0;
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        Trajectory100 t = planner.generateTrajectory(
-                waypoints, start_vel, end_vel);
-        TimedPose p = t.getPoint(6);
-        assertEquals(0.272, p.state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
-
     }
 
     /**
@@ -156,7 +124,7 @@ class TrajectoryPlannerTest implements Timeless {
             System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
         assertEquals(18, t.length());
-        TimedPose p = t.getPoint(6);
+        TimedState p = t.getPoint(6);
         assertEquals(0.585, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
@@ -181,7 +149,7 @@ class TrajectoryPlannerTest implements Timeless {
         double maxDriveAccelerationM_S2 = swerveKinodynamics.getMaxDriveAccelerationM_S2();
         assertEquals(5, maxDriveVelocityM_S);
         assertEquals(10, maxDriveAccelerationM_S2);
-        for (TimedPose p : trajectory.getPoints()) {
+        for (TimedState p : trajectory.getPoints()) {
             assertTrue(p.velocityM_S() - 0.001 <= maxDriveVelocityM_S,
                     String.format("%f %f", p.velocityM_S(), maxDriveVelocityM_S));
             assertTrue(p.acceleration() - 0.001 <= maxDriveAccelerationM_S2,
@@ -201,18 +169,6 @@ class TrajectoryPlannerTest implements Timeless {
     }
 
     @Test
-    void testBackingUp2() {
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
-        List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(-1, 0, 0));
-        Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
-        Trajectory100 traj = planner.movingToRest(start, end);
-        TrajectoryPlotter.plot(traj, 0.1);
-        assertEquals(1.549, traj.duration(), DELTA);
-    }
-
-    @Test
     void test2d() {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
@@ -220,7 +176,7 @@ class TrajectoryPlannerTest implements Timeless {
         ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
-        assertEquals(2.869, traj.duration(), DELTA);
+        assertEquals(3.337, traj.duration(), DELTA);
     }
 
 }

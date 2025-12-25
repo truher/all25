@@ -59,10 +59,8 @@ public class HolonomicSpline {
      * @param p1 ending pose
      */
     public HolonomicSpline(WaypointSE2 p0, WaypointSE2 p1) {
-        // Distance metric includes both translation and rotation. This is not
-        // the geodesic distance, which is zero for spin-in-place. It's just the
-        // L2 norm for all three dimensions.
-        double distance = Metrics.doubleGeodesicDistance(p0.pose(), p1.pose());
+        // Translation distance in the xy plane.
+        double distance = Metrics.translationalDistance(p0.pose(), p1.pose());
         if (DEBUG)
             System.out.printf("distance %f\n", distance);
         double scale0 = p0.scale() * distance;

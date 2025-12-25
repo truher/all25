@@ -26,7 +26,7 @@ import org.team100.lib.subsystems.prr.JointForce;
 import org.team100.lib.subsystems.prr.JointVelocities;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePosition100;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -449,14 +449,14 @@ public class LoggerFactory {
         return new Rotation2dLogger(level, leaf);
     }
 
-    public class TimedPoseLogger {
+    public class TimedStateLogger {
         private final Level m_level;
         private final Pose2dWithMotionLogger m_pose2dWithMotionLogger;
         private final DoubleLogger m_timeLogger;
         private final DoubleLogger m_velocityLogger;
         private final DoubleLogger m_accelLogger;
 
-        TimedPoseLogger(Level level, String leaf) {
+        TimedStateLogger(Level level, String leaf) {
             m_level = level;
             m_pose2dWithMotionLogger = pose2dWithMotionLogger(level, join(leaf, "posestate"));
             m_timeLogger = doubleLogger(level, join(leaf, "time"));
@@ -464,10 +464,10 @@ public class LoggerFactory {
             m_accelLogger = doubleLogger(level, join(leaf, "accel"));
         }
 
-        public void log(Supplier<TimedPose> vals) {
+        public void log(Supplier<TimedState> vals) {
             if (!allow(m_level))
                 return;
-            TimedPose val = vals.get();
+            TimedState val = vals.get();
             m_pose2dWithMotionLogger.log(val::state);
             m_timeLogger.log(val::getTimeS);
             m_velocityLogger.log(val::velocityM_S);
@@ -476,8 +476,8 @@ public class LoggerFactory {
         }
     }
 
-    public TimedPoseLogger timedPoseLogger(Level level, String leaf) {
-        return new TimedPoseLogger(level, leaf);
+    public TimedStateLogger timedPoseLogger(Level level, String leaf) {
+        return new TimedStateLogger(level, leaf);
     }
 
     public class PoseWithCurvatureLogger {

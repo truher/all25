@@ -7,7 +7,6 @@ import java.util.function.BooleanSupplier;
 
 import org.team100.frc2025.Climber.ClimberCommands;
 import org.team100.frc2025.CommandGroups.MoveToAlgaePosition;
-import org.team100.frc2025.CommandGroups.ScoreSmart.ScoreCoralSmartLuke;
 import org.team100.frc2025.Swerve.ManualWithBargeAssist;
 import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.BigLoop;

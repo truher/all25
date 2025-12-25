@@ -16,7 +16,7 @@ import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -235,8 +235,8 @@ public class JacobianTest {
         double d = t.duration();
         double dt = d / 20;
         for (double time = 0; time < d; time += dt) {
-            TimedPose tp = t.sample(time);
-            ModelR3 sm = ModelR3.fromTimedPose(tp);
+            TimedState tp = t.sample(time);
+            ModelR3 sm = ModelR3.fromTimedState(tp);
             Pose2d p = sm.pose();
             VelocitySE2 v = sm.velocity();
             EAWConfig c = k.inverse(p);

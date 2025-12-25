@@ -15,7 +15,7 @@ class TimedStateTest {
     @Test
     void test() {
         // At (0,0,0), t=0, v=0, acceleration=1
-        TimedPose start_state = new TimedPose(
+        TimedState start_state = new TimedState(
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
@@ -23,7 +23,7 @@ class TimedStateTest {
                 0.0, 0.0, 1.0);
 
         // At (.5,0,0), t=1, v=1, acceleration=0
-        TimedPose end_state = new TimedPose(
+        TimedState end_state = new TimedState(
                 new Pose2dWithMotion(
                         WaypointSE2.irrotational(
                                 new Pose2d(0.5, 0, new Rotation2d(0)), 0, 1.2),
@@ -35,7 +35,7 @@ class TimedStateTest {
         assertEquals(end_state, start_state.interpolate(end_state, 1.0));
 
         // halfway between the states by time
-        TimedPose intermediate_state = start_state.interpolate(end_state, 0.5);
+        TimedState intermediate_state = start_state.interpolate(end_state, 0.5);
         assertEquals(0.5, intermediate_state.getTimeS(), EPSILON);
         assertEquals(start_state.acceleration(), intermediate_state.acceleration(), EPSILON);
         assertEquals(0.5, intermediate_state.velocityM_S(), EPSILON);

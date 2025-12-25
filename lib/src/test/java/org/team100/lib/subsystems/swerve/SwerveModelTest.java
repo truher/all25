@@ -8,7 +8,7 @@ import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,9 +27,9 @@ class ModelR3Test {
     }
 
     @Test
-    void testTimedPose() {
-        ModelR3 s = ModelR3.fromTimedPose(
-                new TimedPose(
+    void testTimedState() {
+        ModelR3 s = ModelR3.fromTimedState(
+                new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
@@ -44,9 +44,9 @@ class ModelR3Test {
     }
 
     @Test
-    void testTimedPose2() {
-        ModelR3 s = ModelR3.fromTimedPose(
-                new TimedPose(
+    void testTimedState2() {
+        ModelR3 s = ModelR3.fromTimedState(
+                new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
@@ -61,9 +61,9 @@ class ModelR3Test {
     }
 
     @Test
-    void testTimedPose3() {
-        ModelR3 s = ModelR3.fromTimedPose(
-                new TimedPose(
+    void testTimedState3() {
+        ModelR3 s = ModelR3.fromTimedState(
+                new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
@@ -79,9 +79,9 @@ class ModelR3Test {
 
     /** +x motion, positive curvature => +y accel. */
     @Test
-    void testTimedPose4() {
-        ModelR3 s = ModelR3.fromTimedPose(
-                new TimedPose(
+    void testTimedState4() {
+        ModelR3 s = ModelR3.fromTimedState(
+                new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),

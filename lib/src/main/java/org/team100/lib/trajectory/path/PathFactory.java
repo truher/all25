@@ -108,10 +108,18 @@ public class PathFactory {
         // difference between twist and sample
         Transform2d error = phalf_predicted.minus(phalf);
 
+        Pose2dWithMotion p20 = spline.getPose2dWithMotion(t0);
+        Pose2dWithMotion p21 = spline.getPose2dWithMotion(t1);
+        Twist2d p2t = p20.getPose().course().minus(p21.getPose().course());
+
+        // checks both translational and l2 norms
+        // also checks change in course
         if (Math.abs(error.getTranslation().getX()) > maxDx
                 || Math.abs(error.getTranslation().getY()) > maxDy
                 || Math.abs(error.getRotation().getRadians()) > maxDTheta
-                || Metrics.translationalNorm(twist_half) > maxNorm) {
+                || Metrics.translationalNorm(twist_full) > maxNorm
+                || Metrics.l2Norm(twist_full) > maxNorm
+                || Metrics.l2Norm(p2t) > maxNorm) {
             // add a point in between
             // note the extra condition to avoid points too far apart.
             getSegmentArc(spline, rv, t0, thalf, maxDx, maxDy, maxDTheta);

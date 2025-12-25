@@ -3,6 +3,7 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.Trajectory100;
-import org.team100.lib.trajectory.TrajectoryPlotter;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 
@@ -84,8 +84,8 @@ public class ScheduleGeneratorTest {
 
         // Go state by state, verifying all constraints are satisfied and integration is
         // correct.
-        TimedPose prev_state = null;
-        for (TimedPose state : traj.getPoints()) {
+        TimedState prev_state = null;
+        for (TimedState state : traj.getPoints()) {
             for (final TimingConstraint constraint : constraints) {
                 assertTrue(state.velocityM_S() - EPSILON <= constraint.maxV(state.state()));
                 assertTrue(state.acceleration() - EPSILON <= constraint.maxAccel(
@@ -107,11 +107,10 @@ public class ScheduleGeneratorTest {
     }
 
     /**
-     * Turning in place works now.
+     * Turning in place does not work.k
      */
     @Test
     void testJustTurningInPlace() {
-
         Path100 path = new Path100(Arrays.asList(
                 new Pose2dWithMotion(
                         new WaypointSE2(
@@ -124,25 +123,18 @@ public class ScheduleGeneratorTest {
                                 new DirectionSE2(0, 0, 1), 1),
                         1, 0)));
 
-        // our distance metric combines meters and radians with equal weight
-        // because this is pure rotation, the "distance" here is in radians.
-        assertEquals(Math.PI, path.getMaxDistance(), DELTA);
+        assertEquals(0, path.getMaxDistance(), DELTA);
+        assertEquals(2, path.length());
         if (DEBUG)
             System.out.printf("PATH:\n%s\n", path);
-        TrajectoryPlotter.plot(path, 0.1);
 
         List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
         ScheduleGenerator u = new ScheduleGenerator(constraints);
-        Trajectory100 traj = u.timeParameterizeTrajectory(
+        assertThrows(IllegalArgumentException.class, ()-> u.timeParameterizeTrajectory(
                 path,
                 1.0,
                 0.0,
-                0.0);
-        if (DEBUG)
-            System.out.printf("TRAJ:\n%s\n", traj);
-
-        assertFalse(traj.isEmpty());
-
+                0.0));
     }
 
     /**
@@ -334,7 +326,7 @@ public class ScheduleGeneratorTest {
             System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
         assertEquals(18, t.length());
-        TimedPose p = t.getPoint(6);
+        TimedState p = t.getPoint(6);
         assertEquals(0.575, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 

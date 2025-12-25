@@ -18,7 +18,7 @@ import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
 import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
@@ -51,7 +51,7 @@ class Trajectory100Test implements Timeless {
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
 
-        TimedPose sample = trajectory.sample(0);
+        TimedState sample = trajectory.sample(0);
         assertEquals(0, sample.state().getPose().pose().getTranslation().getX(), DELTA);
 
         sample = trajectory.sample(1);
@@ -84,7 +84,7 @@ class Trajectory100Test implements Timeless {
         Trajectory100 trajectory = planner.restToRest(waypoints);
 
         assertEquals(1.418, trajectory.duration(), DELTA);
-        TimedPose sample = trajectory.sample(0);
+        TimedState sample = trajectory.sample(0);
         assertEquals(0, sample.state().getPose().pose().getTranslation().getX(), DELTA);
         sample = trajectory.sample(1);
         assertEquals(0.825, sample.state().getPose().pose().getTranslation().getX(), DELTA);
@@ -97,7 +97,6 @@ class Trajectory100Test implements Timeless {
      */
     @Test
     void testSampleThoroughly() {
-
         List<WaypointSE2> waypoints = List.of(
                 new WaypointSE2(
                         new Pose2d(
@@ -125,22 +124,26 @@ class Trajectory100Test implements Timeless {
         }
 
         assertEquals(1.418, trajectory.duration(), DELTA);
-        assertEquals(0.000, trajectory.sample(0.0).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.010, trajectory.sample(0.1).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.040, trajectory.sample(0.2).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.090, trajectory.sample(0.3).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.160, trajectory.sample(0.4).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.250, trajectory.sample(0.5).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.360, trajectory.sample(0.6).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.487, trajectory.sample(0.7).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.618, trajectory.sample(0.8).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.732, trajectory.sample(0.9).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.825, trajectory.sample(1.0).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.899, trajectory.sample(1.1).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.953, trajectory.sample(1.2).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(0.987, trajectory.sample(1.3).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(1.000, trajectory.sample(1.4).state().getPose().pose().getTranslation().getX(), DELTA);
-        assertEquals(1.000, trajectory.sample(1.5).state().getPose().pose().getTranslation().getX(), DELTA);
+        check(trajectory, 0.0, 0.000);
+        check(trajectory, 0.1, 0.010);
+        check(trajectory, 0.2, 0.040);
+        check(trajectory, 0.3, 0.090);
+        check(trajectory, 0.4, 0.160);
+        check(trajectory, 0.5, 0.250);
+        check(trajectory, 0.6, 0.360);
+        check(trajectory, 0.7, 0.487);
+        check(trajectory, 0.8, 0.618);
+        check(trajectory, 0.9, 0.732);
+        check(trajectory, 1.0, 0.825);
+        check(trajectory, 1.1, 0.899);
+        check(trajectory, 1.2, 0.953);
+        check(trajectory, 1.3, 0.987);
+        check(trajectory, 1.4, 1.000);
+        check(trajectory, 1.5, 1.000);
+    }
+
+    private void check(Trajectory100 trajectory, double t, double x) {
+        assertEquals(x, trajectory.sample(t).state().getPose().pose().getTranslation().getX(), DELTA);
     }
 
     /**
@@ -183,7 +186,7 @@ class Trajectory100Test implements Timeless {
 
         Path100 path = PathFactory.pathFromWaypoints(
                 waypoints, 0.02, 0.2, 0.1);
-        assertEquals(23.063, path.getMaxDistance(), 0.001);
+        assertEquals(22.734, path.getMaxDistance(), 0.001);
 
         start = System.nanoTime();
         for (int rep = 0; rep < reps; ++rep) {
@@ -206,7 +209,7 @@ class Trajectory100Test implements Timeless {
 
         Trajectory100 trajectory = generator.timeParameterizeTrajectory(path, 0.1, 0, 0);
 
-        assertEquals(232, trajectory.length());
+        assertEquals(229, trajectory.length());
 
         start = System.nanoTime();
         for (int rep = 0; rep < reps; ++rep) {

@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.trajectory.path.spline.SplineR1;
 import org.team100.lib.util.Math100;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-
 public class DirectScheduleTest {
     private static final double EPSILON = 1e-6;
 

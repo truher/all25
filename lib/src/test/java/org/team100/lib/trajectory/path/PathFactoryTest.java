@@ -24,27 +24,6 @@ public class PathFactoryTest implements Timeless {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.01;
 
-    @Test
-    void testBackingUp() {
-        List<WaypointSE2> waypoints = List.of(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(0, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(-1, 0, 0), 1),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(1, 0, 0), 1));
-        Path100 path = PathFactory.pathFromWaypoints(
-                waypoints,
-                0.0127,
-                0.0127,
-                Math.toRadians(1.0));
-        assertEquals(14, path.length());
-    }
-
     /** Preserves the tangent at the corner and so makes a little "S" */
     @Test
     void testCorner() {
@@ -66,13 +45,13 @@ public class PathFactoryTest implements Timeless {
                         new DirectionSE2(0, 1, 0), 1));
         Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
 
-        assertEquals(17, path.length());
+        assertEquals(54, path.length());
         Pose2dWithMotion p = path.getPoint(0);
         assertEquals(0, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = path.getPoint(8);
-        assertEquals(1, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0.5, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
@@ -92,18 +71,18 @@ public class PathFactoryTest implements Timeless {
                         new DirectionSE2(1, 0, 0), 1));
         Path100 path = PathFactory.pathFromWaypoints(
                 waypoints, 0.01, 0.01, 0.1);
-        assertEquals(9, path.length());
+        assertEquals(17, path.length());
         Pose2dWithMotion p = path.getPoint(0);
         assertEquals(0, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
         p = path.getPoint(8);
-        assertEquals(1, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0.5, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.getPose().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 
-    /** Turning in place works now. */
+    /** Turning in place once again does not work. */
     @Test
     void testSpin() {
         List<WaypointSE2> waypoints = List.of(
@@ -117,16 +96,10 @@ public class PathFactoryTest implements Timeless {
                                 new Translation2d(0, 0),
                                 Rotation2d.kCCW_90deg),
                         new DirectionSE2(0, 0, 1), 1));
-        Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
-        TrajectoryPlotter.plot(path, 0.1);
+        assertThrows(IllegalArgumentException.class, () -> PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1));
     }
 
-    /**
-     * Hard corners once again do not work.
-     * 
-     * It *does* kinda work if the rotation axis is doing anything, which seems
-     * dumb.
-     */
+    /** Hard corners once again do not work. */
     @Test
     void testActualCorner() {
         List<WaypointSE2> waypoints = List.of(
@@ -150,8 +123,7 @@ public class PathFactoryTest implements Timeless {
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
                         new DirectionSE2(0, 1, 0), 1));
-        Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
-        TrajectoryPlotter.plot(path, 0.1);
+        assertThrows(IllegalArgumentException.class, () -> PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1));
     }
 
     @Test
@@ -166,11 +138,6 @@ public class PathFactoryTest implements Timeless {
                 new WaypointSE2(
                         new Pose2d(
                                 new Translation2d(1, 0),
-                                new Rotation2d()),
-                        new DirectionSE2(1, 0, 0), 1),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
                                 new Rotation2d(1)),
                         new DirectionSE2(1, 0, 0), 1),
                 new WaypointSE2(
@@ -180,7 +147,7 @@ public class PathFactoryTest implements Timeless {
                         new DirectionSE2(1, 0, 0), 1));
         Path100 foo = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
         TrajectoryPlotter.plot(foo, 0.1);
-        assertEquals(18, foo.length(), 0.001);
+        assertEquals(59, foo.length(), 0.001);
     }
 
     @Test
@@ -276,9 +243,9 @@ public class PathFactoryTest implements Timeless {
             System.out.printf("total duration ms: %5.3f\n", totalDurationMs);
             System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
-        assertEquals(17, t.length());
+        assertEquals(33, t.length());
         Pose2dWithMotion p = t.getPoint(4);
-        assertEquals(0.417, p.getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0.211, p.getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
     }
 

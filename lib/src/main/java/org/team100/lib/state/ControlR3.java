@@ -3,7 +3,7 @@ package org.team100.lib.state;
 import org.team100.lib.geometry.AccelerationSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -124,7 +124,7 @@ public class ControlR3 {
      * 
      * Correctly accounts for centripetal acceleration.
      */
-    public static ControlR3 fromTimedPose(TimedPose timedPose) {
+    public static ControlR3 fromTimedState(TimedState timedPose) {
         double xx = timedPose.state().getPose().pose().getTranslation().getX();
         double yx = timedPose.state().getPose().pose().getTranslation().getY();
         double thetax = timedPose.state().getPose().pose().getRotation().getRadians();
