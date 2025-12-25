@@ -6,6 +6,7 @@ import java.util.List;
 import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
+import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
 
 import edu.wpi.first.math.geometry.Twist2d;
 
@@ -108,6 +109,30 @@ public class Path100 {
         throw new ScheduleGenerator.TimingException();
     }
 
+    /**
+     * Samples the entire path evenly by distance.
+     */
+    public Pose2dWithMotion[] resample(double step) throws ScheduleGenerator.TimingException {
+        double maxDistance = getMaxDistance();
+        if (maxDistance == 0)
+            throw new IllegalArgumentException("max distance must be greater than zero");
+        int num_states = (int) Math.ceil(maxDistance / step) + 1;
+        if (ScheduleGenerator.DEBUG)
+            System.out.printf("resample max distance %f step %f num states %d f %f\n",
+                    maxDistance, step, num_states, maxDistance / step);
+        Pose2dWithMotion[] samples = new Pose2dWithMotion[num_states];
+        for (int i = 0; i < num_states; ++i) {
+            // the dtheta and curvature come from here and are never changed.
+            // the values here are just interpolated from the original values.
+            double d = Math.min(i * step, maxDistance);
+            Pose2dWithMotion state = sample(d);
+            if (ScheduleGenerator.DEBUG)
+                System.out.printf("RESAMPLE: i=%d d=%f state=%s\n", i, d, state);
+            samples[i] =state;
+        }
+        return samples;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -119,4 +144,5 @@ public class Path100 {
         }
         return builder.toString();
     }
+
 }

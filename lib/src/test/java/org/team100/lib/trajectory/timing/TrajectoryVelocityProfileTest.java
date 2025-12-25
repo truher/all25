@@ -32,13 +32,13 @@ public class TrajectoryVelocityProfileTest implements Timeless {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     // A five-meter straight line.
-    public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
+    public static final Pose2dWithMotion[] WAYPOINTS = new Pose2dWithMotion[] {
             new Pose2dWithMotion(WaypointSE2.irrotational(
                     new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2), 0, 0),
             new Pose2dWithMotion(WaypointSE2.irrotational(
                     new Pose2d(2.5, 0, new Rotation2d(0)), 0, 1.2), 0, 0),
             new Pose2dWithMotion(WaypointSE2.irrotational(
-                    new Pose2d(5, 0, new Rotation2d(0)), 0, 1.2), 0, 0));
+                    new Pose2d(5, 0, new Rotation2d(0)), 0, 1.2), 0, 0) };
 
     // No rotation.
     public static final List<Rotation2d> HEADINGS = List.of(
@@ -101,7 +101,7 @@ public class TrajectoryVelocityProfileTest implements Timeless {
         List<TimingConstraint> constraints = timing.testAuto(logger);
         ScheduleGenerator u = new ScheduleGenerator(constraints);
         Trajectory100 traj = u.timeParameterizeTrajectory(
-                new Path100(WAYPOINTS), 0.5, 0, 0);
+                new Path100(Arrays.asList(WAYPOINTS)), 0.5, 0, 0);
         // Trajectory100 traj = u.timeParameterizeTrajectory(WAYPOINTS, 0, 0);
         print(traj);
     }
