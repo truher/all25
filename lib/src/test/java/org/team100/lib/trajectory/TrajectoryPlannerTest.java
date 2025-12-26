@@ -170,12 +170,40 @@ class TrajectoryPlannerTest implements Timeless {
 
     @Test
     void test2d() {
-        SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
-        List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
+       List<TimingConstraint> constraints = List.of(
+                new ConstantConstraint(logger, 1, 1),
+                new CapsizeAccelerationConstraint(logger, 1, 1));
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
+        traj.dump();
+        assertEquals(3.337, traj.duration(), DELTA);
+    }
+
+    // this should result in constant velocity, slowing for the curve, and then
+    // accelerating for the exit.
+    //
+    // but it doesn't, so there's something wrong.
+    //
+    // in both the "pass" and "fail" cases (with decel in the forward pass), this
+    // produces too-low accels in the straights, and too much accel variation in
+    // the curve.
+    @Test
+    void test2d2() {
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(new Pose2d(0, 0, new Rotation2d()), new DirectionSE2(1, 0, 0), 1),
+                new WaypointSE2(new Pose2d(1, 0, new Rotation2d()), new DirectionSE2(1, 0, 0), 1),
+                new WaypointSE2(new Pose2d(2, 1, new Rotation2d()), new DirectionSE2(0, 1, 0), 1),
+                new WaypointSE2(new Pose2d(2, 2, new Rotation2d()), new DirectionSE2(0, 1, 0), 1));
+
+        List<TimingConstraint> constraints = List.of(
+                new ConstantConstraint(logger, 1, 1),
+                new CapsizeAccelerationConstraint(logger, 0.5, 1));
+        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+
+        Trajectory100 traj = planner.generateTrajectory(waypoints, 1, 1);
+        traj.dump();
         assertEquals(3.337, traj.duration(), DELTA);
     }
 

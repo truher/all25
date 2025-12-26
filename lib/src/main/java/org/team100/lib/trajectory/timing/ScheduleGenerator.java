@@ -16,7 +16,7 @@ public class ScheduleGenerator {
     public static class TimingException extends Exception {
     }
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
     private static final double EPSILON = 1e-6;
     /** this is the default, in order to make the constraints set the actual */
     private static final double HIGH_ACCEL = 1000;
@@ -57,21 +57,13 @@ public class ScheduleGenerator {
         if (n < 3)
             throw new IllegalArgumentException("must have at least three samples");
 
+        // distance monotonically increases
         double distances[] = new double[n];
         double velocities[] = new double[n];
         double decels[] = new double[n];
         double accels[] = new double[n];
 
         // Forward pass.
-        //
-        // We look at pairs of consecutive states, where the start state has already
-        // been velocity parameterized (though we may adjust the velocity downwards
-        // during the backwards pass). We wish to find an acceleration that is
-        // admissible at both the start and end state, as well as an admissible end
-        // velocity. If there is no admissible end velocity or acceleration, we set the
-        // end velocity to the state's maximum allowed velocity and will repair the
-        // acceleration during the backward pass (by slowing down the predecessor).
-
         {
             Pose2dWithMotion previousPose = samples[0];
             double previousDistance = 0;
@@ -79,7 +71,7 @@ public class ScheduleGenerator {
             double previousDecel = -HIGH_ACCEL;
             double previousAccel = HIGH_ACCEL;
             for (int i = 0; i < n; ++i) {
-
+                // arclength is never negative but can be zero.
                 double arclength = samples[i].distanceCartesian(previousPose);
                 if (i > 0 && i < n - 1 && arclength < 1e-6) {
                     // the first distance is zero because of the weird loop structure.
@@ -90,6 +82,8 @@ public class ScheduleGenerator {
 
                 distances[i] = arclength + previousDistance;
                 velocities[i] = 100;
+                decels[i] = -HIGH_ACCEL;
+                accels[i] = HIGH_ACCEL;
 
                 // We may need to iterate to find the maximum end velocity and common
                 // acceleration, since acceleration limits may be a function of velocity.
@@ -100,18 +94,27 @@ public class ScheduleGenerator {
                     velocities[i] = v1;
 
                     // also use max accels for the new state accels
-                    decels[i] = -HIGH_ACCEL;
-                    accels[i] = HIGH_ACCEL;
+                    // decels[i] = -HIGH_ACCEL;
+                    // accels[i] = HIGH_ACCEL;
 
                     // reduce velocity according to constraints
                     for (TimingConstraint constraint : m_constraints) {
-                        velocities[i] = Math.min(velocities[i], constraint.maxV(samples[i]));
+                        double constraintV = constraint.maxV(samples[i]);
+                        if (DEBUG) {
+                            System.out.printf("i %d constraint %s v %f\n",
+                                    i, constraint.getClass().getSimpleName(), constraintV);
+                        }
+                        velocities[i] = Math.min(velocities[i], constraintV);
                     }
 
                     for (TimingConstraint constraint1 : m_constraints) {
-                        decels[i] = Math.max(decels[i], constraint1.maxDecel(samples[i], velocities[i]));
+                        // removing this breaks TrajectoryPlannerTest.test2d.
+                        // which is an s-shaped thing with variable curvature.
+                        // the passing test is definitely wrong, and the failing
+                        // test is wrong too.
+                        // decels[i] = Math.max(decels[i], constraint1.maxDecel(samples[i],
+                        // velocities[i]));
                         accels[i] = Math.min(accels[i], constraint1.maxAccel(samples[i], velocities[i]));
-
                     }
 
                     // motionless, which can happen at the end
@@ -159,16 +162,14 @@ public class ScheduleGenerator {
             for (int i = n - 1; i >= 0; --i) {
                 // backwards (negative) distance from successor to initial state.
                 double dq = distances[i] - successorDistance;
-                if (dq > 0) {
-                    // must be negative if we're walking backwards.
-                    throw new IllegalStateException();
-                }
 
                 while (true) {
                     // s0 velocity can't be more than the accel implies
                     // so this is actually an estimate for v0
                     // min a is negative, dq is negative, so v0 is faster than v1
                     double v0 = Math100.v1(successorVelocity, successorDecel, dq);
+                    if (DEBUG)
+                        System.out.printf("i %d v0 %f\n", i, v0);
 
                     if (velocities[i] <= v0) {
                         // s0 v is slower than implied v0, which means
@@ -176,7 +177,9 @@ public class ScheduleGenerator {
                         // No new limits to impose.
                         break;
                     }
-                    // s0 v is too fast, turn it down to obey v1 min accel.
+                    // v is too fast
+                    if (DEBUG)
+                        System.out.printf("v too fast i %d v_i %f v0 %f\n", i, velocities[i], v0);
                     velocities[i] = v0;
 
                     for (TimingConstraint constraint : m_constraints) {
@@ -215,25 +218,25 @@ public class ScheduleGenerator {
         //
         List<TimedState> poses = new ArrayList<>(n);
         {
-            double time = 0.0;
-            double distance = 0.0;
-            double v0 = 0.0;
+            double runningTotalTime = 0.0;
+            double previousDistance = 0.0;
+            double previousVelocity = 0.0;
 
             for (int i = 0; i < n; ++i) {
-                double dq = distances[i] - distance;
+                double dq = distances[i] - previousDistance;
                 double dt = 0.0;
                 if (i > 0) {
-                    double prevAccel = Math100.accel(v0, velocities[i], dq);
+                    double prevAccel = Math100.accel(previousVelocity, velocities[i], dq);
                     poses.get(i - 1).set_acceleration(prevAccel);
-                    dt = dt(v0, velocities[i], dq, prevAccel);
+                    dt = dt(previousVelocity, velocities[i], dq, prevAccel);
                 }
-                time += dt;
-                if (Double.isNaN(time) || Double.isInfinite(time)) {
+                runningTotalTime += dt;
+                if (Double.isNaN(runningTotalTime) || Double.isInfinite(runningTotalTime)) {
                     throw new TimingException();
                 }
-                poses.add(new TimedState(samples[i], time, velocities[i], 0));
-                v0 = velocities[i];
-                distance = distances[i];
+                poses.add(new TimedState(samples[i], runningTotalTime, velocities[i], 0));
+                previousVelocity = velocities[i];
+                previousDistance = distances[i];
             }
         }
 

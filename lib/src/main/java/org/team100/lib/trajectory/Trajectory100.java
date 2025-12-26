@@ -3,7 +3,11 @@ package org.team100.lib.trajectory;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.timing.TimedState;
+
+import edu.wpi.first.math.geometry.Pose2d;
 
 /**
  * A list of timed poses.
@@ -95,5 +99,18 @@ public class Trajectory100 {
             builder.append(System.lineSeparator());
         }
         return builder.toString();
+    }
+
+    /** For cutting-and-pasting into a spreadsheet */
+    public void dump() {
+        System.out.println("i, t, v, a, k, x, y");
+        for (int i = 0; i < length(); ++i) {
+            TimedState ts = getPoint(i);
+            Pose2dWithMotion pwm = ts.state();
+            WaypointSE2 w = pwm.getPose();
+            Pose2d p = w.pose();
+            System.out.printf("%d, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
+                    i, ts.getTimeS(), ts.velocityM_S(), ts.acceleration(), pwm.getCurvatureRad_M(), p.getX(), p.getY());
+        }
     }
 }

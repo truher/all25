@@ -97,32 +97,32 @@ public class Math100 {
 
     /**
      * Return acceleration implied by the change in velocity (v0 to v1)
-     * over the distance, ds.
+     * over the distance, dx.
      * 
-     * a = (v1^2 - v0^2) / 2ds
+     * a = (v1^2 - v0^2) / 2dx
      * 
-     * note ds can be negative, which implies negative time.
+     * note dx can be negative, which implies negative time.
      * 
      * @param v0 initial velocity
      * @param v1 final velocity
-     * @param ds distance
+     * @param dx distance
      */
-    public static double accel(double v0, double v1, double ds) {
-        if (Math.abs(ds) < 1e-6) {
+    public static double accel(double v0, double v1, double dx) {
+        if (Math.abs(dx) < 1e-6) {
             // prevent division by zero
             return 0;
         }
         /*
          * a = dv/dt
-         * v = ds/dt
-         * dt = ds/v
-         * a = v dv/ds
-         * a = v (v1-v0)/ds
+         * v = dx/dt
+         * dt = dx/v
+         * a = v dv/dx
+         * a = v (v1-v0)/dx
          * v = (v0+v1)/2
-         * a = (v0+v1)(v1-v0)/2ds
-         * a = (v1^2 - v0^2)/2ds
+         * a = (v0+v1)(v1-v0)/2dx
+         * a = (v1^2 - v0^2)/2dx
          */
-        return (v1 * v1 - v0 * v0) / (2.0 * ds);
+        return (v1 * v1 - v0 * v0) / (2.0 * dx);
     }
 
     /**

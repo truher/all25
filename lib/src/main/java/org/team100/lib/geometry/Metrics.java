@@ -16,6 +16,8 @@ public class Metrics {
 
     /**
      * The distance between translational components. Ignores rotation entirely.
+     * 
+     * Always non-negative.
      */
     public static double translationalDistance(Pose2d a, Pose2d b) {
         return a.getTranslation().getDistance(b.getTranslation());
@@ -71,7 +73,7 @@ public class Metrics {
      * Don't use it for anything where you compare it to xy planar distances or
      * velocities.
      */
-   public static double l2Norm(Twist2d a) {
+    public static double l2Norm(Twist2d a) {
         return Math.sqrt(a.dx * a.dx + a.dy * a.dy + a.dtheta * a.dtheta);
     }
 
@@ -89,7 +91,7 @@ public class Metrics {
         return v.norm();
     }
 
-        /**
+    /**
      * Double-geodesic combines the angular distance with the translational
      * distance, weighting 1 radian equal to 1 meter.
      * 
