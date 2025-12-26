@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
+import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
@@ -222,6 +223,52 @@ class TrajectoryPlannerTest implements Timeless {
         if (DEBUG)
             traj.dump();
         assertEquals(4.603, traj.duration(), DELTA);
+    }
+
+    /**
+     * accelerating at the start
+     * slowing before the "slow zone" in the middle
+     * speeding up again
+     * slowing to a stop at the end
+     */
+    @Test
+    void testVariableConstraint() {
+
+        class ConditionalTimingConstraint implements TimingConstraint {
+            @Override
+            public double maxV(Pose2dWithMotion state) {
+                double x = state.getPose().pose().getTranslation().getX();
+                if (x < 1.5) {
+                    return 2.0;
+                }
+                if (x < 2.5) {
+                    return 1.0;
+                }
+                return 2.0;
+
+            }
+
+            @Override
+            public double maxAccel(Pose2dWithMotion state, double velocity) {
+                return 2;
+            }
+
+            @Override
+            public double maxDecel(Pose2dWithMotion state, double velocity) {
+                return -1;
+            }
+        }
+
+        List<TimingConstraint> constraints = List.of(
+                new ConditionalTimingConstraint());
+        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(new Pose2d(0, 0, new Rotation2d()), new DirectionSE2(1, 0, 0), 1.3),
+                new WaypointSE2(new Pose2d(4, 0, new Rotation2d()), new DirectionSE2(1, 0, 0), 1.3));
+        Trajectory100 traj = planner.generateTrajectory(waypoints, 0, 0);
+        if (DEBUG)
+            traj.dump();
+
     }
 
 }

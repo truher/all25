@@ -7,6 +7,7 @@ import java.util.stream.DoubleStream;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
+import org.team100.lib.geometry.Metrics;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
@@ -368,7 +369,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 continue;
             }
 
-            final double distanceM = distance(m_prevPose, pose);
+            final double distanceM = Metrics.translationalDistance(m_prevPose, pose);
             if (distanceM > VISION_CHANGE_TOLERANCE_M) {
                 // The new estimate is too far from the previous one: it's probably garbage.
                 m_prevPose = pose;
@@ -424,15 +425,6 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                 K * distanceM,
                 K * distanceM,
                 Double.MAX_VALUE };
-    }
-
-    ///////////////////////////////////////
-
-    /** Distance between pose translations. */
-    private static double distance(Pose2d a, Pose2d b) {
-        // the translation distance is a little quicker to calculate and we don't care
-        // about the "twist" curve measurement
-        return a.getTranslation().getDistance(b.getTranslation());
     }
 
 }

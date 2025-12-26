@@ -19,13 +19,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGenerationException;
 
 /**
- * Creates a trajectory in four steps:
+ * Creates a trajectory in three steps:
  * 
  * 1. create a spline
  * 2. create points along the spline so that the secants between the points are
- * within the spline sample tolerance
- * 3. walk down the secant lines using the step distance
- * 4. assign timestamps to each step
+ * within the spline sample tolerance, and the points are close enough together
+ * 3. assign timestamps to each step
  */
 public class TrajectoryPlanner {
     private static final boolean DEBUG = false;
