@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -22,8 +22,8 @@ public class FieldRelativeVelocityLimiterTest implements Timeless {
         BatterySagSpeedLimit limit = new BatterySagSpeedLimit(logger, k, () -> 12);
         FieldRelativeVelocityLimiter limiter = new FieldRelativeVelocityLimiter(logger, limit);
         assertEquals(5, k.getMaxDriveVelocityM_S(), DELTA);
-        GlobalVelocityR3 s = new GlobalVelocityR3(10, 0, 0);
-        GlobalVelocityR3 i = limiter.proportional(s);
+        VelocitySE2 s = new VelocitySE2(10, 0, 0);
+        VelocitySE2 i = limiter.proportional(s);
         assertEquals(5, i.x(), DELTA);
         assertEquals(0, i.y(), DELTA);
         assertEquals(0, i.theta(), DELTA);
@@ -35,8 +35,8 @@ public class FieldRelativeVelocityLimiterTest implements Timeless {
         BatterySagSpeedLimit limit = new BatterySagSpeedLimit(logger, k, () -> 12);
         FieldRelativeVelocityLimiter limiter = new FieldRelativeVelocityLimiter(logger, limit);
         assertEquals(14.142, k.getMaxAngleSpeedRad_S(), DELTA);
-        GlobalVelocityR3 target = new GlobalVelocityR3(0, 0, -20);
-        GlobalVelocityR3 i = limiter.proportional(target);
+        VelocitySE2 target = new VelocitySE2(0, 0, -20);
+        VelocitySE2 i = limiter.proportional(target);
         assertEquals(0, i.x(), DELTA);
         assertEquals(0, i.y(), DELTA);
         assertEquals(-14.142, i.theta(), DELTA);
@@ -49,8 +49,8 @@ public class FieldRelativeVelocityLimiterTest implements Timeless {
         BatterySagSpeedLimit limit = new BatterySagSpeedLimit(logger, k, () -> 12);
         FieldRelativeVelocityLimiter l = new FieldRelativeVelocityLimiter(logger, limit);
         assertEquals(14.142, k.getMaxAngleSpeedRad_S(), DELTA);
-        GlobalVelocityR3 t = new GlobalVelocityR3(0, 0, 0);
-        GlobalVelocityR3 i = l.preferRotation(t);
+        VelocitySE2 t = new VelocitySE2(0, 0, 0);
+        VelocitySE2 i = l.preferRotation(t);
         assertEquals(0, i.x(), DELTA);
         assertEquals(0, i.y(), DELTA);
         assertEquals(0, i.theta(), DELTA);
@@ -64,24 +64,24 @@ public class FieldRelativeVelocityLimiterTest implements Timeless {
         FieldRelativeVelocityLimiter l = new FieldRelativeVelocityLimiter(logger, limit);
         {
             // inside the envelope => no change
-            GlobalVelocityR3 target = new GlobalVelocityR3(1, 0, 1);
-            GlobalVelocityR3 i = l.preferRotation(target);
+            VelocitySE2 target = new VelocitySE2(1, 0, 1);
+            VelocitySE2 i = l.preferRotation(target);
             assertEquals(1, i.x(), DELTA);
             assertEquals(0, i.y(), DELTA);
             assertEquals(1, i.theta(), DELTA);
         }
         {
             // full v, half omega => half v
-            GlobalVelocityR3 target = new GlobalVelocityR3(5, 0, 7.05);
-            GlobalVelocityR3 i = l.preferRotation(target);
+            VelocitySE2 target = new VelocitySE2(5, 0, 7.05);
+            VelocitySE2 i = l.preferRotation(target);
             assertEquals(2.507, i.x(), DELTA);
             assertEquals(0, i.y(), DELTA);
             assertEquals(7.05, i.theta(), DELTA);
         }
         {
             // full v, full omega => zero v, sorry
-            GlobalVelocityR3 target = new GlobalVelocityR3(5, 0, 14.142);
-            GlobalVelocityR3 i = l.preferRotation(target);
+            VelocitySE2 target = new VelocitySE2(5, 0, 14.142);
+            VelocitySE2 i = l.preferRotation(target);
             assertEquals(0, i.x(), DELTA);
             assertEquals(0, i.y(), DELTA);
             assertEquals(14.142, i.theta(), DELTA);
@@ -94,8 +94,8 @@ public class FieldRelativeVelocityLimiterTest implements Timeless {
         SwerveKinodynamics k = SwerveKinodynamicsFactory.forRealisticTest(logger);
         BatterySagSpeedLimit limit = new BatterySagSpeedLimit(logger, k, () -> 6);
         FieldRelativeVelocityLimiter limiter = new FieldRelativeVelocityLimiter(logger, limit);
-        GlobalVelocityR3 target = new GlobalVelocityR3(1, 0, 0);
-        GlobalVelocityR3 limited = limiter.apply(target);
+        VelocitySE2 target = new VelocitySE2(1, 0, 0);
+        VelocitySE2 limited = limiter.apply(target);
         assertEquals(0, limited.x(), DELTA);
         assertEquals(0, limited.y(), DELTA);
         assertEquals(0, limited.theta(), DELTA);
@@ -109,35 +109,35 @@ public class FieldRelativeVelocityLimiterTest implements Timeless {
         FieldRelativeVelocityLimiter l = new FieldRelativeVelocityLimiter(logger, limit);
 
         { // both motionless
-            GlobalVelocityR3 target = new GlobalVelocityR3(0, 0, 0);
+            VelocitySE2 target = new VelocitySE2(0, 0, 0);
             assertTrue(target.angle().isEmpty());
-            GlobalVelocityR3 desaturated = l.apply(target);
+            VelocitySE2 desaturated = l.apply(target);
             assertTrue(desaturated.angle().isEmpty());
         }
         { // translating ahead
-            GlobalVelocityR3 target = new GlobalVelocityR3(10, 0, 0);
+            VelocitySE2 target = new VelocitySE2(10, 0, 0);
             assertEquals(0, target.angle().get().getRadians(), DELTA);
             assertEquals(10, target.norm(), DELTA);
-            GlobalVelocityR3 desaturated = l.apply(target);
+            VelocitySE2 desaturated = l.apply(target);
             assertEquals(0, desaturated.angle().get().getRadians(), DELTA);
             assertEquals(5, desaturated.norm(), DELTA);
         }
         { // translating ahead and spinning
-            GlobalVelocityR3 target = new GlobalVelocityR3(10, 0, 10);
+            VelocitySE2 target = new VelocitySE2(10, 0, 10);
             assertEquals(0, target.angle().get().getRadians(), DELTA);
             assertEquals(10, target.norm(), DELTA);
             assertEquals(10, target.theta(), DELTA);
-            GlobalVelocityR3 desaturated = l.apply(target);
+            VelocitySE2 desaturated = l.apply(target);
             assertEquals(0, desaturated.angle().get().getRadians(), DELTA);
             assertEquals(3.694, desaturated.norm(), DELTA);
             assertEquals(3.694, desaturated.theta(), DELTA);
         }
         { // translating 45 to the left and spinning
-            GlobalVelocityR3 target = new GlobalVelocityR3(10 / Math.sqrt(2), 10 / Math.sqrt(2), 10);
+            VelocitySE2 target = new VelocitySE2(10 / Math.sqrt(2), 10 / Math.sqrt(2), 10);
             assertEquals(Math.PI / 4, target.angle().get().getRadians(), DELTA);
             assertEquals(10, target.norm(), DELTA);
             assertEquals(10, target.theta(), DELTA);
-            GlobalVelocityR3 desaturated = l.apply(target);
+            VelocitySE2 desaturated = l.apply(target);
             assertEquals(Math.PI / 4, desaturated.angle().get().getRadians(), DELTA);
             assertEquals(2.612, desaturated.x(), DELTA);
             assertEquals(2.612, desaturated.y(), DELTA);
@@ -152,13 +152,13 @@ public class FieldRelativeVelocityLimiterTest implements Timeless {
         SwerveKinodynamics k = SwerveKinodynamicsFactory.limiting(logger);
         BatterySagSpeedLimit limit = new BatterySagSpeedLimit(logger, k, () -> 12);
         FieldRelativeVelocityLimiter limiter = new FieldRelativeVelocityLimiter(logger, limit);
-        GlobalVelocityR3 target = new GlobalVelocityR3(5, 0, 25);
+        VelocitySE2 target = new VelocitySE2(5, 0, 25);
         assertEquals(5, target.x(), DELTA);
         assertEquals(0, target.y(), DELTA);
         assertEquals(25, target.theta(), DELTA);
         // the spin is 5x the drive, as requested.
         // use the target as the previous setpoint
-        GlobalVelocityR3 setpoint = limiter.apply(target);
+        VelocitySE2 setpoint = limiter.apply(target);
         assertEquals(1.806, setpoint.x(), DELTA);
         assertEquals(0, setpoint.y(), DELTA);
         assertEquals(9.032, setpoint.theta(), DELTA);

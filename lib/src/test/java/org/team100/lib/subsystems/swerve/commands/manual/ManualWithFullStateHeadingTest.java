@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -47,7 +47,7 @@ class ManualWithFullStateHeadingTest {
 
         Velocity twist1_1 = new Velocity(0, 0, 0);
 
-        GlobalVelocityR3 twistM_S = m_manualWithHeading.apply(new ModelR3(), twist1_1);
+        VelocitySE2 twistM_S = m_manualWithHeading.apply(new ModelR3(), twist1_1);
         verify(0, 0, 0, twistM_S);
 
         // with a non-null desired rotation we're in snap mode
@@ -79,7 +79,7 @@ class ManualWithFullStateHeadingTest {
 
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
-        GlobalVelocityR3 twistM_S = m_manualWithHeading.apply(
+        VelocitySE2 twistM_S = m_manualWithHeading.apply(
                 new ModelR3(),
                 twist1_1);
 
@@ -116,7 +116,7 @@ class ManualWithFullStateHeadingTest {
         // no user input
         final Velocity zeroVelocity = new Velocity(0, 0, 0);
 
-        GlobalVelocityR3 twistM_S = m_manualWithHeading.apply(
+        VelocitySE2 twistM_S = m_manualWithHeading.apply(
                 new ModelR3(),
                 zeroVelocity);
         // in snap mode
@@ -188,8 +188,8 @@ class ManualWithFullStateHeadingTest {
 
         // no stick input
         Velocity twist1_1 = new Velocity(0, 0, 0);
-        GlobalVelocityR3 v = m_manualWithHeading.apply(
-                new ModelR3(currentPose, new GlobalVelocityR3(0, 0, 0)),
+        VelocitySE2 v = m_manualWithHeading.apply(
+                new ModelR3(currentPose, new VelocitySE2(0, 0, 0)),
                 twist1_1);
 
         // in snap mode
@@ -248,11 +248,11 @@ class ManualWithFullStateHeadingTest {
 
         ModelR3 currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalVelocityR3(0, 0, 0));
+                new VelocitySE2(0, 0, 0));
         // no POV
         desiredRotation = null;
 
-        GlobalVelocityR3 v = m_manualWithHeading.apply(currentState, twist1_1);
+        VelocitySE2 v = m_manualWithHeading.apply(currentState, twist1_1);
         // scale 1.0 input to max omega
         assertNull(m_manualWithHeading.m_goal);
         assertNull(m_manualWithHeading.m_thetaSetpoint);
@@ -261,7 +261,7 @@ class ManualWithFullStateHeadingTest {
         // already going full speed:
         currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalVelocityR3(0, 0, 2.828));
+                new VelocitySE2(0, 0, 2.828));
         // gyro indicates the correct speed
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -273,7 +273,7 @@ class ManualWithFullStateHeadingTest {
         twist1_1 = new Velocity(0, 0, 0);
         currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalVelocityR3(0, 0, 2.828));
+                new VelocitySE2(0, 0, 2.828));
         // gyro rate is still full speed.
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -304,11 +304,11 @@ class ManualWithFullStateHeadingTest {
 
         ModelR3 currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalVelocityR3(0, 0, 0));
+                new VelocitySE2(0, 0, 0));
         // no POV
         desiredRotation = null;
 
-        GlobalVelocityR3 v = m_manualWithHeading.apply(currentState, twist1_1);
+        VelocitySE2 v = m_manualWithHeading.apply(currentState, twist1_1);
         // scale 1.0 input to max omega
         assertNull(m_manualWithHeading.m_goal);
         assertNull(m_manualWithHeading.m_thetaSetpoint);
@@ -317,7 +317,7 @@ class ManualWithFullStateHeadingTest {
         // already going full speed:
         currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalVelocityR3(0, 0, 2.828));
+                new VelocitySE2(0, 0, 2.828));
         // gyro indicates the correct speed
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -329,7 +329,7 @@ class ManualWithFullStateHeadingTest {
         twist1_1 = new Velocity(0, 0, 0);
         currentState = new ModelR3(
                 Pose2d.kZero,
-                new GlobalVelocityR3(0, 0, 2.828));
+                new VelocitySE2(0, 0, 2.828));
         // gyro rate is still full speed.
         gyro.rate = 2.828;
         v = m_manualWithHeading.apply(currentState, twist1_1);
@@ -373,7 +373,7 @@ class ManualWithFullStateHeadingTest {
         }
     }
 
-    private void verify(double vx, double vy, double omega, GlobalVelocityR3 v) {
+    private void verify(double vx, double vy, double omega, VelocitySE2 v) {
         assertEquals(vx, v.x(), DELTA);
         assertEquals(vy, v.y(), DELTA);
         assertEquals(omega, v.theta(), DELTA);

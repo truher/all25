@@ -12,7 +12,7 @@ import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.controller.r3.FullStateControllerR3;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.ReefPoint;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.subsystems.r3.commands.DriveToPoseWithProfile;
@@ -20,6 +20,7 @@ import org.team100.lib.subsystems.r3.commands.DriveToTranslationFacingWithProfil
 import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,8 +52,9 @@ public class LolipopAuto {
         DriveWithTrajectoryFunction toReefTrajectory = new DriveWithTrajectoryFunction(
                 m_log, m_machinery.m_drive, m_autoController, m_machinery.m_trajectoryViz,
                 (p) -> m_planner.restToRest(List.of(
-                        HolonomicPose2d.make(m_machinery.m_drive.getPose(), Math.PI),
-                        HolonomicPose2d.make(3, 5, 0, -2))));
+                        WaypointSE2.irrotational(m_machinery.m_drive.getPose(), Math.PI, 1.2),
+                        WaypointSE2.irrotational(
+                                new Pose2d(3, 5, new Rotation2d(0)), -2, 1.2))));
 
         DriveToPoseWithProfile toReefA = new DriveToPoseWithProfile(
                 m_log, m_machinery.m_drive, m_autoController, m_autoProfile,

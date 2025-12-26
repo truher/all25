@@ -9,8 +9,10 @@ import org.team100.lib.tuning.Mutable;
  * Velocity limit based on curvature and the capsize limit (scaled).
  */
 public class CapsizeAccelerationConstraint implements TimingConstraint {
-    private final SwerveKinodynamics m_limits;
+    private static final boolean DEBUG = false;
     private final Mutable m_scale;
+    private final double m_maxCentripetalAccel;
+    private final double m_maxDecel;
 
     /**
      * Use the factory.
@@ -26,8 +28,16 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
             SwerveKinodynamics limits,
             double scale) {
         LoggerFactory log = parent.type(this);
-        m_limits = limits;
         m_scale = new Mutable(log, "scale", scale);
+        m_maxCentripetalAccel = limits.getMaxCapsizeAccelM_S2();
+        m_maxDecel = -limits.getMaxDriveDecelerationM_S2();
+    }
+
+    public CapsizeAccelerationConstraint(LoggerFactory parent, double centripetal, double decel) {
+        LoggerFactory log = parent.type(this);
+        m_scale = new Mutable(log, "scale", 1);
+        m_maxCentripetalAccel = centripetal;
+        m_maxDecel = -decel;
     }
 
     /**
@@ -38,11 +48,35 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      * If the curvature is zero, this will return infinity.
      */
     @Override
-    public NonNegativeDouble getMaxVelocity(final Pose2dWithMotion state) {
-        double mMaxCentripetalAccel = m_limits.getMaxCapsizeAccelM_S2() * m_scale.getAsDouble();
-        double radius = 1 / state.getCurvature();
+    public double maxV(final Pose2dWithMotion state) {
+        double radius = 1 / Math.abs(state.getCurvatureRad_M());
         // abs is used here to make sure sqrt is happy.
-        return new NonNegativeDouble(Math.sqrt(Math.abs(mMaxCentripetalAccel * radius)));
+        return Math.sqrt(Math.abs(m_maxCentripetalAccel * m_scale.getAsDouble() * radius));
+    }
+
+    @Override
+    public double maxAccel(Pose2dWithMotion state, double velocity) {
+        double alongsq = alongSq(state, velocity);
+        if (alongsq < 0) {
+            if (DEBUG)
+                System.out.println("too fast for the curvature, can't speed up");
+            return 0;
+        }
+        return Math.sqrt(alongsq);
+    }
+
+    @Override
+    public double maxDecel(Pose2dWithMotion state, double velocity) {
+        double alongsq = alongSq(state, velocity);
+        if (alongsq < 0) {
+            if (DEBUG)
+                System.out.println("too fast for the curvature, slowing down is ok");
+            return m_maxDecel * m_scale.getAsDouble();
+        }
+        double decel = -Math.sqrt(alongsq);
+        if (DEBUG)
+            System.out.printf("decel %f\n", decel);
+        return decel;
     }
 
     /**
@@ -56,19 +90,13 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      * so
      * along = sqrt(total^2 - v^4/r^2)
      */
-    @Override
-    public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocity) {
-        double mMaxCentripetalAccel = m_limits.getMaxCapsizeAccelM_S2() * m_scale.getAsDouble();
-
-        double radius = 1 / state.getCurvature();
-        double centripetalAccel = velocity * velocity / radius;
-        double alongsq = mMaxCentripetalAccel * mMaxCentripetalAccel - centripetalAccel * centripetalAccel;
-        if (alongsq < 0) {
-            // if you're here, you're violating the velocity constraint above,
-            // and you should try to gently slow down.
-            return new MinMaxAcceleration(-m_limits.getMaxDriveDecelerationM_S2() * m_scale.getAsDouble(), 0);
-        }
-        double along = Math.sqrt(alongsq);
-        return new MinMaxAcceleration(-along, along);
+    private double alongSq(Pose2dWithMotion state, double velocity) {
+        double radius = 1 / Math.abs(state.getCurvatureRad_M());
+        double actualCentripetalAccel = velocity * velocity / radius;
+        if (DEBUG)
+            System.out.printf("radius %f actual centripetal %f\n",
+                    radius, actualCentripetalAccel);
+        return m_maxCentripetalAccel * m_scale.getAsDouble() * m_maxCentripetalAccel * m_scale.getAsDouble()
+                - actualCentripetalAccel * actualCentripetalAccel;
     }
 }

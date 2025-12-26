@@ -81,7 +81,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
         inst.startClient4("tag_finder24");
 
         // wait for the NT thread
-        Thread.sleep(5);
+        Thread.sleep(100);
         assertTrue(inst.isConnected());
 
         StructArrayTopic<Blip24> topic = inst.getStructArrayTopic(
@@ -92,7 +92,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 (long) Takt.get() * 1000000);
 
         // wait for NT rate-limiting
-        Thread.sleep(100);
+        Thread.sleep(200);
         inst.flush();
 
         assertTrue(poseEstimate.isEmpty());
@@ -111,7 +111,7 @@ class AprilTagRobotLocalizerTest implements Timeless {
                 (long) Takt.get() * 1000000);
 
         // wait for NT rate-limiting
-        Thread.sleep(100);
+        Thread.sleep(200);
         inst.flush();
 
         localizer.update();

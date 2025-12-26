@@ -12,14 +12,14 @@ import org.team100.lib.config.ElevatorUtil.ScoringLevel;
 import org.team100.lib.config.Feedforward100;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ConfigLogger;
-import org.team100.lib.logging.LoggerFactory.GlobalAccelerationR3Logger;
-import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.AccelerationSE2Logger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.logging.LoggerFactory.JointAccelerationsLogger;
 import org.team100.lib.logging.LoggerFactory.JointForceLogger;
 import org.team100.lib.logging.LoggerFactory.JointVelocitiesLogger;
@@ -105,8 +105,8 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
     private final JointForceLogger m_log_jointF;
 
     private final Pose2dLogger m_log_pose;
-    private final GlobalVelocityR3Logger m_log_cartesianV;
-    private final GlobalAccelerationR3Logger m_log_cartesianA;
+    private final VelocitySE2Logger m_log_cartesianV;
+    private final AccelerationSE2Logger m_log_cartesianA;
 
     private final LinearMechanism m_elevatorFront;
     private final LinearMechanism m_elevatorBack;
@@ -146,8 +146,8 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
 
         LoggerFactory cartesianLog = parent.name("cartesian");
         m_log_pose = cartesianLog.pose2dLogger(Level.DEBUG, "pose");
-        m_log_cartesianV = cartesianLog.globalVelocityR3Logger(Level.DEBUG, "velocity");
-        m_log_cartesianA = cartesianLog.globalAccelerationR3Logger(Level.DEBUG, "accel");
+        m_log_cartesianV = cartesianLog.VelocitySE2Logger(Level.DEBUG, "velocity");
+        m_log_cartesianA = cartesianLog.AccelerationSE2Logger(Level.DEBUG, "accel");
 
         LoggerFactory elevatorbackLog = parent.name("elevatorBack");
         LoggerFactory elevatorfrontLog = parent.name("elevatorFront");
@@ -317,14 +317,14 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
         EAWConfig c = getConfig();
         JointVelocities jv = getJointVelocity();
         Pose2d p = m_kinematics.forward(c);
-        GlobalVelocityR3 v = m_jacobian.forward(c, jv);
+        VelocitySE2 v = m_jacobian.forward(c, jv);
         return new ModelR3(p, v);
     }
 
     // for testing only
-    public void setVelocity(GlobalVelocityR3 v) {
+    public void setVelocity(VelocitySE2 v) {
         Pose2d pose = getState().pose();
-        GlobalAccelerationR3 a = new GlobalAccelerationR3(0, 0, 0);
+        AccelerationSE2 a = new AccelerationSE2(0, 0, 0);
         ControlR3 control = new ControlR3(pose, v, a);
 
         JointVelocities jv = m_jacobian.inverse(control.model());
@@ -490,87 +490,87 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
 
     public MoveAndHold homeToL1() {
         return m_transit.endless("homeToL1",
-                HolonomicPose2d.make(m_home, -1.5),
-                HolonomicPose2d.make(L2, -1.7));
+                WaypointSE2.irrotational(m_home, -1.5, 1.2),
+                WaypointSE2.irrotational(L2, -1.7, 1.2));
     }
 
     // NEVER CALL
     public Command l1ToHome() {
         return m_transit.terminal("l1ToHome",
-                HolonomicPose2d.make(L2, 1.3),
-                HolonomicPose2d.make(m_home, 1.5));
+                WaypointSE2.irrotational(L2, 1.3, 1.2),
+                WaypointSE2.irrotational(m_home, 1.5, 1.2));
     }
 
     public MoveAndHold homeToL2() {
         return m_transit.endless("homeToL2",
-                HolonomicPose2d.make(m_home, 1.5),
-                HolonomicPose2d.make(L2, 1.5));
+                WaypointSE2.irrotational(m_home, 1.5, 1.2),
+                WaypointSE2.irrotational(L2, 1.5, 1.2));
     }
 
     public Command l2ToHome() {
         return m_transit.terminal("l2ToHome",
-                HolonomicPose2d.make(L2, -1.5),
-                HolonomicPose2d.make(m_home, -1.5));
+                WaypointSE2.irrotational(L2, -1.5, 1.2),
+                WaypointSE2.irrotational(m_home, -1.5, 1.2));
     }
 
     public MoveAndHold homeToL3() {
         return m_transit.endless("homeToL3",
-                HolonomicPose2d.make(m_home, 0.8),
-                HolonomicPose2d.make(L3, 1.5));
+                WaypointSE2.irrotational(m_home, 0.8, 1.2),
+                WaypointSE2.irrotational(L3, 1.5, 1.2));
     }
 
     public Command l3ToHome() {
         return m_transit.terminal("l3ToHome",
-                HolonomicPose2d.make(L3, -1.5),
-                HolonomicPose2d.make(m_home, -2.3));
+                WaypointSE2.irrotational(L3, -1.5, 1.2),
+                WaypointSE2.irrotational(m_home, -2.3, 1.2));
     }
 
     public MoveAndHold homeToL4() {
         return m_transit.endless("homeToL4",
-                HolonomicPose2d.make(m_home, 0.1),
-                HolonomicPose2d.make(L4, 1.5));
+                WaypointSE2.irrotational(m_home, 0.1, 1.2),
+                WaypointSE2.irrotational(L4, 1.5, 1.2));
     }
 
     public MoveAndHold homeToL4Back() {
         return m_transit.endless("homeToL4",
-                HolonomicPose2d.make(m_home, 0.1),
-                HolonomicPose2d.make(L4_BACK, -1.5));
+                WaypointSE2.irrotational(m_home, 0.1, 1.2),
+                WaypointSE2.irrotational(L4_BACK, -1.5, 1.2));
     }
 
     public Command l4ToHome() {
         return m_transit.terminal("l4ToHome",
-                HolonomicPose2d.make(L4, -1.5),
-                HolonomicPose2d.make(m_home, -3));
+                WaypointSE2.irrotational(L4, -1.5, 1.2),
+                WaypointSE2.irrotational(m_home, -3, 1.2));
     }
 
     public Command l4BackToHome() {
         return m_transit.terminal("l4ToHome",
-                HolonomicPose2d.make(L4_BACK, 1.5),
-                HolonomicPose2d.make(m_home, -3));
+                WaypointSE2.irrotational(L4_BACK, 1.5, 1.2),
+                WaypointSE2.irrotational(m_home, -3, 1.2));
     }
 
     public Command homeToAlgaeL2() {
         return m_transit.endless("homeToAlgaeL2",
-                HolonomicPose2d.make(m_home, 1.5),
-                HolonomicPose2d.make(ALGAE_L2, 1.5));
+                WaypointSE2.irrotational(m_home, 1.5, 1.2),
+                WaypointSE2.irrotational(ALGAE_L2, 1.5, 1.2));
     }
 
     public Command homeToAlgaeL3() {
         return m_transit.endless("homeToAlgaeL3",
-                HolonomicPose2d.make(m_home, 0),
-                HolonomicPose2d.make(ALGAE_L3, 1.5));
+                WaypointSE2.irrotational(m_home, 0, 1.2),
+                WaypointSE2.irrotational(ALGAE_L3, 1.5, 1.2));
     }
 
     public Command algaeL2ToHome() {
         return m_transit.terminal("homeToAlgaeL2",
-                HolonomicPose2d.make(ALGAE_L2, -1.0),
-                HolonomicPose2d.make(m_home, Math.PI));
+                WaypointSE2.irrotational(ALGAE_L2, -1.0, 1.2),
+                WaypointSE2.irrotational(m_home, Math.PI, 1.2));
     }
 
     public Command algaeL3ToHome() {
         return m_transit.terminal("homeToAlgaeL3",
-                HolonomicPose2d.make(ALGAE_L3, -1.0),
-                HolonomicPose2d.make(m_home, Math.PI));
+                WaypointSE2.irrotational(ALGAE_L3, -1.0, 1.2),
+                WaypointSE2.irrotational(m_home, Math.PI, 1.2));
     }
 
     /**
@@ -598,14 +598,14 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
      */
     public MoveAndHold homeToBarge() {
         return m_transit.endless("homeToBarge",
-                HolonomicPose2d.make(m_home, 0),
-                HolonomicPose2d.make(BARGE, -1));
+                WaypointSE2.irrotational(m_home, 0, 1.2),
+                WaypointSE2.irrotational(BARGE, -1, 1.2));
     }
 
     public MoveAndHold bargeToHome() {
         return m_transit.endless("bargeToHome",
-                HolonomicPose2d.make(BARGE, 2.5),
-                HolonomicPose2d.make(m_home, Math.PI));
+                WaypointSE2.irrotational(BARGE, 2.5, 1.2),
+                WaypointSE2.irrotational(m_home, Math.PI, 1.2));
 
     }
 
@@ -672,8 +672,8 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
         m_log_jointA.log(() -> ja);
         m_log_jointF.log(() -> jf);
         Pose2d p = m_kinematics.forward(c);
-        GlobalVelocityR3 v = m_jacobian.forward(c, jv);
-        GlobalAccelerationR3 a = m_jacobian.forwardA(c, jv, ja);
+        VelocitySE2 v = m_jacobian.forward(c, jv);
+        AccelerationSE2 a = m_jacobian.forwardA(c, jv, ja);
         m_log_pose.log(() -> p);
         m_log_cartesianV.log(() -> v);
         m_log_cartesianA.log(() -> a);

@@ -1,9 +1,9 @@
 package org.team100.lib.state;
 
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,14 +33,14 @@ public class ControlR3 {
         m_theta = theta;
     }
 
-    public ControlR3(Pose2d x, GlobalVelocityR3 v) {
+    public ControlR3(Pose2d x, VelocitySE2 v) {
         this(
                 new Control100(x.getX(), v.x(), 0),
                 new Control100(x.getY(), v.y(), 0),
                 new Control100(x.getRotation().getRadians(), v.theta(), 0));
     }
 
-    public ControlR3(Pose2d x, GlobalVelocityR3 v, GlobalAccelerationR3 a) {
+    public ControlR3(Pose2d x, VelocitySE2 v, AccelerationSE2 a) {
         this(
                 new Control100(x.getX(), v.x(), a.x()),
                 new Control100(x.getY(), v.y(), a.y()),
@@ -48,7 +48,7 @@ public class ControlR3 {
     }
 
     public ControlR3(Pose2d x) {
-        this(x, new GlobalVelocityR3(0, 0, 0));
+        this(x, new VelocitySE2(0, 0, 0));
     }
 
     public ControlR3(Rotation2d x) {
@@ -94,8 +94,8 @@ public class ControlR3 {
         return new Rotation2d(m_theta.x());
     }
 
-    public GlobalVelocityR3 velocity() {
-        return new GlobalVelocityR3(m_x.v(), m_y.v(), m_theta.v());
+    public VelocitySE2 velocity() {
+        return new VelocitySE2(m_x.v(), m_y.v(), m_theta.v());
     }
 
     /** Robot-relative speeds */
@@ -103,8 +103,8 @@ public class ControlR3 {
         return SwerveKinodynamics.toInstantaneousChassisSpeeds(velocity(), rotation());
     }
 
-    public GlobalAccelerationR3 acceleration() {
-        return new GlobalAccelerationR3(m_x.a(), m_y.a(), m_theta.a());
+    public AccelerationSE2 acceleration() {
+        return new AccelerationSE2(m_x.a(), m_y.a(), m_theta.a());
     }
 
     public Control100 x() {
@@ -124,13 +124,13 @@ public class ControlR3 {
      * 
      * Correctly accounts for centripetal acceleration.
      */
-    public static ControlR3 fromTimedPose(TimedPose timedPose) {
-        double xx = timedPose.state().getPose().translation().getX();
-        double yx = timedPose.state().getPose().translation().getY();
-        double thetax = timedPose.state().getPose().heading().getRadians();
+    public static ControlR3 fromTimedState(TimedState timedPose) {
+        double xx = timedPose.state().getPose().pose().getTranslation().getX();
+        double yx = timedPose.state().getPose().pose().getTranslation().getY();
+        double thetax = timedPose.state().getPose().pose().getRotation().getRadians();
 
         double velocityM_s = timedPose.velocityM_S();
-        Rotation2d course = timedPose.state().getPose().course();
+        Rotation2d course = timedPose.state().getPose().course().toRotation();
         double xv = course.getCos() * velocityM_s;
         double yv = course.getSin() * velocityM_s;
         double thetav = timedPose.state().getHeadingRateRad_M() * velocityM_s;
@@ -141,7 +141,7 @@ public class ControlR3 {
         double thetaa = timedPose.state().getHeadingRateRad_M() * accelM_s_s;
 
         // centripetal accel = v^2/r = v^2 * curvature
-        double curvRad_M = timedPose.state().getCurvature();
+        double curvRad_M = timedPose.state().getCurvatureRad_M();
         double centripetalAccelM_s_s = velocityM_s * velocityM_s * curvRad_M;
         double xCa = -1.0 * course.getSin() * centripetalAccelM_s_s;
         double yCa = course.getCos() * centripetalAccelM_s_s;

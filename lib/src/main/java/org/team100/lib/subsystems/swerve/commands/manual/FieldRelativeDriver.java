@@ -1,6 +1,6 @@
 package org.team100.lib.subsystems.swerve.commands.manual;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.state.ModelR3;
 
@@ -13,7 +13,7 @@ public interface FieldRelativeDriver {
      * @param input control units [-1,1]
      * @return feasible field-relative velocity in m/s and rad/s
      */
-    GlobalVelocityR3 apply(ModelR3 state, Velocity input);
+    VelocitySE2 apply(ModelR3 state, Velocity input);
 
     void reset(ModelR3 state);
 
@@ -27,8 +27,8 @@ public interface FieldRelativeDriver {
      * @param maxRot   radians per second
      * @return meters and rad per second as specified by speed limits
      */
-    public static GlobalVelocityR3 scale(Velocity twist, double maxSpeed, double maxRot) {
-        return new GlobalVelocityR3(
+    public static VelocitySE2 scale(Velocity twist, double maxSpeed, double maxRot) {
+        return new VelocitySE2(
                 maxSpeed * MathUtil.clamp(twist.x(), -1, 1),
                 maxSpeed * MathUtil.clamp(twist.y(), -1, 1),
                 maxRot * MathUtil.clamp(twist.theta(), -1, 1));

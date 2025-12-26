@@ -1,9 +1,11 @@
 package org.team100.lib.state;
 
 import org.team100.lib.geometry.GlobalVelocityR2;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +33,7 @@ public class ModelR3 {
         m_theta = theta;
     }
 
-    public ModelR3(Pose2d x, GlobalVelocityR3 v) {
+    public ModelR3(Pose2d x, VelocitySE2 v) {
         this(
                 new Model100(x.getX(), v.x()),
                 new Model100(x.getY(), v.y()),
@@ -40,7 +42,7 @@ public class ModelR3 {
 
     /** Motionless with the specified pose */
     public ModelR3(Pose2d x) {
-        this(x, new GlobalVelocityR3(0, 0, 0));
+        this(x, new VelocitySE2(0, 0, 0));
     }
 
     /** Motionless at the origin with the specified heading */
@@ -99,8 +101,8 @@ public class ModelR3 {
         return new Rotation2d(m_theta.x());
     }
 
-    public GlobalVelocityR3 velocity() {
-        return new GlobalVelocityR3(m_x.v(), m_y.v(), m_theta.v());
+    public VelocitySE2 velocity() {
+        return new VelocitySE2(m_x.v(), m_y.v(), m_theta.v());
     }
 
     public GlobalVelocityR2 velocityR2() {
@@ -127,15 +129,18 @@ public class ModelR3 {
     /**
      * Transform timed pose into swerve state.
      */
-    public static ModelR3 fromTimedPose(TimedPose timedPose) {
-        double xx = timedPose.state().getPose().translation().getX();
-        double yx = timedPose.state().getPose().translation().getY();
-        double thetax = timedPose.state().getPose().heading().getRadians();
-        Rotation2d course = timedPose.state().getCourse();
+    public static ModelR3 fromTimedState(TimedState timedPose) {
+        Pose2dWithMotion state = timedPose.state();
+        WaypointSE2 pose = state.getPose();
+        Translation2d translation = pose.pose().getTranslation();
+        double xx = translation.getX();
+        double yx = translation.getY();
+        double thetax = pose.pose().getRotation().getRadians();
+        Rotation2d course = state.getPose().course().toRotation();
         double velocityM_s = timedPose.velocityM_S();
         double xv = course.getCos() * velocityM_s;
         double yv = course.getSin() * velocityM_s;
-        double thetav = timedPose.state().getHeadingRateRad_M() * velocityM_s;
+        double thetav = state.getHeadingRateRad_M() * velocityM_s;
         return new ModelR3(
                 new Model100(xx, xv),
                 new Model100(yx, yv),

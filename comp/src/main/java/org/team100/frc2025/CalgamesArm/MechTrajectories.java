@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.prr.AnalyticalJacobian;
 import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
-import org.team100.lib.subsystems.prr.JointAccelerations;
-import org.team100.lib.subsystems.prr.JointVelocities;
 import org.team100.lib.subsystems.r3.commands.GoToPosePosition;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.JointConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TorqueConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
@@ -22,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 /** Make a trajectory from the start to the end and follow it. */
 public class MechTrajectories extends Command {
-    private static final boolean USE_JOINT_CONSTRAINT = false;
 
     private final LoggerFactory m_log;
     private final CalgamesMech m_subsystem;
@@ -36,21 +32,12 @@ public class MechTrajectories extends Command {
         m_log = parent.type(this);
         m_subsystem = mech;
         List<TimingConstraint> c = new ArrayList<>();
-        if (USE_JOINT_CONSTRAINT) {
-            // This is experimental, don't use it.
-            c.add(new JointConstraint(
-                    k,
-                    j,
-                    new JointVelocities(10, 10, 10),
-                    new JointAccelerations(10, 10, 10)));
 
-        } else {
-            // These are known to work, but suboptimal.
-            c.add(new ConstantConstraint(m_log, 10, 5));
-            c.add(new YawRateConstraint(m_log, 10, 5));
-            // This is new
-            c.add(new TorqueConstraint(20));
-        }
+        // These are known to work, but suboptimal.
+        c.add(new ConstantConstraint(m_log, 10, 5));
+        c.add(new YawRateConstraint(m_log, 10, 5));
+        // This is new
+        c.add(new TorqueConstraint(20));
 
         // ALERT!
         // The parameters here used to be double these values;
@@ -62,22 +49,22 @@ public class MechTrajectories extends Command {
     }
 
     /** A command that goes from the start to the end and then finishes. */
-    public Command terminal(String name, HolonomicPose2d start, HolonomicPose2d end) {
+    public Command terminal(String name, WaypointSE2 start, WaypointSE2 end) {
 
         /** Use the start course and ignore the start pose for now */
         MoveAndHold f = new GoToPosePosition(
-                m_log, m_subsystem, start.course(), end, m_planner);
+                m_log, m_subsystem, start.course().toRotation(), end, m_planner);
         return f
                 .until(f::isDone)
                 .withName(name);
     }
 
     /** A command that goes from the start to the end and then waits forever. */
-    public MoveAndHold endless(String name, HolonomicPose2d start, HolonomicPose2d end) {
+    public MoveAndHold endless(String name, WaypointSE2 start, WaypointSE2 end) {
 
         /** Use the start course and ignore the start pose for now */
         GoToPosePosition c = new GoToPosePosition(
-                m_log, m_subsystem, start.course(), end, m_planner);
+                m_log, m_subsystem, start.course().toRotation(), end, m_planner);
         c.setName(name);
         return c;
 

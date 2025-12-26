@@ -1,6 +1,6 @@
 package org.team100.lib.controller.r3;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 
@@ -27,7 +27,7 @@ public interface ControllerR3 {
      *         Give this to SwerveDriveSubsystem.driveInFieldCoords() or something
      *         similar.
      */
-    GlobalVelocityR3 calculate(
+    VelocitySE2 calculate(
             ModelR3 measurement,
             ModelR3 currentReference,
             ControlR3 nextReference);

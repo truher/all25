@@ -1,8 +1,8 @@
 package org.team100.lib.subsystems.swerve.kinodynamics.limiter;
 
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.util.Math100;
 
@@ -21,8 +21,8 @@ public class SwerveUtil {
             SwerveKinodynamics m_limits,
             double vScale,
             double aScale,
-            GlobalVelocityR3 prev,
-            GlobalVelocityR3 desired) {
+            VelocitySE2 prev,
+            VelocitySE2 desired) {
         if (isAccel(prev, desired)) {
             return minAccel(m_limits, vScale, aScale, prev.norm());
         }
@@ -53,9 +53,9 @@ public class SwerveUtil {
      * This correctly captures sharp turns as decelerations; simply comparing the
      * magnitudes of initial and final velocities is not correct.
      */
-    static boolean isAccel(GlobalVelocityR3 prev,
-            GlobalVelocityR3 target) {
-        GlobalAccelerationR3 accel = target.accel(prev, TimedRobot100.LOOP_PERIOD_S);
+    static boolean isAccel(VelocitySE2 prev,
+            VelocitySE2 target) {
+        AccelerationSE2 accel = target.accel(prev, TimedRobot100.LOOP_PERIOD_S);
         double dot = prev.x() * accel.x() + prev.y() * accel.y();
         return dot >= 0;
     }

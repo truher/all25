@@ -37,19 +37,29 @@ public class YawRateConstraint implements TimingConstraint {
     }
 
     @Override
-    public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {       
+    public double maxV(Pose2dWithMotion state) {
         // Heading rate in rad/m
-        final double heading_rate = state.getHeadingRateRad_M();
+        double heading_rate = state.getHeadingRateRad_M();
         // rad/s / rad/m => m/s.
-        return new NonNegativeDouble(m_maxOmegaRad_S.getAsDouble() / Math.abs(heading_rate));
+        return m_maxOmegaRad_S.getAsDouble() / Math.abs(heading_rate);
     }
 
     @Override
-    public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocity) {
+    public double maxAccel(Pose2dWithMotion state, double velocity) {
+        // TODO: this is wrong
         // Heading rate in rad/m
-        final double heading_rate = state.getHeadingRateRad_M();
+        double heading_rate = state.getHeadingRateRad_M();
         // rad/s^2 / rad/m => m/s^2
-        double limitM_S = m_maxAlphaRad_S2.getAsDouble() / Math.abs(heading_rate);
-        return new MinMaxAcceleration(-limitM_S, limitM_S);
+        return m_maxAlphaRad_S2.getAsDouble() / Math.abs(heading_rate);
     }
+
+    @Override
+    public double maxDecel(Pose2dWithMotion state, double velocity) {
+        // TODO: this is wrong
+        // Heading rate in rad/m
+        double heading_rate = state.getHeadingRateRad_M();
+        // rad/s^2 / rad/m => m/s^2
+        return -(m_maxAlphaRad_S2.getAsDouble() / Math.abs(heading_rate));
+    }
+
 }

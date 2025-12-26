@@ -5,7 +5,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.FullStateControllerR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -20,6 +20,7 @@ import org.team100.lib.trajectory.timing.YawRateConstraint;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -46,8 +47,9 @@ public class DriveWithTrajectoryFunctionTest implements Timeless {
     Trajectory100 makeTrajectory(Pose2d startingPose) {
         return planner.restToRest(
                 List.of(
-                        HolonomicPose2d.make(startingPose, 0),
-                        HolonomicPose2d.make(1, 2, Math.PI / 2, Math.PI / 2)));
+                        WaypointSE2.irrotational(startingPose, 0, 1.2),
+                        WaypointSE2.irrotational(
+                                new Pose2d(1, 2, new Rotation2d(Math.PI / 2)), Math.PI / 2, 1.2)));
     }
 
     @Test

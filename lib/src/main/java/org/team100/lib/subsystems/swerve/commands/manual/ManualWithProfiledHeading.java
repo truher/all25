@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -114,10 +114,10 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public GlobalVelocityR3 apply(
+    public VelocitySE2 apply(
             final ModelR3 state,
             final Velocity twist1_1) {
-        final GlobalVelocityR3 control = clipAndScale(twist1_1);
+        final VelocitySE2 control = clipAndScale(twist1_1);
 
         final double currentVelocity = state.velocity().norm();
 
@@ -172,7 +172,7 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
                 thetaFF + thetaFB,
                 -m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
-        GlobalVelocityR3 twistWithSnapM_S = new GlobalVelocityR3(control.x(), control.y(), omega);
+        VelocitySE2 twistWithSnapM_S = new VelocitySE2(control.x(), control.y(), omega);
 
         m_log_snap_mode.log(() -> true);
         m_log_goal_theta.log(m_goal::getRadians);
@@ -184,7 +184,7 @@ public class ManualWithProfiledHeading implements FieldRelativeDriver {
         return twistWithSnapM_S;
     }
 
-    public GlobalVelocityR3 clipAndScale(Velocity twist1_1) {
+    public VelocitySE2 clipAndScale(Velocity twist1_1) {
         // clip the input to the unit circle
         final Velocity clipped = twist1_1.clip(1.0);
 

@@ -8,19 +8,19 @@ package org.team100.lib.geometry;
  * * the spatial rate of change in course curvature
  */
 public class Pose3dWithMotion {
-    /** Position, heading and course. */
-    private final HolonomicPose3d m_pose;
+    /** Pose and course. */
+    private final Pose3dWithDirection m_pose;
     /** Change in yaw per meter of motion, rad/m. */
     private final double m_headingYawRate;
 
     public Pose3dWithMotion(
-            HolonomicPose3d pose,
+            Pose3dWithDirection pose,
             double headingYawRate) {
         m_pose = pose;
         m_headingYawRate = headingYawRate;
     }
 
-    public HolonomicPose3d getPose() {
+    public Pose3dWithDirection getPose() {
         return m_pose;
     }
 

@@ -10,65 +10,23 @@ import org.team100.lib.geometry.Pose2dWithMotion;
  */
 public interface TimingConstraint {
     /**
-     * Maximum allowed velocity m/s.  This is always non-negative.
+     * Maximum allowed pathwise velocity, m/s.
+     * 
+     * Always positive.
      */
-    NonNegativeDouble getMaxVelocity(Pose2dWithMotion state);
-
-    class NonNegativeDouble {
-        private final double m_value;
-
-        public NonNegativeDouble(double value) {
-            if (value < 0)
-                throw new IllegalArgumentException();
-            m_value = value;
-        }
-
-        public double getValue() {
-            return m_value;
-        }
-    }
+    double maxV(Pose2dWithMotion state);
 
     /**
-     * Minimum and maximum allowed acceleration m/s^2.
+     * Maximum allowed pathwise acceleration, m/s^2.
      * 
-     * The acceleration here is purely *along* the path, it doesn't have anything to
-     * do with cross-track accelerations due to curvature.
+     * Always positive.
      */
-    MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocityM_S);
+    double maxAccel(Pose2dWithMotion state, double velocityM_S);
 
-    class MinMaxAcceleration {
-        public static final MinMaxAcceleration NO_LIMITS = new MinMaxAcceleration();
-
-        private final double m_minAccel;
-        private final double m_maxAccel;
-
-        private MinMaxAcceleration() {
-            this(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        }
-
-        /**
-         * @param minAccel a negative number
-         * @param maxAccel a positive number
-         */
-        public MinMaxAcceleration(double minAccel, double maxAccel) {
-            if (minAccel > 0) {
-                throw new IllegalArgumentException();
-            }
-            if (maxAccel < 0) {
-                throw new IllegalArgumentException();
-            }
-            m_minAccel = minAccel;
-            m_maxAccel = maxAccel;
-        }
-
-        /** Always negative (or zero). */
-        public double getMinAccel() {
-            return m_minAccel;
-        }
-
-        /** Always positive (or zero). */
-        public double getMaxAccel() {
-            return m_maxAccel;
-        }
-    }
+    /**
+     * Maximum allowed pathwise deceleration, m/s^2.
+     * 
+     * Always negative.
+     */
+    double maxDecel(Pose2dWithMotion state, double velocityM_S);
 }

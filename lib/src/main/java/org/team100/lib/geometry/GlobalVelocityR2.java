@@ -20,7 +20,7 @@ public record GlobalVelocityR2(double x, double y) {
     }
 
     /** Pick up the translation component of v. */
-    public static GlobalVelocityR2 fromSe2(GlobalVelocityR3 v) {
+    public static GlobalVelocityR2 fromSe2(VelocitySE2 v) {
         return new GlobalVelocityR2(v.x(), v.y());
     }
 

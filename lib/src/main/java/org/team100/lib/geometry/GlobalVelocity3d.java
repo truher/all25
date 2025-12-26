@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 /**
  * Velocity in three dimensions, companion to Translation3d.
  * 
- * This is different from GlobalVelocityR3, which is the companion to Pose2d,
+ * This is different from VelocitySE2, which is the companion to Pose2d,
  * i.e. velocity of planar rigid transforms.
  */
 public record GlobalVelocity3d(double x, double y, double z) {
@@ -19,7 +19,7 @@ public record GlobalVelocity3d(double x, double y, double z) {
     }
 
     /** Pick up the translation component of v, in the XY plane. */
-    public static GlobalVelocity3d fromSe2(GlobalVelocityR3 v) {
+    public static GlobalVelocity3d fromSe2(VelocitySE2 v) {
         return new GlobalVelocity3d(v.x(), v.y(), 0);
     }
 

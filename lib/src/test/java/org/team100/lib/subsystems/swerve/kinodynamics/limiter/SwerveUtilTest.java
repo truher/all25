@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -25,12 +25,12 @@ class SwerveUtilTest implements Timeless {
     void testIsAccel() {
         // hard left turn is not accel
         assertFalse(SwerveUtil.isAccel(
-                new GlobalVelocityR3(1, 0, 0),
-                new GlobalVelocityR3(0, 1, 0)));
+                new VelocitySE2(1, 0, 0),
+                new VelocitySE2(0, 1, 0)));
         // speed up veering left
         assertTrue(SwerveUtil.isAccel(
-                new GlobalVelocityR3(0.5, 0.5, 0),
-                new GlobalVelocityR3(0, 1, 0)));
+                new VelocitySE2(0.5, 0.5, 0),
+                new VelocitySE2(0, 1, 0)));
     }
 
     @Test
@@ -46,8 +46,8 @@ class SwerveUtilTest implements Timeless {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forRealisticTest(logger);
         assertEquals(10, limits.getMaxDriveAccelerationM_S2(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
-                new GlobalVelocityR3(0, 0, 0),
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(0, 0, 0),
+                new VelocitySE2(1, 0, 0));
         // low speed, current limited.
         assertEquals(10, accelLimit, DELTA);
     }
@@ -58,8 +58,8 @@ class SwerveUtilTest implements Timeless {
         assertEquals(10, limits.getMaxDriveAccelerationM_S2(), DELTA);
         assertEquals(5, limits.getMaxDriveVelocityM_S(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
-                new GlobalVelocityR3(4.9, 0, 0),
-                new GlobalVelocityR3(5, 0, 0));
+                new VelocitySE2(4.9, 0, 0),
+                new VelocitySE2(5, 0, 0));
         // near top speed, EMF-limited
         assertEquals(0.2, accelLimit, DELTA);
     }
@@ -71,8 +71,8 @@ class SwerveUtilTest implements Timeless {
         SwerveKinodynamics limits = new Fixture().swerveKinodynamics;
         assertEquals(1, limits.getMaxDriveAccelerationM_S2(), DELTA);
         double accelLimit = SwerveUtil.getAccelLimit(limits, 1, 1,
-                new GlobalVelocityR3(0.92, 0, 0),
-                new GlobalVelocityR3(0.94, 0, 0));
+                new VelocitySE2(0.92, 0, 0),
+                new VelocitySE2(0.94, 0, 0));
         assertEquals(0.8, accelLimit, DELTA);
     }
 

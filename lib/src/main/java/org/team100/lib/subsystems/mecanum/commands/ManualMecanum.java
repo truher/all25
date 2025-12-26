@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.mecanum.MecanumDrive100;
@@ -72,7 +72,7 @@ public class ManualMecanum extends Command {
             case CLIP -> input.diamond(1, y_x, poseRotation);
             case SQUASH -> input.squashedDiamond(1, y_x, poseRotation);
         };
-        GlobalVelocityR3 scaled = FieldRelativeDriver.scale(
+        VelocitySE2 scaled = FieldRelativeDriver.scale(
                 clippedOrSquashed, m_maxVX.getAsDouble(), m_maxOmega.getAsDouble());
         // Apply field-relative limits.
         if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {

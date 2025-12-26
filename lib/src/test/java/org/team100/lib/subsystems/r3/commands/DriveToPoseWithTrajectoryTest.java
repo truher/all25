@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.controller.r3.ControllerFactoryR3;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.logging.LoggerFactory;
@@ -21,7 +21,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -55,9 +55,11 @@ class DriveToPoseWithTrajectoryTest implements Timeless {
                 drive,
                 (start, end) -> new Trajectory100(
                         List.of(
-                                new TimedPose(
+                                new TimedState(
                                         new Pose2dWithMotion(
-                                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
+                                                WaypointSE2.irrotational(
+                                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                                                0, 0),
                                         0, 0, 0))),
                 controller,
                 viz);

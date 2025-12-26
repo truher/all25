@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -22,7 +22,7 @@ public class FeedforwardControllerR3Test {
     void testMotionless() {
         FeedforwardControllerR3 c = new FeedforwardControllerR3(logger, 0.01, 0.01, 0.01, 0.01);
         assertFalse(c.atReference());
-        GlobalVelocityR3 v = c.calculate(
+        VelocitySE2 v = c.calculate(
                 new ModelR3(
                         new Model100(0, 0),
                         new Model100(0, 0),
@@ -45,7 +45,7 @@ public class FeedforwardControllerR3Test {
     void testNotAtReference() {
         FeedforwardControllerR3 c = new FeedforwardControllerR3(logger, 0.01, 0.01, 0.01, 0.01);
         assertFalse(c.atReference());
-        GlobalVelocityR3 v = c.calculate(
+        VelocitySE2 v = c.calculate(
                 new ModelR3(
                         new Model100(1, 0),
                         new Model100(0, 0),
@@ -68,7 +68,7 @@ public class FeedforwardControllerR3Test {
     void testFeedforward() {
         FeedforwardControllerR3 c = new FeedforwardControllerR3(logger, 0.01, 0.01, 0.01, 0.01);
         assertFalse(c.atReference());
-        GlobalVelocityR3 v = c.calculate(
+        VelocitySE2 v = c.calculate(
                 new ModelR3(
                         new Model100(0, 0),
                         new Model100(0, 0),

@@ -1,6 +1,6 @@
 package org.team100.lib.subsystems.swerve.kinodynamics.limiter;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -29,7 +29,7 @@ public class SwerveDeadband  {
         m_log_scale = log.doubleLogger(Level.TRACE, "scale");
     }
 
-    public GlobalVelocityR3 apply(GlobalVelocityR3 target) {
+    public VelocitySE2 apply(VelocitySE2 target) {
         if (Math.abs(target.x()) > m_translationLimit
                 || Math.abs(target.y()) > m_translationLimit
                 || Math.abs(target.theta()) > m_omegaLimit) {
@@ -37,6 +37,6 @@ public class SwerveDeadband  {
             return target;
         }
         m_log_scale.log(() -> 0.0);
-        return GlobalVelocityR3.ZERO;
+        return VelocitySE2.ZERO;
     }
 }

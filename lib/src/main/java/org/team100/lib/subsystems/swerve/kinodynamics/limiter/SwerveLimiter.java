@@ -4,11 +4,11 @@ import java.util.function.DoubleSupplier;
 
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 /**
@@ -23,20 +23,20 @@ public class SwerveLimiter {
     private final DoubleLogger m_log_norm;
     private final DoubleLogger m_log_normIn;
 
-    private final GlobalVelocityR3Logger m_log_next;
+    private final VelocitySE2Logger m_log_next;
 
     private final FieldRelativeVelocityLimiter m_velocityLimiter;
     private final FieldRelativeCapsizeLimiter m_capsizeLimiter;
     private final FieldRelativeAccelerationLimiter m_accelerationLimiter;
     private final SwerveDeadband m_deadband;
     // Velocity expected at the current time, i.e. the previous time step's desire.
-    private GlobalVelocityR3 m_current;
+    private VelocitySE2 m_current;
 
     public SwerveLimiter(LoggerFactory parent, SwerveKinodynamics dynamics, DoubleSupplier voltage) {
         LoggerFactory log = parent.type(this);
         m_log_norm = log.doubleLogger(Level.TRACE, "norm");
         m_log_normIn = log.doubleLogger(Level.TRACE, "norm in");
-        m_log_next = log.globalVelocityR3Logger(Level.TRACE, "next");
+        m_log_next = log.VelocitySE2Logger(Level.TRACE, "next");
 
         BatterySagSpeedLimit limit = new BatterySagSpeedLimit(log, dynamics, voltage);
         m_velocityLimiter = new FieldRelativeVelocityLimiter(log, limit);
@@ -56,7 +56,7 @@ public class SwerveLimiter {
      * Find a feasible setpoint in the direction of the target, and remember it for
      * next time.
      */
-    public GlobalVelocityR3 apply(GlobalVelocityR3 nextReference) {
+    public VelocitySE2 apply(VelocitySE2 nextReference) {
         m_log_next.log(() -> nextReference);
         m_log_normIn.log(nextReference::norm);
         if (DEBUG) {
@@ -66,7 +66,7 @@ public class SwerveLimiter {
             m_current = nextReference;
 
         // First, limit the goal to a feasible velocity.
-        GlobalVelocityR3 result = m_velocityLimiter.apply(nextReference);
+        VelocitySE2 result = m_velocityLimiter.apply(nextReference);
         if (DEBUG) {
             System.out.printf("velocity limited %s\n", result);
         }
@@ -102,7 +102,7 @@ public class SwerveLimiter {
      * Set the current setpoint to the current velocity measurement.
      * This is required to make resumption of manual control smooth.
      */
-    public void updateSetpoint(GlobalVelocityR3 setpoint) {
+    public void updateSetpoint(VelocitySE2 setpoint) {
         m_current = setpoint;
     }
 

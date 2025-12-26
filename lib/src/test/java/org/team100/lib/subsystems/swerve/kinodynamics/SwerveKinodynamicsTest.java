@@ -3,7 +3,7 @@ package org.team100.lib.subsystems.swerve.kinodynamics;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -21,12 +21,12 @@ class SwerveKinodynamicsTest implements Timeless {
     @Test
     void testRoundTripMotionless() {
         SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited(logger);
-        GlobalVelocityR3 v = new GlobalVelocityR3(0, 0, 0);
+        VelocitySE2 v = new VelocitySE2(0, 0, 0);
         Rotation2d theta = new Rotation2d();
         ChassisSpeeds instantaneous = SwerveKinodynamics.toInstantaneousChassisSpeeds(v, theta);
         SwerveModuleStates states = unlimited.toSwerveModuleStates(instantaneous, 0.02);
         ChassisSpeeds implied = unlimited.toChassisSpeedsWithDiscretization(states, 0.02);
-        GlobalVelocityR3 result = SwerveKinodynamics.fromInstantaneousChassisSpeeds(implied, theta);
+        VelocitySE2 result = SwerveKinodynamics.fromInstantaneousChassisSpeeds(implied, theta);
         assertEquals(0, result.x(), DELTA);
         assertEquals(0, result.y(), DELTA);
         assertEquals(0, result.theta(), DELTA);
@@ -36,12 +36,12 @@ class SwerveKinodynamicsTest implements Timeless {
     @Test
     void testRoundTripDriveAndSpin() {
         SwerveKinodynamics unlimited = SwerveKinodynamicsFactory.unlimited(logger);
-        GlobalVelocityR3 v = new GlobalVelocityR3(5, 0, 25);
+        VelocitySE2 v = new VelocitySE2(5, 0, 25);
         Rotation2d theta = new Rotation2d();
         ChassisSpeeds instantaneous = SwerveKinodynamics.toInstantaneousChassisSpeeds(v, theta);
         SwerveModuleStates states = unlimited.toSwerveModuleStates(instantaneous, 0.02);
         ChassisSpeeds implied = unlimited.toChassisSpeedsWithDiscretization(states, 0.02);
-        GlobalVelocityR3 result = SwerveKinodynamics.fromInstantaneousChassisSpeeds(implied, theta);
+        VelocitySE2 result = SwerveKinodynamics.fromInstantaneousChassisSpeeds(implied, theta);
         assertEquals(5, result.x(), DELTA);
         assertEquals(0, result.y(), DELTA);
         assertEquals(25, result.theta(), DELTA);

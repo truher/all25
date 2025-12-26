@@ -3,13 +3,17 @@ package org.team100.lib.trajectory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.WaypointSE2;
+import org.team100.lib.trajectory.timing.TimedState;
+
+import edu.wpi.first.math.geometry.Pose2d;
 
 /**
  * A list of timed poses.
  */
 public class Trajectory100 {
-    private final List<TimedPose> m_points;
+    private final List<TimedState> m_points;
     private final double m_duration;
 
     public Trajectory100() {
@@ -18,21 +22,20 @@ public class Trajectory100 {
     }
 
     /** First timestamp must be zero. */
-    public Trajectory100(final List<TimedPose> states) {
+    public Trajectory100(final List<TimedState> states) {
         m_points = states;
         m_duration = m_points.get(m_points.size() - 1).getTimeS();
     }
 
     /**
-     * Interpolate a TimedPose.
-     * 
-     * This scans the whole trajectory for every sample, but most of the time
-     * is the interpolation; I tried a TreeMap index and it only saved a few
-     * nanoseconds per call.
+     * Interpolate a TimedState.
      * 
      * @param timeS start is zero.
      */
-    public TimedPose sample(final double timeS) {
+    public TimedState sample(double timeS) {
+        // This scans the whole trajectory for every sample, but most of the time
+        // is the interpolation; I tried a TreeMap index and it only saved a few
+        // nanoseconds per call.
         if (isEmpty())
             throw new IllegalStateException("can't sample an empty trajectory");
         if (timeS >= m_duration) {
@@ -43,15 +46,15 @@ public class Trajectory100 {
         }
 
         for (int i = 1; i < length(); ++i) {
-            final TimedPose ceil = getPoint(i);
+            final TimedState ceil = getPoint(i);
             if (ceil.getTimeS() >= timeS) {
-                final TimedPose floor = getPoint(i - 1);
-                double betweenPoints = ceil.getTimeS() - floor.getTimeS();
-                if (Math.abs(betweenPoints) <= 1e-12) {
+                final TimedState floor = getPoint(i - 1);
+                double span = ceil.getTimeS() - floor.getTimeS();
+                if (Math.abs(span) <= 1e-12) {
                     return ceil;
                 }
-                double t = (timeS - floor.getTimeS()) / betweenPoints;
-                return floor.interpolate2(ceil, t);
+                double delta_t = timeS - floor.getTimeS();
+                return floor.interpolate(ceil, delta_t);
             }
         }
         throw new IllegalStateException("impossible trajectory: " + toString());
@@ -70,7 +73,7 @@ public class Trajectory100 {
         return m_points.size();
     }
 
-    public TimedPose getLastPoint() {
+    public TimedState getLastPoint() {
         return m_points.get(length() - 1);
     }
 
@@ -78,11 +81,11 @@ public class Trajectory100 {
         return m_duration;
     }
 
-    public List<TimedPose> getPoints() {
+    public List<TimedState> getPoints() {
         return m_points;
     }
 
-    public TimedPose getPoint(int index) {
+    public TimedState getPoint(int index) {
         return m_points.get(index);
     }
 
@@ -96,5 +99,18 @@ public class Trajectory100 {
             builder.append(System.lineSeparator());
         }
         return builder.toString();
+    }
+
+    /** For cutting-and-pasting into a spreadsheet */
+    public void dump() {
+        System.out.println("i, t, v, a, k, x, y");
+        for (int i = 0; i < length(); ++i) {
+            TimedState ts = getPoint(i);
+            Pose2dWithMotion pwm = ts.state();
+            WaypointSE2 w = pwm.getPose();
+            Pose2d p = w.pose();
+            System.out.printf("%d, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
+                    i, ts.getTimeS(), ts.velocityM_S(), ts.acceleration(), pwm.getCurvatureRad_M(), p.getX(), p.getY());
+        }
     }
 }

@@ -3,7 +3,8 @@ package org.team100.lib.subsystems.r3.commands;
 import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.DirectionSE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.subsystems.r3.PositionSubsystemR3;
@@ -20,7 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class GoToPosePosition extends MoveAndHold {
     private final LoggerFactory m_log;
     private final PositionSubsystemR3 m_subsystem;
-    private final HolonomicPose2d m_goal;
+    private final WaypointSE2 m_goal;
     private final Rotation2d m_course;
     private final TrajectoryPlanner m_trajectoryPlanner;
 
@@ -30,7 +31,7 @@ public class GoToPosePosition extends MoveAndHold {
             LoggerFactory parent,
             PositionSubsystemR3 subsystem,
             Rotation2d course,
-            HolonomicPose2d goal,
+            WaypointSE2 goal,
             TrajectoryPlanner trajectoryPlanner) {
         m_log = parent.type(this);
         m_subsystem = subsystem;
@@ -42,8 +43,9 @@ public class GoToPosePosition extends MoveAndHold {
 
     @Override
     public void initialize() {
-        HolonomicPose2d m_currentPose = HolonomicPose2d.make(
-                m_subsystem.getState().pose(), m_course);
+        WaypointSE2 m_currentPose = new WaypointSE2(
+                m_subsystem.getState().pose(),
+                DirectionSE2.irrotational(m_course), 1);
         Trajectory100 m_trajectory = m_trajectoryPlanner.restToRest(
                 List.of(m_currentPose, m_goal));
         m_referenceController = new PositionReferenceControllerR3(

@@ -7,7 +7,7 @@ import org.team100.lib.config.DriverSkill;
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
@@ -73,9 +73,9 @@ public class DriveManuallySimple extends Command {
             // switch modes
             m_alternativeDriver.reset(state);
         }
-        GlobalVelocityR3 v = desiredVelocity(state, m_twistSupplier.get());
+        VelocitySE2 v = desiredVelocity(state, m_twistSupplier.get());
         // scale for driver skill.
-        GlobalVelocityR3 scaled = GeometryUtil.scale(v, DriverSkill.level().scale());
+        VelocitySE2 scaled = GeometryUtil.scale(v, DriverSkill.level().scale());
 
         // Apply field-relative limits.
         if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {
@@ -91,7 +91,7 @@ public class DriveManuallySimple extends Command {
         m_drive.stop();
     }
 
-    private GlobalVelocityR3 desiredVelocity(ModelR3 state, Velocity input) {
+    private VelocitySE2 desiredVelocity(ModelR3 state, Velocity input) {
         if (m_useAlternative.get()) {
             return m_alternativeDriver.apply(state, input);
         }

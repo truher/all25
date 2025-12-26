@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GeometryUtil;
+import org.team100.lib.geometry.Metrics;
 
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -77,7 +77,7 @@ public class GradientDescentTest {
         Function<Vector<N1>, Double> f = (x) -> {
             Pose3d sample = new Pose3d(new Translation3d(1, 1, 1), new Rotation3d(axis, x.get(0)));
             Twist3d t = desired.log(sample);
-            return GeometryUtil.norm(t);
+            return Metrics.l2Norm(t);
         };
         GradientDescent<N1> s = new GradientDescent<>(Nat.N1(), f, 1e-12, 100);
         Vector<N1> x = VecBuilder.fill(0);
@@ -92,7 +92,7 @@ public class GradientDescentTest {
         Function<Vector<N1>, Double> f = (x) -> {
             Pose3d sample = new Pose3d(new Translation3d(1, 1, 1), new Rotation3d(axis, x.get(0)));
             Twist3d t = desired.log(sample);
-            return GeometryUtil.norm(t);
+            return Metrics.l2Norm(t);
         };
         GradientDescent<N1> s = new GradientDescent<>(Nat.N1(), f, 1e-3, 100);
 

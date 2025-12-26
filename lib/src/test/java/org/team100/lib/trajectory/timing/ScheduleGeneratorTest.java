@@ -3,7 +3,6 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -11,9 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -22,8 +22,8 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
-import org.team100.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -34,10 +34,14 @@ public class ScheduleGeneratorTest {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     public static final List<Pose2dWithMotion> WAYPOINTS = Arrays.asList(
-            new Pose2dWithMotion(HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(HolonomicPose2d.make(24.0, 0.0, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(HolonomicPose2d.make(36, 12, 0, 0), 0, 0, 0),
-            new Pose2dWithMotion(HolonomicPose2d.make(60, 12, 0, 0), 0, 0, 0));
+            new Pose2dWithMotion(WaypointSE2.irrotational(
+                    new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2), 0, 0),
+            new Pose2dWithMotion(WaypointSE2.irrotational(
+                    new Pose2d(24.0, 0.0, new Rotation2d(0)), 0, 1.2), 0, 0),
+            new Pose2dWithMotion(WaypointSE2.irrotational(
+                    new Pose2d(36, 12, new Rotation2d(0)), 0, 1.2), 0, 0),
+            new Pose2dWithMotion(WaypointSE2.irrotational(
+                    new Pose2d(60, 12, new Rotation2d(0)), 0, 1.2), 0, 0));
 
     public static final List<Rotation2d> HEADINGS = List.of(
             GeometryUtil.fromDegrees(0),
@@ -76,16 +80,17 @@ public class ScheduleGeneratorTest {
 
         // Go state by state, verifying all constraints are satisfied and integration is
         // correct.
-        TimedPose prev_state = null;
-        for (TimedPose state : traj.getPoints()) {
+        TimedState prev_state = null;
+        for (TimedState state : traj.getPoints()) {
             for (final TimingConstraint constraint : constraints) {
-                assertTrue(state.velocityM_S() - EPSILON <= constraint.getMaxVelocity(state.state()).getValue());
-                final MinMaxAcceleration accel_limits = constraint.getMinMaxAcceleration(state.state(),
-                        state.velocityM_S());
-                assertTrue(state.acceleration() - EPSILON <= accel_limits.getMaxAccel(),
-                        String.format("%f %f", state.acceleration(), accel_limits.getMaxAccel()));
-                assertTrue(state.acceleration() + EPSILON >= accel_limits.getMinAccel(),
-                        String.format("%f %f", state.acceleration(), accel_limits.getMinAccel()));
+                assertTrue(state.velocityM_S() - EPSILON <= constraint.maxV(state.state()));
+                assertTrue(state.acceleration() - EPSILON <= constraint.maxAccel(
+                        state.state(), state.velocityM_S()),
+                        String.format("%f %f", state.acceleration(), constraint.maxAccel(
+                                state.state(), state.velocityM_S())));
+                assertTrue(state.acceleration() + EPSILON >= constraint.maxDecel(state.state(), state.velocityM_S()),
+                        String.format("%f %f", state.acceleration(),
+                                constraint.maxDecel(state.state(), state.velocityM_S())));
             }
             if (prev_state != null) {
                 assertEquals(state.velocityM_S(),
@@ -98,28 +103,35 @@ public class ScheduleGeneratorTest {
     }
 
     /**
-     * Turning in place does not work.
+     * Turning in place does not work, but it also doesn't fail.
      */
     @Test
     void testJustTurningInPlace() {
         Path100 path = new Path100(Arrays.asList(
-                new Pose2dWithMotion(HolonomicPose2d.make(0, 0, 0, 0), 1, 0, 0),
-                new Pose2dWithMotion(HolonomicPose2d.make(0, 0, Math.PI, 0), 1, 0, 0)));
+                new Pose2dWithMotion(
+                        new WaypointSE2(
+                                new Pose2d(0, 0, new Rotation2d(0)),
+                                new DirectionSE2(0, 0, 1), 1),
+                        1, 0),
+                new Pose2dWithMotion(
+                        new WaypointSE2(
+                                new Pose2d(0, 0, new Rotation2d(Math.PI)),
+                                new DirectionSE2(0, 0, 1), 1),
+                        1, 0)));
 
-        // Triangle profile.
-        assertThrows(IllegalArgumentException.class,
-                () -> buildAndCheckTrajectory(
-                        path, 1.0, new ArrayList<TimingConstraint>(), 0.0, 0.0, 20.0, 5.0));
+        assertEquals(0, path.getMaxDistance(), DELTA);
+        assertEquals(2, path.length());
+        if (DEBUG)
+            System.out.printf("PATH:\n%s\n", path);
 
-        // Trapezoidal profile.
-        assertThrows(IllegalArgumentException.class,
-                () -> buildAndCheckTrajectory(
-                        path, 1.0, new ArrayList<TimingConstraint>(), 0.0, 0.0, 10.0, 5.0));
-
-        // Trapezoidal profile with start and end velocities.
-        assertThrows(IllegalArgumentException.class,
-                () -> buildAndCheckTrajectory(
-                        path, 1.0, new ArrayList<TimingConstraint>(), 5.0, 2.0, 10.0, 5.0));
+        List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
+        ScheduleGenerator u = new ScheduleGenerator(constraints);
+        Trajectory100 traj = u.timeParameterizeTrajectory(
+                path,
+                1.0,
+                0.0,
+                0.0);
+        assertEquals(0, traj.duration(), DELTA);
     }
 
     /**
@@ -136,21 +148,21 @@ public class ScheduleGeneratorTest {
         Trajectory100 timed_traj = buildAndCheckTrajectory(path,
                 1.0,
                 new ArrayList<TimingConstraint>(), 0.0, 0.0, 20.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
 
         // Trapezoidal profile.
         timed_traj = buildAndCheckTrajectory(path,
                 1.0, new ArrayList<TimingConstraint>(),
                 0.0, 0.0,
                 10.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
 
         // Trapezoidal profile with start and end velocities.
         timed_traj = buildAndCheckTrajectory(path,
                 1.0, new ArrayList<TimingConstraint>(),
                 5.0, 2.0,
                 10.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
     }
 
     /**
@@ -166,18 +178,18 @@ public class ScheduleGeneratorTest {
         Trajectory100 timed_traj = buildAndCheckTrajectory(path,
                 1.0,
                 List.of(new CapsizeAccelerationConstraint(logger, limits, 1.0)), 0.0, 0.0, 20.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
         assertNotNull(timed_traj);
 
         // Trapezoidal profile.
         timed_traj = buildAndCheckTrajectory(path, 1.0, new ArrayList<TimingConstraint>(), 0.0, 0.0,
                 10.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
 
         // Trapezoidal profile with start and end velocities.
         timed_traj = buildAndCheckTrajectory(path, 1.0, new ArrayList<TimingConstraint>(), 5.0, 2.0,
                 10.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
     }
 
     @Test
@@ -186,18 +198,22 @@ public class ScheduleGeneratorTest {
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
-            public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-                if (state.getPose().translation().getX() >= 24.0) {
-                    return new NonNegativeDouble(5.0);
+            public double maxV(Pose2dWithMotion state) {
+                if (state.getPose().pose().getTranslation().getX() >= 24.0) {
+                    return 5.0;
                 } else {
-                    return new NonNegativeDouble(Double.POSITIVE_INFINITY);
+                    return Double.POSITIVE_INFINITY;
                 }
             }
 
             @Override
-            public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state,
-                    double velocity) {
-                return new TimingConstraint.MinMaxAcceleration(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+            public double maxAccel(Pose2dWithMotion state, double velocity) {
+                return Double.POSITIVE_INFINITY;
+            }
+
+            @Override
+            public double maxDecel(Pose2dWithMotion state, double velocity) {
+                return Double.NEGATIVE_INFINITY;
             }
         }
 
@@ -213,14 +229,19 @@ public class ScheduleGeneratorTest {
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
-            public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-                return new NonNegativeDouble(Double.POSITIVE_INFINITY);
+            public double maxV(Pose2dWithMotion state) {
+                return Double.POSITIVE_INFINITY;
             }
 
             @Override
-            public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state,
+            public double maxAccel(Pose2dWithMotion state,
                     double velocity) {
-                return new TimingConstraint.MinMaxAcceleration(-10.0, 10.0 / velocity);
+                return 10.0 / velocity;
+            }
+
+            @Override
+            public double maxDecel(Pose2dWithMotion state, double velocity) {
+                return -10.0;
             }
         }
 
@@ -230,33 +251,6 @@ public class ScheduleGeneratorTest {
         assertNotNull(timed_traj);
     }
 
-    @Test
-    void testAccel() {
-        // average v = 0.5
-        // dv = 1
-        assertEquals(0.5, ScheduleGenerator.accel(0, 1, 1.0), 0.001);
-        assertEquals(1.0, ScheduleGenerator.accel(0, 1, 0.5), 0.001);
-        // average v = 1.5
-        // dv = 1
-        assertEquals(1.5, ScheduleGenerator.accel(1, 2, 1.0), 0.001);
-        // same case, backwards
-        assertEquals(1.5, ScheduleGenerator.accel(2, 1, -1.0), 0.001);
-    }
-
-    @Test
-    void testV1() {
-        // no v or a => no new v
-        assertEquals(0.0, ScheduleGenerator.v1(0, 0, 1.0));
-        // no a => keep old v
-        assertEquals(1.0, ScheduleGenerator.v1(1, 0, 1.0));
-        // a = 0.5 for 1 => final v is 1
-        assertEquals(1.0, ScheduleGenerator.v1(0, 0.5, 1.0));
-        // same case, backwards
-        assertEquals(0.0, ScheduleGenerator.v1(1.0, 0.5, -1.0));
-        // backwards with negative accel
-        assertEquals(1.0, ScheduleGenerator.v1(0.0, -0.5, -1.0));
-    }
-
     /**
      * 0.16 ms on my machine.
      * 
@@ -264,9 +258,17 @@ public class ScheduleGeneratorTest {
      */
     @Test
     void testPerformance() {
-        List<HolonomicPose2d> waypoints = List.of(
-                new HolonomicPose2d(new Translation2d(), new Rotation2d(), new Rotation2d()),
-                new HolonomicPose2d(new Translation2d(1, 1), new Rotation2d(), new Rotation2d(Math.PI / 2)));
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d()),
+                        new DirectionSE2(1, 0, 0), 1.2),
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(1, 1),
+                                new Rotation2d()),
+                        new DirectionSE2(0, 1, 0), 1.2));
         long startTimeNs = System.nanoTime();
         final int iterations = 100;
         final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;
@@ -275,6 +277,7 @@ public class ScheduleGeneratorTest {
 
         Path100 path = PathFactory.pathFromWaypoints(
                 waypoints,
+                TRAJECTORY_STEP_M,
                 SPLINE_SAMPLE_TOLERANCE_M,
                 SPLINE_SAMPLE_TOLERANCE_M,
                 SPLINE_SAMPLE_TOLERANCE_RAD);
@@ -293,9 +296,9 @@ public class ScheduleGeneratorTest {
             System.out.printf("total duration ms: %5.3f\n", totalDurationMs);
             System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
-        assertEquals(18, t.length());
-        TimedPose p = t.getPoint(6);
-        assertEquals(0.575, p.state().getPose().translation().getX(), DELTA);
+        assertEquals(33, t.length());
+        TimedState p = t.getPoint(12);
+        assertEquals(0.605, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 
     }

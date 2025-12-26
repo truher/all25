@@ -4,41 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
-import org.team100.lib.trajectory.path.spline.SplineUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 public class PathFactory {
+    private static final boolean DEBUG = false;
 
     public static Path100 pathFromWaypoints(
-            List<HolonomicPose2d> waypoints,
-            double maxDx,
-            double maxDy,
-            double maxDTheta,
-            final List<Double> mN) {
-        List<HolonomicSpline> splines = new ArrayList<>(waypoints.size() - 1);
-        for (int i = 1; i < waypoints.size(); ++i) {
-            splines.add(
-                    new HolonomicSpline(
-                            waypoints.get(i - 1),
-                            waypoints.get(i),
-                            mN.get(i-1),
-                            mN.get(i)));
-        }
-        // does not force C1, theta responds too much
-        // SplineUtil.forceC1(splines);
-        SplineUtil.optimizeSpline(splines);
-        return new Path100(PathFactory.parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
-    }
-
-    public static Path100 pathFromWaypoints(
-            List<HolonomicPose2d> waypoints,
+            List<WaypointSE2> waypoints,
+            double maxNorm,
             double maxDx,
             double maxDy,
             double maxDTheta) {
@@ -46,36 +26,7 @@ public class PathFactory {
         for (int i = 1; i < waypoints.size(); ++i) {
             splines.add(new HolonomicSpline(waypoints.get(i - 1), waypoints.get(i)));
         }
-        // does not force C1, theta responds too much
-        // SplineUtil.forceC1(splines);
-        SplineUtil.optimizeSpline(splines);
-        return new Path100(PathFactory.parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
-    }
-
-    /**
-     * Make a spline from points without any control points -- the spline will go
-     * through the points, computing appropriate (maybe) control points to do so.
-     */
-    public static Path100 withoutControlPoints(
-            final List<Pose2d> waypoints,
-            double maxDx,
-            double maxDy,
-            double maxDTheta) {
-        List<HolonomicSpline> splines = new ArrayList<>(waypoints.size() - 1);
-        // first make a series of straight lines, with corners at the waypoints
-        for (int i = 1; i < waypoints.size(); ++i) {
-            Translation2d p0 = waypoints.get(i - 1).getTranslation();
-            Translation2d p1 = waypoints.get(i).getTranslation();
-            Rotation2d course = p1.minus(p0).getAngle();
-            splines.add(new HolonomicSpline(
-                    new HolonomicPose2d(p0, waypoints.get(i - 1).getRotation(), course),
-                    new HolonomicPose2d(p1, waypoints.get(i).getRotation(), course)));
-        }
-        // then adjust the control points to make it C1 smooth
-        SplineUtil.forceC1(splines);
-        // then try to make it C2 smooth
-        SplineUtil.optimizeSpline(splines);
-        return new Path100(PathFactory.parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
+        return new Path100(parameterizeSplines(splines, maxNorm, maxDx, maxDy, maxDTheta));
     }
 
     /**
@@ -94,6 +45,7 @@ public class PathFactory {
      */
     static List<Pose2dWithMotion> parameterizeSpline(
             HolonomicSpline s,
+            double maxNorm,
             double maxDx,
             double maxDy,
             double maxDTheta,
@@ -103,13 +55,14 @@ public class PathFactory {
         rv.add(s.getPose2dWithMotion(0.0));
         double dt = (t1 - t0);
         for (double t = 0; t < t1; t += dt) {
-            PathFactory.getSegmentArc(s, rv, t, t + dt, maxDx, maxDy, maxDTheta);
+            PathFactory.getSegmentArc(s, maxNorm, rv, t, t + dt, maxDx, maxDy, maxDTheta);
         }
         return rv;
     }
 
     public static List<Pose2dWithMotion> parameterizeSplines(
             List<? extends HolonomicSpline> splines,
+            double maxNorm,
             double maxDx,
             double maxDy,
             double maxDTheta) {
@@ -119,46 +72,66 @@ public class PathFactory {
         rv.add(splines.get(0).getPose2dWithMotion(0.0));
         for (int i = 0; i < splines.size(); i++) {
             HolonomicSpline s = splines.get(i);
-            List<Pose2dWithMotion> samples = parameterizeSpline(s, maxDx, maxDy, maxDTheta, 0.0, 1.0);
+            if (DEBUG)
+                System.out.printf("SPLINE:\n%d\n%s\n", i, s);
+            List<Pose2dWithMotion> samples = parameterizeSpline(s, maxNorm, maxDx, maxDy, maxDTheta, 0.0, 1.0);
             samples.remove(0);
             rv.addAll(samples);
         }
         return rv;
     }
 
+    /**
+     * Recursive bisection to find a series of secant lines close to the real curve,
+     * and with the points closer than maxNorm to each other, measured in L2 norm
+     * (i.e. x, y, heading), and also course.
+     * 
+     * Note if the path is s-shaped, then bisection can find the middle :-)
+     */
     private static void getSegmentArc(
-            HolonomicSpline s,
+            HolonomicSpline spline,
+            double maxNorm, // max distance between points
             List<Pose2dWithMotion> rv,
-            double t0,
-            double t1,
+            double t0, // [0,1] not time
+            double t1, // [0,1] not time
             double maxDx,
             double maxDy,
             double maxDTheta) {
-        Pose2d p0 = s.getPose2d(t0);
-        Pose2d phalf = s.getPose2d(t0 + (t1 - t0) * .5);
-        Pose2d p1 = s.getPose2d(t1);
-        Twist2d twist_full = Pose2d.kZero.log(GeometryUtil.transformBy(GeometryUtil.inverse(p0), p1));
-        Pose2d phalf_predicted = GeometryUtil.transformBy(p0,
-                Pose2d.kZero.exp(GeometryUtil.scale(twist_full, 0.5)));
-        Pose2d error = GeometryUtil.transformBy(GeometryUtil.inverse(phalf), phalf_predicted);
+        Pose2d p0 = spline.getPose2d(t0);
+        double thalf = (t0 + t1) / 2;
+        Pose2d phalf = spline.getPose2d(thalf);
+        Pose2d p1 = spline.getPose2d(t1);
 
-        if (GeometryUtil.norm(twist_full) < 1e-6) {
-            // the Rotation2d below will be garbage in this case so give up.
-            return;
-        }
-        Rotation2d course_predicted = (new Rotation2d(twist_full.dx, twist_full.dy))
-                .rotateBy(phalf_predicted.getRotation());
+        // twist from p0 to p1
+        Twist2d twist_full = p0.log(p1);
+        // twist halfway from p0 to p1
+        Twist2d twist_half = GeometryUtil.scale(twist_full, 0.5);
+        // point halfway from p0 to p1
+        Pose2d phalf_predicted = p0.exp(twist_half);
+        // difference between twist and sample
+        Transform2d error = phalf_predicted.minus(phalf);
 
-        Rotation2d course_half = s.getCourse(t0 + (t1 - t0) * .5).orElse(course_predicted);
-        double course_error = course_predicted.unaryMinus().rotateBy(course_half).getRadians();
-        if (Math.abs(error.getTranslation().getY()) > maxDy ||
-                Math.abs(error.getTranslation().getX()) > maxDx ||
-                Math.abs(error.getRotation().getRadians()) > maxDTheta ||
-                Math.abs(course_error) > maxDTheta) {
-            getSegmentArc(s, rv, t0, (t0 + t1) / 2, maxDx, maxDy, maxDTheta);
-            getSegmentArc(s, rv, (t0 + t1) / 2, t1, maxDx, maxDy, maxDTheta);
+        // also prohibit large changes in direction between points
+        Pose2dWithMotion p20 = spline.getPose2dWithMotion(t0);
+        Pose2dWithMotion p21 = spline.getPose2dWithMotion(t1);
+        Twist2d p2t = p20.getPose().course().minus(p21.getPose().course());
+
+        // note the extra conditions to avoid points too far apart.
+        // checks both translational and l2 norms
+        // also checks change in course
+        if (Math.abs(error.getTranslation().getX()) > maxDx
+                || Math.abs(error.getTranslation().getY()) > maxDy
+                || Math.abs(error.getRotation().getRadians()) > maxDTheta
+                || Metrics.translationalNorm(twist_full) > maxNorm
+                || Metrics.l2Norm(twist_full) > maxNorm
+                || Metrics.l2Norm(p2t) > maxNorm) {
+            // add a point in between
+
+            getSegmentArc(spline, maxNorm, rv, t0, thalf, maxDx, maxDy, maxDTheta);
+            getSegmentArc(spline, maxNorm, rv, thalf, t1, maxDx, maxDy, maxDTheta);
         } else {
-            rv.add(s.getPose2dWithMotion(t1));
+            // midpoint is close enough, this looks good
+            rv.add(spline.getPose2dWithMotion(t1));
         }
     }
 }

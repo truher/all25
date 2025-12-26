@@ -3,13 +3,16 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 class YawRateConstraintTest implements Timeless {
     private static final double DELTA = 0.001;
@@ -25,12 +28,12 @@ class YawRateConstraintTest implements Timeless {
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forTest(logger),
                 YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0),
+                WaypointSE2.irrotational(new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1, // spatial, so rad/m
-                0, 0);
-        assertEquals(-8.485, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
-        assertEquals(8.485, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
-        assertEquals(2.828, c.getMaxVelocity(p).getValue(), DELTA);
+                0);
+        assertEquals(-8.485, c.maxDecel(p, 0), DELTA);
+        assertEquals(8.485, c.maxAccel(p, 0), DELTA);
+        assertEquals(2.828, c.maxV(p), DELTA);
     }
 
     @Test
@@ -39,9 +42,11 @@ class YawRateConstraintTest implements Timeless {
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forTest2(logger),
                 YAW_RATE_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 1, // spatial, so rad/m
-                0, 0);
-        assertEquals(5.656, c.getMaxVelocity(p).getValue(), DELTA);
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                1, // spatial, so rad/m
+                0);
+        assertEquals(5.656, c.maxV(p), DELTA);
     }
 
     @Test
@@ -52,13 +57,14 @@ class YawRateConstraintTest implements Timeless {
                 YAW_RATE_SCALE);
         // driving and spinning
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 1,
-                0, 0);
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                1,
+                0);
         // there is an accel limit.
-        assertEquals(-8.485,
-                c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
+        assertEquals(-8.485, c.maxDecel(p, 0), DELTA);
         assertEquals(8.485,
-                c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
+                c.maxAccel(p, 0), DELTA);
     }
 
     @Test
@@ -68,13 +74,13 @@ class YawRateConstraintTest implements Timeless {
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forRealisticTest(logger),
                 scale);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0),
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1, // spatial, so rad/m
-                0, 0);
+                0);
         // this number is still quite high even with a low scale.
-        assertEquals(-16.971,
-                c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
+        assertEquals(-16.971, c.maxDecel(p, 0), DELTA);
         assertEquals(16.971,
-                c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
+                c.maxAccel(p, 0), DELTA);
     }
 }

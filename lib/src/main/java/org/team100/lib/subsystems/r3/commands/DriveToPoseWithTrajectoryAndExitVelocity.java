@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.DirectionSE2;
+import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.reference.r3.TrajectoryReferenceR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
@@ -24,7 +25,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     private final LoggerFactory m_log;
     private final Pose2d m_goal;
-    private final GlobalVelocityR3 m_endVelocity;
+    private final VelocitySE2 m_endVelocity;
     private final VelocitySubsystemR3 m_drive;
     private final ControllerR3 m_controller;
     private final TrajectoryVisualization m_viz;
@@ -35,7 +36,7 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     public DriveToPoseWithTrajectoryAndExitVelocity(
             LoggerFactory parent,
             Pose2d goal,
-            GlobalVelocityR3 endVelocity,
+            VelocitySE2 endVelocity,
             VelocitySubsystemR3 drive,
             ControllerR3 controller,
             TrajectoryPlanner planner,
@@ -54,15 +55,15 @@ public class DriveToPoseWithTrajectoryAndExitVelocity extends MoveAndHold {
     public void initialize() {
         Pose2d pose = m_drive.getState().pose();
         Translation2d toGoal = m_goal.getTranslation().minus(pose.getTranslation());
-        GlobalVelocityR3 startVelocity = m_drive.getState().velocity();
-        HolonomicPose2d startWaypoint = new HolonomicPose2d(
-                pose.getTranslation(),
-                pose.getRotation(),
-                startVelocity.angle().orElse(toGoal.getAngle()));
-        HolonomicPose2d endWaypoint = new HolonomicPose2d(
-                m_goal.getTranslation(),
-                m_goal.getRotation(),
-                m_endVelocity.angle().orElse(toGoal.getAngle()));
+        VelocitySE2 startVelocity = m_drive.getState().velocity();
+        WaypointSE2 startWaypoint = new WaypointSE2(
+                pose,
+                DirectionSE2.irrotational(startVelocity.angle().orElse(toGoal.getAngle())),
+                1);
+        WaypointSE2 endWaypoint = new WaypointSE2(
+                m_goal,
+                DirectionSE2.irrotational(m_endVelocity.angle().orElse(toGoal.getAngle())),
+                1);
         Trajectory100 trajectory = m_planner.generateTrajectory(
                 List.of(startWaypoint, endWaypoint),
                 startVelocity.norm(),

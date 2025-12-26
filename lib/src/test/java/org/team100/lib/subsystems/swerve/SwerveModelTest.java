@@ -4,11 +4,11 @@ package org.team100.lib.subsystems.swerve;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,17 +21,19 @@ class ModelR3Test {
     @Test
     void testTransform() {
         Pose2d p = new Pose2d(new Translation2d(1, 1), new Rotation2d(1));
-        GlobalVelocityR3 t = new GlobalVelocityR3(1, 1, 1);
+        VelocitySE2 t = new VelocitySE2(1, 1, 1);
         ModelR3 s = new ModelR3(p, t);
         assertEquals(1, s.x().x(), DELTA);
     }
 
     @Test
-    void testTimedPose() {
-        ModelR3 s = ModelR3.fromTimedPose(
-                new TimedPose(
+    void testTimedState() {
+        ModelR3 s = ModelR3.fromTimedState(
+                new TimedState(
                         new Pose2dWithMotion(
-                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
+                                WaypointSE2.irrotational(
+                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                                0, 0),
                         0, 0, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
@@ -42,11 +44,13 @@ class ModelR3Test {
     }
 
     @Test
-    void testTimedPose2() {
-        ModelR3 s = ModelR3.fromTimedPose(
-                new TimedPose(
+    void testTimedState2() {
+        ModelR3 s = ModelR3.fromTimedState(
+                new TimedState(
                         new Pose2dWithMotion(
-                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
+                                WaypointSE2.irrotational(
+                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                                0, 0),
                         0, 0, 1));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
@@ -57,11 +61,13 @@ class ModelR3Test {
     }
 
     @Test
-    void testTimedPose3() {
-        ModelR3 s = ModelR3.fromTimedPose(
-                new TimedPose(
+    void testTimedState3() {
+        ModelR3 s = ModelR3.fromTimedState(
+                new TimedState(
                         new Pose2dWithMotion(
-                                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0),
+                                WaypointSE2.irrotational(
+                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                                0, 0),
                         0, 1, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);
@@ -73,11 +79,13 @@ class ModelR3Test {
 
     /** +x motion, positive curvature => +y accel. */
     @Test
-    void testTimedPose4() {
-        ModelR3 s = ModelR3.fromTimedPose(
-                new TimedPose(
+    void testTimedState4() {
+        ModelR3 s = ModelR3.fromTimedState(
+                new TimedState(
                         new Pose2dWithMotion(
-                                HolonomicPose2d.make(0, 0, 0, 0), 0, 1, 0),
+                                WaypointSE2.irrotational(
+                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                                0, 1),
                         0, 1, 0));
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);
@@ -91,7 +99,7 @@ class ModelR3Test {
     void testChassisSpeeds0() {
         ModelR3 state = new ModelR3(
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kPi),
-                new GlobalVelocityR3(1, 0, 0));
+                new VelocitySE2(1, 0, 0));
         ChassisSpeeds speeds = state.chassisSpeeds();
         assertEquals(-1, speeds.vxMetersPerSecond, DELTA);
         assertEquals(0, speeds.vyMetersPerSecond, DELTA);
@@ -102,7 +110,7 @@ class ModelR3Test {
     void testChassisSpeeds1() {
         ModelR3 state = new ModelR3(
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kCCW_Pi_2),
-                new GlobalVelocityR3(1, 0, 1));
+                new VelocitySE2(1, 0, 1));
         ChassisSpeeds speeds = state.chassisSpeeds();
         assertEquals(0, speeds.vxMetersPerSecond, DELTA);
         assertEquals(-1, speeds.vyMetersPerSecond, DELTA);

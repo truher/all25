@@ -1,7 +1,7 @@
 package org.team100.lib.subsystems.test;
 
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
 
@@ -59,19 +59,19 @@ public class OffsetDrivetrainWithBoost implements VelocitySubsystemR3 {
      * @param nextV toolpoint velocity for the next timestep
      */
     @Override
-    public void setVelocity(GlobalVelocityR3 nextV) {
+    public void setVelocity(VelocitySE2 nextV) {
         // the component of the cartesian part that tries to spin
         // the delegate
         // adding some of this will make the toolpoint move more rapidly
         // towards the cartesian goal, while injecting theta error.
-        GlobalVelocityR3 perpendicularOmega = OffsetUtil.omega(
+        VelocitySE2 perpendicularOmega = OffsetUtil.omega(
                 r(m_offset), OffsetUtil.velocity(nextV));
 
         // the component of the rotation part that tries to move the
         // delegate in x and y
         // respecting 100% of this velocity will keep the toolpoint
         // where it wants to go (if the delegate responds perfectly)
-        GlobalVelocityR3 tangentialVelocity = OffsetUtil.tangentialVelocity(
+        VelocitySE2 tangentialVelocity = OffsetUtil.tangentialVelocity(
                 OffsetUtil.omega(nextV), r(m_offset.unaryMinus()));
 
         m_delegate.setVelocity(nextV
@@ -95,8 +95,8 @@ public class OffsetDrivetrainWithBoost implements VelocitySubsystemR3 {
     /**
      * Computes toolpoint velocity from delegate velocity, pose, and offset.
      */
-    private GlobalVelocityR3 toolpointVelocity() {
-        GlobalVelocityR3 delegateVelocity = m_delegate.getState().velocity();
+    private VelocitySE2 toolpointVelocity() {
+        VelocitySE2 delegateVelocity = m_delegate.getState().velocity();
         return delegateVelocity.plus(
                 OffsetUtil.tangentialVelocity(
                         OffsetUtil.omega(delegateVelocity), r(m_offset)));

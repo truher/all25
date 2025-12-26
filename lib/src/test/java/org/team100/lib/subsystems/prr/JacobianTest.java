@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -16,7 +16,7 @@ import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -138,21 +138,21 @@ public class JacobianTest {
         assertEquals(0, jv.wrist(), DELTA);
 
         // +x
-        v = new ModelR3(p, new GlobalVelocityR3(1, 0, 0));
+        v = new ModelR3(p, new VelocitySE2(1, 0, 0));
         jv = j.inverse(v);
         assertEquals(1, jv.elevator(), DELTA);
         assertEquals(0, jv.shoulder(), DELTA);
         assertEquals(0, jv.wrist(), DELTA);
 
         // +y
-        v = new ModelR3(p, new GlobalVelocityR3(0, 1, 0));
+        v = new ModelR3(p, new VelocitySE2(0, 1, 0));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(0.5, jv.shoulder(), DELTA);
         assertEquals(-0.5, jv.wrist(), DELTA);
 
         // +theta
-        v = new ModelR3(p, new GlobalVelocityR3(0, 0, 1));
+        v = new ModelR3(p, new VelocitySE2(0, 0, 1));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(-0.5, jv.shoulder(), DELTA);
@@ -235,10 +235,10 @@ public class JacobianTest {
         double d = t.duration();
         double dt = d / 20;
         for (double time = 0; time < d; time += dt) {
-            TimedPose tp = t.sample(time);
-            ModelR3 sm = ModelR3.fromTimedPose(tp);
+            TimedState tp = t.sample(time);
+            ModelR3 sm = ModelR3.fromTimedState(tp);
             Pose2d p = sm.pose();
-            GlobalVelocityR3 v = sm.velocity();
+            VelocitySE2 v = sm.velocity();
             EAWConfig c = k.inverse(p);
             JointVelocities jv = j.inverse(sm);
             if (DEBUG)

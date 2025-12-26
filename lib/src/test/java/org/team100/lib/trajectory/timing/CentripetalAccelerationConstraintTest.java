@@ -3,13 +3,16 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 class CentripetalAccelerationConstraintTest implements Timeless {
     private static final double DELTA = 0.001;
@@ -26,11 +29,13 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0, 1, 0);
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 1);
         // motionless, so 100% of the capsize accel is available
-        assertEquals(-8.166, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
-        assertEquals(8.166, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
-        assertEquals(2.857, c.getMaxVelocity(p).getValue(), DELTA);
+        assertEquals(-8.166, c.maxDecel(p, 0), DELTA);
+        assertEquals(8.166, c.maxAccel(p, 0), DELTA);
+        assertEquals(2.857, c.maxV(p), DELTA);
     }
 
     @Test
@@ -43,11 +48,13 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0, 1, 0);
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 1);
         // moving, only some of the capsize accel is available
-        assertEquals(-5.257, c.getMinMaxAcceleration(p, 2.5).getMinAccel(), DELTA);
-        assertEquals(5.257, c.getMinMaxAcceleration(p, 2.5).getMaxAccel(), DELTA);
-        assertEquals(2.857, c.getMaxVelocity(p).getValue(), DELTA);
+        assertEquals(-5.257, c.maxDecel(p, 2.5), DELTA);
+        assertEquals(5.257, c.maxAccel(p, 2.5), DELTA);
+        assertEquals(2.857, c.maxV(p), DELTA);
     }
 
     @Test
@@ -60,11 +67,13 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0, 1, 0);
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 1);
         // above the velocity limit
-        assertEquals(-1, c.getMinMaxAcceleration(p, 3).getMinAccel(), DELTA);
-        assertEquals(0, c.getMinMaxAcceleration(p, 3).getMaxAccel(), DELTA);
-        assertEquals(2.857, c.getMaxVelocity(p).getValue(), DELTA);
+        assertEquals(-1, c.maxDecel(p, 3), DELTA);
+        assertEquals(0, c.maxAccel(p, 3), DELTA);
+        assertEquals(2.857, c.maxV(p), DELTA);
     }
 
     @Test
@@ -76,10 +85,12 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 SwerveKinodynamicsFactory.forTest2(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0, 1, 0);
-        assertEquals(-4.083, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
-        assertEquals(4.083, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
-        assertEquals(2.021, c.getMaxVelocity(p).getValue(), DELTA);
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 1);
+        assertEquals(-4.083, c.maxDecel(p, 0), DELTA);
+        assertEquals(4.083, c.maxAccel(p, 0), DELTA);
+        assertEquals(2.021, c.maxV(p), DELTA);
     }
 
     @Test
@@ -91,10 +102,12 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 SwerveKinodynamicsFactory.forTest2(logger),
                 CENTRIPETAL_SCALE);
         Pose2dWithMotion p = new Pose2dWithMotion(
-                HolonomicPose2d.make(0, 0, 0, 0), 0, 0, 0);
-        assertEquals(-4.083, c.getMinMaxAcceleration(p, 0).getMinAccel(), DELTA);
-        assertEquals(4.083, c.getMinMaxAcceleration(p, 0).getMaxAccel(), DELTA);
-        assertEquals(Double.POSITIVE_INFINITY, c.getMaxVelocity(p).getValue(), DELTA);
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 0);
+        assertEquals(-4.083, c.maxDecel(p, 0), DELTA);
+        assertEquals(4.083, c.maxAccel(p, 0), DELTA);
+        assertEquals(Double.POSITIVE_INFINITY, c.maxV(p), DELTA);
     }
 
 }

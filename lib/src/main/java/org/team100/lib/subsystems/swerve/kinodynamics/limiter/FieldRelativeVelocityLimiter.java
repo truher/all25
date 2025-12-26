@@ -2,7 +2,7 @@ package org.team100.lib.subsystems.swerve.kinodynamics.limiter;
 
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -24,14 +24,14 @@ public class FieldRelativeVelocityLimiter {
         m_limits = limit;
     }
 
-    public GlobalVelocityR3 apply(GlobalVelocityR3 target) {
+    public VelocitySE2 apply(VelocitySE2 target) {
         if (Experiments.instance.enabled(Experiment.LimitsPreferRotation))
             return preferRotation(target);
         return proportional(target);
     }
 
     /** Maintain translation and rotation proportionality. */
-    GlobalVelocityR3 proportional(GlobalVelocityR3 target) {
+    VelocitySE2 proportional(VelocitySE2 target) {
         if (DEBUG) {
             System.out.printf("proportional %s\n", target);
         }
@@ -63,8 +63,8 @@ public class FieldRelativeVelocityLimiter {
     }
 
     /** Both rotation and translation, scale proportionally. */
-    private GlobalVelocityR3 proportional(
-            GlobalVelocityR3 target,
+    private VelocitySE2 proportional(
+            VelocitySE2 target,
             final double maxV,
             final double maxOmega,
             double xySpeed) {
@@ -74,41 +74,41 @@ public class FieldRelativeVelocityLimiter {
         if (DEBUG) {
             System.out.printf("FieldRelativeVelocityLimiter proportional scale %.5f\n", scale);
         }
-        return new GlobalVelocityR3(
+        return new VelocitySE2(
                 scale * target.x(),
                 scale * target.y(),
                 scale * target.theta());
     }
 
     /** No rotation at all, so use maxV. */
-    private GlobalVelocityR3 translateOnly(GlobalVelocityR3 target, double maxV, double xySpeed) {
+    private VelocitySE2 translateOnly(VelocitySE2 target, double maxV, double xySpeed) {
         double xyAngle = Math.atan2(target.y(), target.x());
         double scale = Math.abs(maxV / xySpeed);
         m_log_scale.log(() -> scale);
         if (DEBUG) {
             System.out.printf("max v %s\n", target);
         }
-        return new GlobalVelocityR3(
+        return new VelocitySE2(
                 maxV * Math.cos(xyAngle),
                 maxV * Math.sin(xyAngle),
                 0);
     }
 
     /** Spinning in place, faster than is possible, so use maxOmega. */
-    private GlobalVelocityR3 spinOnly(GlobalVelocityR3 target, double maxOmega) {
+    private VelocitySE2 spinOnly(VelocitySE2 target, double maxOmega) {
         double scale = Math.abs(maxOmega / target.theta());
         m_log_scale.log(() -> scale);
         if (DEBUG) {
             System.out.printf("max omega %s\n", target);
         }
-        return new GlobalVelocityR3(
+        return new VelocitySE2(
                 0,
                 0,
                 Math.signum(target.theta()) * maxOmega);
     }
 
     /** Scales translation to accommodate the rotation. */
-    GlobalVelocityR3 preferRotation(GlobalVelocityR3 speeds) {
+    VelocitySE2 preferRotation(VelocitySE2 speeds) {
         double omegaRatio = Math.min(1, speeds.theta() / m_limits.getMaxAngleSpeedRad_S());
         double xySpeed = speeds.norm();
         double maxV = m_limits.getMaxDriveVelocityM_S();
@@ -125,7 +125,7 @@ public class FieldRelativeVelocityLimiter {
             System.out.printf("FieldRelativeVelocityLimiter rotation ratio %.5f\n", ratio);
         }
 
-        return new GlobalVelocityR3(
+        return new VelocitySE2(
                 ratio * maxV * Math.cos(xyAngle),
                 ratio * maxV * Math.sin(xyAngle),
                 speeds.theta());

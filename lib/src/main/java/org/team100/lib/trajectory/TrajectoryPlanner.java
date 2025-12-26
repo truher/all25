@@ -3,8 +3,9 @@ package org.team100.lib.trajectory;
 import java.util.List;
 import java.util.function.Function;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.DirectionSE2;
+import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
@@ -27,6 +28,7 @@ import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGeneratio
  * 4. assign timestamps to each step
  */
 public class TrajectoryPlanner {
+    private static final boolean DEBUG = false;
     /*
      * Maximum distance of the secant lines to the continuous spline. The resulting
      * path will have little scallops if it involves rotation. In SE(2), a constant
@@ -101,12 +103,8 @@ public class TrajectoryPlanner {
                 initial.plus(new Transform2d(1, 0, Rotation2d.kZero)));
     }
 
-    public Trajectory100 restToRest(List<HolonomicPose2d> waypoints) {
+    public Trajectory100 restToRest(List<WaypointSE2> waypoints) {
         return generateTrajectory(waypoints, 0.0, 0.0);
-    }
-
-    public Trajectory100 restToRest(List<HolonomicPose2d> waypoints, List<Double> mN) {
-        return generateTrajectory(waypoints, 0.0, 0.0, mN);
     }
 
     public Trajectory100 movingToRest(ModelR3 startState, Pose2d end) {
@@ -115,10 +113,10 @@ public class TrajectoryPlanner {
 
     public Trajectory100 movingToMoving(ModelR3 startState, ModelR3 endState) {
         Translation2d startTranslation = startState.translation();
-        GlobalVelocityR3 startVelocity = startState.velocity();
+        VelocitySE2 startVelocity = startState.velocity();
 
         Translation2d endTranslation = endState.translation();
-        GlobalVelocityR3 endVelocity = endState.velocity();
+        VelocitySE2 endVelocity = endState.velocity();
 
         // should work with out this.
         if (startVelocity.norm() < VELOCITY_EPSILON && endVelocity.norm() < VELOCITY_EPSILON) {
@@ -132,34 +130,33 @@ public class TrajectoryPlanner {
         // use the start velocity to adjust the first magic number.
         // divide by the distance because the spline multiplies by it
         double e1 = 2.0 * startVelocity.norm() / full.getNorm();
-        List<Double> magicNumbers = List.of(e1, 1.2);
 
         try {
             return generateTrajectory(
                     List.of(
-                            new HolonomicPose2d(
-                                    startTranslation,
-                                    startState.rotation(),
-                                    startingAngle),
-                            new HolonomicPose2d(
-                                    endTranslation,
-                                    endState.rotation(),
-                                    courseToGoal)),
+                            new WaypointSE2(
+                                    startState.pose(),
+                                    DirectionSE2.irrotational(startingAngle),
+                                    e1),
+                            new WaypointSE2(
+                                    endState.pose(),
+                                    DirectionSE2.irrotational(courseToGoal),
+                                    1.2)),
                     startVelocity.norm(),
-                    endVelocity.norm(),
-                    magicNumbers);
+                    endVelocity.norm());
         } catch (TrajectoryGenerationException e) {
             System.out.println("WARNING: Trajectory Generation Exception");
             return new Trajectory100();
         }
     }
 
-    public Trajectory100 movingToMoving(ModelR3 startState, Rotation2d startCourse, double splineEntranceVelocity, ModelR3 endState, Rotation2d endCourse, double splineExitVelocity) {
+    public Trajectory100 movingToMoving(ModelR3 startState, Rotation2d startCourse, double splineEntranceVelocity,
+            ModelR3 endState, Rotation2d endCourse, double splineExitVelocity) {
         Translation2d startTranslation = startState.translation();
-        GlobalVelocityR3 startVelocity = startState.velocity();
+        VelocitySE2 startVelocity = startState.velocity();
 
         Translation2d endTranslation = endState.translation();
-        GlobalVelocityR3 endVelocity = endState.velocity();
+        VelocitySE2 endVelocity = endState.velocity();
 
         // should work with out this.
         if (startVelocity.norm() < VELOCITY_EPSILON && endVelocity.norm() < VELOCITY_EPSILON) {
@@ -171,30 +168,30 @@ public class TrajectoryPlanner {
         // use the start velocity to adjust the first magic number.
         // divide by the distance because the spline multiplies by it
         double e1 = 2.0 * startVelocity.norm() / full.getNorm();
-        List<Double> magicNumbers = List.of(e1, 1.2);
 
         try {
             return generateTrajectory(
                     List.of(
-                            new HolonomicPose2d(
-                                    startTranslation,
-                                    startState.rotation(),
-                                    startCourse),
-                            new HolonomicPose2d(
-                                    endTranslation,
-                                    endState.rotation(),
-                                    endCourse)),
+                            new WaypointSE2(
+                                    startState.pose(),
+                                    DirectionSE2.irrotational(startCourse),
+                                    e1),
+                            new WaypointSE2(
+                                    endState.pose(),
+                                    DirectionSE2.irrotational(endCourse),
+                                    1.2)),
                     splineEntranceVelocity,
-                    splineExitVelocity,
-                    magicNumbers);
+                    splineExitVelocity);
         } catch (TrajectoryGenerationException e) {
             System.out.println("WARNING: Trajectory Generation Exception");
             return new Trajectory100();
         }
     }
 
-    public Trajectory100 movingToRest(ModelR3 startState, Rotation2d startCourse, double splineEntranceVelocity, Pose2d end, Rotation2d endCourse, double splineExitVelocity) {
-        return movingToMoving(startState, startCourse,splineEntranceVelocity, new ModelR3(end), endCourse,splineExitVelocity);
+    public Trajectory100 movingToRest(ModelR3 startState, Rotation2d startCourse, double splineEntranceVelocity,
+            Pose2d end, Rotation2d endCourse, double splineExitVelocity) {
+        return movingToMoving(startState, startCourse, splineEntranceVelocity, new ModelR3(end), endCourse,
+                splineExitVelocity);
     }
 
     /**
@@ -207,10 +204,11 @@ public class TrajectoryPlanner {
         Rotation2d courseToGoal = endTranslation.minus(startTranslation).getAngle();
 
         try {
-            return restToRest(
-                    List.of(
-                            new HolonomicPose2d(startTranslation, start.getRotation(), courseToGoal),
-                            new HolonomicPose2d(endTranslation, end.getRotation(), courseToGoal)));
+            // direction towards goal without rotating
+            DirectionSE2 direction = DirectionSE2.irrotational(courseToGoal);
+            return restToRest(List.of(
+                    new WaypointSE2(start, direction, 1),
+                    new WaypointSE2(end, direction, 1)));
         } catch (TrajectoryGenerationException e) {
             return null;
         }
@@ -220,56 +218,34 @@ public class TrajectoryPlanner {
      * The shape of the spline accommodates the start and end velocities.
      */
     public Trajectory100 generateTrajectory(
-            List<HolonomicPose2d> waypoints,
+            List<WaypointSE2> waypoints,
             double start_vel,
             double end_vel) {
         try {
             // Create a path from splines.
             Path100 path = PathFactory.pathFromWaypoints(
                     waypoints,
+                    m_trajectoryStep,
                     m_splineTolerance,
                     m_splineTolerance,
                     m_splineRotationTolerance);
+            if (DEBUG)
+                System.out.printf("PATH\n%s\n", path);
             // Generate the timed trajectory.
-            return m_scheduleGenerator.timeParameterizeTrajectory(
+            Trajectory100 result = m_scheduleGenerator.timeParameterizeTrajectory(
                     path,
                     m_trajectoryStep,
                     start_vel,
                     end_vel);
+            if (DEBUG)
+                System.out.printf("TRAJECTORY\n%s\n", result);
+            return result;
         } catch (IllegalArgumentException e) {
             // catches various kinds of malformed input, returns a no-op.
             // this should never actually happen.
             System.out.println("WARNING: Bad trajectory input!!");
             // print the stack trace if you want to know who is calling
             // e.printStackTrace();
-            return new Trajectory100();
-        }
-    }
-
-    public Trajectory100 generateTrajectory(
-            List<HolonomicPose2d> waypoints,
-            double start_vel,
-            double end_vel,
-            List<Double> mN) {
-        try {
-            // Create a path from splines.
-            Path100 path = PathFactory.pathFromWaypoints(
-                    waypoints,
-                    m_splineTolerance,
-                    m_splineTolerance,
-                    m_splineRotationTolerance,
-                    mN);
-            // Generate the timed trajectory.
-            return m_scheduleGenerator.timeParameterizeTrajectory(
-                    path,
-                    m_trajectoryStep,
-                    start_vel,
-                    end_vel);
-        } catch (IllegalArgumentException e) {
-            // catches various kinds of malformed input, returns a no-op.
-            // this should never actually happen.
-            System.out.println("WARNING: Bad trajectory input!!");
-            e.printStackTrace();
             return new Trajectory100();
         }
     }

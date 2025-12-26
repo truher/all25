@@ -7,7 +7,7 @@ import org.team100.lib.coherence.ObjectCache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.DriverSkill;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.localization.FreshSwerveEstimate;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.logging.Level;
@@ -15,7 +15,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
-import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
 import org.team100.lib.music.Music;
 import org.team100.lib.music.Player;
@@ -49,7 +49,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
     private final DoubleLogger m_log_turning;
     private final DoubleArrayLogger m_log_pose_array;
     private final EnumLogger m_log_skill;
-    private final GlobalVelocityR3Logger m_log_input;
+    private final VelocitySE2Logger m_log_input;
 
     private final List<Player> m_players;
 
@@ -70,7 +70,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
         m_log_turning = log.doubleLogger(Level.TRACE, "Tur Deg");
         m_log_pose_array = log.doubleArrayLogger(Level.COMP, "pose array");
         m_log_skill = log.enumLogger(Level.TRACE, "skill level");
-        m_log_input = log.globalVelocityR3Logger(Level.TRACE, "drive input");
+        m_log_input = log.VelocitySE2Logger(Level.TRACE, "drive input");
         m_players = m_swerveLocal.players();
     }
 
@@ -85,7 +85,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
      * @param nextV for the next timestep
      */
     @Override
-    public void setVelocity(GlobalVelocityR3 nextV) {
+    public void setVelocity(VelocitySE2 nextV) {
         // keep the limiter up to date on what we're doing
         m_limiter.updateSetpoint(nextV);
 
@@ -223,7 +223,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
     }
 
     /** Return cached velocity. */
-    public GlobalVelocityR3 getVelocity() {
+    public VelocitySE2 getVelocity() {
         return m_stateCache.get().velocity();
     }
 

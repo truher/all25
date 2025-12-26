@@ -1,6 +1,6 @@
 package org.team100.lib.targeting;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,7 +37,7 @@ public class TargetUtil {
      * @return apparent rotation of the target around the robot, rad/s
      */
     public static double targetMotion(ModelR3 state, Translation2d target) {
-        GlobalVelocityR3 velocity = state.velocity();
+        VelocitySE2 velocity = state.velocity();
         if (velocity.angle().isEmpty()) {
             // If there's no robot motion, there's no target motion.
             return 0;

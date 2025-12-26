@@ -3,8 +3,11 @@ package org.team100.lib.trajectory.path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
+
+import edu.wpi.first.math.geometry.Twist2d;
 
 /**
  * Represents a 2d holonomic path, i.e. with heading independent from course.
@@ -12,8 +15,18 @@ import org.team100.lib.trajectory.timing.ScheduleGenerator;
  * There's no timing information here. For that, see Trajectory100.
  */
 public class Path100 {
+    private static final boolean DEBUG = false;
+    // if an interpolated point is more than this far from an endpoint,
+    // it indicates the endpoints are too far apart, including too far apart
+    // in rotation, which is an aspect of the path scheduling that the
+    // scheduler can't see
+    // TODO: make this a constructor parameter.
+    private static final double INTERPOLATION_LIMIT = 0.3;
     private final List<Pose2dWithMotion> m_points;
-    /** in meters */
+    /**
+     * Translational distance, just the xy plane, not the Twist arc
+     * or anything else, just xy distance.
+     */
     private final double[] m_distances;
 
     public Path100(final List<Pose2dWithMotion> states) {
@@ -26,8 +39,10 @@ public class Path100 {
         m_points.add(states.get(0));
         for (int i = 1; i < states.size(); ++i) {
             m_points.add(states.get(i));
-            m_distances[i] = m_distances[i - 1]
-                    + getPoint(i - 1).distanceM(getPoint(i));
+            Pose2dWithMotion p0 = getPoint(i - 1);
+            Pose2dWithMotion p1 = getPoint(i);
+            double dist = Metrics.translationalDistance(p0.getPose().pose(), p1.getPose().pose());
+            m_distances[i] = m_distances[i - 1] + dist;
         }
     }
 
@@ -39,7 +54,7 @@ public class Path100 {
         return m_points.size();
     }
 
-    public Pose2dWithMotion getPoint(final int index) {
+    public Pose2dWithMotion getPoint(int index) {
         if (m_points.isEmpty())
             return null;
         return m_points.get(index);
@@ -52,38 +67,50 @@ public class Path100 {
         return m_distances[m_distances.length - 1];
     }
 
-    public double getMinDistance() {
-        return 0.0;
-    }
-
     /**
-     * Walks through all the points to find the bracketing points.
+     * Walks through all the points to find the bracketing points, and then
+     * interpolates between them.
      * 
      * @param distance in meters, always a non-negative number.
      */
     public Pose2dWithMotion sample(double distance) throws ScheduleGenerator.TimingException {
         if (distance >= getMaxDistance()) {
-            Pose2dWithMotion point = getPoint(length() - 1);
-            return point;
+            // off the end
+            return getPoint(length() - 1);
         }
         if (distance <= 0.0) {
-            Pose2dWithMotion point = getPoint(0);
-            return point;
+            // before the start
+            return getPoint(0);
         }
-        for (int i = 1; i < m_distances.length; ++i) {
-            final Pose2dWithMotion point = getPoint(i);
-            if (m_distances[i] >= distance) {
-                final Pose2dWithMotion prev_s = getPoint(i - 1);
-                if (Math.abs(m_distances[i] - m_distances[i - 1]) <= 1e-12) {
-                    return point;
-                } else {
-                    return prev_s.interpolate(
-                            point,
-                            (distance - m_distances[i - 1]) / (m_distances[i] - m_distances[i - 1]));
-                }
+        for (int i = 1; i < length(); ++i) {
+            // walk through the points to bracket the desired distance
+            Pose2dWithMotion p0 = getPoint(i - 1);
+            Pose2dWithMotion p1 = getPoint(i);
+            double d0 = m_distances[i - 1];
+            double d1 = m_distances[i];
+            double d = d1 - d0;
+            if (d1 >= distance) {
+                // Found the bracket.
+                double s = (distance - d0) / d;
+                Pose2dWithMotion lerp = p0.interpolate(p1, s);
+                // disallow corners
+                Twist2d t0 = p0.getPose().course().minus(lerp.getPose().course());
+                double l0 = Metrics.l2Norm(t0);
+                Twist2d t1 = p1.getPose().course().minus(lerp.getPose().course());
+                double l1 = Metrics.l2Norm(t1);
+                if (Math.max(l0, l1) > INTERPOLATION_LIMIT)
+                    System.out.printf(
+                            "WARNING!  Interpolated value too far away, p0=%s, p1=%s, t0=%s t1=%s.  This usually indicates a sharp corner in the path, which is not allowed.",
+                            p0, p1, t0, t1);
+                return lerp;
             }
         }
         throw new ScheduleGenerator.TimingException();
+    }
+
+    /** Just returns the list of points with no further sampling. */
+    public Pose2dWithMotion[] resample() throws ScheduleGenerator.TimingException {
+        return m_points.toArray(Pose2dWithMotion[]::new);
     }
 
     @Override
@@ -96,5 +123,37 @@ public class Path100 {
             builder.append(System.lineSeparator());
         }
         return builder.toString();
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    ///
+    /// DANGER ZONE
+    ///
+    /// Don't use anything here unless you know what you're doing.
+    ///
+
+    /**
+     * Samples the entire path evenly by distance. Since the spline parameterizer
+     * now contains a pathwise distance limit, you shouldn't need this anymore.
+     */
+    Pose2dWithMotion[] resample(double step) throws ScheduleGenerator.TimingException {
+        double maxDistance = getMaxDistance();
+        if (maxDistance == 0)
+            throw new IllegalArgumentException("max distance must be greater than zero");
+        int num_states = (int) Math.ceil(maxDistance / step) + 1;
+        if (DEBUG)
+            System.out.printf("resample max distance %f step %f num states %d f %f\n",
+                    maxDistance, step, num_states, maxDistance / step);
+        Pose2dWithMotion[] samples = new Pose2dWithMotion[num_states];
+        for (int i = 0; i < num_states; ++i) {
+            // the dtheta and curvature come from here and are never changed.
+            // the values here are just interpolated from the original values.
+            double d = Math.min(i * step, maxDistance);
+            Pose2dWithMotion state = sample(d);
+            if (DEBUG)
+                System.out.printf("RESAMPLE: i=%d d=%f state=%s\n", i, d, state);
+            samples[i] = state;
+        }
+        return samples;
     }
 }

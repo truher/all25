@@ -6,7 +6,7 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.subsystems.tank.TankDrive;
 import org.team100.lib.trajectory.Trajectory100;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.controller.LTVUnicycleController;
@@ -59,13 +59,13 @@ public class FixedTrajectory extends Command {
             return;
         // current for position error
         double t = progress();
-        TimedPose current = m_trajectory.sample(t);
+        TimedState current = m_trajectory.sample(t);
         // next for feedforward (and selecting K)
-        TimedPose next = m_trajectory.sample(t + TimedRobot100.LOOP_PERIOD_S);
+        TimedState next = m_trajectory.sample(t + TimedRobot100.LOOP_PERIOD_S);
         Pose2d currentPose = m_drive.getPose();
         Pose2d poseReference = current.state().getPose().pose();
         double velocityReference = next.velocityM_S();
-        double omegaReference = next.velocityM_S() * next.state().getCurvature();
+        double omegaReference = next.velocityM_S() * next.state().getHeadingRateRad_M();
         ChassisSpeeds speeds = m_controller.calculate(
                 currentPose, poseReference, velocityReference, omegaReference);
         m_drive.setVelocity(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);

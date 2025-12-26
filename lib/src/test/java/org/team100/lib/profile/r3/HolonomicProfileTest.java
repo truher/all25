@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -24,9 +24,9 @@ class HolonomicProfileTest implements Timeless {
     void testSolve() {
         HolonomicProfile hp = HolonomicProfileFactory.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
         ModelR3 i = new ModelR3(
-                new Pose2d(0, 0, Rotation2d.kZero), new GlobalVelocityR3(1, 0, 0));
+                new Pose2d(0, 0, Rotation2d.kZero), new VelocitySE2(1, 0, 0));
         ModelR3 g = new ModelR3(
-                new Pose2d(0, 2, Rotation2d.kZero), new GlobalVelocityR3(0, 0, 0));
+                new Pose2d(0, 2, Rotation2d.kZero), new VelocitySE2(0, 0, 0));
         hp.solve(i, g);
         // scale factors
         assertEquals(0.8125, hp.sx, DELTA);
@@ -77,7 +77,7 @@ class HolonomicProfileTest implements Timeless {
     @Test
     void test2dWithEntrySpeed() {
         HolonomicProfile hp = HolonomicProfileFactory.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
-        ModelR3 i = new ModelR3(new Pose2d(), new GlobalVelocityR3(1, 0, 0));
+        ModelR3 i = new ModelR3(new Pose2d(), new VelocitySE2(1, 0, 0));
         ModelR3 g = new ModelR3(new Pose2d(0, 1, Rotation2d.kZero));
         hp.solve(i, g);
         ControlR3 s = i.control();
@@ -104,7 +104,7 @@ class HolonomicProfileTest implements Timeless {
     @Test
     void testSolvePerformance() {
         HolonomicProfile hp = HolonomicProfileFactory.trapezoidal(logger, 1, 1, 0.01, 1, 1, 0.01);
-        ModelR3 i = new ModelR3(new Pose2d(), new GlobalVelocityR3(1, 0, 0));
+        ModelR3 i = new ModelR3(new Pose2d(), new VelocitySE2(1, 0, 0));
         ModelR3 g = new ModelR3(new Pose2d(0, 1, Rotation2d.kZero));
         int N = 10000;
         double t0 = Takt.actual();

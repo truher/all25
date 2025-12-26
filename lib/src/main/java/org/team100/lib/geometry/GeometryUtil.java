@@ -25,14 +25,49 @@ import edu.wpi.first.math.spline.PoseWithCurvature;
  * Lots of utility functions.
  */
 public class GeometryUtil {
-    private static final boolean DEBUG = false;
+    static final boolean DEBUG = false;
 
     private GeometryUtil() {
     }
 
+    /**
+     * Change in course per change in position.
+     * 
+     * The inverse radius of the circle fit to the three points.
+     * 
+     * This is to replace the spline-derived curvature.
+     * 
+     * https://en.wikipedia.org/wiki/Menger_curvature
+     * 
+     * https://hratliff.com/files/curvature_calculations_and_circle_fitting.pdf
+     */
+    public static double mengerCurvature(Translation2d t0, Translation2d t1, Translation2d t2) {
+        double x1 = t0.getX();
+        double x2 = t1.getX();
+        double x3 = t2.getX();
+        double y1 = t0.getY();
+        double y2 = t1.getY();
+        double y3 = t2.getY();
+        double dx12 = x2 - x1;
+        double dx23 = x3 - x2;
+        double dx13 = x1 - x3;
+        double dy12 = y2 - y1;
+        double dy23 = y3 - y2;
+        double dy13 = y1 - y3;
+        double num = 2 * Math.abs(dx12 * dy23 - dy12 * dx23);
+        double den = Math.sqrt((dx12 * dx12 + dy12 * dy12)
+                * (dx23 * dx23 + dy23 * dy23)
+                * (dx13 * dx13 + dy13 * dy13));
+        if (den < 1e-6) {
+            // this isn't really zero
+            return 0;
+        }
+        return num / den;
+    }
+
     /** Return a projected onto the direction of b, retaining the omega of a */
     public static ChassisSpeeds project(ChassisSpeeds a, ChassisSpeeds b) {
-        double norm = norm(b);
+        double norm = Metrics.translationalNorm(b);
         if (norm < 1e-9) {
             // there's no target course, bail out
             return a;
@@ -55,7 +90,7 @@ public class GeometryUtil {
         return a.getX() * b.getX() + a.getY() * b.getY();
     }
 
-    public static double dot(Translation2d a, GlobalVelocityR3 b) {
+    public static double dot(Translation2d a, VelocitySE2 b) {
         return a.getX() * b.x() + a.getY() * b.y();
     }
 
@@ -71,8 +106,8 @@ public class GeometryUtil {
         return new Twist2d(twist.dx * scale, twist.dy * scale, twist.dtheta * scale);
     }
 
-    public static GlobalVelocityR3 scale(GlobalVelocityR3 v, double scale) {
-        return new GlobalVelocityR3(v.x() * scale, v.y() * scale, v.theta() * scale);
+    public static VelocitySE2 scale(VelocitySE2 v, double scale) {
+        return new VelocitySE2(v.x() * scale, v.y() * scale, v.theta() * scale);
     }
 
     public static Pose2d transformBy(Pose2d a, Pose2d b) {
@@ -139,29 +174,6 @@ public class GeometryUtil {
                 || Math.abs(a.getRadians() - WrapRadians(b.getRadians() + Math.PI)) <= 1e-12;
     }
 
-    /**
-     * The norm of the translational part of the twist. Note this does not match the
-     * path length for nonzero omega.
-     */
-    public static double norm(Twist2d a) {
-        // Common case of dy == 0
-        if (a.dy == 0.0)
-            return Math.abs(a.dx);
-        return Math.hypot(a.dx, a.dy);
-    }
-
-    public static double norm(Twist3d t) {
-        Vector<N6> v = VecBuilder.fill(t.dx, t.dy, t.dz, t.rx, t.ry, t.rz);
-        return v.norm();
-    }
-
-    public static double norm(ChassisSpeeds a) {
-        // Common case of dy == 0
-        if (a.vyMetersPerSecond == 0.0)
-            return Math.abs(a.vxMetersPerSecond);
-        return Math.hypot(a.vxMetersPerSecond, a.vyMetersPerSecond);
-    }
-
     public static boolean near(ChassisSpeeds a, ChassisSpeeds b) {
         return MathUtil.isNear(a.vxMetersPerSecond, b.vxMetersPerSecond, 1e-6)
                 && MathUtil.isNear(a.vyMetersPerSecond, b.vyMetersPerSecond, 1e-6)
@@ -170,20 +182,6 @@ public class GeometryUtil {
 
     public static Rotation2d flip(Rotation2d a) {
         return new Rotation2d(MathUtil.angleModulus(a.getRadians() + Math.PI));
-    }
-
-    public static double distance(Rotation2d a, final Rotation2d other) {
-        return a.unaryMinus().rotateBy(other).getRadians();
-    }
-
-    public static Rotation2d interpolate2(Rotation2d a, final Rotation2d b, double x) {
-        if (x <= 0.0) {
-            return a;
-        } else if (x >= 1.0) {
-            return b;
-        }
-        double angle_diff = a.unaryMinus().rotateBy(b).getRadians();
-        return a.rotateBy(Rotation2d.fromRadians(angle_diff * x));
     }
 
     /** Straight-line (not constant-twist) interpolation. */
@@ -199,16 +197,27 @@ public class GeometryUtil {
         Rotation2d bR = b.getRotation();
         // each translation axis is interpolated separately
         Translation2d lerpT = aT.interpolate(bT, x);
-        // Rotation2d lerpR = aR.interpolate(bR, x);
-        Rotation2d lerpR = interpolate2(aR, bR, x);
+        Rotation2d lerpR = aR.interpolate(bR, x);
         return new Pose2d(lerpT, lerpR);
     }
 
-    public static HolonomicPose2d interpolate(HolonomicPose2d a, HolonomicPose2d b, double x) {
-        return new HolonomicPose2d(
-                a.translation().interpolate(b.translation(), x),
-                interpolate2(a.heading(), b.heading(), x),
-                interpolate2(a.course(), b.course(), x));
+    /** Linear interpolation of each component */
+    public static DirectionSE2 interpolate(DirectionSE2 a, DirectionSE2 b, double x) {
+        return new DirectionSE2(
+                MathUtil.interpolate(a.x, b.x, x),
+                MathUtil.interpolate(a.y, b.y, x),
+                MathUtil.interpolate(a.theta, b.theta, x));
+    }
+
+    /** straight-line interpolation of pose, linear interpolation of course */
+    public static WaypointSE2 interpolate(
+            WaypointSE2 a,
+            WaypointSE2 b,
+            double x) {
+        return new WaypointSE2(
+                interpolate(a.pose(), b.pose(), x),
+                interpolate(a.course(), b.course(), x),
+                MathUtil.interpolate(a.scale(), b.scale(), x));
     }
 
     /**
@@ -250,27 +259,6 @@ public class GeometryUtil {
                 MathUtil.interpolate(a.getZ(), b.getZ(), x));
     }
 
-    public static double distance(PoseWithCurvature a, PoseWithCurvature b) {
-        // this is not used
-        return norm(slog(transformBy(inverse(a.poseMeters), b.poseMeters)));
-    }
-
-    /**
-     * Distance along the arc between the two poses (in either order) produced by a
-     * constant twist.
-     */
-    public static double distanceM(Pose2d a, Pose2d b) {
-        return norm(slog(transformBy(inverse(a), b)));
-    }
-
-    public static double distanceM(Translation2d a, Translation2d b) {
-        return a.getDistance(b);
-    }
-
-    public static double distanceM(Translation3d a, Translation3d b) {
-        return a.getDistance(b);
-    }
-
     public static Translation2d inverse(Translation2d a) {
         return new Translation2d(-a.getX(), -a.getY());
     }
@@ -291,7 +279,7 @@ public class GeometryUtil {
 
     /** direction of the translational part of the twist */
     public static Optional<Rotation2d> getCourse(Twist2d t) {
-        if (norm(t) > 1e-12) {
+        if (Metrics.translationalNorm(t) > 1e-12) {
             return Optional.of(new Rotation2d(t.dx, t.dy));
         } else {
             return Optional.empty();
@@ -300,7 +288,7 @@ public class GeometryUtil {
 
     /** robot-relative course */
     public static Optional<Rotation2d> getCourse(ChassisSpeeds t) {
-        if (norm(t) > 1e-12) {
+        if (Metrics.translationalNorm(t) > 1e-12) {
             return Optional.of(new Rotation2d(t.vxMetersPerSecond, t.vyMetersPerSecond));
         } else {
             return Optional.empty();
@@ -376,5 +364,23 @@ public class GeometryUtil {
     /** 3-vector for translation */
     public static Vector<N3> toVec3(Translation2d t) {
         return VecBuilder.fill(t.getX(), t.getY(), 0);
+    }
+
+    /////////////////////////////////////////////////////////////////
+    ///
+    /// DANGER ZONE
+    ///
+    /// Don't use anything below here unless you really know what you're doing
+    ///
+    /**
+     * Change in heading per change in position.
+     */
+    static double headingRatio(Pose2d p0, Pose2d p1) {
+        Rotation2d h0 = p0.getRotation();
+        Rotation2d h1 = p1.getRotation();
+        double d = Metrics.doubleGeodesicDistance(p0, p1);
+        if (Math.abs(d) < 1e-6)
+            return 0;
+        return h1.minus(h0).getRadians() / d;
     }
 }

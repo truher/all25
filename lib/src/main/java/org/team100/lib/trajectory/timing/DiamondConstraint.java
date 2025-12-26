@@ -33,21 +33,26 @@ public class DiamondConstraint implements TimingConstraint {
     }
 
     @Override
-    public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-        Rotation2d course = state.getPose().course();
-        Rotation2d heading = state.getPose().heading();
+    public double maxV(Pose2dWithMotion state) {
+        Rotation2d course = state.getPose().course().toRotation();
+        Rotation2d heading = state.getPose().pose().getRotation();
         Rotation2d strafe = course.minus(heading);
         // a rhombus is a superellipse with exponent 1
         // https://en.wikipedia.org/wiki/Superellipse
         double a = m_maxVelocityX.getAsDouble();
         double b = m_maxVelocityY.getAsDouble();
-        double r = 1 / (Math.abs(strafe.getCos() / a) + Math.abs(strafe.getSin() / b));
-        return new NonNegativeDouble(r);
+        return 1 / (Math.abs(strafe.getCos() / a) + Math.abs(strafe.getSin() / b));
     }
 
     @Override
-    public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocityM_S) {
-        return new MinMaxAcceleration(-m_maxAccel.getAsDouble(), m_maxAccel.getAsDouble());
+    public double maxAccel(Pose2dWithMotion state, double velocityM_S) {
+        // TODO: this should also have a diamond shape
+        return m_maxAccel.getAsDouble();
+    }
+
+    @Override
+    public double maxDecel(Pose2dWithMotion state, double velocity) {
+        return -m_maxAccel.getAsDouble();
     }
 
 }

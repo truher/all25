@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * omega limit calculation is correct.
  */
 public class SwerveDriveDynamicsConstraint implements TimingConstraint {
+    private static final boolean DEBUG = false;
     private final SwerveKinodynamics m_limits;
     private final Mutable vScale;
     private final Mutable aScale;
@@ -41,12 +42,12 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
      * speed allowed (m/s) that maintains the target spatial heading rate.
      */
     @Override
-    public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
+    public double maxV(Pose2dWithMotion state) {
         // First check instantaneous velocity and compute a limit based on drive
         // velocity.
-        Rotation2d course = state.getCourse();
-
-        Rotation2d course_local = course.minus(state.getPose().heading());
+        Rotation2d course = state.getPose().course().toRotation();
+        Rotation2d heading = state.getPose().pose().getRotation();
+        Rotation2d course_local = course.minus(heading);
         double vx = course_local.getCos();
         double vy = course_local.getSin();
         // rad/m
@@ -63,7 +64,7 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
         for (SwerveModuleState100 module : module_states.all()) {
             max_vel = Math.min(max_vel, maxV() / Math.abs(module.speedMetersPerSecond()));
         }
-        return new NonNegativeDouble(max_vel);
+        return max_vel;
     }
 
     double maxV() {
@@ -78,15 +79,22 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
      * @see SwerveUtil.getAccelLimit()
      */
     @Override
-    public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocity) {
+    public double maxAccel(Pose2dWithMotion state, double velocity) {
         if (Double.isNaN(velocity))
             throw new IllegalArgumentException();
-        // min accel is stronger than max accel
-        double minAccel = -1.0 * maxA();
         double maxAccel = SwerveUtil.minAccel(m_limits, 1, 1, velocity);
-        return new MinMaxAcceleration(
-                minAccel,
-                maxAccel);
+        // i think this only works because it's not *exactly* zero at full speed.
+        if (Math.abs(maxAccel) < 1e-3)
+            maxAccel = 0.0;
+        if (DEBUG)
+            System.out.printf("SWERVE CONSTRAINT %f\n", maxAccel);
+        return maxAccel;
+    }
+
+    @Override
+    public double maxDecel(Pose2dWithMotion state, double velocity) {
+        // min accel is stronger than max accel
+        return -1.0 * maxA();
     }
 
     private double maxA() {

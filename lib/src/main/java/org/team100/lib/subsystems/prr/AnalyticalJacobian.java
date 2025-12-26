@@ -1,7 +1,7 @@
 package org.team100.lib.subsystems.prr;
 
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 
@@ -36,9 +36,9 @@ public class AnalyticalJacobian {
      * 
      * See doc/README.md equation 4
      */
-    public GlobalVelocityR3 forward(EAWConfig q, JointVelocities qdot) {
+    public VelocitySE2 forward(EAWConfig q, JointVelocities qdot) {
         Matrix<N3, N3> j = getJ(q);
-        return GlobalVelocityR3.fromVector(j.times(qdot.toVector()));
+        return VelocitySE2.fromVector(j.times(qdot.toVector()));
     }
 
     /**
@@ -50,7 +50,7 @@ public class AnalyticalJacobian {
      */
     public JointVelocities inverse(ModelR3 m) {
         Pose2d x = m.pose();
-        GlobalVelocityR3 xdot = m.velocity();
+        VelocitySE2 xdot = m.velocity();
         EAWConfig q = m_k.inverse(x);
         Matrix<N3, N3> Jinv = getJinv(q);
         return JointVelocities.fromVector(Jinv.times(xdot.toVector()));
@@ -63,11 +63,11 @@ public class AnalyticalJacobian {
      * 
      * See doc/README.md equation 6
      */
-    public GlobalAccelerationR3 forwardA(
+    public AccelerationSE2 forwardA(
             EAWConfig q, JointVelocities qdot, JointAccelerations qddot) {
         Matrix<N3, N3> J = getJ(q);
         Matrix<N3, N3> Jdot = getJdot(q, qdot);
-        return GlobalAccelerationR3.fromVector(
+        return AccelerationSE2.fromVector(
                 Jdot.times(qdot.toVector()).plus(J.times(qddot.toVector())));
     }
 
@@ -80,8 +80,8 @@ public class AnalyticalJacobian {
      */
     public JointAccelerations inverseA(ControlR3 m) {
         Pose2d x = m.pose();
-        GlobalVelocityR3 xdot = m.velocity();
-        GlobalAccelerationR3 xddot = m.acceleration();
+        VelocitySE2 xdot = m.velocity();
+        AccelerationSE2 xddot = m.acceleration();
         EAWConfig q = m_k.inverse(x);
         Matrix<N3, N3> Jinv = getJinv(q);
         JointVelocities qdot = JointVelocities.fromVector(Jinv.times(xdot.toVector()));

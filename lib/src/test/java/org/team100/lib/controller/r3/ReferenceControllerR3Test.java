@@ -9,8 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.DirectionSE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -129,21 +130,31 @@ public class ReferenceControllerR3Test implements Timeless {
 
     @Test
     void testFieldRelativeTrajectory() {
-        List<HolonomicPose2d> waypoints = new ArrayList<>();
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0)));
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(100, 4), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0)));
-        waypoints.add(new HolonomicPose2d(
-                new Translation2d(196, 13), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)));
+        List<WaypointSE2> waypoints = new ArrayList<>();
+        waypoints.add(new WaypointSE2(
+                new Pose2d(
+                        new Translation2d(),
+                        Rotation2d.fromDegrees(180)),
+                new DirectionSE2(1, 0, 0), 1));
+        waypoints.add(new WaypointSE2(
+                new Pose2d(
+                        new Translation2d(100, 4),
+                        Rotation2d.fromDegrees(180)),
+                new DirectionSE2(1, 0, 0), 1));
+        waypoints.add(new WaypointSE2(
+                new Pose2d(
+                        new Translation2d(196, 13),
+                        Rotation2d.fromDegrees(0)),
+                new DirectionSE2(1, 0, 0), 1));
 
         double start_vel = 0.0;
         double end_vel = 0.0;
 
-        Path100 path = PathFactory.pathFromWaypoints(waypoints, 2, 0.25, 0.1);
+        double stepSize = 2;
+
+        Path100 path = PathFactory.pathFromWaypoints(waypoints, stepSize, 2, 0.25, 0.1);
         assertFalse(path.isEmpty());
 
-        double stepSize = 2;
         ScheduleGenerator u = new ScheduleGenerator(Arrays.asList());
         Trajectory100 trajectory = u.timeParameterizeTrajectory(
                 path,
@@ -166,7 +177,7 @@ public class ReferenceControllerR3Test implements Timeless {
                 logger, drive, swerveController, reference);
 
         Pose2d pose = trajectory.sample(0).state().getPose().pose();
-        GlobalVelocityR3 velocity = GlobalVelocityR3.ZERO;
+        VelocitySE2 velocity = VelocitySE2.ZERO;
 
         double mDt = 0.02;
         int i = 0;

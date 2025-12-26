@@ -6,25 +6,32 @@ import java.util.List;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.path.Path100;
+import org.team100.lib.util.Math100;
 
 /**
  * Given a path, produces a trajectory, which includes the path and adds a
  * schedule.
  */
 public class ScheduleGenerator {
+
+    public static class TimingException extends Exception {
+    }
+
+    public static final boolean DEBUG = false;
     private static final double EPSILON = 1e-6;
-    /** this is the default, in order to make the constraints set the actual */
+
+    /** Defaults to make the constraints set the actual. */
+    private static final double HIGH_V = 100;
     private static final double HIGH_ACCEL = 1000;
 
     private final List<TimingConstraint> m_constraints;
 
-    /** If you want a max velocity or accel constraint, use ConstantConstraint. */
     public ScheduleGenerator(List<TimingConstraint> constraints) {
         m_constraints = constraints;
     }
 
     /**
-     * Samples the path evenly by distance, and then assign times to each sample.
+     * Samples the path evenly by distance, then assigns a time to each sample.
      */
     public Trajectory100 timeParameterizeTrajectory(
             Path100 path,
@@ -32,15 +39,8 @@ public class ScheduleGenerator {
             double start_vel,
             double end_vel) {
         try {
-            double maxDistance = path.getMaxDistance();
-            if (maxDistance == 0)
-                throw new IllegalArgumentException();
-            int num_states = (int) Math.ceil(maxDistance / step + 1);
-            List<Pose2dWithMotion> samples = new ArrayList<>(num_states);
-            for (int i = 0; i < num_states; ++i) {
-                Pose2dWithMotion state = path.sample(Math.min(i * step, maxDistance));
-                samples.add(state);
-            }
+            // Pose2dWithMotion[] samples = path.resample(step);
+            Pose2dWithMotion[] samples = path.resample();
             return timeParameterizeTrajectory(samples, start_vel, end_vel);
         } catch (TimingException e) {
             e.printStackTrace();
@@ -50,262 +50,200 @@ public class ScheduleGenerator {
     }
 
     /**
-     * input is some set of samples (could be evenly sampled or not), output is
-     * these same samples with time.
+     * Input is some set of samples (could be evenly sampled or not).
+     * 
+     * Output is these same samples with time.
      */
-    private Trajectory100 timeParameterizeTrajectory(
-            List<Pose2dWithMotion> samples,
+    public Trajectory100 timeParameterizeTrajectory(
+            Pose2dWithMotion[] samples,
             double start_vel,
-            double end_vel) throws TimingException {
-        List<ConstrainedState> constrainedStates = forwardPass(samples, start_vel);
-        Pose2dWithMotion lastState = samples.get(samples.size() - 1);
-        backwardsPass(lastState, end_vel, constrainedStates);
-        return integrate(constrainedStates);
+            double end_vel) {
+        double[] distances = getDistances(samples);
+        double[] velocities = getVelocities(samples, start_vel, end_vel, distances);
+        double[] accels = getAccels(distances, velocities);
+        double[] runningTime = getRunningTime(distances, velocities, accels);
+        List<TimedState> timedStates = getTimedStates(samples, velocities, accels, runningTime);
+        return new Trajectory100(timedStates);
     }
 
     /**
-     * Forward pass.
+     * Creates a list of timed states.
+     */
+    private List<TimedState> getTimedStates(
+            Pose2dWithMotion[] samples, double[] velocities, double[] accels, double[] runningTime) {
+        int n = samples.length;
+        List<TimedState> timedStates = new ArrayList<>(n);
+        for (int i = 0; i < n; ++i) {
+            timedStates.add(new TimedState(samples[i], runningTime[i], velocities[i], accels[i]));
+        }
+        return timedStates;
+    }
+
+    /**
+     * Computes duration of each arc and accumulate. Assigns a time to each point.
+     */
+    private double[] getRunningTime(double[] distances, double[] velocities, double[] accels) {
+        int n = distances.length;
+        double[] runningTime = new double[n];
+        for (int i = 1; i < n; ++i) {
+            double arcLength = distances[i] - distances[i - 1];
+            double dt = dt(velocities[i - 1], velocities[i], arcLength, accels[i - 1]);
+            runningTime[i] = runningTime[i - 1] + dt;
+        }
+        return runningTime;
+    }
+
+    /**
+     * Computes average accel based on distance of each arc and velocity at each
+     * point.
      * 
-     * We look at pairs of consecutive states, where the start state has already
-     * been velocity parameterized (though we may adjust the velocity downwards
-     * during the backwards pass). We wish to find an acceleration that is
-     * admissible at both the start and end state, as well as an admissible end
-     * velocity. If there is no admissible end velocity or acceleration, we set the
-     * end velocity to the state's maximum allowed velocity and will repair the
-     * acceleration during the backward pass (by slowing down the predecessor).
-     */
-    private List<ConstrainedState> forwardPass(List<Pose2dWithMotion> samples, double start_vel) {
-        ConstrainedState predecessor = new ConstrainedState(samples.get(0), 0);
-        predecessor.setVelocityM_S(start_vel);
-        predecessor.setMinAccel(-HIGH_ACCEL);
-        predecessor.setMaxAccel(HIGH_ACCEL);
-
-        // work forward through the samples
-        List<ConstrainedState> constrainedStates = new ArrayList<>(samples.size());
-        for (Pose2dWithMotion sample : samples) {
-            double dsM = sample.distanceM(predecessor.getState());
-            ConstrainedState constrainedState = new ConstrainedState(
-                    sample, dsM + predecessor.getDistanceM());
-            constrainedStates.add(constrainedState);
-            forwardWork(predecessor, constrainedState);
-            predecessor = constrainedState;
-        }
-        return constrainedStates;
-    }
-
-    private void forwardWork(ConstrainedState s0, ConstrainedState s1) {
-        // constant-twist path length between states
-        double dsM = s1.getState().distanceM(s0.getState());
-
-        // We may need to iterate to find the maximum end velocity and common
-        // acceleration, since acceleration limits may be a function of velocity.
-        while (true) {
-            // first try the previous state accel to get the new state velocity
-            double v1 = v1(s0.getVelocityM_S(), s0.getMaxAccel(), dsM);
-            s1.setVelocityM_S(v1);
-
-            // also use max accels for the new state accels
-            s1.setMinAccel(-HIGH_ACCEL);
-            s1.setMaxAccel(HIGH_ACCEL);
-
-            // reduce velocity according to constraints
-            s1.clampVelocity(m_constraints);
-
-            // reduce accel according to constraints
-            s1.clampAccel(m_constraints);
-
-            // motionless
-            if (Math.abs(dsM) < EPSILON) {
-                return;
-            }
-
-            double accel = accel(s0.getVelocityM_S(), s1.getVelocityM_S(), dsM);
-            if (accel > s1.getMaxAccel() + EPSILON) {
-                // implied accel is too high because v1 is too high, perhaps because
-                // a0 was too high, try again with the (lower) constrained value
-                s0.setMaxAccel(s1.getMaxAccel());
-                continue;
-            }
-            if (accel > s0.getMinAccel() + EPSILON) {
-                // set the previous state accel to whatever the constrained velocity implies
-                s0.setMaxAccel(accel);
-            }
-            return;
-        }
-    }
-
-    /**
-     * Backwards pass
-     */
-    private void backwardsPass(
-            Pose2dWithMotion lastState,
-            double end_velocity,
-            List<ConstrainedState> constrainedStates) {
-        // "successor" comes before in the backwards walk. start with the last state.
-        ConstrainedState endState = constrainedStates.get(constrainedStates.size() - 1);
-        ConstrainedState successor = new ConstrainedState(lastState, endState.getDistanceM());
-        successor.setVelocityM_S(end_velocity);
-        successor.setMinAccel(-HIGH_ACCEL);
-        successor.setMaxAccel(HIGH_ACCEL);
-
-        // work backwards through the states list
-        for (int i = constrainedStates.size() - 1; i >= 0; --i) {
-            ConstrainedState constrainedState = constrainedStates.get(i);
-            backwardsWork(constrainedState, successor);
-            successor = constrainedState;
-        }
-    }
-
-    /** s0 is earlier, s1 is "successor", we're walking backwards. */
-    private void backwardsWork(ConstrainedState s0, ConstrainedState s1) {
-        // backwards (negative) distance from successor to initial state.
-        double ds = s0.getDistanceM() - s1.getDistanceM();
-        if (ds > 0) {
-            // must be negative if we're walking backwards.
-            throw new IllegalStateException();
-        }
-
-        while (true) {
-            // s0 velocity can't be more than the accel implies
-            // so this is actually an estimate for v0
-            // min a is negative, ds is negative, so v0 is faster than v1
-            double v0 = v1(s1.getVelocityM_S(), s1.getMinAccel(), ds);
-
-            if (s0.getVelocityM_S() <= v0) {
-                // s0 v is slower than implied v0, which means
-                // that actual accel is larger than the min, so we're fine
-                // No new limits to impose.
-                return;
-            }
-            // s0 v is too fast, turn it down to obey v1 min accel.
-            s0.setVelocityM_S(v0);
-
-            s0.clampAccel(m_constraints);
-
-            // motionless
-            if (Math.abs(ds) < EPSILON) {
-                return;
-            }
-
-            // implied accel using the constrained v0
-            double accel = accel(s1.getVelocityM_S(), s0.getVelocityM_S(), ds);
-            if (accel < s0.getMinAccel() - EPSILON) {
-                // accel is too low which implies that s1 accel is too low, try again
-                s1.setMinAccel(s0.getMinAccel());
-                continue;
-            }
-            // set final accel to the implied value
-            s1.setMinAccel(accel);
-            return;
-        }
-    }
-
-    /**
-     * Integrate the constrained states forward in time to obtain the TimedStates.
+     * Accel is attached to the *start* of each arc ([i] not [i+1])
      * 
-     * last state accel is always zero, which might be wrong.
+     * The very last accel is always zero, but it's never used since it describes
+     * samples off the end of the trajectory.
      */
-    private static Trajectory100 integrate(List<ConstrainedState> states) throws TimingException {
-        List<TimedPose> poses = new ArrayList<>(states.size());
-        double time = 0.0; // time along path
-        double distance = 0.0; // distance along path
-        double v0 = 0.0;
-        for (int i = 0; i < states.size(); ++i) {
-            ConstrainedState state = states.get(i);
-            final double ds = state.getDistanceM() - distance;
-            final double v1 = state.getVelocityM_S();
-            double dt = 0.0;
-            if (i > 0) {
-                double prevAccel = accel(v0, v1, ds);
-                poses.get(i - 1).set_acceleration(prevAccel);
-                dt = dt(v0, v1, ds, prevAccel);
-            }
-            time += dt;
-            if (Double.isNaN(time) || Double.isInfinite(time)) {
-                throw new TimingException();
-            }
-            poses.add(new TimedPose(state.getState(), time, v1, 0));
-            v0 = v1;
-            distance = state.getDistanceM();
+    private double[] getAccels(double[] distances, double[] velocities) {
+        int n = distances.length;
+        double[] accels = new double[n];
+        for (int i = 0; i < n - 1; ++i) {
+            double arcLength = distances[i + 1] - distances[i];
+            accels[i] = Math100.accel(velocities[i], velocities[i + 1], arcLength);
         }
-        return new Trajectory100(poses);
+        return accels;
     }
 
     /**
-     * If accelerating, find the time to go from v0 to v1. Otherwise find the time
-     * to go distance ds at speed v0.
+     * Assigns a velocity to each sample, using velocity, accel, and decel
+     * constraints.
      */
+    private double[] getVelocities(
+            Pose2dWithMotion[] samples, double start_vel, double end_vel, double[] distances) {
+        double velocities[] = new double[samples.length];
+        forward(samples, start_vel, distances, velocities);
+        backward(samples, end_vel, distances, velocities);
+        if (start_vel > velocities[0]) {
+            System.out.printf("WARNING: start velocity %f is higher than constrained velocity %f\n",
+                    start_vel, velocities[0]);
+        }
+        return velocities;
+    }
+
+    /**
+     * Computes velocities[i+1] using velocity and acceleration constraints using
+     * the
+     * state at i.
+     */
+    private void forward(
+            Pose2dWithMotion[] samples, double start_vel, double[] distances, double[] velocities) {
+        int n = samples.length;
+        velocities[0] = start_vel;
+        for (int i = 0; i < n - 1; ++i) {
+            double arclength = distances[i + 1] - distances[i];
+            if (Math.abs(arclength) < EPSILON) {
+                // zero-length arcs have the same state at both ends
+                velocities[i + 1] = velocities[i];
+                break;
+            }
+            // velocity constraint depends only on state
+            double maxV = velocityConstraint(samples[i + 1]);
+            // start with the maximum velocity
+            velocities[i + 1] = maxV;
+            // reduce velocity to fit under the acceleration constraint
+            double impliedAccel = Math100.accel(velocities[i], velocities[i + 1], arclength);
+            double maxAccel = accelConstraint(samples[i], velocities[i]);
+            if (impliedAccel > maxAccel + EPSILON) {
+                velocities[i + 1] = Math100.v1(velocities[i], maxAccel, arclength);
+            }
+        }
+    }
+
+    /**
+     * Adjusts velocities[i] for decel constraint based on the state at i+1.
+     * 
+     * This isn't strictly correct since the decel constraint should operate at i,
+     * but walking backwards through the path, only i+1 is available.
+     */
+    private void backward(
+            Pose2dWithMotion[] samples, double end_vel, double[] distances, double[] velocities) {
+        int n = samples.length;
+        velocities[n - 1] = end_vel;
+        for (int i = n - 2; i >= 0; --i) {
+            double arclength = distances[i + 1] - distances[i];
+            if (Math.abs(arclength) < EPSILON) {
+                // already handled this case
+                break;
+            }
+            double impliedAccel = Math100.accel(velocities[i], velocities[i + 1], arclength);
+            // Apply the decel constraint at the end of the segment since it is feasible.
+            double maxDecel = decelConstraint(samples[i + 1], velocities[i + 1]);
+            if (impliedAccel < maxDecel - EPSILON) {
+                velocities[i] = Math100.v0(velocities[i + 1], maxDecel, arclength);
+            }
+        }
+    }
+
+    /**
+     * Computes the length of each arc and accumulates.
+     */
+    private double[] getDistances(Pose2dWithMotion[] samples) {
+        int n = samples.length;
+        double distances[] = new double[n];
+        for (int i = 1; i < n; ++i) {
+            double arclength = samples[i].distanceCartesian(samples[i - 1]);
+            distances[i] = arclength + distances[i - 1];
+        }
+        return distances;
+    }
+
+    /**
+     * Returns the lowest (i.e. closest to zero) velocity constraint from the list
+     * of constraints. Always positive or zero.
+     */
+    private double velocityConstraint(Pose2dWithMotion sample) {
+        double minVelocity = HIGH_V;
+        for (TimingConstraint constraint : m_constraints) {
+            minVelocity = Math.min(minVelocity, constraint.maxV(sample));
+        }
+        return minVelocity;
+    }
+
+    /**
+     * Returns the lowest (i.e. closest to zero) acceleration constraint from the
+     * list of constraints. Always positive or zero.
+     */
+    private double accelConstraint(Pose2dWithMotion sample, double velocity) {
+        double minAccel = HIGH_ACCEL;
+        for (TimingConstraint constraint : m_constraints) {
+            minAccel = Math.min(minAccel, constraint.maxAccel(sample, velocity));
+        }
+        return minAccel;
+    }
+
+    /**
+     * Returns the highest (i.e. closest to zero) deceleration constraint from the
+     * list of constraints. Always negative or zero.
+     */
+    private double decelConstraint(Pose2dWithMotion sample, double velocity) {
+        double maxDecel = -HIGH_ACCEL;
+        for (TimingConstraint constraint : m_constraints) {
+            maxDecel = Math.max(maxDecel, constraint.maxDecel(sample, velocity));
+        }
+        return maxDecel;
+    }
+
     private static double dt(
             double v0,
             double v1,
-            double ds,
-            double accel) throws TimingException {
+            double arcLength,
+            double accel) {
         if (Math.abs(accel) > EPSILON) {
+            // If accelerating, find the time to go from v0 to v1.
             return (v1 - v0) / accel;
         }
         if (Math.abs(v0) > EPSILON) {
-            return ds / v0;
+            // If moving, find the time to go distance dq at speed v0.
+            return arcLength / v0;
         }
-        throw new TimingException();
-    }
-
-    /**
-     * Return final velocity, v1, given initial velocity, v0, and acceleration over
-     * distance ds.
-     * 
-     * v1 = sqrt(v0^2 + 2ads)
-     * 
-     * note a can be negative.
-     * 
-     * note ds can be negative, which implies backwards time
-     * 
-     * @param v0 initial velocity
-     * @param a  acceleration
-     * @param ds distance
-     * @return final velocity
-     */
-    static double v1(double v0, double a, double ds) {
-        /*
-         * a = dv/dt
-         * v = ds/dt
-         * dt = ds/v
-         * a = v dv/ds
-         * a = v (v1-v0)/ds
-         * v = (v0+v1)/2
-         * a = (v0+v1)(v1-v0)/2ds
-         * a = (v1^2 - v0^2)/2ds
-         * 2*a*ds = v1^2 - v0^2
-         * v1 = sqrt(v0^2 + 2*a*ds)
-         */
-        return Math.sqrt(v0 * v0 + 2.0 * a * ds);
-    }
-
-    /**
-     * Return acceleration implied by the change in velocity (v0 to v1)
-     * over the distance, ds.
-     * 
-     * a = (v1^2 - v0^2) / 2ds
-     * 
-     * note ds can be negative, which implies negative time.
-     * 
-     * @param v0 initial velocity
-     * @param v1 final velocity
-     * @param ds distance
-     */
-    static double accel(double v0, double v1, double ds) {
-        /*
-         * a = dv/dt
-         * v = ds/dt
-         * dt = ds/v
-         * a = v dv/ds
-         * a = v (v1-v0)/ds
-         * v = (v0+v1)/2
-         * a = (v0+v1)(v1-v0)/2ds
-         * a = (v1^2 - v0^2)/2ds
-         */
-        return (v1 * v1 - v0 * v0) / (2.0 * ds);
-    }
-
-    public static class TimingException extends Exception {
+        return 0;
     }
 }

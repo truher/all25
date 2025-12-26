@@ -3,49 +3,33 @@ package org.team100.lib.geometry;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 
-/**
- * HolonomicPose2d with:
- * 
- * * the spatial rate of change in heading
- * * the spatial rate of change in course
- * * the spatial rate of change in course curvature
- */
+/** WaypointSE2 with heading rate and curvature. */
 public class Pose2dWithMotion {
-    /** Position, heading and course. */
-    private final HolonomicPose2d m_pose;
+    private static final boolean DEBUG = false;
+    /** Pose and course. */
+    private final WaypointSE2 m_waypoint;
     /** Change in heading per meter of motion, rad/m. */
-    private final double m_headingRate;
+    private final double m_headingRateRad_M;
     /** Change in course per change in distance, rad/m. */
     private final double m_curvatureRad_M;
-    /** Change in curvature per meter, rad/m^2 */
-    private final double m_dCurvatureDsRad_M2;
 
     /**
-     * @param pose               location and heading of the robot
-     * @param course             motion direction, radians
-     * @param headingRate        change in heading, per meter traveled
-     * @param curvatureRad_M     change in course per meter traveled.
-     * @param dCurvatureDsRad_M2 acceleration in course per meter traveled squared.
+     * @param waypoint         location and heading and direction of travel
+     * @param headingRateRad_M change in heading, per meter traveled
+     * @param curvatureRad_M   change in course per meter traveled.
      */
     public Pose2dWithMotion(
-            HolonomicPose2d pose,
-            double headingRate,
-            double curvatureRad_M,
-            double dCurvatureDsRad_M2) {
-        m_pose = pose;
-        m_headingRate = headingRate;
+            WaypointSE2 waypoint,
+            double headingRateRad_M,
+            double curvatureRad_M) {
+        m_waypoint = waypoint;
+        m_headingRateRad_M = headingRateRad_M;
         m_curvatureRad_M = curvatureRad_M;
-        m_dCurvatureDsRad_M2 = dCurvatureDsRad_M2;
     }
 
-    public HolonomicPose2d getPose() {
-        return m_pose;
-    }
-
-    public Rotation2d getCourse() {
-        return m_pose.course();
+    public WaypointSE2 getPose() {
+        return m_waypoint;
     }
 
     /**
@@ -54,55 +38,72 @@ public class Pose2dWithMotion {
      * If you want radians per second, multiply by velocity (meters per second).
      */
     public double getHeadingRateRad_M() {
-        return m_headingRate;
+        return m_headingRateRad_M;
     }
 
     /** Radians per meter, which is the reciprocal of the radius. */
-    public double getCurvature() {
+    public double getCurvatureRad_M() {
         return m_curvatureRad_M;
     }
 
-    /** Radians per meter squared */
-    public double getDCurvatureDs() {
-        return m_dCurvatureDsRad_M2;
-    }
-
-    /** This no longer uses a constant-twist arc, it's a straight line. */
-    public Pose2dWithMotion interpolate(final Pose2dWithMotion other, double x) {
+    /**
+     * Linear interpolation of each component separately.
+     * 
+     * Not a constant-twist arc.
+     */
+    public Pose2dWithMotion interpolate(Pose2dWithMotion other, double x) {
         return new Pose2dWithMotion(
-                GeometryUtil.interpolate(m_pose, other.m_pose, x),
-                MathUtil.interpolate(m_headingRate, other.m_headingRate, x),
-                Math100.interpolate(m_curvatureRad_M, other.m_curvatureRad_M, x),
-                Math100.interpolate(m_dCurvatureDsRad_M2, other.m_dCurvatureDsRad_M2, x));
+                GeometryUtil.interpolate(m_waypoint, other.m_waypoint, x),
+                MathUtil.interpolate(m_headingRateRad_M, other.m_headingRateRad_M, x),
+                Math100.interpolate(m_curvatureRad_M, other.m_curvatureRad_M, x));
     }
 
-    /** This no longer uses a constant-twist arc, it's a straight line. */
-    public double distanceM(final Pose2dWithMotion other) {
-        return m_pose.translation().getDistance(other.m_pose.translation());
+    /**
+     * R2 (xy) planar distance only (IGNORES ROTATION) so that planar
+     * velocity and curvature works correctly. Not the twist arclength.
+     * Not the double-geodesic L2 thing. Just XY translation hypot.
+     * 
+     * Always non-negative.
+     */
+    public double distanceCartesian(Pose2dWithMotion other) {
+        return Metrics.translationalDistance(m_waypoint.pose(), other.m_waypoint.pose());
     }
 
-    public boolean equals(final Object other) {
+    public boolean equals(Object other) {
         if (!(other instanceof Pose2dWithMotion)) {
+            if (DEBUG)
+                System.out.println("wrong type");
             return false;
         }
 
         Pose2dWithMotion p2dwc = (Pose2dWithMotion) other;
-        return m_pose.equals(p2dwc.m_pose) &&
-                Math100.epsilonEquals(m_headingRate, p2dwc.m_headingRate) &&
-                Math100.epsilonEquals(m_curvatureRad_M, p2dwc.m_curvatureRad_M) &&
-                Math100.epsilonEquals(m_dCurvatureDsRad_M2, p2dwc.m_dCurvatureDsRad_M2);
+        if (!m_waypoint.equals(p2dwc.m_waypoint)) {
+            if (DEBUG)
+                System.out.println("wrong waypoint");
+            return false;
+        }
+        if (!Math100.epsilonEquals(m_headingRateRad_M, p2dwc.m_headingRateRad_M)) {
+            if (DEBUG)
+                System.out.println("wrong heading rate");
+            return false;
+        }
+        if (!Math100.epsilonEquals(m_curvatureRad_M, p2dwc.m_curvatureRad_M)) {
+            if (DEBUG)
+                System.out.println("wrong curvature");
+            return false;
+        }
+        return true;
     }
 
     public String toString() {
         return String.format(
-                "x %5.3f, y %5.3f, theta %5.3f, course %s, dtheta %5.3f, curvature %5.3f, dcurvature_ds %5.3f",
-                m_pose.translation().getX(),
-                m_pose.translation().getY(),
-                m_pose.heading().getRadians(),
-                m_pose.course(),
-                m_headingRate,
-                m_curvatureRad_M,
-                m_dCurvatureDsRad_M2);
+                "x %5.3f, y %5.3f, theta %5.3f, course %s, dtheta %5.3f, curvature %5.3f",
+                m_waypoint.pose().getTranslation().getX(),
+                m_waypoint.pose().getTranslation().getY(),
+                m_waypoint.pose().getRotation().getRadians(),
+                m_waypoint.course(),
+                m_headingRateRad_M,
+                m_curvatureRad_M);
     }
 
 }

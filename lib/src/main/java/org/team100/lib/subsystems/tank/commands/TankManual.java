@@ -4,7 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import org.team100.lib.experiments.Experiment;
 import org.team100.lib.experiments.Experiments;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
@@ -59,7 +59,7 @@ public class TankManual extends Command {
         m_logTranslation.log(() -> translationM_S);
         m_logRotation.log(() -> rotationRad_S);
         Rotation2d currentRotation = m_drive.getPose().getRotation();
-        GlobalVelocityR3 v = SwerveKinodynamics.fromInstantaneousChassisSpeeds(
+        VelocitySE2 v = SwerveKinodynamics.fromInstantaneousChassisSpeeds(
                 new ChassisSpeeds(translationM_S, 0, rotationRad_S), currentRotation);
         if (Experiments.instance.enabled(Experiment.UseSetpointGenerator)) {
             v = m_limiter.apply(v);

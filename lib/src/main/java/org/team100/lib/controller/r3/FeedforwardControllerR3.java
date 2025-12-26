@@ -1,10 +1,10 @@
 package org.team100.lib.controller.r3;
 
-import org.team100.lib.geometry.GlobalDeltaR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.DeltaSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.LoggerFactory.GlobalVelocityR3Logger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.state.ControlR3;
 
 /**
@@ -12,7 +12,7 @@ import org.team100.lib.state.ControlR3;
  * is appropriate if feedback control is outboard.
  */
 public class FeedforwardControllerR3 extends ControllerR3Base {
-    private final GlobalVelocityR3Logger m_log_u_FF;
+    private final VelocitySE2Logger m_log_u_FF;
 
     public FeedforwardControllerR3(
             LoggerFactory parent,
@@ -22,14 +22,14 @@ public class FeedforwardControllerR3 extends ControllerR3Base {
             double omegaTolerance) {
         super(parent, xTolerance, thetaTolerance, xDotTolerance, omegaTolerance);
         LoggerFactory log = parent.type(this);
-        m_log_u_FF = log.globalVelocityR3Logger(Level.TRACE, "feedforward");
+        m_log_u_FF = log.VelocitySE2Logger(Level.TRACE, "feedforward");
 
     }
 
     @Override
-    public GlobalVelocityR3 calculate100(
-            GlobalDeltaR3 positionError,
-            GlobalVelocityR3 velocityError,
+    public VelocitySE2 calculate100(
+            DeltaSE2 positionError,
+            VelocitySE2 velocityError,
             ControlR3 nextReference) {
         m_log_u_FF.log(() -> nextReference.velocity());
         return nextReference.velocity();

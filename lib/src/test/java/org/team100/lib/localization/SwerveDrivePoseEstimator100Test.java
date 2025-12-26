@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -59,7 +59,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
     }
 
     private static void verifyVelocity(double xV, ModelR3 state) {
-        GlobalVelocityR3 v = state.velocity();
+        VelocitySE2 v = state.velocity();
         assertEquals(xV, v.x(), DELTA);
     }
 

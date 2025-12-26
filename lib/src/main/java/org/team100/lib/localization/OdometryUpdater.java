@@ -5,8 +5,8 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.geometry.GlobalDeltaR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.DeltaSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.sensor.gyro.Gyro;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
@@ -154,12 +154,12 @@ public class OdometryUpdater {
         }
 
         // this is the backward finite difference velocity from odometry
-        GlobalDeltaR3 odoVelo = GlobalDeltaR3.delta(
+        DeltaSE2 odoVelo = DeltaSE2.delta(
                 previousState.pose(), newPose)
                 .div(dt);
 
         // use the gyro rate instead of the odometry-derived rate
-        GlobalVelocityR3 velocity = new GlobalVelocityR3(
+        VelocitySE2 velocity = new VelocitySE2(
                 odoVelo.getX(),
                 odoVelo.getY(),
                 gyroRateRad_SNWU);

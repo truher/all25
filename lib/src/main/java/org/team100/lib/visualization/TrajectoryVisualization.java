@@ -2,12 +2,12 @@ package org.team100.lib.visualization;
 
 import java.util.List;
 
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.trajectory.Trajectory100;
-import org.team100.lib.trajectory.timing.TimedPose;
+import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -31,11 +31,11 @@ public class TrajectoryVisualization {
     private static double[] fromTrajectory100(Trajectory100 m_trajectory) {
         double[] arr = new double[m_trajectory.length() * 3];
         int ndx = 0;
-        for (TimedPose p : m_trajectory.getPoints()) {
-            HolonomicPose2d pose = p.state().getPose();
-            arr[ndx + 0] = pose.translation().getX();
-            arr[ndx + 1] = pose.translation().getY();
-            arr[ndx + 2] = pose.heading().getDegrees();
+        for (TimedState p : m_trajectory.getPoints()) {
+            WaypointSE2 pose = p.state().getPose();
+            arr[ndx + 0] = pose.pose().getTranslation().getX();
+            arr[ndx + 1] = pose.pose().getTranslation().getY();
+            arr[ndx + 2] = pose.pose().getRotation().getDegrees();
             ndx += 3;
         }
         return arr;

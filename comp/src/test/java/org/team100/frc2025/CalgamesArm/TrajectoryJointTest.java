@@ -3,9 +3,9 @@ package org.team100.frc2025.CalgamesArm;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.GlobalAccelerationR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
-import org.team100.lib.geometry.HolonomicPose2d;
+import org.team100.lib.geometry.AccelerationSE2;
+import org.team100.lib.geometry.WaypointSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -22,6 +22,7 @@ import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /** How do the joints respond to trajectories? */
 public class TrajectoryJointTest {
@@ -49,8 +50,10 @@ public class TrajectoryJointTest {
         TrajectoryPlanner m_planner = new TrajectoryPlanner(c);
 
         Trajectory100 t = m_planner.restToRest(List.of(
-                HolonomicPose2d.make(1, 0, 0, 0),
-                HolonomicPose2d.make(1.9, 0.5, 2.5, 2)));
+                WaypointSE2.irrotational(
+                        new Pose2d(1, 0, new Rotation2d(0)), 0, 1.2),
+                WaypointSE2.irrotational(
+                        new Pose2d(1.9, 0.5, new Rotation2d(2.5)), 2, 1.2)));
 
         ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(
                 0.5, 0.3);
@@ -60,10 +63,10 @@ public class TrajectoryJointTest {
                     .println(
                             "t, x, y, r, vx, vy, vr, ax, ay, ar, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < t.duration(); tt += 0.02) {
-            ControlR3 m = ControlR3.fromTimedPose(t.sample(tt));
+            ControlR3 m = ControlR3.fromTimedState(t.sample(tt));
             Pose2d p = m.pose();
-            GlobalVelocityR3 v = m.velocity();
-            GlobalAccelerationR3 a = m.acceleration();
+            VelocitySE2 v = m.velocity();
+            AccelerationSE2 a = m.acceleration();
             EAWConfig q = k.inverse(p);
             JointVelocities jv = J.inverse(m.model());
             JointAccelerations ja = J.inverseA(m);

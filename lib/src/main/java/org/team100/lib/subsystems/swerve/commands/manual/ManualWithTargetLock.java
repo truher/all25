@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -89,7 +89,7 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public GlobalVelocityR3 apply(
+    public VelocitySE2 apply(
             final ModelR3 state,
             final Velocity input) {
 
@@ -130,9 +130,9 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
                 -m_swerveKinodynamics.getMaxAngleSpeedRad_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
 
-        final GlobalVelocityR3 scaledInput = getScaledInput(input);
+        final VelocitySE2 scaledInput = getScaledInput(input);
 
-        final GlobalVelocityR3 twistWithLockM_S = new GlobalVelocityR3(
+        final VelocitySE2 twistWithLockM_S = new VelocitySE2(
                 scaledInput.x(), scaledInput.y(), omega);
 
         m_log_apparent_motion.log(() -> targetMotion);
@@ -144,11 +144,11 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
         return twistWithLockM_S;
     }
 
-    private GlobalVelocityR3 getScaledInput(Velocity input) {
+    private VelocitySE2 getScaledInput(Velocity input) {
         // clip the input to the unit circle
         Velocity clipped = input.clip(1.0);
         // this is user input scaled to m/s and rad/s
-        GlobalVelocityR3 scaledInput = FieldRelativeDriver.scale(
+        VelocitySE2 scaledInput = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());

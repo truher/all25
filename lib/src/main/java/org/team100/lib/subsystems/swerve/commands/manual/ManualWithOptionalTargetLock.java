@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -90,7 +90,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
      * @return feasible field-relative velocity in m/s and rad/s
      */
     @Override
-    public GlobalVelocityR3 apply(
+    public VelocitySE2 apply(
             final ModelR3 state,
             final Velocity input) {
 
@@ -106,7 +106,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
         // clip the input to the unit circle
         Velocity clipped = input.clip(1.0);
         Optional<Translation2d> target = m_target.get();
-        GlobalVelocityR3 scaledInput = FieldRelativeDriver.scale(
+        VelocitySE2 scaledInput = FieldRelativeDriver.scale(
                 clipped,
                 m_swerveKinodynamics.getMaxDriveVelocityM_S(),
                 m_swerveKinodynamics.getMaxAngleSpeedRad_S());
@@ -151,7 +151,7 @@ public class ManualWithOptionalTargetLock implements FieldRelativeDriver {
                 target.get().getY(),
                 0 });
 
-        return new GlobalVelocityR3(
+        return new VelocitySE2(
                 scaledInput.x(),
                 scaledInput.y(),
                 omega);

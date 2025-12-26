@@ -1,11 +1,11 @@
 package org.team100.lib.subsystems.r3;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.state.ModelR3;
 
 public class MockSubsystemR3 implements VelocitySubsystemR3 {
-    public GlobalVelocityR3 m_setpoint;
-    public GlobalVelocityR3 m_recentSetpoint;
+    public VelocitySE2 m_setpoint;
+    public VelocitySE2 m_recentSetpoint;
     public ModelR3 m_state;
 
     public MockSubsystemR3(ModelR3 initial) {
@@ -23,7 +23,7 @@ public class MockSubsystemR3 implements VelocitySubsystemR3 {
     }
 
     @Override
-    public void setVelocity(GlobalVelocityR3 setpoint) {
+    public void setVelocity(VelocitySE2 setpoint) {
         m_setpoint = setpoint;
         m_recentSetpoint = setpoint;
     }

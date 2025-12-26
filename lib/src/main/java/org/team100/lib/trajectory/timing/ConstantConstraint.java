@@ -21,13 +21,17 @@ public class ConstantConstraint implements TimingConstraint {
     }
 
     @Override
-    public NonNegativeDouble getMaxVelocity(Pose2dWithMotion state) {
-        return new NonNegativeDouble(m_maxVelocity.getAsDouble());
+    public double maxV(Pose2dWithMotion state) {
+        return m_maxVelocity.getAsDouble();
     }
 
     @Override
-    public MinMaxAcceleration getMinMaxAcceleration(Pose2dWithMotion state, double velocityM_S) {
-        return new MinMaxAcceleration(-m_maxAccel.getAsDouble(), m_maxAccel.getAsDouble());
+    public double maxAccel(Pose2dWithMotion state, double velocityM_S) {
+        return m_maxAccel.getAsDouble();
     }
-
+    
+    @Override
+    public double maxDecel(Pose2dWithMotion state, double velocity) {
+        return -m_maxAccel.getAsDouble();
+    }
 }

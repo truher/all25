@@ -2,7 +2,7 @@ package org.team100.lib.subsystems.prr;
 
 import java.util.function.Function;
 
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.optimization.NumericalJacobian100;
 import org.team100.lib.state.ModelR3;
 
@@ -34,10 +34,10 @@ public class Jacobian {
     /**
      * Given a joint configuration and velocities, what is the cartesian velocity?
      */
-    public GlobalVelocityR3 forward(EAWConfig c, JointVelocities v) {
+    public VelocitySE2 forward(EAWConfig c, JointVelocities v) {
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
                 Nat.N3(), Nat.N3(), m_f, config(c));
-        return GlobalVelocityR3.fromVector(j.times(v.toVector()));
+        return VelocitySE2.fromVector(j.times(v.toVector()));
     }
 
     /**
@@ -46,7 +46,7 @@ public class Jacobian {
      */
     public JointVelocities inverse(ModelR3 swerveModel) {
         Pose2d p = swerveModel.pose();
-        GlobalVelocityR3 v = swerveModel.velocity();
+        VelocitySE2 v = swerveModel.velocity();
         EAWConfig c = m_k.inverse(p);
         Matrix<N3, N3> j = NumericalJacobian100.numericalJacobian2(
                 Nat.N3(), Nat.N3(), m_f, config(c));

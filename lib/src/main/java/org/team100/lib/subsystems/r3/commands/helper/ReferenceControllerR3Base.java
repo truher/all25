@@ -1,7 +1,7 @@
 package org.team100.lib.subsystems.r3.commands.helper;
 
 import org.team100.lib.controller.r3.ControllerR3;
-import org.team100.lib.geometry.GlobalVelocityR3;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.BooleanLogger;
@@ -52,7 +52,7 @@ public abstract class ReferenceControllerR3Base {
      * @param next The next control setpoint.
      * @param u    The controller output for the next dt
      */
-    abstract void execute100(ControlR3 next, GlobalVelocityR3 u);
+    abstract void execute100(ControlR3 next, VelocitySE2 u);
 
     /**
      * This should be called in Command.execute().
@@ -65,7 +65,7 @@ public abstract class ReferenceControllerR3Base {
             ModelR3 error = current.minus(measurement);
             // u represents the time from now until now+dt, so it's also
             // what the mechanism should be doing at the next time step
-            GlobalVelocityR3 u = m_controller.calculate(measurement, current, next);
+            VelocitySE2 u = m_controller.calculate(measurement, current, next);
             execute100(next, u);
             m_log_measurement.log(() -> measurement);
             m_log_current.log(() -> current);
