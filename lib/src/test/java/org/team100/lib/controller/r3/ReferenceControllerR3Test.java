@@ -150,10 +150,11 @@ public class ReferenceControllerR3Test implements Timeless {
         double start_vel = 0.0;
         double end_vel = 0.0;
 
-        Path100 path = PathFactory.pathFromWaypoints(waypoints, 2, 0.25, 0.1);
+        double stepSize = 2;
+
+        Path100 path = PathFactory.pathFromWaypoints(waypoints, stepSize, 2, 0.25, 0.1);
         assertFalse(path.isEmpty());
 
-        double stepSize = 2;
         ScheduleGenerator u = new ScheduleGenerator(Arrays.asList());
         Trajectory100 trajectory = u.timeParameterizeTrajectory(
                 path,

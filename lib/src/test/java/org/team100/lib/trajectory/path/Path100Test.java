@@ -48,7 +48,7 @@ class Path100Test {
         double maxDx = 0.1;
         double maxDy = 0.1;
         double maxDTheta = 0.1;
-        Path100 path = new Path100(PathFactory.parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
+        Path100 path = new Path100(PathFactory.parameterizeSplines(splines, 0.1, maxDx, maxDy, maxDTheta));
         assertEquals(0, path.length(), 0.001);
     }
 

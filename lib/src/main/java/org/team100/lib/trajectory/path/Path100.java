@@ -6,7 +6,6 @@ import java.util.List;
 import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
-import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
 
 import edu.wpi.first.math.geometry.Twist2d;
 
@@ -16,6 +15,7 @@ import edu.wpi.first.math.geometry.Twist2d;
  * There's no timing information here. For that, see Trajectory100.
  */
 public class Path100 {
+    private static final boolean DEBUG = false;
     // if an interpolated point is more than this far from an endpoint,
     // it indicates the endpoints are too far apart, including too far apart
     // in rotation, which is an aspect of the path scheduling that the
@@ -99,38 +99,18 @@ public class Path100 {
                 Twist2d t1 = p1.getPose().course().minus(lerp.getPose().course());
                 double l1 = Metrics.l2Norm(t1);
                 if (Math.max(l0, l1) > INTERPOLATION_LIMIT)
-                    throw new IllegalStateException(
-                            String.format(
-                                    "Interpolated value too far away, p0=%s, p1=%s, t0=%s t1=%s.  This usually indicates a sharp corner in the path, which is not allowed.",
-                                    p0, p1, t0, t1));
+                    System.out.printf(
+                            "WARNING!  Interpolated value too far away, p0=%s, p1=%s, t0=%s t1=%s.  This usually indicates a sharp corner in the path, which is not allowed.",
+                            p0, p1, t0, t1);
                 return lerp;
             }
         }
         throw new ScheduleGenerator.TimingException();
     }
 
-    /**
-     * Samples the entire path evenly by distance.
-     */
-    public Pose2dWithMotion[] resample(double step) throws ScheduleGenerator.TimingException {
-        double maxDistance = getMaxDistance();
-        if (maxDistance == 0)
-            throw new IllegalArgumentException("max distance must be greater than zero");
-        int num_states = (int) Math.ceil(maxDistance / step) + 1;
-        if (ScheduleGenerator.DEBUG)
-            System.out.printf("resample max distance %f step %f num states %d f %f\n",
-                    maxDistance, step, num_states, maxDistance / step);
-        Pose2dWithMotion[] samples = new Pose2dWithMotion[num_states];
-        for (int i = 0; i < num_states; ++i) {
-            // the dtheta and curvature come from here and are never changed.
-            // the values here are just interpolated from the original values.
-            double d = Math.min(i * step, maxDistance);
-            Pose2dWithMotion state = sample(d);
-            if (ScheduleGenerator.DEBUG)
-                System.out.printf("RESAMPLE: i=%d d=%f state=%s\n", i, d, state);
-            samples[i] =state;
-        }
-        return samples;
+    /** Just returns the list of points with no further sampling. */
+    public Pose2dWithMotion[] resample() throws ScheduleGenerator.TimingException {
+        return m_points.toArray(Pose2dWithMotion[]::new);
     }
 
     @Override
@@ -145,4 +125,35 @@ public class Path100 {
         return builder.toString();
     }
 
+    ////////////////////////////////////////////////////////////////////
+    ///
+    /// DANGER ZONE
+    ///
+    /// Don't use anything here unless you know what you're doing.
+    ///
+
+    /**
+     * Samples the entire path evenly by distance. Since the spline parameterizer
+     * now contains a pathwise distance limit, you shouldn't need this anymore.
+     */
+    Pose2dWithMotion[] resample(double step) throws ScheduleGenerator.TimingException {
+        double maxDistance = getMaxDistance();
+        if (maxDistance == 0)
+            throw new IllegalArgumentException("max distance must be greater than zero");
+        int num_states = (int) Math.ceil(maxDistance / step) + 1;
+        if (DEBUG)
+            System.out.printf("resample max distance %f step %f num states %d f %f\n",
+                    maxDistance, step, num_states, maxDistance / step);
+        Pose2dWithMotion[] samples = new Pose2dWithMotion[num_states];
+        for (int i = 0; i < num_states; ++i) {
+            // the dtheta and curvature come from here and are never changed.
+            // the values here are just interpolated from the original values.
+            double d = Math.min(i * step, maxDistance);
+            Pose2dWithMotion state = sample(d);
+            if (DEBUG)
+                System.out.printf("RESAMPLE: i=%d d=%f state=%s\n", i, d, state);
+            samples[i] = state;
+        }
+        return samples;
+    }
 }

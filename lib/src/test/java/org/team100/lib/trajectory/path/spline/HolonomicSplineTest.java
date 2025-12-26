@@ -1,7 +1,6 @@
 package org.team100.lib.trajectory.path.spline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -282,10 +281,17 @@ class HolonomicSplineTest implements Timeless {
         TrajectoryPlotter.plot(splines, 0.1);
     }
 
+    /**
+     * Four splines that make an approximate circle.
+     * 
+     * The heading rate is pretty constant, looking at the origin pretty closely.
+     * 
+     * The path curvature is not constant, because that's how our splines work: the
+     * curvature is always zero at the ends. It does mostly range from about 0.75 to
+     * about 1.25, which is kinda close?
+     */
     @Test
     void testCircle() {
-        // four splines that make a circle should have nice even curvature and velocity
-        // throughout. The circle is centered at zero, the heading always points there.
         double scale = 1.3;
         WaypointSE2 p0 = new WaypointSE2(
                 new Pose2d(new Translation2d(1, 0), Rotation2d.k180deg),
@@ -351,9 +357,11 @@ class HolonomicSplineTest implements Timeless {
     private void checkCircle(List<HolonomicSpline> splines, double rangeError, double azimuthError) {
         double actualRangeError = 0;
         double actualAzimuthError = 0;
-        for (HolonomicSpline s : splines) {
-            for (double j = 0; j < 0.99; j += 0.1) {
-                Pose2d p = s.getPose2d(j);
+        if (DEBUG)
+            System.out.println("s, x, y, k, dh");
+        for (HolonomicSpline spline : splines) {
+            for (double s = 0; s < 0.99; s += 0.01) {
+                Pose2d p = spline.getPose2d(s);
                 // the position should be on the circle
                 double range = p.getTranslation().getNorm();
                 actualRangeError = Math.max(actualRangeError, Math.abs(1.0 - range));
@@ -365,6 +373,12 @@ class HolonomicSplineTest implements Timeless {
                 // circle.
                 // 3/10/25 i made generation coarser so it's less accurate.
                 actualAzimuthError = Math.max(actualAzimuthError, Math.abs(error.getRadians()));
+
+                double k = spline.getCurvature(s);
+
+                double dh = spline.getDHeadingDs(s);
+                if (DEBUG)
+                    System.out.printf("%f, %f, %f, %f, %f\n", s, p.getX(), p.getY(), k, dh);
             }
         }
         assertEquals(0, actualRangeError, rangeError,
@@ -449,8 +463,7 @@ class HolonomicSplineTest implements Timeless {
     @Test
     void testMismatchedXYDerivatives() {
         // because path generation never looks across spline boundaries,
-        // it is possible to make sharp corners at the "knots."  But you can't
-        // make a trajectory with these corners, the scheduler will fail.
+        // it is possible to make sharp corners at the "knots."
 
         // this goes straight ahead to (1,0)
         // derivatives point straight ahead
@@ -489,13 +502,16 @@ class HolonomicSplineTest implements Timeless {
                 System.out.printf("spline %s\n", s);
         }
 
-        Path100 path = new Path100(PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05));
+        Path100 path = new Path100(PathFactory.parameterizeSplines(splines, 0.1, 0.05, 0.05, 0.05));
         if (DEBUG)
             System.out.printf("path %s\n", path);
         List<TimingConstraint> constraints = List.of(new ConstantConstraint(logger, 1, 1));
         ScheduleGenerator scheduleGenerator = new ScheduleGenerator(constraints);
-        assertThrows(IllegalStateException.class, () -> scheduleGenerator.timeParameterizeTrajectory(path,
-                0.05, 0, 0));
+        Trajectory100 traj = scheduleGenerator.timeParameterizeTrajectory(path,
+                0.05, 0, 0);
+        if (DEBUG)
+            traj.dump();
+        TrajectoryPlotter.plot(traj, 0.1);
     }
 
     @Test
@@ -524,7 +540,7 @@ class HolonomicSplineTest implements Timeless {
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("splines", splines);
 
-        List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.05, 0.05, 0.05);
+        List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.1, 0.05, 0.05, 0.05);
         if (DEBUG) {
             for (Pose2dWithMotion p : motion) {
                 System.out.printf("%5.3f %5.3f\n", p.getPose().pose().getTranslation().getX(),

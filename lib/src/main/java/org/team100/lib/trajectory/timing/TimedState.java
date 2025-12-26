@@ -16,8 +16,11 @@ public class TimedState {
     private final double m_timeS;
     /** Instantaneous pathwise velocity, m/s. */
     private final double m_velocityM_S;
-    /** Instantaneous pathwise (not centripetal) acceleration, m/s^2. */
-    private double m_accelM_S_S;
+    /**
+     * Pathwise acceleration for the timespan after this state, m/s^2. It's computed
+     * by looking at the velocity of the next state, and the distance to get there.
+     */
+    private final double m_accelM_S_S;
 
     public TimedState(
             Pose2dWithMotion state,
@@ -42,11 +45,6 @@ public class TimedState {
     /** Instantaneous pathwise velocity, m/s. */
     public double velocityM_S() {
         return m_velocityM_S;
-    }
-
-    /** accel is set based on the velocity of the next state, so we set it here. */
-    void set_acceleration(double acceleration) {
-        m_accelM_S_S = acceleration;
     }
 
     /** Instantaneous pathwise (not centripetal) acceleration, m/s^2. */

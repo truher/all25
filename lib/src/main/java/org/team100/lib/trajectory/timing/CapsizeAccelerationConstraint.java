@@ -9,7 +9,7 @@ import org.team100.lib.tuning.Mutable;
  * Velocity limit based on curvature and the capsize limit (scaled).
  */
 public class CapsizeAccelerationConstraint implements TimingConstraint {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private final Mutable m_scale;
     private final double m_maxCentripetalAccel;
     private final double m_maxDecel;
@@ -49,7 +49,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      */
     @Override
     public double maxV(final Pose2dWithMotion state) {
-        double radius = 1 / state.getCurvatureRad_M();
+        double radius = 1 / Math.abs(state.getCurvatureRad_M());
         // abs is used here to make sure sqrt is happy.
         return Math.sqrt(Math.abs(m_maxCentripetalAccel * m_scale.getAsDouble() * radius));
     }
@@ -73,7 +73,10 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
                 System.out.println("too fast for the curvature, slowing down is ok");
             return m_maxDecel * m_scale.getAsDouble();
         }
-        return -Math.sqrt(alongsq);
+        double decel = -Math.sqrt(alongsq);
+        if (DEBUG)
+            System.out.printf("decel %f\n", decel);
+        return decel;
     }
 
     /**
@@ -88,8 +91,11 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      * along = sqrt(total^2 - v^4/r^2)
      */
     private double alongSq(Pose2dWithMotion state, double velocity) {
-        double radius = 1 / state.getCurvatureRad_M();
+        double radius = 1 / Math.abs(state.getCurvatureRad_M());
         double actualCentripetalAccel = velocity * velocity / radius;
+        if (DEBUG)
+            System.out.printf("radius %f actual centripetal %f\n",
+                    radius, actualCentripetalAccel);
         return m_maxCentripetalAccel * m_scale.getAsDouble() * m_maxCentripetalAccel * m_scale.getAsDouble()
                 - actualCentripetalAccel * actualCentripetalAccel;
     }

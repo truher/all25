@@ -50,12 +50,12 @@ class TrajectoryPlannerTest implements Timeless {
         List<TimingConstraint> constraints = new ArrayList<>();
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         Trajectory100 t = planner.restToRest(waypoints);
-        assertEquals(12, t.length());
+        assertEquals(17, t.length());
         TimedState tp = t.getPoint(0);
         // start at zero velocity
         assertEquals(0, tp.velocityM_S(), DELTA);
-        TimedState p = t.getPoint(6);
-        assertEquals(0.6, p.state().getPose().pose().getTranslation().getX(), DELTA);
+        TimedState p = t.getPoint(8);
+        assertEquals(0.5, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
@@ -81,11 +81,11 @@ class TrajectoryPlannerTest implements Timeless {
                 new CapsizeAccelerationConstraint(logger, limits, 0.2));
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         Trajectory100 t = planner.restToRest(waypoints);
-        assertEquals(12, t.length());
+        assertEquals(17, t.length());
         TimedState tp = t.getPoint(0);
         assertEquals(0, tp.velocityM_S(), DELTA);
-        TimedState p = t.getPoint(6);
-        assertEquals(0.6, p.state().getPose().pose().getTranslation().getX(), DELTA);
+        TimedState p = t.getPoint(8);
+        assertEquals(0.5, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
@@ -123,9 +123,9 @@ class TrajectoryPlannerTest implements Timeless {
             System.out.printf("total duration ms: %5.3f\n", totalDurationMs);
             System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
-        assertEquals(18, t.length());
-        TimedState p = t.getPoint(6);
-        assertEquals(0.585, p.state().getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(33, t.length());
+        TimedState p = t.getPoint(12);
+        assertEquals(0.605, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
     }
 
@@ -168,34 +168,50 @@ class TrajectoryPlannerTest implements Timeless {
         assertEquals(1.176, traj.duration(), DELTA);
     }
 
+    /**
+     * This is a curve that goes +y, turns sharply towards +x, with a more gradual
+     * curve after that.
+     * 
+     * Initial velocity is clamped (with a warning)
+     * Max braking to the apex
+     * Coast through the apex
+     * Max accel for about half of the rest
+     * Max decel to the end
+     */
     @Test
     void test2d() {
-       List<TimingConstraint> constraints = List.of(
+        List<TimingConstraint> constraints = List.of(
                 new ConstantConstraint(logger, 1, 1),
                 new CapsizeAccelerationConstraint(logger, 1, 1));
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
         ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         Trajectory100 traj = planner.movingToRest(start, end);
-        traj.dump();
-        assertEquals(3.337, traj.duration(), DELTA);
+        if (DEBUG)
+            traj.dump();
+        assertEquals(2.741, traj.duration(), DELTA);
     }
 
-    // this should result in constant velocity, slowing for the curve, and then
-    // accelerating for the exit.
-    //
-    // but it doesn't, so there's something wrong.
-    //
-    // in both the "pass" and "fail" cases (with decel in the forward pass), this
-    // produces too-low accels in the straights, and too much accel variation in
-    // the curve.
+    /**
+     * Straight for 1m, approximately a quarter-circle
+     * 
+     * Constant velocity on the straight
+     * Maximum braking just before the start of the curve
+     * Declining braking as the curvature grows
+     * No braking at all at the apex
+     * Gradual acceleration exiting the curve
+     * Maximum acceleration at the exit, to the max V
+     * Constant velocity on the straight
+     * 
+     * These curves should be symmetric around the apex
+     */
     @Test
     void test2d2() {
         List<WaypointSE2> waypoints = List.of(
-                new WaypointSE2(new Pose2d(0, 0, new Rotation2d()), new DirectionSE2(1, 0, 0), 1),
-                new WaypointSE2(new Pose2d(1, 0, new Rotation2d()), new DirectionSE2(1, 0, 0), 1),
-                new WaypointSE2(new Pose2d(2, 1, new Rotation2d()), new DirectionSE2(0, 1, 0), 1),
-                new WaypointSE2(new Pose2d(2, 2, new Rotation2d()), new DirectionSE2(0, 1, 0), 1));
+                new WaypointSE2(new Pose2d(0, 0, new Rotation2d()), new DirectionSE2(1, 0, 0), 1.3),
+                new WaypointSE2(new Pose2d(1, 0, new Rotation2d()), new DirectionSE2(1, 0, 0), 1.3),
+                new WaypointSE2(new Pose2d(2, 1, new Rotation2d()), new DirectionSE2(0, 1, 0), 1.3),
+                new WaypointSE2(new Pose2d(2, 2, new Rotation2d()), new DirectionSE2(0, 1, 0), 1.3));
 
         List<TimingConstraint> constraints = List.of(
                 new ConstantConstraint(logger, 1, 1),
@@ -203,8 +219,9 @@ class TrajectoryPlannerTest implements Timeless {
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
         Trajectory100 traj = planner.generateTrajectory(waypoints, 1, 1);
-        traj.dump();
-        assertEquals(3.337, traj.duration(), DELTA);
+        if (DEBUG)
+            traj.dump();
+        assertEquals(4.603, traj.duration(), DELTA);
     }
 
 }

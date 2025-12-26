@@ -43,7 +43,7 @@ public class PathFactoryTest implements Timeless {
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
                         new DirectionSE2(0, 1, 0), 1));
-        Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
+        Path100 path = PathFactory.pathFromWaypoints(waypoints, 0.1, 0.01, 0.01, 0.1);
 
         assertEquals(54, path.length());
         Pose2dWithMotion p = path.getPoint(0);
@@ -70,7 +70,7 @@ public class PathFactoryTest implements Timeless {
                                 new Rotation2d()),
                         new DirectionSE2(1, 0, 0), 1));
         Path100 path = PathFactory.pathFromWaypoints(
-                waypoints, 0.01, 0.01, 0.1);
+                waypoints, 0.1, 0.01, 0.01, 0.1);
         assertEquals(17, path.length());
         Pose2dWithMotion p = path.getPoint(0);
         assertEquals(0, p.getPose().pose().getTranslation().getX(), DELTA);
@@ -96,7 +96,7 @@ public class PathFactoryTest implements Timeless {
                                 new Translation2d(0, 0),
                                 Rotation2d.kCCW_90deg),
                         new DirectionSE2(0, 0, 1), 1));
-        assertThrows(IllegalArgumentException.class, () -> PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1));
+        assertThrows(IllegalArgumentException.class, () -> PathFactory.pathFromWaypoints(waypoints,0.1, 0.01, 0.01, 0.1));
     }
 
     /** Hard corners once again do not work. */
@@ -123,7 +123,7 @@ public class PathFactoryTest implements Timeless {
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
                         new DirectionSE2(0, 1, 0), 1));
-        assertThrows(IllegalArgumentException.class, () -> PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1));
+        assertThrows(IllegalArgumentException.class, () -> PathFactory.pathFromWaypoints(waypoints,0.1, 0.01, 0.01, 0.1));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class PathFactoryTest implements Timeless {
                                 new Translation2d(2, 0),
                                 new Rotation2d(1)),
                         new DirectionSE2(1, 0, 0), 1));
-        Path100 foo = PathFactory.pathFromWaypoints(waypoints, 0.01, 0.01, 0.1);
+        Path100 foo = PathFactory.pathFromWaypoints(waypoints, 0.1, 0.01, 0.01, 0.1);
         TrajectoryPlotter.plot(foo, 0.1);
         assertEquals(59, foo.length(), 0.001);
     }
@@ -164,7 +164,7 @@ public class PathFactoryTest implements Timeless {
                 new DirectionSE2(1, 5, 0), 1.2);
         HolonomicSpline s = new HolonomicSpline(p1, p2);
 
-        List<Pose2dWithMotion> samples = PathFactory.parameterizeSpline(s, 0.05, 0.05, 0.1, 0.0, 1.0);
+        List<Pose2dWithMotion> samples = PathFactory.parameterizeSpline(s, 0.1, 0.05, 0.05, 0.1, 0.0, 1.0);
 
         double arclength = 0;
         Pose2dWithMotion cur_pose = samples.get(0);
@@ -199,7 +199,7 @@ public class PathFactoryTest implements Timeless {
                                 Rotation2d.kZero),
                         new DirectionSE2(0, 1, 0), 1));
         List<HolonomicSpline> splines = List.of(s0);
-        List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.001, 0.001, 0.001);
+        List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.1, 0.001, 0.001, 0.001);
         for (Pose2dWithMotion p : motion) {
             if (DEBUG)
                 System.out.printf("%5.3f %5.3f\n", p.getPose().pose().getTranslation().getX(),
@@ -233,6 +233,7 @@ public class PathFactoryTest implements Timeless {
         for (int i = 0; i < iterations; ++i) {
             t = PathFactory.pathFromWaypoints(
                     waypoints,
+                    0.1,
                     SPLINE_SAMPLE_TOLERANCE_M,
                     SPLINE_SAMPLE_TOLERANCE_M,
                     SPLINE_SAMPLE_TOLERANCE_RAD);

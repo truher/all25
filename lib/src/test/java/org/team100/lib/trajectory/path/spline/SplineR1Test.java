@@ -37,7 +37,8 @@ public class SplineR1Test {
     }
 
     private void show(SplineR1 spline) {
-        System.out.println("t, x, v, a, j");
+        if (DEBUG)
+            System.out.println("t, x, v, a, j");
         for (double t = 0; t <= 1; t += 0.01) {
             double x = spline.getPosition(t);
             double v = spline.getVelocity(t);

@@ -18,6 +18,7 @@ public class PathFactory {
 
     public static Path100 pathFromWaypoints(
             List<WaypointSE2> waypoints,
+            double maxNorm,
             double maxDx,
             double maxDy,
             double maxDTheta) {
@@ -25,7 +26,7 @@ public class PathFactory {
         for (int i = 1; i < waypoints.size(); ++i) {
             splines.add(new HolonomicSpline(waypoints.get(i - 1), waypoints.get(i)));
         }
-        return new Path100(parameterizeSplines(splines, maxDx, maxDy, maxDTheta));
+        return new Path100(parameterizeSplines(splines, maxNorm, maxDx, maxDy, maxDTheta));
     }
 
     /**
@@ -44,6 +45,7 @@ public class PathFactory {
      */
     static List<Pose2dWithMotion> parameterizeSpline(
             HolonomicSpline s,
+            double maxNorm,
             double maxDx,
             double maxDy,
             double maxDTheta,
@@ -53,13 +55,14 @@ public class PathFactory {
         rv.add(s.getPose2dWithMotion(0.0));
         double dt = (t1 - t0);
         for (double t = 0; t < t1; t += dt) {
-            PathFactory.getSegmentArc(s, rv, t, t + dt, maxDx, maxDy, maxDTheta);
+            PathFactory.getSegmentArc(s, maxNorm, rv, t, t + dt, maxDx, maxDy, maxDTheta);
         }
         return rv;
     }
 
     public static List<Pose2dWithMotion> parameterizeSplines(
             List<? extends HolonomicSpline> splines,
+            double maxNorm,
             double maxDx,
             double maxDy,
             double maxDTheta) {
@@ -71,7 +74,7 @@ public class PathFactory {
             HolonomicSpline s = splines.get(i);
             if (DEBUG)
                 System.out.printf("SPLINE:\n%d\n%s\n", i, s);
-            List<Pose2dWithMotion> samples = parameterizeSpline(s, maxDx, maxDy, maxDTheta, 0.0, 1.0);
+            List<Pose2dWithMotion> samples = parameterizeSpline(s, maxNorm, maxDx, maxDy, maxDTheta, 0.0, 1.0);
             samples.remove(0);
             rv.addAll(samples);
         }
@@ -79,21 +82,21 @@ public class PathFactory {
     }
 
     /**
-     * Recursive bisection to find a series of secant lines close to the real curve.
+     * Recursive bisection to find a series of secant lines close to the real curve,
+     * and with the points closer than maxNorm to each other, measured in L2 norm
+     * (i.e. x, y, heading), and also course.
      * 
      * Note if the path is s-shaped, then bisection can find the middle :-)
      */
     private static void getSegmentArc(
             HolonomicSpline spline,
+            double maxNorm, // max distance between points
             List<Pose2dWithMotion> rv,
             double t0, // [0,1] not time
             double t1, // [0,1] not time
             double maxDx,
             double maxDy,
             double maxDTheta) {
-        // points must be this close together
-        // TODO: make this a parameter.
-        final double maxNorm = 0.1;
         Pose2d p0 = spline.getPose2d(t0);
         double thalf = (t0 + t1) / 2;
         Pose2d phalf = spline.getPose2d(thalf);
@@ -108,10 +111,12 @@ public class PathFactory {
         // difference between twist and sample
         Transform2d error = phalf_predicted.minus(phalf);
 
+        // also prohibit large changes in direction between points
         Pose2dWithMotion p20 = spline.getPose2dWithMotion(t0);
         Pose2dWithMotion p21 = spline.getPose2dWithMotion(t1);
         Twist2d p2t = p20.getPose().course().minus(p21.getPose().course());
 
+        // note the extra conditions to avoid points too far apart.
         // checks both translational and l2 norms
         // also checks change in course
         if (Math.abs(error.getTranslation().getX()) > maxDx
@@ -121,9 +126,9 @@ public class PathFactory {
                 || Metrics.l2Norm(twist_full) > maxNorm
                 || Metrics.l2Norm(p2t) > maxNorm) {
             // add a point in between
-            // note the extra condition to avoid points too far apart.
-            getSegmentArc(spline, rv, t0, thalf, maxDx, maxDy, maxDTheta);
-            getSegmentArc(spline, rv, thalf, t1, maxDx, maxDy, maxDTheta);
+
+            getSegmentArc(spline, maxNorm, rv, t0, thalf, maxDx, maxDy, maxDTheta);
+            getSegmentArc(spline, maxNorm, rv, thalf, t1, maxDx, maxDy, maxDTheta);
         } else {
             // midpoint is close enough, this looks good
             rv.add(spline.getPose2dWithMotion(t1));

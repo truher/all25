@@ -225,6 +225,7 @@ public class TrajectoryPlanner {
             // Create a path from splines.
             Path100 path = PathFactory.pathFromWaypoints(
                     waypoints,
+                    m_trajectoryStep,
                     m_splineTolerance,
                     m_splineTolerance,
                     m_splineRotationTolerance);

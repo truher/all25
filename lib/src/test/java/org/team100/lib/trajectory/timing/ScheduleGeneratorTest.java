@@ -3,7 +3,6 @@ package org.team100.lib.trajectory.timing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -104,7 +103,7 @@ public class ScheduleGeneratorTest {
     }
 
     /**
-     * Turning in place does not work.k
+     * Turning in place does not work, but it also doesn't fail.
      */
     @Test
     void testJustTurningInPlace() {
@@ -127,11 +126,12 @@ public class ScheduleGeneratorTest {
 
         List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
         ScheduleGenerator u = new ScheduleGenerator(constraints);
-        assertThrows(IllegalArgumentException.class, () -> u.timeParameterizeTrajectory(
+        Trajectory100 traj = u.timeParameterizeTrajectory(
                 path,
                 1.0,
                 0.0,
-                0.0));
+                0.0);
+        assertEquals(0, traj.duration(), DELTA);
     }
 
     /**
@@ -148,21 +148,21 @@ public class ScheduleGeneratorTest {
         Trajectory100 timed_traj = buildAndCheckTrajectory(path,
                 1.0,
                 new ArrayList<TimingConstraint>(), 0.0, 0.0, 20.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
 
         // Trapezoidal profile.
         timed_traj = buildAndCheckTrajectory(path,
                 1.0, new ArrayList<TimingConstraint>(),
                 0.0, 0.0,
                 10.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
 
         // Trapezoidal profile with start and end velocities.
         timed_traj = buildAndCheckTrajectory(path,
                 1.0, new ArrayList<TimingConstraint>(),
                 5.0, 2.0,
                 10.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
     }
 
     /**
@@ -178,18 +178,18 @@ public class ScheduleGeneratorTest {
         Trajectory100 timed_traj = buildAndCheckTrajectory(path,
                 1.0,
                 List.of(new CapsizeAccelerationConstraint(logger, limits, 1.0)), 0.0, 0.0, 20.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
         assertNotNull(timed_traj);
 
         // Trapezoidal profile.
         timed_traj = buildAndCheckTrajectory(path, 1.0, new ArrayList<TimingConstraint>(), 0.0, 0.0,
                 10.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
 
         // Trapezoidal profile with start and end velocities.
         timed_traj = buildAndCheckTrajectory(path, 1.0, new ArrayList<TimingConstraint>(), 5.0, 2.0,
                 10.0, 5.0);
-        assertEquals(66, timed_traj.length());
+        assertEquals(4, timed_traj.length());
     }
 
     @Test
@@ -277,6 +277,7 @@ public class ScheduleGeneratorTest {
 
         Path100 path = PathFactory.pathFromWaypoints(
                 waypoints,
+                TRAJECTORY_STEP_M,
                 SPLINE_SAMPLE_TOLERANCE_M,
                 SPLINE_SAMPLE_TOLERANCE_M,
                 SPLINE_SAMPLE_TOLERANCE_RAD);
@@ -295,9 +296,9 @@ public class ScheduleGeneratorTest {
             System.out.printf("total duration ms: %5.3f\n", totalDurationMs);
             System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
-        assertEquals(18, t.length());
-        TimedState p = t.getPoint(6);
-        assertEquals(0.575, p.state().getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(33, t.length());
+        TimedState p = t.getPoint(12);
+        assertEquals(0.605, p.state().getPose().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.state().getHeadingRateRad_M(), DELTA);
 
     }

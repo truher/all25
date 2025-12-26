@@ -112,6 +112,7 @@ public class Math100 {
             // prevent division by zero
             return 0;
         }
+
         /*
          * a = dv/dt
          * v = dx/dt
@@ -127,33 +128,65 @@ public class Math100 {
 
     /**
      * Return final velocity, v1, given initial velocity, v0, and acceleration over
-     * distance ds.
+     * distance dx.
      * 
-     * v1 = sqrt(v0^2 + 2ads)
+     * v1 = sqrt(v0^2 + 2adx)
      * 
      * note a can be negative.
      * 
-     * note ds can be negative, which implies backwards time
+     * note dx can be negative, which implies backwards time
      * 
      * @param v0 initial velocity
      * @param a  acceleration
-     * @param ds distance
+     * @param dx distance
      * @return final velocity
      */
-    public static double v1(double v0, double a, double ds) {
+    public static double v1(double v0, double a, double dx) {
         /*
          * a = dv/dt
-         * v = ds/dt
-         * dt = ds/v
-         * a = v dv/ds
-         * a = v (v1-v0)/ds
+         * v = dx/dt
+         * dt = dx/v
+         * a = v dv/dx
+         * a = v (v1-v0)/dx
          * v = (v0+v1)/2
-         * a = (v0+v1)(v1-v0)/2ds
-         * a = (v1^2 - v0^2)/2ds
-         * 2*a*ds = v1^2 - v0^2
-         * v1 = sqrt(v0^2 + 2*a*ds)
+         * a = (v0+v1)(v1-v0)/2dx
+         * a = (v1^2 - v0^2)/2dx
+         * 2*a*dx = v1^2 - v0^2
+         * v1 = sqrt(v0^2 + 2*a*dx)
          */
-        return Math.sqrt(v0 * v0 + 2.0 * a * ds);
+        return Math.sqrt(v0 * v0 + 2.0 * a * dx);
+    }
+
+    /**
+     * Return initial velocity, v0, given final velocity, v1, and acceleration over
+     * distance dx.
+     * 
+     * v0 = sqrt(v1^2 - 2adx)
+     * 
+     * note a can be negative.
+     * 
+     * note dx can be negative, which implies backwards time
+     * 
+     * @param v1 final velocity
+     * @param a  acceleration
+     * @param dx distance
+     * @return final velocity
+     */
+
+    public static double v0(double v1, double a, double dx) {
+        /*
+         * a = dv/dt
+         * v = dx/dt
+         * dt = dx/v
+         * a = v dv/dx
+         * a = v (v1-v0)/dx
+         * v = (v0+v1)/2
+         * a = (v0+v1)(v1-v0)/2dx
+         * a = (v1^2 - v0^2)/2dx
+         * 2*a*dx = v1^2 - v0^2
+         * v0 = sqrt(v1^2 - 2*a*dx)
+         */
+        return Math.sqrt(v1 * v1 - 2.0 * a * dx);
     }
 
 }

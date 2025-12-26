@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 /** To visualize the different ways to parameterize a spline. */
 public class ParameterizationTest {
+    private static final boolean DEBUG = false;
     private static final LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
 
     private static final Supplier<XYItemRenderer> renderer = () -> new StandardXYItemRenderer(
@@ -113,7 +114,7 @@ public class ParameterizationTest {
                         new DirectionSE2(1, 0, 0), 1));
 
         List<Pose2dWithMotion> poses = PathFactory.parameterizeSplines(
-                List.of(spline), 0.02, 0.2, 0.1);
+                List.of(spline), 0.1, 0.02, 0.2, 0.1);
 
         XYSeries sx = PathToVectorSeries.x("spline", poses);
         XYDataset dataSet = TrajectoryPlotter.collect(sx);
@@ -140,7 +141,8 @@ public class ParameterizationTest {
         Trajectory100 trajectory = p.generateTrajectory(waypoints, 0, 0);
 
         // this is wrong somehow
-        System.out.printf("TRAJECTORY\n%s\n", trajectory);
+        if (DEBUG)
+            System.out.printf("TRAJECTORY\n%s\n", trajectory);
 
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("trajectory", trajectory);

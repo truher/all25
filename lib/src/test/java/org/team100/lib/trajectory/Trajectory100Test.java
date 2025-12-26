@@ -82,12 +82,14 @@ class Trajectory100Test implements Timeless {
         TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
+        if (DEBUG)
+            trajectory.dump();
 
-        assertEquals(1.418, trajectory.duration(), DELTA);
+        assertEquals(1.415, trajectory.duration(), DELTA);
         TimedState sample = trajectory.sample(0);
         assertEquals(0, sample.state().getPose().pose().getTranslation().getX(), DELTA);
         sample = trajectory.sample(1);
-        assertEquals(0.825, sample.state().getPose().pose().getTranslation().getX(), DELTA);
+        assertEquals(0.828, sample.state().getPose().pose().getTranslation().getX(), DELTA);
         sample = trajectory.sample(2);
         assertEquals(1, sample.state().getPose().pose().getTranslation().getX(), DELTA);
     }
@@ -123,7 +125,7 @@ class Trajectory100Test implements Timeless {
             }
         }
 
-        assertEquals(1.418, trajectory.duration(), DELTA);
+        assertEquals(1.415, trajectory.duration(), DELTA);
         check(trajectory, 0.0, 0.000);
         check(trajectory, 0.1, 0.010);
         check(trajectory, 0.2, 0.040);
@@ -131,11 +133,11 @@ class Trajectory100Test implements Timeless {
         check(trajectory, 0.4, 0.160);
         check(trajectory, 0.5, 0.250);
         check(trajectory, 0.6, 0.360);
-        check(trajectory, 0.7, 0.487);
-        check(trajectory, 0.8, 0.618);
-        check(trajectory, 0.9, 0.732);
-        check(trajectory, 1.0, 0.825);
-        check(trajectory, 1.1, 0.899);
+        check(trajectory, 0.7, 0.490);
+        check(trajectory, 0.8, 0.622);
+        check(trajectory, 0.9, 0.734);
+        check(trajectory, 1.0, 0.828);
+        check(trajectory, 1.1, 0.901);
         check(trajectory, 1.2, 0.953);
         check(trajectory, 1.3, 0.987);
         check(trajectory, 1.4, 1.000);
@@ -185,7 +187,7 @@ class Trajectory100Test implements Timeless {
         // INTERPOLATE SPLINE POINTS (170 ns)
 
         Path100 path = PathFactory.pathFromWaypoints(
-                waypoints, 0.02, 0.2, 0.1);
+                waypoints, 0.1, 0.02, 0.2, 0.1);
         assertEquals(22.734, path.getMaxDistance(), 0.001);
 
         start = System.nanoTime();
@@ -208,8 +210,9 @@ class Trajectory100Test implements Timeless {
         ScheduleGenerator generator = new ScheduleGenerator(constraints);
 
         Trajectory100 trajectory = generator.timeParameterizeTrajectory(path, 0.1, 0, 0);
+        TrajectoryPlotter.plot(trajectory, 1);
 
-        assertEquals(229, trajectory.length());
+        assertEquals(313, trajectory.length());
 
         start = System.nanoTime();
         for (int rep = 0; rep < reps; ++rep) {

@@ -81,6 +81,8 @@ public class TrajectoryVelocityProfileTest implements Timeless {
 
     /**
      * This produces the desired current-limited exponential shape.
+     * 
+     * TODO: this tickles a bug in the schedule generator dt(), fix it.
      */
     @Test
     void testSwerveConstraint() throws TimingException {
