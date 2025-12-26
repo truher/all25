@@ -13,10 +13,7 @@ import org.team100.lib.util.Math100;
  * schedule.
  */
 public class ScheduleGenerator {
-
-    public static class TimingException extends Exception {
-    }
-
+    private static final boolean ACTUALLY_RESAMPLE = false;
     public static final boolean DEBUG = false;
     private static final double EPSILON = 1e-6;
 
@@ -38,23 +35,26 @@ public class ScheduleGenerator {
             double step,
             double start_vel,
             double end_vel) {
-        try {
-            // Pose2dWithMotion[] samples = path.resample(step);
-            Pose2dWithMotion[] samples = path.resample();
-            return timeParameterizeTrajectory(samples, start_vel, end_vel);
-        } catch (TimingException e) {
-            e.printStackTrace();
-            System.out.println("WARNING: Timing exception");
-            return new Trajectory100();
-        }
+        Pose2dWithMotion[] samples = getSamples(path, step);
+        return timeParameterizeTrajectory(samples, start_vel, end_vel);
+    }
+
+    private Pose2dWithMotion[] getSamples(Path100 path, double step) {
+        if (ACTUALLY_RESAMPLE)
+            return path.resample(step);
+        // since the path is generated with points close together, we don't need to
+        // resample again.
+        return path.resample();
     }
 
     /**
      * Input is some set of samples (could be evenly sampled or not).
      * 
      * Output is these same samples with time.
+     * 
+     * Not for client use. Use the method above.
      */
-    public Trajectory100 timeParameterizeTrajectory(
+    Trajectory100 timeParameterizeTrajectory(
             Pose2dWithMotion[] samples,
             double start_vel,
             double end_vel) {

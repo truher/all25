@@ -17,7 +17,6 @@ import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.ScheduleGenerator;
-import org.team100.lib.trajectory.timing.ScheduleGenerator.TimingException;
 import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
@@ -156,7 +155,7 @@ class Trajectory100Test implements Timeless {
      * There's no need to run this all the time
      */
     @Test
-    void testSamplePerformance() throws TimingException {
+    void testSamplePerformance() {
         WaypointSE2 p0 = new WaypointSE2(new Pose2d(new Translation2d(), Rotation2d.kZero),
                 new DirectionSE2(1, 0, 0), 1);
         WaypointSE2 p1 = new WaypointSE2(new Pose2d(new Translation2d(10, 0), Rotation2d.kCCW_Pi_2),
