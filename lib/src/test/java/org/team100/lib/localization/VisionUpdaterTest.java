@@ -7,26 +7,9 @@ import org.junit.jupiter.api.Test;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Twist2d;
 
 public class VisionUpdaterTest {
     private static final double DELTA = 0.001;
-
-    @Test
-    void testScaledTwist() {
-        // 1 mm
-        double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
-        double targetRangeM = 1.0;
-        // 2 cm stdev, 20x
-        double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
-        // 10 cm of difference between the vision update and the current pose
-        Twist2d twist = new Twist2d(0.1, 0.1, 0);
-        Twist2d scaled = NudgingVisionUpdater.getScaledTwist(stateStdDev, visionStdDev, twist);
-        // difference is discounted 20x
-        assertEquals(0.002439, scaled.dx, 1e-6);
-        assertEquals(0.002439, scaled.dy, 1e-6);
-        assertEquals(0, scaled.dtheta, 1e-6);
-    }
 
     /**
      * If the measurement is the same as the sample, nothing happens.
@@ -125,25 +108,8 @@ public class VisionUpdaterTest {
 
     }
 
-    @Test
-    void testK() {
-        double[] stateStdDev = AprilTagRobotLocalizer.tightStateStdDevs;
-        double targetRangeM = 1.0;
-        double[] visionStdDev = AprilTagRobotLocalizer.visionMeasurementStdDevs(targetRangeM);
-        double[] k = NudgingVisionUpdater.getK(stateStdDev, visionStdDev);
-        assertEquals(3, k.length);
-        assertEquals(0.024, k[0], DELTA);
-        assertEquals(0.024, k[1], DELTA);
-        assertEquals(0, k[2], DELTA);
-    }
 
-    @Test
-    void testMix() {
-        assertEquals(0.091, NudgingVisionUpdater.mix(1, 100), DELTA);
-        assertEquals(0.24, NudgingVisionUpdater.mix(1, 10), DELTA);
-        assertEquals(0.5, NudgingVisionUpdater.mix(1, 1), DELTA);
-        assertEquals(0.76, NudgingVisionUpdater.mix(10, 1), DELTA);
-        assertEquals(0.909, NudgingVisionUpdater.mix(100, 1), DELTA);
-    }
+
+
 
 }

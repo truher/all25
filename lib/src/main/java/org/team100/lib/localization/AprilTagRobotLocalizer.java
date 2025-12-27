@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  */
 public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     private static final boolean DEBUG = false;
+
     /** Maximum age of the sights we publish for diagnosis. */
     private static final double HISTORY_DURATION = 1.0;
 
@@ -58,23 +59,10 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
      * always use the camera.
      */
     private static final double TAG_ROTATION_BELIEF_THRESHOLD_M = 0;
+
     /** Discard results further than this from the previous one. */
     private static final double VISION_CHANGE_TOLERANCE_M = 0.1;
     // private static final double VISION_CHANGE_TOLERANCE_M = 1;
-
-    /** this is the default value which, in hindsight, seems ridiculously high. */
-    private static final double[] defaultStateStdDevs = new double[] {
-            0.1,
-            0.1,
-            0.1 };
-    /**
-     * This value is tuned so that errors scale at 0.2x per second. See
-     * SwerveDrivePoseEstimator100Test::testFirmerNudge.
-     */
-    static final double[] tightStateStdDevs = new double[] {
-            0.001,
-            0.001,
-            0.1 };
 
     private final DoubleFunction<ModelR3> m_history;
     private final VisionUpdater m_visionUpdater;
@@ -242,28 +230,12 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         m_log_alliance.log(() -> alliance);
         m_log_heedRadius.log(() -> m_heedRadiusM);
 
-        // The pose from the frame timestamp.
-        // note this pulls from the *old history* not the *odometry-updated history*
-        // because we don't care about the latest odometry update: we're trying to
-        // affect the history from several cycles ago -- and replaying that. it's ok for
-        // new odometry to be the last thing.
-        final Pose2d historicalPose = m_history.apply(correctedTimestamp).pose();
-
-        // The gyro rotation for the frame timestamp
-        final Rotation2d gyroRotation = historicalPose.getRotation();
-        if (DEBUG) {
-            System.out.printf("gyro rotation %f\n", gyroRotation.getRadians());
-        }
+        Pose2d historicalPose = historicalPose(correctedTimestamp);
 
         for (int i = 0; i < blips.length; ++i) {
             Blip24 blip = blips[i];
 
-            if (DEBUG) {
-                Translation3d t = blip.getRawPose().getTranslation();
-                Rotation3d r = blip.getRawPose().getRotation();
-                System.out.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
-                        blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ());
-            }
+            printBlip(blip);
 
             // Look up the pose of the tag in the field frame.
             Optional<Pose3d> tagInFieldCoordsOptional = m_layout.getTagPose(alliance, blip.getId());
@@ -274,146 +246,165 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             }
 
             // Field-to-tag, canonical pose from the JSON file
-            final Pose3d tagInField = tagInFieldCoordsOptional.get();
+            Pose3d tagInField = tagInFieldCoordsOptional.get();
 
-            // Camera-to-tag, as it appears in the camera frame.
-            Transform3d blipTransform = blip.blipToTransform();
-            m_log_tag_in_camera.log(() -> blipTransform);
+            Transform3d tagInCamera = tagInCamera(blip);
 
-            Transform3d tagInCamera = blipTransform;
+            printForCalibration(cameraOffset, blip, tagInCamera);
 
-            if (DEBUG) {
-                // This is used for camera offset calibration. Place a tag at a known position,
-                // observe the offset, and add it to Camera.java, inverted.
-                Transform3d tagInRobot = cameraOffset.plus(tagInCamera);
-                System.out.printf("tagInRobot id %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
-                        blip.getId(), tagInRobot.getTranslation().getX(), tagInRobot.getTranslation().getY(),
-                        tagInRobot.getTranslation().getZ(), tagInRobot.getRotation().getX(),
-                        tagInRobot.getRotation().getY(), tagInRobot.getRotation().getZ());
-            }
+            tagInCamera = maybeOverrideRotation(cameraOffset, historicalPose, tagInField, tagInCamera);
 
-            if (tagInCamera.getTranslation().getNorm() > TAG_ROTATION_BELIEF_THRESHOLD_M) {
-                // If the tag is further than the threshold, replace the tag rotation with
-                // a rotation derived from the gyro, if available.
-                m_log_using_gyro.log(() -> true);
-                tagInCamera = PoseEstimationHelper.tagInCamera(
-                        cameraOffset,
-                        tagInField,
-                        tagInCamera,
-                        new Rotation3d(gyroRotation));
-            } else {
-                m_log_using_gyro.log(() -> false);
-            }
+            Pose3d estimatedTagInField = estimatedTagInField(cameraOffset, historicalPose, tagInCamera);
 
-            // Log the estimated tag position, for visualization of vision error
-
-            // Field-to-robot
-            Pose3d historicalPose3d = new Pose3d(historicalPose);
-            // Field-to-robot plus robot-to-camera = field-to-camera
-            Pose3d historicalCameraInField = historicalPose3d.transformBy(cameraOffset);
-            // given the historical pose, where do we think the tag is?
-            Pose3d estimatedTagInField = historicalCameraInField.transformBy(tagInCamera);
             m_allTags.add(correctedTimestamp, estimatedTagInField);
-            // clean the used-tags collection in case we don't end up writing to it.
+
+            logTagError(tagInField, estimatedTagInField);
+
+            Pose2d robotPose2d = robotPose2d(historicalPose, cameraOffset, tagInField, tagInCamera);
+
+            // Clean the used-tags collection in case we don't end up writing to it.
             m_usedTags.cleanup(correctedTimestamp);
 
-            // log the norm of the translational error of the tag.
-            Transform3d tagError = tagInField.minus(estimatedTagInField);
-            m_log_tag_error.log(() -> tagError.getTranslation().getNorm());
-
-            // Estimate of robot pose.
-            Pose3d pose3d = PoseEstimationHelper.robotInField(
-                    cameraOffset,
-                    tagInField,
-                    tagInCamera);
-
-            // Robot in field frame. Use the gyro for rotation if available.
-            final Pose2d pose = new Pose2d(
-                    pose3d.getTranslation().toTranslation2d(),
-                    gyroRotation);
-
-            m_log_pose.log(() -> pose);
-            m_pub_pose.set(pose);
-
+            //////////////////////////////////////////////////////////////////
+            ///
+            /// Should we use this update?
+            ///
             if (!Experiments.instance.enabled(Experiment.HeedVision)) {
-                // If we've turned vision off altogether, then don't apply this update to the
-                // pose estimator.
-                if (DEBUG)
-                    System.out.println("heedvision is off");
+                // No, we've turned vision off.
                 continue;
             }
-
-            if (blipTransform.getTranslation().getNorm() > m_heedRadiusM) {
-                if (DEBUG)
-                    System.out.println("tag is too far");
-                // Skip too-far tags.
+            ///
+            if (tagInCamera.getTranslation().getNorm() > m_heedRadiusM) {
+                // No, the tag is too far away.
                 continue;
             }
-
+            ///
             if (m_prevPose == null) {
-                // Ignore the very first update since we have no idea if it is far from the
-                // previous one.
-                if (DEBUG)
-                    System.out.println("skip first update");
-                m_prevPose = pose;
+                // No, we need another nearby fix to believe either one.
+                m_prevPose = robotPose2d;
                 continue;
             }
-
-            final double distanceM = Metrics.translationalDistance(m_prevPose, pose);
+            ///
+            double distanceM = Metrics.translationalDistance(m_prevPose, robotPose2d);
             if (distanceM > VISION_CHANGE_TOLERANCE_M) {
-                // The new estimate is too far from the previous one: it's probably garbage.
-                m_prevPose = pose;
-                if (DEBUG)
-                    System.out.println("too far from previous");
+                // No, the new estimate is too far from the previous one.
+                m_prevPose = robotPose2d;
                 continue;
             }
-
-            // If we got this far, we're using the tag for localization, so add it to the
-            // history of used tags.
+            ///
+            /// Yes, we should use this update.
+            ///
+            //////////////////////////////////////////////////////////////////
 
             m_usedTags.add(correctedTimestamp, estimatedTagInField);
-
             m_visionUpdater.put(
                     correctedTimestamp,
-                    pose,
-                    stateStdDevs(),
-                    visionMeasurementStdDevs(distanceM));
-
-            m_prevPose = pose;
+                    robotPose2d,
+                    Uncertainty.stateStdDevs(),
+                    Uncertainty.visionMeasurementStdDevs(distanceM));
+            m_prevPose = robotPose2d;
         }
     }
 
-    static double[] stateStdDevs() {
-        if (Experiments.instance.enabled(Experiment.AvoidVisionJitter)) {
-            return tightStateStdDevs;
-        }
-        return defaultStateStdDevs;
+    /**
+     * Project the 3d pose into a Pose2d, but use the historical pose rotation
+     * (which is the gyro rotation from that timestamp)
+     */
+    private Pose2d robotPose2d(
+            Pose2d historicalPose,
+            Transform3d cameraInRobot,
+            Pose3d tagInField,
+            Transform3d tagInCamera) {
+        Pose3d robotPose3d = PoseEstimationHelper.robotInField(
+                cameraInRobot, tagInField, tagInCamera);
+        Pose2d robotPose2d = new Pose2d(
+                robotPose3d.getTranslation().toTranslation2d(),
+                historicalPose.getRotation());
+        m_log_pose.log(() -> robotPose2d);
+        m_pub_pose.set(robotPose2d);
+        return robotPose2d;
     }
 
-    /** This is an educated guess. */
-    static double[] visionMeasurementStdDevs(double distanceM) {
-        if (Experiments.instance.enabled(Experiment.AvoidVisionJitter)) {
-            /*
-             * NEW (3/12/25), 2 cm std dev seems kinda realistic for 1 m.
-             * 
-             * If it still jitters, try 0.03 or 0.05, but watch out for slow convergence.
-             */
-            final double K = 0.03;
-            return new double[] {
-                    (K * distanceM) + 0.01,
-                    (K * distanceM) + 0.01,
-                    Double.MAX_VALUE };
+    /**
+     * If the tag is too far, replace the blip-derived tag rotation with a
+     * gyro-derived tag rotation.
+     */
+    private Transform3d maybeOverrideRotation(
+            Transform3d cameraOffset, Pose2d historicalPose, Pose3d tagInField, Transform3d tagInCamera) {
+        if (tagInCamera.getTranslation().getNorm() > TAG_ROTATION_BELIEF_THRESHOLD_M) {
+            m_log_using_gyro.log(() -> true);
+            tagInCamera = PoseEstimationHelper.tagInCamera(
+                    cameraOffset, tagInField, tagInCamera, new Rotation3d(historicalPose.getRotation()));
+        } else {
+            m_log_using_gyro.log(() -> false);
         }
-        /*
-         * Standard deviation of pose estimate, as a fraction of target range.
-         * This is a guess based on figure 5 in the Apriltag2 paper:
-         * https://april.eecs.umich.edu/media/media/pdfs/wang2016iros.pdf
-         */
-        final double K = 0.03;
-        return new double[] {
-                K * distanceM,
-                K * distanceM,
-                Double.MAX_VALUE };
+        return tagInCamera;
+    }
+
+    /** Log the norm of the translational error of the tag. */
+    private void logTagError(Pose3d tagInField, Pose3d estimatedTagInField) {
+        Transform3d tagError = tagInField.minus(estimatedTagInField);
+        m_log_tag_error.log(() -> tagError.getTranslation().getNorm());
+    }
+
+    /**
+     * Returns the pose from the frame timestamp.
+     * 
+     * Note this pulls from the *old history*, not the *odometry-updated history*,
+     * because we don't care about the latest odometry update.
+     * 
+     * Because the camera delay is much more than the odometry delay, we're always
+     * trying to write history from several cycles ago (followed by replay). It's ok
+     * for new odometry to be the last thing.
+     */
+    private Pose2d historicalPose(double correctedTimestamp) {
+        Pose2d historicalPose = m_history.apply(correctedTimestamp).pose();
+        Rotation2d gyroRotation = historicalPose.getRotation();
+        if (DEBUG) {
+            System.out.printf("historical gyro rotation %f\n", gyroRotation.getRadians());
+        }
+        return historicalPose;
+    }
+
+    private void printBlip(Blip24 blip) {
+        if (!DEBUG)
+            return;
+        Translation3d t = blip.getRawPose().getTranslation();
+        Rotation3d r = blip.getRawPose().getRotation();
+        System.out.printf("blip raw pose %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
+                blip.getId(), t.getX(), t.getY(), t.getZ(), r.getX(), r.getY(), r.getZ());
+    }
+
+    /**
+     * This is used for camera offset calibration. Place a tag at a known position,
+     * observe the offset, and add it to Camera.java, inverted.
+     */
+    private void printForCalibration(Transform3d cameraOffset, Blip24 blip, Transform3d tagInCamera) {
+        if (!DEBUG)
+            return;
+        Transform3d tagInRobot = cameraOffset.plus(tagInCamera);
+        System.out.printf("tagInRobot id %d X %5.2f Y %5.2f Z %5.2f R %5.2f P %5.2f Y %5.2f\n",
+                blip.getId(), tagInRobot.getTranslation().getX(), tagInRobot.getTranslation().getY(),
+                tagInRobot.getTranslation().getZ(), tagInRobot.getRotation().getX(),
+                tagInRobot.getRotation().getY(), tagInRobot.getRotation().getZ());
+    }
+
+    /** The estimated tag position, for visualization of vision error. */
+    private Pose3d estimatedTagInField(
+            Transform3d cameraOffset, Pose2d historicalPose, Transform3d tagInCamera) {
+        // Field-to-robot
+        Pose3d historicalPose3d = new Pose3d(historicalPose);
+        // Field-to-robot plus robot-to-camera = field-to-camera
+        Pose3d historicalCameraInField = historicalPose3d.transformBy(cameraOffset);
+        // Given the historical pose, where do we think the tag is?
+        return historicalCameraInField.transformBy(tagInCamera);
+    }
+
+    /** Camera-to-tag, as it appears in the camera frame. */
+    private Transform3d tagInCamera(Blip24 blip) {
+        Transform3d blipTransform = blip.blipToTransform();
+        m_log_tag_in_camera.log(() -> blipTransform);
+        return blipTransform;
     }
 
 }

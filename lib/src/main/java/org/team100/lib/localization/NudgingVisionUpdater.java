@@ -82,43 +82,8 @@ public class NudgingVisionUpdater implements VisionUpdater {
         // Step 2: Measure the twist between the odometry pose and the vision pose.
         Twist2d twist = sample.log(measurement);
         // Step 4: Discount the twist based on the sigmas relative to each other
-        Twist2d scaledTwist = getScaledTwist(stateSigma, visionSigma, twist);
+        Twist2d scaledTwist = Uncertainty.getScaledTwist(stateSigma, visionSigma, twist);
         return sample.exp(scaledTwist);
-    }
-
-    static Twist2d getScaledTwist(
-            double[] stateSigma,
-            double[] visionSigma,
-            Twist2d twist) {
-        // discount the vision update by this factor.
-        final double[] K = getK(stateSigma, visionSigma);
-        Twist2d scaledTwist = new Twist2d(
-                K[0] * twist.dx,
-                K[1] * twist.dy,
-                K[2] * twist.dtheta);
-        return scaledTwist;
-    }
-
-    static double[] getK(double[] stateSigma, double[] visionSigma) {
-        return new double[] {
-                mix(Math.pow(stateSigma[0], 2), Math.pow(visionSigma[0], 2)),
-                mix(Math.pow(stateSigma[1], 2), Math.pow(visionSigma[1], 2)),
-                mix(Math.pow(stateSigma[2], 2), Math.pow(visionSigma[2], 2))
-        };
-    }
-
-    /**
-     * Given q and r stddev's, what mixture should that yield?
-     * This is the "closed form Kalman gain for continuous Kalman filter with A = 0
-     * and C = I. See wpimath/algorithms.md." ... but really it's just a mixer.
-     * 
-     * @param q state variance
-     * @param r vision variance
-     */
-    static double mix(final double q, final double r) {
-        if (q == 0.0)
-            return 0.0;
-        return q / (q + Math.sqrt(q * r));
     }
 
 }
