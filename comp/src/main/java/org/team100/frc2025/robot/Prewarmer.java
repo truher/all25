@@ -10,6 +10,9 @@ import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.path.PathFactory;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
+import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -38,8 +41,10 @@ public class Prewarmer {
                 new Pose2d(new Translation2d(1, 0), Rotation2d.kZero),
                 new DirectionSE2(1, 0, 0),
                 1));
-        TrajectoryPlanner planner = new TrajectoryPlanner(
-                new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium(logger));
+        List<TimingConstraint> constraints = new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium(logger);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
         planner.restToRest(waypoints);
 
         // Exercise the drive motors.

@@ -15,7 +15,7 @@ The process of constructing a trajectory has three stages:
 
 3. Construct a list of points interpolated along the secant lines, such that the points aren't too far apart.
 
-4. Using a list of kinodynamic constraints (see `lib.trajectory.timing`), assign a time for each point.  The resulting list of `TimedState`s is created by `ScheduleGenerator`, producing `Trajectory100`.
+4. Using a list of kinodynamic constraints (see `lib.trajectory.timing`), assign a time for each point.  The resulting list of `TimedState`s is created by `TrajectoryFactory`, producing `Trajectory100`.
 
 To use a trajectory, you `sample()` it, with time (in seconds) as the parameter.  The resulting `TimedState` is interpolated between from the list above.
 

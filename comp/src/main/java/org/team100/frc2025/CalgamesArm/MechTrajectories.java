@@ -10,7 +10,9 @@ import org.team100.lib.subsystems.prr.AnalyticalJacobian;
 import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
 import org.team100.lib.subsystems.r3.commands.GoToPosePosition;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TorqueConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
@@ -44,8 +46,9 @@ public class MechTrajectories extends Command {
         // These finer grains make smoother paths and schedules but
         // take longer to compute, so if it takes too long, make these
         // numbers bigger!
-        m_planner = new TrajectoryPlanner(0.01, 0.1, 0.05, c);
-        // m_planner = new TrajectoryPlanner(0.02, 0.2, 0.1, c);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(c);
+        PathFactory pathFactory = new PathFactory(0.05, 0.01, 0.01, 0.1);
+        m_planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
     }
 
     /** A command that goes from the start to the end and then finishes. */

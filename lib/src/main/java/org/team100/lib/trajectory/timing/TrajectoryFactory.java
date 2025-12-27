@@ -12,8 +12,7 @@ import org.team100.lib.util.Math100;
  * Given a path, produces a trajectory, which includes the path and adds a
  * schedule.
  */
-public class ScheduleGenerator {
-    private static final boolean ACTUALLY_RESAMPLE = false;
+public class TrajectoryFactory {
     public static final boolean DEBUG = false;
     private static final double EPSILON = 1e-6;
 
@@ -23,53 +22,50 @@ public class ScheduleGenerator {
 
     private final List<TimingConstraint> m_constraints;
 
-    public ScheduleGenerator(List<TimingConstraint> constraints) {
+    public TrajectoryFactory(List<TimingConstraint> constraints) {
         m_constraints = constraints;
     }
 
     /**
-     * Samples the path evenly by distance, then assigns a time to each sample.
+     * Samples the path, then assigns a time to each sample.
      */
-    public Trajectory100 timeParameterizeTrajectory(
-            Path100 path,
-            double step,
-            double start_vel,
-            double end_vel) {
-        Pose2dWithMotion[] samples = getSamples(path, step);
-        return timeParameterizeTrajectory(samples, start_vel, end_vel);
+    public Trajectory100 fromPath(Path100 path, double start_vel, double end_vel) {
+        Pose2dWithMotion[] samples = getSamples(path);
+        return fromSamples(samples, start_vel, end_vel);
     }
 
-    private Pose2dWithMotion[] getSamples(Path100 path, double step) {
-        if (ACTUALLY_RESAMPLE)
-            return path.resample(step);
-        // since the path is generated with points close together, we don't need to
-        // resample again.
+    /////////////////////////////////////////////////////////////////////////////////////
+    ///
+    ///
+
+    /**
+     * Return an array of poses from the path.
+     */
+    private Pose2dWithMotion[] getSamples(Path100 path) {
         return path.resample();
     }
 
     /**
-     * Input is some set of samples (could be evenly sampled or not).
+     * Input is a list of samples (could be evenly sampled or not).
      * 
      * Output is these same samples with time.
-     * 
-     * Not for client use. Use the method above.
      */
-    Trajectory100 timeParameterizeTrajectory(
+    private Trajectory100 fromSamples(
             Pose2dWithMotion[] samples,
             double start_vel,
             double end_vel) {
-        double[] distances = getDistances(samples);
-        double[] velocities = getVelocities(samples, start_vel, end_vel, distances);
-        double[] accels = getAccels(distances, velocities);
-        double[] runningTime = getRunningTime(distances, velocities, accels);
-        List<TimedState> timedStates = getTimedStates(samples, velocities, accels, runningTime);
+        double[] distances = distances(samples);
+        double[] velocities = velocities(samples, start_vel, end_vel, distances);
+        double[] accels = accels(distances, velocities);
+        double[] runningTime = runningTime(distances, velocities, accels);
+        List<TimedState> timedStates = timedStates(samples, velocities, accels, runningTime);
         return new Trajectory100(timedStates);
     }
 
     /**
      * Creates a list of timed states.
      */
-    private List<TimedState> getTimedStates(
+    private List<TimedState> timedStates(
             Pose2dWithMotion[] samples, double[] velocities, double[] accels, double[] runningTime) {
         int n = samples.length;
         List<TimedState> timedStates = new ArrayList<>(n);
@@ -82,7 +78,7 @@ public class ScheduleGenerator {
     /**
      * Computes duration of each arc and accumulate. Assigns a time to each point.
      */
-    private double[] getRunningTime(double[] distances, double[] velocities, double[] accels) {
+    private double[] runningTime(double[] distances, double[] velocities, double[] accels) {
         int n = distances.length;
         double[] runningTime = new double[n];
         for (int i = 1; i < n; ++i) {
@@ -102,7 +98,7 @@ public class ScheduleGenerator {
      * The very last accel is always zero, but it's never used since it describes
      * samples off the end of the trajectory.
      */
-    private double[] getAccels(double[] distances, double[] velocities) {
+    private double[] accels(double[] distances, double[] velocities) {
         int n = distances.length;
         double[] accels = new double[n];
         for (int i = 0; i < n - 1; ++i) {
@@ -116,7 +112,7 @@ public class ScheduleGenerator {
      * Assigns a velocity to each sample, using velocity, accel, and decel
      * constraints.
      */
-    private double[] getVelocities(
+    private double[] velocities(
             Pose2dWithMotion[] samples, double start_vel, double end_vel, double[] distances) {
         double velocities[] = new double[samples.length];
         forward(samples, start_vel, distances, velocities);
@@ -129,9 +125,8 @@ public class ScheduleGenerator {
     }
 
     /**
-     * Computes velocities[i+1] using velocity and acceleration constraints using
-     * the
-     * state at i.
+     * Computes velocities[i+1] using velocity and acceleration constraints
+     * referencing the state at i.
      */
     private void forward(
             Pose2dWithMotion[] samples, double start_vel, double[] distances, double[] velocities) {
@@ -145,12 +140,12 @@ public class ScheduleGenerator {
                 break;
             }
             // velocity constraint depends only on state
-            double maxV = velocityConstraint(samples[i + 1]);
+            double maxVelocity = maxVelocity(samples[i + 1]);
             // start with the maximum velocity
-            velocities[i + 1] = maxV;
+            velocities[i + 1] = maxVelocity;
             // reduce velocity to fit under the acceleration constraint
             double impliedAccel = Math100.accel(velocities[i], velocities[i + 1], arclength);
-            double maxAccel = accelConstraint(samples[i], velocities[i]);
+            double maxAccel = maxAccel(samples[i], velocities[i]);
             if (impliedAccel > maxAccel + EPSILON) {
                 velocities[i + 1] = Math100.v1(velocities[i], maxAccel, arclength);
             }
@@ -158,10 +153,12 @@ public class ScheduleGenerator {
     }
 
     /**
-     * Adjusts velocities[i] for decel constraint based on the state at i+1.
+     * Adjusts velocities[i] for decel constraint referencing the state at i+1.
      * 
      * This isn't strictly correct since the decel constraint should operate at i,
-     * but walking backwards through the path, only i+1 is available.
+     * but walking backwards through the path, only i+1 is available, and the
+     * samples should be enough close together, and the velocity should change
+     * smoothly smooth enough so it shouldn't matter much in practice.
      */
     private void backward(
             Pose2dWithMotion[] samples, double end_vel, double[] distances, double[] velocities) {
@@ -175,7 +172,7 @@ public class ScheduleGenerator {
             }
             double impliedAccel = Math100.accel(velocities[i], velocities[i + 1], arclength);
             // Apply the decel constraint at the end of the segment since it is feasible.
-            double maxDecel = decelConstraint(samples[i + 1], velocities[i + 1]);
+            double maxDecel = maxDecel(samples[i + 1], velocities[i + 1]);
             if (impliedAccel < maxDecel - EPSILON) {
                 velocities[i] = Math100.v0(velocities[i + 1], maxDecel, arclength);
             }
@@ -185,7 +182,7 @@ public class ScheduleGenerator {
     /**
      * Computes the length of each arc and accumulates.
      */
-    private double[] getDistances(Pose2dWithMotion[] samples) {
+    private double[] distances(Pose2dWithMotion[] samples) {
         int n = samples.length;
         double distances[] = new double[n];
         for (int i = 1; i < n; ++i) {
@@ -199,7 +196,7 @@ public class ScheduleGenerator {
      * Returns the lowest (i.e. closest to zero) velocity constraint from the list
      * of constraints. Always positive or zero.
      */
-    private double velocityConstraint(Pose2dWithMotion sample) {
+    private double maxVelocity(Pose2dWithMotion sample) {
         double minVelocity = HIGH_V;
         for (TimingConstraint constraint : m_constraints) {
             minVelocity = Math.min(minVelocity, constraint.maxV(sample));
@@ -211,7 +208,7 @@ public class ScheduleGenerator {
      * Returns the lowest (i.e. closest to zero) acceleration constraint from the
      * list of constraints. Always positive or zero.
      */
-    private double accelConstraint(Pose2dWithMotion sample, double velocity) {
+    private double maxAccel(Pose2dWithMotion sample, double velocity) {
         double minAccel = HIGH_ACCEL;
         for (TimingConstraint constraint : m_constraints) {
             minAccel = Math.min(minAccel, constraint.maxAccel(sample, velocity));
@@ -223,7 +220,7 @@ public class ScheduleGenerator {
      * Returns the highest (i.e. closest to zero) deceleration constraint from the
      * list of constraints. Always negative or zero.
      */
-    private double decelConstraint(Pose2dWithMotion sample, double velocity) {
+    private double maxDecel(Pose2dWithMotion sample, double velocity) {
         double maxDecel = -HIGH_ACCEL;
         for (TimingConstraint constraint : m_constraints) {
             maxDecel = Math.max(maxDecel, constraint.maxDecel(sample, velocity));

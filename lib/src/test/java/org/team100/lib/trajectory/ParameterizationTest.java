@@ -17,6 +17,7 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 
@@ -113,8 +114,8 @@ public class ParameterizationTest {
                                 new Rotation2d(0)),
                         new DirectionSE2(1, 0, 0), 1));
 
-        List<Pose2dWithMotion> poses = PathFactory.parameterizeSplines(
-                List.of(spline), 0.1, 0.02, 0.2, 0.1);
+        PathFactory pathFactory = new PathFactory(0.1, 0.02, 0.2, 0.1);
+        List<Pose2dWithMotion> poses = pathFactory.samplesFromSplines(List.of(spline));
 
         XYSeries sx = PathToVectorSeries.x("spline", poses);
         XYDataset dataSet = TrajectoryPlotter.collect(sx);
@@ -126,7 +127,9 @@ public class ParameterizationTest {
         List<TimingConstraint> c = List.of(
                 new ConstantConstraint(log, 2, 0.5),
                 new YawRateConstraint(log, 1, 1));
-        TrajectoryPlanner p = new TrajectoryPlanner(c);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(c);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner p = new TrajectoryPlanner(pathFactory, trajectoryFactory);
         List<WaypointSE2> waypoints = List.of(
                 new WaypointSE2(
                         new Pose2d(

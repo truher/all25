@@ -15,18 +15,70 @@ import edu.wpi.first.math.geometry.Twist2d;
 
 public class PathFactory {
     private static final boolean DEBUG = false;
+    /*
+     * Maximum distance of the secant lines to the continuous spline. The resulting
+     * path will have little scallops if it involves rotation. In SE(2), a constant
+     * "twist" segment with rotation is a curve. If the scallops are too big, make
+     * this number smaller. If the trajectories are too slow to generate, make this
+     * number bigger.
+     */
+    private static final double SPLINE_SAMPLE_TOLERANCE_M = 0.02;
+    /**
+     * Maximum theta error.
+     */
+    private static final double SPLINE_SAMPLE_TOLERANCE_RAD = 0.2;
+    /**
+     * Size of steps along the path. Make this number smaller for tight curves to
+     * look better. Make it bigger to make trajectories (a little) faster to
+     * generate.
+     */
+    private static final double TRAJECTORY_STEP_M = 0.1;
 
-    public static Path100 pathFromWaypoints(
-            List<WaypointSE2> waypoints,
+    private final double maxNorm;
+    private final double maxDx;
+    private final double maxDy;
+    private final double maxDTheta;
+
+    public PathFactory() {
+        this(TRAJECTORY_STEP_M,
+                SPLINE_SAMPLE_TOLERANCE_M,
+                SPLINE_SAMPLE_TOLERANCE_M,
+                SPLINE_SAMPLE_TOLERANCE_RAD);
+    }
+
+    public PathFactory(
             double maxNorm,
             double maxDx,
             double maxDy,
             double maxDTheta) {
+        this.maxNorm = maxNorm;
+        this.maxDx = maxDx;
+        this.maxDy = maxDy;
+        this.maxDTheta = maxDTheta;
+    }
+
+    /**
+     * A path that passes through the waypoints and control directions.
+     */
+    public Path100 fromWaypoints(List<WaypointSE2> waypoints) {
+        List<HolonomicSpline> splines = splinesFromWaypoints(waypoints);
+        return fromSplines(splines);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    ///
+    ///
+    ///
+  
+    /**
+     * Make a list of splines with the waypoints as knots.
+     */
+    private List<HolonomicSpline> splinesFromWaypoints(List<WaypointSE2> waypoints) {
         List<HolonomicSpline> splines = new ArrayList<>(waypoints.size() - 1);
         for (int i = 1; i < waypoints.size(); ++i) {
             splines.add(new HolonomicSpline(waypoints.get(i - 1), waypoints.get(i)));
         }
-        return new Path100(parameterizeSplines(splines, maxNorm, maxDx, maxDy, maxDTheta));
+        return splines;
     }
 
     /**
@@ -36,49 +88,38 @@ public class PathFactory {
      * the specified tolerance (dx, dy, dtheta) of the actual spline.
      * 
      * The trajectory scheduler consumes these points, interpolating between them
-     * with straight lines. It might be better to sample the spline directly.
-     *
-     * @param s  the spline to parametrize
-     * @param t0 starting percentage of spline to parametrize
-     * @param t1 ending percentage of spline to parametrize
-     * @return list of Pose2dWithCurvature that approximates the original spline
+     * with straight lines.
      */
-    static List<Pose2dWithMotion> parameterizeSpline(
-            HolonomicSpline s,
-            double maxNorm,
-            double maxDx,
-            double maxDy,
-            double maxDTheta,
-            double t0,
-            double t1) {
-        List<Pose2dWithMotion> rv = new ArrayList<>();
-        rv.add(s.getPose2dWithMotion(0.0));
-        double dt = (t1 - t0);
-        for (double t = 0; t < t1; t += dt) {
-            PathFactory.getSegmentArc(s, maxNorm, rv, t, t + dt, maxDx, maxDy, maxDTheta);
-        }
-        return rv;
+    List<Pose2dWithMotion> samplesFromSpline(HolonomicSpline spline) {
+        List<Pose2dWithMotion> result = new ArrayList<>();
+        result.add(spline.getPose2dWithMotion(0.0));
+        getSegmentArc(spline, result, 0, 1);
+        return result;
     }
 
-    public static List<Pose2dWithMotion> parameterizeSplines(
-            List<? extends HolonomicSpline> splines,
-            double maxNorm,
-            double maxDx,
-            double maxDy,
-            double maxDTheta) {
-        List<Pose2dWithMotion> rv = new ArrayList<>();
+    public Path100 fromSplines(List<? extends HolonomicSpline> splines) {
+        return new Path100(samplesFromSplines(splines));
+    }
+
+    /**
+     * For testing only. Do not call this directly
+     */
+    public List<Pose2dWithMotion> samplesFromSplines(List<? extends HolonomicSpline> splines) {
+        List<Pose2dWithMotion> result = new ArrayList<>();
         if (splines.isEmpty())
-            return rv;
-        rv.add(splines.get(0).getPose2dWithMotion(0.0));
+            return result;
+        result.add(splines.get(0).getPose2dWithMotion(0.0));
         for (int i = 0; i < splines.size(); i++) {
             HolonomicSpline s = splines.get(i);
             if (DEBUG)
                 System.out.printf("SPLINE:\n%d\n%s\n", i, s);
-            List<Pose2dWithMotion> samples = parameterizeSpline(s, maxNorm, maxDx, maxDy, maxDTheta, 0.0, 1.0);
+            List<Pose2dWithMotion> samples = samplesFromSpline(s);
+            // the sample at the end of the previous spline is the same as the one for the
+            // beginning of the next, so don't include it twice.
             samples.remove(0);
-            rv.addAll(samples);
+            result.addAll(samples);
         }
-        return rv;
+        return result;
     }
 
     /**
@@ -88,19 +129,15 @@ public class PathFactory {
      * 
      * Note if the path is s-shaped, then bisection can find the middle :-)
      */
-    private static void getSegmentArc(
+    private void getSegmentArc(
             HolonomicSpline spline,
-            double maxNorm, // max distance between points
             List<Pose2dWithMotion> rv,
-            double t0, // [0,1] not time
-            double t1, // [0,1] not time
-            double maxDx,
-            double maxDy,
-            double maxDTheta) {
-        Pose2d p0 = spline.getPose2d(t0);
-        double thalf = (t0 + t1) / 2;
-        Pose2d phalf = spline.getPose2d(thalf);
-        Pose2d p1 = spline.getPose2d(t1);
+            double s0,
+            double s1) {
+        Pose2d p0 = spline.getPose2d(s0);
+        double shalf = (s0 + s1) / 2;
+        Pose2d phalf = spline.getPose2d(shalf);
+        Pose2d p1 = spline.getPose2d(s1);
 
         // twist from p0 to p1
         Twist2d twist_full = p0.log(p1);
@@ -112,8 +149,8 @@ public class PathFactory {
         Transform2d error = phalf_predicted.minus(phalf);
 
         // also prohibit large changes in direction between points
-        Pose2dWithMotion p20 = spline.getPose2dWithMotion(t0);
-        Pose2dWithMotion p21 = spline.getPose2dWithMotion(t1);
+        Pose2dWithMotion p20 = spline.getPose2dWithMotion(s0);
+        Pose2dWithMotion p21 = spline.getPose2dWithMotion(s1);
         Twist2d p2t = p20.getPose().course().minus(p21.getPose().course());
 
         // note the extra conditions to avoid points too far apart.
@@ -126,12 +163,11 @@ public class PathFactory {
                 || Metrics.l2Norm(twist_full) > maxNorm
                 || Metrics.l2Norm(p2t) > maxNorm) {
             // add a point in between
-
-            getSegmentArc(spline, maxNorm, rv, t0, thalf, maxDx, maxDy, maxDTheta);
-            getSegmentArc(spline, maxNorm, rv, thalf, t1, maxDx, maxDy, maxDTheta);
+            getSegmentArc(spline, rv, s0, shalf);
+            getSegmentArc(spline, rv, shalf, s1);
         } else {
-            // midpoint is close enough, this looks good
-            rv.add(spline.getPose2dWithMotion(t1));
+            // midpoint is close enough, so add the endpoint
+            rv.add(spline.getPose2dWithMotion(s1));
         }
     }
 }

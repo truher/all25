@@ -27,7 +27,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class ScheduleGeneratorTest {
+public class TrajectoryFactoryTest {
     private static final boolean DEBUG = false;
     public static final double EPSILON = 1e-12;
     private static final double DELTA = 0.01;
@@ -57,12 +57,8 @@ public class ScheduleGeneratorTest {
             double end_vel,
             double max_vel,
             double max_acc) {
-        ScheduleGenerator u = new ScheduleGenerator(constraints);
-        Trajectory100 timed_traj = u.timeParameterizeTrajectory(
-                path,
-                step_size,
-                start_vel,
-                end_vel);
+        TrajectoryFactory u = new TrajectoryFactory(constraints);
+        Trajectory100 timed_traj = u.fromPath(path, start_vel, end_vel);
         checkTrajectory(timed_traj, constraints, start_vel, end_vel, max_vel, max_acc);
         return timed_traj;
     }
@@ -125,12 +121,8 @@ public class ScheduleGeneratorTest {
             System.out.printf("PATH:\n%s\n", path);
 
         List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
-        ScheduleGenerator u = new ScheduleGenerator(constraints);
-        Trajectory100 traj = u.timeParameterizeTrajectory(
-                path,
-                1.0,
-                0.0,
-                0.0);
+        TrajectoryFactory u = new TrajectoryFactory(constraints);
+        Trajectory100 traj = u.fromPath(path, 0.0, 0.0);
         assertEquals(0, traj.duration(), DELTA);
     }
 
@@ -271,24 +263,12 @@ public class ScheduleGeneratorTest {
                         new DirectionSE2(0, 1, 0), 1.2));
         long startTimeNs = System.nanoTime();
         final int iterations = 100;
-        final double SPLINE_SAMPLE_TOLERANCE_M = 0.05;
-        final double SPLINE_SAMPLE_TOLERANCE_RAD = 0.2;
-        final double TRAJECTORY_STEP_M = 0.1;
-
-        Path100 path = PathFactory.pathFromWaypoints(
-                waypoints,
-                TRAJECTORY_STEP_M,
-                SPLINE_SAMPLE_TOLERANCE_M,
-                SPLINE_SAMPLE_TOLERANCE_M,
-                SPLINE_SAMPLE_TOLERANCE_RAD);
+        PathFactory pathFactory = new PathFactory(0.1, 0.05, 0.05, 0.2);
+        Path100 path = pathFactory.fromWaypoints(waypoints);
         Trajectory100 t = new Trajectory100();
-        ScheduleGenerator m_scheduleGenerator = new ScheduleGenerator(new ArrayList<>());
+        TrajectoryFactory m_trajectoryFactory = new TrajectoryFactory(new ArrayList<>());
         for (int i = 0; i < iterations; ++i) {
-            t = m_scheduleGenerator.timeParameterizeTrajectory(
-                    path,
-                    TRAJECTORY_STEP_M,
-                    0,
-                    0);
+            t = m_trajectoryFactory.fromPath(path, 0, 0);
         }
         long endTimeNs = System.nanoTime();
         double totalDurationMs = (endTimeNs - startTimeNs) / 1000000.0;

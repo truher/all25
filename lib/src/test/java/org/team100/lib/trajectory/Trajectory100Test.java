@@ -16,7 +16,7 @@ import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.path.spline.HolonomicSpline;
-import org.team100.lib.trajectory.timing.ScheduleGenerator;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
@@ -46,7 +46,9 @@ class Trajectory100Test implements Timeless {
                 new WaypointSE2(end, DirectionSE2.irrotational(angleToGoal), 1));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
 
@@ -78,7 +80,9 @@ class Trajectory100Test implements Timeless {
                 new WaypointSE2(end, DirectionSE2.irrotational(angleToGoal), 1));
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
         if (DEBUG)
@@ -112,7 +116,9 @@ class Trajectory100Test implements Timeless {
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
 
         Trajectory100 trajectory = planner.restToRest(waypoints);
         if (DEBUG)
@@ -185,8 +191,8 @@ class Trajectory100Test implements Timeless {
 
         // INTERPOLATE SPLINE POINTS (170 ns)
 
-        Path100 path = PathFactory.pathFromWaypoints(
-                waypoints, 0.1, 0.02, 0.2, 0.1);
+        PathFactory pathFactory = new PathFactory(0.1, 0.02, 0.2, 0.1);
+        Path100 path = pathFactory.fromWaypoints(waypoints);
         assertEquals(22.734, path.getMaxDistance(), 0.001);
 
         start = System.nanoTime();
@@ -206,9 +212,9 @@ class Trajectory100Test implements Timeless {
 
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
-        ScheduleGenerator generator = new ScheduleGenerator(constraints);
+        TrajectoryFactory generator = new TrajectoryFactory(constraints);
 
-        Trajectory100 trajectory = generator.timeParameterizeTrajectory(path, 0.1, 0, 0);
+        Trajectory100 trajectory = generator.fromPath(path, 0, 0);
         TrajectoryPlotter.plot(trajectory, 1);
 
         assertEquals(313, trajectory.length());

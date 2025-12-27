@@ -16,8 +16,11 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.examples.TrajectoryExamples;
+import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,12 +31,15 @@ public class TrajectoryReferenceTest implements Timeless {
 
     SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
     List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
-    TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+    PathFactory pathFactory = new PathFactory();
+    TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+    TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
 
     @Test
     void testSimple() {
         Cache.clear();
-        Trajectory100 t = planner.restToRest(
+        TrajectoryExamples ex = new TrajectoryExamples(planner);
+        Trajectory100 t = ex.restToRest(
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         TrajectoryReferenceR3 r = new TrajectoryReferenceR3(logger, t);

@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.DirectionSE2;
+import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -24,9 +24,10 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.examples.TrajectoryExamples;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
-import org.team100.lib.trajectory.timing.ScheduleGenerator;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
@@ -44,9 +45,12 @@ public class ReferenceControllerR3Test implements Timeless {
     void testTrajectoryStart() {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
         // stepTime();
-        Trajectory100 t = planner.restToRest(
+        TrajectoryExamples ex = new TrajectoryExamples(planner);
+        Trajectory100 t = ex.restToRest(
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
@@ -97,10 +101,12 @@ public class ReferenceControllerR3Test implements Timeless {
     void testTrajectoryDone() {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
         stepTime();
-
-        Trajectory100 t = planner.restToRest(
+        TrajectoryExamples ex = new TrajectoryExamples(planner);
+        Trajectory100 t = ex.restToRest(
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
@@ -152,15 +158,12 @@ public class ReferenceControllerR3Test implements Timeless {
 
         double stepSize = 2;
 
-        Path100 path = PathFactory.pathFromWaypoints(waypoints, stepSize, 2, 0.25, 0.1);
+        PathFactory pathFactory = new PathFactory(stepSize, 2, 0.25, 0.1);
+        Path100 path = pathFactory.fromWaypoints(waypoints);
         assertFalse(path.isEmpty());
 
-        ScheduleGenerator u = new ScheduleGenerator(Arrays.asList());
-        Trajectory100 trajectory = u.timeParameterizeTrajectory(
-                path,
-                stepSize,
-                start_vel,
-                end_vel);
+        TrajectoryFactory u = new TrajectoryFactory(Arrays.asList());
+        Trajectory100 trajectory = u.fromPath(path, start_vel, end_vel);
         if (DEBUG)
             System.out.printf("TRAJECTORY:\n%s\n", trajectory);
 

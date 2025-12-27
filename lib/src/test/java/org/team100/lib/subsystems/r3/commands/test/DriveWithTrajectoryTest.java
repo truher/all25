@@ -34,6 +34,9 @@ import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.examples.TrajectoryExamples;
+import org.team100.lib.trajectory.path.PathFactory;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -52,8 +55,11 @@ public class DriveWithTrajectoryTest implements Timeless {
     void testTrajectoryStart() {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        Trajectory100 t = planner.restToRest(
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
+        TrajectoryExamples ex = new TrajectoryExamples(planner);
+        Trajectory100 t = ex.restToRest(
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
@@ -106,8 +112,11 @@ public class DriveWithTrajectoryTest implements Timeless {
     void testTrajectoryDone() {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        Trajectory100 t = planner.restToRest(
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
+        TrajectoryExamples ex = new TrajectoryExamples(planner);
+        Trajectory100 t = ex.restToRest(
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
@@ -146,8 +155,11 @@ public class DriveWithTrajectoryTest implements Timeless {
         SwerveModuleCollection collection = SwerveModuleCollection.get(logger, 10, 20, swerveKinodynamics);
         collection.reset();
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
-        Trajectory100 trajectory = planner.restToRest(
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
+        TrajectoryExamples ex = new TrajectoryExamples(planner);
+        Trajectory100 trajectory = ex.restToRest(
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless

@@ -1,5 +1,7 @@
 package org.team100.frc2025.robot;
 
+import java.util.List;
+
 import org.team100.lib.config.AnnotatedCommand;
 import org.team100.lib.config.AutonChooser;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
@@ -11,6 +13,9 @@ import org.team100.lib.logging.Logging;
 import org.team100.lib.profile.r3.HolonomicProfileFactory;
 import org.team100.lib.profile.r3.ProfileR3;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.path.PathFactory;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
+import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,8 +39,11 @@ public class AllAutons {
                 5);
         final FullStateControllerR3 controller = ControllerFactoryR3
                 .auto2025LooseTolerance(autoLog);
-        final TrajectoryPlanner planner = new TrajectoryPlanner(
-                new TimingConstraintFactory(machinery.m_swerveKinodynamics).medium(autoLog));
+        List<TimingConstraint> constraints = new TimingConstraintFactory(machinery.m_swerveKinodynamics)
+                .medium(autoLog);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        final TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
 
         // WARNING! The glass widget will override the default, so check it!
         // Run the auto in pre-match testing!

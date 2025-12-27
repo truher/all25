@@ -39,8 +39,8 @@ public class TrajectoryVelocityProfileTest implements Timeless {
                     new Pose2d(5, 0, new Rotation2d(0)), 0, 1.2), 0, 0) };
 
     private static List<WaypointSE2> waypointList = Arrays.asList(WAYPOINTS).stream().map(p -> p.getPose()).toList();
-
-    private static Path100 path = PathFactory.pathFromWaypoints(waypointList, 0.1, 0.1, 0.1, 0.1);
+    private static PathFactory pathFactory = new PathFactory(0.1, 0.1, 0.1, 0.1);
+    private static Path100 path = pathFactory.fromWaypoints(waypointList);
 
     /**
      * Default max accel and velocity makes a very fast triangle profile.
@@ -48,8 +48,8 @@ public class TrajectoryVelocityProfileTest implements Timeless {
     @Test
     void testNoConstraint() {
         List<TimingConstraint> constraints = new ArrayList<TimingConstraint>();
-        ScheduleGenerator u = new ScheduleGenerator(constraints);
-        Trajectory100 traj = u.timeParameterizeTrajectory(path, 0.1, 0, 0);
+        TrajectoryFactory u = new TrajectoryFactory(constraints);
+        Trajectory100 traj = u.fromPath(path, 0, 0);
         if (DEBUG)
             traj.dump();
     }
@@ -63,8 +63,8 @@ public class TrajectoryVelocityProfileTest implements Timeless {
         // somewhat realistic numbers
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         List<TimingConstraint> constraints = List.of(new ConstantConstraint(logger, 1, 1, limits));
-        ScheduleGenerator u = new ScheduleGenerator(constraints);
-        Trajectory100 traj = u.timeParameterizeTrajectory(path, 0.1, 0, 0);
+        TrajectoryFactory u = new TrajectoryFactory(constraints);
+        Trajectory100 traj = u.fromPath(path, 0, 0);
         if (DEBUG)
             traj.dump();
     }
@@ -79,8 +79,8 @@ public class TrajectoryVelocityProfileTest implements Timeless {
     void testSwerveConstraint() {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         List<TimingConstraint> constraints = List.of(new SwerveDriveDynamicsConstraint(logger, limits, 1, 1));
-        ScheduleGenerator u = new ScheduleGenerator(constraints);
-        Trajectory100 traj = u.timeParameterizeTrajectory(path, .1, 0, 0);
+        TrajectoryFactory u = new TrajectoryFactory(constraints);
+        Trajectory100 traj = u.fromPath(path, 0, 0);
         if (DEBUG)
             traj.dump();
     }
@@ -95,8 +95,8 @@ public class TrajectoryVelocityProfileTest implements Timeless {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTrajectoryTimingTest(logger);
         TimingConstraintFactory timing = new TimingConstraintFactory(limits);
         List<TimingConstraint> constraints = timing.testAuto(logger);
-        ScheduleGenerator u = new ScheduleGenerator(constraints);
-        Trajectory100 traj = u.timeParameterizeTrajectory(path, 0.5, 0, 0);
+        TrajectoryFactory u = new TrajectoryFactory(constraints);
+        Trajectory100 traj = u.fromPath(path, 0, 0);
         if (DEBUG)
             traj.dump();
     }

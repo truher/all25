@@ -20,6 +20,9 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.Fixture;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.examples.TrajectoryExamples;
+import org.team100.lib.trajectory.path.PathFactory;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -41,7 +44,10 @@ class DriveWithTrajectoryListFunctionTest implements Timeless {
     void testSimple() throws IOException {
         Fixture fixture = new Fixture();
         List<TimingConstraint> constraints = new TimingConstraintFactory(fixture.swerveKinodynamics).allGood(logger);
-        TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
+        TrajectoryExamples ex = new TrajectoryExamples(planner);
         // this initial step is required since the timebase is different?
         stepTime();
         Experiments.instance.testOverride(Experiment.UseSetpointGenerator, true);
@@ -50,7 +56,7 @@ class DriveWithTrajectoryListFunctionTest implements Timeless {
                 logger,
                 fixture.drive,
                 control,
-                x -> List.of(planner.line(x)),
+                x -> List.of(ex.line(x)),
                 viz);
         c.initialize();
         assertEquals(0, fixture.drive.getPose().getX(), DELTA);
