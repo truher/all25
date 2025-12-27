@@ -20,7 +20,7 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.sensor.gyro.MockGyro;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
@@ -47,11 +47,11 @@ class ManualWithProfiledHeadingTest implements Timeless {
                 swerveKinodynamics,
                 rotationSupplier,
                 thetaFeedback);
-        m_manualWithHeading.reset(new ModelR3());
+        m_manualWithHeading.reset(new ModelSE2());
 
         Velocity twist1_1 = new Velocity(0, 0, 0);
 
-        VelocitySE2 twistM_S = m_manualWithHeading.apply(new ModelR3(), twist1_1);
+        VelocitySE2 twistM_S = m_manualWithHeading.apply(new ModelSE2(), twist1_1);
         verify(0, 0, 0, twistM_S);
 
         // with a non-null desired rotation we're in snap mode
@@ -59,7 +59,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         desiredRotation = null;
 
         twist1_1 = new Velocity(0, 0, 1);
-        twistM_S = m_manualWithHeading.apply(new ModelR3(), twist1_1);
+        twistM_S = m_manualWithHeading.apply(new ModelSE2(), twist1_1);
         // with a nonzero desired twist, we're out of snap mode
         assertNull(m_manualWithHeading.m_goal);
 
@@ -78,7 +78,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
                 rotationSupplier,
                 thetaFeedback);
 
-        m_manualWithHeading.reset(new ModelR3());
+        m_manualWithHeading.reset(new ModelSE2());
 
         // no desired rotation
         desiredRotation = null;
@@ -86,7 +86,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
         VelocitySE2 twistM_S = m_manualWithHeading.apply(
-                new ModelR3(),
+                new ModelSE2(),
                 twist1_1);
 
         // not in snap mode
@@ -95,7 +95,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
 
         twist1_1 = new Velocity(1, 0, 0);
 
-        twistM_S = m_manualWithHeading.apply(new ModelR3(Pose2d.kZero, twistM_S), twist1_1);
+        twistM_S = m_manualWithHeading.apply(new ModelSE2(Pose2d.kZero, twistM_S), twist1_1);
         assertNull(m_manualWithHeading.m_goal);
         verify(1, 0, 0, twistM_S);
     }
@@ -113,7 +113,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
                 rotationSupplier,
                 thetaFeedback);
 
-        m_manualWithHeading.reset(new ModelR3());
+        m_manualWithHeading.reset(new ModelSE2());
         // reset means setpoint is currentpose.
         assertEquals(0, m_manualWithHeading.m_thetaSetpoint.x(), DELTA);
         assertEquals(0, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
@@ -125,7 +125,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
 
         // initial state is motionless
         VelocitySE2 twistM_S = m_manualWithHeading.apply(
-                new ModelR3(),
+                new ModelSE2(),
                 twist1_1);
         // in snap mode
         assertNotNull(m_manualWithHeading.m_goal);
@@ -145,7 +145,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // say we've rotated a little.
         m_manualWithHeading.m_thetaSetpoint = new Control100(0.5, 1);
         twistM_S = m_manualWithHeading.apply(
-                new ModelR3(
+                new ModelSE2(
                         new Pose2d(0, 0, new Rotation2d(0.5)),
                         new VelocitySE2(0, 0, 0.1)),
                 twist1_1);
@@ -156,7 +156,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // mostly rotated
         m_manualWithHeading.m_thetaSetpoint = new Control100(1.55, 0.2);
         twistM_S = m_manualWithHeading.apply(
-                new ModelR3(
+                new ModelSE2(
                         new Pose2d(0, 0, new Rotation2d(1.55)),
                         new VelocitySE2(0, 0, 0.2)),
                 twist1_1);
@@ -168,7 +168,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // done
         m_manualWithHeading.m_thetaSetpoint = new Control100(Math.PI / 2, 0);
         twistM_S = m_manualWithHeading.apply(
-                new ModelR3(
+                new ModelSE2(
                         new Pose2d(0, 0, new Rotation2d(Math.PI / 2)),
                         new VelocitySE2(0, 0, 0)),
                 twist1_1);
@@ -194,7 +194,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
                 thetaFeedback);
 
         // currently facing +x
-        m_manualWithHeading.reset(new ModelR3());
+        m_manualWithHeading.reset(new ModelSE2());
 
         // want to face towards +y
         desiredRotation = Rotation2d.kCCW_Pi_2;
@@ -203,7 +203,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // no stick input
         final Velocity twist1_1 = new Velocity(0, 0, 0);
         VelocitySE2 v = m_manualWithHeading.apply(
-                new ModelR3(),
+                new ModelSE2(),
                 twist1_1);
 
         // in snap mode
@@ -215,7 +215,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // say we've rotated a little.
         m_manualWithHeading.m_thetaSetpoint = new Control100(0.5, 1);
         v = m_manualWithHeading.apply(
-                new ModelR3(
+                new ModelSE2(
                         new Pose2d(0, 0, new Rotation2d(0.5)),
                         new VelocitySE2(0, 0, 1)),
                 twist1_1);
@@ -226,7 +226,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // mostly rotated, so the FB controller is calm
         m_manualWithHeading.m_thetaSetpoint = new Control100(1.555, 0.2);
         v = m_manualWithHeading.apply(
-                new ModelR3(
+                new ModelSE2(
                         new Pose2d(0, 0, new Rotation2d(1.555)),
                         new VelocitySE2(0, 0, 0.2)),
                 twist1_1);
@@ -239,7 +239,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // at the setpoint
         m_manualWithHeading.m_thetaSetpoint = new Control100(Math.PI / 2, 0);
         v = m_manualWithHeading.apply(
-                new ModelR3(
+                new ModelSE2(
                         new Pose2d(0, 0, new Rotation2d(Math.PI / 2)),
                         new VelocitySE2(0, 0, 0)),
                 twist1_1);
@@ -268,7 +268,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // driver rotates a bit
         Velocity control = new Velocity(0, 0, 1);
 
-        ModelR3 currentState = new ModelR3(
+        ModelSE2 currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 0));
         // no POV
@@ -281,7 +281,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         verify(0, 0, 2.828, v);
 
         // already going full speed:
-        currentState = new ModelR3(
+        currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 2.828));
         // gyro indicates the correct speed
@@ -293,7 +293,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
 
         // let go of the stick
         control = new Velocity(0, 0, 0);
-        currentState = new ModelR3(
+        currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 2.828));
         // gyro rate is still full speed.
@@ -339,7 +339,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         // driver rotates a bit
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
-        ModelR3 currentState = new ModelR3(
+        ModelSE2 currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 0));
         // no POV
@@ -352,7 +352,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
         verify(0, 0, 2.828, v);
 
         // already going full speed:
-        currentState = new ModelR3(
+        currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 2.828));
         // gyro indicates the correct speed
@@ -364,7 +364,7 @@ class ManualWithProfiledHeadingTest implements Timeless {
 
         // let go of the stick
         twist1_1 = new Velocity(0, 0, 0);
-        currentState = new ModelR3(
+        currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 2.828));
         // gyro rate is still full speed.

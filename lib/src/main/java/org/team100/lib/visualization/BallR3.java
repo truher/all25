@@ -7,7 +7,7 @@ import org.team100.lib.geometry.GlobalVelocity3d;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.targeting.Drag;
 
 import edu.wpi.first.math.Matrix;
@@ -19,13 +19,13 @@ import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.NumericalIntegration;
 
 /**
- * Simulated projectile in three dimensions
+ * Simulated projectile in three dimensions (x, y, z)
  */
 public class BallR3 implements Ball {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private final DoubleArrayLogger m_log_field_ball;
     private final Drag m_drag;
-    private final Supplier<ModelR3> m_robot;
+    private final Supplier<ModelSE2> m_robot;
     private final Supplier<Rotation2d> m_azimuth;
     private final Supplier<Rotation2d> m_elevation;
     private final double m_speed;
@@ -51,7 +51,7 @@ public class BallR3 implements Ball {
     public BallR3(
             LoggerFactory field,
             Drag drag,
-            Supplier<ModelR3> robot,
+            Supplier<ModelSE2> robot,
             Supplier<Rotation2d> azimuth,
             Supplier<Rotation2d> elevation,
             double speed,

@@ -5,7 +5,7 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 /**
@@ -29,7 +29,7 @@ public class ManualFieldRelativeSpeeds implements FieldRelativeDriver {
      * feasible) speeds.
      */
     @Override
-    public VelocitySE2 apply(ModelR3 state, Velocity input) {
+    public VelocitySE2 apply(ModelSE2 state, Velocity input) {
         // clip the input to the unit circle
         final Velocity clipped = input.clip(1.0);
 
@@ -44,7 +44,7 @@ public class ManualFieldRelativeSpeeds implements FieldRelativeDriver {
     }
 
     @Override
-    public void reset(ModelR3 p) {
+    public void reset(ModelSE2 p) {
         //
     }
 }

@@ -17,7 +17,7 @@ import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
 import org.team100.lib.logging.LoggerFactory.Transform3dLogger;
 import org.team100.lib.network.CameraReader;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.util.TrailingHistory;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -64,7 +64,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     private static final double VISION_CHANGE_TOLERANCE_M = 0.1;
     // private static final double VISION_CHANGE_TOLERANCE_M = 1;
 
-    private final DoubleFunction<ModelR3> m_history;
+    private final DoubleFunction<ModelSE2> m_history;
     private final VisionUpdater m_visionUpdater;
     private final AprilTagFieldLayoutWithCorrectOrientation m_layout;
 
@@ -132,7 +132,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
             LoggerFactory parent,
             LoggerFactory fieldLogger,
             AprilTagFieldLayoutWithCorrectOrientation layout,
-            DoubleFunction<ModelR3> history,
+            DoubleFunction<ModelSE2> history,
             VisionUpdater visionUpdater) {
         super(parent, "vision", "blips", StructBuffer.create(Blip24.struct));
         LoggerFactory log = parent.type(this);

@@ -2,8 +2,8 @@ package org.team100.lib.subsystems.test;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.VelocitySE2;
-import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
+import org.team100.lib.state.ModelSE2;
+import org.team100.lib.subsystems.se2.VelocitySubsystemSE2;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,13 +28,13 @@ import edu.wpi.first.math.numbers.N3;
  * essentially edits the output of the controller, so we can leave the
  * controller alone.
  */
-public class OffsetDrivetrainWithBoost implements VelocitySubsystemR3 {
+public class OffsetDrivetrainWithBoost implements VelocitySubsystemSE2 {
     /**
      * How much of the perpendicular speed to mix in. This interacts with the
      * controller "P" values, so should be tuned together with them.
      */
     private static final double OMEGA_MIXER = 2.0;
-    private final VelocitySubsystemR3 m_delegate;
+    private final VelocitySubsystemSE2 m_delegate;
     private final Translation2d m_offset;
 
     /**
@@ -42,14 +42,14 @@ public class OffsetDrivetrainWithBoost implements VelocitySubsystemR3 {
      * @param offset  from delegate to toolpoint
      */
     public OffsetDrivetrainWithBoost(
-            VelocitySubsystemR3 delegate, Translation2d offset) {
+            VelocitySubsystemSE2 delegate, Translation2d offset) {
         m_delegate = delegate;
         m_offset = offset;
     }
 
     @Override
-    public ModelR3 getState() {
-        return new ModelR3(toolpointPose(), toolpointVelocity());
+    public ModelSE2 getState() {
+        return new ModelSE2(toolpointPose(), toolpointVelocity());
     }
 
     /**

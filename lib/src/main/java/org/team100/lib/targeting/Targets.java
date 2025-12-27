@@ -16,7 +16,7 @@ import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.IntLogger;
 import org.team100.lib.network.CameraReader;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.util.CoalescingCollection;
 import org.team100.lib.util.TrailingHistory;
 
@@ -47,7 +47,7 @@ public class Targets extends CameraReader<Rotation3d> {
     public final DoubleArrayLogger m_log_coalescedTargets;
 
     /** state = f(takt seconds) from history. */
-    private final DoubleFunction<ModelR3> m_history;
+    private final DoubleFunction<ModelSE2> m_history;
     /** Accumulation of targets we see; this is really for logging only. */
     private final TrailingHistory<Translation2d> m_allTargets;
     /** Coalesced targets */
@@ -61,7 +61,7 @@ public class Targets extends CameraReader<Rotation3d> {
     public Targets(
             LoggerFactory parent,
             LoggerFactory fieldLogger,
-            DoubleFunction<ModelR3> history) {
+            DoubleFunction<ModelSE2> history) {
         super(parent, "objectVision", "Rotation3d", StructBuffer.create(Rotation3d.struct));
         LoggerFactory log = parent.type(this);
         m_log_historySize = log.intLogger(Level.TRACE, "history size");

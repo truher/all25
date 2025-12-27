@@ -6,8 +6,8 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
+import org.team100.lib.state.ModelSE2;
+import org.team100.lib.subsystems.se2.VelocitySubsystemSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 
 /** Uses the limited drive subsystem since this is manual driving. */
@@ -15,19 +15,19 @@ public class FieldRelativeAdapter implements DriverAdapter {
     private static final boolean DEBUG = false;
 
     private final SwerveLimiter m_limiter;
-    private final VelocitySubsystemR3 m_drive;
+    private final VelocitySubsystemSE2 m_drive;
     private final FieldRelativeDriver m_driver;
 
     public FieldRelativeAdapter(
             SwerveLimiter limiter,
-            VelocitySubsystemR3 drive,
+            VelocitySubsystemSE2 drive,
             FieldRelativeDriver driver) {
         m_limiter = limiter;
         m_drive = drive;
         m_driver = driver;
     }
 
-    public void apply(ModelR3 s, Velocity t) {
+    public void apply(ModelSE2 s, Velocity t) {
         if (DEBUG) {
             System.out.printf("FieldRelativeDriver %s\n", t);
         }
@@ -42,7 +42,7 @@ public class FieldRelativeAdapter implements DriverAdapter {
         m_drive.setVelocity(scaled);
     }
 
-    public void reset(ModelR3 p) {
+    public void reset(ModelSE2 p) {
         m_driver.reset(p);
     }
 

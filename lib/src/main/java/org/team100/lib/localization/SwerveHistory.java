@@ -8,7 +8,7 @@ import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.util.TimeInterpolatableBuffer100;
@@ -28,7 +28,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * 
  * Other SwerveModel consumers should use SwerveModelEstimate.
  */
-public class SwerveHistory implements DoubleFunction<ModelR3> {
+public class SwerveHistory implements DoubleFunction<ModelSE2> {
     /**
      * The buffer only needs to be long enough to catch stale-but-still-helpful
      * vision updates.
@@ -57,7 +57,7 @@ public class SwerveHistory implements DoubleFunction<ModelR3> {
                 timestampSeconds,
                 new InterpolationRecord(
                         m_kinodynamics.getKinematics(),
-                        new ModelR3(
+                        new ModelSE2(
                                 initialPoseMeters,
                                 new VelocitySE2(0, 0, 0)),
                         modulePositions));
@@ -67,7 +67,7 @@ public class SwerveHistory implements DoubleFunction<ModelR3> {
      * Sample the state estimate buffer.
      */
     @Override
-    public ModelR3 apply(double timestampSeconds) {
+    public ModelSE2 apply(double timestampSeconds) {
         m_log_timestamp.log(() -> timestampSeconds);
         return m_poseBuffer.get(timestampSeconds).m_state;
     }
@@ -82,7 +82,7 @@ public class SwerveHistory implements DoubleFunction<ModelR3> {
                 timestampSeconds,
                 new InterpolationRecord(
                         m_kinodynamics.getKinematics(),
-                        new ModelR3(pose, new VelocitySE2(0, 0, 0)),
+                        new ModelSE2(pose, new VelocitySE2(0, 0, 0)),
                         modulePositions));
     }
 
@@ -94,7 +94,7 @@ public class SwerveHistory implements DoubleFunction<ModelR3> {
      */
     void put(
             double timestamp,
-            ModelR3 model,
+            ModelSE2 model,
             SwerveModulePositions positions) {
         m_poseBuffer.put(
                 timestamp,

@@ -1,14 +1,14 @@
 package org.team100.lib.subsystems.swerve.commands.manual;
 
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 
 /**
  * Adapts various types of manual drivers so `DriveManually` can switch between
  * them easily.
  */
 public interface DriverAdapter {
-    void apply(ModelR3 s, Velocity t);
+    void apply(ModelSE2 s, Velocity t);
 
-    void reset(ModelR3 s);
+    void reset(ModelSE2 s);
 }

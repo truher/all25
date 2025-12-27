@@ -19,7 +19,7 @@ import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.sensor.gyro.MockGyro;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 
@@ -43,11 +43,11 @@ class ManualWithFullStateHeadingTest {
                 swerveKinodynamics,
                 rotationSupplier,
                 new double[] { 1.0, 1.0 });
-        m_manualWithHeading.reset(new ModelR3());
+        m_manualWithHeading.reset(new ModelSE2());
 
         Velocity twist1_1 = new Velocity(0, 0, 0);
 
-        VelocitySE2 twistM_S = m_manualWithHeading.apply(new ModelR3(), twist1_1);
+        VelocitySE2 twistM_S = m_manualWithHeading.apply(new ModelSE2(), twist1_1);
         verify(0, 0, 0, twistM_S);
 
         // with a non-null desired rotation we're in snap mode
@@ -55,7 +55,7 @@ class ManualWithFullStateHeadingTest {
         desiredRotation = null;
 
         twist1_1 = new Velocity(0, 0, 1);
-        twistM_S = m_manualWithHeading.apply(new ModelR3(), twist1_1);
+        twistM_S = m_manualWithHeading.apply(new ModelSE2(), twist1_1);
         // with a nonzero desired twist, we're out of snap mode
         assertNull(m_manualWithHeading.m_goal);
 
@@ -72,7 +72,7 @@ class ManualWithFullStateHeadingTest {
                 rotationSupplier,
                 new double[] { 1.0, 1.0 });
 
-        m_manualWithHeading.reset(new ModelR3());
+        m_manualWithHeading.reset(new ModelSE2());
 
         // no desired rotation
         desiredRotation = null;
@@ -80,7 +80,7 @@ class ManualWithFullStateHeadingTest {
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
         VelocitySE2 twistM_S = m_manualWithHeading.apply(
-                new ModelR3(),
+                new ModelSE2(),
                 twist1_1);
 
         // not in snap mode
@@ -89,7 +89,7 @@ class ManualWithFullStateHeadingTest {
 
         twist1_1 = new Velocity(1, 0, 0);
 
-        twistM_S = m_manualWithHeading.apply(new ModelR3(Pose2d.kZero, twistM_S), twist1_1);
+        twistM_S = m_manualWithHeading.apply(new ModelSE2(Pose2d.kZero, twistM_S), twist1_1);
         assertNull(m_manualWithHeading.m_goal);
         verify(1, 0, 0, twistM_S);
     }
@@ -106,7 +106,7 @@ class ManualWithFullStateHeadingTest {
                 new double[] { 1.0, 0.1 });
 
         // facing +x
-        m_manualWithHeading.reset(new ModelR3());
+        m_manualWithHeading.reset(new ModelSE2());
         // reset means setpoint is currentpose.
         assertEquals(0, m_manualWithHeading.m_thetaSetpoint.x(), DELTA);
         assertEquals(0, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
@@ -117,7 +117,7 @@ class ManualWithFullStateHeadingTest {
         final Velocity zeroVelocity = new Velocity(0, 0, 0);
 
         VelocitySE2 twistM_S = m_manualWithHeading.apply(
-                new ModelR3(),
+                new ModelSE2(),
                 zeroVelocity);
         // in snap mode
         assertNotNull(m_manualWithHeading.m_goal);
@@ -137,7 +137,7 @@ class ManualWithFullStateHeadingTest {
         Pose2d currentPose = new Pose2d(0, 0, new Rotation2d(0.5));
         // cheat the setpoint for the test
         m_manualWithHeading.m_thetaSetpoint = new Control100(0.5, 1);
-        twistM_S = m_manualWithHeading.apply(new ModelR3(currentPose, twistM_S), zeroVelocity);
+        twistM_S = m_manualWithHeading.apply(new ModelSE2(currentPose, twistM_S), zeroVelocity);
         // setpoint is the goal
         assertEquals(0.0, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
@@ -148,7 +148,7 @@ class ManualWithFullStateHeadingTest {
         currentPose = new Pose2d(0, 0, new Rotation2d(1.55));
         // cheat the setpoint for the test
         m_manualWithHeading.m_thetaSetpoint = new Control100(1.55, 0.2);
-        twistM_S = m_manualWithHeading.apply(new ModelR3(currentPose, twistM_S), zeroVelocity);
+        twistM_S = m_manualWithHeading.apply(new ModelSE2(currentPose, twistM_S), zeroVelocity);
         // setpoint is the goal
         assertEquals(0.0, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
@@ -158,7 +158,7 @@ class ManualWithFullStateHeadingTest {
         // done
         currentPose = new Pose2d(0, 0, new Rotation2d(Math.PI / 2));
         m_manualWithHeading.m_thetaSetpoint = new Control100(Math.PI / 2, 0);
-        twistM_S = m_manualWithHeading.apply(new ModelR3(currentPose, twistM_S), zeroVelocity);
+        twistM_S = m_manualWithHeading.apply(new ModelSE2(currentPose, twistM_S), zeroVelocity);
         assertNotNull(m_manualWithHeading.m_goal);
 
         // there should be no more profile to follow
@@ -180,7 +180,7 @@ class ManualWithFullStateHeadingTest {
 
         // currently facing +x
         Pose2d currentPose = Pose2d.kZero;
-        m_manualWithHeading.reset(new ModelR3());
+        m_manualWithHeading.reset(new ModelSE2());
 
         // want to face towards +y
         desiredRotation = Rotation2d.kCCW_Pi_2;
@@ -189,7 +189,7 @@ class ManualWithFullStateHeadingTest {
         // no stick input
         Velocity twist1_1 = new Velocity(0, 0, 0);
         VelocitySE2 v = m_manualWithHeading.apply(
-                new ModelR3(currentPose, new VelocitySE2(0, 0, 0)),
+                new ModelSE2(currentPose, new VelocitySE2(0, 0, 0)),
                 twist1_1);
 
         // in snap mode
@@ -203,7 +203,7 @@ class ManualWithFullStateHeadingTest {
 
         // cheat the setpoint for the test
         m_manualWithHeading.m_thetaSetpoint = new Control100(0.5, 1);
-        v = m_manualWithHeading.apply(new ModelR3(currentPose, v), twist1_1);
+        v = m_manualWithHeading.apply(new ModelSE2(currentPose, v), twist1_1);
         // the setpoint is the goal
         assertEquals(0.0, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
@@ -213,7 +213,7 @@ class ManualWithFullStateHeadingTest {
         currentPose = new Pose2d(0, 0, new Rotation2d(1.555));
         // cheat the setpoint for the test
         m_manualWithHeading.m_thetaSetpoint = new Control100(1.555, 0.2);
-        v = m_manualWithHeading.apply(new ModelR3(currentPose, v), twist1_1);
+        v = m_manualWithHeading.apply(new ModelSE2(currentPose, v), twist1_1);
         // the setpoint is the goal
         assertEquals(0.0, m_manualWithHeading.m_thetaSetpoint.v(), DELTA);
         assertNotNull(m_manualWithHeading.m_goal);
@@ -224,7 +224,7 @@ class ManualWithFullStateHeadingTest {
         // at the setpoint
         currentPose = new Pose2d(0, 0, new Rotation2d(Math.PI / 2));
         m_manualWithHeading.m_thetaSetpoint = new Control100(Math.PI / 2, 0);
-        v = m_manualWithHeading.apply(new ModelR3(currentPose, v), twist1_1);
+        v = m_manualWithHeading.apply(new ModelSE2(currentPose, v), twist1_1);
         assertNotNull(m_manualWithHeading.m_goal);
         // there should be no more profile to follow
         verify(0, 0, 0, v);
@@ -246,7 +246,7 @@ class ManualWithFullStateHeadingTest {
         // driver rotates a bit
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
-        ModelR3 currentState = new ModelR3(
+        ModelSE2 currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 0));
         // no POV
@@ -259,7 +259,7 @@ class ManualWithFullStateHeadingTest {
         verify(0, 0, 2.828, v);
 
         // already going full speed:
-        currentState = new ModelR3(
+        currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 2.828));
         // gyro indicates the correct speed
@@ -271,7 +271,7 @@ class ManualWithFullStateHeadingTest {
 
         // let go of the stick
         twist1_1 = new Velocity(0, 0, 0);
-        currentState = new ModelR3(
+        currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 2.828));
         // gyro rate is still full speed.
@@ -302,7 +302,7 @@ class ManualWithFullStateHeadingTest {
         // driver rotates a bit
         Velocity twist1_1 = new Velocity(0, 0, 1);
 
-        ModelR3 currentState = new ModelR3(
+        ModelSE2 currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 0));
         // no POV
@@ -315,7 +315,7 @@ class ManualWithFullStateHeadingTest {
         verify(0, 0, 2.828, v);
 
         // already going full speed:
-        currentState = new ModelR3(
+        currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 2.828));
         // gyro indicates the correct speed
@@ -327,7 +327,7 @@ class ManualWithFullStateHeadingTest {
 
         // let go of the stick
         twist1_1 = new Velocity(0, 0, 0);
-        currentState = new ModelR3(
+        currentState = new ModelSE2(
                 Pose2d.kZero,
                 new VelocitySE2(0, 0, 2.828));
         // gyro rate is still full speed.

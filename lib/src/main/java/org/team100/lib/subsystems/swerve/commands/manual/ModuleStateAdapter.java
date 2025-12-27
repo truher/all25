@@ -1,7 +1,7 @@
 package org.team100.lib.subsystems.swerve.commands.manual;
 
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 
 public class ModuleStateAdapter implements DriverAdapter {
@@ -16,7 +16,7 @@ public class ModuleStateAdapter implements DriverAdapter {
     }
 
     @Override
-    public void apply(ModelR3 s, Velocity t) {
+    public void apply(ModelSE2 s, Velocity t) {
         if (DEBUG) {
             System.out.printf("ModuleStateDriver %s\n",  t );
         }
@@ -24,7 +24,7 @@ public class ModuleStateAdapter implements DriverAdapter {
     }
 
     @Override
-    public void reset(ModelR3 p) {
+    public void reset(ModelSE2 p) {
         //
     }
 }

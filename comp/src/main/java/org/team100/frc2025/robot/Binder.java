@@ -12,19 +12,19 @@ import org.team100.frc2025.Swerve.ManualWithProfiledReefLock;
 import org.team100.frc2025.Swerve.Auto.BigLoop;
 import org.team100.lib.controller.r1.Feedback100;
 import org.team100.lib.controller.r1.PIDFeedback;
-import org.team100.lib.controller.r3.ControllerFactoryR3;
-import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.se2.ControllerFactorySE2;
+import org.team100.lib.controller.se2.ControllerSE2;
 import org.team100.lib.hid.Buttons2025;
 import org.team100.lib.hid.DriverXboxControl;
 import org.team100.lib.hid.OperatorXboxControl;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
-import org.team100.lib.profile.r3.HolonomicProfileFactory;
-import org.team100.lib.profile.r3.ProfileR3;
+import org.team100.lib.profile.se2.HolonomicProfileFactory;
+import org.team100.lib.profile.se2.ProfileSE2;
 import org.team100.lib.subsystems.prr.commands.FollowJointProfiles;
-import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
-import org.team100.lib.subsystems.r3.commands.FloorPickSequence2;
-import org.team100.lib.subsystems.r3.commands.ManualPosition;
+import org.team100.lib.subsystems.se2.commands.DriveWithTrajectoryFunction;
+import org.team100.lib.subsystems.se2.commands.FloorPickSequence2;
+import org.team100.lib.subsystems.se2.commands.ManualPosition;
 import org.team100.lib.subsystems.swerve.commands.SetRotation;
 import org.team100.lib.subsystems.swerve.commands.manual.DriveManuallySimple;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
@@ -137,7 +137,7 @@ public class Binder {
                 .onFalse(m_machinery.m_mech.profileHomeTerminal());
 
         // go full speed for rotation, so that rotation gets there first.
-        final ProfileR3 coralPickProfile = HolonomicProfileFactory.freeRotationCurrentLimitedExponential(
+        final ProfileSE2 coralPickProfile = HolonomicProfileFactory.freeRotationCurrentLimitedExponential(
                 m_machinery.m_swerveKinodynamics, 0.5, 1.0);
 
         // Pick a game piece from the floor, based on camera input.
@@ -149,7 +149,7 @@ public class Binder {
         // m_machinery.m_manipulator.centerIntake(),
         // FloorPickSequence.get(
         // log, fieldLogger, m_machinery.m_drive, m_machinery.m_targets,
-        // ControllerFactoryR3.pick(log), coralPickProfile)
+        // ControllerFactorySE2.pick(log), coralPickProfile)
         // .withName("Floor Pick"))
         // .until(m_machinery.m_manipulator::hasCoral));
 
@@ -160,7 +160,7 @@ public class Binder {
                         fieldLogger,
                         m_machinery.m_drive,
                         m_machinery.m_targets,
-                        ControllerFactoryR3.pick(log),
+                        ControllerFactorySE2.pick(log),
                         coralPickProfile)
                         .withName("FloorPick"));
 
@@ -183,9 +183,9 @@ public class Binder {
         // whileTrue(driverControl::test, m_mech.homeToL4()).onFalse(m_mech.l4ToHome());
 
         final LoggerFactory coralSequence = rootLogger.name("Coral Sequence");
-        final ProfileR3 profile = HolonomicProfileFactory.get(
+        final ProfileSE2 profile = HolonomicProfileFactory.get(
                 coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5, 1, 0.2);
-        final ControllerR3 holonomicController = ControllerFactoryR3.byIdentity(coralSequence);
+        final ControllerSE2 holonomicController = ControllerFactorySE2.byIdentity(coralSequence);
 
         // Drive to a scoring location at the reef and score.
         whileTrue(driver::b, m_machinery.m_manipulator.centerEject());

@@ -8,7 +8,7 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 
@@ -21,7 +21,7 @@ class ManualFieldRelativeSpeedsTest {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest(logger);
         ManualFieldRelativeSpeeds manual = new ManualFieldRelativeSpeeds(logger, limits);
         Velocity input = new Velocity(0, 0, 0);
-        ModelR3 s = new ModelR3();
+        ModelSE2 s = new ModelSE2();
         VelocitySE2 twist = manual.apply(s, input);
         assertEquals(0, twist.x(), DELTA);
         assertEquals(0, twist.y(), DELTA);
@@ -34,7 +34,7 @@ class ManualFieldRelativeSpeedsTest {
         ManualFieldRelativeSpeeds manual = new ManualFieldRelativeSpeeds(logger, limits);
         // these inputs are clipped
         Velocity input = new Velocity(1, 2, 3);
-        ModelR3 s = new ModelR3();
+        ModelSE2 s = new ModelSE2();
         VelocitySE2 twist = manual.apply(s, input);
         assertEquals(0.447, twist.x(), DELTA);
         assertEquals(0.894, twist.y(), DELTA);

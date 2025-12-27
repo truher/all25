@@ -14,7 +14,7 @@ import org.team100.lib.profile.incremental.IncrementalProfile;
 import org.team100.lib.profile.incremental.TrapezoidIncrementalProfile;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.targeting.TargetUtil;
 import org.team100.lib.util.Math100;
@@ -71,7 +71,7 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
     }
 
     @Override
-    public void reset(ModelR3 state) {
+    public void reset(ModelSE2 state) {
         m_thetaSetpoint = state.theta().control();
         m_thetaController.reset();
     }
@@ -90,7 +90,7 @@ public class ManualWithTargetLock implements FieldRelativeDriver {
      */
     @Override
     public VelocitySE2 apply(
-            final ModelR3 state,
+            final ModelSE2 state,
             final Velocity input) {
 
         //

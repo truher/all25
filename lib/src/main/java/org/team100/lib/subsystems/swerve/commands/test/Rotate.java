@@ -1,13 +1,13 @@
 package org.team100.lib.subsystems.swerve.commands.test;
 
 import org.team100.lib.commands.MoveAndHold;
-import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.se2.ControllerSE2;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.profile.r3.HolonomicProfileFactory;
-import org.team100.lib.profile.r3.ProfileR3;
-import org.team100.lib.reference.r3.ProfileReferenceR3;
-import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.r3.commands.helper.VelocityReferenceControllerR3;
+import org.team100.lib.profile.se2.HolonomicProfileFactory;
+import org.team100.lib.profile.se2.ProfileSE2;
+import org.team100.lib.reference.se2.ProfileReferenceSE2;
+import org.team100.lib.state.ModelSE2;
+import org.team100.lib.subsystems.se2.commands.helper.VelocityReferenceControllerSE2;
 import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
@@ -29,18 +29,18 @@ public class Rotate extends MoveAndHold {
 
     private final LoggerFactory m_log;
     private final SwerveDriveSubsystem m_drive;
-    private final ControllerR3 m_controller;
+    private final ControllerSE2 m_controller;
     private final SwerveKinodynamics m_swerveKinodynamics;
     private final Rotation2d m_target;
-    private final ProfileR3 m_profile;
+    private final ProfileSE2 m_profile;
 
-    private ProfileReferenceR3 m_reference;
-    private VelocityReferenceControllerR3 m_referenceController;
+    private ProfileReferenceSE2 m_reference;
+    private VelocityReferenceControllerSE2 m_referenceController;
 
     public Rotate(
             LoggerFactory parent,
             SwerveDriveSubsystem drive,
-            ControllerR3 controller,
+            ControllerSE2 controller,
             SwerveKinodynamics swerveKinodynamics,
             double targetAngleRadians) {
         m_log = parent.type(this);
@@ -70,9 +70,9 @@ public class Rotate extends MoveAndHold {
         // instead, pick a goal at the stopping distance in the current direction.
         Translation2d dx = m_drive.getVelocity().stopping(m_swerveKinodynamics.getMaxDriveAccelerationM_S2());
         Pose2d goal = new Pose2d(measurement.getX() + dx.getX(), measurement.getY() + dx.getY(), m_target);
-        m_reference = new ProfileReferenceR3(m_log, m_profile, "rotate");
-        m_reference.setGoal(new ModelR3(goal));
-        m_referenceController = new VelocityReferenceControllerR3(
+        m_reference = new ProfileReferenceSE2(m_log, m_profile, "rotate");
+        m_reference.setGoal(new ModelSE2(goal));
+        m_referenceController = new VelocityReferenceControllerSE2(
                 m_log, m_drive, m_controller, m_reference);
     }
 

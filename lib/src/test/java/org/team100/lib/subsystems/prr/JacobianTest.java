@@ -12,7 +12,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.optimization.NumericalJacobian100;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
@@ -134,7 +134,7 @@ public class JacobianTest {
 
         // some example velocities
         // zero velocity
-        ModelR3 v = new ModelR3(p);
+        ModelSE2 v = new ModelSE2(p);
 
         JointVelocities jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
@@ -142,21 +142,21 @@ public class JacobianTest {
         assertEquals(0, jv.wrist(), DELTA);
 
         // +x
-        v = new ModelR3(p, new VelocitySE2(1, 0, 0));
+        v = new ModelSE2(p, new VelocitySE2(1, 0, 0));
         jv = j.inverse(v);
         assertEquals(1, jv.elevator(), DELTA);
         assertEquals(0, jv.shoulder(), DELTA);
         assertEquals(0, jv.wrist(), DELTA);
 
         // +y
-        v = new ModelR3(p, new VelocitySE2(0, 1, 0));
+        v = new ModelSE2(p, new VelocitySE2(0, 1, 0));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(0.5, jv.shoulder(), DELTA);
         assertEquals(-0.5, jv.wrist(), DELTA);
 
         // +theta
-        v = new ModelR3(p, new VelocitySE2(0, 0, 1));
+        v = new ModelSE2(p, new VelocitySE2(0, 0, 1));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(-0.5, jv.shoulder(), DELTA);
@@ -244,7 +244,7 @@ public class JacobianTest {
         double dt = d / 20;
         for (double time = 0; time < d; time += dt) {
             TimedState tp = t.sample(time);
-            ModelR3 sm = ModelR3.fromTimedState(tp);
+            ModelSE2 sm = ModelSE2.fromTimedState(tp);
             Pose2d p = sm.pose();
             VelocitySE2 v = sm.velocity();
             EAWConfig c = k.inverse(p);

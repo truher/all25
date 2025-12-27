@@ -2,8 +2,8 @@ package org.team100.lib.subsystems.test;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.VelocitySE2;
-import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
+import org.team100.lib.state.ModelSE2;
+import org.team100.lib.subsystems.se2.VelocitySubsystemSE2;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,8 +23,8 @@ import edu.wpi.first.math.numbers.N3;
  * 
  * This version of the offset drivetrain does not include boosting.
  */
-public class OffsetDrivetrain implements VelocitySubsystemR3 {
-    private final VelocitySubsystemR3 m_delegate;
+public class OffsetDrivetrain implements VelocitySubsystemSE2 {
+    private final VelocitySubsystemSE2 m_delegate;
     private final Translation2d m_offset;
 
     /**
@@ -32,14 +32,14 @@ public class OffsetDrivetrain implements VelocitySubsystemR3 {
      * @param offset  from delegate to toolpoint
      */
     public OffsetDrivetrain(
-            VelocitySubsystemR3 delegate, Translation2d offset) {
+            VelocitySubsystemSE2 delegate, Translation2d offset) {
         m_delegate = delegate;
         m_offset = offset;
     }
 
     @Override
-    public ModelR3 getState() {
-        return new ModelR3(toolpointPose(), toolpointVelocity());
+    public ModelSE2 getState() {
+        return new ModelSE2(toolpointPose(), toolpointVelocity());
     }
 
     /**

@@ -1,7 +1,7 @@
 package org.team100.lib.localization;
 
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -54,7 +54,7 @@ public class NudgingVisionUpdater implements VisionUpdater {
                 sample.m_state.pose(), measurement, stateSigma, visionSigma);
         m_history.put(
                 timestampS,
-                new ModelR3(nudged, sample.m_state.velocity()),
+                new ModelSE2(nudged, sample.m_state.velocity()),
                 sample.m_wheelPositions);
         m_odometryUpdater.replay(timestampS);
         m_latestTimeS = Takt.get();

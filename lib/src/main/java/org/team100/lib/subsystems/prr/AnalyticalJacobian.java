@@ -2,8 +2,8 @@ package org.team100.lib.subsystems.prr;
 
 import org.team100.lib.geometry.AccelerationSE2;
 import org.team100.lib.geometry.VelocitySE2;
-import org.team100.lib.state.ControlR3;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ControlSE2;
+import org.team100.lib.state.ModelSE2;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -48,7 +48,7 @@ public class AnalyticalJacobian {
      * 
      * See README.md equation 5
      */
-    public JointVelocities inverse(ModelR3 m) {
+    public JointVelocities inverse(ModelSE2 m) {
         Pose2d x = m.pose();
         VelocitySE2 xdot = m.velocity();
         EAWConfig q = m_k.inverse(x);
@@ -78,7 +78,7 @@ public class AnalyticalJacobian {
      * 
      * See doc/README.md equation 9
      */
-    public JointAccelerations inverseA(ControlR3 m) {
+    public JointAccelerations inverseA(ControlSE2 m) {
         Pose2d x = m.pose();
         VelocitySE2 xdot = m.velocity();
         AccelerationSE2 xddot = m.acceleration();

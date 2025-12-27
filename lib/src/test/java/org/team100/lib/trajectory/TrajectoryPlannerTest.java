@@ -14,7 +14,7 @@ import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
@@ -146,7 +146,7 @@ class TrajectoryPlannerTest implements Timeless {
         TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
         PathFactory pathFactory = new PathFactory();
         TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
-        ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(0, 0, 0));
+        ModelSE2 start = new ModelSE2(Pose2d.kZero, new VelocitySE2(0, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         TrajectoryExamples ex = new TrajectoryExamples(planner);
         Trajectory100 trajectory = ex.restToRest(start.pose(), end);
@@ -177,7 +177,7 @@ class TrajectoryPlannerTest implements Timeless {
         TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
         PathFactory pathFactory = new PathFactory();
         TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
-        ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(1, 0, 0));
+        ModelSE2 start = new ModelSE2(Pose2d.kZero, new VelocitySE2(1, 0, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
 
         VelocitySE2 startVelocity = start.velocity();
@@ -222,7 +222,7 @@ class TrajectoryPlannerTest implements Timeless {
         TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
         PathFactory pathFactory = new PathFactory();
         TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
-        ModelR3 start = new ModelR3(Pose2d.kZero, new VelocitySE2(0, 1, 0));
+        ModelSE2 start = new ModelSE2(Pose2d.kZero, new VelocitySE2(0, 1, 0));
         Pose2d end = new Pose2d(1, 0, Rotation2d.kZero);
         VelocitySE2 startVelocity = start.velocity();
 

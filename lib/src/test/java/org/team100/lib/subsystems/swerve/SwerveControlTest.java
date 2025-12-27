@@ -3,10 +3,10 @@ package org.team100.lib.subsystems.swerve;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.VelocitySE2;
-import org.team100.lib.state.ControlR3;
+import org.team100.lib.geometry.WaypointSE2;
+import org.team100.lib.state.ControlSE2;
 import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,13 +21,13 @@ class SwerveControlTest {
     void testTransform() {
         Pose2d p = new Pose2d(new Translation2d(1, 1), new Rotation2d(1));
         VelocitySE2 t = new VelocitySE2(1, 1, 1);
-        ControlR3 s = new ControlR3(p, t);
+        ControlSE2 s = new ControlSE2(p, t);
         assertEquals(1, s.x().x(), DELTA);
     }
 
     @Test
     void testTimedState() {
-        ControlR3 s = ControlR3.fromTimedState(
+        ControlSE2 s = ControlSE2.fromTimedState(
                 new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
@@ -44,7 +44,7 @@ class SwerveControlTest {
 
     @Test
     void testTimedState2() {
-        ControlR3 s = ControlR3.fromTimedState(
+        ControlSE2 s = ControlSE2.fromTimedState(
                 new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
@@ -61,7 +61,7 @@ class SwerveControlTest {
 
     @Test
     void testTimedState3() {
-        ControlR3 s = ControlR3.fromTimedState(
+        ControlSE2 s = ControlSE2.fromTimedState(
                 new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
@@ -79,7 +79,7 @@ class SwerveControlTest {
     /** +x motion, positive curvature => +y accel. */
     @Test
     void testTimedState4() {
-        ControlR3 s = ControlR3.fromTimedState(
+        ControlSE2 s = ControlSE2.fromTimedState(
                 new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
@@ -96,7 +96,7 @@ class SwerveControlTest {
 
     @Test
     void testChassisSpeeds0() {
-        ControlR3 state = new ControlR3(
+        ControlSE2 state = new ControlSE2(
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kPi),
                 new VelocitySE2(1, 0, 0));
         ChassisSpeeds speeds = state.chassisSpeeds();
@@ -107,7 +107,7 @@ class SwerveControlTest {
 
     @Test
     void testChassisSpeeds1() {
-        ControlR3 state = new ControlR3(
+        ControlSE2 state = new ControlSE2(
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kCCW_Pi_2),
                 new VelocitySE2(1, 0, 1));
         ChassisSpeeds speeds = state.chassisSpeeds();
