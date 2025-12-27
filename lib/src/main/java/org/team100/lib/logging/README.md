@@ -1,4 +1,4 @@
-# lib.ogging
+# lib.logging
 
 This package is what we use to put stuff on the dashboard
 and in the log file.

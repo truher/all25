@@ -7,5 +7,4 @@ actual mechanism state and applying some control law.
 There are two packages here:
 
 * `r1` for single-dimension control
-* `r3` bundles together three independent dimensions, for drivetrain or planar
-mechanism control.
+* `se2` describes planar mechanisms and drivetrain motion in the SE(2) manifold.

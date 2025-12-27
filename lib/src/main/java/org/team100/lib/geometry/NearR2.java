@@ -5,11 +5,11 @@ import java.util.function.BiPredicate;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /** True if the two translations are near each other. */
-public class Near2d implements BiPredicate<Translation2d, Translation2d> {
+public class NearR2 implements BiPredicate<Translation2d, Translation2d> {
 
     private final double m_threshold;
 
-    public Near2d(double threshold) {
+    public NearR2(double threshold) {
         m_threshold = threshold;
     }
 

@@ -8,8 +8,8 @@ import java.util.stream.DoubleStream;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.SideEffect;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.geometry.Centroid2d;
-import org.team100.lib.geometry.Near2d;
+import org.team100.lib.geometry.CentroidR2;
+import org.team100.lib.geometry.NearR2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
@@ -73,8 +73,8 @@ public class Targets extends CameraReader<Rotation3d> {
         m_allTargets = new TrailingHistory<>(HISTORY_DURATION);
         m_targets = new CoalescingCollection<>(
                 new TrailingHistory<>(HISTORY_DURATION),
-                new Near2d(NEARNESS_THRESHOLD),
-                new Centroid2d());
+                new NearR2(NEARNESS_THRESHOLD),
+                new CentroidR2());
         m_vision = Cache.ofSideEffect(this::update);
     }
 

@@ -1,4 +1,4 @@
-# lib.controller.r3
+# lib.controller.se2
 
 This package contains control methods for three dimensional
 coordinates, where the three coordinates are orthogonal.  Our high-level

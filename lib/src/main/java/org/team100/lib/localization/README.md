@@ -19,7 +19,7 @@ robot (see `Camera`), and each tag relative to the field
 (see `AprilTagFieldLayoutWithCorrectOrientation`).
 
 The main complexity here is __accommodating delay.__  Camera input is delayed between
-around 75 and 100, and so it can't be used to directly adjust the robot's __current__ pose
+around 75 and 100 ms, and so it can't be used to directly adjust the robot's __current__ pose
 estimate.  Instead, we apply camera input to __old__ pose estimates, recorded by
 `SwerveHistory`, and then __replay__ the subsequent odometry differentials to get
 the current pose.

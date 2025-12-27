@@ -1,7 +1,7 @@
-# lib.subsystems.r3.commands
+# lib.subsystems.se2.commands
 
-This package contains commands for motion in R3, any space
-with three orthogonal axes.  These are useful for drivetrains,
+This package contains commands for motion in the space of 2-dimensional
+rigid transforms, SE(2).  These are useful for drivetrains,
 or any planar mechanism.
 
 Commands we used in 2025:
