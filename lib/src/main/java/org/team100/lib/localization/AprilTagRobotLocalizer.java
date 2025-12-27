@@ -121,8 +121,6 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
     // distance between consecutive updates, and ignore too-far updates.
     private Pose2d m_prevPose;
 
-    private double m_latestTime = 0;
-
     /** use tags closer than this; ignore tags further than this. */
     private double m_heedRadiusM = 3.5;
 
@@ -171,15 +169,6 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         m_log_pose = log.pose2dLogger(Level.TRACE, "pose");
         m_log_tag_in_camera = log.transform3dLogger(Level.TRACE, "tag in camera");
         m_log_lag = log.doubleLogger(Level.TRACE, "lag");
-    }
-
-    /**
-     * The age of the last pose estimate, in microseconds.
-     * The caller could use this to, say, indicate tag visibility.
-     */
-    public double getPoseAgeSec() {
-        double now = Takt.get();
-        return now - m_latestTime;
     }
 
     @Override
@@ -240,6 +229,7 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
         double correctedTimestamp = valueTimestamp - IMPORTANT_MAGIC_NUMBER;
 
         // this seems to always be 1. ????
+        // TODO: look more closely at this
         m_log_lag.log(() -> Takt.get() - correctedTimestamp);
 
         if (!optAlliance.isPresent()) {
@@ -389,7 +379,6 @@ public class AprilTagRobotLocalizer extends CameraReader<Blip24> {
                     stateStdDevs(),
                     visionMeasurementStdDevs(distanceM));
 
-            m_latestTime = Takt.get();
             m_prevPose = pose;
         }
     }

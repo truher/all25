@@ -1,5 +1,6 @@
 package org.team100.lib.localization;
 
+import org.team100.lib.coherence.Takt;
 import org.team100.lib.state.ModelR3;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,6 +20,8 @@ public class NudgingVisionUpdater implements VisionUpdater {
     private final SwerveHistory m_history;
     /** For replay. */
     private final OdometryUpdater m_odometryUpdater;
+    /** To measure time since last update, for indicator. */
+    private double m_latestTimeS = 0;
 
     public NudgingVisionUpdater(
             SwerveHistory history,
@@ -54,6 +57,16 @@ public class NudgingVisionUpdater implements VisionUpdater {
                 new ModelR3(nudged, sample.m_state.velocity()),
                 sample.m_wheelPositions);
         m_odometryUpdater.replay(timestampS);
+        m_latestTimeS = Takt.get();
+    }
+
+    /**
+     * The age of the last pose estimate, in seconds.
+     * The caller could use this to, say, indicate tag visibility.
+     */
+    public double getPoseAgeSec() {
+        double now = Takt.get();
+        return now - m_latestTimeS;
     }
 
     /////////////////////////////////////////
