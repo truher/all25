@@ -22,7 +22,7 @@ import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.ScheduleGenerator;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -502,13 +502,13 @@ class HolonomicSplineTest implements Timeless {
                 System.out.printf("spline %s\n", s);
         }
 
-        Path100 path = new Path100(PathFactory.parameterizeSplines(splines, 0.1, 0.05, 0.05, 0.05));
+        PathFactory pathFactory = new PathFactory(0.1, 0.05, 0.05, 0.05);
+        Path100 path = pathFactory.fromSplines(splines);
         if (DEBUG)
             System.out.printf("path %s\n", path);
         List<TimingConstraint> constraints = List.of(new ConstantConstraint(logger, 1, 1));
-        ScheduleGenerator scheduleGenerator = new ScheduleGenerator(constraints);
-        Trajectory100 traj = scheduleGenerator.timeParameterizeTrajectory(path,
-                0.05, 0, 0);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        Trajectory100 traj = trajectoryFactory.fromPath(path, 0, 0);
         if (DEBUG)
             traj.dump();
         TrajectoryPlotter.plot(traj, 0.1);
@@ -540,7 +540,8 @@ class HolonomicSplineTest implements Timeless {
         TrajectoryPlotter plotter = new TrajectoryPlotter(0.1);
         plotter.plot("splines", splines);
 
-        List<Pose2dWithMotion> motion = PathFactory.parameterizeSplines(splines, 0.1, 0.05, 0.05, 0.05);
+        PathFactory pathFactory = new PathFactory(0.1, 0.05, 0.05, 0.05);
+        List<Pose2dWithMotion> motion = pathFactory.samplesFromSplines(splines);
         if (DEBUG) {
             for (Pose2dWithMotion p : motion) {
                 System.out.printf("%5.3f %5.3f\n", p.getPose().pose().getTranslation().getX(),
@@ -563,11 +564,10 @@ class HolonomicSplineTest implements Timeless {
         assertEquals(8.166666, limits.getMaxCapsizeAccelM_S2(), 1e-6);
         List<TimingConstraint> constraints = List.of(
                 new CapsizeAccelerationConstraint(logger, limits, 1.0));
-        ScheduleGenerator scheduleGenerator = new ScheduleGenerator(constraints);
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
         // speed
         // a = v^2/r so v = sqrt(ar) = 2.858
-        Trajectory100 trajectory = scheduleGenerator.timeParameterizeTrajectory(path,
-                0.05, 2.858, 2.858);
+        Trajectory100 trajectory = trajectoryFactory.fromPath(path, 2.858, 2.858);
 
         plotter.plot("plot", trajectory);
 

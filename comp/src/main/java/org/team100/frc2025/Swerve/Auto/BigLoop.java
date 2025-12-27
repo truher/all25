@@ -9,7 +9,10 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.path.PathFactory;
+import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -17,11 +20,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 public class BigLoop implements Function<Pose2d, Trajectory100> {
     private final TrajectoryPlanner m_planner;
 
-    public BigLoop(
-            LoggerFactory log,
-            SwerveKinodynamics kinodynamics) {
-        m_planner = new TrajectoryPlanner(
-                new TimingConstraintFactory(kinodynamics).auto(log.type(this)));
+    public BigLoop(LoggerFactory log, SwerveKinodynamics kinodynamics) {
+        List<TimingConstraint> constraints = new TimingConstraintFactory(kinodynamics).auto(log.type(this));
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        m_planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
     }
 
     @Override

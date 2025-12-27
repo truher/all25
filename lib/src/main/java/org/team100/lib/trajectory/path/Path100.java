@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.Pose2dWithMotion;
-import org.team100.lib.trajectory.timing.ScheduleGenerator;
 
 import edu.wpi.first.math.geometry.Twist2d;
 
@@ -30,14 +29,15 @@ public class Path100 {
     private final double[] m_distances;
 
     public Path100(final List<Pose2dWithMotion> states) {
-        m_points = new ArrayList<>(states.size());
-        m_distances = new double[states.size()];
+        int n = states.size();
+        m_points = new ArrayList<>(n);
+        m_distances = new double[n];
         if (states.isEmpty()) {
             return;
         }
         m_distances[0] = 0.0;
         m_points.add(states.get(0));
-        for (int i = 1; i < states.size(); ++i) {
+        for (int i = 1; i < n; ++i) {
             m_points.add(states.get(i));
             Pose2dWithMotion p0 = getPoint(i - 1);
             Pose2dWithMotion p1 = getPoint(i);
@@ -71,9 +71,11 @@ public class Path100 {
      * Walks through all the points to find the bracketing points, and then
      * interpolates between them.
      * 
+     * Beware, can return null if the path is empty.
+     * 
      * @param distance in meters, always a non-negative number.
      */
-    public Pose2dWithMotion sample(double distance) throws ScheduleGenerator.TimingException {
+    public Pose2dWithMotion sample(double distance) {
         if (distance >= getMaxDistance()) {
             // off the end
             return getPoint(length() - 1);
@@ -105,11 +107,11 @@ public class Path100 {
                 return lerp;
             }
         }
-        throw new ScheduleGenerator.TimingException();
+        return null;
     }
 
     /** Just returns the list of points with no further sampling. */
-    public Pose2dWithMotion[] resample() throws ScheduleGenerator.TimingException {
+    public Pose2dWithMotion[] resample() {
         return m_points.toArray(Pose2dWithMotion[]::new);
     }
 
@@ -136,7 +138,7 @@ public class Path100 {
      * Samples the entire path evenly by distance. Since the spline parameterizer
      * now contains a pathwise distance limit, you shouldn't need this anymore.
      */
-    Pose2dWithMotion[] resample(double step) throws ScheduleGenerator.TimingException {
+    public Pose2dWithMotion[] resample(double step) {
         double maxDistance = getMaxDistance();
         if (maxDistance == 0)
             throw new IllegalArgumentException("max distance must be greater than zero");
@@ -150,6 +152,7 @@ public class Path100 {
             // the values here are just interpolated from the original values.
             double d = Math.min(i * step, maxDistance);
             Pose2dWithMotion state = sample(d);
+            if (state == null) continue; 
             if (DEBUG)
                 System.out.printf("RESAMPLE: i=%d d=%f state=%s\n", i, d, state);
             samples[i] = state;

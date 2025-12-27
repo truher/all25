@@ -7,7 +7,7 @@ import org.team100.lib.util.Math100;
  * Represents a state within a 2d holonomic trajectory, i.e. with heading
  * independent from course.
  * 
- * The timing fields are set by the ScheduleGenerator.
+ * The timing fields are set by the TrajectoryFactory.
  */
 public class TimedState {
     private static final boolean DEBUG = false;

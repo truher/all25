@@ -45,10 +45,8 @@ class Path100Test {
     @Test
     void testEmpty() {
         List<HolonomicSpline> splines = new ArrayList<>();
-        double maxDx = 0.1;
-        double maxDy = 0.1;
-        double maxDTheta = 0.1;
-        Path100 path = new Path100(PathFactory.parameterizeSplines(splines, 0.1, maxDx, maxDy, maxDTheta));
+        PathFactory pathFactory = new PathFactory(0.1, 0.1, 0.1, 0.1);
+        Path100 path = pathFactory.fromSplines(splines);
         assertEquals(0, path.length(), 0.001);
     }
 

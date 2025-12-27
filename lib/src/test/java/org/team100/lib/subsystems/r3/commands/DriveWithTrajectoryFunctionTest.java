@@ -14,8 +14,10 @@ import org.team100.lib.subsystems.r3.MockSubsystemR3;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
@@ -29,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * https://docs.google.com/spreadsheets/d/1tt7Fq-gkR7aoY6kH2WFVxj4y__SMXiKE0scPG3eHSAk/edit?gid=0#gid=0
  */
 public class DriveWithTrajectoryFunctionTest implements Timeless {
+
     private static final boolean DEBUG = false;
 
     LoggerFactory log = new TestLoggerFactory(new TestPrimitiveLogger());
@@ -38,7 +41,9 @@ public class DriveWithTrajectoryFunctionTest implements Timeless {
     List<TimingConstraint> constraints = List.of(
             new ConstantConstraint(log, 2, 2),
             new YawRateConstraint(log, 1, 1));
-    TrajectoryPlanner planner = new TrajectoryPlanner(constraints);
+    PathFactory pathFactory = new PathFactory();
+    TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+    TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
 
     /**
      * This is the key to using DriveWithTrajectoryFunction: a function that takes a

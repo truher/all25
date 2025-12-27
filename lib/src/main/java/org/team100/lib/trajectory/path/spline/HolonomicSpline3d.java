@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.team100.lib.geometry.DirectionR3;
 import org.team100.lib.geometry.DirectionSE3;
-import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Pose3dWithDirection;
 import org.team100.lib.util.Math100;
 

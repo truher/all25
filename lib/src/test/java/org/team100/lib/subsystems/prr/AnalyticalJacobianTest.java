@@ -14,8 +14,12 @@ import org.team100.lib.state.ControlR3;
 import org.team100.lib.state.ModelR3;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
+import org.team100.lib.trajectory.examples.TrajectoryExamples;
+import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimedState;
+import org.team100.lib.trajectory.timing.TimingConstraint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -251,10 +255,14 @@ public class AnalyticalJacobianTest {
         final ElevatorArmWristKinematics k = new ElevatorArmWristKinematics(2, 1);
         AnalyticalJacobian j = new AnalyticalJacobian(k);
 
-        TrajectoryPlanner planner = new TrajectoryPlanner(List.of(new ConstantConstraint(logger, 1, 1)));
+        List<TimingConstraint> constraints = List.of(new ConstantConstraint(logger, 1, 1));
+        TrajectoryFactory trajectoryFactory = new TrajectoryFactory(constraints);
+        PathFactory pathFactory = new PathFactory();
+        TrajectoryPlanner planner = new TrajectoryPlanner(pathFactory, trajectoryFactory);
         Pose2d start = new Pose2d(1, -1, Rotation2d.kZero);
         Pose2d end = new Pose2d(2, 1, Rotation2d.k180deg);
-        Trajectory100 t = planner.restToRest(start, end);
+        TrajectoryExamples ex = new TrajectoryExamples(planner);
+        Trajectory100 t = ex.restToRest(start, end);
         double d = t.duration();
         double dt = d / 20;
         for (double time = 0; time < d; time += dt) {
