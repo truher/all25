@@ -10,10 +10,6 @@ public class Torque {
         m_torque = torque;
     }
 
-    /**
-     * I know it's weird to use an optional argument here but it keeps the default
-     * in one place.
-     */
     public double torque(double positionRad) {
         return m_torque.applyAsDouble(positionRad);
     }

@@ -1,6 +1,7 @@
 package org.team100.lib.localization;
 
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.coherence.Takt;
+import org.team100.lib.state.ModelSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -19,6 +20,8 @@ public class NudgingVisionUpdater implements VisionUpdater {
     private final SwerveHistory m_history;
     /** For replay. */
     private final OdometryUpdater m_odometryUpdater;
+    /** To measure time since last update, for indicator. */
+    private double m_latestTimeS = 0;
 
     public NudgingVisionUpdater(
             SwerveHistory history,
@@ -51,9 +54,19 @@ public class NudgingVisionUpdater implements VisionUpdater {
                 sample.m_state.pose(), measurement, stateSigma, visionSigma);
         m_history.put(
                 timestampS,
-                new ModelR3(nudged, sample.m_state.velocity()),
+                new ModelSE2(nudged, sample.m_state.velocity()),
                 sample.m_wheelPositions);
         m_odometryUpdater.replay(timestampS);
+        m_latestTimeS = Takt.get();
+    }
+
+    /**
+     * The age of the last pose estimate, in seconds.
+     * The caller could use this to, say, indicate tag visibility.
+     */
+    public double getPoseAgeSec() {
+        double now = Takt.get();
+        return now - m_latestTimeS;
     }
 
     /////////////////////////////////////////
@@ -69,43 +82,8 @@ public class NudgingVisionUpdater implements VisionUpdater {
         // Step 2: Measure the twist between the odometry pose and the vision pose.
         Twist2d twist = sample.log(measurement);
         // Step 4: Discount the twist based on the sigmas relative to each other
-        Twist2d scaledTwist = getScaledTwist(stateSigma, visionSigma, twist);
+        Twist2d scaledTwist = Uncertainty.getScaledTwist(stateSigma, visionSigma, twist);
         return sample.exp(scaledTwist);
-    }
-
-    static Twist2d getScaledTwist(
-            double[] stateSigma,
-            double[] visionSigma,
-            Twist2d twist) {
-        // discount the vision update by this factor.
-        final double[] K = getK(stateSigma, visionSigma);
-        Twist2d scaledTwist = new Twist2d(
-                K[0] * twist.dx,
-                K[1] * twist.dy,
-                K[2] * twist.dtheta);
-        return scaledTwist;
-    }
-
-    static double[] getK(double[] stateSigma, double[] visionSigma) {
-        return new double[] {
-                mix(Math.pow(stateSigma[0], 2), Math.pow(visionSigma[0], 2)),
-                mix(Math.pow(stateSigma[1], 2), Math.pow(visionSigma[1], 2)),
-                mix(Math.pow(stateSigma[2], 2), Math.pow(visionSigma[2], 2))
-        };
-    }
-
-    /**
-     * Given q and r stddev's, what mixture should that yield?
-     * This is the "closed form Kalman gain for continuous Kalman filter with A = 0
-     * and C = I. See wpimath/algorithms.md." ... but really it's just a mixer.
-     * 
-     * @param q state variance
-     * @param r vision variance
-     */
-    static double mix(final double q, final double r) {
-        if (q == 0.0)
-            return 0.0;
-        return q / (q + Math.sqrt(q * r));
     }
 
 }

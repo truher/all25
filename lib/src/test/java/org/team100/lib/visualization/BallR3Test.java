@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.targeting.Drag;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,7 +16,7 @@ public class BallR3Test {
     private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
 
-    ModelR3 robot = new ModelR3();
+    ModelSE2 robot = new ModelSE2();
     Rotation2d azimuth = new Rotation2d();
     Rotation2d elevation = new Rotation2d();
 

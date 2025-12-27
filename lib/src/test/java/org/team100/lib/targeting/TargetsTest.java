@@ -12,7 +12,7 @@ import org.team100.lib.config.Camera;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -35,7 +35,7 @@ public class TargetsTest implements Timeless {
         Thread.sleep(50);
         stepTime();
 
-        ModelR3 p = new ModelR3();
+        ModelSE2 p = new ModelSE2();
         Targets t = new Targets(logger, logger, (x) -> p);
         t.update();
         assertTrue(t.getTargets().isEmpty());
@@ -80,7 +80,7 @@ public class TargetsTest implements Timeless {
         Thread.sleep(50);
         stepTime();
 
-        ModelR3 p = new ModelR3();
+        ModelSE2 p = new ModelSE2();
         Targets reader = new Targets(logger, logger, (x) -> p);
         Thread.sleep(200);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
@@ -119,7 +119,7 @@ public class TargetsTest implements Timeless {
         Thread.sleep(50);
         stepTime();
 
-        ModelR3 p = new ModelR3();
+        ModelSE2 p = new ModelSE2();
         Targets reader = new Targets(logger, logger, (x) -> p);
         Thread.sleep(100);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
@@ -159,7 +159,7 @@ public class TargetsTest implements Timeless {
         Thread.sleep(100);
         stepTime();
 
-        ModelR3 p = new ModelR3();
+        ModelSE2 p = new ModelSE2();
         Targets reader = new Targets(logger, logger, x -> p);
         Thread.sleep(100);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(
@@ -200,7 +200,7 @@ public class TargetsTest implements Timeless {
         Thread.sleep(50);
         stepTime();
 
-        ModelR3 p = new ModelR3();
+        ModelSE2 p = new ModelSE2();
         Targets reader = new Targets(logger, logger, (x) -> p);
         Thread.sleep(50);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(

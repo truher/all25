@@ -9,8 +9,8 @@ import org.team100.lib.experiments.Experiments;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
+import org.team100.lib.state.ModelSE2;
+import org.team100.lib.subsystems.se2.VelocitySubsystemSE2;
 import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 
@@ -31,7 +31,7 @@ public class DriveManuallySimple extends Command {
      */
     private final Supplier<Velocity> m_twistSupplier;
     private final DoubleConsumer m_heedRadiusM;
-    private final VelocitySubsystemR3 m_drive;
+    private final VelocitySubsystemSE2 m_drive;
     private final SwerveLimiter m_limiter;
     private final FieldRelativeDriver m_defaultDriver;
     private final FieldRelativeDriver m_alternativeDriver;
@@ -68,7 +68,7 @@ public class DriveManuallySimple extends Command {
 
     @Override
     public void execute() {
-        ModelR3 state = m_drive.getState();
+        ModelSE2 state = m_drive.getState();
         if (m_useAlternative.get() != wasUsingAlternative) {
             // switch modes
             m_alternativeDriver.reset(state);
@@ -91,7 +91,7 @@ public class DriveManuallySimple extends Command {
         m_drive.stop();
     }
 
-    private VelocitySE2 desiredVelocity(ModelR3 state, Velocity input) {
+    private VelocitySE2 desiredVelocity(ModelSE2 state, Velocity input) {
         if (m_useAlternative.get()) {
             return m_alternativeDriver.apply(state, input);
         }

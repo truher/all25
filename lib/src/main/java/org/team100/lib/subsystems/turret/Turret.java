@@ -20,7 +20,7 @@ import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSenso
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.OnboardAngularPositionServo;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.targeting.Drag;
 import org.team100.lib.targeting.Intercept;
 import org.team100.lib.targeting.Range;
@@ -55,7 +55,7 @@ public class Turret extends SubsystemBase {
      */
     private static final double DELAY = 0.2;
     private final DoubleArrayLogger m_log_field_turret;
-    private final Supplier<ModelR3> m_state;
+    private final Supplier<ModelSE2> m_state;
     private final Supplier<Translation2d> m_target;
     private final AngularPositionServo m_pivot;
     private final AngularPositionServo m_elevation;
@@ -74,7 +74,7 @@ public class Turret extends SubsystemBase {
     public Turret(
             LoggerFactory parent,
             LoggerFactory field,
-            Supplier<ModelR3> state,
+            Supplier<ModelSE2> state,
             Supplier<Translation2d> target,
             double speed) {
         LoggerFactory log = parent.type(this);
@@ -170,7 +170,7 @@ public class Turret extends SubsystemBase {
      * motion of either one.
      */
     private Optional<Solution> getAbsoluteBearingInstantaneous() {
-        ModelR3 state = m_state.get();
+        ModelSE2 state = m_state.get();
         Translation2d target = m_target.get();
         return Optional.of(
                 new Solution(
@@ -179,7 +179,7 @@ public class Turret extends SubsystemBase {
     }
 
     private Optional<Solution> getShootingMethod() {
-        ModelR3 state = m_state.get();
+        ModelSE2 state = m_state.get();
         Translation2d robotPosition = state.translation();
         GlobalVelocityR2 robotVelocity = state.velocityR2();
         Translation2d targetPosition = m_target.get();
@@ -194,7 +194,7 @@ public class Turret extends SubsystemBase {
      * moving robot.
      */
     private Optional<Solution> getAbsoluteBearingForIntercept() {
-        ModelR3 state = m_state.get();
+        ModelSE2 state = m_state.get();
 
         Translation2d robotPosition = state.translation();
         GlobalVelocityR2 robotVelocity = state.velocityR2();

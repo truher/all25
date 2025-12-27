@@ -14,7 +14,7 @@ import org.team100.lib.logging.LoggerFactory.Control100Logger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.state.Control100;
 import org.team100.lib.state.Model100;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.util.Math100;
 
@@ -89,7 +89,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
     }
 
     @Override
-    public void reset(ModelR3 state) {
+    public void reset(ModelSE2 state) {
         m_thetaSetpoint = state.theta().control();
         m_goal = null;
         m_latch.unlatch();
@@ -111,7 +111,7 @@ public class ManualWithFullStateHeading implements FieldRelativeDriver {
      */
     @Override
     public VelocitySE2 apply(
-            final ModelR3 state,
+            final ModelSE2 state,
             final Velocity twist1_1) {
         final Model100 thetaState = state.theta();
         final double yawMeasurement = thetaState.x();

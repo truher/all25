@@ -3,11 +3,11 @@ package org.team100.lib.visualization;
 import java.util.function.Supplier;
 
 import org.team100.lib.framework.TimedRobot100;
-import org.team100.lib.geometry.GlobalVelocity3d;
+import org.team100.lib.geometry.GlobalVelocityR3;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.targeting.Drag;
 
 import edu.wpi.first.math.Matrix;
@@ -19,13 +19,13 @@ import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.NumericalIntegration;
 
 /**
- * Simulated projectile in three dimensions
+ * Simulated projectile in three dimensions (x, y, z)
  */
 public class BallR3 implements Ball {
     private static final double DT = TimedRobot100.LOOP_PERIOD_S;
     private final DoubleArrayLogger m_log_field_ball;
     private final Drag m_drag;
-    private final Supplier<ModelR3> m_robot;
+    private final Supplier<ModelSE2> m_robot;
     private final Supplier<Rotation2d> m_azimuth;
     private final Supplier<Rotation2d> m_elevation;
     private final double m_speed;
@@ -51,7 +51,7 @@ public class BallR3 implements Ball {
     public BallR3(
             LoggerFactory field,
             Drag drag,
-            Supplier<ModelR3> robot,
+            Supplier<ModelSE2> robot,
             Supplier<Rotation2d> azimuth,
             Supplier<Rotation2d> elevation,
             double speed,
@@ -68,13 +68,13 @@ public class BallR3 implements Ball {
     @Override
     public void launch() {
         // Velocity due only to the gun
-        GlobalVelocity3d v = GlobalVelocity3d.fromPolar(
+        GlobalVelocityR3 v = GlobalVelocityR3.fromPolar(
                 m_azimuth.get(), m_elevation.get(), m_speed);
         // velocity due to robot translation
-        GlobalVelocity3d mv = GlobalVelocity3d.fromSe2(m_robot.get().velocity());
+        GlobalVelocityR3 mv = GlobalVelocityR3.fromSe2(m_robot.get().velocity());
         // Initial position is on the floor. TODO: offsets.
         m_location = new Translation3d(m_robot.get().pose().getTranslation());
-        GlobalVelocity3d m_velocity = v.plus(mv);
+        GlobalVelocityR3 m_velocity = v.plus(mv);
         // velocity in the XY plane
         double vxy = m_velocity.normXY();
         double vz = m_velocity.z();
@@ -122,13 +122,13 @@ public class BallR3 implements Ball {
     }
 
     // for testing
-    GlobalVelocity3d velocity() {
+    GlobalVelocityR3 velocity() {
         if (m_x == null) {
-            return GlobalVelocity3d.fromSe2(m_robot.get().velocity());
+            return GlobalVelocityR3.fromSe2(m_robot.get().velocity());
         }
         double vxy = m_x.get(3, 0);
         double vz = m_x.get(4, 0);
-        return new GlobalVelocity3d(
+        return new GlobalVelocityR3(
                 vxy * m_az.getCos(),
                 vxy * m_az.getSin(),
                 vz);

@@ -9,7 +9,7 @@ import org.team100.lib.config.Camera;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.testing.Timeless;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,7 +27,7 @@ public class SimulatedTargetWriterTest implements Timeless {
         Thread.sleep(50);
         stepTime();
 
-        ModelR3 p = new ModelR3();
+        ModelSE2 p = new ModelSE2();
         Targets reader = new Targets(logger, logger, x -> p);
         Thread.sleep(50);
         SimulatedTargetWriter writer = new SimulatedTargetWriter(

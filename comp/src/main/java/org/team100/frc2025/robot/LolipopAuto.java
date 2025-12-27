@@ -9,15 +9,15 @@ import java.util.List;
 
 import org.team100.lib.commands.MoveAndHold;
 import org.team100.lib.config.ElevatorUtil.ScoringLevel;
-import org.team100.lib.controller.r3.FullStateControllerR3;
+import org.team100.lib.controller.se2.FullStateControllerSE2;
 import org.team100.lib.field.FieldConstants;
 import org.team100.lib.field.FieldConstants.ReefPoint;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.profile.r3.ProfileR3;
-import org.team100.lib.subsystems.r3.commands.DriveToPoseWithProfile;
-import org.team100.lib.subsystems.r3.commands.DriveToTranslationFacingWithProfile;
-import org.team100.lib.subsystems.r3.commands.DriveWithTrajectoryFunction;
+import org.team100.lib.profile.se2.ProfileSE2;
+import org.team100.lib.subsystems.se2.commands.DriveToPoseWithProfile;
+import org.team100.lib.subsystems.se2.commands.DriveToTranslationFacingWithProfile;
+import org.team100.lib.subsystems.se2.commands.DriveWithTrajectoryFunction;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,15 +30,15 @@ public class LolipopAuto {
     private static final double HEED_RADIUS_M = 3;
     private final LoggerFactory m_log;
     private final Machinery m_machinery;
-    private final ProfileR3 m_autoProfile;
-    private final FullStateControllerR3 m_autoController;
+    private final ProfileSE2 m_autoProfile;
+    private final FullStateControllerSE2 m_autoController;
     private final TrajectoryPlanner m_planner;
 
     public LolipopAuto(
             LoggerFactory parent,
             Machinery machinery,
-            ProfileR3 autoProfile,
-            FullStateControllerR3 autoController,
+            ProfileSE2 autoProfile,
+            FullStateControllerSE2 autoController,
             TrajectoryPlanner planner) {
         m_log = parent.type(this);
         m_machinery = machinery;

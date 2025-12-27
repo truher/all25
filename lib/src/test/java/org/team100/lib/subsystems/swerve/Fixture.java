@@ -2,8 +2,8 @@ package org.team100.lib.subsystems.swerve;
 
 import java.io.IOException;
 
-import org.team100.lib.controller.r3.ControllerFactoryR3;
-import org.team100.lib.controller.r3.ControllerR3;
+import org.team100.lib.controller.se2.ControllerFactorySE2;
+import org.team100.lib.controller.se2.ControllerSE2;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.FreshSwerveEstimate;
@@ -41,7 +41,7 @@ public class Fixture {
     public SwerveLocal swerveLocal;
     public OdometryUpdater odometryUpdater;
     public SwerveDriveSubsystem drive;
-    public ControllerR3 controller;
+    public ControllerSE2 controller;
     public LoggerFactory logger;
     public LoggerFactory fieldLogger;
 
@@ -81,7 +81,7 @@ public class Fixture {
                 swerveLocal,
                 limiter);
 
-        controller = ControllerFactoryR3.test(logger);
+        controller = ControllerFactorySE2.test(logger);
     }
 
     public void close() {

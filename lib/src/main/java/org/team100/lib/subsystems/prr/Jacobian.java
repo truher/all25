@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.optimization.NumericalJacobian100;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -44,7 +44,7 @@ public class Jacobian {
      * Given a state (position and velocity), what are the joint velocities?
      * It's a bit weird to use "swerve" here. Maybe rename this SE2Model?
      */
-    public JointVelocities inverse(ModelR3 swerveModel) {
+    public JointVelocities inverse(ModelSE2 swerveModel) {
         Pose2d p = swerveModel.pose();
         VelocitySE2 v = swerveModel.velocity();
         EAWConfig c = m_k.inverse(p);

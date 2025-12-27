@@ -17,13 +17,13 @@ import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.logging.LoggerFactory.ConfigLogger;
 import org.team100.lib.logging.LoggerFactory.AccelerationSE2Logger;
-import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
+import org.team100.lib.logging.LoggerFactory.ConfigLogger;
 import org.team100.lib.logging.LoggerFactory.JointAccelerationsLogger;
 import org.team100.lib.logging.LoggerFactory.JointForceLogger;
 import org.team100.lib.logging.LoggerFactory.JointVelocitiesLogger;
 import org.team100.lib.logging.LoggerFactory.Pose2dLogger;
+import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.mechanism.LinearMechanism;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
@@ -41,8 +41,8 @@ import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSenso
 import org.team100.lib.sensor.position.absolute.wpi.AS5048RotaryPositionSensor;
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
-import org.team100.lib.state.ControlR3;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ControlSE2;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.prr.AnalyticalJacobian;
 import org.team100.lib.subsystems.prr.EAWConfig;
 import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
@@ -51,7 +51,7 @@ import org.team100.lib.subsystems.prr.JointForce;
 import org.team100.lib.subsystems.prr.JointVelocities;
 import org.team100.lib.subsystems.prr.SubsystemPRR;
 import org.team100.lib.subsystems.prr.commands.FollowJointProfiles;
-import org.team100.lib.subsystems.r3.PositionSubsystemR3;
+import org.team100.lib.subsystems.se2.PositionSubsystemSE2;
 import org.team100.lib.util.CanId;
 import org.team100.lib.util.RoboRioChannel;
 import org.team100.lib.util.StrUtil;
@@ -61,7 +61,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CalgamesMech extends SubsystemBase implements Music, PositionSubsystemR3, SubsystemPRR {
+public class CalgamesMech extends SubsystemBase implements Music, PositionSubsystemSE2, SubsystemPRR {
     private static final boolean DEBUG = false;
     private boolean DISABLED = false;
     ////////////////////////////////////////////////////////
@@ -313,19 +313,19 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
     }
 
     @Override
-    public ModelR3 getState() {
+    public ModelSE2 getState() {
         EAWConfig c = getConfig();
         JointVelocities jv = getJointVelocity();
         Pose2d p = m_kinematics.forward(c);
         VelocitySE2 v = m_jacobian.forward(c, jv);
-        return new ModelR3(p, v);
+        return new ModelSE2(p, v);
     }
 
     // for testing only
     public void setVelocity(VelocitySE2 v) {
         Pose2d pose = getState().pose();
         AccelerationSE2 a = new AccelerationSE2(0, 0, 0);
-        ControlR3 control = new ControlR3(pose, v, a);
+        ControlSE2 control = new ControlSE2(pose, v, a);
 
         JointVelocities jv = m_jacobian.inverse(control.model());
         JointAccelerations ja = m_jacobian.inverseA(control);
@@ -343,7 +343,7 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
 
     /** There are no profiles here, so this control needs to be feasible. */
     @Override
-    public void set(ControlR3 control) {
+    public void set(ControlSE2 control) {
         Pose2d pose = control.pose();
         EAWConfig config = m_kinematics.inverse(pose);
         if (DEBUG) {

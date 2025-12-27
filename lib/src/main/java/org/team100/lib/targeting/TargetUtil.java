@@ -1,7 +1,7 @@
 package org.team100.lib.targeting;
 
 import org.team100.lib.geometry.VelocitySE2;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,7 +36,7 @@ public class TargetUtil {
      * @param target field-relative target position
      * @return apparent rotation of the target around the robot, rad/s
      */
-    public static double targetMotion(ModelR3 state, Translation2d target) {
+    public static double targetMotion(ModelSE2 state, Translation2d target) {
         VelocitySE2 velocity = state.velocity();
         if (velocity.angle().isEmpty()) {
             // If there's no robot motion, there's no target motion.

@@ -8,7 +8,7 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.geometry.DeltaSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.sensor.gyro.Gyro;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModuleDeltas;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
@@ -123,7 +123,7 @@ public class OdometryUpdater {
 
         double dt = currentTimeS - lowerEntry.getKey();
         InterpolationRecord value = lowerEntry.getValue();
-        ModelR3 previousState = value.m_state;
+        ModelSE2 previousState = value.m_state;
         if (DEBUG) {
             System.out.printf("previous x %.6f y %.6f\n", previousState.pose().getX(), previousState.pose().getY());
         }
@@ -164,7 +164,7 @@ public class OdometryUpdater {
                 odoVelo.getY(),
                 gyroRateRad_SNWU);
 
-        ModelR3 swerveState = new ModelR3(newPose, velocity);
+        ModelSE2 swerveState = new ModelSE2(newPose, velocity);
 
         m_history.put(currentTimeS, swerveState, wheelPositions);
     }

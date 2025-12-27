@@ -10,16 +10,16 @@ import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.state.ControlR3;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ControlSE2;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.trajectory.Trajectory100;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -83,7 +83,7 @@ public class AnalyticalJacobianTest {
 
         // some example velocities
         // zero velocity
-        ModelR3 v = new ModelR3(p);
+        ModelSE2 v = new ModelSE2(p);
 
         JointVelocities jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
@@ -91,21 +91,21 @@ public class AnalyticalJacobianTest {
         assertEquals(0, jv.wrist(), DELTA);
 
         // +x
-        v = new ModelR3(p, new VelocitySE2(1, 0, 0));
+        v = new ModelSE2(p, new VelocitySE2(1, 0, 0));
         jv = j.inverse(v);
         assertEquals(1, jv.elevator(), DELTA);
         assertEquals(0, jv.shoulder(), DELTA);
         assertEquals(0, jv.wrist(), DELTA);
 
         // +y
-        v = new ModelR3(p, new VelocitySE2(0, 1, 0));
+        v = new ModelSE2(p, new VelocitySE2(0, 1, 0));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(0.5, jv.shoulder(), DELTA);
         assertEquals(-0.5, jv.wrist(), DELTA);
 
         // +theta
-        v = new ModelR3(p, new VelocitySE2(0, 0, 1));
+        v = new ModelSE2(p, new VelocitySE2(0, 0, 1));
         jv = j.inverse(v);
         assertEquals(0, jv.elevator(), DELTA);
         assertEquals(-0.5, jv.shoulder(), DELTA);
@@ -180,7 +180,7 @@ public class AnalyticalJacobianTest {
         EAWConfig c = new EAWConfig(0, 0, 0);
         Pose2d p = k.forward(c);
         VelocitySE2 v = new VelocitySE2(0, 0, 0);
-        ControlR3 m = new ControlR3(p, v, new AccelerationSE2(0, 0, 0));
+        ControlSE2 m = new ControlSE2(p, v, new AccelerationSE2(0, 0, 0));
         JointAccelerations ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -190,7 +190,7 @@ public class AnalyticalJacobianTest {
         c = new EAWConfig(0, 0, 0);
         p = k.forward(c);
         v = new VelocitySE2(0, 0, 0);
-        m = new ControlR3(p, v, new AccelerationSE2(1, 0, 0));
+        m = new ControlSE2(p, v, new AccelerationSE2(1, 0, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -200,7 +200,7 @@ public class AnalyticalJacobianTest {
         c = new EAWConfig(0, 0, 0);
         p = k.forward(c);
         v = new VelocitySE2(0, 0, 0);
-        m = new ControlR3(p, v, new AccelerationSE2(0, 1, 0));
+        m = new ControlSE2(p, v, new AccelerationSE2(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(0.5, ja.shoulder(), DELTA);
@@ -210,7 +210,7 @@ public class AnalyticalJacobianTest {
         c = new EAWConfig(0, 0, 0);
         p = k.forward(c);
         v = new VelocitySE2(0, 0, 0);
-        m = new ControlR3(p, v, new AccelerationSE2(0, 0, 1));
+        m = new ControlSE2(p, v, new AccelerationSE2(0, 0, 1));
         ja = j.inverseA(m);
         assertEquals(0, ja.elevator(), DELTA);
         assertEquals(-0.5, ja.shoulder(), DELTA);
@@ -221,7 +221,7 @@ public class AnalyticalJacobianTest {
         c = new EAWConfig(0, Math.PI / 4, 0);
         p = k.forward(c);
         v = new VelocitySE2(0, 0, 0);
-        m = new ControlR3(p, v, new AccelerationSE2(1, 0, 0));
+        m = new ControlSE2(p, v, new AccelerationSE2(1, 0, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0, ja.shoulder(), DELTA);
@@ -232,7 +232,7 @@ public class AnalyticalJacobianTest {
         // using 45 deg because of singularity at 90
         p = k.forward(c);
         v = new VelocitySE2(0, 0, 0);
-        m = new ControlR3(p, v, new AccelerationSE2(0, 1, 0));
+        m = new ControlSE2(p, v, new AccelerationSE2(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0.707, ja.shoulder(), DELTA);
@@ -243,7 +243,7 @@ public class AnalyticalJacobianTest {
         // using 45 deg because of singularity at 90
         p = k.forward(c);
         v = new VelocitySE2(0, 0, 0);
-        m = new ControlR3(p, v, new AccelerationSE2(0, 1, 0));
+        m = new ControlSE2(p, v, new AccelerationSE2(0, 1, 0));
         ja = j.inverseA(m);
         assertEquals(1, ja.elevator(), DELTA);
         assertEquals(0.707, ja.shoulder(), DELTA);
@@ -267,7 +267,7 @@ public class AnalyticalJacobianTest {
         double dt = d / 20;
         for (double time = 0; time < d; time += dt) {
             TimedState tp = t.sample(time);
-            ModelR3 sm = ModelR3.fromTimedState(tp);
+            ModelSE2 sm = ModelSE2.fromTimedState(tp);
             Pose2d p = sm.pose();
             VelocitySE2 v = sm.velocity();
             EAWConfig c = k.inverse(p);

@@ -8,13 +8,13 @@ import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.prr.AnalyticalJacobian;
 import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
-import org.team100.lib.subsystems.r3.commands.GoToPosePosition;
+import org.team100.lib.subsystems.se2.commands.GoToPosePosition;
 import org.team100.lib.trajectory.TrajectoryPlanner;
 import org.team100.lib.trajectory.path.PathFactory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TorqueConstraint;
+import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 import edu.wpi.first.wpilibj2.command.Command;

@@ -17,9 +17,9 @@ import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.primitive.PrimitiveLogger;
 import org.team100.lib.reference.r1.SetpointsR1;
 import org.team100.lib.state.Control100;
-import org.team100.lib.state.ControlR3;
+import org.team100.lib.state.ControlSE2;
 import org.team100.lib.state.Model100;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.prr.EAWConfig;
 import org.team100.lib.subsystems.prr.JointAccelerations;
 import org.team100.lib.subsystems.prr.JointForce;
@@ -579,13 +579,13 @@ public class LoggerFactory {
         return new ChassisSpeedsLogger(level, leaf);
     }
 
-    public class GlobaDeltaR3Logger {
+    public class GlobaDeltaSE2Logger {
         private final Level m_level;
         private final DoubleLogger m_xLogger;
         private final DoubleLogger m_yLogger;
         private final DoubleLogger m_thetaLogger;
 
-        GlobaDeltaR3Logger(Level level, String leaf) {
+        GlobaDeltaSE2Logger(Level level, String leaf) {
             m_level = level;
             m_xLogger = doubleLogger(level, join(leaf, "x m"));
             m_yLogger = doubleLogger(level, join(leaf, "y m"));
@@ -602,8 +602,8 @@ public class LoggerFactory {
         }
     }
 
-    public GlobaDeltaR3Logger DeltaSE2Logger(Level level, String leaf) {
-        return new GlobaDeltaR3Logger(level, leaf);
+    public GlobaDeltaSE2Logger DeltaSE2Logger(Level level, String leaf) {
+        return new GlobaDeltaSE2Logger(level, leaf);
     }
 
     public class VelocitySE2Logger {
@@ -755,62 +755,62 @@ public class LoggerFactory {
         return new SetpointsR1Logger(level, leaf);
     }
 
-    public class ControlR3Logger {
+    public class ControlSE2Logger {
         private final Level m_level;
         private final Control100Logger m_xLogger;
         private final Control100Logger m_yLogger;
         private final Control100Logger m_thetaLogger;
 
-        ControlR3Logger(Level level, String leaf) {
+        ControlSE2Logger(Level level, String leaf) {
             m_level = level;
             m_xLogger = control100Logger(level, join(leaf, "x"));
             m_yLogger = control100Logger(level, join(leaf, "y"));
             m_thetaLogger = control100Logger(level, join(leaf, "theta"));
         }
 
-        public void log(Supplier<ControlR3> vals) {
+        public void log(Supplier<ControlSE2> vals) {
             if (!allow(m_level))
                 return;
-            ControlR3 val = vals.get();
+            ControlSE2 val = vals.get();
             m_xLogger.log(val::x);
             m_yLogger.log(val::y);
             m_thetaLogger.log(val::theta);
         }
     }
 
-    public ControlR3Logger controlR3Logger(Level level, String leaf) {
-        return new ControlR3Logger(level, leaf);
+    public ControlSE2Logger controlSE2Logger(Level level, String leaf) {
+        return new ControlSE2Logger(level, leaf);
     }
 
     public Model100Logger model100Logger(Level level, String leaf) {
         return new Model100Logger(level, leaf);
     }
 
-    public class ModelR3Logger {
+    public class ModelSE2Logger {
         private final Level m_level;
         private final Model100Logger m_xLogger;
         private final Model100Logger m_yLogger;
         private final Model100Logger m_thetaLogger;
 
-        ModelR3Logger(Level level, String leaf) {
+        ModelSE2Logger(Level level, String leaf) {
             m_level = level;
             m_xLogger = model100Logger(level, join(leaf, "x"));
             m_yLogger = model100Logger(level, join(leaf, "y"));
             m_thetaLogger = model100Logger(level, join(leaf, "theta"));
         }
 
-        public void log(Supplier<ModelR3> vals) {
+        public void log(Supplier<ModelSE2> vals) {
             if (!allow(m_level))
                 return;
-            ModelR3 val = vals.get();
+            ModelSE2 val = vals.get();
             m_xLogger.log(val::x);
             m_yLogger.log(val::y);
             m_thetaLogger.log(val::theta);
         }
     }
 
-    public ModelR3Logger modelR3Logger(Level level, String leaf) {
-        return new ModelR3Logger(level, leaf);
+    public ModelSE2Logger modelSE2Logger(Level level, String leaf) {
+        return new ModelSE2Logger(level, leaf);
     }
 
     public class SwerveModulePosition100Logger {

@@ -16,11 +16,11 @@ import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.logging.LoggerFactory.DoubleLogger;
 import org.team100.lib.logging.LoggerFactory.EnumLogger;
 import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
-import org.team100.lib.logging.LoggerFactory.ModelR3Logger;
+import org.team100.lib.logging.LoggerFactory.ModelSE2Logger;
 import org.team100.lib.music.Music;
 import org.team100.lib.music.Player;
-import org.team100.lib.state.ModelR3;
-import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
+import org.team100.lib.state.ModelSE2;
+import org.team100.lib.subsystems.se2.VelocitySubsystemSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
@@ -32,7 +32,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsystemR3, Music {
+public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsystemSE2, Music {
     // DEBUG produces a LOT of output, you should only enable it while you're
     // looking at it.
     private static final boolean DEBUG = false;
@@ -42,10 +42,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
     private final SwerveLimiter m_limiter;
 
     // CACHES
-    private final ObjectCache<ModelR3> m_stateCache;
+    private final ObjectCache<ModelSE2> m_stateCache;
 
     // LOGGERS
-    private final ModelR3Logger m_log_state;
+    private final ModelSE2Logger m_log_state;
     private final DoubleLogger m_log_turning;
     private final DoubleArrayLogger m_log_pose_array;
     private final EnumLogger m_log_skill;
@@ -66,7 +66,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
         m_limiter = limiter;
         m_stateCache = Cache.of(this::update);
         stop();
-        m_log_state = log.modelR3Logger(Level.COMP, "state");
+        m_log_state = log.modelSE2Logger(Level.COMP, "state");
         m_log_turning = log.doubleLogger(Level.TRACE, "Tur Deg");
         m_log_pose_array = log.doubleArrayLogger(Level.COMP, "pose array");
         m_log_skill = log.enumLogger(Level.TRACE, "skill level");
@@ -92,9 +92,9 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
         // Actuation is constant for the whole control period, which means
         // that to calculate robot-relative speed from field-relative speed,
         // we need to use the robot rotation *at the future time*.
-        ModelR3 currentState = getState();
+        ModelSE2 currentState = getState();
         // Note this may add a bit of noise.
-        ModelR3 nextState = currentState.evolve(TimedRobot100.LOOP_PERIOD_S);
+        ModelSE2 nextState = currentState.evolve(TimedRobot100.LOOP_PERIOD_S);
         Rotation2d nextTheta = nextState.rotation();
 
         ChassisSpeeds nextSpeed = SwerveKinodynamics.toInstantaneousChassisSpeeds(
@@ -160,7 +160,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
      * acceleration.
      */
     @Override
-    public ModelR3 getState() {
+    public ModelSE2 getState() {
         return m_stateCache.get();
     }
 
@@ -204,13 +204,13 @@ public class SwerveDriveSubsystem extends SubsystemBase implements VelocitySubsy
      * Compute the current state. This is a fairly heavyweight thing to do, so it
      * should be cached (thus refreshed once per cycle).
      */
-    private ModelR3 update() {
+    private ModelSE2 update() {
         double now = Takt.get();
         SwerveModulePositions positions = m_swerveLocal.positions();
         // now that the pose estimator uses the SideEffect thing, we don't need this.
         // m_odometryUpdater.update();
         // m_cameraUpdater.run();
-        ModelR3 swerveModel = m_estimate.apply(now);
+        ModelSE2 swerveModel = m_estimate.apply(now);
         if (DEBUG) {
             System.out.printf("update() positions %s estimated pose: %s\n", positions, swerveModel);
         }

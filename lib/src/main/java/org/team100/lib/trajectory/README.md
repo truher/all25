@@ -13,9 +13,7 @@ The process of constructing a trajectory has three stages:
 
 2. Construct a list of points along the spline, such that straight lines connecting the points ("secant lines") don't deviate too much from the true spline, and aren't too far apart from each other. (This uses recursive bisection.)  These points will be close together where the curvature is high, and far apart along straighter sections of the spline.  The list is created by `PathFactory`, producing `Path100`, which integrates along the list to find the distance.  See the `lib.trajectory.path` package.
 
-3. Construct a list of points interpolated along the secant lines, such that the points aren't too far apart.
-
-4. Using a list of kinodynamic constraints (see `lib.trajectory.timing`), assign a time for each point.  The resulting list of `TimedState`s is created by `TrajectoryFactory`, producing `Trajectory100`.
+3. Using a list of kinodynamic constraints (see `lib.trajectory.timing`), assign a time for each point.  The resulting list of `TimedState`s is created by `TrajectoryFactory`, producing `Trajectory100`.
 
 To use a trajectory, you `sample()` it, with time (in seconds) as the parameter.  The resulting `TimedState` is interpolated between from the list above.
 

@@ -6,7 +6,7 @@ import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 import org.team100.lib.subsystems.swerve.kinodynamics.limiter.SwerveLimiter;
 import org.team100.lib.util.NamedChooser;
@@ -71,7 +71,7 @@ public class DriveManually extends Command {
         m_heedRadiusM.accept(HEED_RADIUS_M);
         // make sure the limiter knows what we're doing
         m_limiter.updateSetpoint(m_drive.getVelocity());
-        ModelR3 p = m_drive.getState();
+        ModelSE2 p = m_drive.getState();
         for (DriverAdapter d : m_drivers.values()) {
             d.reset(p);
         }
@@ -87,7 +87,7 @@ public class DriveManually extends Command {
         if (!(manualMode.equals(currentManualMode))) {
             currentManualMode = manualMode;
             // there's state in there we'd like to forget
-            ModelR3 p = m_drive.getState();
+            ModelSE2 p = m_drive.getState();
             for (DriverAdapter d : m_drivers.values()) {
                 d.reset(p);
             }
@@ -95,7 +95,7 @@ public class DriveManually extends Command {
 
         // input in [-1,1] control units
         Velocity input = m_twistSupplier.get();
-        ModelR3 state = m_drive.getState();
+        ModelSE2 state = m_drive.getState();
         DriverAdapter d = m_drivers.getOrDefault(manualMode, m_defaultDriver);
         d.apply(state, input);
 

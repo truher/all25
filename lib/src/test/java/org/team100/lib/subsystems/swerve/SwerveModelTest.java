@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.Pose2dWithMotion;
 import org.team100.lib.geometry.VelocitySE2;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,20 +15,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-class ModelR3Test {
+class ModelSE2Test {
     private static final double DELTA = 0.001;
 
     @Test
     void testTransform() {
         Pose2d p = new Pose2d(new Translation2d(1, 1), new Rotation2d(1));
         VelocitySE2 t = new VelocitySE2(1, 1, 1);
-        ModelR3 s = new ModelR3(p, t);
+        ModelSE2 s = new ModelSE2(p, t);
         assertEquals(1, s.x().x(), DELTA);
     }
 
     @Test
     void testTimedState() {
-        ModelR3 s = ModelR3.fromTimedState(
+        ModelSE2 s = ModelSE2.fromTimedState(
                 new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
@@ -45,7 +45,7 @@ class ModelR3Test {
 
     @Test
     void testTimedState2() {
-        ModelR3 s = ModelR3.fromTimedState(
+        ModelSE2 s = ModelSE2.fromTimedState(
                 new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
@@ -62,7 +62,7 @@ class ModelR3Test {
 
     @Test
     void testTimedState3() {
-        ModelR3 s = ModelR3.fromTimedState(
+        ModelSE2 s = ModelSE2.fromTimedState(
                 new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
@@ -80,7 +80,7 @@ class ModelR3Test {
     /** +x motion, positive curvature => +y accel. */
     @Test
     void testTimedState4() {
-        ModelR3 s = ModelR3.fromTimedState(
+        ModelSE2 s = ModelSE2.fromTimedState(
                 new TimedState(
                         new Pose2dWithMotion(
                                 WaypointSE2.irrotational(
@@ -97,7 +97,7 @@ class ModelR3Test {
 
     @Test
     void testChassisSpeeds0() {
-        ModelR3 state = new ModelR3(
+        ModelSE2 state = new ModelSE2(
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kPi),
                 new VelocitySE2(1, 0, 0));
         ChassisSpeeds speeds = state.chassisSpeeds();
@@ -108,7 +108,7 @@ class ModelR3Test {
 
     @Test
     void testChassisSpeeds1() {
-        ModelR3 state = new ModelR3(
+        ModelSE2 state = new ModelSE2(
                 new Pose2d(new Translation2d(0, 0), Rotation2d.kCCW_Pi_2),
                 new VelocitySE2(1, 0, 1));
         ChassisSpeeds speeds = state.chassisSpeeds();

@@ -2,7 +2,7 @@ package org.team100.lib.subsystems.swerve.commands.manual;
 
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.hid.Velocity;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -13,9 +13,9 @@ public interface FieldRelativeDriver {
      * @param input control units [-1,1]
      * @return feasible field-relative velocity in m/s and rad/s
      */
-    VelocitySE2 apply(ModelR3 state, Velocity input);
+    VelocitySE2 apply(ModelSE2 state, Velocity input);
 
-    void reset(ModelR3 state);
+    void reset(ModelSE2 state);
 
     /**
      * Scales driver input to field-relative velocity.

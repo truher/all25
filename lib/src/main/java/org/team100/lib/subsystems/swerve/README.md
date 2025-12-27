@@ -14,4 +14,4 @@ The subsystem has two layers:
 
 * `SwerveLocal` is only aware of robot-relative control, and performs inverse kinematics
 to execute it in SE(2), using discretization.
-* `SwerveDriveSubsystem` is aware of field-relative continuous control in R3.
+* `SwerveDriveSubsystem` is aware of field-relative continuous control in SE(2).

@@ -4,7 +4,7 @@ import org.team100.lib.hid.Velocity;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.ChassisSpeedsLogger;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 import edu.wpi.first.math.MathUtil;
@@ -32,7 +32,7 @@ public class ManualChassisSpeeds implements ChassisSpeedDriver {
      * feasible) speeds.
      */
     @Override
-    public ChassisSpeeds apply(ModelR3 state, Velocity input) {
+    public ChassisSpeeds apply(ModelSE2 state, Velocity input) {
         // clip the input to the unit circle
         final Velocity clipped = input.clip(1.0);
         // scale to max in both translation and rotation
@@ -63,7 +63,7 @@ public class ManualChassisSpeeds implements ChassisSpeedDriver {
                 maxRot * MathUtil.clamp(twist.theta(), -1, 1));
     }
 
-    public void reset(ModelR3 p) {
+    public void reset(ModelSE2 p) {
         //
     }
 }

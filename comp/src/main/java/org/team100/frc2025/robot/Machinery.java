@@ -162,7 +162,7 @@ public class Machinery {
         // LED INDICATOR
         //
         m_leds = new LEDIndicator(
-                m_localizer,
+                visionUpdater,
                 m_manipulator,
                 m_climberIntake);
         m_beeper = new Beeper(m_mech, m_manipulator, m_drive);

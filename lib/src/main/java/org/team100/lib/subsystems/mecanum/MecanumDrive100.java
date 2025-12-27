@@ -7,10 +7,10 @@ import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
 import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.sensor.gyro.Gyro;
 import org.team100.lib.servo.OutboardLinearVelocityServo;
-import org.team100.lib.state.ModelR3;
+import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.mecanum.kinematics.MecanumKinematics100;
 import org.team100.lib.subsystems.mecanum.kinematics.MecanumKinematics100.Slip;
-import org.team100.lib.subsystems.r3.VelocitySubsystemR3;
+import org.team100.lib.subsystems.se2.VelocitySubsystemSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Mecanum drive with optional gyro. */
-public class MecanumDrive100 extends SubsystemBase implements VelocitySubsystemR3 {
+public class MecanumDrive100 extends SubsystemBase implements VelocitySubsystemSE2 {
 
     private final DoubleArrayLogger m_log_field_robot;
     private final VelocitySE2Logger m_log_input;
@@ -81,9 +81,9 @@ public class MecanumDrive100 extends SubsystemBase implements VelocitySubsystemR
     }
 
     @Override
-    public ModelR3 getState() {
+    public ModelSE2 getState() {
         // assume the velocity is exactly what was requested.
-        return new ModelR3(m_pose, m_input);
+        return new ModelSE2(m_pose, m_input);
     }
 
     /**
